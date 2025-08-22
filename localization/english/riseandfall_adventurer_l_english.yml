@@ -1,17 +1,3 @@
 ﻿l_english:
  # Title names
- riseandfall_adventurer_title_name: "[ROOT.GetName]'s Band"
- 
- # Debug decisions
-
- # Developer notes shown in-game if accidentally used as loc keys
- riseandfall.placeholder_note: "(riseandfall) Placeholder text — replace with proper loc when finalizing."
-
- # Event localization
- riseandfall.100.t: "A Chance for Adventure"
- riseandfall.100.d: "Some of your children may take to the road as adventurers."
- riseandfall.100.a: "Very well."
-
- riseandfall.200.t: "Children Scattered"
- riseandfall.200.d: "With the ruler's death, some children may decide to seek their fortunes elsewhere."
- riseandfall.200.a: "I understand."
+ riseandfall_adventurer_title_name: "[adventurer_child.GetNamePossessive] Legitimists Army"

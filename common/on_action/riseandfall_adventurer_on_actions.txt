@@ -5,6 +5,12 @@
     }
 }
 
+on_death = {
+    on_actions = {
+        riseandfall_ruler_death_child_camps
+    }
+}
+
 riseandfall_yearly_adventurer = {
     effect = {
         every_independent_ruler = {
@@ -13,8 +19,10 @@ riseandfall_yearly_adventurer = {
     }
 }
 
-on_death = {
+riseandfall_ruler_death_child_camps = {
     effect = {
-        riseandfall_ruler_death_child_camps_se = yes
+        every_independent_ruler = {
+            riseandfall_ruler_death_child_camps_se = yes
+        }
     }
 }
