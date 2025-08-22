@@ -21,13 +21,13 @@ riseandfall_turn_into_adventurer_se = {
             create_adventurer_title = {
                 name = riseandfall_adventurer_title_name
                 holder = scope:adventurer_child
-                article = 
                 save_scope_as = created_adventurer_title
             }
             # Set camp law on the created adventurer's camp
             scope:adventurer_child = {
                 add_realm_law = camp_purpose_legitimists
                 add_gold = 1000 # Give some gold to start with
+                add_character_modifier = { modifier = riseandfall_adventurer_gold_mod }
             }
         }
         1 = {
@@ -54,17 +54,28 @@ riseandfall_ruler_death_child_camps_se = {
                     create_adventurer_title = {
                         name = riseandfall_adventurer_title_name
                         holder = scope:adventurer_child
-                        article = DEFAULT_TITLE_NAME_ARTICLE
                         save_scope_as = created_adventurer_title
                     }
 
                     # Set camp law on the created adventurer's camp
                     scope:adventurer_child = {
                         add_realm_law = camp_purpose_legitimists
+                        add_character_modifier = { modifier = riseandfall_adventurer_gold_mod }
                     }
                 }
                 1 = { }
             }
         }
+    }
+}
+
+# Removes the adventurer gold modifier if the character is no longer a landless adventurer
+riseandfall_remove_adventurer_gold_mod_if_not_landless_se = {
+    # expects character scope
+    if = {
+        limit = {
+            NOT = { has_government = landless_adventurer_government }
+        }
+        remove_character_modifier = riseandfall_adventurer_gold_mod
     }
 }

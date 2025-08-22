@@ -1,7 +1,8 @@
 ﻿yearly_global_pulse = {
     on_actions = {
         riseandfall_yearly_adventurer
-        riseandfall_yearly_adventurer_check
+    riseandfall_yearly_adventurer_check
+    riseandfall_yearly_remove_adventurer_gold_mod
     }
 }
 
@@ -15,6 +16,16 @@ riseandfall_yearly_adventurer = {
     effect = {
         every_independent_ruler = {
             riseandfall_check_dynasty_for_adventurers_se = yes
+        }
+    }
+}
+
+# Find every character with the adventurer gold modifier and run the removal check
+riseandfall_yearly_remove_adventurer_gold_mod = {
+    effect = {
+        every_character_with_royal_court = {
+            limit = { has_character_modifier = riseandfall_adventurer_gold_mod }
+            riseandfall_remove_adventurer_gold_mod_if_not_landless_se = yes
         }
     }
 }
