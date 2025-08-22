@@ -16,7 +16,7 @@
 
 riseandfall_turn_into_adventurer_se = {
     random_list = {
-        99 = {  # 5% chance to become adventurer
+        5 = {  # 5% chance to become adventurer
             save_scope_as = adventurer_child
             create_adventurer_title = {
                 name = riseandfall_adventurer_title_name
@@ -30,41 +30,8 @@ riseandfall_turn_into_adventurer_se = {
                 add_character_modifier = { modifier = riseandfall_adventurer_gold_mod }
             }
         }
-        1 = {
+        95 = {
             # Nothing happens in this branch
-        }
-    }
-}
-
-riseandfall_ruler_death_child_camps_se = {
-    # Expecting character scope (the dead ruler). Iterate their dynasty members.
-    dynasty = {
-        every_dynasty_member = {
-            limit = {
-                is_claimant = yes
-                is_alive = yes
-                NOT = { has_government = landless_adventurer_government }
-                any_claim = { tier >= tier_kingdom }
-                age >= 16
-                is_landed = no
-            }
-            random_list = {
-                99 = {
-                    save_scope_as = adventurer_child
-                    create_adventurer_title = {
-                        name = riseandfall_adventurer_title_name
-                        holder = scope:adventurer_child
-                        save_scope_as = created_adventurer_title
-                    }
-
-                    # Set camp law on the created adventurer's camp
-                    scope:adventurer_child = {
-                        add_realm_law = camp_purpose_legitimists
-                        add_character_modifier = { modifier = riseandfall_adventurer_gold_mod }
-                    }
-                }
-                1 = { }
-            }
         }
     }
 }

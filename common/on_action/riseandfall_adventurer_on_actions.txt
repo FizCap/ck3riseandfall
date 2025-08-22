@@ -6,12 +6,6 @@
     }
 }
 
-on_death = {
-    on_actions = {
-        riseandfall_ruler_death_child_camps
-    }
-}
-
 riseandfall_yearly_adventurer = {
     effect = {
         every_independent_ruler = {
@@ -26,14 +20,6 @@ riseandfall_yearly_remove_adventurer_gold_mod = {
         every_character_with_royal_court = {
             limit = { has_character_modifier = riseandfall_adventurer_gold_mod }
             riseandfall_remove_adventurer_gold_mod_if_not_landless_se = yes
-        }
-    }
-}
-
-riseandfall_ruler_death_child_camps = {
-    effect = {
-        every_independent_ruler = {
-            riseandfall_ruler_death_child_camps_se = yes
         }
     }
 }
