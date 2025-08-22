@@ -6,3 +6,15 @@ riseandfall_adventurer_gold_mod = {
     # Icon displayed for this modifier (uses game's gfx file name). Available in game gfx/interface/icons/message_feed/
     icon = intrigue_positive
 }
+
+# Medium power adventurer: stronger income
+riseandfall_adventurer_power_medium = {
+    monthly_income = 50
+    icon = intrigue_positive
+}
+
+# Large power adventurer: strongest income for empire-level claims
+riseandfall_adventurer_power_large = {
+    monthly_income = 100
+    icon = intrigue_positive
+}

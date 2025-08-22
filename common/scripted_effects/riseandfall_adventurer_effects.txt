@@ -26,8 +26,22 @@ riseandfall_turn_into_adventurer_se = {
             # Set camp law on the created adventurer's camp
             scope:adventurer_child = {
                 add_realm_law = camp_purpose_legitimists
-                add_gold = 1000 # Give some gold to start with
-                add_character_modifier = { modifier = riseandfall_adventurer_gold_mod }
+                # Scale starting gold & income modifier based on the tier of the claim the new adventurer holds
+                # If they have an empire-level claim -> large, kingdom-level -> medium, otherwise small
+                if = {
+                    limit = { any_claim = { tier >= tier_empire } }
+                    add_gold = 8000
+                    add_character_modifier = { modifier = riseandfall_adventurer_power_large }
+                }
+                else_if = {
+                    limit = { any_claim = { tier >= tier_kingdom } }
+                    add_gold = 4000
+                    add_character_modifier = { modifier = riseandfall_adventurer_power_medium }
+                }
+                else = {
+                    add_gold = 1000 # baseline for lower-tier claims
+                    add_character_modifier = { modifier = riseandfall_adventurer_gold_mod }
+                }
             }
         }
         95 = {
@@ -43,6 +57,8 @@ riseandfall_remove_adventurer_gold_mod_if_not_landless_se = {
         limit = {
             NOT = { has_government = landless_adventurer_government }
         }
-        remove_character_modifier = riseandfall_adventurer_gold_mod
+    remove_character_modifier = riseandfall_adventurer_gold_mod
+    remove_character_modifier = riseandfall_adventurer_power_medium
+    remove_character_modifier = riseandfall_adventurer_power_large
     }
 }
