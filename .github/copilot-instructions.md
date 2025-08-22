@@ -29,7 +29,7 @@ Minimal engineering contract for script changes
 Best-practice checklist for edits
 - Use `riseandfall.` as your ID prefix when adding events/effects/modifiers.
 - Place permanent modifiers in `common/static_modifiers/`; put temporary or computed modifiers in `common/scripted_modifiers/`.
-- Register `on_actions` in `common/on_actions/` and call scripted effects with `effect = { your_effect = yes }`.
+- Register `on_actions` in `common/on_action/` and call scripted effects with `effect = { your_effect = yes }`.
 - Always add `l_english:` entries for any UI-facing keys.
 - Use `docs/` logs to validate valid tokens and scope support before saving changes.
 
@@ -163,7 +163,7 @@ Merged CK3-specific lessons & best practices
 - Save dynamic scopes with `save_scope_as = X` and reference them as `scope:X` when needed.
 
 4. Directory Structure & File Placement (CK3)
-- New `on_actions` live under `common/on_actions/`.
+- New `on_actions` live under `common/on_action/`.
 - New scripted effects go in `common/scripted_effects/` (use a repo prefix, e.g., `riseandfall_` or `rf_`).
 - New scripted triggers go in `common/scripted_triggers/` (prefix similarly).
 - Scripted modifiers belong in `common/scripted_modifiers/`.

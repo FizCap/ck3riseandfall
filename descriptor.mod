@@ -5,4 +5,5 @@ tags={
 	"Fixes"
 }
 name="Rise and Fall"
+path="mod/riseandfall"
 supported_version="1.16.2.3"

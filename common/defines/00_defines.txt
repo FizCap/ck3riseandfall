@@ -1,0 +1,3 @@
+﻿NArmy = {
+	REGIMENT_DEFAULT_MAX_SIZE = 99					# Number of regiment chunks
+}

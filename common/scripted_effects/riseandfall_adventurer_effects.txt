@@ -1,0 +1,67 @@
+﻿riseandfall_check_dynasty_for_adventurers_se = {
+    # Expecting character scope (independent ruler). Check their dynasty members.
+    dynasty = {
+        every_dynasty_member = {
+            limit = {
+                is_landed = no
+                is_alive = yes
+                NOT = { has_government = landless_adventurer_government }
+                age >= 16
+                any_claim = { tier >= tier_kingdom }
+            }
+            riseandfall_turn_into_adventurer_se = yes
+        }
+    }
+}
+
+riseandfall_turn_into_adventurer_se = {
+    random_list = {
+        99 = {  # 5% chance to become adventurer
+            save_scope_as = adventurer_child
+            create_adventurer_title = {
+                name = adventurer_name_001
+                holder = scope:adventurer_child
+                save_scope_as = created_adventurer_title
+            }
+            # Set camp law on the created adventurer's camp
+            scope:adventurer_child = {
+                add_realm_law = camp_purpose_legitimists
+            }
+        }
+        1 = {
+            # Nothing happens in this branch
+        }
+    }
+}
+
+riseandfall_ruler_death_child_camps_se = {
+    # Expecting character scope (the dead ruler). Iterate their dynasty members.
+    dynasty = {
+        every_dynasty_member = {
+            limit = {
+                is_claimant = yes
+                is_alive = yes
+                NOT = { has_government = landless_adventurer_government }
+                any_claim = { tier >= tier_kingdom }
+                age >= 16
+                is_landed = no
+            }
+            random_list = {
+                99 = {
+                    save_scope_as = adventurer_child
+                    create_adventurer_title = {
+                        name = adventurer_name_001
+                        holder = scope:adventurer_child
+                        save_scope_as = created_adventurer_title
+                    }
+
+                    # Set camp law on the created adventurer's camp
+                    scope:adventurer_child = {
+                        add_realm_law = camp_purpose_legitimists
+                    }
+                }
+                1 = { }
+            }
+        }
+    }
+}

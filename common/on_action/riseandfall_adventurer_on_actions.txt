@@ -1,0 +1,20 @@
+﻿yearly_global_pulse = {
+    on_actions = {
+        riseandfall_yearly_adventurer
+        riseandfall_yearly_adventurer_check
+    }
+}
+
+riseandfall_yearly_adventurer = {
+    effect = {
+        every_independent_ruler = {
+            riseandfall_check_dynasty_for_adventurers_se = yes
+        }
+    }
+}
+
+on_death = {
+    effect = {
+        riseandfall_ruler_death_child_camps_se = yes
+    }
+}
