@@ -1,4 +1,4 @@
-riseandfall_adventurer_gold_mod = {
+﻿riseandfall_adventurer_gold_mod = {
     # Grants the adventurer +25 monthly gold income
     monthly_income = 25
     # Use localization for name/description. Localization key for name: riseandfall_adventurer_gold_mod_name

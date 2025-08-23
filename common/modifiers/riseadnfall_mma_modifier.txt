@@ -1,0 +1,4 @@
+﻿riseandfall_yearly_maa_limit_increase_effect = {
+    men_at_arms_limit = 1000
+    icon = intrigue_positive
+}

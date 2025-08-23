@@ -2,6 +2,9 @@
  # Title names
  riseandfall_adventurer_title_name: "[adventurer_child.GetNamePossessive] Legitimists Army"
 
+ # Army names
+ riseandfall_adventurer_host_name: "[adventurer_child.GetFirstNamePossessiveNoTooltip] Host"
+
 	# Modifier names and descriptions
  riseandfall_adventurer_gold_mod: "Adventurer Wealth"
  riseandfall_adventurer_gold_mod_desc: "+25 monthly gold income for this adventurer"

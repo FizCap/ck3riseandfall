@@ -1,0 +1,3 @@
+﻿riseandfall_yearly_maa_limit_increase_effect = {
+    add_character_modifier = riseandfall_yearly_maa_limit_increase_effect
+}

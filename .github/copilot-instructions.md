@@ -88,6 +88,41 @@ Files & docs to consult
 
 If something is unclear, provide the exact file paths or engine log lines and I will inspect `docs/` and the target files and suggest fixes.
 
+---
+
+Session learnings (concise)
+
+- Common error sources we hit:
+  - Invalid event target links when a saved scope doesn't point to the right target type (e.g., saving a barony but expecting a province).
+  - Illegal comparisons using `var:` in triggers — direct numeric compares with `var:` are not supported; use `has_variable` or compute the numeric value in a scope and compare with documented triggers that accept `script_value`.
+  - Missing or wrong spawn_army parameters — the `location` must be a valid province event target (for example `scope:character.capital_province`), and providing a `name` is helpful (engine expects it in some contexts).
+  - Iterators over null scopes (for example running `every_dynasty_member` when the ruler has no dynasty) — always guard with `has_dynasty = yes`.
+
+- How to avoid these errors (rules of thumb):
+  - When saving scopes, ensure the saved scope type matches the later usage. For spawn locations prefer `capital_province` (province target) over `capital_barony` when a province is required.
+  - Don't write trigger comparisons using `var:foo > 0`. Instead:
+    - compute the numeric value inside the same unbroken event effect and use `has_variable = foo` to check existence, or
+    - use documented `script_value`/`scripted` trigger patterns if comparing to a scripted value.
+  - Use `has_dynasty` and similar existence guards before iterating over dynasty or title-based structures.
+  - Use variable helpers correctly: `set_variable`, `change_variable` (with multiply/add), `clamp_variable`, `round_variable`, and `remove_variable` to keep the chain clean.
+  - When calling `spawn_army`, prefer `location = scope:some_character.capital_province` or a saved province event target; avoid relying on optional saved-scope targets unless you verify they exist with `exists` or `has_variable`.
+
+- How we fixed the errors in this session (concrete deltas):
+  1. Removed the unsupported `var:... > 0` comparison; instead the army size is calculated in the `adventurer_child` scope via `set_variable`, `change_variable multiply = 0.1`, clamped, rounded, and then used directly.
+  2. Added a `has_dynasty` guard before `dynasty = { every_dynasty_member = ... }` to avoid invalid dynasty IDs.
+  3. Replaced fragile saved-scope barony logic with a direct province reference for `spawn_army`:
+     - `location = scope:independent_ruler.capital_province` (provinces are valid spawn locations for `spawn_army`).
+  4. Added `name = riseandfall_adventurer_host_name` for the spawned army and a localization entry to prevent the engine complaining about missing or generic names.
+
+- Concrete debugging checklist (quick):
+  - Grep the error log for your mod prefix (e.g. `riseandfall`) and copy the full failing lines.
+  - Open the file/line referenced by the log and inspect the effect/trigger for mismatched scope types (character vs. province vs. title vs. barony).
+  - Consult `docs/effects.log`, `docs/triggers.log`, and `docs/event_scopes.log` for the supported targets and tokens.
+  - Use `set_variable` / `save_scope_as` only when the saved object type is compatible with future usage.
+  - Add defensive guards: `has_variable`, `has_dynasty`, `exists = capital_barony` (or appropriate token) before using a saved link.
+
+Keep this section short — add repo-specific follow-ups below it as needed.
+
 ```
 ```instructions
 # Copilot instructions for the Rise and Fall mod (merged & CK3-adapted)

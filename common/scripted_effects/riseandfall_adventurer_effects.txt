@@ -1,22 +1,25 @@
 ﻿riseandfall_check_dynasty_for_adventurers_se = {
     # Expecting character scope (independent ruler). Check their dynasty members.
-    dynasty = {
-        every_dynasty_member = {
-            limit = {
-                is_landed = no
-                is_alive = yes
-                NOT = { has_government = landless_adventurer_government }
-                age >= 16
-                any_claim = { tier >= tier_kingdom }
+    if = {
+        limit = { has_dynasty = yes }
+        dynasty = {
+            every_dynasty_member = {
+                limit = {
+                    is_landed = no
+                    is_alive = yes
+                    NOT = { has_government = landless_adventurer_government }
+                    age >= 16
+                    any_claim = { tier >= tier_kingdom }
+                }
+                riseandfall_turn_into_adventurer_se = yes
             }
-            riseandfall_turn_into_adventurer_se = yes
         }
     }
 }
 
 riseandfall_turn_into_adventurer_se = {
     random_list = {
-        5 = {  # 5% chance to become adventurer
+        99 = {  # chance weight 99
             save_scope_as = adventurer_child
             create_adventurer_title = {
                 name = riseandfall_adventurer_title_name
@@ -30,12 +33,12 @@ riseandfall_turn_into_adventurer_se = {
                 # If they have an empire-level claim -> large, kingdom-level -> medium, otherwise small
                 if = {
                     limit = { any_claim = { tier >= tier_empire } }
-                    add_gold = 8000
+                    add_gold = 3000
                     add_character_modifier = { modifier = riseandfall_adventurer_power_large }
                 }
                 else_if = {
                     limit = { any_claim = { tier >= tier_kingdom } }
-                    add_gold = 4000
+                    add_gold = 2000
                     add_character_modifier = { modifier = riseandfall_adventurer_power_medium }
                 }
                 else = {
@@ -43,22 +46,23 @@ riseandfall_turn_into_adventurer_se = {
                     add_character_modifier = { modifier = riseandfall_adventurer_gold_mod }
                 }
             }
+            scope:adventurer_child = {
+                # Calculate 10% of independent ruler's max strength
+                set_variable = { name = adventurer_army_size value = scope:independent_ruler.max_military_strength }
+                change_variable = { name = adventurer_army_size multiply = 0.8 }
+                round_variable = { name = adventurer_army_size nearest = 1 }
+
+                spawn_army = {
+                    name = riseandfall_adventurer_host_name
+                    levies = var:adventurer_army_size
+                    location = scope:independent_ruler.capital_province
+                }
+                remove_variable = adventurer_army_size
+            }
         }
-        95 = {
+        1 = {
             # Nothing happens in this branch
         }
     }
 }
 
-# Removes the adventurer gold modifier if the character is no longer a landless adventurer
-riseandfall_remove_adventurer_gold_mod_if_not_landless_se = {
-    # expects character scope
-    if = {
-        limit = {
-            NOT = { has_government = landless_adventurer_government }
-        }
-    remove_character_modifier = riseandfall_adventurer_gold_mod
-    remove_character_modifier = riseandfall_adventurer_power_medium
-    remove_character_modifier = riseandfall_adventurer_power_large
-    }
-}
