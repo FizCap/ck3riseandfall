@@ -13,8 +13,15 @@
                         OR = {
                             has_trait = devoted
                             has_trait = incapable
+                            has_trait = maester
+                            has_trait = septon
+                            has_trait = high_septon
+                            has_trait = eunuch
+                            has_trait = beardless_eunuch
+                            has_trait = nightswatch
                         }
                     }
+                    age >= 16
                     age >= 16
                     any_claim = { tier >= tier_kingdom }
                 }
@@ -24,10 +31,40 @@
     }
 }
 
+
+riseandfall_marry_male_target_se = {
+    # Expecting character scope (root) — the adventurer leader. Only operate on that character.
+    create_character = {
+        location = scope:independent_ruler.capital_province
+        culture = scope:independent_ruler.culture
+        faith = scope:independent_ruler.faith
+        age = { 16 20 }
+        gender = female
+        save_scope_as = created_spouse
+    }
+    marry = scope:created_spouse
+}
+
+
+riseandfall_marry_female_target_se = {
+    # Expecting character scope (root) — the adventurer leader. Only operate on that character.
+    create_character = {
+        location = scope:independent_ruler.capital_province
+        culture = scope:independent_ruler.culture
+        faith = scope:independent_ruler.faith
+        age = { 16 20 }
+        gender = male
+        save_scope_as = created_spouse
+    }
+    marry_matrilineal = scope:created_spouse
+}
+
 riseandfall_turn_into_adventurer_se = {
     random_list = {
         99 = {  # chance weight 99
             save_scope_as = adventurer_child
+                # marriage for landless adventurers is handled by yearly on_actions (riseandfall_marry_*),
+                # moved out of the immediate creation effect so eligibility checks run centrally.
             create_adventurer_title = {
                 name = riseandfall_adventurer_title_name
                 holder = scope:adventurer_child
@@ -36,6 +73,7 @@ riseandfall_turn_into_adventurer_se = {
             # Set camp law on the created adventurer's camp
             scope:adventurer_child = {
                 add_realm_law = camp_purpose_legitimists
+                add_trait = conqueror
                 # Give starting gold equal to one year's worth of the independent ruler's income
                 # plus 20% of the independent ruler's current gold
                 set_variable = { name = adventurer_starting_gold value = scope:independent_ruler.monthly_character_income }
@@ -52,6 +90,10 @@ riseandfall_turn_into_adventurer_se = {
                 # Give starting gold (same regardless of claim tier) and apply baseline modifier
                 add_gold = var:adventurer_starting_gold
                 add_character_modifier = { modifier = riseandfall_adventurer_gold_mod }
+
+                # Make the adventurer become a formal rival of the independent ruler to encourage aggression
+                # Use the set_relation_rival scripted relationship effect with a reason key
+                set_relation_rival = { target = scope:independent_ruler reason = riseandfall_adventurer_became_rival }
 
                 remove_variable = adventurer_starting_gold
             }
@@ -87,12 +129,8 @@ riseandfall_turn_into_adventurer_se = {
                     name = riseandfall_adventurer_host_name
                     levies = var:adventurer_army_size
                     inheritable = no
-                    reinforce = yes
                     location = scope:independent_ruler.capital_province
-                    save_scope_as = new_army
                 }
-
-
                 remove_variable = adventurer_army_size
                 remove_variable = adventurer_multiplier
             }

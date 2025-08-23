@@ -12,3 +12,6 @@
 # Modifier for yearly men-at-arms limit increase
 riseandfall_yearly_maa_limit_increase_effect: "Expanded Men-at-Arms Cap"
 riseandfall_yearly_maa_limit_increase_effect_desc: "Sets the realm's men-at-arms cap to 1000 while this modifier is active."
+
+# Reason key for becoming a rival
+riseandfall_adventurer_became_rival: "Became rival due to adventurer uprising"

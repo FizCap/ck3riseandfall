@@ -3,6 +3,8 @@
     riseandfall_yearly_adventurer
     riseandfall_yearly_remove_adventurer_gold_mod
     riseandfall_yearly_maa_limit_increase
+    riseandfall_marry_male_target_se
+    riseandfall_marry_female_target_se
     }
 }
 
@@ -35,6 +37,41 @@ riseandfall_yearly_remove_adventurer_gold_mod = {
                 NOT = { has_government = landless_adventurer_government }
             }
             riseandfall_remove_adventurer_gold_mod_if_not_landless_se = yes
+        }
+    }
+}
+
+# On_action that runs yearly to marry male landless adventurers (creates female spouse)
+riseandfall_marry_male_target_se = {
+    effect = {
+        every_ruler = {
+            limit = {
+                        is_male = yes
+        is_adult = yes
+        is_married = no
+        is_betrothed = no
+                has_realm_law = camp_purpose_legitimists
+            }
+                save_scope_as = independent_ruler
+                # Defer character-level checks to the scripted effect for performance.
+                riseandfall_marry_male_target_se = yes
+        }
+    }
+}
+
+# On_action that runs yearly to marry female landless adventurers (creates male spouse)
+riseandfall_marry_female_target_se = {
+    effect = {
+        every_ruler = {
+            limit = {
+                        is_female = yes
+        is_adult = yes
+        is_married = no
+        is_betrothed = no
+                has_realm_law = camp_purpose_legitimists
+            }
+                save_scope_as = independent_ruler
+                riseandfall_marry_female_target_se = yes
         }
     }
 }
