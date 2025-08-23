@@ -8,7 +8,7 @@
 	# Modifier names and descriptions
  riseandfall_adventurer_gold_mod: "Adventurer Wealth"
  riseandfall_adventurer_gold_mod_desc: "+25 monthly gold income for this adventurer"
- riseandfall_adventurer_power_medium: "Adventurer Fortune"
- riseandfall_adventurer_power_medium_desc: "+50 monthly gold income for this adventurer (medium claim)"
- riseandfall_adventurer_power_large: "Adventurer Treasury"
- riseandfall_adventurer_power_large_desc: "+100 monthly gold income for this adventurer (large claim)"
+
+# Modifier for yearly men-at-arms limit increase
+riseandfall_yearly_maa_limit_increase_effect: "Expanded Men-at-Arms Cap"
+riseandfall_yearly_maa_limit_increase_effect_desc: "Sets the realm's men-at-arms cap to 1000 while this modifier is active."

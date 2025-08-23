@@ -31,11 +31,8 @@ riseandfall_yearly_remove_adventurer_gold_mod = {
     effect = {
         every_ruler = {
             limit = {
-                OR = {
-                    has_character_modifier = riseandfall_adventurer_gold_mod
-                    has_character_modifier = riseandfall_adventurer_power_medium
-                    has_character_modifier = riseandfall_adventurer_power_large
-                }
+                has_character_modifier = riseandfall_adventurer_gold_mod
+                NOT = { has_government = landless_adventurer_government }
             }
             riseandfall_remove_adventurer_gold_mod_if_not_landless_se = yes
         }
