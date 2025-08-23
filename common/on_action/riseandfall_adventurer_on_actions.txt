@@ -46,15 +46,15 @@ riseandfall_marry_male_target_se = {
     effect = {
         every_ruler = {
             limit = {
-                        is_male = yes
-        is_adult = yes
-        is_married = no
-        is_betrothed = no
+                is_male = yes
+                is_adult = yes
+                is_married = no
+                is_betrothed = no
                 has_realm_law = camp_purpose_legitimists
             }
-                save_scope_as = independent_ruler
-                # Defer character-level checks to the scripted effect for performance.
-                riseandfall_marry_male_target_se = yes
+            save_scope_as = independent_ruler
+            # Defer character-level checks to the scripted effect for performance.
+            riseandfall_marry_male_target_se = yes
         }
     }
 }
@@ -64,14 +64,14 @@ riseandfall_marry_female_target_se = {
     effect = {
         every_ruler = {
             limit = {
-                        is_female = yes
-        is_adult = yes
-        is_married = no
-        is_betrothed = no
+                is_female = yes
+                is_adult = yes
+                is_married = no
+                is_betrothed = no
                 has_realm_law = camp_purpose_legitimists
             }
-                save_scope_as = independent_ruler
-                riseandfall_marry_female_target_se = yes
+            save_scope_as = independent_ruler
+            riseandfall_marry_female_target_se = yes
         }
     }
 }
