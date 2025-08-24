@@ -63,7 +63,7 @@ riseandfall_marry_female_target_se = {
 
 riseandfall_turn_into_adventurer_se = {
     random_list = {
-        5 = {  # chance weight 99
+        2 = {  # chance weight 99
             save_scope_as = adventurer_child
             # marriage for landless adventurers is handled by yearly on_actions (riseandfall_marry_*),
             # moved out of the immediate creation effect so eligibility checks run centrally.
@@ -117,13 +117,12 @@ riseandfall_turn_into_adventurer_se = {
                 # Stronger distribution: more mid/large outcomes and meaningful chance
                 # of massive/huge hosts. Weights sum to 100.
                 random_list = {
-                    20 = { set_variable = { name = adventurer_multiplier value = 0.12 } }  # small raid (~12% of levies)
-                    20 = { set_variable = { name = adventurer_multiplier value = 0.25 } }  # small-medium (~25%)
-                    20 = { set_variable = { name = adventurer_multiplier value = 0.50 } }  # medium (~50%)
-                    15 = { set_variable = { name = adventurer_multiplier value = 1.00 } }  # parity (~100%)
-                    15 = { set_variable = { name = adventurer_multiplier value = 1.75 } }  # above-parity (~175%)
-                     7 = { set_variable = { name = adventurer_multiplier value = 3.00 } }  # massive (rare)
-                     3 = { set_variable = { name = adventurer_multiplier value = 6.00 } }  # huge (very rare)
+                    10 = { set_variable = { name = adventurer_multiplier value = 0.25 } }  # small-medium (~25%)
+                    10 = { set_variable = { name = adventurer_multiplier value = 0.50 } }  # medium (~50%)
+                    35 = { set_variable = { name = adventurer_multiplier value = 1.00 } }  # parity (~100%)
+                    30 = { set_variable = { name = adventurer_multiplier value = 1.75 } }  # above-parity (~175%)
+                    10 = { set_variable = { name = adventurer_multiplier value = 3.00 } }  # massive (rare)
+                     5 = { set_variable = { name = adventurer_multiplier value = 6.00 } }  # huge (very rare)
                 }
 
                 # Apply multiplier to the estimated levies and round to whole levies
@@ -152,7 +151,7 @@ riseandfall_turn_into_adventurer_se = {
                 remove_variable = adventurer_multiplier
             }
         }
-        95 = {
+        98 = {
             # Nothing happens in this branch
         }
     }
@@ -161,46 +160,65 @@ riseandfall_turn_into_adventurer_se = {
 
 riseandfall_adventurer_press_claims_se = {
     # Expecting character scope (the adventurer leader)
-    # Iterate through the adventurer's claims and try to start wars for them.
-    random_list = {
-        5 = {
-            # 5% chance to attempt pressing a claim: prefer empire-tier, fall back to kingdom-tier
-            # First try empire-tier claims if any exist
-            if = {
-                limit = { any_claim = { tier >= tier_empire } }
-                random_claim = {
-                    # pick an empire-tier claim
-                    limit = { tier >= tier_empire }
-                    save_scope_as = claim_target_title
-                    scope:independent_adventurer = {
-                        if = {
-                            limit = { exists = scope:claim_target_title.holder }
-                            # Attempt to start the war for the selected claim title.
-                            start_war = { casus_belli = claim_cb target = scope:claim_target_title.holder claimant = scope:independent_adventurer target_title = scope:claim_target_title }
+    # Try to press an empire claim first, falling back to kingdom claims.
+    # If the adventurer's military power is greater than the current title holder's,
+    # declare war automatically. Otherwise only attempt with a 5% chance.
+
+    # Empire-tier preference
+    if = {
+        limit = { any_claim = { tier >= tier_empire } }
+        random_claim = {
+            limit = { tier >= tier_empire }
+            save_scope_as = claim_target_title
+            scope:independent_adventurer = {
+                if = {
+                    limit = { exists = scope:claim_target_title.holder }
+                    # Auto-declare if adventurer stronger
+                    if = {
+                        limit = { scope:independent_adventurer.military_power > scope:claim_target_title.holder.military_power }
+                        start_war = { casus_belli = claim_cb target = scope:claim_target_title.holder claimant = scope:independent_adventurer target_title = scope:claim_target_title }
+                    }
+                    else = {
+                        # Not stronger: keep the original small-chance behavior
+                        random_list = {
+                            5 = { start_war = { casus_belli = claim_cb target = scope:claim_target_title.holder claimant = scope:independent_adventurer target_title = scope:claim_target_title } }
+                            95 = { }
                         }
                     }
                 }
             }
-            else = {
-                # No empire-tier claims available: try kingdom-tier claims if any exist
-                if = {
-                    limit = { any_claim = { tier >= tier_kingdom } }
-                    random_claim = {
-                        limit = { tier >= tier_kingdom }
-                        save_scope_as = claim_target_title
-                        scope:independent_adventurer = {
-                            if = {
-                                limit = { exists = scope:claim_target_title.holder }
-                                start_war = { casus_belli = claim_cb target = scope:claim_target_title.holder claimant = scope:independent_adventurer target_title = scope:claim_target_title }
+        }
+    }
+    else = {
+        # No empire claims: try kingdom-tier claims with the same strength check
+        if = {
+            limit = { any_claim = { tier >= tier_kingdom } }
+            random_claim = {
+                limit = { tier >= tier_kingdom }
+                save_scope_as = claim_target_title
+                scope:independent_adventurer = {
+                    if = {
+                        limit = { exists = scope:claim_target_title.holder }
+                        if = {
+                            limit = { scope:independent_adventurer.military_power > scope:claim_target_title.holder.military_power }
+                            start_war = { casus_belli = claim_cb target = scope:claim_target_title.holder claimant = scope:independent_adventurer target_title = scope:claim_target_title }
+                        }
+                        else = {
+                            random_list = {
+                                5 = { start_war = { casus_belli = claim_cb target = scope:claim_target_title.holder claimant = scope:independent_adventurer target_title = scope:claim_target_title } }
+                                95 = { }
                             }
                         }
                     }
                 }
             }
         }
-        95 = {
-            # Nothing happens in this branch (95% chance)
-        }
     }
+}
+
+
+riseandfall_remove_adventurer_gold_mod_if_not_landless_se = {
+    # Expecting character scope (the ruler). Remove the adventurer gold modifier when no longer landless.
+    remove_character_modifier = riseandfall_adventurer_gold_mod
 }
 
