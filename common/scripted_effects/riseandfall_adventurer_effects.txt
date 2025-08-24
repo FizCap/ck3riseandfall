@@ -62,40 +62,7 @@ riseandfall_marry_female_target_se = {
         save_scope_as = created_spouse
     }
     marry_matrilineal = scope:created_spouse
-}
 
-
-riseandfall_turn_into_adventurer_se = {
-    # Do not create an adventurer camp if the candidate is cowardly
-    if = {
-        limit = { NOT = { has_trait = cowardly } }
-
-        # Base chance: increased to 25% for testing
-        random_list = {
-            25 = { riseandfall_do_create_adventurer_se = yes }
-            75 = { }
-        }
-
-        # Trait bonuses applied as additional independent small chances
-        if = {
-            limit = { has_trait = ambitious }
-            # ambitious: +5% chance
-            random_list = { 7 = { riseandfall_do_create_adventurer_se = yes } 95 = { } }
-        }
-
-        if = {
-            limit = { has_trait = brave }
-            # brave: +2% chance
-            random_list = { 4 = { riseandfall_do_create_adventurer_se = yes } 98 = { } }
-        }
-
-        if = {
-            limit = { has_trait = dragon_rider }
-            # dragon_rider: +7% chance
-            random_list = { 7 = { riseandfall_do_create_adventurer_se = yes } 93 = { } }
-        }
-    }
-}
 
 
 ### Dedicated creation effect (guarded to avoid double-creation if multiple chances hit)
