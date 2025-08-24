@@ -10,6 +10,8 @@
                     NOT = { has_government = landless_adventurer_government }
                     # Exclude anyone who is an heir of the independent ruler (primary/designated/player)
                     NOT = { is_heir_of = scope:independent_ruler }
+                            # Exclude dynasty members who are allied, married to, or highly positive toward the ruler
+                            NOT = { OR = { is_allied_to = scope:independent_ruler is_spouse_of = scope:independent_ruler opinion = { target = scope:independent_ruler value >= 75 } } }
                     # Exclude religious/scholarly characters who should not become adventurers
                     NOT = {
                         OR = {
@@ -36,14 +38,16 @@
                 if = { limit = { has_trait = ambitious } change_variable = { name = rf_adventurer_trait_chance add = 5 } }
                 if = { limit = { has_trait = brave } change_variable = { name = rf_adventurer_trait_chance add = 2 } }
 
-                # Final chance = base 2 + trait bonuses, clamp to 100
-                set_variable = { name = rf_adventurer_final_chance value = 2 }
+                # Final chance = base 2 + trait bonuses, clamp to [0,100]
+                set_variable = { name = rf_adventurer_final_chance value = 1 }
                 change_variable = { name = rf_adventurer_final_chance add = var:rf_adventurer_trait_chance }
-                if = { limit = { var:rf_adventurer_final_chance > 100 } set_variable = { name = rf_adventurer_final_chance value = 100 } }
+                clamp_variable = { name = rf_adventurer_final_chance min = 0 max = 100 }
 
                 random = {
-                    chance = var:rf_adventurer_trait_chance
-                    riseandfall_do_create_adventurer_se = yes
+                    chance = var:rf_adventurer_final_chance
+                    hidden_effect = {
+                        riseandfall_do_create_adventurer_se = yes
+                    }
                 }
                 remove_variable = rf_adventurer_trait_chance
                 remove_variable = rf_adventurer_final_chance
@@ -121,7 +125,30 @@ riseandfall_do_create_adventurer_se = {
         }
 
         scope:adventurer_child = {
-            set_variable = { name = adventurer_base_levies value = scope:independent_ruler.military_power }
+            # Prefer scaling to the holder of a claim this adventurer has (empire first, then kingdom).
+            # Save a claim target title for strength scaling only; fallback to independent_ruler if none.
+            if = {
+                limit = { any_claim = { tier >= tier_empire } }
+                random_claim = {
+                    limit = { tier >= tier_empire }
+                    save_scope_as = claim_target_title
+                }
+            }
+            else_if = {
+                limit = { any_claim = { tier >= tier_kingdom } }
+                random_claim = {
+                    limit = { tier >= tier_kingdom }
+                    save_scope_as = claim_target_title
+                }
+            }
+
+            if = {
+                limit = { exists = scope:claim_target_title.holder }
+                set_variable = { name = adventurer_base_levies value = scope:claim_target_title.holder.military_power }
+            }
+            else = {
+                set_variable = { name = adventurer_base_levies value = scope:independent_ruler.military_power }
+            }
             change_variable = { name = adventurer_base_levies multiply = 0.10 }
 
             set_variable = { name = adventurer_multiplier value = scope:adventurer_child.martial }
@@ -156,7 +183,7 @@ riseandfall_do_create_adventurer_se = {
 
             set_variable = { name = rf_while_counter value = 0 }
             set_variable = { name = rf_while_loop_target value = scope:adventurer_child.diplomacy }
-            if = { limit = { var:rf_while_loop_target > 20 } set_variable = { name = rf_while_loop_target value = 20 } }
+            clamp_variable = { name = rf_while_loop_target min = 0 max = 20 }
             riseandfall_run_create_knights_while_se = yes
             remove_variable = rf_while_counter
             remove_variable = rf_while_loop_target
@@ -184,7 +211,7 @@ riseandfall_adventurer_press_claims_se = {
                     if = {
                         limit = { scope:independent_adventurer.military_power > scope:claim_target_title.holder.military_power }
                         if = {
-                            limit = { NOT = { has_truce = scope:claim_target_title.holder } }
+                            limit = { NOT = { OR = { has_truce = scope:claim_target_title.holder is_allied_to = scope:claim_target_title.holder } } }
                                 if = { limit = { NOT = { has_character_flag = riseandfall_newadventurer_war_block } } start_war = { casus_belli = claim_cb target = scope:claim_target_title.holder claimant = scope:independent_adventurer target_title = scope:claim_target_title } }
                         }
                     }
@@ -193,7 +220,7 @@ riseandfall_adventurer_press_claims_se = {
                         random_list = {
                             5 = {
                                 if = {
-                                    limit = { NOT = { has_truce = scope:claim_target_title.holder } }
+                                    limit = { NOT = { OR = { has_truce = scope:claim_target_title.holder is_allied_to = scope:claim_target_title.holder } } }
                                     start_war = { casus_belli = claim_cb target = scope:claim_target_title.holder claimant = scope:independent_adventurer target_title = scope:claim_target_title }
                                 }
                             }
@@ -217,7 +244,7 @@ riseandfall_adventurer_press_claims_se = {
                         if = {
                             limit = { scope:independent_adventurer.military_power > scope:claim_target_title.holder.military_power }
                             if = {
-                                limit = { NOT = { has_truce = scope:claim_target_title.holder } }
+                                limit = { NOT = { OR = { has_truce = scope:claim_target_title.holder is_allied_to = scope:claim_target_title.holder } } }
                                 start_war = { casus_belli = claim_cb target = scope:claim_target_title.holder claimant = scope:independent_adventurer target_title = scope:claim_target_title }
                             }
                         }
@@ -225,7 +252,7 @@ riseandfall_adventurer_press_claims_se = {
                             random_list = {
                                 5 = {
                                     if = {
-                                        limit = { NOT = { has_truce = scope:claim_target_title.holder } }
+                                        limit = { NOT = { OR = { has_truce = scope:claim_target_title.holder is_allied_to = scope:claim_target_title.holder } } }
                                         start_war = { casus_belli = claim_cb target = scope:claim_target_title.holder claimant = scope:independent_adventurer target_title = scope:claim_target_title }
                                     }
                                 }
