@@ -21,12 +21,16 @@
                             has_trait = eunuch
                             has_trait = beardless_eunuch
                             has_trait = nightswatch
+                            has_trait = cowardly
                         }
                     }
+                    # Cowardly check moved to riseandfall_turn_into_adventurer_se with other trait checks
                     age >= 16
                     any_claim = { tier >= tier_kingdom }
                 }
-                riseandfall_turn_into_adventurer_se = yes
+
+                # Roll per individual dynasty member for adventurer creation
+                random_list = { 2 = { riseandfall_do_create_adventurer_se = yes } 98 = { } }
             }
         }
     }
@@ -62,121 +66,117 @@ riseandfall_marry_female_target_se = {
 
 
 riseandfall_turn_into_adventurer_se = {
-    random_list = {
-        2 = {  # chance weight 99
-            save_scope_as = adventurer_child
-            # marriage for landless adventurers is handled by yearly on_actions (riseandfall_marry_*),
-            # moved out of the immediate creation effect so eligibility checks run centrally.
+    # Do not create an adventurer camp if the candidate is cowardly
+    if = {
+        limit = { NOT = { has_trait = cowardly } }
 
-            create_adventurer_title = {
-                name = riseandfall_adventurer_title_name
-                holder = scope:adventurer_child
-                save_scope_as = created_adventurer_title
-            }
-
-            # Set camp law on the created adventurer's camp
-            scope:adventurer_child = {
-                add_realm_law = camp_purpose_legitimists
-                # Starting gold is based on the adventurer's stewardship stat and the independent ruler's income.
-                # Design: stewardship 10 => 1.0x of one year's ruler income. Every +1 stewardship => +10%.
-                # multiplier = stewardship * 0.1 (clamped to reasonable bounds)
-                # Compute base yearly income from the independent ruler and clamp to >= 0
-                set_variable = { name = adventurer_base_year_income value = scope:independent_ruler.monthly_character_income }
-                change_variable = { name = adventurer_base_year_income multiply = 12 }
-
-                # Stewardship -> multiplier (10 => 1.0). Clamp multiplier to sensible bounds.
-                set_variable = { name = adventurer_start_gold_mult value = scope:adventurer_child.stewardship }
-                change_variable = { name = adventurer_start_gold_mult multiply = 0.1 }
-
-                # Compute starting gold and ensure it's non-negative
-                set_variable = { name = adventurer_starting_gold value = var:adventurer_base_year_income }
-                change_variable = { name = adventurer_starting_gold multiply = var:adventurer_start_gold_mult }
-                round_variable = { name = adventurer_starting_gold nearest = 1 }
-
-                # Give starting gold and apply baseline modifier (only if non-negative)
-                if = {
-                    limit = { var:adventurer_starting_gold >= 0 }
-                    add_gold = var:adventurer_starting_gold
-                }
-                add_character_modifier = { modifier = riseandfall_adventurer_gold_mod }
-                # mark this character as a freshly created adventurer for other systems to detect
-                add_character_flag = riseandfall_newadventurer
-
-                # Cleanup helper vars
-                remove_variable = adventurer_starting_gold
-                remove_variable = adventurer_base_year_income
-                remove_variable = adventurer_start_gold_mult
-            }
-
-            scope:adventurer_child = {
-                # Derive an estimated levies number from the ruler's military_power
-                # (approx conversion: military_power / 20 => levies). This keeps army sizes
-                # proportional to real levies instead of raw military_power units.
-                # Increase base conversion so adventurer hosts are significantly tougher.
-                # New conversion: military_power * 0.10 => estimated levies (stronger scaling).
-                set_variable = { name = adventurer_base_levies value = scope:independent_ruler.military_power }
-                change_variable = { name = adventurer_base_levies multiply = 0.10 }
-
-                # Scale the levies multiplier from the adventurer's martial skill.
-                # Design: martial 10 => 1.0 (average). Every +1 martial => +10% (0.1).
-                # That simplifies to: multiplier = martial * 0.1
-                set_variable = { name = adventurer_multiplier value = scope:adventurer_child.martial }
-                change_variable = { name = adventurer_multiplier multiply = 0.1 }
-
-                # Mild stochastic variation so not every high-martial character produces
-                # exactly the same multiplier (weights chosen to keep most outcomes near the
-                # martial-derived value, but allow down/up variance).
-                random_list = {
-                    15 = { change_variable = { name = adventurer_multiplier multiply = 0.75 } } # downward variance
-                    70 = { } # no change (most common)
-                    10 = { change_variable = { name = adventurer_multiplier multiply = 1.25 } } # upward variance
-                     5 = { change_variable = { name = adventurer_multiplier multiply = 1.75 } } # rare spike
-                }
-
-                # Clamp to sensible bounds so we don't generate absurd multipliers.
-                
-
-                # Apply multiplier to the estimated levies and round to whole levies
-                set_variable = { name = adventurer_army_size value = var:adventurer_base_levies }
-                change_variable = { name = adventurer_army_size multiply = var:adventurer_multiplier }
-                round_variable = { name = adventurer_army_size nearest = 1 }
-
-                # Safety clamp: allow much larger spawns but cap at 6x the estimated levies
-                # to prevent absurd extremes. Also raise minimum to 100 levies.
-                # Compute cap from the already-calculated base levies variable to avoid
-                # relying on scope:independent_ruler being present in every call.
-                set_variable = { name = adventurer_max_cap value = var:adventurer_base_levies }
-                change_variable = { name = adventurer_max_cap multiply = 6 }
-
-                # Cleanup helper vars
-                remove_variable = adventurer_base_levies
-                remove_variable = adventurer_max_cap
-
-                spawn_army = {
-                    name = riseandfall_adventurer_host_name
-                    levies = var:adventurer_army_size
-                    inheritable = no
-                    location = scope:independent_ruler.capital_province
-                }
-                remove_variable = adventurer_army_size
-                remove_variable = adventurer_multiplier
-                # Create starting knights based on the adventurer's diplomacy stat.
-                # Design: diplomacy 10 => 10 starting knights. Cap at 20 to avoid runaway spawns.
-                # Use a lightweight while-style loop implemented with variables and a recursive runner.
-                # Initialize loop counter and target
-                set_variable = { name = rf_while_counter value = 0 }
-                set_variable = { name = rf_while_loop_target value = scope:adventurer_child.diplomacy }
-                # Clamp to max 20
-                if = { limit = { var:rf_while_loop_target > 20 } set_variable = { name = rf_while_loop_target value = 20 } }
-                # Run the recursive runner which will call the single-knight creator N times
-                riseandfall_run_create_knights_while_se = yes
-                # Cleanup loop variables
-                remove_variable = rf_while_counter
-                remove_variable = rf_while_loop_target
-            }
+        # Base chance: increased to 25% for testing
+        random_list = {
+            25 = { riseandfall_do_create_adventurer_se = yes }
+            75 = { }
         }
-        98 = {
-            # Nothing happens in this branch
+
+        # Trait bonuses applied as additional independent small chances
+        if = {
+            limit = { has_trait = ambitious }
+            # ambitious: +5% chance
+            random_list = { 7 = { riseandfall_do_create_adventurer_se = yes } 95 = { } }
+        }
+
+        if = {
+            limit = { has_trait = brave }
+            # brave: +2% chance
+            random_list = { 4 = { riseandfall_do_create_adventurer_se = yes } 98 = { } }
+        }
+
+        if = {
+            limit = { has_trait = dragon_rider }
+            # dragon_rider: +7% chance
+            random_list = { 7 = { riseandfall_do_create_adventurer_se = yes } 93 = { } }
+        }
+    }
+}
+
+
+### Dedicated creation effect (guarded to avoid double-creation if multiple chances hit)
+riseandfall_do_create_adventurer_se = {
+    # Ensure we haven't already made this character into an adventurer (guard against multiple triggers)
+    if = {
+        limit = { NOT = { has_character_flag = riseandfall_newadventurer } }
+
+        save_scope_as = adventurer_child
+
+        create_adventurer_title = {
+            name = riseandfall_adventurer_title_name
+            holder = scope:adventurer_child
+            save_scope_as = created_adventurer_title
+        }
+
+        scope:adventurer_child = {
+            add_realm_law = camp_purpose_legitimists
+            set_variable = { name = adventurer_base_year_income value = scope:independent_ruler.monthly_character_income }
+            change_variable = { name = adventurer_base_year_income multiply = 60 }
+
+            set_variable = { name = adventurer_start_gold_mult value = scope:adventurer_child.stewardship }
+            change_variable = { name = adventurer_start_gold_mult multiply = 0.1 }
+
+            set_variable = { name = adventurer_starting_gold value = var:adventurer_base_year_income }
+            change_variable = { name = adventurer_starting_gold multiply = var:adventurer_start_gold_mult }
+            round_variable = { name = adventurer_starting_gold nearest = 1 }
+
+            if = {
+                limit = { var:adventurer_starting_gold >= 0 }
+                add_gold = var:adventurer_starting_gold
+            }
+            add_character_modifier = { modifier = riseandfall_adventurer_gold_mod }
+            add_character_flag = riseandfall_newadventurer
+            add_character_flag = { flag = riseandfall_newadventurer_war_block years = 10 }
+
+            remove_variable = adventurer_starting_gold
+            remove_variable = adventurer_base_year_income
+            remove_variable = adventurer_start_gold_mult
+        }
+
+        scope:adventurer_child = {
+            set_variable = { name = adventurer_base_levies value = scope:independent_ruler.military_power }
+            change_variable = { name = adventurer_base_levies multiply = 0.10 }
+
+            set_variable = { name = adventurer_multiplier value = scope:adventurer_child.martial }
+            change_variable = { name = adventurer_multiplier multiply = 0.1 }
+
+            random_list = {
+                15 = { change_variable = { name = adventurer_multiplier multiply = 0.75 } }
+                70 = { }
+                10 = { change_variable = { name = adventurer_multiplier multiply = 1.25 } }
+                5 = { change_variable = { name = adventurer_multiplier multiply = 1.75 } }
+            }
+
+            set_variable = { name = adventurer_army_size value = var:adventurer_base_levies }
+            change_variable = { name = adventurer_army_size multiply = var:adventurer_multiplier }
+            round_variable = { name = adventurer_army_size nearest = 1 }
+
+            set_variable = { name = adventurer_max_cap value = var:adventurer_base_levies }
+            change_variable = { name = adventurer_max_cap multiply = 6 }
+
+            remove_variable = adventurer_base_levies
+            remove_variable = adventurer_max_cap
+
+            spawn_army = {
+                name = riseandfall_adventurer_host_name
+                levies = var:adventurer_army_size
+                war_keep_on_attacker_victory = no
+                inheritable = no
+                location = scope:independent_ruler.capital_province
+            }
+            remove_variable = adventurer_army_size
+            remove_variable = adventurer_multiplier
+
+            set_variable = { name = rf_while_counter value = 0 }
+            set_variable = { name = rf_while_loop_target value = scope:adventurer_child.diplomacy }
+            if = { limit = { var:rf_while_loop_target > 20 } set_variable = { name = rf_while_loop_target value = 20 } }
+            riseandfall_run_create_knights_while_se = yes
+            remove_variable = rf_while_counter
+            remove_variable = rf_while_loop_target
         }
     }
 }
@@ -202,7 +202,7 @@ riseandfall_adventurer_press_claims_se = {
                         limit = { scope:independent_adventurer.military_power > scope:claim_target_title.holder.military_power }
                         if = {
                             limit = { NOT = { has_truce = scope:claim_target_title.holder } }
-                            start_war = { casus_belli = claim_cb target = scope:claim_target_title.holder claimant = scope:independent_adventurer target_title = scope:claim_target_title }
+                                if = { limit = { NOT = { has_character_flag = riseandfall_newadventurer_war_block } } start_war = { casus_belli = claim_cb target = scope:claim_target_title.holder claimant = scope:independent_adventurer target_title = scope:claim_target_title } }
                         }
                     }
                     else = {
@@ -219,7 +219,7 @@ riseandfall_adventurer_press_claims_se = {
                     }
                 }
             }
-        }
+                                        if = { limit = { NOT = { has_character_flag = riseandfall_newadventurer_war_block } } start_war = { casus_belli = claim_cb target = scope:claim_target_title.holder claimant = scope:independent_adventurer target_title = scope:claim_target_title } }
     }
     else = {
         # No empire claims: try kingdom-tier claims with the same strength check
@@ -227,7 +227,7 @@ riseandfall_adventurer_press_claims_se = {
             limit = { any_claim = { tier >= tier_kingdom } }
             random_claim = {
                 limit = { tier >= tier_kingdom }
-                save_scope_as = claim_target_title
+                                            if = { limit = { NOT = { has_character_flag = riseandfall_newadventurer_war_block } } start_war = { casus_belli = claim_cb target = scope:claim_target_title.holder claimant = scope:independent_adventurer target_title = scope:claim_target_title } }
                 scope:independent_adventurer = {
                     if = {
                         limit = { exists = scope:claim_target_title.holder }
@@ -254,6 +254,7 @@ riseandfall_adventurer_press_claims_se = {
             }
         }
     }
+}
 }
 
 

@@ -1,0 +1,43 @@
+### ai_men_at_arms_chance_landless_ruler
+# Chance the AI will prefer MaA to buildings when they are a landless ruler.
+# Scoped to: root (character)
+# Rise and Fall mod override file. If the realm law `camp_purpose_legitimist` is present
+# the value is forced to 1 and no other modifiers apply.
+
+ai_men_at_arms_chance_landless_ruler = {
+    value = {
+        value = 0.5
+        desc = "default value"
+
+        # If legitimist, always choose MaA (force to 1). Other modifiers explicitly exclude legitimist.
+        if = {
+            limit = { has_realm_law = camp_purpose_legitimists }
+            value = 1
+        }
+
+        if = {
+            limit = { NOT = { has_realm_law = camp_purpose_legitimists } OR = { has_realm_law = camp_purpose_mercenaries has_realm_law = camp_purpose_brigands } }
+            add = 0.25
+        }
+
+        if = {
+            limit = { NOT = { has_realm_law = camp_purpose_legitimists } has_realm_law = camp_purpose_scholars }
+            add = -0.25
+        }
+
+        if = { # Landless admin focus mostly on Buildings
+            limit = { NOT = { has_realm_law = camp_purpose_legitimists } government_allows = administrative }
+            add = -0.3
+        }
+
+        if = { # Adventurers want a minimum set of buildings
+            limit = { NOT = { has_realm_law = camp_purpose_legitimists } is_landless_adventurer = yes max_military_strength >= 100 domicile.num_domicile_buildings <= 4 }
+            add = -0.4
+        }
+
+        if = { # To avoid Adventurer travels becoming super-costly provision-wise, they should focus on buildings over MaA at certain ratios
+            limit = { NOT = { has_realm_law = camp_purpose_legitimists } is_landless_adventurer = yes max_military_strength >= 500 domicile.max_provisions <= 4000 }
+            multiply = 0
+        }
+    }
+}
