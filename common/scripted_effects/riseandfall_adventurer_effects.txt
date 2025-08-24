@@ -63,7 +63,7 @@ riseandfall_marry_female_target_se = {
 
 riseandfall_turn_into_adventurer_se = {
     random_list = {
-        99 = {  # chance weight 99
+        5 = {  # chance weight 99
             save_scope_as = adventurer_child
             # marriage for landless adventurers is handled by yearly on_actions (riseandfall_marry_*),
             # moved out of the immediate creation effect so eligibility checks run centrally.
@@ -152,7 +152,7 @@ riseandfall_turn_into_adventurer_se = {
                 remove_variable = adventurer_multiplier
             }
         }
-        1 = {
+        95 = {
             # Nothing happens in this branch
         }
     }
