@@ -33,7 +33,7 @@ riseandfall_yearly_adventurer = {
     }
 
     effect = {
-        every_independent_ruler = {
+        every_ruler = {
             save_scope_as = independent_ruler
             riseandfall_check_dynasty_for_adventurers_se = yes
         }

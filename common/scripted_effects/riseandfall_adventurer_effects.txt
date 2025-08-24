@@ -42,8 +42,7 @@
                 if = { limit = { var:rf_adventurer_final_chance > 100 } set_variable = { name = rf_adventurer_final_chance value = 100 } }
 
                 random = {
-                    chance = var:rf_adventurer_final_chance
-                    modifier = 0
+                    chance = var:rf_adventurer_trait_chance
                     riseandfall_do_create_adventurer_se = yes
                 }
                 remove_variable = rf_adventurer_trait_chance
