@@ -97,32 +97,44 @@ riseandfall_turn_into_adventurer_se = {
                 remove_variable = adventurer_starting_gold
             }
             scope:adventurer_child = {
-                # Calculate 10% of independent ruler's max strength
-                set_variable = { name = adventurer_army_size value = scope:independent_ruler.max_military_strength }
-                change_variable = { name = adventurer_army_size multiply = 0.8 }
+                # Derive an estimated levies number from the ruler's military_power
+                # (approx conversion: military_power / 20 => levies). This keeps army sizes
+                # proportional to real levies instead of raw military_power units.
+                # Increase base conversion so adventurer hosts are significantly tougher.
+                # New conversion: military_power * 0.10 => estimated levies (stronger scaling).
+                set_variable = { name = adventurer_base_levies value = scope:independent_ruler.military_power }
+                change_variable = { name = adventurer_base_levies multiply = 0.10 }
 
-                # Choose a random multiplier between 0.5 and 2.0 for army size
+                # Weighted random distribution so adventurer hosts can be small, medium,
+                # large, or occasionally massive relative to the ruler's levies.
                 set_variable = { name = adventurer_multiplier value = 1 }
+                # Stronger distribution: more mid/large outcomes and meaningful chance
+                # of massive/huge hosts. Weights sum to 100.
                 random_list = {
-                    1 = { set_variable = { name = adventurer_multiplier value = 0.5 } }
-                    1 = { set_variable = { name = adventurer_multiplier value = 0.6 } }
-                    1 = { set_variable = { name = adventurer_multiplier value = 0.7 } }
-                    1 = { set_variable = { name = adventurer_multiplier value = 0.8 } }
-                    1 = { set_variable = { name = adventurer_multiplier value = 0.9 } }
-                    1 = { set_variable = { name = adventurer_multiplier value = 1.0 } }
-                    1 = { set_variable = { name = adventurer_multiplier value = 1.1 } }
-                    1 = { set_variable = { name = adventurer_multiplier value = 1.2 } }
-                    1 = { set_variable = { name = adventurer_multiplier value = 1.3 } }
-                    1 = { set_variable = { name = adventurer_multiplier value = 1.4 } }
-                    1 = { set_variable = { name = adventurer_multiplier value = 1.5 } }
-                    1 = { set_variable = { name = adventurer_multiplier value = 1.6 } }
-                    1 = { set_variable = { name = adventurer_multiplier value = 1.7 } }
-                    1 = { set_variable = { name = adventurer_multiplier value = 1.8 } }
-                    1 = { set_variable = { name = adventurer_multiplier value = 1.9 } }
-                    1 = { set_variable = { name = adventurer_multiplier value = 2.0 } }
+                    20 = { set_variable = { name = adventurer_multiplier value = 0.12 } }  # small raid (~12% of levies)
+                    20 = { set_variable = { name = adventurer_multiplier value = 0.25 } }  # small-medium (~25%)
+                    20 = { set_variable = { name = adventurer_multiplier value = 0.50 } }  # medium (~50%)
+                    15 = { set_variable = { name = adventurer_multiplier value = 1.00 } }  # parity (~100%)
+                    15 = { set_variable = { name = adventurer_multiplier value = 1.75 } }  # above-parity (~175%)
+                     7 = { set_variable = { name = adventurer_multiplier value = 3.00 } }  # massive (rare)
+                     3 = { set_variable = { name = adventurer_multiplier value = 6.00 } }  # huge (very rare)
                 }
+
+                # Apply multiplier to the estimated levies and round to whole levies
+                set_variable = { name = adventurer_army_size value = var:adventurer_base_levies }
                 change_variable = { name = adventurer_army_size multiply = var:adventurer_multiplier }
                 round_variable = { name = adventurer_army_size nearest = 1 }
+
+                # Safety clamp: allow much larger spawns but cap at 6x the estimated levies
+                # to prevent absurd extremes. Also raise minimum to 100 levies.
+                # Compute cap from the already-calculated base levies variable to avoid
+                # relying on scope:independent_ruler being present in every call.
+                set_variable = { name = adventurer_max_cap value = var:adventurer_base_levies }
+                change_variable = { name = adventurer_max_cap multiply = 6 }
+
+                # Cleanup helper vars
+                remove_variable = adventurer_base_levies
+                remove_variable = adventurer_max_cap
 
                 spawn_army = {
                     name = riseandfall_adventurer_host_name
