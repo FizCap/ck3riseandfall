@@ -30,7 +30,24 @@
                 }
 
                 # Roll per individual dynasty member for adventurer creation
-                random_list = { 2 = { riseandfall_do_create_adventurer_se = yes } 98 = { } }
+                # Base chance is 2%; trait bonuses: dragonrider +5%, ambitious +5%, brave +2%
+                set_variable = { name = rf_adventurer_trait_chance value = 0 }
+                if = { limit = { has_trait = dragonrider } change_variable = { name = rf_adventurer_trait_chance add = 5 } }
+                if = { limit = { has_trait = ambitious } change_variable = { name = rf_adventurer_trait_chance add = 5 } }
+                if = { limit = { has_trait = brave } change_variable = { name = rf_adventurer_trait_chance add = 2 } }
+
+                # Final chance = base 2 + trait bonuses, clamp to 100
+                set_variable = { name = rf_adventurer_final_chance value = 2 }
+                change_variable = { name = rf_adventurer_final_chance add = var:rf_adventurer_trait_chance }
+                if = { limit = { var:rf_adventurer_final_chance > 100 } set_variable = { name = rf_adventurer_final_chance value = 100 } }
+
+                random = {
+                    chance = var:rf_adventurer_final_chance
+                    modifier = 0
+                    riseandfall_do_create_adventurer_se = yes
+                }
+                remove_variable = rf_adventurer_trait_chance
+                remove_variable = rf_adventurer_final_chance
             }
         }
     }
@@ -62,7 +79,7 @@ riseandfall_marry_female_target_se = {
         save_scope_as = created_spouse
     }
     marry_matrilineal = scope:created_spouse
-
+}
 
 
 ### Dedicated creation effect (guarded to avoid double-creation if multiple chances hit)
@@ -261,4 +278,5 @@ riseandfall_run_create_knights_while_se = {
         riseandfall_run_create_knights_while_se = yes
     }
 }
+
 
