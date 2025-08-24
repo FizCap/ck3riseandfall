@@ -1,0 +1,33 @@
+riseandfall_enable_adventurer_creator = {
+
+    categories = {
+        riseandfall
+    }
+
+    # Default: enabled (adventurer creation systems active)
+    default = riseandfall_adventurer_creator_enabled
+
+    riseandfall_adventurer_creator_enabled = {
+    }
+
+    riseandfall_adventurer_creator_disabled = {
+        flag = riseandfall_adventurer_creator_disabled
+    }
+}
+
+riseandfall_enable_mma_modifier = {
+
+    categories = {
+        riseandfall
+    }
+
+    # Default: enabled (men-at-arms modifier applied)
+    default = riseandfall_mma_modifier_enabled
+
+    riseandfall_mma_modifier_enabled = {
+    }
+
+    riseandfall_mma_modifier_disabled = {
+        flag = riseandfall_mma_modifier_disabled
+    }
+}

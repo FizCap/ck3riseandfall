@@ -1,26 +1,37 @@
 ﻿yearly_global_pulse = {
     on_actions = {
-    riseandfall_yearly_adventurer
-    riseandfall_yearly_remove_adventurer_gold_mod
-    riseandfall_yearly_maa_limit_increase
-    riseandfall_marry_male_target_se
-    riseandfall_marry_female_target_se
-    riseandfall_yearly_adventurer_press_claims
+        riseandfall_yearly_adventurer
+        riseandfall_yearly_remove_adventurer_gold_mod
+        riseandfall_yearly_maa_limit_increase
+        riseandfall_marry_male_target_se
+        riseandfall_marry_female_target_se
+        riseandfall_yearly_adventurer_press_claims
     }
 }
 
+
 riseandfall_yearly_maa_limit_increase = {
+    trigger = {
+        has_game_rule = riseandfall_mma_modifier_enabled
+    }
+
     effect = {
         every_ruler = {
             limit = {
                 NOT = { has_character_modifier = riseandfall_yearly_maa_limit_increase_effect }
             }
+
             riseandfall_yearly_maa_limit_increase_effect = yes
         }
     }
 }
 
+
 riseandfall_yearly_adventurer = {
+    trigger = {
+        has_game_rule = riseandfall_adventurer_creator_enabled
+    }
+
     effect = {
         every_independent_ruler = {
             save_scope_as = independent_ruler
@@ -40,12 +51,15 @@ riseandfall_yearly_adventurer_press_claims = {
                 is_adult = yes
                 is_imprisoned = no
             }
+
             save_scope_as = independent_adventurer
+
             # call the scripted effect on the adventurer leader
             riseandfall_adventurer_press_claims_se = yes
         }
     }
 }
+
 
 # Find every character with the adventurer gold modifier and run the removal check
 riseandfall_yearly_remove_adventurer_gold_mod = {
@@ -55,10 +69,12 @@ riseandfall_yearly_remove_adventurer_gold_mod = {
                 has_character_modifier = riseandfall_adventurer_gold_mod
                 NOT = { has_government = landless_adventurer_government }
             }
+
             riseandfall_remove_adventurer_gold_mod_if_not_landless_se = yes
         }
     }
 }
+
 
 # On_action that runs yearly to marry male landless adventurers (creates female spouse)
 riseandfall_marry_male_target_se = {
@@ -71,12 +87,15 @@ riseandfall_marry_male_target_se = {
                 is_betrothed = no
                 has_realm_law = camp_purpose_legitimists
             }
+
             save_scope_as = independent_ruler
+
             # Defer character-level checks to the scripted effect for performance.
             riseandfall_marry_male_target_se = yes
         }
     }
 }
+
 
 # On_action that runs yearly to marry female landless adventurers (creates male spouse)
 riseandfall_marry_female_target_se = {
@@ -89,6 +108,7 @@ riseandfall_marry_female_target_se = {
                 is_betrothed = no
                 has_realm_law = camp_purpose_legitimists
             }
+
             save_scope_as = independent_ruler
             riseandfall_marry_female_target_se = yes
         }

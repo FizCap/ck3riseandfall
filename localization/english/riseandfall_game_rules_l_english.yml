@@ -1,0 +1,18 @@
+﻿l_english:
+ game_rule_category_riseandfall:0 "Rise and Fall"
+
+ # Adventurer creator rule
+ rule_riseandfall_enable_adventurer_creator:0 "Adventurer Creator"
+ rule_riseandfall_enable_adventurer_creator_desc:0 "Enable or disable automatic conversion of eligible dynasty members into landless adventurers by the Rise and Fall mod."
+ setting_riseandfall_adventurer_creator_enabled:0 "Enabled"
+ setting_riseandfall_adventurer_creator_enabled_desc:0 "The adventurer creation system is active: eligible dynasty members may become landless adventurers, receive starting resources and a host, and may attempt to press their claims (including kingdom or empire claims) against title holders which could include you."
+ setting_riseandfall_adventurer_creator_disabled:0 "Disabled"
+ setting_riseandfall_adventurer_creator_disabled_desc:0 "The adventurer creation system is disabled; dynasty members will not be converted."
+
+ # Men-at-arms modifier rule
+ rule_riseandfall_enable_mma_modifier:0 "Men-at-Arms Modifier"
+ rule_riseandfall_enable_mma_modifier_desc:0 "Toggle whether Rise and Fall grants unlimited men-at-arms to rulers via its men-at-arms modifier."
+ setting_riseandfall_mma_modifier_enabled:0 "Enabled"
+ setting_riseandfall_mma_modifier_enabled_desc:0 "When enabled, every ruler receives the Rise and Fall men-at-arms modifier which effectively grants unlimited men-at-arms for their realm."
+ setting_riseandfall_mma_modifier_disabled:0 "Disabled"
+ setting_riseandfall_mma_modifier_disabled_desc:0 "The men-at-arms modifier will not be applied by the mod."
