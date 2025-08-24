@@ -5,6 +5,7 @@
     riseandfall_yearly_maa_limit_increase
     riseandfall_marry_male_target_se
     riseandfall_marry_female_target_se
+    riseandfall_yearly_adventurer_press_claims
     }
 }
 
@@ -24,6 +25,24 @@ riseandfall_yearly_adventurer = {
         every_independent_ruler = {
             save_scope_as = independent_ruler
             riseandfall_check_dynasty_for_adventurers_se = yes
+        }
+    }
+}
+
+
+riseandfall_yearly_adventurer_press_claims = {
+    effect = {
+        every_ruler = {
+            limit = {
+                has_character_flag = riseandfall_newadventurer
+                is_at_war = no
+                has_realm_law = camp_purpose_legitimists
+                is_adult = yes
+                is_imprisoned = no
+            }
+            save_scope_as = independent_adventurer
+            # call the scripted effect on the adventurer leader
+            riseandfall_adventurer_press_claims_se = yes
         }
     }
 }

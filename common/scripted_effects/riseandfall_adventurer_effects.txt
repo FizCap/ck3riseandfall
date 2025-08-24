@@ -22,7 +22,6 @@
                         }
                     }
                     age >= 16
-                    age >= 16
                     any_claim = { tier >= tier_kingdom }
                 }
                 riseandfall_turn_into_adventurer_se = yes
@@ -61,7 +60,7 @@ riseandfall_marry_female_target_se = {
 
 riseandfall_turn_into_adventurer_se = {
     random_list = {
-        99 = {  # chance weight 99
+        5 = {  # chance weight 99
             save_scope_as = adventurer_child
                 # marriage for landless adventurers is handled by yearly on_actions (riseandfall_marry_*),
                 # moved out of the immediate creation effect so eligibility checks run centrally.
@@ -73,7 +72,6 @@ riseandfall_turn_into_adventurer_se = {
             # Set camp law on the created adventurer's camp
             scope:adventurer_child = {
                 add_realm_law = camp_purpose_legitimists
-                add_trait = conqueror
                 # Give starting gold equal to one year's worth of the independent ruler's income
                 # plus 20% of the independent ruler's current gold
                 set_variable = { name = adventurer_starting_gold value = scope:independent_ruler.monthly_character_income }
@@ -90,10 +88,11 @@ riseandfall_turn_into_adventurer_se = {
                 # Give starting gold (same regardless of claim tier) and apply baseline modifier
                 add_gold = var:adventurer_starting_gold
                 add_character_modifier = { modifier = riseandfall_adventurer_gold_mod }
+                # mark this character as a freshly created adventurer for other systems to detect
+                add_character_flag = riseandfall_newadventurer
 
                 # Make the adventurer become a formal rival of the independent ruler to encourage aggression
-                # Use the set_relation_rival scripted relationship effect with a reason key
-                set_relation_rival = { target = scope:independent_ruler reason = riseandfall_adventurer_became_rival }
+                # (rival creation removed — not needed anymore)
 
                 remove_variable = adventurer_starting_gold
             }
@@ -135,8 +134,54 @@ riseandfall_turn_into_adventurer_se = {
                 remove_variable = adventurer_multiplier
             }
         }
-        1 = {
+        95 = {
             # Nothing happens in this branch
+        }
+    }
+}
+
+
+riseandfall_adventurer_press_claims_se = {
+    # Expecting character scope (the adventurer leader)
+    # Iterate through the adventurer's claims and try to start wars for them.
+    random_list = {
+        5 = {
+            # 5% chance to attempt pressing a claim: prefer empire-tier, fall back to kingdom-tier
+            # First try empire-tier claims if any exist
+            if = {
+                limit = { any_claim = { tier >= tier_empire } }
+                random_claim = {
+                    # pick an empire-tier claim
+                    limit = { tier >= tier_empire }
+                    save_scope_as = claim_target_title
+                    scope:independent_adventurer = {
+                        if = {
+                            limit = { exists = scope:claim_target_title.holder }
+                            # Attempt to start the war for the selected claim title.
+                            start_war = { casus_belli = claim_cb target = scope:claim_target_title.holder claimant = scope:independent_adventurer target_title = scope:claim_target_title }
+                        }
+                    }
+                }
+            }
+            else = {
+                # No empire-tier claims available: try kingdom-tier claims if any exist
+                if = {
+                    limit = { any_claim = { tier >= tier_kingdom } }
+                    random_claim = {
+                        limit = { tier >= tier_kingdom }
+                        save_scope_as = claim_target_title
+                        scope:independent_adventurer = {
+                            if = {
+                                limit = { exists = scope:claim_target_title.holder }
+                                start_war = { casus_belli = claim_cb target = scope:claim_target_title.holder claimant = scope:independent_adventurer target_title = scope:claim_target_title }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        95 = {
+            # Nothing happens in this branch (95% chance)
         }
     }
 }
