@@ -1,4 +1,4 @@
-riseandfall_enable_adventurer_creator = {
+﻿riseandfall_enable_adventurer_creator = {
 
     categories = {
         riseandfall

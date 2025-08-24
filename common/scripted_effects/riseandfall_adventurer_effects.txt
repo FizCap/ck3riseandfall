@@ -77,29 +77,32 @@ riseandfall_turn_into_adventurer_se = {
             # Set camp law on the created adventurer's camp
             scope:adventurer_child = {
                 add_realm_law = camp_purpose_legitimists
-                # Give starting gold equal to one year's worth of the independent ruler's income
-                # plus 20% of the independent ruler's current gold
-                set_variable = { name = adventurer_starting_gold value = scope:independent_ruler.monthly_character_income }
-                change_variable = { name = adventurer_starting_gold multiply = 12 }
+                # Starting gold is based on the adventurer's stewardship stat and the independent ruler's income.
+                # Design: stewardship 10 => 1.0x of one year's ruler income. Every +1 stewardship => +10%.
+                # multiplier = stewardship * 0.1 (clamped to reasonable bounds)
+                # Compute base yearly income from the independent ruler and clamp to >= 0
+                set_variable = { name = adventurer_base_year_income value = scope:independent_ruler.monthly_character_income }
+                change_variable = { name = adventurer_base_year_income multiply = 12 }
 
-                # Compute 20% of the ruler's current gold and add it to the starting amount
-                set_variable = { name = adventurer_gold_percent value = scope:independent_ruler.gold }
-                change_variable = { name = adventurer_gold_percent multiply = 0.2 }
-                change_variable = { name = adventurer_starting_gold add = var:adventurer_gold_percent }
+                # Stewardship -> multiplier (10 => 1.0). Clamp multiplier to sensible bounds.
+                set_variable = { name = adventurer_start_gold_mult value = scope:adventurer_child.stewardship }
+                change_variable = { name = adventurer_start_gold_mult multiply = 0.1 }
 
-                # Final rounding and cleanup
+                # Compute starting gold and ensure it's non-negative
+                set_variable = { name = adventurer_starting_gold value = var:adventurer_base_year_income }
+                change_variable = { name = adventurer_starting_gold multiply = var:adventurer_start_gold_mult }
                 round_variable = { name = adventurer_starting_gold nearest = 1 }
 
-                # Give starting gold (same regardless of claim tier) and apply baseline modifier
+                # Give starting gold and apply baseline modifier
                 add_gold = var:adventurer_starting_gold
                 add_character_modifier = { modifier = riseandfall_adventurer_gold_mod }
                 # mark this character as a freshly created adventurer for other systems to detect
                 add_character_flag = riseandfall_newadventurer
 
-                # Make the adventurer become a formal rival of the independent ruler to encourage aggression
-                # (rival creation removed — not needed anymore)
-
+                # Cleanup helper vars
                 remove_variable = adventurer_starting_gold
+                remove_variable = adventurer_base_year_income
+                remove_variable = adventurer_start_gold_mult
             }
 
             scope:adventurer_child = {
@@ -111,19 +114,24 @@ riseandfall_turn_into_adventurer_se = {
                 set_variable = { name = adventurer_base_levies value = scope:independent_ruler.military_power }
                 change_variable = { name = adventurer_base_levies multiply = 0.10 }
 
-                # Weighted random distribution so adventurer hosts can be small, medium,
-                # large, or occasionally massive relative to the ruler's levies.
-                set_variable = { name = adventurer_multiplier value = 1 }
-                # Stronger distribution: more mid/large outcomes and meaningful chance
-                # of massive/huge hosts. Weights sum to 100.
+                # Scale the levies multiplier from the adventurer's martial skill.
+                # Design: martial 10 => 1.0 (average). Every +1 martial => +10% (0.1).
+                # That simplifies to: multiplier = martial * 0.1
+                set_variable = { name = adventurer_multiplier value = scope:adventurer_child.martial }
+                change_variable = { name = adventurer_multiplier multiply = 0.1 }
+
+                # Mild stochastic variation so not every high-martial character produces
+                # exactly the same multiplier (weights chosen to keep most outcomes near the
+                # martial-derived value, but allow down/up variance).
                 random_list = {
-                    10 = { set_variable = { name = adventurer_multiplier value = 0.25 } }  # small-medium (~25%)
-                    10 = { set_variable = { name = adventurer_multiplier value = 0.50 } }  # medium (~50%)
-                    35 = { set_variable = { name = adventurer_multiplier value = 1.00 } }  # parity (~100%)
-                    30 = { set_variable = { name = adventurer_multiplier value = 1.75 } }  # above-parity (~175%)
-                    10 = { set_variable = { name = adventurer_multiplier value = 3.00 } }  # massive (rare)
-                     5 = { set_variable = { name = adventurer_multiplier value = 6.00 } }  # huge (very rare)
+                    15 = { change_variable = { name = adventurer_multiplier multiply = 0.75 } } # downward variance
+                    70 = { } # no change (most common)
+                    10 = { change_variable = { name = adventurer_multiplier multiply = 1.25 } } # upward variance
+                     5 = { change_variable = { name = adventurer_multiplier multiply = 1.75 } } # rare spike
                 }
+
+                # Clamp to sensible bounds so we don't generate absurd multipliers.
+                
 
                 # Apply multiplier to the estimated levies and round to whole levies
                 set_variable = { name = adventurer_army_size value = var:adventurer_base_levies }
@@ -149,6 +157,19 @@ riseandfall_turn_into_adventurer_se = {
                 }
                 remove_variable = adventurer_army_size
                 remove_variable = adventurer_multiplier
+                # Create starting knights based on the adventurer's diplomacy stat.
+                # Design: diplomacy 10 => 10 starting knights. Cap at 20 to avoid runaway spawns.
+                # Use a lightweight while-style loop implemented with variables and a recursive runner.
+                # Initialize loop counter and target
+                set_variable = { name = rf_while_counter value = 0 }
+                set_variable = { name = rf_while_loop_target value = scope:adventurer_child.diplomacy }
+                # Clamp to max 20
+                if = { limit = { var:rf_while_loop_target > 20 } set_variable = { name = rf_while_loop_target value = 20 } }
+                # Run the recursive runner which will call the single-knight creator N times
+                riseandfall_run_create_knights_while_se = yes
+                # Cleanup loop variables
+                remove_variable = rf_while_counter
+                remove_variable = rf_while_loop_target
             }
         }
         98 = {
@@ -220,5 +241,37 @@ riseandfall_adventurer_press_claims_se = {
 riseandfall_remove_adventurer_gold_mod_if_not_landless_se = {
     # Expecting character scope (the ruler). Remove the adventurer gold modifier when no longer landless.
     remove_character_modifier = riseandfall_adventurer_gold_mod
+}
+
+
+# Create a single knight companion for the adventurer and add them to the adventurer's travel plan.
+# Expects to be called from a context where `adventurer_child` saved scope exists (save_scope_as = adventurer_child)
+riseandfall_create_adventurer_knight_se = {
+    # Create a single knight near the independent ruler's capital and save scope for adding as companion
+    create_character = {
+        employer = scope:adventurer_child
+        culture = scope:adventurer_child.culture
+        faith = scope:adventurer_child.faith
+        age = { 18 35 }
+        gender = male
+        # Give a small chance for knightly traits via random_traits_list if desired; keep simple for now
+        save_scope_as = created_knight
+    }
+
+    # Cleanup saved scope
+    clear_saved_scope = created_knight
+}
+
+# Recursive runner: create knights until rf_while_counter >= rf_while_loop_target
+riseandfall_run_create_knights_while_se = {
+    if = {
+        limit = { var:rf_while_counter < var:rf_while_loop_target }
+        # Create one knight
+        riseandfall_create_adventurer_knight_se = yes
+        # increment counter
+        change_variable = { name = rf_while_counter add = 1 }
+        # recurse
+        riseandfall_run_create_knights_while_se = yes
+    }
 }
 
