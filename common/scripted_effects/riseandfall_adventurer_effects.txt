@@ -4,12 +4,14 @@
         limit = { has_dynasty = yes }
         dynasty = {
             every_dynasty_member = {
+                # DEBUG: mark characters who are heirs of the saved independent ruler (temporary)
+                if = { limit = { is_heir_of = scope:independent_ruler } add_character_flag = riseandfall_debug_is_heir }
                 limit = {
                     is_landed = no
                     is_imprisoned = no
                     NOT = { has_government = landless_adventurer_government }
                     # Exclude anyone who is an heir of the independent ruler (primary/designated/player)
-                    NOT = { is_heir_of = scope:independent_ruler }
+                    NOT = { OR = { is_heir_of = scope:independent_ruler is_primary_heir_of = scope:independent_ruler } }
                             # Exclude dynasty members who are allied, married to, or highly positive toward the ruler
                             NOT = { OR = { is_allied_to = scope:independent_ruler is_spouse_of = scope:independent_ruler opinion = { target = scope:independent_ruler value >= 75 } } }
                     # Exclude religious/scholarly characters who should not become adventurers
