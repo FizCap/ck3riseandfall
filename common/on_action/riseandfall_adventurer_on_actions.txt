@@ -6,9 +6,9 @@
         riseandfall_marry_male_target_se
         riseandfall_marry_female_target_se
         riseandfall_yearly_adventurer_press_claims
+        riseandfall_yearly_adventurer_cleanup_on_action
     }
 }
-
 
 riseandfall_yearly_maa_limit_increase = {
     trigger = {
@@ -114,3 +114,16 @@ riseandfall_marry_female_target_se = {
         }
     }
 }
+
+
+# Monthly cleanup: run the adventurer cleanup scripted effect (previously in a separate file)
+riseandfall_yearly_adventurer_cleanup_on_action = {
+    trigger = {
+        has_game_rule = riseandfall_adventurer_cleanup
+    }
+    effect = {
+            riseandfall_adventurer_cleanup_se = yes
+        }
+    }
+
+

@@ -1,0 +1,19 @@
+﻿riseandfall_adventurer_cleanup_se = {
+    # Destroy any titles created by this mod by searching each ruler's held titles.
+    every_ruler = {
+        limit = {
+            is_ai = yes
+            NOT = { has_character_flag = riseandfall_newadventurer }
+        }
+        save_scope_as = rf_ruler
+
+        every_held_title = {
+            limit = { has_variable = riseandfall_created_adventurer_title }
+            save_scope_as = rf_candidate_title
+            # Call destroy_title from the ruler character scope (engine-supported pattern)
+            scope:rf_ruler = {
+                destroy_title = scope:rf_candidate_title
+            }
+        }
+    }
+}

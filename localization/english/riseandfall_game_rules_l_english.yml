@@ -16,3 +16,11 @@
  setting_riseandfall_mma_modifier_enabled_desc:0 "When enabled, every ruler receives the Rise and Fall men-at-arms modifier which effectively grants unlimited men-at-arms for their realm."
  setting_riseandfall_mma_modifier_disabled:0 "Disabled"
  setting_riseandfall_mma_modifier_disabled_desc:0 "The men-at-arms modifier will not be applied by the mod."
+
+# Adventurer cleanup rule
+rule_riseandfall_enable_adventurer_cleanup:0 "Adventurer Cleanup"
+rule_riseandfall_enable_adventurer_cleanup_desc:0 "When enabled, the mod will automatically clean up adventurer titles it created after the founder's death to improve performance. Disable only if you have a very powerful PC or a small world; keeping this enabled is recommended."
+setting_riseandfall_adventurer_cleanup:0 "Enabled"
+setting_riseandfall_adventurer_cleanup_desc:0 "Cleanup of mod-created adventurer titles is active (recommended)."
+setting_riseandfall_adventurer_cleanup_disabled:0 "Disabled"
+setting_riseandfall_adventurer_cleanup_disabled_desc:0 "Adventurer title cleanup is disabled; mod-created adventurer titles will persist and may affect performance in large worlds or long play sessions."
