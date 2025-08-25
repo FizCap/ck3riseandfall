@@ -32,7 +32,7 @@
                 }
 
                 # Roll per individual dynasty member for adventurer creation
-                # Base chance is 2%; trait bonuses: dragonrider +5%, ambitious +5%, brave +2%
+                # Base chance is 1%; trait bonuses: dragonrider +5%, ambitious +5%, brave +2%
                 set_variable = { name = rf_adventurer_trait_chance value = 0 }
                 if = { limit = { has_trait = dragonrider } change_variable = { name = rf_adventurer_trait_chance add = 5 } }
                 if = { limit = { has_trait = ambitious } change_variable = { name = rf_adventurer_trait_chance add = 5 } }
