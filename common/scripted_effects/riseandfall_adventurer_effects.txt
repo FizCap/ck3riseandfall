@@ -12,13 +12,12 @@
                     is_landed = no
                     is_imprisoned = no
                     NOT = { has_government = landless_adventurer_government }
-                    # Exclude anyone who is an heir of the independent ruler (primary/designated/player)
-                    NOT = { OR = { is_heir_of = scope:independent_ruler is_primary_heir_of = scope:independent_ruler is_player_heir_of = scope:independent_ruler } }
+                    
                     # Exclude anyone who is spouse to any ruler (married into another realm)
                     NOT = { every_ruler = { limit = { is_spouse_of = scope:candidate } } }
                             # Exclude dynasty members who are allied, married to, or highly positive toward the ruler
                     # exclude dynasty members who are allied to or highly positive toward the ruler
-                    NOT = { OR = { is_allied_to = scope:independent_ruler opinion = { target = scope:independent_ruler value >= 75 } } }
+                    
                     # Exclude religious/scholarly characters who should not become adventurers
                     NOT = {
                         OR = {
@@ -48,9 +47,17 @@
                         save_scope_as = claim_target_title
                     }
 
-                    # If candidate is allied to, spouse of, or very positive toward the claim holder, disqualify
+                    # If candidate is allied to, spouse of, very positive toward the claim holder,
+                    # or is an heir of the claim holder, disqualify
                     if = {
-                        limit = { OR = { is_allied_to = scope:claim_target_title.holder is_spouse_of = scope:claim_target_title.holder opinion = { target = scope:claim_target_title.holder value >= 75 } } }
+                        limit = { OR = {
+                            is_allied_to = scope:claim_target_title.holder
+                            is_spouse_of = scope:claim_target_title.holder
+                            opinion = { target = scope:claim_target_title.holder value >= 75 }
+                            is_heir_of = scope:claim_target_title.holder
+                            is_primary_heir_of = scope:claim_target_title.holder
+                            is_player_heir_of = scope:claim_target_title.holder
+                        } }
                         set_variable = { name = rf_disqualify value = 1 }
                     }
                 }
