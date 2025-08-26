@@ -190,12 +190,12 @@ riseandfall_do_create_adventurer_se = {
 
             if = {
                 limit = { exists = scope:claim_target_title.holder }
-                set_variable = { name = adventurer_base_levies value = scope:claim_target_title.holder.military_power }
+                set_variable = { name = adventurer_base_levies value = scope:claim_target_title.holder.max_military_strength }
             }
             else = {
-                set_variable = { name = adventurer_base_levies value = scope:independent_ruler.military_power }
+                set_variable = { name = adventurer_base_levies value = scope:independent_ruler.max_military_strength }
             }
-            change_variable = { name = adventurer_base_levies multiply = 0.10 }
+            change_variable = { name = adventurer_base_levies multiply = 1.0 }
 
             set_variable = { name = adventurer_multiplier value = scope:adventurer_child.martial }
             change_variable = { name = adventurer_multiplier multiply = 0.1 }
