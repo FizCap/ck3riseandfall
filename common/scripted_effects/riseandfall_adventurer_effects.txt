@@ -72,7 +72,7 @@
                     # If we selected a claim target and the holder has low legitimacy, increase chance
                     if = {
                         limit = { exists = scope:claim_target_title.holder }
-                        if = { limit = { scope:claim_target_title.holder = { legitimacy < 1400 } } change_variable = { name = rf_adventurer_final_chance multiply = 2 } }
+                        if = { limit = { scope:claim_target_title.holder = { legitimacy_level < 4 } } change_variable = { name = rf_adventurer_final_chance multiply = 2 } }
                     }
                     clamp_variable = { name = rf_adventurer_final_chance min = 0 max = 100 }
 
