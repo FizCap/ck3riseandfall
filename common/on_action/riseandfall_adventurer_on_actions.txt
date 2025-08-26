@@ -48,12 +48,9 @@ riseandfall_yearly_adventurer_press_claims = {
                 has_character_flag = riseandfall_newadventurer
                 is_at_war = no
                 has_realm_law = camp_purpose_legitimists
-                is_adult = yes
                 is_imprisoned = no
             }
-
             save_scope_as = independent_adventurer
-
             # call the scripted effect on the adventurer leader
             riseandfall_adventurer_press_claims_se = yes
         }
