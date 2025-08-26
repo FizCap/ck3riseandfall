@@ -66,8 +66,8 @@
                     if = { limit = { has_trait = ambitious } change_variable = { name = rf_adventurer_trait_chance add = 2 } }
                     if = { limit = { has_trait = brave } change_variable = { name = rf_adventurer_trait_chance add = 1 } }
 
-                    # Final chance = base 1 + trait bonuses, clamp to [0,100]
-                    set_variable = { name = rf_adventurer_final_chance value = 100 }
+                    # Final chance = base 0.5 + trait bonuses, clamp to [0,100]
+                    set_variable = { name = rf_adventurer_final_chance value = 0.5 }
                     change_variable = { name = rf_adventurer_final_chance add = var:rf_adventurer_trait_chance }
                     # If we selected a claim target and the holder has low legitimacy, increase chance
                     if = {
@@ -252,8 +252,8 @@ riseandfall_adventurer_press_claims_se = {
                     if = {
                         limit = { scope:independent_adventurer.military_power > scope:claim_target_title.holder.military_power }
                         if = {
-                            # Holder must not have a truce or be allied to the adventurer
-                            limit = { scope:claim_target_title.holder = { NOT = { OR = { has_truce = scope:independent_adventurer is_allied_to = scope:independent_adventurer } } } }
+                            # Adventurer must not have a truce or be allied to the holder
+                            limit = { scope:independent_adventurer = { NOT = { OR = { has_truce = scope:claim_target_title.holder is_allied_to = scope:claim_target_title.holder } } } }
                             # Adventurer must not be under the temporary war-block flag
                             if = { limit = { NOT = { has_character_flag = riseandfall_newadventurer_war_block } } start_war = { casus_belli = claim_cb target = scope:claim_target_title.holder claimant = scope:independent_adventurer target_title = scope:claim_target_title } }
                         }
@@ -261,8 +261,8 @@ riseandfall_adventurer_press_claims_se = {
                         # Not stronger: small chance, respect truces/alliances
                         random_list = {
                             5 = {
-                                # Only try a risky declare if holder has no truce/alliance and adventurer is not war-blocked
-                                if = { limit = { scope:claim_target_title.holder = { NOT = { OR = { has_truce = scope:independent_adventurer is_allied_to = scope:independent_adventurer } } } }
+                                # Only try a risky declare if adventurer has no truce/alliance with the holder and is not war-blocked
+                                if = { limit = { scope:independent_adventurer = { NOT = { OR = { has_truce = scope:claim_target_title.holder is_allied_to = scope:claim_target_title.holder } } } }
                                     if = { limit = { NOT = { has_character_flag = riseandfall_newadventurer_war_block } } start_war = { casus_belli = claim_cb target = scope:claim_target_title.holder claimant = scope:independent_adventurer target_title = scope:claim_target_title } }
                                 }
                             95 = { }
@@ -275,7 +275,8 @@ riseandfall_adventurer_press_claims_se = {
         # final safety: if holder is independent and adventurer allowed to war, try a default declare (covers edge cases)
         if = {
             limit = {
-                scope:claim_target_title.holder = { is_independent_ruler = yes NOT = { OR = { has_truce = scope:independent_adventurer is_allied_to = scope:independent_adventurer } } }
+                scope:claim_target_title.holder = { is_independent_ruler = yes }
+                scope:independent_adventurer = { NOT = { OR = { has_truce = scope:claim_target_title.holder is_allied_to = scope:claim_target_title.holder } } }
                 scope:independent_adventurer = { NOT = { has_character_flag = riseandfall_newadventurer_war_block } }
             }
             start_war = { casus_belli = claim_cb target = scope:claim_target_title.holder claimant = scope:independent_adventurer target_title = scope:claim_target_title }
@@ -297,8 +298,8 @@ riseandfall_adventurer_press_claims_se = {
                     if = {
                         limit = { scope:independent_adventurer.military_power > scope:claim_target_title.holder.military_power }
                         if = {
-                            # Holder must not have a truce or be allied to the adventurer
-                            limit = { scope:claim_target_title.holder = { NOT = { OR = { has_truce = scope:independent_adventurer is_allied_to = scope:independent_adventurer } } } }
+                            # Adventurer must not have a truce or be allied to the holder
+                            limit = { scope:independent_adventurer = { NOT = { OR = { has_truce = scope:claim_target_title.holder is_allied_to = scope:claim_target_title.holder } } } }
                             # Adventurer must not be under the temporary war-block flag
                             if = { limit = { NOT = { has_character_flag = riseandfall_newadventurer_war_block } } start_war = { casus_belli = claim_cb target = scope:claim_target_title.holder claimant = scope:independent_adventurer target_title = scope:claim_target_title } }
                         }
@@ -306,8 +307,8 @@ riseandfall_adventurer_press_claims_se = {
                     else = {
                         random_list = {
                             5 = {
-                                # Only try a risky declare if holder has no truce/alliance and adventurer is not war-blocked
-                                if = { limit = { scope:claim_target_title.holder = { NOT = { OR = { has_truce = scope:independent_adventurer is_allied_to = scope:independent_adventurer } } } }
+                                # Only try a risky declare if adventurer has no truce/alliance with the holder and is not war-blocked
+                                if = { limit = { scope:independent_adventurer = { NOT = { OR = { has_truce = scope:claim_target_title.holder is_allied_to = scope:claim_target_title.holder } } } }
                                     if = { limit = { NOT = { has_character_flag = riseandfall_newadventurer_war_block } } start_war = { casus_belli = claim_cb target = scope:claim_target_title.holder claimant = scope:independent_adventurer target_title = scope:claim_target_title } }
                                 }
                             95 = { }
