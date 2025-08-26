@@ -1,7 +1,6 @@
 ﻿riseandfall_check_dynasty_for_adventurers_se = {
     # Expecting character scope (independent ruler). Check their dynasty members.
     # Re-save the calling ruler to a stable label to ensure availability inside nested scopes
-    save_scope_as = independent_ruler
     if = {
         limit = { has_dynasty = yes }
         dynasty = {
@@ -12,6 +11,13 @@
                     is_landed = no
                     is_imprisoned = no
                     NOT = { has_government = landless_adventurer_government }
+
+                    # Exclude noble-family title holders (landless playable noble families)
+                    NOT = {
+                        any_held_title = {
+                            is_noble_family_title = yes
+                        }
+                    }
                                  
                     # Exclude religious/scholarly characters who should not become adventurers
                     NOT = {
@@ -72,7 +78,7 @@
                     # If we selected a claim target and the holder has low legitimacy, increase chance
                     if = {
                         limit = { exists = scope:claim_target_title.holder }
-                        if = { limit = { scope:claim_target_title.holder = { legitimacy_level < 4 } } change_variable = { name = rf_adventurer_final_chance multiply = 2 } }
+                        if = { limit = { scope:claim_target_title.holder = { legitimacy_level < 3 } } change_variable = { name = rf_adventurer_final_chance multiply = 2 } }
                     }
                     clamp_variable = { name = rf_adventurer_final_chance min = 0 max = 100 }
 
