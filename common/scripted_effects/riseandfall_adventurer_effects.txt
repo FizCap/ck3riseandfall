@@ -67,7 +67,7 @@
                     if = { limit = { has_trait = brave } change_variable = { name = rf_adventurer_trait_chance add = 1 } }
 
                     # Final chance = base 0.5 + trait bonuses, clamp to [0,100]
-                    set_variable = { name = rf_adventurer_final_chance value = 0.5 }
+                    set_variable = { name = rf_adventurer_final_chance value = 100 }
                     change_variable = { name = rf_adventurer_final_chance add = var:rf_adventurer_trait_chance }
                     # If we selected a claim target and the holder has low legitimacy, increase chance
                     if = {
@@ -361,7 +361,7 @@ riseandfall_run_create_knights_while_se = {
 
 
 # Pay quarterly income to adventurers equal to 3x the monthly income of their primary claim target's holder,
-# scaled by the adventurer's stewardship (multiplier = 1 + stewardship * 0.1). If no valid claim holder, pay 0.
+# scaled by the adventurer's stewardship (multiplier = stewardship * 0.1). If no valid claim holder, pay 0.
 # Expects ROOT = the adventurer character. Safe to call broadly; does nothing if not landless adventurer or lacks the gold mod.
 riseandfall_adventurer_quarterly_income_se = {
     if = {
@@ -389,10 +389,10 @@ riseandfall_adventurer_quarterly_income_se = {
             limit = { exists = scope:claim_target_title.holder }
             # Base monthly from holder
             set_variable = { name = rf_holder_monthly value = scope:claim_target_title.holder.monthly_character_income }
-            # Stewardship multiplier = 1 + stewardship * 0.1
+            # Stewardship multiplier = stewardship * 0.1 (minimum 0.1 so stake > 0)
             set_variable = { name = rf_mult value = stewardship }
             change_variable = { name = rf_mult multiply = 0.1 }
-            change_variable = { name = rf_mult add = 1 }
+            clamp_variable = { name = rf_mult min = 0.1 max = 100 }
 
             # Quarterly payout = monthly * 3 * multiplier
             set_variable = { name = rf_income_amount value = var:rf_holder_monthly }
