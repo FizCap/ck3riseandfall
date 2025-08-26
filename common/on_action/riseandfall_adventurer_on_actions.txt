@@ -57,6 +57,28 @@ riseandfall_yearly_adventurer_press_claims = {
     }
 }
 
+# Pay adventurer income quarterly; root scope is each playable character. We'll iterate rulers with the gold mod.
+quarterly_playable_pulse = {
+    on_actions = {
+        riseandfall_quarterly_adventurer_income
+    }
+}
+
+# Helper on_action: iterate adventurers and pay quarterly income
+riseandfall_quarterly_adventurer_income = {
+    effect = {
+        every_ruler = {
+            limit = {
+                has_character_modifier = riseandfall_adventurer_gold_mod
+                has_government = landless_adventurer_government
+                is_landed = no
+                is_imprisoned = no
+            }
+            riseandfall_adventurer_quarterly_income_se = yes
+        }
+    }
+}
+
 
 # Find every character with the adventurer gold modifier and run the removal check
 riseandfall_yearly_remove_adventurer_gold_mod = {

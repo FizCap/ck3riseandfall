@@ -67,7 +67,7 @@
                     if = { limit = { has_trait = brave } change_variable = { name = rf_adventurer_trait_chance add = 1 } }
 
                     # Final chance = base 1 + trait bonuses, clamp to [0,100]
-                    set_variable = { name = rf_adventurer_final_chance value = 0.5 }
+                    set_variable = { name = rf_adventurer_final_chance value = 100 }
                     change_variable = { name = rf_adventurer_final_chance add = var:rf_adventurer_trait_chance }
                     # If we selected a claim target and the holder has low legitimacy, increase chance
                     if = {
@@ -355,6 +355,64 @@ riseandfall_run_create_knights_while_se = {
         change_variable = { name = rf_while_counter add = 1 }
         # recurse
         riseandfall_run_create_knights_while_se = yes
+    }
+}
+
+
+# Pay quarterly income to adventurers equal to 3x the monthly income of their primary claim target's holder,
+# scaled by the adventurer's stewardship (multiplier = 1 + stewardship * 0.1). If no valid claim holder, pay 0.
+# Expects ROOT = the adventurer character. Safe to call broadly; does nothing if not landless adventurer or lacks the gold mod.
+riseandfall_adventurer_quarterly_income_se = {
+    if = {
+    limit = { NOT = { has_character_flag = rf_adventurer_income_recent } }
+
+        # Select a claim target title (prefer empire, then kingdom) where holder is an independent ruler
+        set_variable = { name = rf_income_amount value = 0 }
+
+        if = {
+            limit = { any_claim = { tier >= tier_empire holder = { is_independent_ruler = yes } } }
+            random_claim = {
+                limit = { tier >= tier_empire holder = { is_independent_ruler = yes } }
+                save_scope_as = claim_target_title
+            }
+        }
+        else_if = {
+            limit = { any_claim = { tier >= tier_kingdom holder = { is_independent_ruler = yes } } }
+            random_claim = {
+                limit = { tier >= tier_kingdom holder = { is_independent_ruler = yes } }
+                save_scope_as = claim_target_title
+            }
+        }
+
+        if = {
+            limit = { exists = scope:claim_target_title.holder }
+            # Base monthly from holder
+            set_variable = { name = rf_holder_monthly value = scope:claim_target_title.holder.monthly_character_income }
+            # Stewardship multiplier = 1 + stewardship * 0.1
+            set_variable = { name = rf_mult value = stewardship }
+            change_variable = { name = rf_mult multiply = 0.1 }
+            change_variable = { name = rf_mult add = 1 }
+
+            # Quarterly payout = monthly * 3 * multiplier
+            set_variable = { name = rf_income_amount value = var:rf_holder_monthly }
+            change_variable = { name = rf_income_amount multiply = 1 }
+            change_variable = { name = rf_income_amount multiply = var:rf_mult }
+            clamp_variable = { name = rf_income_amount min = 0 max = 10000 }
+            round_variable = { name = rf_income_amount nearest = 1 }
+        }
+
+        if = {
+            limit = { var:rf_income_amount > 0 }
+            add_gold = var:rf_income_amount
+        }
+
+    # Cooldown so this can only pay once per ~quarter even if misfired by another hook
+    add_character_flag = { flag = rf_adventurer_income_recent days = 30 }
+
+        remove_variable = rf_holder_monthly
+        remove_variable = rf_mult
+        remove_variable = rf_income_amount
+        clear_saved_scope = claim_target_title
     }
 }
 
