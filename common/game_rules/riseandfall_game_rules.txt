@@ -32,6 +32,24 @@ riseandfall_enable_mma_modifier = {
     }
 }
 
+
+    riseandfall_enable_mma_limit_modifier = {
+
+        categories = {
+            riseandfall
+        }
+
+        # Default: disabled (men-at-arms cap increases for administrative governments are off by default)
+        default = riseandfall_mma_limit_modifier_disabled
+
+        riseandfall_mma_limit_modifier_enabled = {
+        }
+
+        riseandfall_mma_limit_modifier_disabled = {
+            flag = riseandfall_mma_limit_modifier_disabled
+        }
+    }
+
 riseandfall_enable_adventurer_cleanup = {
 
     categories = {

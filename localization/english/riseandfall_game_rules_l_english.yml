@@ -24,3 +24,11 @@ setting_riseandfall_adventurer_cleanup:0 "Enabled"
 setting_riseandfall_adventurer_cleanup_desc:0 "Cleanup of mod-created adventurer titles is active (recommended)."
 setting_riseandfall_adventurer_cleanup_disabled:0 "Disabled"
 setting_riseandfall_adventurer_cleanup_disabled_desc:0 "Adventurer title cleanup is disabled; mod-created adventurer titles will persist and may affect performance in large worlds or long play sessions."
+
+# Men-at-arms cap increase rule (administrative governments)
+rule_riseandfall_enable_mma_limit_modifier:0 "Men-at-Arms Cap Increase (Administrative Governments)"
+rule_riseandfall_enable_mma_limit_modifier_desc:0 "When enabled, certain administrative governments receive a yearly modifier that increases the realm men-at-arms cap. This may make militaries larger for administrative realms."
+setting_riseandfall_mma_limit_modifier_enabled:0 "Enabled"
+setting_riseandfall_mma_limit_modifier_enabled_desc:0 "Administrative governments will receive the men-at-arms cap increase modifier yearly. May be unbalanced with current influence costs; use at your own risk."
+setting_riseandfall_mma_limit_modifier_disabled:0 "Disabled"
+setting_riseandfall_mma_limit_modifier_disabled_desc:0 "Administrative governments will not receive the men-at-arms cap increase modifier (recommended default)."

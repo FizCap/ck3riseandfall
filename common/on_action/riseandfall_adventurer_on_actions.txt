@@ -2,11 +2,12 @@
     on_actions = {
         riseandfall_yearly_adventurer
         riseandfall_yearly_remove_adventurer_gold_mod
-        riseandfall_yearly_maa_limit_increase
         riseandfall_marry_male_target_se
         riseandfall_marry_female_target_se
         riseandfall_yearly_adventurer_press_claims
         riseandfall_yearly_adventurer_cleanup_on_action
+        riseandfall_yearly_mma_limit_cap_increase
+        riseandfall_yearly_maa_limit_increase
     }
 }
 
@@ -20,11 +21,25 @@ riseandfall_yearly_maa_limit_increase = {
             limit = {
                 NOT = { has_character_modifier = riseandfall_yearly_maa_limit_increase_effect }
             }
-
-            riseandfall_yearly_maa_limit_increase_effect = yes
+            add_character_modifier = riseandfall_yearly_maa_limit_increase_modifier
         }
     }
 }
+
+
+riseandfall_yearly_mma_limit_cap_increase = {
+    trigger = {
+        has_game_rule = riseandfall_mma_limit_modifier_enabled
+    }
+    effect = {
+        every_ruler = {
+            limit = {
+                NOT = { has_character_modifier = riseandfall_yearly_maa_limit_cap_increase_modifier }
+            }
+            add_character_modifier = riseandfall_yearly_maa_limit_cap_increase_modifier
+        }
+    }
+}   
 
 
 riseandfall_yearly_adventurer = {
