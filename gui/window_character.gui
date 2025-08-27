@@ -4722,7 +4722,7 @@ types CharacterWindow
 			hbox = {
 				spacing = 3
 
-				tooltip = "Stability: [Character.MakeScope.Var('riseandfall_realm_stability_score').GetValue|V]"
+				tooltip = "Current Stability: [Character.MakeScope.Var('riseandfall_realm_stability_score').GetValue|V] | Target Stability: [Character.MakeScope.Var('riseandfall_realm_stability_target').GetValue|V]"
 				using = tooltip_se
 
 				expand = {}
@@ -4735,7 +4735,7 @@ types CharacterWindow
 
 				text_single = {
 					name = "stability"
-					text = ""
+					text = "[Character.MakeScope.Var('riseandfall_realm_stability_score').GetValue|0]/[Character.MakeScope.Var('riseandfall_realm_stability_target').GetValue|0]"
 					default_format = "#high"
 					align = center|nobaseline
 					fontsize_min = 12
