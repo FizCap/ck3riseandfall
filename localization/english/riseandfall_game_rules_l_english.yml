@@ -9,13 +9,14 @@
  setting_riseandfall_adventurer_creator_disabled:0 "Disabled"
  setting_riseandfall_adventurer_creator_disabled_desc:0 "The adventurer creation system is disabled; dynasty members will not be converted."
 
- # Men-at-arms modifier rule
- rule_riseandfall_enable_mma_modifier:0 "Men-at-Arms Modifier"
- rule_riseandfall_enable_mma_modifier_desc:0 "Toggle whether Rise and Fall grants unlimited men-at-arms to rulers via its men-at-arms modifier."
- setting_riseandfall_mma_modifier_enabled:0 "Enabled"
- setting_riseandfall_mma_modifier_enabled_desc:0 "When enabled, every ruler receives the Rise and Fall men-at-arms modifier which effectively grants unlimited men-at-arms for their realm."
- setting_riseandfall_mma_modifier_disabled:0 "Disabled"
- setting_riseandfall_mma_modifier_disabled_desc:0 "The men-at-arms modifier will not be applied by the mod."
+
+# Men-at-arms modifier rule
+rule_riseandfall_enable_mma_modifier:0 "Men-at-Arms Modifier"
+rule_riseandfall_enable_mma_modifier_desc:0 "Controls whether Rise and Fall applies a large men-at-arms modifier to every realm. Use with caution — it can be unbalanced."
+setting_riseandfall_mma_modifier_enabled:0 "Enabled"
+setting_riseandfall_mma_modifier_enabled_desc:0 "Apply the men-at-arms increase to all characters."
+setting_riseandfall_mma_modifier_disabled:0 "Disabled"
+setting_riseandfall_mma_modifier_disabled_desc:0 "Does not give the men-at-arms increase to all characters."
 
 # Adventurer cleanup rule
 rule_riseandfall_enable_adventurer_cleanup:0 "Adventurer Cleanup"
@@ -26,9 +27,9 @@ setting_riseandfall_adventurer_cleanup_disabled:0 "Disabled"
 setting_riseandfall_adventurer_cleanup_disabled_desc:0 "Adventurer title cleanup is disabled; mod-created adventurer titles will persist and may affect performance in large worlds or long play sessions."
 
 # Men-at-arms cap increase rule (administrative governments)
-rule_riseandfall_enable_mma_limit_modifier:0 "Men-at-Arms Cap Increase (Administrative Governments)"
-rule_riseandfall_enable_mma_limit_modifier_desc:0 "When enabled, certain administrative governments receive a yearly modifier that increases the realm men-at-arms cap. This may make militaries larger for administrative realms."
+rule_riseandfall_enable_mma_limit_modifier:0 "Men-at-Arms Cap Increase (Administrative Titles)"
+rule_riseandfall_enable_mma_limit_modifier_desc:0 "Controls whether Rise and Fall applies a yearly men-at-arms cap increase modifier to administrative governments. Use with caution — it may be unbalanced."
 setting_riseandfall_mma_limit_modifier_enabled:0 "Enabled"
-setting_riseandfall_mma_limit_modifier_enabled_desc:0 "Administrative governments will receive the men-at-arms cap increase modifier yearly. May be unbalanced with current influence costs; use at your own risk."
+setting_riseandfall_mma_limit_modifier_enabled_desc:0 "Controls whether Rise and Fall applies a yearly men-at-arms cap increase modifier to administrative governments. Use with caution — it may be unbalanced."
 setting_riseandfall_mma_limit_modifier_disabled:0 "Disabled"
-setting_riseandfall_mma_limit_modifier_disabled_desc:0 "Administrative governments will not receive the men-at-arms cap increase modifier (recommended default)."
+setting_riseandfall_mma_limit_modifier_disabled_desc:0 "Do not apply the men-at-arms cap increase to administrative titles."

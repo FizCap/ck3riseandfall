@@ -1,10 +1,8 @@
 ﻿riseandfall_yearly_maa_limit_increase_modifier = {
     men_at_arms_limit = 1000
-    icon = intrigue_positive
 }
 
 riseandfall_yearly_maa_limit_cap_increase_modifier = {
     men_at_arms_title_limit = 1000
-    icon = intrigue_positive
 }
 

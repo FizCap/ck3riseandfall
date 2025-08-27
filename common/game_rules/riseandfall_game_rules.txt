@@ -21,12 +21,15 @@ riseandfall_enable_mma_modifier = {
         riseandfall
     }
 
-    # Default: enabled (men-at-arms modifier applied)
-    default = riseandfall_mma_modifier_enabled
+    # Default: disabled (men-at-arms modifier is off by default)
+    default = riseandfall_mma_modifier_disabled
 
+    # Legacy name (kept for savegame compatibility) — behaves identically to the 'all' option
     riseandfall_mma_modifier_enabled = {
+        apply_modifier = all:riseandfall_yearly_maa_limit_increase_modifier
     }
 
+    # Disabled (do not apply the men-at-arms modifier)
     riseandfall_mma_modifier_disabled = {
         flag = riseandfall_mma_modifier_disabled
     }
@@ -41,10 +44,13 @@ riseandfall_enable_mma_modifier = {
 
         # Default: disabled (men-at-arms cap increases for administrative governments are off by default)
         default = riseandfall_mma_limit_modifier_disabled
-
+        
+        # Legacy name (kept for savegame compatibility) — behaves identically to the 'all' option
         riseandfall_mma_limit_modifier_enabled = {
+            apply_modifier = all:riseandfall_yearly_maa_limit_cap_increase_modifier
         }
-
+        
+    # Disabled (no automatic modifier application)
         riseandfall_mma_limit_modifier_disabled = {
             flag = riseandfall_mma_limit_modifier_disabled
         }
