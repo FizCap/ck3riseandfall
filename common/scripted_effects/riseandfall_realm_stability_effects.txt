@@ -27,32 +27,32 @@ riseandfall_calculate_realm_stability_se = {
     set_variable = { name = riseandfall_rs_stats_component value = 0 }
 
     # Diplomacy
-    set_variable = { name = tmp_add value = diplomacy }
-    change_variable = { name = tmp_add multiply = 0.333333 }
+    set_variable = { name = tmp_add value = scope:independent_ruler.diplomacy }
+    change_variable = { name = tmp_add multiply = 0.333 }
     clamp_variable = { name = tmp_add min = 0 max = 5 }
     change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
 
     # Martial
-    set_variable = { name = tmp_add value = martial }
-    change_variable = { name = tmp_add multiply = 0.333333 }
+    set_variable = { name = tmp_add value = scope:independent_ruler.martial }
+    change_variable = { name = tmp_add multiply = 0.333 }
     clamp_variable = { name = tmp_add min = 0 max = 5 }
     change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
 
     # Stewardship
-    set_variable = { name = tmp_add value = stewardship }
-    change_variable = { name = tmp_add multiply = 0.333333 }
+    set_variable = { name = tmp_add value = scope:independent_ruler.stewardship }
+    change_variable = { name = tmp_add multiply = 0.333 }
     clamp_variable = { name = tmp_add min = 0 max = 5 }
     change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
 
     # Intrigue
-    set_variable = { name = tmp_add value = intrigue }
-    change_variable = { name = tmp_add multiply = 0.333333 }
+    set_variable = { name = tmp_add value = scope:independent_ruler.intrigue }
+    change_variable = { name = tmp_add multiply = 0.333 }
     clamp_variable = { name = tmp_add min = 0 max = 5 }
     change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
 
     # Learning
-    set_variable = { name = tmp_add value = learning }
-    change_variable = { name = tmp_add multiply = 0.333333 }
+    set_variable = { name = tmp_add value = scope:independent_ruler.learning }
+    change_variable = { name = tmp_add multiply = 0.333 }
     clamp_variable = { name = tmp_add min = 0 max = 5 }
     change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
 
@@ -136,51 +136,59 @@ riseandfall_calculate_realm_stability_se = {
 
     ########################################
     # 5) VASSAL RELATIONS (25 points max)
-    # Single random powerful vassal approach: use their numeric opinion / 4
+    # Calculate average vassal opinion across every_vassal (negatives treated as 0)
     set_variable = { name = riseandfall_rs_vassals_component value = 0 }
-    # Save the ruler scope before selecting vassal
+    # Save ruler scope and prepare accumulators
     save_scope_as = ruler_scope
-    random_vassal = {
-        # Save the chosen vassal's scope so ruler can query it safely (pick any vassal)
-        save_scope_as = chosen_vassal
+    set_variable = { name = tmp_vassal_count value = vassal_count }
+    set_variable = { name = tmp_opinion_sum value = 0 }
 
-        # From the ruler scope, read the vassal's opinion via opinion triggers.
-        # We approximate the numeric opinion by testing thresholds in steps of 4
-        # so the final multiplied value is roughly opinion / 4.
+    # If there are any vassals, iterate them and add their non-negative opinion to the sum
+    every_vassal = {
+        save_scope_as = iter_vassal
+        # From the ruler scope, evaluate the vassal's opinion of the ruler via opinion triggers
         scope:ruler_scope = {
-            set_variable = { name = tmp_op value = 0 }
-            if = { limit = { opinion = { target = scope:chosen_vassal value >= 100 } } set_variable = { name = tmp_op value = 100 } }
-            else_if = { limit = { opinion = { target = scope:chosen_vassal value >= 96 } } set_variable = { name = tmp_op value = 96 } }
-            else_if = { limit = { opinion = { target = scope:chosen_vassal value >= 92 } } set_variable = { name = tmp_op value = 92 } }
-            else_if = { limit = { opinion = { target = scope:chosen_vassal value >= 88 } } set_variable = { name = tmp_op value = 88 } }
-            else_if = { limit = { opinion = { target = scope:chosen_vassal value >= 84 } } set_variable = { name = tmp_op value = 84 } }
-            else_if = { limit = { opinion = { target = scope:chosen_vassal value >= 80 } } set_variable = { name = tmp_op value = 80 } }
-            else_if = { limit = { opinion = { target = scope:chosen_vassal value >= 76 } } set_variable = { name = tmp_op value = 76 } }
-            else_if = { limit = { opinion = { target = scope:chosen_vassal value >= 72 } } set_variable = { name = tmp_op value = 72 } }
-            else_if = { limit = { opinion = { target = scope:chosen_vassal value >= 68 } } set_variable = { name = tmp_op value = 68 } }
-            else_if = { limit = { opinion = { target = scope:chosen_vassal value >= 64 } } set_variable = { name = tmp_op value = 64 } }
-            else_if = { limit = { opinion = { target = scope:chosen_vassal value >= 60 } } set_variable = { name = tmp_op value = 60 } }
-            else_if = { limit = { opinion = { target = scope:chosen_vassal value >= 56 } } set_variable = { name = tmp_op value = 56 } }
-            else_if = { limit = { opinion = { target = scope:chosen_vassal value >= 52 } } set_variable = { name = tmp_op value = 52 } }
-            else_if = { limit = { opinion = { target = scope:chosen_vassal value >= 48 } } set_variable = { name = tmp_op value = 48 } }
-            else_if = { limit = { opinion = { target = scope:chosen_vassal value >= 44 } } set_variable = { name = tmp_op value = 44 } }
-            else_if = { limit = { opinion = { target = scope:chosen_vassal value >= 40 } } set_variable = { name = tmp_op value = 40 } }
-            else_if = { limit = { opinion = { target = scope:chosen_vassal value >= 36 } } set_variable = { name = tmp_op value = 36 } }
-            else_if = { limit = { opinion = { target = scope:chosen_vassal value >= 32 } } set_variable = { name = tmp_op value = 32 } }
-            else_if = { limit = { opinion = { target = scope:chosen_vassal value >= 28 } } set_variable = { name = tmp_op value = 28 } }
-            else_if = { limit = { opinion = { target = scope:chosen_vassal value >= 24 } } set_variable = { name = tmp_op value = 24 } }
-            else_if = { limit = { opinion = { target = scope:chosen_vassal value >= 20 } } set_variable = { name = tmp_op value = 20 } }
-            else_if = { limit = { opinion = { target = scope:chosen_vassal value >= 16 } } set_variable = { name = tmp_op value = 16 } }
-            else_if = { limit = { opinion = { target = scope:chosen_vassal value >= 12 } } set_variable = { name = tmp_op value = 12 } }
-            else_if = { limit = { opinion = { target = scope:chosen_vassal value >= 8 } } set_variable = { name = tmp_op value = 8 } }
-            else_if = { limit = { opinion = { target = scope:chosen_vassal value >= 4 } } set_variable = { name = tmp_op value = 4 } }
-            else = { set_variable = { name = tmp_op value = 0 } }
+            set_variable = { name = tmp_local_op value = 0 }
+            if = { limit = { opinion = { target = scope:iter_vassal value >= 100 } } set_variable = { name = tmp_local_op value = 100 } }
+            else_if = { limit = { opinion = { target = scope:iter_vassal value >= 96 } } set_variable = { name = tmp_local_op value = 96 } }
+            else_if = { limit = { opinion = { target = scope:iter_vassal value >= 92 } } set_variable = { name = tmp_local_op value = 92 } }
+            else_if = { limit = { opinion = { target = scope:iter_vassal value >= 88 } } set_variable = { name = tmp_local_op value = 88 } }
+            else_if = { limit = { opinion = { target = scope:iter_vassal value >= 84 } } set_variable = { name = tmp_local_op value = 84 } }
+            else_if = { limit = { opinion = { target = scope:iter_vassal value >= 80 } } set_variable = { name = tmp_local_op value = 80 } }
+            else_if = { limit = { opinion = { target = scope:iter_vassal value >= 76 } } set_variable = { name = tmp_local_op value = 76 } }
+            else_if = { limit = { opinion = { target = scope:iter_vassal value >= 72 } } set_variable = { name = tmp_local_op value = 72 } }
+            else_if = { limit = { opinion = { target = scope:iter_vassal value >= 68 } } set_variable = { name = tmp_local_op value = 68 } }
+            else_if = { limit = { opinion = { target = scope:iter_vassal value >= 64 } } set_variable = { name = tmp_local_op value = 64 } }
+            else_if = { limit = { opinion = { target = scope:iter_vassal value >= 60 } } set_variable = { name = tmp_local_op value = 60 } }
+            else_if = { limit = { opinion = { target = scope:iter_vassal value >= 56 } } set_variable = { name = tmp_local_op value = 56 } }
+            else_if = { limit = { opinion = { target = scope:iter_vassal value >= 52 } } set_variable = { name = tmp_local_op value = 52 } }
+            else_if = { limit = { opinion = { target = scope:iter_vassal value >= 48 } } set_variable = { name = tmp_local_op value = 48 } }
+            else_if = { limit = { opinion = { target = scope:iter_vassal value >= 44 } } set_variable = { name = tmp_local_op value = 44 } }
+            else_if = { limit = { opinion = { target = scope:iter_vassal value >= 40 } } set_variable = { name = tmp_local_op value = 40 } }
+            else_if = { limit = { opinion = { target = scope:iter_vassal value >= 36 } } set_variable = { name = tmp_local_op value = 36 } }
+            else_if = { limit = { opinion = { target = scope:iter_vassal value >= 32 } } set_variable = { name = tmp_local_op value = 32 } }
+            else_if = { limit = { opinion = { target = scope:iter_vassal value >= 28 } } set_variable = { name = tmp_local_op value = 28 } }
+            else_if = { limit = { opinion = { target = scope:iter_vassal value >= 24 } } set_variable = { name = tmp_local_op value = 24 } }
+            else_if = { limit = { opinion = { target = scope:iter_vassal value >= 20 } } set_variable = { name = tmp_local_op value = 20 } }
+            else_if = { limit = { opinion = { target = scope:iter_vassal value >= 16 } } set_variable = { name = tmp_local_op value = 16 } }
+            else_if = { limit = { opinion = { target = scope:iter_vassal value >= 12 } } set_variable = { name = tmp_local_op value = 12 } }
+            else_if = { limit = { opinion = { target = scope:iter_vassal value >= 8 } } set_variable = { name = tmp_local_op value = 8 } }
+            else_if = { limit = { opinion = { target = scope:iter_vassal value >= 4 } } set_variable = { name = tmp_local_op value = 4 } }
+            else = { set_variable = { name = tmp_local_op value = 0 } }
 
-            # clamp to non-negative then scale (opinion/4 approximation)
-            if = { limit = { var:tmp_op < 0 } set_variable = { name = tmp_op value = 0 } }
-            change_variable = { name = tmp_op multiply = 0.25 }
-            set_variable = { name = riseandfall_rs_vassals_component value = var:tmp_op }
+            # Add this vassal's non-negative opinion to the running sum
+            change_variable = { name = tmp_opinion_sum add = var:tmp_local_op }
         }
+    }
+
+    # Compute average (if there are vassals) and scale to 0..25 by dividing by 4
+    if = {
+        limit = { var:tmp_vassal_count > 0 }
+        set_variable = { name = tmp_avg_opinion value = var:tmp_opinion_sum }
+        change_variable = { name = tmp_avg_opinion divide = var:tmp_vassal_count }
+    clamp_variable = { name = tmp_avg_opinion min = 0 max = 100 }
+    # store raw average (0..100) for testing
+    set_variable = { name = riseandfall_rs_vassals_component value = var:tmp_avg_opinion }
     }
 
     clamp_variable = { name = riseandfall_rs_vassals_component min = 0 max = 25 }
