@@ -187,7 +187,9 @@ riseandfall_calculate_realm_stability_se = {
         set_variable = { name = tmp_avg_opinion value = var:tmp_opinion_sum }
         change_variable = { name = tmp_avg_opinion divide = var:tmp_vassal_count }
     clamp_variable = { name = tmp_avg_opinion min = 0 max = 100 }
-    # store raw average (0..100) for testing
+    # scale raw average (0..100) to component range 0..25 by dividing by 4
+    change_variable = { name = tmp_avg_opinion divide = 4 }
+    # store scaled average (0..25)
     set_variable = { name = riseandfall_rs_vassals_component value = var:tmp_avg_opinion }
     }
 
@@ -211,39 +213,72 @@ riseandfall_calculate_realm_stability_se = {
     # 41-60: average
     # 61-80: good
     # 81-100: golden_age
-    # First, clear any existing stability flags so we only have one active flag.
-    remove_character_flag = { name = riseandfall_realm_stability_collapsing }
-    remove_character_flag = { name = riseandfall_realm_stability_low }
-    remove_character_flag = { name = riseandfall_realm_stability_average }
-    remove_character_flag = { name = riseandfall_realm_stability_good }
-    remove_character_flag = { name = riseandfall_realm_stability_golden_age }
+    # First, clear any existing stability variables so we only have one active variable.
+    # Use a single numeric stage variable (1..5) for robustness.
+    remove_variable = riseandfall_realm_stability_stage
+    # Also clear legacy boolean vars if present
+    remove_variable = riseandfall_realm_stability_collapsing
+    remove_variable = riseandfall_realm_stability_low
+    remove_variable = riseandfall_realm_stability_average
+    remove_variable = riseandfall_realm_stability_good
+    remove_variable = riseandfall_realm_stability_golden_age
 
     # Nested if/else chain to assign exactly one flag based on the score
+    # Map score ranges to a single stage number: 1=collapsing,2=low,3=average,4=good,5=golden
     if = {
-        limit = { riseandfall_realm_stability_score <= 20 }
-        add_character_flag = { name = riseandfall_realm_stability_collapsing }
+        limit = { var:riseandfall_realm_stability_score <= 20 }
+        set_variable = { name = riseandfall_realm_stability_stage value = 1 }
     }
     else = {
         if = {
-            limit = { riseandfall_realm_stability_score <= 40 }
-            add_character_flag = { name = riseandfall_realm_stability_low }
+            limit = { var:riseandfall_realm_stability_score <= 40 }
+            set_variable = { name = riseandfall_realm_stability_stage value = 2 }
         }
         else = {
             if = {
-                limit = { riseandfall_realm_stability_score <= 60 }
-                add_character_flag = { name = riseandfall_realm_stability_average }
+                limit = { var:riseandfall_realm_stability_score <= 60 }
+                set_variable = { name = riseandfall_realm_stability_stage value = 3 }
             }
             else = {
                 if = {
-                    limit = { riseandfall_realm_stability_score <= 80 }
-                    add_character_flag = { name = riseandfall_realm_stability_good }
+                    limit = { var:riseandfall_realm_stability_score <= 80 }
+                    set_variable = { name = riseandfall_realm_stability_stage value = 4 }
                 }
                 else = {
                     # 81-100
-                    add_character_flag = { name = riseandfall_realm_stability_golden_age }
+                    set_variable = { name = riseandfall_realm_stability_stage value = 5 }
                 }
             }
         }
+    }
+
+    # Ensure exactly one stage modifier is present on the ruler matching the stability flag.
+    # Remove any old stage modifiers first, then add the correct one.
+    remove_character_modifier = riseandfall_stage1_stability
+    remove_character_modifier = riseandfall_stage2_stability
+    remove_character_modifier = riseandfall_stage3_stability
+    remove_character_modifier = riseandfall_stage4_stability
+    remove_character_modifier = riseandfall_stage5_stability
+
+    # Choose modifier based on numeric stage variable
+    if = {
+        limit = { var:riseandfall_realm_stability_stage = 1 }
+        add_character_modifier = { modifier = riseandfall_stage1_stability }
+    }
+    else_if = {
+        limit = { var:riseandfall_realm_stability_stage = 2 }
+        add_character_modifier = { modifier = riseandfall_stage2_stability }
+    }
+    else_if = {
+        limit = { var:riseandfall_realm_stability_stage = 3 }
+        add_character_modifier = { modifier = riseandfall_stage3_stability }
+    }
+    else_if = {
+        limit = { var:riseandfall_realm_stability_stage = 4 }
+        add_character_modifier = { modifier = riseandfall_stage4_stability }
+    }
+    else = {
+        add_character_modifier = { modifier = riseandfall_stage5_stability }
     }
 
 }
