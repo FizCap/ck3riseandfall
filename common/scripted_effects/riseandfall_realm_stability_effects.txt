@@ -1,0 +1,241 @@
+﻿###############################
+# Rise and Fall - Realm Stability
+# Computes a 0..100 realm stability score and stores it on the ruler as
+# riseandfall_realm_stability_score
+# Weighting (user spec):
+#  - 25% ruler stats (Diplomacy/Martial/Stewardship/Intrigue/Learning)
+#    For every full 10 points in a stat -> +5 (max 25)
+#  - 10% regency/child (binary penalty: 0 => 10, yes => 0)
+#  - 15% debt ("gold option 3" threshold: considered in_debt if gold < -3 * monthly_character_income)
+#    if in debt -> scale up to full 15 based on how deep the debt is (clamped)
+#  - 25% RNG (random 0..25)
+#  - 25% vassal relations (average direct vassal opinion -100..100 mapped to 0..25)
+
+riseandfall_calculate_realm_stability_se = {
+    # Root scope: called from an every_ruler on_action, so root is the ruler
+    # Clear any previous working vars
+    remove_variable = riseandfall_rs_stats_component
+    remove_variable = riseandfall_rs_regency_component
+    remove_variable = riseandfall_rs_debt_component
+    remove_variable = riseandfall_rs_rng_component
+    remove_variable = riseandfall_rs_vassals_component
+    remove_variable = riseandfall_realm_stability_score
+
+    ########################################
+    # 1) RULER STATS (25 points max)
+    # Simplified rule: each 1 stat ≈ 0.3333 stability points (15 stat -> 5 points), capped at 5 per stat
+    set_variable = { name = riseandfall_rs_stats_component value = 0 }
+
+    # Diplomacy
+    set_variable = { name = tmp_add value = diplomacy }
+    change_variable = { name = tmp_add multiply = 0.333333 }
+    clamp_variable = { name = tmp_add min = 0 max = 5 }
+    change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
+
+    # Martial
+    set_variable = { name = tmp_add value = martial }
+    change_variable = { name = tmp_add multiply = 0.333333 }
+    clamp_variable = { name = tmp_add min = 0 max = 5 }
+    change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
+
+    # Stewardship
+    set_variable = { name = tmp_add value = stewardship }
+    change_variable = { name = tmp_add multiply = 0.333333 }
+    clamp_variable = { name = tmp_add min = 0 max = 5 }
+    change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
+
+    # Intrigue
+    set_variable = { name = tmp_add value = intrigue }
+    change_variable = { name = tmp_add multiply = 0.333333 }
+    clamp_variable = { name = tmp_add min = 0 max = 5 }
+    change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
+
+    # Learning
+    set_variable = { name = tmp_add value = learning }
+    change_variable = { name = tmp_add multiply = 0.333333 }
+    clamp_variable = { name = tmp_add min = 0 max = 5 }
+    change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
+
+    # Clamp stats component to 0..25
+    clamp_variable = { name = riseandfall_rs_stats_component min = 0 max = 25 }
+
+    ########################################
+    # 2) REGENCY / CHILD CHECK (10 points)
+    # If ruler is a child OR has an active regency diarchy type, they lose the 10 points (we award 0 if regency/child present, 10 otherwise)
+    set_variable = { name = riseandfall_rs_regency_component value = 10 }
+    if = {
+        # Child check: use age 0..15 to detect child rulers (safer syntax than is_child)
+        limit = { age = { 0 15 } }
+        set_variable = { name = riseandfall_rs_regency_component value = 0 }
+    }
+
+    ########################################
+    # 3) DEBT (15 points) - gold option 3
+    # Consider in_debt if gold < -3 * monthly_character_income
+    # We scale contribution 0..15 where shallower debt gives smaller penalty.
+    set_variable = { name = riseandfall_rs_debt_component value = 15 }
+    set_variable = { name = tmp_gold value = gold }
+    set_variable = { name = tmp_income value = monthly_character_income }
+    # threshold = -3 * income
+    set_variable = { name = tmp_threshold value = var:tmp_income }
+    change_variable = { name = tmp_threshold multiply = -3 }
+
+    if = {
+        limit = { var:tmp_gold < var:tmp_threshold }
+        # depth = abs(gold / threshold) (positive number > 1)
+        # approximate scale: depth_factor = min( (abs(tmp_gold) / abs(tmp_threshold)), 2 ) then map to 0..15
+    set_variable = { name = tmp_gold_abs value = var:tmp_gold }
+    change_variable = { name = tmp_gold_abs multiply = -1 }
+    set_variable = { name = tmp_threshold_abs value = var:tmp_threshold }
+    change_variable = { name = tmp_threshold_abs multiply = -1 }
+        set_variable = { name = tmp_depth_ratio value = 0 }
+        # avoid divide: use multiply by (1/threshold_abs) via change_variable multiply if threshold_abs non-zero.
+        # We approximate ratio by scaling: tmp_depth_ratio = tmp_gold_abs * 0.3333 / tmp_threshold_abs  -> simplifies to tmp_gold_abs/tmp_income
+    set_variable = { name = tmp_depth_ratio value = var:tmp_gold_abs }
+    change_variable = { name = tmp_depth_ratio multiply = 0.333333 }
+    change_variable = { name = tmp_depth_ratio add = 0 } # ensure variable exists
+        # Clamp depth between 0 and 2
+        clamp_variable = { name = tmp_depth_ratio min = 0 max = 2 }
+        # ratio 1 -> full 15, ratio 2 -> also full (cap). We'll map ratio 0..2 -> 0..15
+    change_variable = { name = riseandfall_rs_debt_component multiply = var:tmp_depth_ratio }
+        clamp_variable = { name = riseandfall_rs_debt_component min = 0 max = 15 }
+    }
+
+    ########################################
+    # 4) RNG (0..25)
+    # Pick a uniform integer in 0..25 via random_list and store it in the rng component
+    set_variable = { name = riseandfall_rs_rng_component value = 0 }
+    random_list = {
+        1 = { set_variable = { name = riseandfall_rs_rng_component value = 0 } }
+        1 = { set_variable = { name = riseandfall_rs_rng_component value = 1 } }
+        1 = { set_variable = { name = riseandfall_rs_rng_component value = 2 } }
+        1 = { set_variable = { name = riseandfall_rs_rng_component value = 3 } }
+        1 = { set_variable = { name = riseandfall_rs_rng_component value = 4 } }
+        1 = { set_variable = { name = riseandfall_rs_rng_component value = 5 } }
+        1 = { set_variable = { name = riseandfall_rs_rng_component value = 6 } }
+        1 = { set_variable = { name = riseandfall_rs_rng_component value = 7 } }
+        1 = { set_variable = { name = riseandfall_rs_rng_component value = 8 } }
+        1 = { set_variable = { name = riseandfall_rs_rng_component value = 9 } }
+        1 = { set_variable = { name = riseandfall_rs_rng_component value = 10 } }
+        1 = { set_variable = { name = riseandfall_rs_rng_component value = 11 } }
+        1 = { set_variable = { name = riseandfall_rs_rng_component value = 12 } }
+        1 = { set_variable = { name = riseandfall_rs_rng_component value = 13 } }
+        1 = { set_variable = { name = riseandfall_rs_rng_component value = 14 } }
+        1 = { set_variable = { name = riseandfall_rs_rng_component value = 15 } }
+        1 = { set_variable = { name = riseandfall_rs_rng_component value = 16 } }
+        1 = { set_variable = { name = riseandfall_rs_rng_component value = 17 } }
+        1 = { set_variable = { name = riseandfall_rs_rng_component value = 18 } }
+        1 = { set_variable = { name = riseandfall_rs_rng_component value = 19 } }
+        1 = { set_variable = { name = riseandfall_rs_rng_component value = 20 } }
+        1 = { set_variable = { name = riseandfall_rs_rng_component value = 21 } }
+        1 = { set_variable = { name = riseandfall_rs_rng_component value = 22 } }
+        1 = { set_variable = { name = riseandfall_rs_rng_component value = 23 } }
+        1 = { set_variable = { name = riseandfall_rs_rng_component value = 24 } }
+        1 = { set_variable = { name = riseandfall_rs_rng_component value = 25 } }
+    }
+
+    ########################################
+    # 5) VASSAL RELATIONS (25 points max)
+    # Single random powerful vassal approach: use their numeric opinion / 4
+    set_variable = { name = riseandfall_rs_vassals_component value = 0 }
+    # Save the ruler scope before selecting vassal
+    save_scope_as = ruler_scope
+    random_vassal = {
+        # Save the chosen vassal's scope so ruler can query it safely (pick any vassal)
+        save_scope_as = chosen_vassal
+
+        # From the ruler scope, read the vassal's opinion via opinion triggers.
+        # We approximate the numeric opinion by testing thresholds in steps of 4
+        # so the final multiplied value is roughly opinion / 4.
+        scope:ruler_scope = {
+            set_variable = { name = tmp_op value = 0 }
+            if = { limit = { opinion = { target = scope:chosen_vassal value >= 100 } } set_variable = { name = tmp_op value = 100 } }
+            else_if = { limit = { opinion = { target = scope:chosen_vassal value >= 96 } } set_variable = { name = tmp_op value = 96 } }
+            else_if = { limit = { opinion = { target = scope:chosen_vassal value >= 92 } } set_variable = { name = tmp_op value = 92 } }
+            else_if = { limit = { opinion = { target = scope:chosen_vassal value >= 88 } } set_variable = { name = tmp_op value = 88 } }
+            else_if = { limit = { opinion = { target = scope:chosen_vassal value >= 84 } } set_variable = { name = tmp_op value = 84 } }
+            else_if = { limit = { opinion = { target = scope:chosen_vassal value >= 80 } } set_variable = { name = tmp_op value = 80 } }
+            else_if = { limit = { opinion = { target = scope:chosen_vassal value >= 76 } } set_variable = { name = tmp_op value = 76 } }
+            else_if = { limit = { opinion = { target = scope:chosen_vassal value >= 72 } } set_variable = { name = tmp_op value = 72 } }
+            else_if = { limit = { opinion = { target = scope:chosen_vassal value >= 68 } } set_variable = { name = tmp_op value = 68 } }
+            else_if = { limit = { opinion = { target = scope:chosen_vassal value >= 64 } } set_variable = { name = tmp_op value = 64 } }
+            else_if = { limit = { opinion = { target = scope:chosen_vassal value >= 60 } } set_variable = { name = tmp_op value = 60 } }
+            else_if = { limit = { opinion = { target = scope:chosen_vassal value >= 56 } } set_variable = { name = tmp_op value = 56 } }
+            else_if = { limit = { opinion = { target = scope:chosen_vassal value >= 52 } } set_variable = { name = tmp_op value = 52 } }
+            else_if = { limit = { opinion = { target = scope:chosen_vassal value >= 48 } } set_variable = { name = tmp_op value = 48 } }
+            else_if = { limit = { opinion = { target = scope:chosen_vassal value >= 44 } } set_variable = { name = tmp_op value = 44 } }
+            else_if = { limit = { opinion = { target = scope:chosen_vassal value >= 40 } } set_variable = { name = tmp_op value = 40 } }
+            else_if = { limit = { opinion = { target = scope:chosen_vassal value >= 36 } } set_variable = { name = tmp_op value = 36 } }
+            else_if = { limit = { opinion = { target = scope:chosen_vassal value >= 32 } } set_variable = { name = tmp_op value = 32 } }
+            else_if = { limit = { opinion = { target = scope:chosen_vassal value >= 28 } } set_variable = { name = tmp_op value = 28 } }
+            else_if = { limit = { opinion = { target = scope:chosen_vassal value >= 24 } } set_variable = { name = tmp_op value = 24 } }
+            else_if = { limit = { opinion = { target = scope:chosen_vassal value >= 20 } } set_variable = { name = tmp_op value = 20 } }
+            else_if = { limit = { opinion = { target = scope:chosen_vassal value >= 16 } } set_variable = { name = tmp_op value = 16 } }
+            else_if = { limit = { opinion = { target = scope:chosen_vassal value >= 12 } } set_variable = { name = tmp_op value = 12 } }
+            else_if = { limit = { opinion = { target = scope:chosen_vassal value >= 8 } } set_variable = { name = tmp_op value = 8 } }
+            else_if = { limit = { opinion = { target = scope:chosen_vassal value >= 4 } } set_variable = { name = tmp_op value = 4 } }
+            else = { set_variable = { name = tmp_op value = 0 } }
+
+            # clamp to non-negative then scale (opinion/4 approximation)
+            if = { limit = { var:tmp_op < 0 } set_variable = { name = tmp_op value = 0 } }
+            change_variable = { name = tmp_op multiply = 0.25 }
+            set_variable = { name = riseandfall_rs_vassals_component value = var:tmp_op }
+        }
+    }
+
+    clamp_variable = { name = riseandfall_rs_vassals_component min = 0 max = 25 }
+
+    ########################################
+    # Sum components into final 0..100 score
+    set_variable = { name = riseandfall_realm_stability_score value = 0 }
+    change_variable = { name = riseandfall_realm_stability_score add = var:riseandfall_rs_stats_component }
+    change_variable = { name = riseandfall_realm_stability_score add = var:riseandfall_rs_regency_component }
+    change_variable = { name = riseandfall_realm_stability_score add = var:riseandfall_rs_debt_component }
+    change_variable = { name = riseandfall_realm_stability_score add = var:riseandfall_rs_rng_component }
+    change_variable = { name = riseandfall_realm_stability_score add = var:riseandfall_rs_vassals_component }
+
+    clamp_variable = { name = riseandfall_realm_stability_score min = 0 max = 100 }
+    round_variable = { name = riseandfall_realm_stability_score }
+
+    # Set exactly one character flag representing the stability band:
+    # 0-20: collapsing
+    # 21-40: low
+    # 41-60: average
+    # 61-80: good
+    # 81-100: golden_age
+    # First, clear any existing stability flags so we only have one active flag.
+    remove_character_flag = { name = riseandfall_realm_stability_collapsing }
+    remove_character_flag = { name = riseandfall_realm_stability_low }
+    remove_character_flag = { name = riseandfall_realm_stability_average }
+    remove_character_flag = { name = riseandfall_realm_stability_good }
+    remove_character_flag = { name = riseandfall_realm_stability_golden_age }
+
+    # Nested if/else chain to assign exactly one flag based on the score
+    if = {
+        limit = { riseandfall_realm_stability_score <= 20 }
+        add_character_flag = { name = riseandfall_realm_stability_collapsing }
+    }
+    else = {
+        if = {
+            limit = { riseandfall_realm_stability_score <= 40 }
+            add_character_flag = { name = riseandfall_realm_stability_low }
+        }
+        else = {
+            if = {
+                limit = { riseandfall_realm_stability_score <= 60 }
+                add_character_flag = { name = riseandfall_realm_stability_average }
+            }
+            else = {
+                if = {
+                    limit = { riseandfall_realm_stability_score <= 80 }
+                    add_character_flag = { name = riseandfall_realm_stability_good }
+                }
+                else = {
+                    # 81-100
+                    add_character_flag = { name = riseandfall_realm_stability_golden_age }
+                }
+            }
+        }
+    }
+
+}

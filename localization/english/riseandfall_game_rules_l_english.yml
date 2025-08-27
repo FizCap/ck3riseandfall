@@ -26,6 +26,15 @@ setting_riseandfall_adventurer_cleanup_desc:0 "Cleanup of mod-created adventurer
 setting_riseandfall_adventurer_cleanup_disabled:0 "Disabled"
 setting_riseandfall_adventurer_cleanup_disabled_desc:0 "Adventurer title cleanup is disabled; mod-created adventurer titles will persist and may affect performance in large worlds or long play sessions."
 
+
+# Realm Stability rule
+rule_riseandfall_enable_realm_stability:0 "Realm Stability"
+rule_riseandfall_enable_realm_stability_desc:0 "Toggle the Rise and Fall realm stability system."
+setting_riseandfall_realm_stability_enabled:0 "Enabled"
+setting_riseandfall_realm_stability_enabled_desc:0 "Realm stability is active; rulers receive a stability rating and corresponding flags."
+setting_riseandfall_realm_stability_disabled:0 "Disabled"
+setting_riseandfall_realm_stability_disabled_desc:0 "Realm stability is inactive; no stability flags will be applied."
+
 # Men-at-arms cap increase rule (administrative governments)
 rule_riseandfall_enable_mma_limit_modifier:0 "Men-at-Arms Cap Increase (Administrative Titles)"
 rule_riseandfall_enable_mma_limit_modifier_desc:0 "Controls whether Rise and Fall applies a yearly men-at-arms cap increase modifier to administrative governments. Use with caution — it may be unbalanced."

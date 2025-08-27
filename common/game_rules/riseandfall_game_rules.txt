@@ -72,3 +72,21 @@ riseandfall_enable_adventurer_cleanup = {
         flag = riseandfall_adventurer_cleanup_disabled
     }
 }
+
+
+riseandfall_enable_realm_stability = {
+
+    categories = {
+        riseandfall
+    }
+
+    # Default: enabled
+    default = riseandfall_realm_stability_enabled
+
+    riseandfall_realm_stability_enabled = {
+    }
+
+    riseandfall_realm_stability_disabled = {
+        flag = riseandfall_realm_stability_disabled
+    }
+}

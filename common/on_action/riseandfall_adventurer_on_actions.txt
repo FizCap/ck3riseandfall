@@ -10,11 +10,16 @@
     }
 }
 
+quarterly_playable_pulse = {
+    on_actions = {
+        riseandfall_quarterly_adventurer_income
+    }
+}
+
 riseandfall_yearly_adventurer = {
     trigger = {
         has_game_rule = riseandfall_adventurer_creator_enabled
     }
-
     effect = {
         every_ruler = {
             limit = { is_dynast = yes }
@@ -38,13 +43,6 @@ riseandfall_yearly_adventurer_press_claims = {
             # call the scripted effect on the adventurer leader
             riseandfall_adventurer_press_claims_se = yes
         }
-    }
-}
-
-# Pay adventurer income quarterly; root scope is each playable character. We'll iterate rulers with the gold mod.
-quarterly_playable_pulse = {
-    on_actions = {
-        riseandfall_quarterly_adventurer_income
     }
 }
 

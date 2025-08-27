@@ -1,0 +1,28 @@
+﻿# On_actions for the Realm Stability mechanic
+# This file isolates the realm stability on_action so it can be enabled, disabled,
+# or scheduled independently from adventurer logic.
+
+yearly_global_pulse = {
+    on_actions = {
+        riseandfall_yearly_realm_stability
+    }
+}
+
+riseandfall_yearly_realm_stability = {
+    trigger = {
+        has_game_rule = riseandfall_realm_stability_enabled
+    }
+
+    effect = {
+        every_ruler = {
+            # Run only for kings or emperors (king-level rulers and above)
+            limit = {
+                highest_held_title_tier >= tier_kingdom
+            }
+            save_scope_as = independent_ruler
+            scope:independent_ruler = {
+                riseandfall_calculate_realm_stability_se = yes
+            }
+        }
+    }
+}
