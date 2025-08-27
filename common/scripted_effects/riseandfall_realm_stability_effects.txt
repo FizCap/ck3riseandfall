@@ -8,7 +8,7 @@
 #  - 10% regency/child (binary penalty: 0 => 10, yes => 0)
 #  - 15% debt ("gold option 3" threshold: considered in_debt if gold < -3 * monthly_character_income)
 #    if in debt -> scale up to full 15 based on how deep the debt is (clamped)
-#  - 25% RNG (random 0..25)
+#  - 25% legitimacy (based on ruler's legitimacy level: 1=0, 2=5, 3=10, 4=17, 5=25)
 #  - 25% vassal relations (average direct vassal opinion -100..100 mapped to 0..25)
 
 riseandfall_calculate_realm_stability_se = {
@@ -25,33 +25,33 @@ riseandfall_calculate_realm_stability_se = {
     set_variable = { name = riseandfall_rs_stats_component value = 0 }
 
     # Diplomacy
-    set_variable = { name = tmp_add value = scope:independent_ruler.diplomacy }
+    set_variable = { name = tmp_add value = diplomacy }
     # approximate multiply 0.333 by dividing by 3 to avoid decimal literal parsing
     change_variable = { name = tmp_add divide = 3 }
     clamp_variable = { name = tmp_add min = 0 max = 5 }
     change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
 
     # Martial
-    set_variable = { name = tmp_add value = scope:independent_ruler.martial }
+    set_variable = { name = tmp_add value = martial }
     change_variable = { name = tmp_add divide = 3 }
     clamp_variable = { name = tmp_add min = 0 max = 5 }
     change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
         # Note: do NOT remove `riseandfall_realm_stability_score` here — it is the persistent
         # "current" stability we will nudge slowly toward the freshly-calculated target.
     # Stewardship
-    set_variable = { name = tmp_add value = scope:independent_ruler.stewardship }
+    set_variable = { name = tmp_add value = stewardship }
     change_variable = { name = tmp_add divide = 3 }
     clamp_variable = { name = tmp_add min = 0 max = 5 }
     change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
 
     # Intrigue
-    set_variable = { name = tmp_add value = scope:independent_ruler.intrigue }
+    set_variable = { name = tmp_add value = intrigue }
     change_variable = { name = tmp_add divide = 3 }
     clamp_variable = { name = tmp_add min = 0 max = 5 }
     change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
 
     # Learning
-    set_variable = { name = tmp_add value = scope:independent_ruler.learning }
+    set_variable = { name = tmp_add value = learning }
     change_variable = { name = tmp_add divide = 3 }
     clamp_variable = { name = tmp_add min = 0 max = 5 }
     change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
@@ -103,39 +103,28 @@ riseandfall_calculate_realm_stability_se = {
     }
 
     ########################################
-    # 4) RNG (0..25) - roll once per character
-    # Only generate a random component if the character doesn't already have one saved.
+    # 4) LEGITIMACY (0..25) - based on ruler's legitimacy level
+    # Map legitimacy levels 1-5 to stability points: 1=0, 2=5, 3=10, 4=17, 5=25
+    set_variable = { name = riseandfall_rs_legitimacy_component value = 0 }
+    
+    # Check legitimacy level and assign corresponding points
     if = {
-        limit = { NOT = { has_variable = riseandfall_rs_rng_component } }
-        random_list = {
-            1 = { set_variable = { name = riseandfall_rs_rng_component value = 0 } }
-            1 = { set_variable = { name = riseandfall_rs_rng_component value = 1 } }
-            1 = { set_variable = { name = riseandfall_rs_rng_component value = 2 } }
-            1 = { set_variable = { name = riseandfall_rs_rng_component value = 3 } }
-            1 = { set_variable = { name = riseandfall_rs_rng_component value = 4 } }
-            1 = { set_variable = { name = riseandfall_rs_rng_component value = 5 } }
-            1 = { set_variable = { name = riseandfall_rs_rng_component value = 6 } }
-            1 = { set_variable = { name = riseandfall_rs_rng_component value = 7 } }
-            1 = { set_variable = { name = riseandfall_rs_rng_component value = 8 } }
-            1 = { set_variable = { name = riseandfall_rs_rng_component value = 9 } }
-            1 = { set_variable = { name = riseandfall_rs_rng_component value = 10 } }
-            1 = { set_variable = { name = riseandfall_rs_rng_component value = 11 } }
-            1 = { set_variable = { name = riseandfall_rs_rng_component value = 12 } }
-            1 = { set_variable = { name = riseandfall_rs_rng_component value = 13 } }
-            1 = { set_variable = { name = riseandfall_rs_rng_component value = 14 } }
-            1 = { set_variable = { name = riseandfall_rs_rng_component value = 15 } }
-            1 = { set_variable = { name = riseandfall_rs_rng_component value = 16 } }
-            1 = { set_variable = { name = riseandfall_rs_rng_component value = 17 } }
-            1 = { set_variable = { name = riseandfall_rs_rng_component value = 18 } }
-            1 = { set_variable = { name = riseandfall_rs_rng_component value = 19 } }
-            1 = { set_variable = { name = riseandfall_rs_rng_component value = 20 } }
-            1 = { set_variable = { name = riseandfall_rs_rng_component value = 21 } }
-            1 = { set_variable = { name = riseandfall_rs_rng_component value = 22 } }
-            1 = { set_variable = { name = riseandfall_rs_rng_component value = 23 } }
-            1 = { set_variable = { name = riseandfall_rs_rng_component value = 24 } }
-            1 = { set_variable = { name = riseandfall_rs_rng_component value = 25 } }
-        }
+        limit = { legitimacy_level = 2 }
+        set_variable = { name = riseandfall_rs_legitimacy_component value = 5 }
     }
+    else_if = {
+        limit = { legitimacy_level = 3 }
+        set_variable = { name = riseandfall_rs_legitimacy_component value = 10 }
+    }
+    else_if = {
+        limit = { legitimacy_level = 4 }
+        set_variable = { name = riseandfall_rs_legitimacy_component value = 17 }
+    }
+    else_if = {
+        limit = { legitimacy_level = 5 }
+        set_variable = { name = riseandfall_rs_legitimacy_component value = 25 }
+    }
+    # Level 1 defaults to 0 (already set above)
 
     ########################################
     # 5) VASSAL RELATIONS (25 points max)
@@ -206,13 +195,13 @@ riseandfall_calculate_realm_stability_se = {
     if = { limit = { NOT = { has_variable = riseandfall_rs_stats_component } } set_variable = { name = riseandfall_rs_stats_component value = 0 } }
     if = { limit = { NOT = { has_variable = riseandfall_rs_regency_component } } set_variable = { name = riseandfall_rs_regency_component value = 0 } }
     if = { limit = { NOT = { has_variable = riseandfall_rs_debt_component } } set_variable = { name = riseandfall_rs_debt_component value = 0 } }
-    if = { limit = { NOT = { has_variable = riseandfall_rs_rng_component } } set_variable = { name = riseandfall_rs_rng_component value = 0 } }
+    if = { limit = { NOT = { has_variable = riseandfall_rs_legitimacy_component } } set_variable = { name = riseandfall_rs_legitimacy_component value = 0 } }
     if = { limit = { NOT = { has_variable = riseandfall_rs_vassals_component } } set_variable = { name = riseandfall_rs_vassals_component value = 0 } }
     set_variable = { name = tmp_target_score value = 0 }
     change_variable = { name = tmp_target_score add = var:riseandfall_rs_stats_component }
     change_variable = { name = tmp_target_score add = var:riseandfall_rs_regency_component }
     change_variable = { name = tmp_target_score add = var:riseandfall_rs_debt_component }
-    change_variable = { name = tmp_target_score add = var:riseandfall_rs_rng_component }
+    change_variable = { name = tmp_target_score add = var:riseandfall_rs_legitimacy_component }
     change_variable = { name = tmp_target_score add = var:riseandfall_rs_vassals_component }
 
     clamp_variable = { name = tmp_target_score min = 0 max = 100 }
