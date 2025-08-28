@@ -8,8 +8,8 @@
 #  - 10% regency/child (binary penalty: 0 => 10, yes => 0)
 #  - 15% debt ("gold option 3" threshold: considered in_debt if gold < -3 * monthly_character_income)
 #    if in debt -> scale up to full 15 based on how deep the debt is (clamped)
-#  - 25% legitimacy (based on ruler's legitimacy level: 1=0, 2=5, 3=10, 4=17, 5=25)
-#  - 25% vassal relations (average direct vassal opinion -100..100 mapped to 0..25)
+#  - 20% legitimacy (based on ruler's legitimacy level: 1=0, 2=4, 3=8, 4=14, 5=20)
+#  - 30% vassal relations (average direct vassal opinion -100..100 mapped to 0..30)
 
 riseandfall_calculate_realm_stability_se = {
     # Root scope: called from an every_ruler on_action, so root is the ruler
@@ -104,76 +104,58 @@ riseandfall_calculate_realm_stability_se = {
 
     ########################################
     # 4) LEGITIMACY (0..25) - based on ruler's legitimacy level
-    # Map legitimacy levels 1-5 to stability points: 1=0, 2=5, 3=10, 4=17, 5=25
+    # Map legitimacy levels 1-5 to stability points (scaled to 0..20):
+    # 1=0, 2=4, 3=8, 4=14, 5=20  (approximate scaling from previous 0..25 mapping)
     set_variable = { name = riseandfall_rs_legitimacy_component value = 0 }
-    
+
     # Check legitimacy level and assign corresponding points
     if = {
         limit = { legitimacy_level = 2 }
-        set_variable = { name = riseandfall_rs_legitimacy_component value = 5 }
+        set_variable = { name = riseandfall_rs_legitimacy_component value = 4 }
     }
     else_if = {
         limit = { legitimacy_level = 3 }
-        set_variable = { name = riseandfall_rs_legitimacy_component value = 10 }
+        set_variable = { name = riseandfall_rs_legitimacy_component value = 8 }
     }
     else_if = {
         limit = { legitimacy_level = 4 }
-        set_variable = { name = riseandfall_rs_legitimacy_component value = 17 }
+        set_variable = { name = riseandfall_rs_legitimacy_component value = 14 }
     }
     else_if = {
         limit = { legitimacy_level = 5 }
-        set_variable = { name = riseandfall_rs_legitimacy_component value = 25 }
+        set_variable = { name = riseandfall_rs_legitimacy_component value = 20 }
     }
     # Level 1 defaults to 0 (already set above)
 
     ########################################
-    # 5) VASSAL RELATIONS (25 points max)
-    # Calculate average vassal opinion across every_vassal (negatives treated as 0)
+    # 5) VASSAL RELATIONS (30 points max)
+    # Calculate average vassal opinion across every_vassal (including negative opinions)
     set_variable = { name = riseandfall_rs_vassals_component value = 0 }
-    # Save ruler scope and prepare accumulators
-    save_scope_as = ruler_scope
-    set_variable = { name = tmp_vassal_count value = vassal_count }
+    # Prepare accumulators - count vassals we actually process
+    set_variable = { name = tmp_vassal_count value = 0 }
     set_variable = { name = tmp_opinion_sum value = 0 }
 
-    # If there are any vassals, iterate them and add their non-negative opinion to the sum
+    # Save ruler scope first so vassals can modify the ruler's variables
+    save_scope_as = ruler
+    
+    # If there are any vassals, iterate them and add their opinion to the sum
     every_vassal = {
-        save_scope_as = iter_vassal
-        # From the ruler scope, evaluate the vassal's opinion of the ruler via opinion triggers
-        scope:ruler_scope = {
-            set_variable = { name = tmp_local_op value = 0 }
-            if = { limit = { opinion = { target = scope:iter_vassal value >= 100 } } set_variable = { name = tmp_local_op value = 100 } }
-            else_if = { limit = { opinion = { target = scope:iter_vassal value >= 96 } } set_variable = { name = tmp_local_op value = 96 } }
-            else_if = { limit = { opinion = { target = scope:iter_vassal value >= 92 } } set_variable = { name = tmp_local_op value = 92 } }
-            else_if = { limit = { opinion = { target = scope:iter_vassal value >= 88 } } set_variable = { name = tmp_local_op value = 88 } }
-            else_if = { limit = { opinion = { target = scope:iter_vassal value >= 84 } } set_variable = { name = tmp_local_op value = 84 } }
-            else_if = { limit = { opinion = { target = scope:iter_vassal value >= 80 } } set_variable = { name = tmp_local_op value = 80 } }
-            else_if = { limit = { opinion = { target = scope:iter_vassal value >= 76 } } set_variable = { name = tmp_local_op value = 76 } }
-            else_if = { limit = { opinion = { target = scope:iter_vassal value >= 72 } } set_variable = { name = tmp_local_op value = 72 } }
-            else_if = { limit = { opinion = { target = scope:iter_vassal value >= 68 } } set_variable = { name = tmp_local_op value = 68 } }
-            else_if = { limit = { opinion = { target = scope:iter_vassal value >= 64 } } set_variable = { name = tmp_local_op value = 64 } }
-            else_if = { limit = { opinion = { target = scope:iter_vassal value >= 60 } } set_variable = { name = tmp_local_op value = 60 } }
-            else_if = { limit = { opinion = { target = scope:iter_vassal value >= 56 } } set_variable = { name = tmp_local_op value = 56 } }
-            else_if = { limit = { opinion = { target = scope:iter_vassal value >= 52 } } set_variable = { name = tmp_local_op value = 52 } }
-            else_if = { limit = { opinion = { target = scope:iter_vassal value >= 48 } } set_variable = { name = tmp_local_op value = 48 } }
-            else_if = { limit = { opinion = { target = scope:iter_vassal value >= 44 } } set_variable = { name = tmp_local_op value = 44 } }
-            else_if = { limit = { opinion = { target = scope:iter_vassal value >= 40 } } set_variable = { name = tmp_local_op value = 40 } }
-            else_if = { limit = { opinion = { target = scope:iter_vassal value >= 36 } } set_variable = { name = tmp_local_op value = 36 } }
-            else_if = { limit = { opinion = { target = scope:iter_vassal value >= 32 } } set_variable = { name = tmp_local_op value = 32 } }
-            else_if = { limit = { opinion = { target = scope:iter_vassal value >= 28 } } set_variable = { name = tmp_local_op value = 28 } }
-            else_if = { limit = { opinion = { target = scope:iter_vassal value >= 24 } } set_variable = { name = tmp_local_op value = 24 } }
-            else_if = { limit = { opinion = { target = scope:iter_vassal value >= 20 } } set_variable = { name = tmp_local_op value = 20 } }
-            else_if = { limit = { opinion = { target = scope:iter_vassal value >= 16 } } set_variable = { name = tmp_local_op value = 16 } }
-            else_if = { limit = { opinion = { target = scope:iter_vassal value >= 12 } } set_variable = { name = tmp_local_op value = 12 } }
-            else_if = { limit = { opinion = { target = scope:iter_vassal value >= 8 } } set_variable = { name = tmp_local_op value = 8 } }
-            else_if = { limit = { opinion = { target = scope:iter_vassal value >= 4 } } set_variable = { name = tmp_local_op value = 4 } }
-            else = { set_variable = { name = tmp_local_op value = 0 } }
-
-            # Add this vassal's non-negative opinion to the running sum
-            change_variable = { name = tmp_opinion_sum add = var:tmp_local_op }
+        # Increment the count of vassals we're processing
+        scope:ruler = {
+            change_variable = { name = tmp_vassal_count add = 1 }
+        }
+        # Save the vassal's opinion of their liege and add it to the sum (including negative opinions)
+        if = {
+            limit = {
+                save_temporary_opinion_value_as = { name = tmp_vassal_opinion target = liege }
+            }
+            scope:ruler = {
+                change_variable = { name = tmp_opinion_sum add = scope:tmp_vassal_opinion }
+            }
         }
     }
 
-    # Compute average (if there are vassals) and scale to 0..25 by dividing by 4
+    # Compute average (if there are vassals) and scale to 0..30
     # initialize tmp_avg_opinion so clamp/divide calls are safe when there are no vassals
     set_variable = { name = tmp_avg_opinion value = 0 }
     if = {
@@ -181,13 +163,18 @@ riseandfall_calculate_realm_stability_se = {
         set_variable = { name = tmp_avg_opinion value = var:tmp_opinion_sum }
         change_variable = { name = tmp_avg_opinion divide = var:tmp_vassal_count }
     }
-    clamp_variable = { name = tmp_avg_opinion min = 0 max = 100 }
-    # scale raw average (0..100) to component range 0..25 by dividing by 4
-    change_variable = { name = tmp_avg_opinion divide = 4 }
-    # store scaled average (0..25)
+    else = {
+        # If no vassals, give a default of 33.33 opinion (which will scale to 10 points out of 30)
+        set_variable = { name = tmp_avg_opinion value = 33 }
+    }
+    # scale raw average (0..100) to component range 0..30
+    # multiply by 0.3 implemented as multiply=3 then divide=10 to avoid decimal literals
+    change_variable = { name = tmp_avg_opinion multiply = 3 }
+    change_variable = { name = tmp_avg_opinion divide = 10 }
+    # store scaled average (0..30)
     set_variable = { name = riseandfall_rs_vassals_component value = var:tmp_avg_opinion }
 
-    clamp_variable = { name = riseandfall_rs_vassals_component min = 0 max = 25 }
+    clamp_variable = { name = riseandfall_rs_vassals_component min = 0 max = 30 }
 
     ########################################
     # Sum components into final 0..100 TARGET score (don't overwrite the persistent current score yet)
