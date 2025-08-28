@@ -1,13 +1,10 @@
-﻿###############################
+﻿##########################
 # Rise and Fall - Realm Stability
 # Computes a 0..100 realm stability score and stores it on the ruler as
 # riseandfall_realm_stability_score
 # Weighting (user spec):
-#  - 25% ruler stats (Diplomacy/Martial/Stewardship/Intrigue/Learning)
-#    For every full 10 points in a stat -> +5 (max 25)
-#  - 10% regency/child (binary penalty: 0 => 10, yes => 0)
-#  - 15% debt ("gold option 3" threshold: considered in_debt if gold < -3 * monthly_character_income)
-#    if in debt -> scale up to full 15 based on how deep the debt is (clamped)
+#  - 50% ruler stats (Diplomacy/Martial/Stewardship/Intrigue/Learning)
+#    For every full 10 points in a stat -> +10 (max 50)
 #  - 20% legitimacy (based on ruler's legitimacy level: 1=0, 2=4, 3=8, 4=14, 5=20)
 #  - 30% vassal relations (average direct vassal opinion -100..100 mapped to 0..30)
 
@@ -15,95 +12,59 @@ riseandfall_calculate_realm_stability_se = {
     # Root scope: called from an every_ruler on_action, so root is the ruler
     # Clear any previous working vars
     remove_variable = riseandfall_rs_stats_component
-    remove_variable = riseandfall_rs_regency_component
-    remove_variable = riseandfall_rs_debt_component
     remove_variable = riseandfall_rs_vassals_component
 
     ########################################
-    # 1) RULER STATS (25 points max)
-    # Simplified rule: each 1 stat ≈ 0.3333 stability points (15 stat -> 5 points), capped at 5 per stat
+    # 1) RULER STATS (50 points max)
+    # Simplified rule: each 1 stat ≈ 0.6667 stability points (15 stat -> 10 points), capped at 10 per stat
     set_variable = { name = riseandfall_rs_stats_component value = 0 }
 
     # Diplomacy
     set_variable = { name = tmp_add value = diplomacy }
-    # approximate multiply 0.333 by dividing by 3 to avoid decimal literal parsing
+    # approximate multiply 0.6667 by multiplying by 2 then dividing by 3
+    change_variable = { name = tmp_add multiply = 2 }
     change_variable = { name = tmp_add divide = 3 }
-    clamp_variable = { name = tmp_add min = 0 max = 5 }
+    clamp_variable = { name = tmp_add min = 0 max = 10 }
     change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
 
     # Martial
     set_variable = { name = tmp_add value = martial }
+    change_variable = { name = tmp_add multiply = 2 }
     change_variable = { name = tmp_add divide = 3 }
-    clamp_variable = { name = tmp_add min = 0 max = 5 }
+    clamp_variable = { name = tmp_add min = 0 max = 10 }
     change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
         # Note: do NOT remove `riseandfall_realm_stability_score` here — it is the persistent
         # "current" stability we will nudge slowly toward the freshly-calculated target.
     # Stewardship
     set_variable = { name = tmp_add value = stewardship }
+    change_variable = { name = tmp_add multiply = 2 }
     change_variable = { name = tmp_add divide = 3 }
-    clamp_variable = { name = tmp_add min = 0 max = 5 }
+    clamp_variable = { name = tmp_add min = 0 max = 10 }
     change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
 
     # Intrigue
     set_variable = { name = tmp_add value = intrigue }
+    change_variable = { name = tmp_add multiply = 2 }
     change_variable = { name = tmp_add divide = 3 }
-    clamp_variable = { name = tmp_add min = 0 max = 5 }
+    clamp_variable = { name = tmp_add min = 0 max = 10 }
     change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
 
     # Learning
     set_variable = { name = tmp_add value = learning }
+    change_variable = { name = tmp_add multiply = 2 }
     change_variable = { name = tmp_add divide = 3 }
-    clamp_variable = { name = tmp_add min = 0 max = 5 }
+    clamp_variable = { name = tmp_add min = 0 max = 10 }
     change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
 
-    # Clamp stats component to 0..25
-    clamp_variable = { name = riseandfall_rs_stats_component min = 0 max = 25 }
+    # Clamp stats component to 0..50
+    clamp_variable = { name = riseandfall_rs_stats_component min = 0 max = 50 }
+
+
+
+
 
     ########################################
-    # 2) REGENCY / CHILD CHECK (10 points)
-    # If ruler is a child OR has an active regency diarchy type, they lose the 10 points (we award 0 if regency/child present, 10 otherwise)
-    set_variable = { name = riseandfall_rs_regency_component value = 10 }
-    if = {
-        # Child check: use age 0..15 to detect child rulers (safer syntax than is_child)
-        limit = { age = { 0 15 } }
-        set_variable = { name = riseandfall_rs_regency_component value = 0 }
-    }
-
-    ########################################
-    # 3) DEBT (15 points) - gold option 3
-    # Consider in_debt if gold < -3 * monthly_character_income
-    # We scale contribution 0..15 where shallower debt gives smaller penalty.
-    set_variable = { name = riseandfall_rs_debt_component value = 15 }
-    set_variable = { name = tmp_gold value = gold }
-    set_variable = { name = tmp_income value = monthly_character_income }
-    # threshold = -3 * income
-    set_variable = { name = tmp_threshold value = var:tmp_income }
-    change_variable = { name = tmp_threshold multiply = -3 }
-
-    if = {
-        limit = { var:tmp_gold < var:tmp_threshold }
-        # depth = abs(gold / threshold) (positive number > 1)
-        # approximate scale: depth_factor = min( (abs(tmp_gold) / abs(tmp_threshold)), 2 ) then map to 0..15
-    set_variable = { name = tmp_gold_abs value = var:tmp_gold }
-    change_variable = { name = tmp_gold_abs multiply = -1 }
-    set_variable = { name = tmp_threshold_abs value = var:tmp_threshold }
-    change_variable = { name = tmp_threshold_abs multiply = -1 }
-        set_variable = { name = tmp_depth_ratio value = 0 }
-        # avoid divide: use multiply by (1/threshold_abs) via change_variable multiply if threshold_abs non-zero.
-        # We approximate ratio by scaling: tmp_depth_ratio = tmp_gold_abs * 0.3333 / tmp_threshold_abs  -> simplifies to tmp_gold_abs/tmp_income
-    set_variable = { name = tmp_depth_ratio value = var:tmp_gold_abs }
-    # avoid decimal literal parsing issues; divide by 3 instead of multiplying by 0.333333
-    change_variable = { name = tmp_depth_ratio divide = 3 }
-    change_variable = { name = tmp_depth_ratio add = 0 } # ensure variable exists
-        # Clamp depth between 0 and 2
-        clamp_variable = { name = tmp_depth_ratio min = 0 max = 2 }
-        # ratio 1 -> full 15, ratio 2 -> also full (cap). We'll map ratio 0..2 -> 0..15
-    change_variable = { name = riseandfall_rs_debt_component multiply = var:tmp_depth_ratio }
-        clamp_variable = { name = riseandfall_rs_debt_component min = 0 max = 15 }
-    }
-
-    ########################################
-    # 4) LEGITIMACY (0..25) - based on ruler's legitimacy level
+    # 2) LEGITIMACY (0..20) - based on ruler's legitimacy level
     # Map legitimacy levels 1-5 to stability points (scaled to 0..20):
     # 1=0, 2=4, 3=8, 4=14, 5=20  (approximate scaling from previous 0..25 mapping)
     set_variable = { name = riseandfall_rs_legitimacy_component value = 0 }
@@ -128,7 +89,7 @@ riseandfall_calculate_realm_stability_se = {
     # Level 1 defaults to 0 (already set above)
 
     ########################################
-    # 5) VASSAL RELATIONS (30 points max)
+    # 3) VASSAL RELATIONS (30 points max)
     # Calculate average vassal opinion across every_vassal (including negative opinions)
     set_variable = { name = riseandfall_rs_vassals_component value = 0 }
     # Prepare accumulators - count vassals we actually process
@@ -177,17 +138,13 @@ riseandfall_calculate_realm_stability_se = {
     clamp_variable = { name = riseandfall_rs_vassals_component min = 0 max = 30 }
 
     ########################################
-    # Sum components into final 0..100 TARGET score (don't overwrite the persistent current score yet)
+    # 4) Sum components into final 0..100 TARGET score (don't overwrite the persistent current score yet)
     # Ensure component vars exist (safe defaults) to avoid unset-variable engine errors
     if = { limit = { NOT = { has_variable = riseandfall_rs_stats_component } } set_variable = { name = riseandfall_rs_stats_component value = 0 } }
-    if = { limit = { NOT = { has_variable = riseandfall_rs_regency_component } } set_variable = { name = riseandfall_rs_regency_component value = 0 } }
-    if = { limit = { NOT = { has_variable = riseandfall_rs_debt_component } } set_variable = { name = riseandfall_rs_debt_component value = 0 } }
     if = { limit = { NOT = { has_variable = riseandfall_rs_legitimacy_component } } set_variable = { name = riseandfall_rs_legitimacy_component value = 0 } }
     if = { limit = { NOT = { has_variable = riseandfall_rs_vassals_component } } set_variable = { name = riseandfall_rs_vassals_component value = 0 } }
     set_variable = { name = tmp_target_score value = 0 }
     change_variable = { name = tmp_target_score add = var:riseandfall_rs_stats_component }
-    change_variable = { name = tmp_target_score add = var:riseandfall_rs_regency_component }
-    change_variable = { name = tmp_target_score add = var:riseandfall_rs_debt_component }
     change_variable = { name = tmp_target_score add = var:riseandfall_rs_legitimacy_component }
     change_variable = { name = tmp_target_score add = var:riseandfall_rs_vassals_component }
 
