@@ -1,4 +1,4 @@
-######################################################
+﻿######################################################
 ################# CHARACTER WINDOW ###################
 ######################################################
 
@@ -970,7 +970,7 @@ window = {
 
 							hbox = {
 								margin_left = 4
-								spacing = -3
+								spacing = 5
 
 								icon = {
 									visible = "[Not(Character.IsDeadAndValid)]"
@@ -986,6 +986,8 @@ window = {
 									texture = "gfx/interface/icons/character_status/icon_dead.dds"
 									tooltip = "CHARACTER_DEAD_TOOLTIP"
 								}
+
+
 							}
 
 							expand = {}
@@ -1381,6 +1383,30 @@ window = {
 								text = "[Character.GetDomainSize]/[Character.GetDomainLimit]"
 								default_format = "#high"
 								align = center|nobaseline
+							}
+
+							hbox = {
+								spacing = 5
+								margin_top = 3
+
+								vbox = {
+									tooltip = "Current Stability: [Character.MakeScope.Var('riseandfall_realm_stability_score').GetValue|V] | Target Stability: [Character.MakeScope.Var('riseandfall_realm_stability_target').GetValue|V]"
+									using = tooltip_se
+									spacing = -3
+
+									icon = {
+										name = "icon_stability"
+										size = { 32 32 }
+										texture = "gfx/interface/icons/scale_of_power.dds"
+									}
+
+									text_single = {
+										name = "stability"
+										text = "[Character.MakeScope.Var('riseandfall_realm_stability_score').GetValue|0]/[Character.MakeScope.Var('riseandfall_realm_stability_target').GetValue|0]"
+										default_format = "#high"
+										align = nobaseline
+									}
+								}
 							}
 						}
 
@@ -4713,41 +4739,6 @@ types CharacterWindow
 
 				expand = {}
 			}
-		}
-
-		#Stability
-		widget = {
-			size = { 72 32 }
-
-			hbox = {
-				spacing = 3
-
-				tooltip = "Current Stability: [Character.MakeScope.Var('riseandfall_realm_stability_score').GetValue|V] | Target Stability: [Character.MakeScope.Var('riseandfall_realm_stability_target').GetValue|V]"
-				using = tooltip_se
-
-				expand = {}
-
-				icon = {
-					name = "icon_stability"
-					size = { 30 30 }
-					texture = "gfx/interface/icons/scale_of_power.dds"
-				}
-
-				text_single = {
-					name = "stability"
-					text = "[Character.MakeScope.Var('riseandfall_realm_stability_score').GetValue|0]/[Character.MakeScope.Var('riseandfall_realm_stability_target').GetValue|0]"
-					default_format = "#high"
-					align = center|nobaseline
-					fontsize_min = 12
-					max_width = 50
-				}
-
-				expand = {}
-			}
-		}
-
-		divider_light = {
-			layoutpolicy_vertical = expanding
 		}
 
 		divider_light = {
