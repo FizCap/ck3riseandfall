@@ -1,3 +1,13 @@
 ﻿l_english:
  riseandfall.stability.title:0 "Stability"
  RISEANDFALL_STABILITY_TT:0 "Stability level for this character. Higher is better."
+ 
+ REALM_STABILITY_TOOLTIP:0 "#bold Realm Stability#!\nCurrent: [Character.MakeScope.Var('riseandfall_realm_stability_score').GetValue|0]\nTarget: [Character.MakeScope.Var('riseandfall_realm_stability_target').GetValue|0]\n\n#bold Components:#!\nRuler Stats: [Character.MakeScope.Var('riseandfall_rs_stats_component').GetValue|0]/25\nRegency Penalty: [Character.MakeScope.Var('riseandfall_rs_regency_component').GetValue|0]/10\nDebt Status: [Character.MakeScope.Var('riseandfall_rs_debt_component').GetValue|0]/15\nLegitimacy: [Character.MakeScope.Var('riseandfall_rs_legitimacy_component').GetValue|0]/25\nVassal Relations: [Character.MakeScope.Var('riseandfall_rs_vassals_component').GetValue|0]/25\n\n#bold Stability Bands:#!\n0-20: #X Collapsing#!\n21-40: #low Low#!\n41-60: #medium Average#!\n61-80: #high Good#!\n81-100: #positive Golden Age#!"
+
+ # Scripted modifier descriptions
+ STABILITY_INCOME_MODIFIER_DESC:0 "Realm Stability affects economic efficiency"
+ STABILITY_LEVY_MODIFIER_DESC:0 "Realm Stability affects military recruitment"
+ STABILITY_DEVELOPMENT_MODIFIER_DESC:0 "Realm Stability affects development and control"
+ STABILITY_PRESTIGE_MODIFIER_DESC:0 "Realm Stability affects prestige gain"
+ STABILITY_COLLAPSING_ADDITIONAL_EFFECTS_DESC:0 "Collapsing realm suffers additional economic and military penalties"
+ STABILITY_GOLDEN_AGE_ADDITIONAL_EFFECTS_DESC:0 "Golden age provides additional economic and military bonuses"

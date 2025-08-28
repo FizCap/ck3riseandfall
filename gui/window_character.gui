@@ -1390,8 +1390,8 @@ window = {
 								margin_top = 3
 
 								vbox = {
-									tooltip = "Current Stability: [Character.MakeScope.Var('riseandfall_realm_stability_score').GetValue|V] | Target Stability: [Character.MakeScope.Var('riseandfall_realm_stability_target').GetValue|V]"
-									using = tooltip_se
+									tooltip = "REALM_STABILITY_TOOLTIP"
+									using = tooltip_ne
 									spacing = -3
 
 									icon = {
