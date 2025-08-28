@@ -334,33 +334,210 @@ riseandfall_calculate_realm_stability_se = {
     else_if = { limit = { var:riseandfall_realm_stability_stage = 4 } set_variable = { name = riseandfall_realm_stability_good value = 1 } }
     else = { set_variable = { name = riseandfall_realm_stability_golden_age value = 1 } }
 
-    # Ensure exactly one stage modifier is present on the ruler matching the stability flag.
-    # Remove any old stage modifiers first, then add the correct one.
-    remove_character_modifier = riseandfall_stage1_stability
-    remove_character_modifier = riseandfall_stage2_stability
-    remove_character_modifier = riseandfall_stage3_stability
-    remove_character_modifier = riseandfall_stage4_stability
-    remove_character_modifier = riseandfall_stage5_stability
+    # Remove any previously-applied fine-grained stability modifiers (1..100)
+    remove_character_modifier = riseandfall_stability_1
+    remove_character_modifier = riseandfall_stability_2
+    remove_character_modifier = riseandfall_stability_3
+    remove_character_modifier = riseandfall_stability_4
+    remove_character_modifier = riseandfall_stability_5
+    remove_character_modifier = riseandfall_stability_6
+    remove_character_modifier = riseandfall_stability_7
+    remove_character_modifier = riseandfall_stability_8
+    remove_character_modifier = riseandfall_stability_9
+    remove_character_modifier = riseandfall_stability_10
+    remove_character_modifier = riseandfall_stability_11
+    remove_character_modifier = riseandfall_stability_12
+    remove_character_modifier = riseandfall_stability_13
+    remove_character_modifier = riseandfall_stability_14
+    remove_character_modifier = riseandfall_stability_15
+    remove_character_modifier = riseandfall_stability_16
+    remove_character_modifier = riseandfall_stability_17
+    remove_character_modifier = riseandfall_stability_18
+    remove_character_modifier = riseandfall_stability_19
+    remove_character_modifier = riseandfall_stability_20
+    remove_character_modifier = riseandfall_stability_21
+    remove_character_modifier = riseandfall_stability_22
+    remove_character_modifier = riseandfall_stability_23
+    remove_character_modifier = riseandfall_stability_24
+    remove_character_modifier = riseandfall_stability_25
+    remove_character_modifier = riseandfall_stability_26
+    remove_character_modifier = riseandfall_stability_27
+    remove_character_modifier = riseandfall_stability_28
+    remove_character_modifier = riseandfall_stability_29
+    remove_character_modifier = riseandfall_stability_30
+    remove_character_modifier = riseandfall_stability_31
+    remove_character_modifier = riseandfall_stability_32
+    remove_character_modifier = riseandfall_stability_33
+    remove_character_modifier = riseandfall_stability_34
+    remove_character_modifier = riseandfall_stability_35
+    remove_character_modifier = riseandfall_stability_36
+    remove_character_modifier = riseandfall_stability_37
+    remove_character_modifier = riseandfall_stability_38
+    remove_character_modifier = riseandfall_stability_39
+    remove_character_modifier = riseandfall_stability_40
+    remove_character_modifier = riseandfall_stability_41
+    remove_character_modifier = riseandfall_stability_42
+    remove_character_modifier = riseandfall_stability_43
+    remove_character_modifier = riseandfall_stability_44
+    remove_character_modifier = riseandfall_stability_45
+    remove_character_modifier = riseandfall_stability_46
+    remove_character_modifier = riseandfall_stability_47
+    remove_character_modifier = riseandfall_stability_48
+    remove_character_modifier = riseandfall_stability_49
+    remove_character_modifier = riseandfall_stability_50
+    remove_character_modifier = riseandfall_stability_51
+    remove_character_modifier = riseandfall_stability_52
+    remove_character_modifier = riseandfall_stability_53
+    remove_character_modifier = riseandfall_stability_54
+    remove_character_modifier = riseandfall_stability_55
+    remove_character_modifier = riseandfall_stability_56
+    remove_character_modifier = riseandfall_stability_57
+    remove_character_modifier = riseandfall_stability_58
+    remove_character_modifier = riseandfall_stability_59
+    remove_character_modifier = riseandfall_stability_60
+    remove_character_modifier = riseandfall_stability_61
+    remove_character_modifier = riseandfall_stability_62
+    remove_character_modifier = riseandfall_stability_63
+    remove_character_modifier = riseandfall_stability_64
+    remove_character_modifier = riseandfall_stability_65
+    remove_character_modifier = riseandfall_stability_66
+    remove_character_modifier = riseandfall_stability_67
+    remove_character_modifier = riseandfall_stability_68
+    remove_character_modifier = riseandfall_stability_69
+    remove_character_modifier = riseandfall_stability_70
+    remove_character_modifier = riseandfall_stability_71
+    remove_character_modifier = riseandfall_stability_72
+    remove_character_modifier = riseandfall_stability_73
+    remove_character_modifier = riseandfall_stability_74
+    remove_character_modifier = riseandfall_stability_75
+    remove_character_modifier = riseandfall_stability_76
+    remove_character_modifier = riseandfall_stability_77
+    remove_character_modifier = riseandfall_stability_78
+    remove_character_modifier = riseandfall_stability_79
+    remove_character_modifier = riseandfall_stability_80
+    remove_character_modifier = riseandfall_stability_81
+    remove_character_modifier = riseandfall_stability_82
+    remove_character_modifier = riseandfall_stability_83
+    remove_character_modifier = riseandfall_stability_84
+    remove_character_modifier = riseandfall_stability_85
+    remove_character_modifier = riseandfall_stability_86
+    remove_character_modifier = riseandfall_stability_87
+    remove_character_modifier = riseandfall_stability_88
+    remove_character_modifier = riseandfall_stability_89
+    remove_character_modifier = riseandfall_stability_90
+    remove_character_modifier = riseandfall_stability_91
+    remove_character_modifier = riseandfall_stability_92
+    remove_character_modifier = riseandfall_stability_93
+    remove_character_modifier = riseandfall_stability_94
+    remove_character_modifier = riseandfall_stability_95
+    remove_character_modifier = riseandfall_stability_96
+    remove_character_modifier = riseandfall_stability_97
+    remove_character_modifier = riseandfall_stability_98
+    remove_character_modifier = riseandfall_stability_99
+    remove_character_modifier = riseandfall_stability_100
 
-    # Choose modifier based on numeric stage variable
-    if = {
-        limit = { var:riseandfall_realm_stability_stage = 1 }
-        add_character_modifier = { modifier = riseandfall_stage1_stability }
-    }
-    else_if = {
-        limit = { var:riseandfall_realm_stability_stage = 2 }
-        add_character_modifier = { modifier = riseandfall_stage2_stability }
-    }
-    else_if = {
-        limit = { var:riseandfall_realm_stability_stage = 3 }
-        add_character_modifier = { modifier = riseandfall_stage3_stability }
-    }
-    else_if = {
-        limit = { var:riseandfall_realm_stability_stage = 4 }
-        add_character_modifier = { modifier = riseandfall_stage4_stability }
-    }
-    else = {
-        add_character_modifier = { modifier = riseandfall_stage5_stability }
-    }
+    # Choose and add exactly one fine-grained modifier based on CURRENT score (0..100)
+    # Map score N -> riseandfall_stability_N, with 0 mapped to 1 since modifiers are 1..100
+    if = { limit = { var:riseandfall_realm_stability_score = 0 } add_character_modifier = { modifier = riseandfall_stability_0 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 1 } add_character_modifier = { modifier = riseandfall_stability_1 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 2 } add_character_modifier = { modifier = riseandfall_stability_2 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 3 } add_character_modifier = { modifier = riseandfall_stability_3 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 4 } add_character_modifier = { modifier = riseandfall_stability_4 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 5 } add_character_modifier = { modifier = riseandfall_stability_5 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 6 } add_character_modifier = { modifier = riseandfall_stability_6 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 7 } add_character_modifier = { modifier = riseandfall_stability_7 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 8 } add_character_modifier = { modifier = riseandfall_stability_8 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 9 } add_character_modifier = { modifier = riseandfall_stability_9 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 10 } add_character_modifier = { modifier = riseandfall_stability_10 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 11 } add_character_modifier = { modifier = riseandfall_stability_11 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 12 } add_character_modifier = { modifier = riseandfall_stability_12 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 13 } add_character_modifier = { modifier = riseandfall_stability_13 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 14 } add_character_modifier = { modifier = riseandfall_stability_14 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 15 } add_character_modifier = { modifier = riseandfall_stability_15 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 16 } add_character_modifier = { modifier = riseandfall_stability_16 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 17 } add_character_modifier = { modifier = riseandfall_stability_17 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 18 } add_character_modifier = { modifier = riseandfall_stability_18 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 19 } add_character_modifier = { modifier = riseandfall_stability_19 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 20 } add_character_modifier = { modifier = riseandfall_stability_20 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 21 } add_character_modifier = { modifier = riseandfall_stability_21 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 22 } add_character_modifier = { modifier = riseandfall_stability_22 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 23 } add_character_modifier = { modifier = riseandfall_stability_23 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 24 } add_character_modifier = { modifier = riseandfall_stability_24 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 25 } add_character_modifier = { modifier = riseandfall_stability_25 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 26 } add_character_modifier = { modifier = riseandfall_stability_26 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 27 } add_character_modifier = { modifier = riseandfall_stability_27 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 28 } add_character_modifier = { modifier = riseandfall_stability_28 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 29 } add_character_modifier = { modifier = riseandfall_stability_29 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 30 } add_character_modifier = { modifier = riseandfall_stability_30 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 31 } add_character_modifier = { modifier = riseandfall_stability_31 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 32 } add_character_modifier = { modifier = riseandfall_stability_32 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 33 } add_character_modifier = { modifier = riseandfall_stability_33 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 34 } add_character_modifier = { modifier = riseandfall_stability_34 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 35 } add_character_modifier = { modifier = riseandfall_stability_35 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 36 } add_character_modifier = { modifier = riseandfall_stability_36 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 37 } add_character_modifier = { modifier = riseandfall_stability_37 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 38 } add_character_modifier = { modifier = riseandfall_stability_38 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 39 } add_character_modifier = { modifier = riseandfall_stability_39 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 40 } add_character_modifier = { modifier = riseandfall_stability_40 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 41 } add_character_modifier = { modifier = riseandfall_stability_41 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 42 } add_character_modifier = { modifier = riseandfall_stability_42 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 43 } add_character_modifier = { modifier = riseandfall_stability_43 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 44 } add_character_modifier = { modifier = riseandfall_stability_44 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 45 } add_character_modifier = { modifier = riseandfall_stability_45 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 46 } add_character_modifier = { modifier = riseandfall_stability_46 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 47 } add_character_modifier = { modifier = riseandfall_stability_47 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 48 } add_character_modifier = { modifier = riseandfall_stability_48 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 49 } add_character_modifier = { modifier = riseandfall_stability_49 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 50 } add_character_modifier = { modifier = riseandfall_stability_50 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 51 } add_character_modifier = { modifier = riseandfall_stability_51 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 52 } add_character_modifier = { modifier = riseandfall_stability_52 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 53 } add_character_modifier = { modifier = riseandfall_stability_53 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 54 } add_character_modifier = { modifier = riseandfall_stability_54 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 55 } add_character_modifier = { modifier = riseandfall_stability_55 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 56 } add_character_modifier = { modifier = riseandfall_stability_56 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 57 } add_character_modifier = { modifier = riseandfall_stability_57 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 58 } add_character_modifier = { modifier = riseandfall_stability_58 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 59 } add_character_modifier = { modifier = riseandfall_stability_59 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 60 } add_character_modifier = { modifier = riseandfall_stability_60 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 61 } add_character_modifier = { modifier = riseandfall_stability_61 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 62 } add_character_modifier = { modifier = riseandfall_stability_62 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 63 } add_character_modifier = { modifier = riseandfall_stability_63 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 64 } add_character_modifier = { modifier = riseandfall_stability_64 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 65 } add_character_modifier = { modifier = riseandfall_stability_65 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 66 } add_character_modifier = { modifier = riseandfall_stability_66 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 67 } add_character_modifier = { modifier = riseandfall_stability_67 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 68 } add_character_modifier = { modifier = riseandfall_stability_68 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 69 } add_character_modifier = { modifier = riseandfall_stability_69 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 70 } add_character_modifier = { modifier = riseandfall_stability_70 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 71 } add_character_modifier = { modifier = riseandfall_stability_71 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 72 } add_character_modifier = { modifier = riseandfall_stability_72 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 73 } add_character_modifier = { modifier = riseandfall_stability_73 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 74 } add_character_modifier = { modifier = riseandfall_stability_74 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 75 } add_character_modifier = { modifier = riseandfall_stability_75 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 76 } add_character_modifier = { modifier = riseandfall_stability_76 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 77 } add_character_modifier = { modifier = riseandfall_stability_77 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 78 } add_character_modifier = { modifier = riseandfall_stability_78 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 79 } add_character_modifier = { modifier = riseandfall_stability_79 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 80 } add_character_modifier = { modifier = riseandfall_stability_80 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 81 } add_character_modifier = { modifier = riseandfall_stability_81 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 82 } add_character_modifier = { modifier = riseandfall_stability_82 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 83 } add_character_modifier = { modifier = riseandfall_stability_83 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 84 } add_character_modifier = { modifier = riseandfall_stability_84 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 85 } add_character_modifier = { modifier = riseandfall_stability_85 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 86 } add_character_modifier = { modifier = riseandfall_stability_86 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 87 } add_character_modifier = { modifier = riseandfall_stability_87 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 88 } add_character_modifier = { modifier = riseandfall_stability_88 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 89 } add_character_modifier = { modifier = riseandfall_stability_89 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 90 } add_character_modifier = { modifier = riseandfall_stability_90 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 91 } add_character_modifier = { modifier = riseandfall_stability_91 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 92 } add_character_modifier = { modifier = riseandfall_stability_92 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 93 } add_character_modifier = { modifier = riseandfall_stability_93 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 94 } add_character_modifier = { modifier = riseandfall_stability_94 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 95 } add_character_modifier = { modifier = riseandfall_stability_95 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 96 } add_character_modifier = { modifier = riseandfall_stability_96 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 97 } add_character_modifier = { modifier = riseandfall_stability_97 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 98 } add_character_modifier = { modifier = riseandfall_stability_98 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score = 99 } add_character_modifier = { modifier = riseandfall_stability_99 } }
+    else = { add_character_modifier = { modifier = riseandfall_stability_100 } }
 
 }

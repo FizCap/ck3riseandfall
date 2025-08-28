@@ -1,0 +1,808 @@
+﻿riseandfall_stability_0 = {
+    independent_ruler_opinion = -50
+    vassal_opinion = -25
+    county_opinion_add = -30
+    courtier_opinion = -25
+    icon = intrigue_negative
+}
+
+riseandfall_stability_1 = {
+    independent_ruler_opinion = -50
+    vassal_opinion = -25
+    county_opinion_add = -30
+    courtier_opinion = -25
+    icon = intrigue_negative
+}
+
+riseandfall_stability_2 = {
+    independent_ruler_opinion = -49
+    vassal_opinion = -24
+    county_opinion_add = -29
+    courtier_opinion = -24
+    icon = intrigue_negative
+}
+
+riseandfall_stability_3 = {
+    independent_ruler_opinion = -48
+    vassal_opinion = -24
+    county_opinion_add = -29
+    courtier_opinion = -24
+    icon = intrigue_negative
+}
+
+riseandfall_stability_4 = {
+    independent_ruler_opinion = -47
+    vassal_opinion = -23
+    county_opinion_add = -28
+    courtier_opinion = -23
+    icon = intrigue_negative
+}
+
+riseandfall_stability_5 = {
+    independent_ruler_opinion = -46
+    vassal_opinion = -23
+    county_opinion_add = -28
+    courtier_opinion = -23
+    icon = intrigue_negative
+}
+
+riseandfall_stability_6 = {
+    independent_ruler_opinion = -45
+    vassal_opinion = -22
+    county_opinion_add = -27
+    courtier_opinion = -22
+    icon = intrigue_negative
+}
+
+riseandfall_stability_7 = {
+    independent_ruler_opinion = -44
+    vassal_opinion = -21
+    county_opinion_add = -26
+    courtier_opinion = -21
+    icon = intrigue_negative
+}
+
+riseandfall_stability_8 = {
+    independent_ruler_opinion = -43
+    vassal_opinion = -21
+    county_opinion_add = -26
+    courtier_opinion = -21
+    icon = intrigue_negative
+}
+
+riseandfall_stability_9 = {
+    independent_ruler_opinion = -42
+    vassal_opinion = -20
+    county_opinion_add = -25
+    courtier_opinion = -20
+    icon = intrigue_negative
+}
+
+riseandfall_stability_10 = {
+    independent_ruler_opinion = -41
+    vassal_opinion = -20
+    county_opinion_add = -25
+    courtier_opinion = -20
+    icon = intrigue_negative
+}
+
+riseandfall_stability_11 = {
+    independent_ruler_opinion = -40
+    vassal_opinion = -19
+    county_opinion_add = -24
+    courtier_opinion = -19
+    icon = intrigue_negative
+}
+
+riseandfall_stability_12 = {
+    independent_ruler_opinion = -39
+    vassal_opinion = -18
+    county_opinion_add = -23
+    courtier_opinion = -18
+    icon = intrigue_negative
+}
+
+riseandfall_stability_13 = {
+    independent_ruler_opinion = -38
+    vassal_opinion = -18
+    county_opinion_add = -23
+    courtier_opinion = -18
+    icon = intrigue_negative
+}
+
+riseandfall_stability_14 = {
+    independent_ruler_opinion = -37
+    vassal_opinion = -17
+    county_opinion_add = -22
+    courtier_opinion = -17
+    icon = intrigue_negative
+}
+
+riseandfall_stability_15 = {
+    independent_ruler_opinion = -36
+    vassal_opinion = -17
+    county_opinion_add = -22
+    courtier_opinion = -17
+    icon = intrigue_negative
+}
+
+riseandfall_stability_16 = {
+    independent_ruler_opinion = -35
+    vassal_opinion = -16
+    county_opinion_add = -21
+    courtier_opinion = -16
+    icon = intrigue_negative
+}
+
+riseandfall_stability_17 = {
+    independent_ruler_opinion = -34
+    vassal_opinion = -15
+    county_opinion_add = -20
+    courtier_opinion = -15
+    icon = intrigue_negative
+}
+
+riseandfall_stability_18 = {
+    independent_ruler_opinion = -33
+    vassal_opinion = -15
+    county_opinion_add = -20
+    courtier_opinion = -15
+    icon = intrigue_negative
+}
+
+riseandfall_stability_19 = {
+    independent_ruler_opinion = -32
+    vassal_opinion = -14
+    county_opinion_add = -19
+    courtier_opinion = -14
+    icon = intrigue_negative
+}
+
+riseandfall_stability_20 = {
+    independent_ruler_opinion = -31
+    vassal_opinion = -13
+    county_opinion_add = -18
+    courtier_opinion = -13
+    icon = intrigue_negative
+}
+
+riseandfall_stability_21 = {
+    independent_ruler_opinion = -30
+    vassal_opinion = -13
+    county_opinion_add = -18
+    courtier_opinion = -13
+    icon = intrigue_negative
+}
+
+riseandfall_stability_22 = {
+    independent_ruler_opinion = -29
+    vassal_opinion = -12
+    county_opinion_add = -17
+    courtier_opinion = -12
+    icon = intrigue_negative
+}
+
+riseandfall_stability_23 = {
+    independent_ruler_opinion = -28
+    vassal_opinion = -12
+    county_opinion_add = -17
+    courtier_opinion = -12
+    icon = intrigue_negative
+}
+
+riseandfall_stability_24 = {
+    independent_ruler_opinion = -27
+    vassal_opinion = -11
+    county_opinion_add = -16
+    courtier_opinion = -11
+    icon = intrigue_negative
+}
+
+riseandfall_stability_25 = {
+    independent_ruler_opinion = -26
+    vassal_opinion = -10
+    county_opinion_add = -15
+    courtier_opinion = -10
+    icon = intrigue_negative
+}
+
+riseandfall_stability_26 = {
+    independent_ruler_opinion = -25
+    vassal_opinion = -10
+    county_opinion_add = -15
+    courtier_opinion = -10
+    icon = intrigue_negative
+}
+
+riseandfall_stability_27 = {
+    independent_ruler_opinion = -24
+    vassal_opinion = -9
+    county_opinion_add = -14
+    courtier_opinion = -9
+    icon = intrigue_negative
+}
+
+riseandfall_stability_28 = {
+    independent_ruler_opinion = -23
+    vassal_opinion = -9
+    county_opinion_add = -14
+    courtier_opinion = -9
+    icon = intrigue_negative
+}
+
+riseandfall_stability_29 = {
+    independent_ruler_opinion = -22
+    vassal_opinion = -9
+    county_opinion_add = -13
+    courtier_opinion = -9
+    icon = intrigue_negative
+}
+
+riseandfall_stability_30 = {
+    independent_ruler_opinion = -21
+    vassal_opinion = -8
+    county_opinion_add = -12
+    courtier_opinion = -8
+    icon = intrigue_negative
+}
+
+riseandfall_stability_31 = {
+    independent_ruler_opinion = -20
+    vassal_opinion = -8
+    county_opinion_add = -12
+    courtier_opinion = -8
+    icon = intrigue_negative
+}
+
+riseandfall_stability_32 = {
+    independent_ruler_opinion = -19
+    vassal_opinion = -7
+    county_opinion_add = -11
+    courtier_opinion = -7
+    icon = intrigue_negative
+}
+
+riseandfall_stability_33 = {
+    independent_ruler_opinion = -18
+    vassal_opinion = -7
+    county_opinion_add = -11
+    courtier_opinion = -7
+    icon = intrigue_negative
+}
+
+riseandfall_stability_34 = {
+    independent_ruler_opinion = -17
+    vassal_opinion = -7
+    county_opinion_add = -10
+    courtier_opinion = -7
+    icon = intrigue_negative
+}
+
+riseandfall_stability_35 = {
+    independent_ruler_opinion = -16
+    vassal_opinion = -6
+    county_opinion_add = -9
+    courtier_opinion = -6
+    icon = intrigue_negative
+}
+
+riseandfall_stability_36 = {
+    independent_ruler_opinion = -15
+    vassal_opinion = -6
+    county_opinion_add = -9
+    courtier_opinion = -6
+    icon = intrigue_negative
+}
+
+riseandfall_stability_37 = {
+    independent_ruler_opinion = -14
+    vassal_opinion = -5
+    county_opinion_add = -8
+    courtier_opinion = -5
+    icon = intrigue_negative
+}
+
+riseandfall_stability_38 = {
+    independent_ruler_opinion = -13
+    vassal_opinion = -5
+    county_opinion_add = -8
+    courtier_opinion = -5
+    icon = intrigue_negative
+}
+
+riseandfall_stability_39 = {
+    independent_ruler_opinion = -12
+    vassal_opinion = -5
+    county_opinion_add = -7
+    courtier_opinion = -5
+    icon = intrigue_negative
+}
+
+riseandfall_stability_40 = {
+    independent_ruler_opinion = -11
+    vassal_opinion = -4
+    county_opinion_add = -6
+    courtier_opinion = -4
+    icon = intrigue_negative
+}
+
+riseandfall_stability_41 = {
+    independent_ruler_opinion = -10
+    vassal_opinion = -4
+    county_opinion_add = -6
+    courtier_opinion = -4
+    icon = intrigue_negative
+}
+
+riseandfall_stability_42 = {
+    independent_ruler_opinion = -9
+    vassal_opinion = -3
+    county_opinion_add = -5
+    courtier_opinion = -3
+    icon = intrigue_negative
+}
+
+riseandfall_stability_43 = {
+    independent_ruler_opinion = -8
+    vassal_opinion = -3
+    county_opinion_add = -5
+    courtier_opinion = -3
+    icon = intrigue_negative
+}
+
+riseandfall_stability_44 = {
+    independent_ruler_opinion = -7
+    vassal_opinion = -3
+    county_opinion_add = -4
+    courtier_opinion = -3
+    icon = intrigue_negative
+}
+
+riseandfall_stability_45 = {
+    independent_ruler_opinion = -6
+    vassal_opinion = -2
+    county_opinion_add = -3
+    courtier_opinion = -2
+    icon = intrigue_negative
+}
+
+riseandfall_stability_46 = {
+    independent_ruler_opinion = -5
+    vassal_opinion = -2
+    county_opinion_add = -3
+    courtier_opinion = -2
+    icon = intrigue_negative
+}
+
+riseandfall_stability_47 = {
+    independent_ruler_opinion = -4
+    vassal_opinion = -1
+    county_opinion_add = -2
+    courtier_opinion = -1
+    icon = intrigue_negative
+}
+
+riseandfall_stability_48 = {
+    independent_ruler_opinion = -3
+    vassal_opinion = -1
+    county_opinion_add = -2
+    courtier_opinion = -1
+    icon = intrigue_negative
+}
+
+riseandfall_stability_49 = {
+    independent_ruler_opinion = -2
+    vassal_opinion = -1
+    county_opinion_add = -1
+    courtier_opinion = -1
+    icon = intrigue_negative
+}
+
+riseandfall_stability_50 = {
+    independent_ruler_opinion = -1
+    vassal_opinion = 0
+    county_opinion_add = 0
+    courtier_opinion = 0
+    icon = intrigue_negative
+}
+
+riseandfall_stability_51 = {
+    independent_ruler_opinion = 0
+    vassal_opinion = 0
+    county_opinion_add = 0
+    courtier_opinion = 0
+    icon = intrigue_positive
+}
+
+riseandfall_stability_52 = {
+    independent_ruler_opinion = 1
+    vassal_opinion = 0
+    county_opinion_add = 0
+    courtier_opinion = 0
+    icon = intrigue_positive
+}
+
+riseandfall_stability_53 = {
+    independent_ruler_opinion = 1
+    vassal_opinion = 1
+    county_opinion_add = 1
+    courtier_opinion = 1
+    icon = intrigue_positive
+}
+
+riseandfall_stability_54 = {
+    independent_ruler_opinion = 1
+    vassal_opinion = 1
+    county_opinion_add = 1
+    courtier_opinion = 1
+    icon = intrigue_positive
+}
+
+riseandfall_stability_55 = {
+    independent_ruler_opinion = 2
+    vassal_opinion = 1
+    county_opinion_add = 1
+    courtier_opinion = 1
+    icon = intrigue_positive
+}
+
+riseandfall_stability_56 = {
+    independent_ruler_opinion = 2
+    vassal_opinion = 1
+    county_opinion_add = 1
+    courtier_opinion = 1
+    icon = intrigue_positive
+}
+
+riseandfall_stability_57 = {
+    independent_ruler_opinion = 3
+    vassal_opinion = 1
+    county_opinion_add = 1
+    courtier_opinion = 1
+    icon = intrigue_positive
+}
+
+riseandfall_stability_58 = {
+    independent_ruler_opinion = 3
+    vassal_opinion = 2
+    county_opinion_add = 2
+    courtier_opinion = 2
+    icon = intrigue_positive
+}
+
+riseandfall_stability_59 = {
+    independent_ruler_opinion = 3
+    vassal_opinion = 2
+    county_opinion_add = 2
+    courtier_opinion = 2
+    icon = intrigue_positive
+}
+
+riseandfall_stability_60 = {
+    independent_ruler_opinion = 4
+    vassal_opinion = 2
+    county_opinion_add = 2
+    courtier_opinion = 2
+    icon = intrigue_positive
+}
+
+riseandfall_stability_61 = {
+    independent_ruler_opinion = 4
+    vassal_opinion = 2
+    county_opinion_add = 2
+    courtier_opinion = 2
+    icon = intrigue_positive
+}
+
+riseandfall_stability_62 = {
+    independent_ruler_opinion = 5
+    vassal_opinion = 2
+    county_opinion_add = 2
+    courtier_opinion = 2
+    icon = intrigue_positive
+}
+
+riseandfall_stability_63 = {
+    independent_ruler_opinion = 5
+    vassal_opinion = 3
+    county_opinion_add = 3
+    courtier_opinion = 3
+    icon = intrigue_positive
+}
+
+riseandfall_stability_64 = {
+    independent_ruler_opinion = 5
+    vassal_opinion = 3
+    county_opinion_add = 3
+    courtier_opinion = 3
+    icon = intrigue_positive
+}
+
+riseandfall_stability_65 = {
+    independent_ruler_opinion = 6
+    vassal_opinion = 3
+    county_opinion_add = 3
+    courtier_opinion = 3
+    icon = intrigue_positive
+}
+
+riseandfall_stability_66 = {
+    independent_ruler_opinion = 6
+    vassal_opinion = 3
+    county_opinion_add = 3
+    courtier_opinion = 3
+    icon = intrigue_positive
+}
+
+riseandfall_stability_67 = {
+    independent_ruler_opinion = 7
+    vassal_opinion = 3
+    county_opinion_add = 3
+    courtier_opinion = 3
+    icon = intrigue_positive
+}
+
+riseandfall_stability_68 = {
+    independent_ruler_opinion = 7
+    vassal_opinion = 4
+    county_opinion_add = 4
+    courtier_opinion = 4
+    icon = intrigue_positive
+}
+
+riseandfall_stability_69 = {
+    independent_ruler_opinion = 7
+    vassal_opinion = 4
+    county_opinion_add = 4
+    courtier_opinion = 4
+    icon = intrigue_positive
+}
+
+riseandfall_stability_70 = {
+    independent_ruler_opinion = 8
+    vassal_opinion = 4
+    county_opinion_add = 4
+    courtier_opinion = 4
+    icon = intrigue_positive
+}
+
+riseandfall_stability_71 = {
+    independent_ruler_opinion = 8
+    vassal_opinion = 4
+    county_opinion_add = 4
+    courtier_opinion = 4
+    icon = intrigue_positive
+}
+
+riseandfall_stability_72 = {
+    independent_ruler_opinion = 9
+    vassal_opinion = 4
+    county_opinion_add = 4
+    courtier_opinion = 4
+    icon = intrigue_positive
+}
+
+riseandfall_stability_73 = {
+    independent_ruler_opinion = 9
+    vassal_opinion = 5
+    county_opinion_add = 5
+    courtier_opinion = 5
+    icon = intrigue_positive
+}
+
+riseandfall_stability_74 = {
+    independent_ruler_opinion = 9
+    vassal_opinion = 5
+    county_opinion_add = 5
+    courtier_opinion = 5
+    icon = intrigue_positive
+}
+
+riseandfall_stability_75 = {
+    independent_ruler_opinion = 10
+    vassal_opinion = 5
+    county_opinion_add = 5
+    courtier_opinion = 5
+    icon = intrigue_positive
+}
+
+riseandfall_stability_76 = {
+    independent_ruler_opinion = 11
+    vassal_opinion = 5
+    county_opinion_add = 5
+    courtier_opinion = 5
+    icon = intrigue_positive
+}
+
+riseandfall_stability_77 = {
+    independent_ruler_opinion = 11
+    vassal_opinion = 5
+    county_opinion_add = 5
+    courtier_opinion = 5
+    icon = intrigue_positive
+}
+
+riseandfall_stability_78 = {
+    independent_ruler_opinion = 12
+    vassal_opinion = 6
+    county_opinion_add = 6
+    courtier_opinion = 6
+    icon = intrigue_positive
+}
+
+riseandfall_stability_79 = {
+    independent_ruler_opinion = 13
+    vassal_opinion = 6
+    county_opinion_add = 6
+    courtier_opinion = 6
+    icon = intrigue_positive
+}
+
+riseandfall_stability_80 = {
+    independent_ruler_opinion = 14
+    vassal_opinion = 6
+    county_opinion_add = 6
+    courtier_opinion = 6
+    icon = intrigue_positive
+}
+
+riseandfall_stability_81 = {
+    independent_ruler_opinion = 15
+    vassal_opinion = 6
+    county_opinion_add = 6
+    courtier_opinion = 6
+    icon = intrigue_positive
+}
+
+riseandfall_stability_82 = {
+    independent_ruler_opinion = 15
+    vassal_opinion = 6
+    county_opinion_add = 6
+    courtier_opinion = 6
+    icon = intrigue_positive
+}
+
+riseandfall_stability_83 = {
+    independent_ruler_opinion = 16
+    vassal_opinion = 7
+    county_opinion_add = 7
+    courtier_opinion = 7
+    icon = intrigue_positive
+}
+
+riseandfall_stability_84 = {
+    independent_ruler_opinion = 17
+    vassal_opinion = 7
+    county_opinion_add = 7
+    courtier_opinion = 7
+    icon = intrigue_positive
+}
+
+riseandfall_stability_85 = {
+    independent_ruler_opinion = 18
+    vassal_opinion = 7
+    county_opinion_add = 7
+    courtier_opinion = 7
+    icon = intrigue_positive
+}
+
+riseandfall_stability_86 = {
+    independent_ruler_opinion = 19
+    vassal_opinion = 7
+    county_opinion_add = 7
+    courtier_opinion = 7
+    icon = intrigue_positive
+}
+
+riseandfall_stability_87 = {
+    independent_ruler_opinion = 19
+    vassal_opinion = 7
+    county_opinion_add = 7
+    courtier_opinion = 7
+    icon = intrigue_positive
+}
+
+riseandfall_stability_88 = {
+    independent_ruler_opinion = 20
+    vassal_opinion = 8
+    county_opinion_add = 8
+    courtier_opinion = 8
+    icon = intrigue_positive
+}
+
+riseandfall_stability_89 = {
+    independent_ruler_opinion = 21
+    vassal_opinion = 8
+    county_opinion_add = 8
+    courtier_opinion = 8
+    icon = intrigue_positive
+}
+
+riseandfall_stability_90 = {
+    independent_ruler_opinion = 22
+    vassal_opinion = 8
+    county_opinion_add = 8
+    courtier_opinion = 8
+    icon = intrigue_positive
+}
+
+riseandfall_stability_91 = {
+    independent_ruler_opinion = 23
+    vassal_opinion = 8
+    county_opinion_add = 8
+    courtier_opinion = 8
+    icon = intrigue_positive
+}
+
+riseandfall_stability_92 = {
+    independent_ruler_opinion = 24
+    vassal_opinion = 8
+    county_opinion_add = 8
+    courtier_opinion = 8
+    icon = intrigue_positive
+}
+
+riseandfall_stability_93 = {
+    independent_ruler_opinion = 24
+    vassal_opinion = 9
+    county_opinion_add = 9
+    courtier_opinion = 9
+    icon = intrigue_positive
+}
+
+riseandfall_stability_94 = {
+    independent_ruler_opinion = 25
+    vassal_opinion = 9
+    county_opinion_add = 9
+    courtier_opinion = 9
+    icon = intrigue_positive
+}
+
+riseandfall_stability_95 = {
+    independent_ruler_opinion = 26
+    vassal_opinion = 9
+    county_opinion_add = 9
+    courtier_opinion = 9
+    icon = intrigue_positive
+}
+
+riseandfall_stability_96 = {
+    independent_ruler_opinion = 27
+    vassal_opinion = 9
+    county_opinion_add = 9
+    courtier_opinion = 9
+    icon = intrigue_positive
+}
+
+riseandfall_stability_97 = {
+    independent_ruler_opinion = 28
+    vassal_opinion = 9
+    county_opinion_add = 9
+    courtier_opinion = 9
+    icon = intrigue_positive
+}
+
+riseandfall_stability_98 = {
+    independent_ruler_opinion = 28
+    vassal_opinion = 10
+    county_opinion_add = 10
+    courtier_opinion = 10
+    icon = intrigue_positive
+}
+
+riseandfall_stability_99 = {
+    independent_ruler_opinion = 29
+    vassal_opinion = 10
+    county_opinion_add = 10
+    courtier_opinion = 10
+    icon = intrigue_positive
+}
+
+riseandfall_stability_100 = {
+    independent_ruler_opinion = 30
+    vassal_opinion = 10
+    county_opinion_add = 10
+    courtier_opinion = 10
+    icon = intrigue_positive
+}
+
