@@ -1,9 +1,0 @@
-﻿riseandfall_adventurer_gold_mod = {
-    # Dynamic income now handled via quarterly scripted effect; no static monthly income here
-    provisions_capacity_add = 500000
-    men_at_arms_cap = 7
-    # Use localization for name/description. Localization key for name: riseandfall_adventurer_gold_mod_name
-    # Localization key for description: riseandfall_adventurer_gold_mod_desc
-    # Icon displayed for this modifier (uses game's gfx file name). Available in game gfx/interface/icons/message_feed/
-    icon = intrigue_positive
-}
