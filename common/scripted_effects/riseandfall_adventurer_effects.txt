@@ -255,24 +255,25 @@ riseandfall_adventurer_press_claims_se = {
                 limit = { exists = scope:claim_target_title.holder }
 
                 # If we're stronger than the holder, attempt an auto-declare only when no truce/alliance
+                if = {
+                    limit = { scope:independent_adventurer.military_power > scope:claim_target_title.holder.military_power }
                     if = {
-                        limit = { scope:independent_adventurer.military_power > scope:claim_target_title.holder.military_power }
-                        if = {
-                            # Adventurer must not have a truce or be allied to the holder
-                            limit = { scope:independent_adventurer = { NOT = { OR = { has_truce = scope:claim_target_title.holder is_allied_to = scope:claim_target_title.holder } } } }
-                            # Adventurer must not be under the temporary war-block flag
-                            if = { limit = { NOT = { has_character_flag = riseandfall_newadventurer_war_block } } start_war = { casus_belli = claim_cb target = scope:claim_target_title.holder claimant = scope:independent_adventurer target_title = scope:claim_target_title } }
+                        # Adventurer must not have a truce or be allied to the holder
+                        limit = { scope:independent_adventurer = { NOT = { OR = { has_truce = scope:claim_target_title.holder is_allied_to = scope:claim_target_title.holder } } } }
+                        # Adventurer must not be under the temporary war-block flag
+                        if = { limit = { NOT = { has_character_flag = riseandfall_newadventurer_war_block } } start_war = { casus_belli = claim_cb target = scope:claim_target_title.holder claimant = scope:independent_adventurer target_title = scope:claim_target_title } }
+                    }
+                }
+                else = {
+                    # Not stronger: small chance, respect truces/alliances
+                    random_list = {
+                        5 = {
+                            if = {
+                                limit = { scope:independent_adventurer = { NOT = { OR = { has_truce = scope:claim_target_title.holder is_allied_to = scope:claim_target_title.holder } } } }
+                                if = { limit = { NOT = { has_character_flag = riseandfall_newadventurer_war_block } } start_war = { casus_belli = claim_cb target = scope:claim_target_title.holder claimant = scope:independent_adventurer target_title = scope:claim_target_title } }
+                            }
                         }
-                    else = {
-                        # Not stronger: small chance, respect truces/alliances
-                        random_list = {
-                            5 = {
-                                # Only try a risky declare if adventurer has no truce/alliance with the holder and is not war-blocked
-                                if = { limit = { scope:independent_adventurer = { NOT = { OR = { has_truce = scope:claim_target_title.holder is_allied_to = scope:claim_target_title.holder } } } }
-                                    if = { limit = { NOT = { has_character_flag = riseandfall_newadventurer_war_block } } start_war = { casus_belli = claim_cb target = scope:claim_target_title.holder claimant = scope:independent_adventurer target_title = scope:claim_target_title } }
-                                }
-                            95 = { }
-                        }
+                        95 = { }
                     }
                 }
             }
@@ -313,10 +314,11 @@ riseandfall_adventurer_press_claims_se = {
                     else = {
                         random_list = {
                             5 = {
-                                # Only try a risky declare if adventurer has no truce/alliance with the holder and is not war-blocked
-                                if = { limit = { scope:independent_adventurer = { NOT = { OR = { has_truce = scope:claim_target_title.holder is_allied_to = scope:claim_target_title.holder } } } }
+                                if = {
+                                    limit = { scope:independent_adventurer = { NOT = { OR = { has_truce = scope:claim_target_title.holder is_allied_to = scope:claim_target_title.holder } } } }
                                     if = { limit = { NOT = { has_character_flag = riseandfall_newadventurer_war_block } } start_war = { casus_belli = claim_cb target = scope:claim_target_title.holder claimant = scope:independent_adventurer target_title = scope:claim_target_title } }
                                 }
+                            }
                             95 = { }
                         }
                     }
@@ -325,8 +327,7 @@ riseandfall_adventurer_press_claims_se = {
         }
     }
 }
-}
-}
+
 
 riseandfall_remove_adventurer_gold_mod_if_not_landless_se = {
     # Expecting character scope (the ruler). Remove the adventurer gold modifier when no longer landless.
