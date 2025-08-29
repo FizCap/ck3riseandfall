@@ -74,7 +74,13 @@ riseandfall_calculate_realm_stability_se = {
     # Theocracy governments get full legitimacy automatically
     if = {
         limit = { has_government = theocracy_government }
-        set_variable = { name = riseandfall_rs_legitimacy_component value = 20 }
+        # For theocracy rulers, base legitimacy on piety_level (1..6 -> 0..20)
+        # Map: (piety_level - 1) * 4 -> results: 1=0, 2=4, 3=8, 4=12, 5=16, 6=20
+        set_variable = { name = tmp_piety_level value = piety_level }
+        change_variable = { name = tmp_piety_level add = -1 }
+        change_variable = { name = tmp_piety_level multiply = 4 }
+        clamp_variable = { name = tmp_piety_level min = 0 max = 20 }
+        set_variable = { name = riseandfall_rs_legitimacy_component value = var:tmp_piety_level }
     }
     else = {
         if = {
