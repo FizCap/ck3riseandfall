@@ -19,42 +19,93 @@ riseandfall_calculate_realm_stability_se = {
     # Simplified rule: each 1 stat ≈ 0.6667 stability points (15 stat -> 10 points), capped at 10 per stat
     set_variable = { name = riseandfall_rs_stats_component value = 0 }
 
+    # If ruler is under regency, save the active diarch scope so we can read their stats
+    if = {
+        limit = { has_diarchy_type = regency }
+        save_scope_as = diarch
+    }
+
     # Diplomacy
-    set_variable = { name = tmp_add value = diplomacy }
-    # approximate multiply 0.6667 by multiplying by 2 then dividing by 3
-    change_variable = { name = tmp_add multiply = 2 }
-    change_variable = { name = tmp_add divide = 3 }
-    clamp_variable = { name = tmp_add min = 0 max = 10 }
-    change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
+    if = {
+        limit = { has_diarchy_type = regency }
+    # use active diarch's diplomacy but scale weaker (divide by 3)
+    set_variable = { name = tmp_add value = scope:diarch.diplomacy }
+        change_variable = { name = tmp_add divide = 3 }
+        clamp_variable = { name = tmp_add min = 0 max = 10 }
+        change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
+    }
+    else = {
+        set_variable = { name = tmp_add value = diplomacy }
+        # approximate multiply 0.6667 by multiplying by 2 then dividing by 3
+        change_variable = { name = tmp_add multiply = 2 }
+        change_variable = { name = tmp_add divide = 3 }
+        clamp_variable = { name = tmp_add min = 0 max = 10 }
+        change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
+    }
 
     # Martial
-    set_variable = { name = tmp_add value = martial }
-    change_variable = { name = tmp_add multiply = 2 }
-    change_variable = { name = tmp_add divide = 3 }
-    clamp_variable = { name = tmp_add min = 0 max = 10 }
-    change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
-        # Note: do NOT remove `riseandfall_realm_stability_score` here — it is the persistent
-        # "current" stability we will nudge slowly toward the freshly-calculated target.
+    if = {
+        limit = { has_diarchy_type = regency }
+    set_variable = { name = tmp_add value = scope:diarch.martial }
+        change_variable = { name = tmp_add divide = 3 }
+        clamp_variable = { name = tmp_add min = 0 max = 10 }
+        change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
+    }
+    else = {
+        set_variable = { name = tmp_add value = martial }
+        change_variable = { name = tmp_add multiply = 2 }
+        change_variable = { name = tmp_add divide = 3 }
+        clamp_variable = { name = tmp_add min = 0 max = 10 }
+        change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
+    }
+
     # Stewardship
-    set_variable = { name = tmp_add value = stewardship }
-    change_variable = { name = tmp_add multiply = 2 }
-    change_variable = { name = tmp_add divide = 3 }
-    clamp_variable = { name = tmp_add min = 0 max = 10 }
-    change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
+    if = {
+        limit = { has_diarchy_type = regency }
+    set_variable = { name = tmp_add value = scope:diarch.stewardship }
+        change_variable = { name = tmp_add divide = 3 }
+        clamp_variable = { name = tmp_add min = 0 max = 10 }
+        change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
+    }
+    else = {
+        set_variable = { name = tmp_add value = stewardship }
+        change_variable = { name = tmp_add multiply = 2 }
+        change_variable = { name = tmp_add divide = 3 }
+        clamp_variable = { name = tmp_add min = 0 max = 10 }
+        change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
+    }
 
     # Intrigue
-    set_variable = { name = tmp_add value = intrigue }
-    change_variable = { name = tmp_add multiply = 2 }
-    change_variable = { name = tmp_add divide = 3 }
-    clamp_variable = { name = tmp_add min = 0 max = 10 }
-    change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
+    if = {
+        limit = { has_diarchy_type = regency }
+    set_variable = { name = tmp_add value = scope:diarch.intrigue }
+        change_variable = { name = tmp_add divide = 3 }
+        clamp_variable = { name = tmp_add min = 0 max = 10 }
+        change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
+    }
+    else = {
+        set_variable = { name = tmp_add value = intrigue }
+        change_variable = { name = tmp_add multiply = 2 }
+        change_variable = { name = tmp_add divide = 3 }
+        clamp_variable = { name = tmp_add min = 0 max = 10 }
+        change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
+    }
 
     # Learning
-    set_variable = { name = tmp_add value = learning }
-    change_variable = { name = tmp_add multiply = 2 }
-    change_variable = { name = tmp_add divide = 3 }
-    clamp_variable = { name = tmp_add min = 0 max = 10 }
-    change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
+    if = {
+        limit = { has_diarchy_type = regency }
+    set_variable = { name = tmp_add value = scope:diarch.learning }
+        change_variable = { name = tmp_add divide = 3 }
+        clamp_variable = { name = tmp_add min = 0 max = 10 }
+        change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
+    }
+    else = {
+        set_variable = { name = tmp_add value = learning }
+        change_variable = { name = tmp_add multiply = 2 }
+        change_variable = { name = tmp_add divide = 3 }
+        clamp_variable = { name = tmp_add min = 0 max = 10 }
+        change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
+    }
 
     # Clamp stats component to 0..50
     clamp_variable = { name = riseandfall_rs_stats_component min = 0 max = 50 }
