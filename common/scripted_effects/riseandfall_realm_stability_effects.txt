@@ -70,23 +70,31 @@ riseandfall_calculate_realm_stability_se = {
     set_variable = { name = riseandfall_rs_legitimacy_component value = 0 }
 
     # Check legitimacy level and assign corresponding points
+    # Check legitimacy level and assign corresponding points
+    # Theocracy governments get full legitimacy automatically
     if = {
-        limit = { legitimacy_level = 2 }
-        set_variable = { name = riseandfall_rs_legitimacy_component value = 4 }
-    }
-    else_if = {
-        limit = { legitimacy_level = 3 }
-        set_variable = { name = riseandfall_rs_legitimacy_component value = 8 }
-    }
-    else_if = {
-        limit = { legitimacy_level = 4 }
-        set_variable = { name = riseandfall_rs_legitimacy_component value = 14 }
-    }
-    else_if = {
-        limit = { legitimacy_level = 5 }
+        limit = { has_government = theocracy_government }
         set_variable = { name = riseandfall_rs_legitimacy_component value = 20 }
     }
-    # Level 1 defaults to 0 (already set above)
+    else = {
+        if = {
+            limit = { legitimacy_level = 2 }
+            set_variable = { name = riseandfall_rs_legitimacy_component value = 4 }
+        }
+        else_if = {
+            limit = { legitimacy_level = 3 }
+            set_variable = { name = riseandfall_rs_legitimacy_component value = 8 }
+        }
+        else_if = {
+            limit = { legitimacy_level = 4 }
+            set_variable = { name = riseandfall_rs_legitimacy_component value = 14 }
+        }
+        else_if = {
+            limit = { legitimacy_level = 5 }
+            set_variable = { name = riseandfall_rs_legitimacy_component value = 20 }
+        }
+        # Level 1 defaults to 0 (already set above)
+    }
 
     ########################################
     # 3) VASSAL RELATIONS (30 points max)
