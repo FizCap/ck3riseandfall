@@ -131,23 +131,30 @@ riseandfall_calculate_realm_stability_se = {
         set_variable = { name = riseandfall_rs_legitimacy_component value = var:tmp_piety_level }
     }
     else = {
-        # Prefer influence_level if available, else use legitimacy
+        # Prefer legitimacy if available, else fall back to influence
         if = {
-            limit = { influence_level > 0 }
-            set_variable = { name = riseandfall_rs_legitimacy_component value = 0 }
-            if = { limit = { influence_level = 1 } set_variable = { name = riseandfall_rs_legitimacy_component value = 2 } }
-            else_if = { limit = { influence_level = 2 } set_variable = { name = riseandfall_rs_legitimacy_component value = 4 } }
-            else_if = { limit = { influence_level = 3 } set_variable = { name = riseandfall_rs_legitimacy_component value = 8 } }
-            else_if = { limit = { influence_level = 4 } set_variable = { name = riseandfall_rs_legitimacy_component value = 14 } }
-            else_if = { limit = { influence_level = 5 } set_variable = { name = riseandfall_rs_legitimacy_component value = 20 } }
-            else_if = { limit = { influence_level = 6 } set_variable = { name = riseandfall_rs_legitimacy_component value = 20 } }
-        }
-        else = {
-            # No influence, use legitimacy
+            limit = { has_legitimacy = yes }
+            # Use legitimacy_level mapping
             if = { limit = { legitimacy_level = 2 } set_variable = { name = riseandfall_rs_legitimacy_component value = 4 } }
             else_if = { limit = { legitimacy_level = 3 } set_variable = { name = riseandfall_rs_legitimacy_component value = 8 } }
             else_if = { limit = { legitimacy_level = 4 } set_variable = { name = riseandfall_rs_legitimacy_component value = 14 } }
             else_if = { limit = { legitimacy_level = 5 } set_variable = { name = riseandfall_rs_legitimacy_component value = 20 } }
+        }
+        else = {
+            # No legitimacy available, use influence_level mapping if present
+            if = {
+                limit = { influence_level > 0 }
+                set_variable = { name = riseandfall_rs_legitimacy_component value = 0 }
+                if = { limit = { influence_level = 1 } set_variable = { name = riseandfall_rs_legitimacy_component value = 2 } }
+                else_if = { limit = { influence_level = 2 } set_variable = { name = riseandfall_rs_legitimacy_component value = 4 } }
+                else_if = { limit = { influence_level = 3 } set_variable = { name = riseandfall_rs_legitimacy_component value = 8 } }
+                else_if = { limit = { influence_level = 4 } set_variable = { name = riseandfall_rs_legitimacy_component value = 14 } }
+                else_if = { limit = { influence_level = 5 } set_variable = { name = riseandfall_rs_legitimacy_component value = 20 } }
+                else_if = { limit = { influence_level = 6 } set_variable = { name = riseandfall_rs_legitimacy_component value = 20 } }
+            }
+            else = {
+                # No legitimacy or influence available - keep component at 0
+            }
         }
     }
 
