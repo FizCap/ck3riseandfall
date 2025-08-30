@@ -91,6 +91,23 @@ riseandfall_enable_realm_stability = {
     }
 }
 
+riseandfall_enable_ai_kingdom_creation = {
+
+    categories = {
+        riseandfall
+    }
+
+    # Default: enabled (AI rulers will create higher-tier titles: duchies, kingdoms, empires)
+    default = riseandfall_ai_kingdom_creation_enabled
+
+    riseandfall_ai_kingdom_creation_enabled = {
+    }
+
+    riseandfall_ai_kingdom_creation_disabled = {
+        flag = riseandfall_ai_kingdom_creation_disabled
+    }
+}
+
 riseandfall_enable_interaction_stability = {
 
     categories = {

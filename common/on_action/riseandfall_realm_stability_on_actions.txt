@@ -5,6 +5,9 @@
 yearly_global_pulse = {
     on_actions = {
         riseandfall_yearly_realm_stability
+        riseandfall_ai_create_kingdoms
+        riseandfall_ai_create_duchies
+        riseandfall_ai_create_empires
     }
 }
 
@@ -25,5 +28,32 @@ riseandfall_yearly_realm_stability = {
                 riseandfall_calculate_realm_stability_se = yes
             }
         }
+    }
+}
+
+riseandfall_ai_create_kingdoms = {
+    trigger = {
+        has_game_rule = riseandfall_ai_kingdom_creation_enabled
+    }
+    effect = {
+        riseandfall_ai_create_kingdoms_se = yes
+    }
+}
+
+riseandfall_ai_create_duchies = {
+    trigger = {
+        has_game_rule = riseandfall_ai_kingdom_creation_enabled
+    }
+    effect = {
+        riseandfall_ai_create_duchies_se = yes
+    }
+}
+
+riseandfall_ai_create_empires = {
+    trigger = {
+        has_game_rule = riseandfall_ai_kingdom_creation_enabled
+    }
+    effect = {
+        riseandfall_ai_create_empires_se = yes
     }
 }
