@@ -121,12 +121,9 @@ riseandfall_calculate_realm_stability_se = {
     set_variable = { name = riseandfall_rs_legitimacy_component value = 0 }
 
     # Check legitimacy level and assign corresponding points
-    # Check legitimacy level and assign corresponding points
-    # Theocracy governments get full legitimacy automatically
+    # Theocracy governments get full legitimacy automatically (piety -> 0..20)
     if = {
         limit = { has_government = theocracy_government }
-        # For theocracy rulers, base legitimacy on piety_level (1..6 -> 0..20)
-        # Map: (piety_level - 1) * 4 -> results: 1=0, 2=4, 3=8, 4=12, 5=16, 6=20
         set_variable = { name = tmp_piety_level value = piety_level }
         change_variable = { name = tmp_piety_level add = -1 }
         change_variable = { name = tmp_piety_level multiply = 4 }
@@ -134,23 +131,24 @@ riseandfall_calculate_realm_stability_se = {
         set_variable = { name = riseandfall_rs_legitimacy_component value = var:tmp_piety_level }
     }
     else = {
+        # Prefer influence_level if available, else use legitimacy
         if = {
-            limit = { legitimacy_level = 2 }
-            set_variable = { name = riseandfall_rs_legitimacy_component value = 4 }
+            limit = { influence_level > 0 }
+            set_variable = { name = riseandfall_rs_legitimacy_component value = 0 }
+            if = { limit = { influence_level = 1 } set_variable = { name = riseandfall_rs_legitimacy_component value = 2 } }
+            else_if = { limit = { influence_level = 2 } set_variable = { name = riseandfall_rs_legitimacy_component value = 4 } }
+            else_if = { limit = { influence_level = 3 } set_variable = { name = riseandfall_rs_legitimacy_component value = 8 } }
+            else_if = { limit = { influence_level = 4 } set_variable = { name = riseandfall_rs_legitimacy_component value = 14 } }
+            else_if = { limit = { influence_level = 5 } set_variable = { name = riseandfall_rs_legitimacy_component value = 20 } }
+            else_if = { limit = { influence_level = 6 } set_variable = { name = riseandfall_rs_legitimacy_component value = 20 } }
         }
-        else_if = {
-            limit = { legitimacy_level = 3 }
-            set_variable = { name = riseandfall_rs_legitimacy_component value = 8 }
+        else = {
+            # No influence, use legitimacy
+            if = { limit = { legitimacy_level = 2 } set_variable = { name = riseandfall_rs_legitimacy_component value = 4 } }
+            else_if = { limit = { legitimacy_level = 3 } set_variable = { name = riseandfall_rs_legitimacy_component value = 8 } }
+            else_if = { limit = { legitimacy_level = 4 } set_variable = { name = riseandfall_rs_legitimacy_component value = 14 } }
+            else_if = { limit = { legitimacy_level = 5 } set_variable = { name = riseandfall_rs_legitimacy_component value = 20 } }
         }
-        else_if = {
-            limit = { legitimacy_level = 4 }
-            set_variable = { name = riseandfall_rs_legitimacy_component value = 14 }
-        }
-        else_if = {
-            limit = { legitimacy_level = 5 }
-            set_variable = { name = riseandfall_rs_legitimacy_component value = 20 }
-        }
-        # Level 1 defaults to 0 (already set above)
     }
 
     ########################################

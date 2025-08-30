@@ -6,19 +6,12 @@
         riseandfall_marry_female_target_se
         riseandfall_yearly_adventurer_press_claims
         riseandfall_yearly_adventurer_cleanup_on_action
-        riseandfall_set_player_ui_variable
     }
 }
 
 quarterly_playable_pulse = {
     on_actions = {
         riseandfall_quarterly_adventurer_income
-    }
-}
-
-on_game_start_after_lobby = {
-    on_actions = {
-        riseandfall_set_player_ui_variable
     }
 }
 
