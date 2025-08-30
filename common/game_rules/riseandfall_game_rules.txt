@@ -90,3 +90,21 @@ riseandfall_enable_realm_stability = {
         flag = riseandfall_realm_stability_disabled
     }
 }
+
+riseandfall_enable_interaction_stability = {
+
+    categories = {
+        riseandfall
+    }
+
+    # Default: enabled (show stability in interaction menu)
+    default = riseandfall_interaction_stability_enabled
+
+    riseandfall_interaction_stability_enabled = {
+        flag = enable_riseandfall_ui
+    }
+
+    riseandfall_interaction_stability_disabled = {
+        flag = riseandfall_interaction_stability_disabled
+    }
+}

@@ -42,3 +42,12 @@ setting_riseandfall_mma_limit_modifier_enabled:0 "Enabled"
 setting_riseandfall_mma_limit_modifier_enabled_desc:0 "Controls whether Rise and Fall applies a yearly men-at-arms cap increase modifier to administrative governments. Use with caution — it may be unbalanced."
 setting_riseandfall_mma_limit_modifier_disabled:0 "Disabled"
 setting_riseandfall_mma_limit_modifier_disabled_desc:0 "Do not apply the men-at-arms cap increase to administrative titles."
+
+
+# Interaction Stability (UI marker in interaction menu)
+rule_riseandfall_enable_interaction_stability:0 "Interaction Stability Marker"
+rule_riseandfall_enable_interaction_stability_desc:0 "Controls whether a realm stability marker appears in the character interaction menu. Recommended if other mods override or hide the stability UI in the main character window."
+setting_riseandfall_interaction_stability_enabled:0 "Enabled"
+setting_riseandfall_interaction_stability_enabled_desc:0 "Will put a stability marker in the character interaction menu (recommended if other mods override the stability UI in the character screen)."
+setting_riseandfall_interaction_stability_disabled:0 "Disabled"
+setting_riseandfall_interaction_stability_disabled_desc:0 "Does not show a stability marker in the character interaction menu."

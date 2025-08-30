@@ -26,6 +26,23 @@ Common building blocks (tokens & primitives)
 - Animation & states: `state = { name = _show ... using = Animation_* }`, `delay/duration/next/on_start` to chain animations, `PdxGuiTriggerAllAnimations` or `PdxGuiWidget.FindChild(...).TriggerAnimation(...)` for programmatic triggers.
 - Variable UI toggles: `GetVariableSystem` / `VariableSystem.Toggle('key')` for ephemeral UI state.
 
+Delta: Game rule-driven visibility (Interaction Stability Marker)
+- Problem: `GameRuleSetting.HasFlag('foo')` only works when the widget’s datacontext is a GameRuleSetting. Calling it without a proper context makes the check ineffective.
+- Fix: Bind to the current GameRuleSetting via the global rules accessor, then call `HasFlag` on that context. Prefer checking the disabled-flag and negating it.
+- Working snippet (copypasta):
+  vbox = {
+    datacontext = "[AccessGameRules.AccessNamedGameRule( 'riseandfall_enable_interaction_stability' ).GetSetting]"
+    visible = "[Not( GameRuleSetting.HasFlag( 'riseandfall_interaction_stability_disabled' ) )]"
+    # ... UI content ...
+  }
+- Notes: Game rules lock per-save; change in the frontend and start a new game. Apply settings, and restart the game if GUI caching interferes.
+
+Mini contract for this pattern
+- Inputs: rule key ('riseandfall_enable_interaction_stability'), setting flags ('enable_riseandfall_ui', 'riseandfall_interaction_stability_disabled').
+- Output: a `visible` guard that reflects the selected setting reliably in any GUI.
+- Error modes: wrong context (no-op), testing in old saves, missing flag on setting.
+- Success: toggling the rule in a new game shows/hides the widget predictably.
+
 Common patterns & examples (minimal, LLM-ready snippets)
 - Minimal window skeleton (concept):
   window = {
