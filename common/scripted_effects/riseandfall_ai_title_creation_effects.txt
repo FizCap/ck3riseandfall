@@ -55,8 +55,12 @@ riseandfall_ai_create_kingdoms_se = {
                     # For kings creating other kingdoms, only set as primary if it's more prestigious
                     if = {
                         limit = {
+                            # prev is a title/landed_title scope returned by change_title_holder;
+                            # monthly_character_income is a character trigger, so compare the holder character's income instead
                             prev = {
-                                monthly_character_income > scope:acting_ruler.primary_title.monthly_character_income
+                                holder = {
+                                    monthly_character_income > scope:acting_ruler.primary_title.holder.monthly_character_income
+                                }
                             }
                         }
                         set_primary_title_to = prev
@@ -187,8 +191,11 @@ riseandfall_ai_create_empires_se = {
                     # For emperors creating other empires, only set as primary if it's more prestigious
                     if = {
                         limit = {
+                            # Compare the income of the holder character of the prev title against the acting ruler's primary title holder
                             prev = {
-                                monthly_character_income > scope:acting_ruler.primary_title.monthly_character_income
+                                holder = {
+                                    monthly_character_income > scope:acting_ruler.primary_title.holder.monthly_character_income
+                                }
                             }
                         }
                         set_primary_title_to = prev
