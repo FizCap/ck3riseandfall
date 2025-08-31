@@ -17,6 +17,29 @@ on_game_start_after_lobby = {
     }
 }
 
+# React to characters gaining titles by inheritance so newly-inherited rulers
+# get a computed realm stability value instead of the engine defaulting them to 100.
+on_title_gain_inheritance = {
+    on_actions = {
+        riseandfall_on_title_gain_inheritance
+    }
+}
+
+riseandfall_on_title_gain_inheritance = {
+    # Expected scope: character (the inheritor)
+    trigger = {
+        has_game_rule = riseandfall_realm_stability_enabled
+    }
+    effect = {
+        # Only run the calculation for characters who don't already have a stability score
+        # and who actually hold a landed title (avoid courtiers inheriting minor artifacts).
+        if = {
+            limit = { NOT = { has_variable = riseandfall_realm_stability_score } }
+            if = { limit = { has_landed_title = yes } riseandfall_calculate_realm_stability_se = yes }
+        }
+    }
+}
+
 riseandfall_yearly_realm_stability = {
     trigger = {
         has_game_rule = riseandfall_realm_stability_enabled
