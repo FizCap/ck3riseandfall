@@ -16,28 +16,19 @@ riseandfall_low_stability_roll_se = {
                 set_variable = { name = riseandfall_realm_stability_score value = 100 }
             }
 
-            # Compute chance based on stability
-            # Only trigger when stability is 30 or less.
-            # Chance scales linearly: chance = 1 + ((30 - stability) * 99) / 30
-            if = {
-                limit = { check_variable = { which = riseandfall_realm_stability_score value > 30 } }
-                set_variable = { name = tmp_chance value = 0 }
-            }
-            else = {
-                # tmp_diff = 30 - stability
-                set_variable = { name = tmp_diff value = 0 }
-                change_variable = { name = tmp_diff add = var:riseandfall_realm_stability_score }
-                change_variable = { name = tmp_diff multiply = -1 }
-                change_variable = { name = tmp_diff add = 30 }
+            # Compute tmp_diff = 30 - stability, clamp to [0,30], then tmp_chance = floor((tmp_diff*99)/30) + 1
+            # This avoids unsupported trigger tokens and yields: stability=30 -> chance=1, stability=0 -> chance=100
+            set_variable = { name = tmp_diff value = 30 }
+            change_variable = { name = tmp_diff add = var:riseandfall_realm_stability_score }
+            change_variable = { name = tmp_diff multiply = -1 }
+            clamp_variable = { name = tmp_diff min = 0 max = 30 }
 
-                # tmp_chance = (tmp_diff * 99) / 30 + 1
-                set_variable = { name = tmp_chance value = 0 }
-                change_variable = { name = tmp_chance add = var:tmp_diff }
-                change_variable = { name = tmp_chance multiply = 99 }
-                change_variable = { name = tmp_chance divide = 30 }
-                change_variable = { name = tmp_chance add = 1 }
-                clamp_variable = { name = tmp_chance min = 1 max = 100 }
-            }
+            set_variable = { name = tmp_chance value = 0 }
+            change_variable = { name = tmp_chance add = var:tmp_diff }
+            change_variable = { name = tmp_chance multiply = 99 }
+            change_variable = { name = tmp_chance divide = 30 }
+            change_variable = { name = tmp_chance add = 1 }
+            clamp_variable = { name = tmp_chance min = 1 max = 100 }
 
             # Roll once for the independent ruler. If it succeeds, notify the liege and add stability
             random = {

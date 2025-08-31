@@ -41,6 +41,8 @@ warlord.1002 = {
         name = warlord.1002.a
         # Become a warlord: gain the 'warlord' trait and create a decision to raise faction/claim
         add_trait = warlord
+    # Immediately run the warlord action event for this new warlord
+    trigger_event = { id = warlord.1003 }
         ai_chance = { factor = 3 }
     }
 

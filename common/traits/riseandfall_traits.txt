@@ -1,4 +1,4 @@
-warlord = {
+﻿warlord = {
 	category = fame
 
 	ai_war_chance = 100
