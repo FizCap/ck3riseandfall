@@ -1,0 +1,35 @@
+﻿yearly_global_pulse = {
+    on_actions = {
+        riseandfall_warlord_independent_removal
+        riseandfall_low_stability_roll
+        riseandfall_warlord
+    }
+}
+
+riseandfall_low_stability_roll = {
+    trigger = {
+        has_game_rule = riseandfall_low_stability_events_enabled
+    }
+    effect = {
+        riseandfall_low_stability_roll_se = yes
+    }
+}
+
+
+riseandfall_warlord = {
+    effect = {
+        every_ruler = {
+            limit = { has_trait = warlord }
+            riseandfall_warlord_roll_se = yes
+        }
+    }
+}
+
+riseandfall_warlord_independent_removal = {
+    effect = {
+        every_independent_ruler = {
+            limit = { has_trait = warlord }
+            remove_trait = warlord
+        }
+    }
+}

@@ -1,0 +1,23 @@
+warlord = {
+	category = fame
+
+	ai_war_chance = 100
+	ai_war_cooldown = -100
+	ai_amenity_spending = -0.25
+	ai_amenity_target_baseline = -0.4
+	ai_boldness = 0.75
+	title_creation_cost_mult = -0.75
+    opinion_of_liege = -30
+
+	shown_in_ruler_designer = no
+		icon = {
+			first_valid = {
+				# Use the same icon as the vanilla 'conqueror' trait for now
+				desc = "gfx/interface/icons/traits/conqueror.dds"
+			}
+		}
+		
+	#ai_greed = 1000
+	#ai_boldness = 1000
+	#ai_honor = -1000
+}

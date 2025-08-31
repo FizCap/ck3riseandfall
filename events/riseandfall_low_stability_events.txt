@@ -1,0 +1,90 @@
+﻿namespace = warlord
+
+# Liege-facing notification: informs the ruler that warlords are rising among vassals
+warlord.1001 = {
+    type = character_event
+    title = warlord.1001.t
+    desc = warlord.1001.d
+    theme = generic
+
+    option = {
+        name = warlord.1001.a
+        ai_chance = { factor = 1 }
+        # Run hidden_effect here so the iteration runs in effect scope and 'scope:this' is valid
+        hidden_effect = {
+            every_vassal = {
+                limit = {
+                    NOT = { has_trait = warlord }
+                    NOT = { has_trait = loyal }
+                }
+                trigger_event = { id = warlord.1002 }
+            }
+        }
+    }
+}
+
+# Vassal-facing decision: vassals may choose to become a warlord or remain loyal
+warlord.1002 = {
+    type = character_event
+    title = warlord.1002.t
+    desc = warlord.1002.d
+    theme = generic
+
+    immediate = {
+        # Present a choice; effects happen in options below
+    }
+
+    option = {
+        name = warlord.1002.a
+        # Become a warlord: gain the 'warlord' trait and create a decision to raise faction/claim
+        add_trait = warlord
+        ai_chance = { factor = 3 }
+    }
+
+    option = {
+        name = warlord.1002.b
+        # Remain loyal: grant the built-in 'loyal' trait (vanilla trait) or a custom loyal marker
+        add_trait = loyal
+        # small positive opinion or stability bonus could be added by scripted effects
+        ai_chance = { factor = 1 }
+    }
+}
+
+# Warlord event: triggered for rulers with the warlord trait
+warlord.1003 = {
+    type = character_event
+    title = warlord.1003.t
+    desc = warlord.1003.d
+    theme = generic
+
+    option = {
+        name = warlord.1003.a
+        ai_chance = { factor = 1 }
+        # Give claims on titles held by other vassals of this warlord's liege
+        if = {
+            limit = { exists = liege }
+            liege = {
+                every_vassal = {
+                    limit = { 
+                        NOT = { this = root }
+                        is_landed = yes
+                    }
+                    every_held_title = {
+                        limit = { 
+                            tier = tier_county
+                            NOT = { root = { has_claim_on = prev } }
+                        }
+                        root = { add_unpressed_claim = prev }
+                    }
+                    every_held_title = {
+                        limit = { 
+                            tier = tier_duchy
+                            NOT = { root = { has_claim_on = prev } }
+                        }
+                        root = { add_unpressed_claim = prev }
+                    }
+                }
+            }
+        }
+    }
+}

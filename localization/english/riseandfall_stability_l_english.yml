@@ -106,3 +106,20 @@
 	riseandfall_stability_98:0 "Stability: 98"
 	riseandfall_stability_99:0 "Stability: 99"
 	riseandfall_stability_100:0 "Stability: 100"
+
+# Low stability event localization
+warlord.1001.t:0 "Warlords in the Realm"
+warlord.1001.d:0 "Reports from across your court warn that the realm is showing signs of severe instability — ambitious warlords and rebellious nobles are emerging among your vassals and threaten the cohesion of the realm."
+warlord.1001.a:0 "This is concerning..."
+warlord.1001.a:0 "Review the reports"
+warlord.1001.picture:0 "gfx/interface/portraits/medium/portrait_generic_m.tga"
+warlord.1001.background:0 "gfx/interface/event_pictures/backgrounds/bg_realm_unrest.tga"
+
+warlord.1002.t:0 "Warlord or Loyalist"
+warlord.1002.d:0 "Rumours swirl that local strongmen see an opportunity in the realm's disorder. Will you rise as a warlord and claim your own path, or stay loyal to your liege?"
+warlord.1002.a:0 "Raise the banner — become a warlord"
+warlord.1002.b:0 "Stand with the liege — remain loyal"
+
+warlord.1003.t:0 "Warlord's Call"
+warlord.1003.d:0 "As a warlord, you feel the urge to rally forces and challenge the established order."
+warlord.1003.a:0 "Gather your forces"

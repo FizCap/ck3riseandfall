@@ -108,6 +108,22 @@ riseandfall_enable_ai_kingdom_creation = {
     }
 }
 
+riseandfall_low_stability_events = {
+    categories = {
+        riseandfall
+    }
+
+    # Default: enabled
+    default = riseandfall_low_stability_events_disabled
+
+    riseandfall_low_stability_events_enabled = {
+    }
+
+    riseandfall_low_stability_events_disabled = {
+        flag = riseandfall_low_stability_events_disabled
+    }
+}
+
 riseandfall_enable_interaction_stability = {
 
     categories = {

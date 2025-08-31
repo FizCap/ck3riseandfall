@@ -59,3 +59,11 @@ setting_riseandfall_interaction_stability_enabled:0 "Enabled"
 setting_riseandfall_interaction_stability_enabled_desc:0 "Will put a stability marker in the character interaction menu (recommended if other mods override the stability UI in the character screen)."
 setting_riseandfall_interaction_stability_disabled:0 "Disabled"
 setting_riseandfall_interaction_stability_disabled_desc:0 "Does not show a stability marker in the character interaction menu."
+
+# Low Stability Events rule
+rule_riseandfall_low_stability_events:0 "Low Stability Events"
+rule_riseandfall_low_stability_events_desc:0 "When enabled, rulers with low realm stability will occasionally trigger disruptive events (warlords, uprisings, etc.). The chance increases as stability decreases, capped at 5% per year."
+setting_riseandfall_low_stability_events_enabled:0 "Enabled"
+setting_riseandfall_low_stability_events_enabled_desc:0 "Low stability events may occur each year for rulers with low stability."
+setting_riseandfall_low_stability_events_disabled:0 "Disabled"
+setting_riseandfall_low_stability_events_disabled_desc:0 "Low stability events will not be triggered by the Rise and Fall mod."

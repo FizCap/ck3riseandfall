@@ -1,0 +1,40 @@
+﻿##########################
+# Rise and Fall - Low Stability yearly roll
+# Runs once per year from an on_action. For each ruler, compute chance = (100 - stability_score) * 0.05 (capped at 5%).
+# If the random check succeeds, trigger an event (riseandfall.1001 - warlord).
+
+riseandfall_low_stability_roll_se = {
+    # For every independent ruler, compute chance once using the ruler's stability
+    every_independent_ruler = {
+        save_scope_as = independent_ruler
+
+        # Perform computations inside the saved scope so scope:independent_ruler variables resolve correctly
+        scope:independent_ruler = {
+            # Ensure the ruler has a stability score; default to 100 if missing
+            if = {
+                limit = { NOT = { has_variable = riseandfall_realm_stability_score } }
+                set_variable = { name = riseandfall_realm_stability_score value = 100 }
+            }
+
+            # Compute tmp_stab_diff = 100 - ruler_stability
+            set_variable = { name = tmp_stab_diff value = 100 }
+            change_variable = { name = tmp_stab_diff add = var:riseandfall_realm_stability_score }
+            change_variable = { name = tmp_stab_diff multiply = -1 }
+            change_variable = { name = tmp_stab_diff add = 100 }
+
+            # Convert to percentage chance: chance = tmp_stab_diff * 5 / 100 -> integer percent 0..5
+            set_variable = { name = tmp_chance value = var:tmp_stab_diff }
+            change_variable = { name = tmp_chance multiply = 5 }
+            change_variable = { name = tmp_chance divide = 100 }
+            clamp_variable = { name = tmp_chance min = 0 max = 5 }
+
+            # Roll once for the independent ruler. If it succeeds, notify the liege; the liege's option
+            # can then decide to trigger the vassal-facing event for each vassal.
+            random = {
+                chance = var:tmp_chance
+                # Notify the liege (independent_ruler) that warlords are emerging
+                trigger_event = { id = warlord.1001 saved_event_id = scope:independent_ruler }
+            }
+        }
+    }
+}

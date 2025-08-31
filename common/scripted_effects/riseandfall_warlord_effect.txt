@@ -1,0 +1,3 @@
+﻿riseandfall_warlord_roll_se = {
+    trigger_event = { id = warlord.1003 }
+}
