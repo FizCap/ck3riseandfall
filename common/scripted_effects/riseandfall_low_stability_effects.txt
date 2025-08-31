@@ -16,24 +16,34 @@ riseandfall_low_stability_roll_se = {
                 set_variable = { name = riseandfall_realm_stability_score value = 100 }
             }
 
-            # Compute tmp_stab_diff = 100 - ruler_stability
-            set_variable = { name = tmp_stab_diff value = 100 }
-            change_variable = { name = tmp_stab_diff add = var:riseandfall_realm_stability_score }
-            change_variable = { name = tmp_stab_diff multiply = -1 }
-            change_variable = { name = tmp_stab_diff add = 100 }
+            # Compute chance based on stability
+            # Only trigger when stability is 30 or less.
+            # Chance scales linearly: chance = 1 + ((30 - stability) * 99) / 30
+            if = {
+                limit = { check_variable = { which = riseandfall_realm_stability_score value > 30 } }
+                set_variable = { name = tmp_chance value = 0 }
+            }
+            else = {
+                # tmp_diff = 30 - stability
+                set_variable = { name = tmp_diff value = 0 }
+                change_variable = { name = tmp_diff add = var:riseandfall_realm_stability_score }
+                change_variable = { name = tmp_diff multiply = -1 }
+                change_variable = { name = tmp_diff add = 30 }
 
-            # Convert to percentage chance: chance = tmp_stab_diff * 5 / 100 -> integer percent 0..5
-            set_variable = { name = tmp_chance value = var:tmp_stab_diff }
-            change_variable = { name = tmp_chance multiply = 5 }
-            change_variable = { name = tmp_chance divide = 100 }
-            clamp_variable = { name = tmp_chance min = 0 max = 5 }
+                # tmp_chance = (tmp_diff * 99) / 30 + 1
+                set_variable = { name = tmp_chance value = 0 }
+                change_variable = { name = tmp_chance add = var:tmp_diff }
+                change_variable = { name = tmp_chance multiply = 99 }
+                change_variable = { name = tmp_chance divide = 30 }
+                change_variable = { name = tmp_chance add = 1 }
+                clamp_variable = { name = tmp_chance min = 1 max = 100 }
+            }
 
-            # Roll once for the independent ruler. If it succeeds, notify the liege; the liege's option
-            # can then decide to trigger the vassal-facing event for each vassal.
+            # Roll once for the independent ruler. If it succeeds, notify the liege and add stability
             random = {
                 chance = var:tmp_chance
                 # Notify the liege (independent_ruler) that warlords are emerging
-                trigger_event = { id = warlord.1001 saved_event_id = scope:independent_ruler }
+                trigger_event = { id = warlord.1001 }
             }
         }
     }

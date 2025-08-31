@@ -108,18 +108,21 @@
 	riseandfall_stability_100:0 "Stability: 100"
 
 # Low stability event localization
-warlord.1001.t:0 "Warlords in the Realm"
-warlord.1001.d:0 "Reports from across your court warn that the realm is showing signs of severe instability — ambitious warlords and rebellious nobles are emerging among your vassals and threaten the cohesion of the realm."
-warlord.1001.a:0 "This is concerning..."
-warlord.1001.a:0 "Review the reports"
+warlord.1001.t:0 "The Realm Trembles"
+warlord.1001.d:0 "Whispers of rebellion poison the halls of power. Ambitious warlords marshal men and steel in the shadows, their banners rising like storm clouds — the realm risks being sundered unless you seize the reins of fate."
+warlord.1001.a:0 "Summon the council — confront the threat"
 warlord.1001.picture:0 "gfx/interface/portraits/medium/portrait_generic_m.tga"
 warlord.1001.background:0 "gfx/interface/event_pictures/backgrounds/bg_realm_unrest.tga"
 
-warlord.1002.t:0 "Warlord or Loyalist"
-warlord.1002.d:0 "Rumours swirl that local strongmen see an opportunity in the realm's disorder. Will you rise as a warlord and claim your own path, or stay loyal to your liege?"
-warlord.1002.a:0 "Raise the banner — become a warlord"
-warlord.1002.b:0 "Stand with the liege — remain loyal"
+warlord.1002.t:0 "Banner or Fealty?"
+warlord.1002.d:0 "Order frays and opportunity blooms for those with steel and ambition. Will you raise your standard and carve a realm of your own, or bend the knee and cling to the waning shelter of your liege?"
+warlord.1002.a:0 "Raise your standard — become a warlord"
+warlord.1002.b:0 "Bend the knee — remain loyal"
 
-warlord.1003.t:0 "Warlord's Call"
-warlord.1003.d:0 "As a warlord, you feel the urge to rally forces and challenge the established order."
-warlord.1003.a:0 "Gather your forces"
+warlord.1003.t:0 "Clarion of Rebellion"
+warlord.1003.d:0 "The drums of ambition thunder in your breast. Rally your retainers, proclaim your claims, and let the old order quake before the march you now command."
+warlord.1003.a:0 "Rally the host — press your claim"
+
+# Trait localization
+trait_warlord:0 "Warlord"
+trait_warlord_desc:0 "A bold and ruthless commander, the warlord carves power from chaos — feared by liege and vassal alike."

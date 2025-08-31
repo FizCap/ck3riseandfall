@@ -5,12 +5,13 @@ warlord.1001 = {
     type = character_event
     title = warlord.1001.t
     desc = warlord.1001.d
-    theme = generic
+    theme = realm
 
     option = {
         name = warlord.1001.a
         ai_chance = { factor = 1 }
-        # Run hidden_effect here so the iteration runs in effect scope and 'scope:this' is valid
+        # Grant the liege a realm law and run the hidden_effect so the iteration runs in effect scope
+        add_realm_law = crown_authority_0
         hidden_effect = {
             every_vassal = {
                 limit = {
@@ -20,6 +21,8 @@ warlord.1001 = {
                 trigger_event = { id = warlord.1002 }
             }
         }
+    # Add 30 stability to the liege when this event fires
+    change_variable = { name = riseandfall_realm_stability_score add = 30 }
     }
 }
 
@@ -28,7 +31,7 @@ warlord.1002 = {
     type = character_event
     title = warlord.1002.t
     desc = warlord.1002.d
-    theme = generic
+    theme = realm
 
     immediate = {
         # Present a choice; effects happen in options below
@@ -55,12 +58,12 @@ warlord.1003 = {
     type = character_event
     title = warlord.1003.t
     desc = warlord.1003.d
-    theme = generic
+    theme = realm
 
     option = {
         name = warlord.1003.a
         ai_chance = { factor = 1 }
-        # Give claims on titles held by other vassals of this warlord's liege
+        # Give claims on titles held by other vassals of this warlord's liege and the liege itself
         if = {
             limit = { exists = liege }
             liege = {
@@ -83,6 +86,35 @@ warlord.1003 = {
                         }
                         root = { add_unpressed_claim = prev }
                     }
+                }
+                # Also give claims on the liege's own county/duchy/kingdom titles to the warlord
+                every_held_title = {
+                    limit = { 
+                        tier = tier_county
+                        NOT = { root = { has_claim_on = prev } }
+                    }
+                    root = { add_unpressed_claim = prev }
+                }
+                every_held_title = {
+                    limit = { 
+                        tier = tier_duchy
+                        NOT = { root = { has_claim_on = prev } }
+                    }
+                    root = { add_unpressed_claim = prev }
+                }
+                every_held_title = {
+                    limit = { 
+                        tier = tier_kingdom
+                        NOT = { root = { has_claim_on = prev } }
+                    }
+                    root = { add_unpressed_claim = prev }
+                }
+                every_held_title = {
+                    limit = { 
+                        tier = tier_empire
+                        NOT = { root = { has_claim_on = prev } }
+                    }
+                    root = { add_unpressed_claim = prev }
                 }
             }
         }
