@@ -1,0 +1,39 @@
+ # Developer debug decision: decrease realm stability by 10 for testing
+    riseandfall_debug_reduce_stability_10 = {
+        picture = {
+            reference = "gfx/interface/illustrations/decisions/decision_misc.dds"
+        }
+        sort_order = 100
+        desc = riseandfall_debug_reduce_stability_10_desc
+        selection_tooltip = riseandfall_debug_reduce_stability_10_tooltip
+        decision_group_type = admin
+
+        is_shown = {
+            always = yes
+        }
+
+        is_valid = {
+            always = yes
+        }
+
+        effect = {
+            if = {
+                limit = { NOT = { has_variable = riseandfall_realm_stability_score } }
+                set_variable = { name = riseandfall_realm_stability_score value = 50 }
+            }
+            change_variable = { name = riseandfall_realm_stability_score add = -10 }
+            clamp_variable = { name = riseandfall_realm_stability_score min = 0 max = 100 }
+            round_variable = { name = riseandfall_realm_stability_score }
+            riseandfall_calculate_realm_stability_se = yes
+        }
+
+        ai_potential = {
+            factor = 0
+        }
+
+        ai_will_do = {
+            factor = 0
+        }
+    }
+
+

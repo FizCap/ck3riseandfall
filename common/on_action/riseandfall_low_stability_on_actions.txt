@@ -11,7 +11,10 @@ riseandfall_low_stability_roll = {
         has_game_rule = riseandfall_low_stability_events_enabled
     }
     effect = {
-        riseandfall_low_stability_roll_se = yes
+        every_independent_ruler = {
+            save_scope_as = ruler_low_stability
+            riseandfall_low_stability_roll_se = yes
+        }
     }
 }
 

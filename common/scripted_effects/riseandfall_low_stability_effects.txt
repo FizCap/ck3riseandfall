@@ -5,30 +5,30 @@
 
 riseandfall_low_stability_roll_se = {
     # For every independent ruler, compute chance once using the ruler's stability
-    every_independent_ruler = {
-        save_scope_as = independent_ruler
-
         # Perform computations inside the saved scope so scope:independent_ruler variables resolve correctly
-        scope:independent_ruler = {
-            # Ensure the ruler has a stability score; default to 100 if missing
-            if = {
-                limit = { NOT = { has_variable = riseandfall_realm_stability_score } }
-                set_variable = { name = riseandfall_realm_stability_score value = 100 }
-            }
-
-            # Compute tmp_diff = 30 - stability, clamp to [0,30], then tmp_chance = floor((tmp_diff*99)/30) + 1
-            # This avoids unsupported trigger tokens and yields: stability=30 -> chance=1, stability=0 -> chance=100
-            set_variable = { name = tmp_diff value = 30 }
+        scope:ruler_low_stability = {
+            # Compute chance scaled to stability: stability 30 -> 1%, stability 0 -> 100%.
+            # Formula: tmp_diff = clamp(30 - stability, 0, 30)
+            # tmp_chance = floor((tmp_diff * 99) / 30) + 1  -> yields 1..100
+            # tmp_diff = 30 - stability_score
+            set_variable = { name = tmp_diff value = 0 }
             change_variable = { name = tmp_diff add = var:riseandfall_realm_stability_score }
             change_variable = { name = tmp_diff multiply = -1 }
+            change_variable = { name = tmp_diff add = 30 }
             clamp_variable = { name = tmp_diff min = 0 max = 30 }
 
             set_variable = { name = tmp_chance value = 0 }
-            change_variable = { name = tmp_chance add = var:tmp_diff }
-            change_variable = { name = tmp_chance multiply = 99 }
-            change_variable = { name = tmp_chance divide = 30 }
-            change_variable = { name = tmp_chance add = 1 }
-            clamp_variable = { name = tmp_chance min = 1 max = 100 }
+            # If stability >= 31, chance should be 0%
+            if = {
+                limit = { var:riseandfall_realm_stability_score >= 31 }
+                set_variable = { name = tmp_chance value = 0 }
+            }
+            else = {
+                change_variable = { name = tmp_chance add = var:tmp_diff }
+                change_variable = { name = tmp_chance multiply = 99 }
+                change_variable = { name = tmp_chance divide = 30 }
+                change_variable = { name = tmp_chance add = 1 }
+            }
 
             # Roll once for the independent ruler. If it succeeds, notify the liege and add stability
             random = {
@@ -38,4 +38,4 @@ riseandfall_low_stability_roll_se = {
             }
         }
     }
-}
+

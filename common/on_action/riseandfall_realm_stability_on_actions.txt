@@ -35,7 +35,7 @@ riseandfall_on_title_gain_inheritance = {
         # and who actually hold a landed title (avoid courtiers inheriting minor artifacts).
         if = {
             limit = { NOT = { has_variable = riseandfall_realm_stability_score } }
-            if = { limit = { has_landed_title = yes } riseandfall_calculate_realm_stability_se = yes }
+            if = { limit = { holds_landed_title = yes } riseandfall_calculate_realm_stability_se = yes }
         }
     }
 }
@@ -46,6 +46,7 @@ riseandfall_yearly_realm_stability = {
     }
     effect = {
         every_ruler = {
+            limit = { is_landed = yes }
             save_scope_as = independent_ruler
             scope:independent_ruler = {
                 riseandfall_calculate_realm_stability_se = yes
