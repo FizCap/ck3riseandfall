@@ -9,7 +9,7 @@ warlord.1001 = {
 
     option = {
         name = warlord.1001.a
-        ai_chance = { factor = 1 }
+        ai_chance = { base = 100 }
         # Grant the liege a realm law and run the hidden_effect so the iteration runs in effect scope
         add_realm_law = crown_authority_0
         hidden_effect = {
@@ -53,11 +53,10 @@ warlord.1002 = {
     # Immediately run the warlord action event for this new warlord
     trigger_event = { id = warlord.1003 }
         ai_chance = {
-            factor = 10
+            base = 10
             modifier = {
-                factor = 0
+                value = 0
                 OR = {
-                    exists = liege
                     liege = { opinion = { who = root value >= 50 } }
                     has_trait = craven
                 }
@@ -79,11 +78,10 @@ warlord.1002 = {
         }
         # small positive opinion or stability bonus could be added by scripted effects
         ai_chance = {
-            factor = 0
+            base = 0
             modifier = {
-                factor = 90
+                value = 90
                 OR = {
-                    exists = liege
                     liege = { opinion = { who = root value >= 50 } }
                     has_trait = craven
                 }
@@ -101,7 +99,7 @@ warlord.1003 = {
 
     option = {
         name = warlord.1003.a
-        ai_chance = { factor = 1 }
+        ai_chance = { base = 100 }
         # Give claims on the liege's own titles to the warlord
         if = {
             limit = { exists = liege }
@@ -153,16 +151,14 @@ warlord.1003 = {
             }
         }
         ai_chance = {
-            factor = 0
+            base = 0
             modifier = {
-                factor = 100
-                exists = liege
+                value = 100
                 liege = { opinion = { who = root value >= 50 } }
             }
             modifier = {
-                factor = 0
+                value = 0
                 NOT = {
-                    exists = liege
                     liege = { opinion = { who = root value >= 50 } }
                 }
             }
