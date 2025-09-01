@@ -20,7 +20,7 @@ riseandfall_yearly_adventurer = {
         has_game_rule = riseandfall_adventurer_creator_enabled
     }
     effect = {
-        every_ruler = {
+        every_living_character = {
             limit = { is_dynast = yes }
             save_scope_as = independent_ruler
             riseandfall_check_dynasty_for_adventurers_se = yes
