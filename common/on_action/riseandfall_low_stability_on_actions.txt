@@ -27,12 +27,3 @@ riseandfall_warlord = {
         }
     }
 }
-
-riseandfall_warlord_independent_removal = {
-    effect = {
-        every_independent_ruler = {
-            limit = { has_trait = warlord }
-            remove_trait = warlord
-        }
-    }
-}
