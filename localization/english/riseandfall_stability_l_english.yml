@@ -2,7 +2,8 @@
  riseandfall.stability.title:0 "Stability"
  RISEANDFALL_STABILITY_TT:0 "Stability level for this character. Higher is better."
  
- REALM_STABILITY_TOOLTIP:0 "#bold Realm Stability#!\nCurrent: [Character.MakeScope.Var('riseandfall_realm_stability_score').GetValue|0]\nTarget: [Character.MakeScope.Var('riseandfall_realm_stability_target').GetValue|0]\n\n#bold Components#!\nRuler Stats: [Character.MakeScope.Var('riseandfall_rs_stats_component').GetValue|0]/50\nLegitimacy: [Character.MakeScope.Var('riseandfall_rs_legitimacy_component').GetValue|0]/20\nVassal Relations: [Character.MakeScope.Var('riseandfall_rs_vassals_component').GetValue|0]/30\n\n#bold Stability Bands#!\n0-20: #X Collapsing#!\n21-40: #low Low#!\n41-60: #medium Average#!\n61-80: #high Good#!\n81-100: #positive Golden Age#!"
+ REALM_STABILITY_TOOLTIP:0 "#bold Realm Stability#!\nCurrent: [Character.MakeScope.Var('riseandfall_realm_stability_score').GetValue|0]\nTarget: [Character.MakeScope.Var('riseandfall_realm_stability_target').GetValue|0]\nPredicted change this year: [Character.MakeScope.Var('riseandfall_realm_stability_predicted_change').GetValue|0]\n\n#bold Components#!\nRuler Stats: [Character.MakeScope.Var('riseandfall_rs_stats_component').GetValue|0]/50\nLegitimacy: [Character.MakeScope.Var('riseandfall_rs_legitimacy_component').GetValue|0]/20\nVassal Relations: [Character.MakeScope.Var('riseandfall_rs_vassals_component').GetValue|0]/30\n\n#bold Stability Bands#!\n0-20: #X Collapsing#!\n21-40: #low Low#!\n41-60: #medium Average#!\n61-80: #high Good#!\n81-100: #positive Golden Age#!"
+
  
 	# Fine-grained stability modifier names
 	riseandfall_stability_0:0 "Stability: 0"

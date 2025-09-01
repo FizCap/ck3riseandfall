@@ -247,37 +247,50 @@ riseandfall_calculate_realm_stability_se = {
             limit = { var:riseandfall_rs_adjust_months >= 1 }
             # reset months counter so we apply at most one adjustment now
             set_variable = { name = riseandfall_rs_adjust_months value = 0 }
-            # move current score up to 3 points toward the target (no overshoot)
+            # Move current score toward target by a distance-scaled step so it reaches the target
+            # within at most 3 runs (years). Compute step = ceil(abs(delta) / 3), min 1.
             # compute delta = target - current
-            # compute delta = target - current without using invalid '-var:' syntax
             set_variable = { name = tmp_rs_delta value = var:riseandfall_realm_stability_target }
-            set_variable = { name = tmp_rs_current_neg value = var:riseandfall_realm_stability_score }
-            change_variable = { name = tmp_rs_current_neg multiply = -1 }
-            change_variable = { name = tmp_rs_delta add = var:tmp_rs_current_neg }
-            # if target is higher
+            set_variable = { name = tmp_rs_current value = var:riseandfall_realm_stability_score }
+            change_variable = { name = tmp_rs_current multiply = -1 }
+            change_variable = { name = tmp_rs_delta add = var:tmp_rs_current }
+
+            # Compute absolute delta into tmp_rs_delta_abs
             if = {
-                limit = { var:tmp_rs_delta >= 3 }
-                change_variable = { name = riseandfall_realm_stability_score add = 3 }
-            }
-            else_if = {
-                limit = { var:tmp_rs_delta > 0 }
-                change_variable = { name = riseandfall_realm_stability_score add = var:tmp_rs_delta }
+                limit = { var:tmp_rs_delta >= 0 }
+                set_variable = { name = tmp_rs_delta_abs value = var:tmp_rs_delta }
             }
             else = {
-                # target is lower or equal; work with absolute negative delta
-                set_variable = { name = tmp_rs_delta_neg value = var:tmp_rs_delta }
-                change_variable = { name = tmp_rs_delta_neg multiply = -1 }
-                if = {
-                    limit = { var:tmp_rs_delta_neg >= 3 }
-                    change_variable = { name = riseandfall_realm_stability_score add = -3 }
-                }
-                else_if = {
-                    limit = { var:tmp_rs_delta_neg > 0 }
-                    # add negative of the remaining distance
-                    set_variable = { name = tmp_rs_neg_step value = var:tmp_rs_delta_neg }
-                    change_variable = { name = tmp_rs_neg_step multiply = -1 }
-                    change_variable = { name = riseandfall_realm_stability_score add = var:tmp_rs_neg_step }
-                }
+                set_variable = { name = tmp_rs_delta_abs value = var:tmp_rs_delta }
+                change_variable = { name = tmp_rs_delta_abs multiply = -1 }
+            }
+
+            # step = ceil(tmp_rs_delta_abs / 3) implemented as integer: (abs + 2) / 3
+            set_variable = { name = tmp_rs_step_numer value = var:tmp_rs_delta_abs }
+            change_variable = { name = tmp_rs_step_numer add = 2 }
+            set_variable = { name = tmp_rs_step value = var:tmp_rs_step_numer }
+            change_variable = { name = tmp_rs_step divide = 3 }
+
+            # Ensure at least 1 when there is a non-zero delta
+            if = {
+                limit = { var:tmp_rs_step < 1 }
+                if = { limit = { var:tmp_rs_delta_abs > 0 } set_variable = { name = tmp_rs_step value = 1 } }
+            }
+
+            # Apply the step toward the target (respect sign of delta)
+            if = {
+                limit = { var:tmp_rs_delta > 0 }
+                change_variable = { name = riseandfall_realm_stability_score add = var:tmp_rs_step }
+                # Store predicted positive change for UI
+                set_variable = { name = riseandfall_realm_stability_predicted_change value = var:tmp_rs_step }
+            }
+            else = {
+                # negative delta -> subtract step
+                set_variable = { name = tmp_rs_step_neg value = var:tmp_rs_step }
+                change_variable = { name = tmp_rs_step_neg multiply = -1 }
+                change_variable = { name = riseandfall_realm_stability_score add = var:tmp_rs_step_neg }
+                # Store predicted negative change for UI
+                set_variable = { name = riseandfall_realm_stability_predicted_change value = var:tmp_rs_step_neg }
             }
         }
     }
