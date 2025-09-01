@@ -165,5 +165,15 @@ warlord.1003 = {
                 opinion = { target = liege value >= 50 }
             }
         }
+        # If this character had claims on their liege's titles, remove them
+        if = {
+            limit = { exists = liege }
+            liege = {
+                every_held_title = {
+                    limit = { root = { has_claim_on = prev } }
+                    root = { remove_claim = prev }
+                }
+            }
+        }
     }
 }
