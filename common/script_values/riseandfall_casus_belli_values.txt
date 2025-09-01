@@ -1,0 +1,315 @@
+﻿common_cb_cost_multiplier_core = {
+	value = 1
+	
+	# Bellum Justum Perk
+	if = {
+		limit = {
+			scope:attacker = {
+				has_perk = bellum_justum_perk
+			}
+		}
+		multiply = {
+			add = bellum_justum_discount_percentage
+			divide = 100
+			desc = CB_ATTACKER_BELLUM_JUSTUM
+		}
+	}
+	# Dynasty Warfare Perk
+	if = {
+		limit = {
+			scope:attacker = {
+				has_dynasty = yes
+				dynasty = {
+					has_dynasty_perk = warfare_legacy_2
+				}
+			}
+		}
+		multiply = {
+			value = warfare_legacy_2_discount
+			desc = CB_ATTACKER_DYNASTY_WARFARE
+		}
+	}
+	#Confederation vassals against fellow vassals
+	if = {
+		limit = {
+			scope:attacker = {
+				OR = {
+					government_has_flag = government_is_tribal
+					government_has_flag = government_is_nomadic
+					government_has_flag = government_is_herder
+				}
+			}
+			scope:attacker.top_liege = {
+				is_confederation_member = yes
+			}
+			scope:defender.top_liege = {
+				this = scope:attacker.top_liege
+			}
+		}
+		multiply = {
+			add = confederation_cb_cost_value
+			desc = CB_CONFEDERATION_VASSALS
+		}
+	}
+	# Culture
+	if = {
+		limit = {
+			scope:attacker = {
+				culture = {
+					has_cultural_parameter = cheaper_cbs
+				}
+			}
+		}
+		multiply = {
+			value = 0.8
+			desc = "CB_ATTACKER_CULTURE"
+		}
+	}
+
+	if = {
+		limit = {
+			scope:attacker = { government_has_flag = government_is_tribal }
+		}
+		multiply = {
+			value = 0.5
+			desc = CB_TRIBAL_COST
+		}
+	}
+	
+	# Clan Unity modifiers
+	if = {
+		limit = {
+			scope:attacker = {
+				government_has_flag = government_is_clan
+				exists = scope:attacker.house
+			}
+		}
+		if = {
+			limit = {
+				scope:attacker.house = {
+					has_house_unity_parameter = unity_antagonistic_cb_cost
+				}
+			}
+			multiply = {
+				value = unity_antagonistic_cb_cost_value
+				desc = CB_UNITY_COST
+			}
+		}
+		if = {
+			limit = {
+				scope:attacker.house = {
+					has_house_unity_parameter = unity_competitive_cb_cost
+				}
+			}
+			multiply = {
+				value = unity_competitive_cb_cost_value
+				desc = CB_UNITY_COST
+			}
+		}
+		if = {
+			limit = {
+				scope:attacker.house = {
+					has_house_unity_parameter = unity_friendly_cb_cost
+				}
+			}
+			multiply = {
+				value = unity_friendly_cb_cost_value
+				desc = CB_UNITY_COST
+			}
+		}
+		if = {
+			limit = {
+				scope:attacker.house = {
+					has_house_unity_parameter = unity_harmonious_cb_cost
+				}
+			}
+			multiply = {
+				value = unity_harmonious_cb_cost_value
+				desc = CB_UNITY_COST
+			}
+		}
+	}
+
+	# Special increase for Persia if Concession is reached
+	if = {
+		limit = {
+			exists = global_var:fp3_struggle_ending
+			global_var:fp3_struggle_ending = flag:fp3_struggle_concession_ending
+			OR = {
+				scope:attacker = {
+					capital_province ?= {
+						geographical_region = world_persian_empire
+					}
+				}
+				scope:defender = {
+					capital_province ?= {
+						geographical_region = world_persian_empire
+					}
+				}
+			}
+		}
+		multiply = {
+			value = 1
+			add = {
+				if = {
+					limit = {
+						scope:attacker = {
+							house ?= {
+								OR = {
+								 	has_house_modifier = fp3_house_modifier_frontier_ambitions
+									has_house_modifier = fp3_house_modifier_rebuilding_efforts
+								}
+							}
+						}
+					}
+					add = 0.5
+				}
+				if = {
+					limit = {
+						scope:defender = {
+							house ?= {
+								OR = {
+								 	has_house_modifier = fp3_house_modifier_frontier_ambitions
+									has_house_modifier = fp3_house_modifier_rebuilding_efforts
+								}
+							}
+						}
+					}
+					add = 0.5
+				}
+			}
+			desc = CB_STRUGGLE_CONCESSION_ENDING
+		}
+	}
+
+	if = {
+		limit = {
+			scope:attacker = {
+				house ?= { has_house_modifier = fp3_house_modifier_frontier_ambitions }
+			}
+			NOT = {
+				scope:defender = {
+					capital_province ?= {
+						geographical_region = world_persian_empire
+					}
+				}
+			}
+		}
+		multiply = 0.5
+	}
+
+	if = {
+		limit = {
+			OR = {
+				has_game_rule = hard_difficulty
+				has_game_rule = very_hard_difficulty
+			}
+			scope:attacker = {
+				is_ai = yes
+				prestige > 0
+				prestige_level > 0
+			}
+			scope:defender = {
+				is_ai = no
+			}
+		}
+		multiply = {
+			value = 0
+			desc = hard_difficulty
+		}
+	}
+	else_if = {
+		limit = {
+			OR = {
+				has_game_rule = hard_difficulty
+				has_game_rule = very_hard_difficulty
+			}
+			scope:attacker = {
+				is_ai = yes
+				prestige > 0
+				prestige_level > 0
+			}
+		}
+		multiply = {
+			value = 0.5
+			desc = hard_difficulty
+		}
+	}
+
+	if = {
+		limit = {
+			has_game_rule = no_cost_casus_belli_costs
+		}
+		multiply = {
+			value = 0
+			desc = CB_GAME_RULE_NO_COST
+		}
+	}
+
+	if = {
+		limit = {
+			scope:attacker = {
+				ai_should_get_conqueror_bonuses = yes
+			}
+		}
+		multiply = {
+			value = 0
+			desc = ai_conqueror_modifier
+		}
+	}
+	# Warlord trait: remove prestige/piety costs for casus belli
+	if = {
+		limit = {
+			scope:attacker = {
+				has_trait = warlord
+			}
+		}
+		multiply = {
+			value = 0
+			desc = warlord_modifier
+		}
+	}
+	#Pissed off by a severed head
+	if = {
+		limit = {
+			scope:defender = {
+				save_temporary_scope_as = head_giver
+			}
+			scope:attacker = {
+				has_variable = severed_head_cb_revenge
+				var:severed_head_cb_revenge = {
+					this = scope:head_giver
+				}
+			}
+		}
+		multiply = {
+			value = 0.25
+			desc = severed_head_revenge_modifier
+		}
+	}
+}
+
+common_cb_cost_multiplier = {
+	value = common_cb_cost_multiplier_core
+	# Struggle Multipliers
+	if = {
+		limit = {
+			scope:attacker = {
+				OR = {
+					any_character_struggle = {
+						involvement = involved
+						is_struggle_parameter_active_variable_cb_target_secondary_county_trigger = { PARAMETER = involved_or_interloper_wars_in_struggle_region_cheaper_costs }
+					}
+					any_character_struggle = {
+						involvement = interloper
+						is_struggle_parameter_active_variable_cb_target_secondary_county_trigger = { PARAMETER = involved_or_interloper_wars_in_struggle_region_cheaper_costs }
+					}
+				}
+			}
+		}
+		multiply = {
+			value = 0.5
+			desc = CB_STRUGGLE_PHASE_DISCOUNT
+		}
+	}
+}

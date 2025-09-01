@@ -3,9 +3,8 @@
 
  # Adventurer creator rule
  rule_riseandfall_enable_adventurer_creator:0 "Adventurer Creator"
- rule_riseandfall_enable_adventurer_creator_desc:0 "Enable or disable automatic conversion of eligible dynasty members into landless adventurers by the Rise and Fall mod."
  setting_riseandfall_adventurer_creator_enabled:0 "Enabled"
- setting_riseandfall_adventurer_creator_enabled_desc:0 "The adventurer creation system is active: eligible dynasty members may become landless adventurers, receive starting resources and a host, and may attempt to press their claims (including kingdom or empire claims) against title holders which could include you."
+ setting_riseandfall_adventurer_creator_enabled_desc:0 "Adventurer creation active — eligible dynasty members may become landless adventurers with resources and a host, and may press claims (including kingdom or empire)."
  setting_riseandfall_adventurer_creator_disabled:0 "Disabled"
  setting_riseandfall_adventurer_creator_disabled_desc:0 "The adventurer creation system is disabled; dynasty members will not be converted."
 
@@ -45,9 +44,9 @@ setting_riseandfall_mma_limit_modifier_disabled_desc:0 "Do not apply the men-at-
 
 # AI Kingdom Creation rule
 rule_riseandfall_enable_ai_kingdom_creation:0 "AI Title Creation"
-rule_riseandfall_enable_ai_kingdom_creation_desc:0 "Controls whether AI rulers will automatically create higher-tier titles when they have enough territory and gold. Counts will create duchies, kings and emperors will create kingdoms, and kings and emperors will create empires. This helps ensure proper realm structure and realistic title hierarchies."
+rule_riseandfall_enable_ai_kingdom_creation_desc:0 "Enable AI rulers to auto-create higher titles (counts → duchies, kings/emperors → kingdoms/empires) for better realm structure."
 setting_riseandfall_ai_kingdom_creation_enabled:0 "Enabled"
-setting_riseandfall_ai_kingdom_creation_enabled_desc:0 "AI rulers will automatically create higher-tier titles when possible: counts create duchies, kings and emperors create kingdoms, and kings and emperors create empires. This improves realm structure and creates more realistic hierarchies."
+setting_riseandfall_ai_kingdom_creation_enabled_desc:0 "AI rulers will auto-create higher-tier titles when possible (counts→duchies, kings→kingdoms, emperors→empires) to improve realm structure."
 setting_riseandfall_ai_kingdom_creation_disabled:0 "Disabled"
 setting_riseandfall_ai_kingdom_creation_disabled_desc:0 "AI rulers will not automatically create higher-tier titles; they will only create them through normal game prompts."
 
