@@ -146,6 +146,11 @@ warlord.1003 = {
                     limit = { var:riseandfall_realm_stability_score <= 40 }
                     add_legitimacy = { value = legitimacy divide = 98 multiply = -1 }
                 }
+                    
+                    add_opinion = {
+                        target = root
+                        modifier = warlord_rebellion_opinion
+                    }
             }
         }
     }
