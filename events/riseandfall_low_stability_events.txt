@@ -41,9 +41,28 @@ warlord.1002 = {
         name = warlord.1002.a
         # Become a warlord: gain the 'warlord' trait and create a decision to raise faction/claim
         add_trait = warlord
+        if = {
+            limit = { exists = liege }
+            liege = {
+                add_opinion = {
+                    target = root
+                    modifier = warlord_rebellion_opinion
+                }
+            }
+        }
     # Immediately run the warlord action event for this new warlord
     trigger_event = { id = warlord.1003 }
-        ai_chance = { factor = 3 }
+        ai_chance = {
+            factor = 10
+            modifier = {
+                factor = 0
+                OR = {
+                    exists = liege
+                    liege = { opinion = { who = root value >= 50 } }
+                    has_trait = craven
+                }
+            }
+        }
     }
 
     option = {
@@ -51,7 +70,17 @@ warlord.1002 = {
         # Remain loyal: grant the built-in 'loyal' trait (vanilla trait) or a custom loyal marker
         add_trait = loyal
         # small positive opinion or stability bonus could be added by scripted effects
-        ai_chance = { factor = 1 }
+        ai_chance = {
+            factor = 0
+            modifier = {
+                factor = 90
+                OR = {
+                    exists = liege
+                    liege = { opinion = { who = root value >= 50 } }
+                    has_trait = craven
+                }
+            }
+        }
     }
 }
 
@@ -65,58 +94,68 @@ warlord.1003 = {
     option = {
         name = warlord.1003.a
         ai_chance = { factor = 1 }
-        # Give claims on titles held by other vassals of this warlord's liege and the liege itself
+        # Give claims on the liege's own titles to the warlord
         if = {
             limit = { exists = liege }
             liege = {
-                every_vassal = {
-                    limit = { 
-                        NOT = { this = root }
-                        is_landed = yes
-                    }
-                    every_held_title = {
-                        limit = { 
-                            tier = tier_county
-                            NOT = { root = { has_claim_on = prev } }
-                        }
-                        root = { add_unpressed_claim = prev }
-                    }
-                    every_held_title = {
-                        limit = { 
-                            tier = tier_duchy
-                            NOT = { root = { has_claim_on = prev } }
-                        }
-                        root = { add_unpressed_claim = prev }
-                    }
-                }
-                # Also give claims on the liege's own county/duchy/kingdom titles to the warlord
+                # Give claims on the liege's own county/duchy/kingdom/empire titles to the warlord
                 every_held_title = {
-                    limit = { 
+                    limit = {
                         tier = tier_county
                         NOT = { root = { has_claim_on = prev } }
                     }
                     root = { add_unpressed_claim = prev }
                 }
                 every_held_title = {
-                    limit = { 
+                    limit = {
                         tier = tier_duchy
                         NOT = { root = { has_claim_on = prev } }
                     }
                     root = { add_unpressed_claim = prev }
                 }
                 every_held_title = {
-                    limit = { 
+                    limit = {
                         tier = tier_kingdom
                         NOT = { root = { has_claim_on = prev } }
                     }
                     root = { add_unpressed_claim = prev }
                 }
                 every_held_title = {
-                    limit = { 
+                    limit = {
                         tier = tier_empire
                         NOT = { root = { has_claim_on = prev } }
                     }
                     root = { add_unpressed_claim = prev }
+                }
+                if = {
+                    limit = { var:riseandfall_realm_stability_score <= 40 }
+                    add_legitimacy = { value = legitimacy divide = 98 multiply = -1 }
+                }
+            }
+        }
+    }
+
+    option = {
+        name = warlord.1003.b
+        # Remove the warlord trait and abandon the path
+        remove_trait = warlord
+        if = {
+            limit = { exists = liege }
+            liege = {
+            }
+        }
+        ai_chance = {
+            factor = 0
+            modifier = {
+                factor = 100
+                exists = liege
+                liege = { opinion = { who = root value >= 50 } }
+            }
+            modifier = {
+                factor = 0
+                NOT = {
+                    exists = liege
+                    liege = { opinion = { who = root value >= 50 } }
                 }
             }
         }

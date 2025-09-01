@@ -120,10 +120,17 @@ warlord.1002.d:0 "Order frays and opportunity blooms for those with steel and am
 warlord.1002.a:0 "Raise your standard — become a warlord"
 warlord.1002.b:0 "Bend the knee — remain loyal"
 
-warlord.1003.t:0 "Clarion of Rebellion"
-warlord.1003.d:0 "The drums of ambition thunder in your breast. Rally your retainers, proclaim your claims, and let the old order quake before the march you now command."
-warlord.1003.a:0 "Rally the host — press your claim"
+warlord.1003.t:0 "The Path of the Warlord"
+warlord.1003.d:0 "You have embraced the mantle of warlord, and now the path unfolds before you. With claims secured against your liege, you stand at the crossroads of destiny — will you press forward and claim what is rightfully yours?"
+warlord.1003.a:0 "Continue the path — press your claims"
+warlord.1003.b:0 "Abandon the path — renounce your warlord ambitions"
 
 # Trait localization
 trait_warlord:0 "Warlord"
 trait_warlord_desc:0 "A bold and ruthless commander, the warlord carves power from chaos — feared by liege and vassal alike."
+
+# Opinion localization
+warlord_rebellion_opinion:0 "Rebellious Warlord"
+warlord_rebellion_opinion_desc:0 "This vassal has raised the banner of rebellion as a warlord, threatening the stability of the realm."
+warlord_abandonment_opinion:0 "Abandoned Warlord Ambitions"
+warlord_abandonment_opinion_desc:0 "This former warlord has renounced their rebellious ambitions and returned to the fold."

@@ -1,0 +1,7 @@
+﻿l_english:
+ riseandfall_ducal_conquest_cb: "Warlord Ducal Conquest"
+ RISEANDFALL_DUCAL_CONQUEST_CB_NAME: "[ducal_conquest|E] of [county|E]"
+ RISEANDFALL_DUCAL_CONQUEST_CB_SPECIFIC_NAME: "Warlord Ducal Conquest of [TITLE.GetBaseName]"
+ WARLORD_CONQUEST_WAR_NAME: "Warlord Conquest of [ATTACKER.GetPrimaryTitle.GetAdjective]"
+ WARLORD_CONQUEST_WAR_NAME_BASE: "[ATTACKER.GetPrimaryTitle.GetAdjective][DEFENDER.GetPrimaryTitle.GetName]"
+ WARLORD_CONQUEST_CB_NAME: "Warlord Conquest"
