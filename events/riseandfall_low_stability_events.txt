@@ -67,8 +67,16 @@ warlord.1002 = {
 
     option = {
         name = warlord.1002.b
-        # Remain loyal: grant the built-in 'loyal' trait (vanilla trait) or a custom loyal marker
-        add_trait = loyal
+        # Remain loyal: boost relations with liege instead of adding trait
+        if = {
+            limit = { exists = liege }
+            liege = {
+                add_opinion = {
+                    target = root
+                    modifier = warlord_loyalty_opinion
+                }
+            }
+        }
         # small positive opinion or stability bonus could be added by scripted effects
         ai_chance = {
             factor = 0
