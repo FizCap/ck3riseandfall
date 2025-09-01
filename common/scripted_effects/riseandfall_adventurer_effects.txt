@@ -8,6 +8,7 @@
                 # Save the current dynasty member for nested spouse checks
                 save_scope_as = candidate
                 limit = {
+                    is_alive = yes
                     is_landed = no
                     is_imprisoned = no
                     NOT = { has_government = landless_adventurer_government }

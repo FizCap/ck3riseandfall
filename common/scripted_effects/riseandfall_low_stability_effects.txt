@@ -7,6 +7,11 @@ riseandfall_low_stability_roll_se = {
     # For every independent ruler, compute chance once using the ruler's stability
         # Perform computations inside the saved scope so scope:independent_ruler variables resolve correctly
         scope:ruler_low_stability = {
+            # Ensure the stability variable exists for this ruler; default to 30 (neutral)
+            if = {
+                limit = { NOT = { has_variable = riseandfall_realm_stability_score } }
+                set_variable = { name = riseandfall_realm_stability_score value = 30 }
+            }
             # Compute chance scaled to stability: stability 30 -> 1%, stability 0 -> 100%.
             # Formula: tmp_diff = clamp(30 - stability, 0, 30)
             # tmp_chance = floor((tmp_diff * 99) / 30) + 1  -> yields 1..100

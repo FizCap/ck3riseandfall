@@ -6,9 +6,7 @@
     should_show_war_goal_subview = yes
     mutually_exclusive_titles = { always = yes }
     
-    ai_can_target_all_titles = {
-        has_trait = warlord
-    }
+    
 
     # Allow vassals with warlord trait to use this CB against other vassals
     allowed_for_character = {
@@ -21,54 +19,37 @@
     }
 
     allowed_against_character = {
-        # Allow targeting any character for now - validation happens in valid_to_start
-        always = yes
+    # Warlords can attack fellow vassals under the same liege
+    is_vassal_or_below_of = scope:attacker.liege
+    NOT = { this = scope:attacker }
     }
     target_titles = neighbor_land
     target_title_tier = all  # Allow targeting any tier titles, including non-existent ones
     target_de_jure_regions_above = yes
     ignore_effect = change_title_holder
 
-    ai_can_target_all_titles = {
-        has_trait = warlord
-    }
+    
 
     valid_to_start = {
-        # Allow targeting any valid title, whether it exists or not
         scope:target = {
-            OR = {
-                # Existing titles with valid holders
-                AND = {
-                    exists = holder
-                    holder = {
-                        is_vassal_or_below_of = scope:attacker.liege
-                        NOT = { this = scope:attacker }
-                    }
+            any_in_de_jure_hierarchy = {
+                tier = tier_county
+                neighboring_county_or_viking_conquest_trigger = { CHARACTER = root }
+            }
+        }
+        scope:target = {
+            trigger_if = {
+                limit = {
+                    scope:attacker = { is_ai = yes }
                 }
-                # Non-existent titles that could be created
-                AND = {
-                    NOT = { exists = holder }
-                    # Must be adjacent to attacker's territory or in their realm
-                    OR = {
-                        title_province = {
-                            any_neighbor_province = {
-                                county = {
-                                    holder = {
-                                        OR = {
-                                            this = scope:attacker
-                                            is_vassal_or_below_of = scope:attacker
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        any_in_de_jure_hierarchy = {
-                            holder = {
-                                OR = {
-                                    this = scope:attacker
-                                    is_vassal_or_below_of = scope:attacker
-                                }
-                            }
+                any_in_de_jure_hierarchy = {
+                    continue = { tier > tier_county }
+                    count >= 2
+                    tier = tier_county
+                    holder ?= {
+                        OR = {
+                            this = scope:defender
+                            is_vassal_or_below_of = scope:defender
                         }
                     }
                 }
@@ -88,28 +69,12 @@
         NOT = {
             any_in_list = {
                 list = target_titles
-                OR = {
-                    # For existing titles
-                    any_in_de_jure_hierarchy = {
-                        tier = tier_county
-                        holder = {
-                            OR = {
-                                this = scope:defender
-                                target_is_liege_or_above = scope:defender
-                            }
-                        }
-                    }
-                    # For non-existent titles, check if they would be controlled by defender
-                    AND = {
-                        NOT = { exists = holder }
-                        any_in_de_jure_hierarchy = {
-                            tier = tier_county
-                            de_jure_liege = {
-                                OR = {
-                                    this = scope:defender
-                                    target_is_liege_or_above = scope:defender
-                                }
-                            }
+                any_in_de_jure_hierarchy = {
+                    tier = tier_county
+                    holder = {
+                        OR = {
+                            this = scope:defender
+                            target_is_liege_or_above = scope:defender
                         }
                     }
                 }
@@ -181,84 +146,13 @@
         # EP3 Laamp possibility warning
         scope:defender = { ep3_war_loss_adventurer_tt_effect = yes }
 
-        # Handle both existing and non-existent titles
+        # Follow vanilla conquest transfer logic for predictable behavior
         every_in_list = {
             list = target_titles
             custom_tooltip = CONQUEST_CB_TITLE
-            every_in_de_jure_hierarchy = {
-                continue = {
-                    OR = {
-                        NOT = {
-                            exists = holder
-                        }
-                        NOT = {
-                            holder = {
-                                target_is_liege_or_above = scope:defender
-                            }
-                        }
-                        AND = {
-                            scope:attacker.faith = {
-                                faith_hostility_level_comparison = {
-                                    prev.holder.faith <= scope:defender.faith
-                                }
-                            }
-                            holder = {
-                                OR = {
-                                    this = scope:defender
-                                    target_is_liege_or_above = scope:defender
-                                }
-                            }
-                        }
-                    }
-                    tier > tier_county
-                }
-                limit = {
-                    tier = tier_county
-                    OR = {
-                        # Existing counties with holders
-                        AND = {
-                            exists = holder
-                            holder = {
-                                OR = {
-                                    this = scope:defender
-                                    target_is_liege_or_above = scope:defender
-                                }
-                            }
-                        }
-                        # Non-existent counties (create them)
-                        AND = {
-                            NOT = { exists = holder }
-                            any_in_de_jure_hierarchy = {
-                                tier = tier_county
-                                de_jure_liege = {
-                                    OR = {
-                                        this = scope:defender
-                                        target_is_liege_or_above = scope:defender
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
 
-                if = {
-                    limit = {
-                        OR = {
-                            scope:attacker.faith = {
-                                faith_hostility_level_comparison = {
-                                    prev.holder.faith >= scope:defender.faith
-                                }
-                            }
-                            holder.primary_title.tier >= scope:attacker.primary_title.tier
-                        }
-                    }
-                    add_to_temporary_list = titles_taken
-                }
-                else = {
-                    holder = {
-                        add_to_temporary_list = vassals_taken
-                    }
-                }
+            conquest_cb_title_transfer = {
+                RELIGIOUS_WAR = no
             }
         }
 

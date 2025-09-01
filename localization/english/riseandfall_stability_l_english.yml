@@ -134,3 +134,6 @@ warlord_rebellion_opinion:0 "Rebellious Warlord"
 warlord_rebellion_opinion_desc:0 "This vassal has raised the banner of rebellion as a warlord, threatening the stability of the realm."
 warlord_abandonment_opinion:0 "Abandoned Warlord Ambitions"
 warlord_abandonment_opinion_desc:0 "This former warlord has renounced their rebellious ambitions and returned to the fold."
+
+trait_retiredwarlord:0 "Retired Warlord"
+trait_retiredwarlord_desc:0 "Once a stirring force who sowed chaos across the realm, they have laid down their sword — their days of conquest are done."

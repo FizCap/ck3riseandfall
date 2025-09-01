@@ -11,7 +11,10 @@ warlord.1001 = {
         name = warlord.1001.a
         ai_chance = { base = 100 }
         # Grant the liege a realm law and run the hidden_effect so the iteration runs in effect scope
-        add_realm_law = crown_authority_0
+        if = {
+            limit = { NOT = { has_realm_law = crown_authority_0 } }
+            add_realm_law = crown_authority_0
+        }
         hidden_effect = {
             every_vassal = {
                 limit = {
@@ -41,8 +44,8 @@ warlord.1002 = {
         name = warlord.1002.a
         # Become a warlord: gain the 'warlord' trait and create a decision to raise faction/claim
         add_trait = warlord
-        if = {
-            limit = { exists = liege }
+                if = {
+            limit = { is_independent_ruler = no }
             liege = {
                 add_opinion = {
                     target = root
@@ -50,25 +53,23 @@ warlord.1002 = {
                 }
             }
         }
+    ai_chance = {
+        base = 0
+        modifier = {
+            add = 100
+            is_independent_ruler = no
+            opinion = { target = liege value < 50 }
+        }
+    }
     # Immediately run the warlord action event for this new warlord
     trigger_event = { id = warlord.1003 }
-        ai_chance = {
-            value = 10
-            modifier = {
-                value = 0
-                OR = {
-                    liege = { opinion = { who = root value >= 50 } }
-                    has_trait = craven
-                }
-            }
-        }
     }
 
     option = {
         name = warlord.1002.b
-        # Remain loyal: boost relations with liege instead of adding trait
+        # Remain loyal: boost relationzs with liege instead of adding trait
         if = {
-            limit = { exists = liege }
+            limit = { is_independent_ruler = no }
             liege = {
                 add_opinion = {
                     target = root
@@ -78,13 +79,15 @@ warlord.1002 = {
         }
         # small positive opinion or stability bonus could be added by scripted effects
         ai_chance = {
-            value = 0
+            base = 0
             modifier = {
-                value = 90
-                OR = {
-                    liege = { opinion = { who = root value >= 50 } }
-                    has_trait = craven
-                }
+                add = 100
+                is_independent_ruler = yes
+            }
+            modifier = {
+                add = 100
+                is_independent_ruler = no
+                opinion = { target = liege value >= 50 }
             }
         }
     }
@@ -100,10 +103,10 @@ warlord.1003 = {
     option = {
         name = warlord.1003.a
         ai_chance = {
-            value = 100
+            base = 100
             modifier = {
+                add = -100
                 is_independent_ruler = yes
-                subtract = 100
             }
         }
         # Give claims on the liege's own titles to the warlord
@@ -146,26 +149,15 @@ warlord.1003 = {
             }
         }
     }
-
     option = {
         name = warlord.1003.b
         # Remove the warlord trait and abandon the path
         remove_trait = warlord
         ai_chance = {
-            value = 0
+            base = 0
             modifier = {
                 add = 100
-                liege = { opinion = { who = root value >= 50 } }
-            }
-            modifier = {
-                value = 0
-                NOT = {
-                    liege = { opinion = { who = root value >= 50 } }
-                }
-            }
-            modifier = {
-                is_independent_ruler = yes
-                add = 100
+                opinion = { target = liege value >= 50 }
             }
         }
     }
