@@ -6,9 +6,9 @@
     should_show_war_goal_subview = yes
     mutually_exclusive_titles = { always = yes }
     
-    attacker_score_from_occupation_scale = 150
-    attacker_score_from_battles_scale = 150
-    defender_score_from_battles_scale = 150
+    ai_can_target_all_titles = {
+        has_trait = warlord
+    }
 
     # Allow vassals with warlord trait to use this CB against other vassals
     allowed_for_character = {
@@ -21,24 +21,57 @@
     }
 
     allowed_against_character = {
-        # Defender must be a vassal of the attacker's liege (prevents attacking independent rulers)
-        scope:defender = {
-            is_vassal_or_below_of = scope:attacker.liege
-            NOT = { this = scope:attacker }  # Can't target yourself
-            is_independent_ruler = no  # Explicitly prevent targeting independent rulers
-        }
+        # Allow targeting any character for now - validation happens in valid_to_start
+        always = yes
     }
-    target_titles = all
-    target_title_tier = all  # Focus on county-level conquest like vanilla county conquest
+    target_titles = neighbor_land
+    target_title_tier = all  # Allow targeting any tier titles, including non-existent ones
     target_de_jure_regions_above = yes
     ignore_effect = change_title_holder
 
+    ai_can_target_all_titles = {
+        has_trait = warlord
+    }
+
     valid_to_start = {
-        # Only allow targets whose holder is a vassal (or below) of the attacker's liege
+        # Allow targeting any valid title, whether it exists or not
         scope:target = {
-            holder = {
-                is_vassal_or_below_of = scope:attacker.liege
-                NOT = { this = scope:attacker }  # Can't target yourself
+            OR = {
+                # Existing titles with valid holders
+                AND = {
+                    exists = holder
+                    holder = {
+                        is_vassal_or_below_of = scope:attacker.liege
+                        NOT = { this = scope:attacker }
+                    }
+                }
+                # Non-existent titles that could be created
+                AND = {
+                    NOT = { exists = holder }
+                    # Must be adjacent to attacker's territory or in their realm
+                    OR = {
+                        title_province = {
+                            any_neighbor_province = {
+                                county = {
+                                    holder = {
+                                        OR = {
+                                            this = scope:attacker
+                                            is_vassal_or_below_of = scope:attacker
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        any_in_de_jure_hierarchy = {
+                            holder = {
+                                OR = {
+                                    this = scope:attacker
+                                    is_vassal_or_below_of = scope:attacker
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -55,12 +88,28 @@
         NOT = {
             any_in_list = {
                 list = target_titles
-                any_in_de_jure_hierarchy = {
-                    tier = tier_county
-                    holder = {
-                        OR = {
-                            this = scope:defender
-                            target_is_liege_or_above = scope:defender
+                OR = {
+                    # For existing titles
+                    any_in_de_jure_hierarchy = {
+                        tier = tier_county
+                        holder = {
+                            OR = {
+                                this = scope:defender
+                                target_is_liege_or_above = scope:defender
+                            }
+                        }
+                    }
+                    # For non-existent titles, check if they would be controlled by defender
+                    AND = {
+                        NOT = { exists = holder }
+                        any_in_de_jure_hierarchy = {
+                            tier = tier_county
+                            de_jure_liege = {
+                                OR = {
+                                    this = scope:defender
+                                    target_is_liege_or_above = scope:defender
+                                }
+                            }
                         }
                     }
                 }
@@ -132,8 +181,7 @@
         # EP3 Laamp possibility warning
         scope:defender = { ep3_war_loss_adventurer_tt_effect = yes }
 
-        # go through the dejure hierarchy under target titles, transfer titles with same or worse tolerance holders (their religion equaly or less tolerated than the defender's),
-        # take the holder as vassal otherwise and don't go deeper
+        # Handle both existing and non-existent titles
         every_in_list = {
             list = target_titles
             custom_tooltip = CONQUEST_CB_TITLE
@@ -166,11 +214,29 @@
                 }
                 limit = {
                     tier = tier_county
-                    exists = holder
-                    holder = {
-                        OR = {
-                            this = scope:defender
-                            target_is_liege_or_above = scope:defender
+                    OR = {
+                        # Existing counties with holders
+                        AND = {
+                            exists = holder
+                            holder = {
+                                OR = {
+                                    this = scope:defender
+                                    target_is_liege_or_above = scope:defender
+                                }
+                            }
+                        }
+                        # Non-existent counties (create them)
+                        AND = {
+                            NOT = { exists = holder }
+                            any_in_de_jure_hierarchy = {
+                                tier = tier_county
+                                de_jure_liege = {
+                                    OR = {
+                                        this = scope:defender
+                                        target_is_liege_or_above = scope:defender
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -360,8 +426,6 @@
     cb_name = "WARLORD_CONQUEST_CB_NAME"
 
     interface_priority = 79
-
-    use_de_jure_wargoal_only = yes
 
     attacker_wargoal_percentage = 0.8
     

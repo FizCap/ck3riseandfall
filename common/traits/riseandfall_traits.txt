@@ -9,6 +9,11 @@
 	title_creation_cost_mult = -0.75
     opinion_of_liege = -30
 
+	opinion_modifier = {
+		who = trait:warlord
+		opinion = -30
+	}
+
 	shown_in_ruler_designer = no
 		
 	#ai_greed = 1000

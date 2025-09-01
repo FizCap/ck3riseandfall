@@ -53,7 +53,7 @@ warlord.1002 = {
     # Immediately run the warlord action event for this new warlord
     trigger_event = { id = warlord.1003 }
         ai_chance = {
-            base = 10
+            value = 10
             modifier = {
                 value = 0
                 OR = {
@@ -78,7 +78,7 @@ warlord.1002 = {
         }
         # small positive opinion or stability bonus could be added by scripted effects
         ai_chance = {
-            base = 0
+            value = 0
             modifier = {
                 value = 90
                 OR = {
@@ -99,7 +99,13 @@ warlord.1003 = {
 
     option = {
         name = warlord.1003.a
-        ai_chance = { base = 100 }
+        ai_chance = {
+            value = 100
+            modifier = {
+                is_independent_ruler = yes
+                subtract = 100
+            }
+        }
         # Give claims on the liege's own titles to the warlord
         if = {
             limit = { exists = liege }
@@ -145,15 +151,10 @@ warlord.1003 = {
         name = warlord.1003.b
         # Remove the warlord trait and abandon the path
         remove_trait = warlord
-        if = {
-            limit = { exists = liege }
-            liege = {
-            }
-        }
         ai_chance = {
-            base = 0
+            value = 0
             modifier = {
-                value = 100
+                add = 100
                 liege = { opinion = { who = root value >= 50 } }
             }
             modifier = {
@@ -161,6 +162,10 @@ warlord.1003 = {
                 NOT = {
                     liege = { opinion = { who = root value >= 50 } }
                 }
+            }
+            modifier = {
+                is_independent_ruler = yes
+                add = 100
             }
         }
     }

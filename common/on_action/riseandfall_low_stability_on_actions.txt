@@ -1,6 +1,5 @@
 ﻿yearly_global_pulse = {
     on_actions = {
-        riseandfall_warlord_independent_removal
         riseandfall_low_stability_roll
         riseandfall_warlord
     }
