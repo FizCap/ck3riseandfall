@@ -73,9 +73,13 @@
                     if = { limit = { has_trait = ambitious } change_variable = { name = rf_adventurer_trait_chance add = 2 } }
                     if = { limit = { has_trait = brave } change_variable = { name = rf_adventurer_trait_chance add = 1 } }
 
-                    # Final chance = base 0.5 + trait bonuses, clamp to [0,100]
+                    # Final chance = base 0.5 + trait bonuses + intrigue bonus, clamp to [0,100]
                     set_variable = { name = rf_adventurer_final_chance value = 0.5 }
                     change_variable = { name = rf_adventurer_final_chance add = var:rf_adventurer_trait_chance }
+                    # Add intrigue bonus: intrigue * 0.1 (e.g., 10 intrigue = +1.0)
+                    set_variable = { name = intrigue_bonus value = scope:candidate.intrigue }
+                    change_variable = { name = intrigue_bonus multiply = 0.1 }
+                    change_variable = { name = rf_adventurer_final_chance add = var:intrigue_bonus }
                     # If we selected a claim target and the holder has low legitimacy, increase chance
                     if = {
                         limit = { exists = scope:claim_target_title.holder }
@@ -91,6 +95,7 @@
                     }
                     remove_variable = rf_adventurer_trait_chance
                     remove_variable = rf_adventurer_final_chance
+                    remove_variable = intrigue_bonus
                 }
                 remove_variable = rf_disqualify
             }
