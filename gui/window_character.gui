@@ -1,4 +1,5 @@
-﻿######################################################
+﻿# EK ADDITION: arcana, praxis, important chars
+######################################################
 ################# CHARACTER WINDOW ###################
 ######################################################
 
@@ -10,8 +11,6 @@ window = {
 	movable = no
 	layer = middle
 	allow_outside = yes
-	#AGOT Added
-	size = { 650 100% }
 
 	using = Window_Size_Sidebar
 	using = Window_Background_Sidebar
@@ -37,8 +36,6 @@ window = {
 	vbox = {
 		name = "main_content"
 		using = Window_Margins_Sidebar
-		#AGOT Added
-		visible = "[IsCharacterNormal]"
 
 		###############
 		# Character box
@@ -46,9 +43,7 @@ window = {
 			name = "main_characters"
 			datacontext = "[GetIllustration( 'character_view_bg' )]"
 			layoutpolicy_horizontal = expanding
-			#AGOT Modified
-			# size = { 0 305 }
-			size = { 0 325 }
+			size = { 0 305 }
 
 
 			widget = {
@@ -74,17 +69,13 @@ window = {
 			### Primary Spouse
 			container_secondary = {
 				visible = "[CharacterWindow.ShouldShowSecondary]"
-				#AGOT Added
-				position = { 60 0 }
 			}
 
 			### Main Character
 			portrait_character_view_main = {
 				name = "tutorial_highlight_main_character_button"
 				parentanchor = bottom|left
-				#AGOT Modified
-				# position = { 0 0 }
-				position = { 60 0 }
+				position = { 0 0 }
 
 				using = Animation_Character_Window_Refresh_Short
 
@@ -125,9 +116,7 @@ window = {
 
 			secondary_widget = {
 				visible = "[CharacterWindow.ShouldShowSecondary]"
-				#AGOT Modified
-				# position = { 250 0 }
-				position = { 310 0 }
+				position = { 250 0 }
 			}
 
 			buttons_window_control = {
@@ -155,8 +144,6 @@ window = {
 						onclick = "[Character.CopyCharacterPersistentDna]"
 						raw_tooltip = "Copy Persistent DNA"
 					}
-					#AGOT Added
-					agot_knight_tree_button = {}
 				}
 
 				blockoverride "button_close"
@@ -637,9 +624,6 @@ window = {
 							size = { 60 40 }
 							onclick = "[AddWatchWindow( CharacterWindow.GetCharacter.MakeScope )]"
 						}
-
-						#AGOT Added
-						agot_portrait_editor_button = {}
 					}
 				}
 			}
@@ -742,8 +726,6 @@ window = {
 						}
 					}
 				}
-				#AGOT Added
-				agot_ai_stress_icon = {}
 
 				container = {
 					visible = "[GreaterThan_int32(GetDataModelSize(Character.GetKnownLanguages), '(int32)1')]"
@@ -786,6 +768,9 @@ window = {
 						parentanchor = center
 					}
 				}
+				
+				# EK ADDITION: important char
+				ek_important_character = { }
 
 				button_normal = {
 					name = "open_kill_list"
@@ -954,54 +939,36 @@ window = {
 					layoutpolicy_horizontal = expanding
 
 					using = Animation_Character_Window_Refresh
-					#AGOT Added
-					margin = { 0 -2 }
-
 
 					vbox = {
 						name = "name_etc"
 						layoutpolicy_horizontal = expanding
-						#AGOT Added
-						layoutpolicy_vertical = expanding
-						margin = { 0 2 }
 
 						## Name
 						hbox = {
 							layoutpolicy_horizontal = expanding
 							margin = { 3 0 }
-							#AGOT Modified
-							# margin_top = 1
-							margin_top = -2
-							#AGOT Added
-							layoutpolicy_vertical = expanding
+							margin_top = 1
 
-							#AGOT Disabled for name flavourization
-							# text_single = {
-								# name = "character_name"
-								# raw_text = "[Character.GetUINameNotMeNoTooltip], "
-								# margin_left = 2
-								# max_width = 398
-								# fontsize = 20
-								# fontsize_min = 14
-								# align = nobaseline
-								# default_format = "#medium"
-								# tooltip = "[Character.GetUINameNotMeNoTooltip]"
-							# }
-
-							#AGOT Added for name flavourization, no touchy, please see Badger
-							agot_name_flavorization = {}
+							text_single = {
+								name = "character_name"
+								raw_text = "[Character.GetUINameNotMeNoTooltip], "
+								margin_left = 2
+								max_width = 398
+								fontsize = 20
+								fontsize_min = 14
+								align = nobaseline
+								default_format = "#medium"
+								tooltip = "[Character.GetUINameNotMeNoTooltip]"
+							}
 
 							text_single = {
 								name = "character_age"
 								raw_text = " [Character.GetAge]"
 								default_format = "#low"
-								#AGOT Modified
-								#tooltip = "[Character.GetDeathOrBirthDateInfo]"
-								tooltip = "[SelectLocalization( Character.MakeScope.Var('agot_birthplace').IsSet, 'AGOT_BIRTHPLACE', Character.GetDeathOrBirthDateInfo )]"
+								tooltip = "[Character.GetDeathOrBirthDateInfo]"
 								fontsize = 20
-								#AGOT Modified
-								# max_width = 28
-								max_width = 48
+								max_width = 50 #EK EDIT: was 28
 								align = nobaseline
 							}
 
@@ -1023,6 +990,9 @@ window = {
 									texture = "gfx/interface/icons/character_status/icon_dead.dds"
 									tooltip = "CHARACTER_DEAD_TOOLTIP"
 								}
+
+								# EK ADDITION: magicka icon
+								ek_magicka = { }
 							}
 
 							expand = {}
@@ -1031,20 +1001,95 @@ window = {
 						hbox_character_relation_and_ai = {
 							name = "character_relation_and_ai"
 							margin = { 3 0 }
-							#AGOT Added
-							margin_top = -4
-							margin_bottom = -4
 						}
 					}
 
 					## Traits
-					#AGOT Modified
-					# hbox_traits_list = {
-						# name = "tutorial_highlight_traits"
-						# datacontext = "[CharacterWindow.GetTraitArrays]"
-						# margin_bottom = 2
-					# }
-					agot_trait_expanding_button = {}
+					hbox_traits_list = {
+						name = "tutorial_highlight_traits"
+						datacontext = "[CharacterWindow.GetTraitArrays]"
+						margin_bottom = 2
+					}
+
+					#EK EDIT: moved traits to here
+					divider_light = {
+						layoutpolicy_horizontal = expanding
+						# visible = "[DataModelHasItems( CharacterWindow.GetTimedModifiers )]"
+					}
+
+					hbox = {
+						layoutpolicy_horizontal = expanding
+						margin = { 0 0 }
+
+						using = Animation_Character_Window_Refresh
+
+						button_group = {
+							onclick = "[CharacterWindow.ToggleExpandedModifiers]"
+							# visible = "[DataModelHasItems( CharacterWindow.GetTimedModifiers )]"
+							tooltip = "CHARACTER_WINDOW_MODIFIERS"
+
+							# Button here purely to give mouse hover visual effect
+							button_standard_hover = {
+								size = { 100% 100% }
+							}
+
+							hbox = {
+								margin_top = 4
+								margin_bottom = 2
+								margin_left = 2
+								set_parent_size_to_minimum = yes
+								minimumsize = { 22 22 }
+
+								fixedgridbox = {
+									name = "modifiers_grid"
+									datamodel = "[CharacterWindow.GetTimedModifiers]"
+									flipdirection = yes
+									addcolumn = 25
+									addrow = 23
+									datamodel_wrap = 17
+									maxhorizontalslots = 17
+									maxverticalslots = 1
+
+									layoutpolicy_vertical = expanding
+
+									using = Animation_Character_Window_Refresh
+
+									item = {
+										modifier_item_icon = {
+											size = { 22 22 }
+
+											blockoverride "input_info_text" {
+												text = "CHARACTER_WINDOW_MODIFIERS"
+											}
+										}
+									}
+								}
+
+								#EK EDIT: " + " will display when too many modifiers. (+<number>) won't work afaik
+								text_single = {
+									visible = "[GreaterThan_int32( GetDataModelSize(CharacterWindow.GetTimedModifiers), '(int32)17' )]"
+									min_width = 22
+									margin_top = -4
+									margin_bottom = 6
+									raw_text = " + "
+									default_format = "#low"
+								}
+
+								# EK EDIT: disabled because our bar is way bigger
+								# text_single = {
+								# 	visible = "[CharacterWindow.IsExtraModifiersNumberShown]"
+								# 	min_width = 22
+								# 	margin_top = -4
+								# 	margin_bottom = 6
+								# 	text = "CHARACTER_WINDOW_EXTRA_MODIFIERS"
+								# 	default_format = "#low"
+								# }
+							}
+						}
+
+						expand = {}
+					}
+					#EK EDIT END
 				}
 
 				divider_light = {
@@ -1146,6 +1191,9 @@ window = {
 								align = nobaseline
 							}
 						}
+						
+						# EK ADDITION: arcana
+						ek_arcana = { }
 
 						divider_light = {
 							layoutpolicy_vertical = expanding
@@ -1201,65 +1249,7 @@ window = {
 						}
 					}
 
-					vbox = {
-						layoutpolicy_vertical = expanding
-						margin = { 0 0 }
-
-						using = Animation_Character_Window_Refresh
-
-						button_group = {
-							onclick = "[CharacterWindow.ToggleExpandedModifiers]"
-							tooltip = "CHARACTER_WINDOW_MODIFIERS"
-
-							button_tertiary = {
-								size = { 100% 100% }
-							}
-
-							hbox = {
-								set_parent_size_to_minimum = yes
-								margin = { 2 2 }
-
-								fixedgridbox = {
-									name = "modifiers_grid"
-									datamodel = "[CharacterWindow.GetTimedModifiers]"
-									addcolumn = 23
-									addrow = 23
-									datamodel_wrap = 2
-									maxhorizontalslots = 2
-									maxverticalslots = 2
-
-									layoutpolicy_vertical = expanding
-
-									using = Animation_Character_Window_Refresh
-
-									item = {
-										widget = {
-											size = { 23 23 }
-
-											modifier_item_icon = {
-												parentanchor = center
-												size = { 20 20 }
-
-												blockoverride "input_info_text" {
-													text = "CHARACTER_WINDOW_MODIFIERS"
-												}
-											}
-										}
-									}
-								}
-
-								text_single = {
-									visible = "[CharacterWindow.IsExtraModifiersNumberShown]"
-									min_width = 22
-									margin_bottom = 10
-									text = "CHARACTER_WINDOW_EXTRA_MODIFIERS"
-									default_format = "#low"
-								}
-							}
-						}
-
-						expand = {}
-					}
+					#EK EDIT: removed traits list here
 
 					expand = {}
 				}
@@ -1274,9 +1264,7 @@ window = {
 				name = "house"
 				datacontext = "[Character.GetHouse]"
 				layoutpolicy_vertical = expanding
-				#AGOT Modified
-				#size = { 125 0 }
-				size = { 120 0 }
+				size = { 125 0 }
 
 				using = Animation_Character_Window_Refresh
 
@@ -1334,8 +1322,6 @@ window = {
 
 					expand = {}
 				}
-				#AGOT Added
-				agot_personal_coat_of_arms = {}
 			}
 		}
 
@@ -1431,68 +1417,62 @@ window = {
 						}
 
 						hbox = {
-							spacing = 5
-							margin_top = 3
-							margin_bottom = 20
+							name = "realm_stability"
+							visible = "[And( Not( Character.GetPrimaryTitle.HasFaction ), And( Character.HasLandedTitles, Character.IsAlive ) )]"
+							tooltip = "REALM_STABILITY_TOOLTIP"
+							spacing = -2
 
-							vbox = {
-								tooltip = "REALM_STABILITY_TOOLTIP"
-								using = tooltip_ne
-								spacing = -3
+							icon = {
+								name = "stability_icon"
+								size = { 30 30 }
+								texture = "gfx/interface/icons/icon_stability.dds"
+							}
 
-								icon = {
-									name = "icon_stability"
-									size = { 32 32 }
-									texture = "gfx/interface/icons/scale_of_power.dds"
-								}
-
-								text_single = {
-									name = "stability"
-									text = "[Character.MakeScope.Var('riseandfall_realm_stability_score').GetValue|0]/[Character.MakeScope.Var('riseandfall_realm_stability_target').GetValue|0]"
-									default_format = "#high"
-									align = nobaseline
-								}
+							text_single = {
+								name = "stability_score"
+								text = "[Character.MakeScope.Var('riseandfall_realm_stability_score').GetValue]/[Character.MakeScope.Var('riseandfall_realm_stability_target').GetValue]"
+								default_format = "#high"
+								align = center|nobaseline
 							}
 						}
 
-						#AGOT Disabled
-						# flowcontainer = {
-							# margin = { 3 2 }
-							# ignoreinvisible = yes
+						flowcontainer = {
+							margin = { 3 2 }
+							ignoreinvisible = yes
 
-							# background = {
-								# using = Background_Area_Dark
-							# }
+							background = {
+								using = Background_Area_Dark
+							}
 
-							# flowcontainer = {
-								# visible = "[Character.IsTheocraticLessee]"
-								# tooltip = "CV_THEOCRACY_LESSEE_TOOLTIP"
-								# spacing = -2
-								# direction = vertical
+							flowcontainer = {
+								visible = "[Character.IsTheocraticLessee]"
+								tooltip = "CV_THEOCRACY_LESSEE_TOOLTIP"
+								spacing = -2
+								direction = vertical
 
-								# icon = {
-									# name = "theocracy_lessee_info"
-									# texture = "gfx/interface/icons/icon_holding_church.dds"
-									# size = { 30 30 }
-								# }
+								icon = {
+									name = "theocracy_lessee_info"
+									texture = "gfx/interface/icons/icon_holding_church.dds"
+									size = { 30 30 }
+								}
 
-								# text_single = {
-									# name = "domain_limit"
-									# parentanchor = hcenter
-									# text = "[Character.GetNumTitlesFromTheocraticLease]"
-									# default_format = "#high"
-									# align = center|nobaseline
-								# }
-							# }
+								text_single = {
+									name = "domain_limit"
+									parentanchor = hcenter
+									text = "[Character.GetNumTitlesFromTheocraticLease]"
+									default_format = "#high"
+									align = center|nobaseline
+								}
+							}
 
-							# icon = {
-								# name = "religious_head_info"
-								# visible = "[Character.IsReligiousHead]"
-								# size = { 30 30 }
-								# texture = "gfx/interface/icons/icon_head_of_faith_income.dds"
-								# tooltip = "CV_THEOCRACY_RELIGIOUS_HEAD_TOOLTIP"
-							# }
-						# }
+							icon = {
+								name = "religious_head_info"
+								visible = "[Character.IsReligiousHead]"
+								size = { 30 30 }
+								texture = "gfx/interface/icons/icon_head_of_faith_income.dds"
+								tooltip = "CV_THEOCRACY_RELIGIOUS_HEAD_TOOLTIP"
+							}
+						}
 
 						expand = {}
 					}
@@ -1540,9 +1520,7 @@ window = {
 								name = "realm_name_and_type"
 								visible = "[Character.HasLandedTitles]"
 								datacontext = "[Character.GetPrimaryTitle]"
-								#AGOT Modified
-								# max_width = 250
-								max_width = 350
+								max_width = 250
 							}
 
 							expand = {}
@@ -1634,8 +1612,6 @@ window = {
 			visible = "[And(CharacterWindow.AreNoneExpanded, Not( GreaterThan_CFixedPoint( GetPlayer.MakeScope.Var('hide_ui_character_sheet_bottom').GetValue, '(CFixedPoint)0' ) ))]"
 			layoutpolicy_horizontal = expanding
 			using = Animation_ShowHide_Quick
-			#AGOT Added
-			margin = { 0 10 }
 
 			button_tab = {
 				name = "family_button"
@@ -1687,9 +1663,7 @@ window = {
 
 					text_single = {
 						align = center
-						#AGOT Modified
-						# text = "[CharacterWindow.GetTabItemsCount('relations')]"
-						text = "[CharacterWindow.GetCharacter.MakeScope.ScriptValue('agot_relations_value')|0]"
+						text = "[CharacterWindow.GetTabItemsCount('relations')]"
 						default_format = "#low"
 						margin_right = 15
 						min_width = 30
@@ -1786,9 +1760,7 @@ window = {
 
 				vbox = {
 					name = "family_main_view"
-					#AGOT Modified
-					# visible = "[Not( Or(CharacterWindow.IsRelationExpanded( 'children' ), CharacterWindow.IsRelationExpanded( 'siblings' ) ) )]"
-					visible = "[And( Not( Or(CharacterWindow.IsRelationExpanded( 'children' ), CharacterWindow.IsRelationExpanded( 'siblings' ) )), Not( CharacterWindow.IsRelationExpanded( 'spouses' ) ))]"
+					visible = "[Not( Or(CharacterWindow.IsRelationExpanded( 'children' ), CharacterWindow.IsRelationExpanded( 'siblings' ) ) )]"
 
 					widget = {
 						name = "parents_grandparents_spouses"
@@ -1868,8 +1840,6 @@ window = {
 									}
 								}
 							}
-							#AGOT Added; Paramours
-							agot_paramour_relationship_row = {}
 
 							vbox_character_row_item = {
 								name = "secondary_spouses"
@@ -1878,30 +1848,14 @@ window = {
 
 								blockoverride "portrait_datamodel" {
 									datamodel = "[CharacterWindow.GetSecondarySpouses]"
-									#AGOT Added
-									maxhorizontalslots = 4
 								}
 
 								blockoverride "header_text"
 								{
-									#AGOT Modified
-									# text = "SECONDARY_SPOUSES"
-									text = "AGOT_SECONDARY_SPOUSES"
+									text = "SECONDARY_SPOUSES"
 								}
 
-								#AGOT Modified
-								# blockoverride "expand_button" {}
-								blockoverride "expand_button_inside" {
-									visible = "[GreaterThan_int32( GetDataModelSize(CharacterWindow.GetSecondarySpouses), '(int32)4' )]"
-									onclick = "[CharacterWindow.ToggleExpandedRelation( 'spouses' )]"
-								}
-
-								#AGOT Added
-								blockoverride "remaining_items"
-								{
-									visible = "[GreaterThan_int32( GetDataModelSize(CharacterWindow.GetSecondarySpouses), '(int32)4' )]"
-									text = "[GetNumberAbove_int32( GetDataModelSize(CharacterWindow.GetSecondarySpouses), '(int32)4' )|=]"
-								}
+								blockoverride "expand_button" {}
 
 								blockoverride "find_partner"
 								{
@@ -2156,37 +2110,6 @@ window = {
 						}
 					}
 				}
-
-				#AGOT Added
-				scrollbox = {
-					name = "family_spouses_expanded"
-					visible = "[CharacterWindow.IsRelationExpanded( 'spouses' )]"
-					size = { 100% 100% }
-
-					blockoverride "scrollbox_replace_vbox" {
-						vbox_character_row_item = {
-							name = "spouses"
-							margin_top = 10
-							spacing = 5
-
-							blockoverride "portrait_datamodel" {
-								datamodel = "[CharacterWindow.GetSecondarySpouses]"
-							}
-
-							blockoverride "header_text"
-							{
-								text = "AGOT_SECONDARY_SPOUSES"
-							}
-
-							blockoverride "expand_button_inside" {
-								onclick = "[CharacterWindow.ToggleExpandedRelation( 'spouses' )]"
-								down = "[CharacterWindow.IsRelationExpanded( 'spouses' )]"
-							}
-
-							blockoverride "gridbox_slots" {}
-						}
-					}
-				}
 			}
 
 			####################################
@@ -2212,10 +2135,6 @@ window = {
 						scissor = yes
 
 						hbox = {
-							#AGOT Added; Squires and Knights
-							agot_squire_relationship_row = {}
-							agot_knight_relationship_row = {}
-
 							vbox_character_row_item = {
 								name = "wards"
 								visible = "[CharacterWindow.GetCharacter.IsAdult]"
@@ -2343,9 +2262,7 @@ window = {
 							### LOVERS 5 PORTRAITS
 							vbox_character_row_relationship_item = {
 								name = "lovers_no_diarchy"
-								#AGOT Modified
-								# visible = "[And( CharacterWindow.GetCharacter.IsAdult, Not( CharacterWindow.GetCharacter.HasActiveDiarchy ) )]"
-								visible = "[And(CharacterWindow.GetCharacter.IsAdult, And(And(Not(CharacterWindow.GetCharacter.HasActiveDiarchy), Not(CharacterShowingSquires)), Not(CharacterShowingKnight)))]"
+								visible = "[And( CharacterWindow.GetCharacter.IsAdult, Not( CharacterWindow.GetCharacter.HasActiveDiarchy ) )]"
 								layoutpolicy_vertical = expanding
 								layoutpolicy_horizontal = expanding
 
@@ -2378,9 +2295,7 @@ window = {
 							### LOVERS 4 PORTRAITS (FOR WHEN REGENT PORTRAIT IS VISIBLE)
 							vbox_character_row_relationship_item = {
 								name = "lovers_diarchy"
-								#AGOT Modified
-								# visible = "[And( CharacterWindow.GetCharacter.IsAdult, CharacterWindow.GetCharacter.HasActiveDiarchy )]"
-								visible = "[And(CharacterWindow.GetCharacter.IsAdult, And(Not(CharacterShowingSquires), Or(And(CharacterWindow.GetCharacter.HasActiveDiarchy, Not(CharacterShowingKnight)), And(Not(CharacterWindow.GetCharacter.HasActiveDiarchy), CharacterShowingKnight))))]"
+								visible = "[And( CharacterWindow.GetCharacter.IsAdult, CharacterWindow.GetCharacter.HasActiveDiarchy )]"
 								layoutpolicy_vertical = expanding
 								layoutpolicy_horizontal = expanding
 
@@ -2409,9 +2324,6 @@ window = {
 									maxhorizontalslots = 4
 								}
 							}
-							#AGOT Added
-							agot_lovers_plus_two = {}
-							agot_lovers_plus_three = {}
 
 							vbox_character_row_item = {
 								name = "guardian"
@@ -2533,22 +2445,10 @@ window = {
 						scissor = yes
 
 						hbox = {
-							#AGOT Added; Bodyguards and their targets
-							agot_bodyguard_relationship_row = {}
-							agot_bodyguard_target_relationship_row = {}
-							agot_friends_with_bodyguards = {}
-
-							#AGOT Added; Dragons
-							agot_dragons_relationship_row = {}
-							agot_friends_with_dragons = {}
-							agot_friends_with_both = {}
-
 							vbox_character_row_relationship_item = {
 								name = "friends"
 								layoutpolicy_vertical = expanding
 								layoutpolicy_horizontal = expanding
-								#AGOT Added
-								visible = "[Not(Or(CharacterHasBodyguard, CharacterHasDragon))]"
 
 								blockoverride "portrait_datamodel" {
 									datamodel = "[CharacterWindow.GetRelationsOfType( GetRelation( 'friend' ) )]"
@@ -2647,7 +2547,7 @@ window = {
 
 							vbox_character_row_relationship_item = {
 								name = "grudges"
-								visible = "[GreaterThanOrEqualTo_int32(GetDataModelSize(CharacterWindow.GetRelationsOfType( GetRelation( 'grudge' ) )), '(int32)1')]"
+								visible = "[GreaterThanOrEqualTo_int32(GetDataModelSize(CharacterWindow.GetRelationsOfType( GetRelation( 'grudge' ) ), '(int32)1' ))]"
 								layoutpolicy_vertical = expanding
 
 								blockoverride "portrait_datamodel" {
@@ -3009,96 +2909,93 @@ window = {
 			{
 				spacing = 10
 
-				#AGOT Disabled
-				# vbox = {
-					# spacing = 10
+				vbox = {
+					spacing = 10
 
-					# text_label_center = {
-						# text = "MODIFIERS"
-					# }
+					text_label_center = {
+						text = "MODIFIERS"
+					}
 
-					# text_single = {
-						# visible = "[IsDataModelEmpty(CharacterWindow.GetTimedModifiers)]"
-						# text = "CV_NO_MODIFIERS"
-						# default_format = "#low;italic"
-					# }
+					text_single = {
+						visible = "[IsDataModelEmpty(CharacterWindow.GetTimedModifiers)]"
+						text = "CV_NO_MODIFIERS"
+						default_format = "#low;italic"
+					}
 
-					# dynamicgridbox = {
-						# name = "modifiers_grid"
-						# datamodel = "[CharacterWindow.GetTimedModifiers]"
-						# datamodel_wrap = 8
-						# flipdirection = yes
+					dynamicgridbox = {
+						name = "modifiers_grid"
+						datamodel = "[CharacterWindow.GetTimedModifiers]"
+						datamodel_wrap = 8
+						flipdirection = yes
 
-						# item = {
-							# modifier_item_icon = {
-								# size = { 35 35 }
-							# }
-						# }
-					# }
-				# }
+						item = {
+							modifier_item_icon = {
+								size = { 35 35 }
+							}
+						}
+					}
+				}
 
-				# divider_light = {
-					# layoutpolicy_horizontal = expanding
-				# }
+				divider_light = {
+					layoutpolicy_horizontal = expanding
+				}
 
-				#AGOT Modified
-				# vbox = {
-					# spacing = 10
-					# datacontext = "[CharacterWindow.GetTraitArrays]"
+				vbox = {
+					spacing = 10
+					datacontext = "[CharacterWindow.GetTraitArrays]"
 
-					# text_label_center = {
-						# text = "TRAITS"
-					# }
+					text_label_center = {
+						text = "TRAITS"
+					}
 
-					# fixedgridbox = {
-						# name = "personality_traits_grid"
-						# datamodel = "[TraitArrays.GetPersonalityTraits]"
-						# addcolumn = 85
-						# addrow = 105
-						# flipdirection = yes
-						# datamodel_wrap = 6
+					fixedgridbox = {
+						name = "personality_traits_grid"
+						datamodel = "[TraitArrays.GetPersonalityTraits]"
+						addcolumn = 85
+						addrow = 105
+						flipdirection = yes
+						datamodel_wrap = 6
 
-						# item = {
-							# icon_trait = {
-								# text_multi = {
-									# parentanchor = bottom|hcenter
-									# widgetanchor = top|hcenter
-									# position = { 0 -5 }
-									# autoresize = yes
-									# max_width = 80
-									# text = "[Trait.GetNameNoTooltip(Character.Self)]"
-									# default_format = "#high"
-									# align = hcenter
-								# }
-							# }
-						# }
-					# }
+						item = {
+							icon_trait = {
+								text_multi = {
+									parentanchor = bottom|hcenter
+									widgetanchor = top|hcenter
+									position = { 0 -5 }
+									autoresize = yes
+									max_width = 80
+									text = "[Trait.GetNameNoTooltip(Character.Self)]"
+									default_format = "#high"
+									align = hcenter
+								}
+							}
+						}
+					}
 
-					# fixedgridbox = {
-						# name = "traits_grid"
-						# datamodel = "[TraitArrays.GetTraits]"
-						# addcolumn = 85
-						# addrow = 105
-						# flipdirection = yes
-						# datamodel_wrap = 6
+					fixedgridbox = {
+						name = "traits_grid"
+						datamodel = "[TraitArrays.GetTraits]"
+						addcolumn = 85
+						addrow = 105
+						flipdirection = yes
+						datamodel_wrap = 6
 
-						# item = {
-							# icon_trait = {
-								# text_multi = {
-									# parentanchor = bottom|hcenter
-									# widgetanchor = top|hcenter
-									# position = { 0 -5 }
-									# autoresize = yes
-									# max_width = 80
-									# text = "[Trait.GetNameNoTooltip(Character.Self)]"
-									# default_format = "#high"
-									# align = hcenter
-								# }
-							# }
-						# }
-					# }
-				# }
-				agot_expanded_traits_vbox = {}
+						item = {
+							icon_trait = {
+								text_multi = {
+									parentanchor = bottom|hcenter
+									widgetanchor = top|hcenter
+									position = { 0 -5 }
+									autoresize = yes
+									max_width = 80
+									text = "[Trait.GetNameNoTooltip(Character.Self)]"
+									default_format = "#high"
+									align = hcenter
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 
@@ -3396,151 +3293,146 @@ window = {
 			{
 				spacing = 15
 
-				#AGOT Modified
-				# text_label_center = {
-					# text = "MODIFIERS"
-				# }
+				text_label_center = {
+					text = "MODIFIERS"
+				}
 
-				# vbox = {
-					# layoutpolicy_horizontal = expanding
-					# datamodel = "[CharacterWindow.GetTimedModifiers]"
-					# spacing = 2
+				vbox = {
+					layoutpolicy_horizontal = expanding
+					datamodel = "[CharacterWindow.GetTimedModifiers]"
+					spacing = 2
 
-					# item = {
-						# vbox = {
-							# layoutpolicy_horizontal = expanding
+					item = {
+						vbox = {
+							layoutpolicy_horizontal = expanding
 
-							# hbox = {
-								# layoutpolicy_horizontal = expanding
+							hbox = {
+								layoutpolicy_horizontal = expanding
 
-								# hbox = {
-									# margin_right = 10
-									# margin_top = 8
-									# margin_left = -4
+								hbox = {
+									margin_right = 10
+									margin_top = 8
+									margin_left = -4
 
-									# icon = {
-										# size = { 32 32 }
-										# texture = "[ModifierItem.GetIcon]"
-									# }
-								# }
+									icon = {
+										size = { 32 32 }
+										texture = "[ModifierItem.GetIcon]"
+									}
+								}
 
-								# text_single = {
-									# layoutpolicy_horizontal = expanding
-									# text = "[ModifierItem.GetStaticModifier.GetName]"
-								# }
-							# }
+								text_single = {
+									layoutpolicy_horizontal = expanding
+									text = "[ModifierItem.GetStaticModifier.GetName]"
+								}
+							}
 
-							# textbox = {
-								# layoutpolicy_horizontal = expanding
-								# visible = "[ModifierItem.HasTooltipDataByTag('single_modifier')]"
-								# datacontext = "[ModifierItem.GetSingleModifierTooltipData]"
-								# max_width = 500
-								# using = DefaultTooltipText
-								# multiline = yes
-								# text = "[TimedModifierSingleItem.GetDesc]"
-								# alwaystransparent = no
-							# }
+							textbox = {
+								layoutpolicy_horizontal = expanding
+								visible = "[ModifierItem.HasTooltipDataByTag('single_modifier')]"
+								datacontext = "[ModifierItem.GetSingleModifierTooltipData]"
+								max_width = 500
+								using = DefaultTooltipText
+								multiline = yes
+								text = "[TimedModifierSingleItem.GetDesc]"
+								alwaystransparent = no
+							}
 
-							# vbox = {
-								# visible = "[ModifierItem.HasTooltipDataByTag('preview_list')]"
-								# datacontext = "[ModifierItem.GetPreviewList]"
-								# layoutpolicy_horizontal = expanding
+							vbox = {
+								visible = "[ModifierItem.HasTooltipDataByTag('preview_list')]"
+								datacontext = "[ModifierItem.GetPreviewList]"
+								layoutpolicy_horizontal = expanding
 
-								# textbox = {
-									# layoutpolicy_horizontal = expanding
-									# max_width = 500
-									# using = DefaultTooltipText
-									# multiline = yes
-									# text = "[TimedModifierPreviewList.GetScaledDesc]"
-									# alwaystransparent = no
-								# }
+								textbox = {
+									layoutpolicy_horizontal = expanding
+									max_width = 500
+									using = DefaultTooltipText
+									multiline = yes
+									text = "[TimedModifierPreviewList.GetScaledDesc]"
+									alwaystransparent = no
+								}
 
-								# vbox = {
-									# datamodel = "[TimedModifierPreviewList.GetItems]"
-									# layoutpolicy_horizontal = expanding
-									# max_width = 500
+								vbox = {
+									datamodel = "[TimedModifierPreviewList.GetItems]"
+									layoutpolicy_horizontal = expanding
+									max_width = 500
 
-									# item = {
-										# vbox = {
-											# layoutpolicy_horizontal = expanding
+									item = {
+										vbox = {
+											layoutpolicy_horizontal = expanding
 
-											# text_single = {
-												# layoutpolicy_horizontal = expanding
-												# text = "[TimedModifierPreviewItem.GetTitle]"
-											# }
+											text_single = {
+												layoutpolicy_horizontal = expanding
+												text = "[TimedModifierPreviewItem.GetTitle]"
+											}
 
-											# text_single = {
-												# layoutpolicy_horizontal = expanding
-												# text = "[TimedModifierPreviewItem.GetExpirationDate]"
-											# }
+											text_single = {
+												layoutpolicy_horizontal = expanding
+												text = "[TimedModifierPreviewItem.GetExpirationDate]"
+											}
 
-											# expand = {}
-										# }
-									# }
-								# }
-							# }
+											expand = {}
+										}
+									}
+								}
+							}
 
-							# vbox = {
-								# layoutpolicy_horizontal = expanding
-								# visible = "[ModifierItem.HasTooltipDataByTag('scaled_single_modifier')]"
-								# datacontext = "[ModifierItem.GetScaledSingleModifierTooltipData]"
+							vbox = {
+								layoutpolicy_horizontal = expanding
+								visible = "[ModifierItem.HasTooltipDataByTag('scaled_single_modifier')]"
+								datacontext = "[ModifierItem.GetScaledSingleModifierTooltipData]"
 
-								# textbox = {
-									# layoutpolicy_horizontal = expanding
-									# max_width = 500
-									# using = DefaultTooltipText
-									# multiline = yes
-									# text = "[TimedModifierScaledSingleItem.GetDesc]"
-									# alwaystransparent = no
-								# }
+								textbox = {
+									layoutpolicy_horizontal = expanding
+									max_width = 500
+									using = DefaultTooltipText
+									multiline = yes
+									text = "[TimedModifierScaledSingleItem.GetDesc]"
+									alwaystransparent = no
+								}
 
-								# vbox = {
-									# layoutpolicy_horizontal = expanding
-									# datamodel = "[TimedModifierScaledSingleItem.GetEffectItems]"
+								vbox = {
+									layoutpolicy_horizontal = expanding
+									datamodel = "[TimedModifierScaledSingleItem.GetEffectItems]"
 
-									# item = {
-										# textbox = {
-											# layoutpolicy_horizontal = expanding
-											# max_width = 500
-											# margin_top = 5
-											# margin_left = 10
-											# margin_right = 5
-											# margin_bottom = 10
-											# using = DefaultTooltipText
-											# using = Background_Area
-											# text = "[CString.GetString]"
-											# alwaystransparent = no
-										# }
-									# }
-								# }
+									item = {
+										vbox = {
+											layoutpolicy_horizontal = expanding
 
-								# text_single = {
-									# layoutpolicy_horizontal = growing
-									# max_width = 500
-									# text = "[TimedModifierScaledSingleItem.GetExpirationDate]"
-								# }
-							# }
+											text_single = {
+												layoutpolicy_horizontal = growing
+												text = "[TimedModifierPreviewItem.GetTitle]"
+											}
 
-							# spacer = {
-								# size = { 2 10 }
-							# }
+											text_single = {
+												layoutpolicy_horizontal = growing
+												text = "[TimedModifierPreviewItem.GetExpirationDate]"
+											}
+										}
+									}
+								}
 
-							# divider_light = {
-								# layoutpolicy_horizontal = expanding
-								# # Don't show divider after the last item in the datamodel
-								# visible = "[Not( EqualTo_int32( PdxGuiWidget.GetIndexInDataModel, Subtract_int32( GetDataModelSize( CharacterWindow.GetTimedModifiers ), '(int32)1' ) ) )]"
-							# }
-						# }
-					# }
-				# }
-				agot_expanded_modifiers_vbox = {}
+								text_single = {
+									layoutpolicy_horizontal = growing
+									max_width = 500
+									text = "[TimedModifierScaledSingleItem.GetExpirationDate]"
+								}
+							}
+
+							spacer = {
+								size = { 2 10 }
+							}
+
+							divider_light = {
+								layoutpolicy_horizontal = expanding
+								# Don't show divider after the last item in the datamodel
+								visible = "[Not( EqualTo_int32( PdxGuiWidget.GetIndexInDataModel, Subtract_int32( GetDataModelSize( CharacterWindow.GetTimedModifiers ), '(int32)1' ) ) )]"
+							}
+						}
+					}
+				}
 			}
 		}
 	}
-	#AGOT Added, Ruins, Dragons, Fake Death
-	agot_hidden_character_view = {}
-	agot_dragons_character_view = {}
-	agot_fake_death_character_view = {}
 
 	window_character_filter = {
 		name = "court_character_filter_window"
@@ -3908,9 +3800,7 @@ types CharacterWindow
 			maximumsize = { 430 -1 }
 
 			text_single = {
-				#AGOT Modified
-				# maximumsize = { 281 -1 }
-				maximumsize = { 320 -1 }
+				maximumsize = { 281 -1 }
 				name = "character_relation_to_you"
 				text = "[Character.GetRelationToString( GetPlayer )]"
 				tooltip = "EXTENDED_RELATIONS_TOOLTIP"
@@ -3948,9 +3838,7 @@ types CharacterWindow
 		}
 
 		icon = {
-			#AGOT Modified
-			#visible = "[Not(Character.IsFemale)]"
-			visible = "[GetScriptedGui('agot_male_gender_shown').IsShown(GuiScope.SetRoot(CharacterWindow.GetCharacter.MakeScope).End)]"
+			visible = "[Not(Character.IsFemale)]"
 			size = { 20 20 }
 			framesize = { 40 40 }
 			frame = "[Character.GetSexualityFrame]"
@@ -3959,9 +3847,7 @@ types CharacterWindow
 		}
 
 		icon = {
-			#AGOT Modified
-			#visible = "[Character.IsFemale]"
-			visible = "[GetScriptedGui('agot_female_gender_shown').IsShown(GuiScope.SetRoot(CharacterWindow.GetCharacter.MakeScope).End)]"
+			visible = "[Character.IsFemale]"
 			size = { 20 20 }
 			framesize = { 40 40 }
 			frame = "[Character.GetSexualityFrame]"
@@ -5039,6 +4925,13 @@ types CharacterWindow
 			}
 		}
 
+		#EK ADDITION: praxis
+		widget = {
+			size = { 72 32 }
+			ek_praxis = { }
+			visible = "[Character.MakeScope.Var('state_praxis').IsSet]"
+		}
+
 		divider_light = {
 			visible = "[Character.HasLandedTitles]"
 			layoutpolicy_vertical = expanding
@@ -5051,12 +4944,7 @@ types CharacterWindow
 			tooltip = CHARACTER_WINDOW_MILITARY_STRENGTH_TOOLTIP
 			using = tooltip_es
 
-			#AGOT Added; Displays relevant dragons in faux military breakdown
-			agot_dragon_army_composition = {}
-
 			hbox = {
-				#AGOT Added
-				visible = "[Not(GetScriptedGui('agot_can_see_dragon_military_view').IsShown(GuiScope.SetRoot(CharacterWindow.GetCharacter.MakeScope).End))]"
 				spacing = 3
 
 				expand = {}
