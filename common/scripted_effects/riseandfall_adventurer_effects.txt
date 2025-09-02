@@ -349,15 +349,66 @@ riseandfall_remove_adventurer_gold_mod_if_not_landless_se = {
 # Expects to be called from a context where `adventurer_child` saved scope exists (save_scope_as = adventurer_child)
 riseandfall_create_adventurer_knight_se = {
     # Create a single knight near the independent ruler's capital and save scope for adding as companion
+    # Compute martial and prowess for the knight based on the adventurer's learning skill.
+    # Formula: multiplier randomly chosen between ~0.5 and 1.5, so learning=10 -> ~5..15, learning=20 -> ~10..30
+    set_variable = { name = rf_knight_learning value = scope:adventurer_child.learning }
+
+    # Choose a random multiplier for martial
+    set_variable = { name = rf_knight_multiplier value = 1 }
+    random_list = {
+        10 = { change_variable = { name = rf_knight_multiplier multiply = 0.5 } }
+        10 = { change_variable = { name = rf_knight_multiplier multiply = 0.6 } }
+        10 = { change_variable = { name = rf_knight_multiplier multiply = 0.7 } }
+        10 = { change_variable = { name = rf_knight_multiplier multiply = 0.8 } }
+        10 = { change_variable = { name = rf_knight_multiplier multiply = 0.9 } }
+        10 = { change_variable = { name = rf_knight_multiplier multiply = 1.0 } }
+        10 = { change_variable = { name = rf_knight_multiplier multiply = 1.1 } }
+        10 = { change_variable = { name = rf_knight_multiplier multiply = 1.2 } }
+        10 = { change_variable = { name = rf_knight_multiplier multiply = 1.3 } }
+        10 = { change_variable = { name = rf_knight_multiplier multiply = 1.5 } }
+    }
+
+    set_variable = { name = rf_knight_martial value = var:rf_knight_learning }
+    change_variable = { name = rf_knight_martial multiply = var:rf_knight_multiplier }
+    round_variable = { name = rf_knight_martial nearest = 1 }
+
+    # Choose a random (independent) multiplier for prowess
+    set_variable = { name = rf_knight_multiplier2 value = 1 }
+    random_list = {
+        10 = { change_variable = { name = rf_knight_multiplier2 multiply = 0.5 } }
+        10 = { change_variable = { name = rf_knight_multiplier2 multiply = 0.6 } }
+        10 = { change_variable = { name = rf_knight_multiplier2 multiply = 0.7 } }
+        10 = { change_variable = { name = rf_knight_multiplier2 multiply = 0.8 } }
+        10 = { change_variable = { name = rf_knight_multiplier2 multiply = 0.9 } }
+        10 = { change_variable = { name = rf_knight_multiplier2 multiply = 1.0 } }
+        10 = { change_variable = { name = rf_knight_multiplier2 multiply = 1.1 } }
+        10 = { change_variable = { name = rf_knight_multiplier2 multiply = 1.2 } }
+        10 = { change_variable = { name = rf_knight_multiplier2 multiply = 1.3 } }
+        10 = { change_variable = { name = rf_knight_multiplier2 multiply = 1.5 } }
+    }
+
+    set_variable = { name = rf_knight_prowess value = var:rf_knight_learning }
+    change_variable = { name = rf_knight_prowess multiply = var:rf_knight_multiplier2 }
+    round_variable = { name = rf_knight_prowess nearest = 1 }
+
     create_character = {
         employer = scope:adventurer_child
         culture = scope:adventurer_child.culture
         faith = scope:adventurer_child.faith
         age = { 18 35 }
         gender = male
+        martial = var:rf_knight_martial
+        prowess = var:rf_knight_prowess
         # Give a small chance for knightly traits via random_traits_list if desired; keep simple for now
         save_scope_as = created_knight
     }
+
+    # Clean up temporary variables
+    remove_variable = rf_knight_learning
+    remove_variable = rf_knight_multiplier
+    remove_variable = rf_knight_martial
+    remove_variable = rf_knight_multiplier2
+    remove_variable = rf_knight_prowess
 }
 
 # Recursive runner: create knights until rf_while_counter >= rf_while_loop_target
