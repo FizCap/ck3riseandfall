@@ -48,19 +48,38 @@
                         save_scope_as = claim_target_title
                     }
 
-                    # If the selected claim has a valid holder, check relationships and disqualify if needed
+                    # If the selected claim has a valid holder, check relationships and disqualify if needed.
+                    # Special rule: if the holder is very old (>100), only spouse and heir relations should disqualify.
                     if = {
                         limit = { exists = scope:claim_target_title.holder }
+
+                        # If holder is age <= 100 use full relationship checks
                         if = {
-                            limit = { OR = {
-                                is_allied_to = scope:claim_target_title.holder
-                                is_spouse_of = scope:claim_target_title.holder
-                                opinion = { target = scope:claim_target_title.holder value >= 75 }
-                                is_heir_of = scope:claim_target_title.holder
-                                is_primary_heir_of = scope:claim_target_title.holder
-                                is_player_heir_of = scope:claim_target_title.holder
-                            } }
-                            set_variable = { name = rf_disqualify value = 1 }
+                            limit = { scope:claim_target_title.holder = { age <= 100 } }
+                            if = {
+                                limit = { OR = {
+                                    is_allied_to = scope:claim_target_title.holder
+                                    is_spouse_of = scope:claim_target_title.holder
+                                    opinion = { target = scope:claim_target_title.holder value >= 75 }
+                                    is_heir_of = scope:claim_target_title.holder
+                                    is_primary_heir_of = scope:claim_target_title.holder
+                                    is_player_heir_of = scope:claim_target_title.holder
+                                } }
+                                set_variable = { name = rf_disqualify value = 1 }
+                            }
+                        }
+                        else = {
+                            # Holder is very old (>100): spouse, heirs, and allied relations disqualify
+                            if = {
+                                limit = { OR = {
+                                    is_spouse_of = scope:claim_target_title.holder
+                                    is_heir_of = scope:claim_target_title.holder
+                                    is_primary_heir_of = scope:claim_target_title.holder
+                                    is_player_heir_of = scope:claim_target_title.holder
+                                    is_allied_to = scope:claim_target_title.holder
+                                } }
+                                set_variable = { name = rf_disqualify value = 1 }
+                            }
                         }
                     }
                 }
