@@ -1414,25 +1414,29 @@ window = {
 								default_format = "#high"
 								align = center|nobaseline
 							}
-						}
 
-						hbox = {
-							name = "realm_stability"
-							visible = "[And( Not( Character.GetPrimaryTitle.HasFaction ), And( Character.HasLandedTitles, Character.IsAlive ) )]"
-							tooltip = "REALM_STABILITY_TOOLTIP"
-							spacing = -2
+							hbox = {
+								spacing = 5
+								margin_top = 3
 
-							icon = {
-								name = "stability_icon"
-								size = { 30 30 }
-								texture = "gfx/interface/icons/icon_stability.dds"
-							}
+								vbox = {
+									tooltip = "REALM_STABILITY_TOOLTIP"
+									using = tooltip_ne
+									spacing = -3
 
-							text_single = {
-								name = "stability_score"
-								text = "[Character.MakeScope.Var('riseandfall_realm_stability_score').GetValue]/[Character.MakeScope.Var('riseandfall_realm_stability_target').GetValue]"
-								default_format = "#high"
-								align = center|nobaseline
+									icon = {
+										name = "icon_stability"
+										size = { 32 32 }
+										texture = "gfx/interface/icons/scale_of_power.dds"
+									}
+
+									text_single = {
+										name = "stability"
+										text = "[Character.MakeScope.Var('riseandfall_realm_stability_score').GetValue|0]/[Character.MakeScope.Var('riseandfall_realm_stability_target').GetValue|0]"
+										default_format = "#high"
+										align = nobaseline
+									}
+								}
 							}
 						}
 
