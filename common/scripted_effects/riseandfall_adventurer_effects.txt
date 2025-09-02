@@ -35,31 +35,33 @@
                         }
                     }
                     age >= 16
-                    # Only qualify if they have a claim on a title whose holder is an independent ruler
-                    any_claim = { tier >= tier_kingdom holder = { is_independent_ruler = yes } }
+                    # Only qualify if they have a claim on a title (we'll validate the holder after selection)
+                    any_claim = { tier >= tier_kingdom }
                 }
 
                 # Determine a claim target title and disqualify if candidate is allied/spouse/too-positive toward that claim holder
                 set_variable = { name = rf_disqualify value = 0 }
                 if = {
-                    limit = { any_claim = { tier >= tier_kingdom holder = { is_independent_ruler = yes } } }
+                    limit = { any_claim = { tier >= tier_kingdom } }
                     random_claim = {
-                        limit = { tier >= tier_kingdom holder = { is_independent_ruler = yes } }
+                        limit = { tier >= tier_kingdom }
                         save_scope_as = claim_target_title
                     }
 
-                    # If candidate is allied to, spouse of, very positive toward the claim holder,
-                    # or is an heir of the claim holder, disqualify
+                    # If the selected claim has a valid holder, check relationships and disqualify if needed
                     if = {
-                        limit = { OR = {
-                            is_allied_to = scope:claim_target_title.holder
-                            is_spouse_of = scope:claim_target_title.holder
-                            opinion = { target = scope:claim_target_title.holder value >= 75 }
-                            is_heir_of = scope:claim_target_title.holder
-                            is_primary_heir_of = scope:claim_target_title.holder
-                            is_player_heir_of = scope:claim_target_title.holder
-                        } }
-                        set_variable = { name = rf_disqualify value = 1 }
+                        limit = { exists = scope:claim_target_title.holder }
+                        if = {
+                            limit = { OR = {
+                                is_allied_to = scope:claim_target_title.holder
+                                is_spouse_of = scope:claim_target_title.holder
+                                opinion = { target = scope:claim_target_title.holder value >= 75 }
+                                is_heir_of = scope:claim_target_title.holder
+                                is_primary_heir_of = scope:claim_target_title.holder
+                                is_player_heir_of = scope:claim_target_title.holder
+                            } }
+                            set_variable = { name = rf_disqualify value = 1 }
+                        }
                     }
                 }
 
@@ -74,7 +76,7 @@
                     if = { limit = { has_trait = brave } change_variable = { name = rf_adventurer_trait_chance add = 1 } }
 
                     # Final chance = base 0.5 + trait bonuses + intrigue bonus, clamp to [0,100]
-                    set_variable = { name = rf_adventurer_final_chance value = 0.5 }
+                    set_variable = { name = rf_adventurer_final_chance value = 100 }
                     change_variable = { name = rf_adventurer_final_chance add = var:rf_adventurer_trait_chance }
                     # Add intrigue bonus: intrigue * 0.1 (e.g., 10 intrigue = +1.0)
                     set_variable = { name = intrigue_bonus value = scope:candidate.intrigue }
@@ -182,14 +184,14 @@ riseandfall_do_create_adventurer_se = {
             if = {
                 limit = { any_claim = { tier >= tier_empire } }
                 random_claim = {
-                    limit = { tier >= tier_empire holder = { is_independent_ruler = yes } }
+                    limit = { tier >= tier_empire }
                     save_scope_as = claim_target_title
                 }
             }
             else_if = {
                 limit = { any_claim = { tier >= tier_kingdom } }
                 random_claim = {
-                    limit = { tier >= tier_kingdom holder = { is_independent_ruler = yes } }
+                    limit = { tier >= tier_kingdom }
                     save_scope_as = claim_target_title
                 }
             }
@@ -248,13 +250,13 @@ riseandfall_adventurer_press_claims_se = {
     # Using saved scope: scope:independent_adventurer = the adventurer character
 
     # Try empire claims first
-    if = {
-        limit = { any_claim = { tier >= tier_empire } }
-        # pick a random empire-tier claim whose holder is an independent ruler
-        random_claim = {
-            limit = { tier >= tier_empire holder = { is_independent_ruler = yes } }
-            save_scope_as = claim_target_title
-        }
+        if = {
+            limit = { any_claim = { tier >= tier_empire } }
+            # pick a random empire-tier claim (we'll validate the holder after selection)
+            random_claim = {
+                limit = { tier >= tier_empire }
+                save_scope_as = claim_target_title
+            }
 
         scope:independent_adventurer = {
             if = {
@@ -273,12 +275,12 @@ riseandfall_adventurer_press_claims_se = {
                 else = {
                     # Not stronger: small chance, respect truces/alliances
                     random_list = {
-                        5 = {
-                            if = {
-                                limit = { scope:independent_adventurer = { NOT = { OR = { has_truce = scope:claim_target_title.holder is_allied_to = scope:claim_target_title.holder } } } }
-                                if = { limit = { NOT = { has_character_flag = riseandfall_newadventurer_war_block } } start_war = { casus_belli = claim_cb target = scope:claim_target_title.holder claimant = scope:independent_adventurer target_title = scope:claim_target_title } }
+                        if = {
+                            limit = { any_claim = { tier >= tier_kingdom } }
+                            random_claim = {
+                                limit = { tier >= tier_kingdom }
+                                save_scope_as = claim_target_title
                             }
-                        }
                         95 = { }
                     }
                 }
@@ -288,6 +290,7 @@ riseandfall_adventurer_press_claims_se = {
         # final safety: if holder is independent and adventurer allowed to war, try a default declare (covers edge cases)
         if = {
             limit = {
+                exists = scope:claim_target_title.holder
                 scope:claim_target_title.holder = { is_independent_ruler = yes }
                 scope:independent_adventurer = { NOT = { OR = { has_truce = scope:claim_target_title.holder is_allied_to = scope:claim_target_title.holder } } }
                 scope:independent_adventurer = { NOT = { has_character_flag = riseandfall_newadventurer_war_block } }
@@ -300,7 +303,7 @@ riseandfall_adventurer_press_claims_se = {
         if = {
             limit = { any_claim = { tier >= tier_kingdom } }
             random_claim = {
-                limit = { tier >= tier_kingdom holder = { is_independent_ruler = yes } }
+                limit = { tier >= tier_kingdom }
                 save_scope_as = claim_target_title
             }
 
@@ -333,6 +336,7 @@ riseandfall_adventurer_press_claims_se = {
         }
     }
 }
+}
 
 
 riseandfall_remove_adventurer_gold_mod_if_not_landless_se = {
@@ -354,9 +358,6 @@ riseandfall_create_adventurer_knight_se = {
         # Give a small chance for knightly traits via random_traits_list if desired; keep simple for now
         save_scope_as = created_knight
     }
-
-    # Cleanup saved scope
-    clear_saved_scope = created_knight
 }
 
 # Recursive runner: create knights until rf_while_counter >= rf_while_loop_target
@@ -384,16 +385,16 @@ riseandfall_adventurer_quarterly_income_se = {
         set_variable = { name = rf_income_amount value = 0 }
 
         if = {
-            limit = { any_claim = { tier >= tier_empire holder = { is_independent_ruler = yes } } }
+            limit = { any_claim = { tier >= tier_empire } }
             random_claim = {
-                limit = { tier >= tier_empire holder = { is_independent_ruler = yes } }
+                limit = { tier >= tier_empire }
                 save_scope_as = claim_target_title
             }
         }
         else_if = {
-            limit = { any_claim = { tier >= tier_kingdom holder = { is_independent_ruler = yes } } }
+            limit = { any_claim = { tier >= tier_kingdom } }
             random_claim = {
-                limit = { tier >= tier_kingdom holder = { is_independent_ruler = yes } }
+                limit = { tier >= tier_kingdom }
                 save_scope_as = claim_target_title
             }
         }
@@ -426,7 +427,6 @@ riseandfall_adventurer_quarterly_income_se = {
         remove_variable = rf_holder_monthly
         remove_variable = rf_mult
         remove_variable = rf_income_amount
-        clear_saved_scope = claim_target_title
     }
 }
 

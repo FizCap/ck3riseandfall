@@ -315,34 +315,6 @@ riseandfall_calculate_realm_stability_se = {
     remove_variable = riseandfall_realm_stability_good
     remove_variable = riseandfall_realm_stability_golden_age
 
-    # Nested if/else chain to assign exactly one flag based on the score
-    # Map score ranges to a single stage number: 1=collapsing,2=low,3=average,4=good,5=golden
-    if = {
-        limit = { var:riseandfall_realm_stability_score <= 20 }
-        set_variable = { name = riseandfall_realm_stability_stage value = 1 }
-    }
-    else = {
-        if = {
-            limit = { var:riseandfall_realm_stability_score <= 40 }
-            set_variable = { name = riseandfall_realm_stability_stage value = 2 }
-        }
-        else = {
-            if = {
-                limit = { var:riseandfall_realm_stability_score <= 60 }
-                set_variable = { name = riseandfall_realm_stability_stage value = 3 }
-            }
-            else = {
-                if = {
-                    limit = { var:riseandfall_realm_stability_score <= 80 }
-                    set_variable = { name = riseandfall_realm_stability_stage value = 4 }
-                }
-                else = {
-                    # 81-100
-                    set_variable = { name = riseandfall_realm_stability_stage value = 5 }
-                }
-            }
-        }
-    }
 
     # Maintain legacy boolean flags for compatibility (ensure they're set somewhere)
     set_variable = { name = riseandfall_realm_stability_collapsing value = 0 }
@@ -351,14 +323,11 @@ riseandfall_calculate_realm_stability_se = {
     set_variable = { name = riseandfall_realm_stability_good value = 0 }
     set_variable = { name = riseandfall_realm_stability_golden_age value = 0 }
 
-    # Set the appropriate legacy flag to 1 for compatibility with older code
-    if = {
-        limit = { var:riseandfall_realm_stability_stage = 1 }
-        set_variable = { name = riseandfall_realm_stability_collapsing value = 1 }
-    }
-    else_if = { limit = { var:riseandfall_realm_stability_stage = 2 } set_variable = { name = riseandfall_realm_stability_low value = 1 } }
-    else_if = { limit = { var:riseandfall_realm_stability_stage = 3 } set_variable = { name = riseandfall_realm_stability_average value = 1 } }
-    else_if = { limit = { var:riseandfall_realm_stability_stage = 4 } set_variable = { name = riseandfall_realm_stability_good value = 1 } }
+    # Set the appropriate legacy flag directly from the CURRENT score (0..100)
+    if = { limit = { var:riseandfall_realm_stability_score <= 20 } set_variable = { name = riseandfall_realm_stability_collapsing value = 1 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score <= 40 } set_variable = { name = riseandfall_realm_stability_low value = 1 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score <= 60 } set_variable = { name = riseandfall_realm_stability_average value = 1 } }
+    else_if = { limit = { var:riseandfall_realm_stability_score <= 80 } set_variable = { name = riseandfall_realm_stability_good value = 1 } }
     else = { set_variable = { name = riseandfall_realm_stability_golden_age value = 1 } }
 
     # Remove any previously-applied fine-grained stability modifiers (1..100)

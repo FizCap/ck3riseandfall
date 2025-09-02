@@ -28,7 +28,6 @@ riseandfall_yearly_adventurer = {
     }
 }
 
-
 riseandfall_yearly_adventurer_press_claims = {
     effect = {
         every_ruler = {
