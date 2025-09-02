@@ -4,8 +4,7 @@ tags={
 	"Gameplay"
 	"Fixes"
 }
-name="Rise and Fall"
+name="development"
 picture="thumbnail.png"
 supported_version="1.16.2.3"
-path="C:/Users/Aweso/Documents/Paradox Interactive/Crusader Kings III/mod/riseandfall"
 remote_file_id="3554844335"
