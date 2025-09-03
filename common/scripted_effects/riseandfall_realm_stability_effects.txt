@@ -180,8 +180,17 @@ riseandfall_calculate_realm_stability_se = {
             limit = {
                 save_temporary_opinion_value_as = { name = tmp_vassal_opinion target = liege }
             }
-            scope:ruler = {
-                change_variable = { name = tmp_opinion_sum add = scope:tmp_vassal_opinion }
+            # Only add positive opinions; treat negative opinions as 0 so they don't reduce the vassal component
+            if = {
+                limit = { scope:tmp_vassal_opinion > 0 }
+                scope:ruler = {
+                    change_variable = { name = tmp_opinion_sum add = scope:tmp_vassal_opinion }
+                }
+            }
+            else = {
+                scope:ruler = {
+                    change_variable = { name = tmp_opinion_sum add = 0 }
+                }
             }
         }
     }
@@ -221,7 +230,60 @@ riseandfall_calculate_realm_stability_se = {
     clamp_variable = { name = tmp_target_score min = 0 max = 100 }
     round_variable = { name = tmp_target_score }
 
-    # Persist the target so we can smooth changes over time
+    # Civil war adjustment applied to the TARGET score (so smoothing moves current toward
+    # the penalized target) instead of modifying the persistent current score directly.
+    # Ensure counter exists
+    if = { limit = { NOT = { has_variable = riseandfall_rs_civil_war_years } } set_variable = { name = riseandfall_rs_civil_war_years value = 0 } }
+    # Ensure sex-law penalty tooltip var exists
+    if = { limit = { NOT = { has_variable = riseandfall_realm_stability_sex_law_penalty } } set_variable = { name = riseandfall_realm_stability_sex_law_penalty value = 0 } }
+
+    if = {
+        limit = { is_independent_ruler = yes }
+        # Increment or decay the consecutive-years counter depending on whether the ruler
+        # is in a civil war this tick. This ensures the TARGET reflects the new year state.
+        if = { limit = { is_in_civil_war = yes } change_variable = { name = riseandfall_rs_civil_war_years add = 1 } }
+        else = { if = { limit = { var:riseandfall_rs_civil_war_years > 0 } change_variable = { name = riseandfall_rs_civil_war_years add = -1 } } }
+
+    # Compute cumulative penalty (years * -5), cap it at a minimum of -25, and subtract from tmp_target_score
+    set_variable = { name = tmp_cw_total value = var:riseandfall_rs_civil_war_years }
+    change_variable = { name = tmp_cw_total multiply = -5 }
+    # Cap the civil war penalty so it never goes below -25
+    clamp_variable = { name = tmp_cw_total min = -25 max = 0 }
+    change_variable = { name = tmp_target_score add = var:tmp_cw_total }
+    # store the displayed cumulative penalty for the tooltip
+    set_variable = { name = riseandfall_realm_stability_civil_war_penalty value = var:tmp_cw_total }
+
+        # Sex vs realm-law penalty: if the ruler's sex conflicts with realm succession laws,
+        # apply a -10 penalty to the TARGET score and expose it for the tooltip.
+        # Female ruler in male-only/preference law
+        set_variable = { name = tmp_sex_penalty value = 0 }
+        if = {
+            limit = { is_female = yes has_realm_law = male_only_law }
+            set_variable = { name = tmp_sex_penalty value = -10 }
+        }
+        else_if = {
+            limit = { is_female = yes has_realm_law = male_preference_law }
+            set_variable = { name = tmp_sex_penalty value = -10 }
+        }
+        # Male ruler in female-only/preference law
+        else_if = {
+            limit = { is_male = yes has_realm_law = female_only_law }
+            set_variable = { name = tmp_sex_penalty value = -10 }
+        }
+        else_if = {
+            limit = { is_male = yes has_realm_law = female_preference_law }
+            set_variable = { name = tmp_sex_penalty value = -10 }
+        }
+
+        # Apply sex penalty to target and store for tooltip
+        change_variable = { name = tmp_target_score add = var:tmp_sex_penalty }
+        set_variable = { name = riseandfall_realm_stability_sex_law_penalty value = var:tmp_sex_penalty }
+    # Ensure the penalized target stays within 0..100 to avoid negative drift
+    clamp_variable = { name = tmp_target_score min = 0 max = 100 }
+    round_variable = { name = tmp_target_score }
+    }
+
+    # Persist the (possibly penalized) target so smoothing moves the current score toward it
     set_variable = { name = riseandfall_realm_stability_target value = var:tmp_target_score }
 
     # Smooth the persistent current score (`riseandfall_realm_stability_score`) toward the target
@@ -298,6 +360,16 @@ riseandfall_calculate_realm_stability_se = {
     # Ensure current score remains clamped and integer
     clamp_variable = { name = riseandfall_realm_stability_score min = 0 max = 100 }
     round_variable = { name = riseandfall_realm_stability_score }
+
+    ########################################
+    # Civil war penalty is applied to the TARGET now; we do not modify the persistent
+    # current score here. Ensure the tooltip variable exists.
+    if = { limit = { NOT = { has_variable = riseandfall_realm_stability_civil_war_penalty } } set_variable = { name = riseandfall_realm_stability_civil_war_penalty value = 0 } }
+
+    # Clamp and round the persistent current score (unchanged by civil-war target adjustments here)
+    clamp_variable = { name = riseandfall_realm_stability_score min = 0 max = 100 }
+    round_variable = { name = riseandfall_realm_stability_score }
+
 
     # Set exactly one character flag representing the stability band based on the CURRENT score:
     # 0-20: collapsing
