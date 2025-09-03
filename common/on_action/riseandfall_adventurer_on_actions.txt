@@ -21,7 +21,7 @@ riseandfall_yearly_adventurer = {
     }
     effect = {
         every_living_character = {
-            limit = { any_claim = { count = 0 } }
+            limit = { any_claim = { count > 0 } }
             save_scope_as = independent_ruler
             riseandfall_check_dynasty_for_adventurers_se = yes
         }
