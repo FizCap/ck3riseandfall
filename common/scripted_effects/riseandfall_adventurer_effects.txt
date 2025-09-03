@@ -478,10 +478,12 @@ riseandfall_adventurer_quarterly_income_se = {
             change_variable = { name = rf_mult multiply = 0.1 }
             clamp_variable = { name = rf_mult min = 0.1 max = 100 }
 
-            # Quarterly payout = monthly * 3 * multiplier
+            # Quarterly payout = monthly * 3 * multiplier (scale down to 20% of computed payout)
             set_variable = { name = rf_income_amount value = var:rf_holder_monthly }
             change_variable = { name = rf_income_amount multiply = 1 }
             change_variable = { name = rf_income_amount multiply = var:rf_mult }
+            # Reduce payout to 20% of the computed amount
+            change_variable = { name = rf_income_amount multiply = 0.2 }
             clamp_variable = { name = rf_income_amount min = 0 max = 10000 }
             round_variable = { name = rf_income_amount nearest = 1 }
         }
