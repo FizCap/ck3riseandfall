@@ -246,7 +246,7 @@ riseandfall_calculate_realm_stability_se = {
 
     # Compute cumulative penalty (years * -5), cap it at a minimum of -25, and subtract from tmp_target_score
     set_variable = { name = tmp_cw_total value = var:riseandfall_rs_civil_war_years }
-    change_variable = { name = tmp_cw_total multiply = -5 }
+    change_variable = { name = tmp_cw_total multiply = -2 }
     # Cap the civil war penalty so it never goes below -25
     clamp_variable = { name = tmp_cw_total min = -25 max = 0 }
     change_variable = { name = tmp_target_score add = var:tmp_cw_total }
