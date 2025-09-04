@@ -269,13 +269,13 @@ riseandfall_adventurer_press_claims_se = {
     # Using saved scope: scope:independent_adventurer = the adventurer character
 
     # Try empire claims first
-        if = {
-            limit = { any_claim = { tier >= tier_empire } }
-            # pick a random empire-tier claim (we'll validate the holder after selection)
-            random_claim = {
-                limit = { tier >= tier_empire }
-                save_scope_as = claim_target_title
-            }
+    if = {
+        limit = { any_claim = { tier >= tier_empire } }
+        # pick a random empire-tier claim (we'll validate the holder after selection)
+        random_claim = {
+            limit = { tier >= tier_empire }
+            save_scope_as = claim_target_title
+        }
 
         scope:independent_adventurer = {
             if = {
@@ -294,12 +294,20 @@ riseandfall_adventurer_press_claims_se = {
                 else = {
                     # Not stronger: small chance, respect truces/alliances
                     random_list = {
-                        if = {
-                            limit = { any_claim = { tier >= tier_kingdom } }
-                            random_claim = {
-                                limit = { tier >= tier_kingdom }
-                                save_scope_as = claim_target_title
+                        5 = {
+                            if = {
+                                limit = { any_claim = { tier >= tier_kingdom } }
+                                random_claim = {
+                                    limit = { tier >= tier_kingdom }
+                                    save_scope_as = claim_target_title
+                                }
+                                # Attempt war if still valid (no truce/alliance and not war-blocked)
+                                if = {
+                                    limit = { scope:independent_adventurer = { NOT = { OR = { has_truce = scope:claim_target_title.holder is_allied_to = scope:claim_target_title.holder } } } }
+                                    if = { limit = { NOT = { has_character_flag = riseandfall_newadventurer_war_block } } start_war = { casus_belli = claim_cb target = scope:claim_target_title.holder claimant = scope:independent_adventurer target_title = scope:claim_target_title } }
+                                }
                             }
+                        }
                         95 = { }
                     }
                 }
@@ -354,7 +362,6 @@ riseandfall_adventurer_press_claims_se = {
             }
         }
     }
-}
 }
 
 
