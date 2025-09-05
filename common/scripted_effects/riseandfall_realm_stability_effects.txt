@@ -159,6 +159,71 @@ riseandfall_calculate_realm_stability_se = {
     }
 
     ########################################
+    # 2.5) REALM LAW (0..20)
+    # Map authority law levels to a small stability bonus exposed in the tooltip
+    # Check the scoped character's authority level for different government types
+    set_variable = { name = riseandfall_rs_realm_law_component value = 0 }
+    # Check crown authority (feudal)
+    if = {
+        limit = { has_realm_law = crown_authority_3 }
+        set_variable = { name = riseandfall_rs_realm_law_component value = 15 }
+    }
+    else_if = {
+        limit = { has_realm_law = crown_authority_2 }
+        set_variable = { name = riseandfall_rs_realm_law_component value = 10 }
+    }
+    else_if = {
+        limit = { has_realm_law = crown_authority_1 }
+        set_variable = { name = riseandfall_rs_realm_law_component value = 5 }
+    }
+    # Check tribal authority
+    else_if = {
+        limit = { has_realm_law = tribal_authority_3 }
+        set_variable = { name = riseandfall_rs_realm_law_component value = 15 }
+    }
+    else_if = {
+        limit = { has_realm_law = tribal_authority_2 }
+        set_variable = { name = riseandfall_rs_realm_law_component value = 10 }
+    }
+    else_if = {
+        limit = { has_realm_law = tribal_authority_1 }
+        set_variable = { name = riseandfall_rs_realm_law_component value = 5 }
+    }
+    # Check imperial bureaucracy
+    else_if = {
+        limit = { has_realm_law = imperial_bureaucracy_3 }
+        set_variable = { name = riseandfall_rs_realm_law_component value = 15 }
+    }
+    else_if = {
+        limit = { has_realm_law = imperial_bureaucracy_2 }
+        set_variable = { name = riseandfall_rs_realm_law_component value = 10 }
+    }
+    else_if = {
+        limit = { has_realm_law = imperial_bureaucracy_1 }
+        set_variable = { name = riseandfall_rs_realm_law_component value = 5 }
+    }
+    # Check nomadic authority (has 5 levels, so scale to 20 max)
+    else_if = {
+        limit = { has_realm_law = nomadic_authority_5 }
+        set_variable = { name = riseandfall_rs_realm_law_component value = 20 }
+    }
+    else_if = {
+        limit = { has_realm_law = nomadic_authority_4 }
+        set_variable = { name = riseandfall_rs_realm_law_component value = 15 }
+    }
+    else_if = {
+        limit = { has_realm_law = nomadic_authority_3 }
+        set_variable = { name = riseandfall_rs_realm_law_component value = 10 }
+    }
+    else_if = {
+        limit = { has_realm_law = nomadic_authority_2 }
+        set_variable = { name = riseandfall_rs_realm_law_component value = 5 }
+    }
+    else = { set_variable = { name = riseandfall_rs_realm_law_component value = 0 } }
+    # Expose the chosen authority bonus for the tooltip
+    set_variable = { name = riseandfall_realm_stability_realm_law_bonus value = var:riseandfall_rs_realm_law_component }
+
+    ########################################
     # 3) VASSAL RELATIONS (30 points max)
     # Calculate average vassal opinion across every_vassal (including negative opinions)
     set_variable = { name = riseandfall_rs_vassals_component value = 0 }
@@ -222,10 +287,13 @@ riseandfall_calculate_realm_stability_se = {
     if = { limit = { NOT = { has_variable = riseandfall_rs_stats_component } } set_variable = { name = riseandfall_rs_stats_component value = 0 } }
     if = { limit = { NOT = { has_variable = riseandfall_rs_legitimacy_component } } set_variable = { name = riseandfall_rs_legitimacy_component value = 0 } }
     if = { limit = { NOT = { has_variable = riseandfall_rs_vassals_component } } set_variable = { name = riseandfall_rs_vassals_component value = 0 } }
+    if = { limit = { NOT = { has_variable = riseandfall_rs_realm_law_component } } set_variable = { name = riseandfall_rs_realm_law_component value = 0 } }
     set_variable = { name = tmp_target_score value = 0 }
     change_variable = { name = tmp_target_score add = var:riseandfall_rs_stats_component }
     change_variable = { name = tmp_target_score add = var:riseandfall_rs_legitimacy_component }
     change_variable = { name = tmp_target_score add = var:riseandfall_rs_vassals_component }
+    # Add realm law component (0..20)
+    change_variable = { name = tmp_target_score add = var:riseandfall_rs_realm_law_component }
 
     clamp_variable = { name = tmp_target_score min = 0 max = 100 }
     round_variable = { name = tmp_target_score }
@@ -236,6 +304,8 @@ riseandfall_calculate_realm_stability_se = {
     if = { limit = { NOT = { has_variable = riseandfall_rs_civil_war_years } } set_variable = { name = riseandfall_rs_civil_war_years value = 0 } }
     # Ensure sex-law penalty tooltip var exists
     if = { limit = { NOT = { has_variable = riseandfall_realm_stability_sex_law_penalty } } set_variable = { name = riseandfall_realm_stability_sex_law_penalty value = 0 } }
+    # Ensure realm-law (crown authority) tooltip var exists
+    if = { limit = { NOT = { has_variable = riseandfall_realm_stability_realm_law_bonus } } set_variable = { name = riseandfall_realm_stability_realm_law_bonus value = 0 } }
 
     if = {
         limit = { is_independent_ruler = yes }
@@ -354,6 +424,9 @@ riseandfall_calculate_realm_stability_se = {
                 # Store predicted negative change for UI
                 set_variable = { name = riseandfall_realm_stability_predicted_change value = var:tmp_rs_step_neg }
             }
+            # Use the predicted change variable in-script (clamp/round) so the engine treats it as used
+            clamp_variable = { name = riseandfall_realm_stability_predicted_change min = -100 max = 100 }
+            round_variable = { name = riseandfall_realm_stability_predicted_change }
         }
     }
 
@@ -371,36 +444,7 @@ riseandfall_calculate_realm_stability_se = {
     round_variable = { name = riseandfall_realm_stability_score }
 
 
-    # Set exactly one character flag representing the stability band based on the CURRENT score:
-    # 0-20: collapsing
-    # 21-40: low
-    # 41-60: average
-    # 61-80: good
-    # 81-100: golden_age
-    # First, clear any existing stability variables so we only have one active variable.
-    # Use a single numeric stage variable (1..5) for robustness.
-    remove_variable = riseandfall_realm_stability_stage
-    # Also clear legacy boolean vars if present
-    remove_variable = riseandfall_realm_stability_collapsing
-    remove_variable = riseandfall_realm_stability_low
-    remove_variable = riseandfall_realm_stability_average
-    remove_variable = riseandfall_realm_stability_good
-    remove_variable = riseandfall_realm_stability_golden_age
 
-
-    # Maintain legacy boolean flags for compatibility (ensure they're set somewhere)
-    set_variable = { name = riseandfall_realm_stability_collapsing value = 0 }
-    set_variable = { name = riseandfall_realm_stability_low value = 0 }
-    set_variable = { name = riseandfall_realm_stability_average value = 0 }
-    set_variable = { name = riseandfall_realm_stability_good value = 0 }
-    set_variable = { name = riseandfall_realm_stability_golden_age value = 0 }
-
-    # Set the appropriate legacy flag directly from the CURRENT score (0..100)
-    if = { limit = { var:riseandfall_realm_stability_score <= 20 } set_variable = { name = riseandfall_realm_stability_collapsing value = 1 } }
-    else_if = { limit = { var:riseandfall_realm_stability_score <= 40 } set_variable = { name = riseandfall_realm_stability_low value = 1 } }
-    else_if = { limit = { var:riseandfall_realm_stability_score <= 60 } set_variable = { name = riseandfall_realm_stability_average value = 1 } }
-    else_if = { limit = { var:riseandfall_realm_stability_score <= 80 } set_variable = { name = riseandfall_realm_stability_good value = 1 } }
-    else = { set_variable = { name = riseandfall_realm_stability_golden_age value = 1 } }
 
     # Remove any previously-applied fine-grained stability modifiers (1..100)
     remove_character_modifier = riseandfall_stability_1
