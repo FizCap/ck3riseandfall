@@ -22,7 +22,7 @@ riseandfall_calculate_realm_stability_se = {
     # If ruler is under regency, save the active diarch scope so we can read their stats
     if = {
         limit = { has_diarchy_type = regency }
-        save_scope_as = diarch
+        diarch = { save_scope_as = diarch }
     }
 
     # Diplomacy
