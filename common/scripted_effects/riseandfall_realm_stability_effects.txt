@@ -295,9 +295,6 @@ riseandfall_calculate_realm_stability_se = {
     # Add realm law component (0..20)
     change_variable = { name = tmp_target_score add = var:riseandfall_rs_realm_law_component }
 
-    clamp_variable = { name = tmp_target_score min = 0 max = 100 }
-    round_variable = { name = tmp_target_score }
-
     # Civil war adjustment applied to the TARGET score (so smoothing moves current toward
     # the penalized target) instead of modifying the persistent current score directly.
     # Ensure counter exists
@@ -348,9 +345,6 @@ riseandfall_calculate_realm_stability_se = {
         # Apply sex penalty to target and store for tooltip
         change_variable = { name = tmp_target_score add = var:tmp_sex_penalty }
         set_variable = { name = riseandfall_realm_stability_sex_law_penalty value = var:tmp_sex_penalty }
-    # Ensure the penalized target stays within 0..100 to avoid negative drift
-    clamp_variable = { name = tmp_target_score min = 0 max = 100 }
-    round_variable = { name = tmp_target_score }
     }
 
     # WAR LOSS / VICTORY PENALTY
@@ -370,6 +364,10 @@ riseandfall_calculate_realm_stability_se = {
     # Apply war penalty to the target score and expose for tooltip
     change_variable = { name = tmp_target_score add = var:riseandfall_realm_stability_war_penalty }
     set_variable = { name = riseandfall_realm_stability_war_penalty value = var:riseandfall_realm_stability_war_penalty }
+
+    # Ensure the target stays within 0..100 after applying war penalties
+    clamp_variable = { name = tmp_target_score min = 0 max = 100 }
+    round_variable = { name = tmp_target_score }
 
     # Persist the (possibly penalized) target so smoothing moves the current score toward it
     set_variable = { name = riseandfall_realm_stability_target value = var:tmp_target_score }
