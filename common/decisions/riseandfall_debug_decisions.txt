@@ -1,4 +1,4 @@
- # Developer debug decision: decrease realm stability by 10 for testing
+﻿ # Developer debug decision: decrease realm stability by 10 for testing
     riseandfall_debug_reduce_stability_10 = {
         picture = {
             reference = "gfx/interface/illustrations/decisions/decision_misc.dds"
@@ -9,7 +9,7 @@
         decision_group_type = admin
 
         is_shown = {
-            always = no
+            always = yes
         }
 
         is_valid = {
@@ -19,20 +19,27 @@
         effect = {
             if = {
                 limit = { NOT = { has_variable = riseandfall_realm_stability_score } }
-                set_variable = { name = riseandfall_realm_stability_score value = 50 }
+                set_variable = { name = riseandfall_realm_stability_score value = 0 }
             }
-            change_variable = { name = riseandfall_realm_stability_score add = -10 }
+            # For debugging, force stability to 0
+            set_variable = { name = riseandfall_realm_stability_score value = 0 }
             clamp_variable = { name = riseandfall_realm_stability_score min = 0 max = 100 }
             round_variable = { name = riseandfall_realm_stability_score }
+            # Recompute normally (updates target/current smoothing state)
             riseandfall_calculate_realm_stability_se = yes
+            # Ensure smoothing/target don't immediately nudge the score away from 0
+            set_variable = { name = riseandfall_realm_stability_target value = 0 }
+            set_variable = { name = riseandfall_realm_stability_score value = 0 }
+            # Reset adjustment months so smoothing won't apply until next tick
+            set_variable = { name = riseandfall_rs_adjust_months value = 0 }
+            set_variable = { name = riseandfall_realm_stability_predicted_change value = 0 }
         }
 
         ai_potential = {
-            factor = 0
         }
 
         ai_will_do = {
-            factor = 0
+            base = 0
         }
     }
 

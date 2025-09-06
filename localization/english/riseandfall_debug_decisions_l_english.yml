@@ -1,0 +1,5 @@
+﻿l_english:
+ riseandfall_debug_reduce_stability_10:0 "Force realm stability to 0 (debug)"
+ riseandfall_debug_reduce_stability_10_desc:0 "Developer decision: force the realm stability score to zero for testing low-stability systems."
+ riseandfall_debug_reduce_stability_10_tooltip:0 "Set realm stability score to 0 and recalculate."
+ riseandfall_debug_reduce_stability_10_confirm:0 "Are you sure you want to force realm stability to 0?"
