@@ -108,33 +108,3 @@ REALM_STABILITY_TOOLTIP:0 "#bold Realm Stability#!\nCurrent: [Character.MakeScop
 	riseandfall_stability_98:0 "Stability: 98"
 	riseandfall_stability_99:0 "Stability: 99"
 	riseandfall_stability_100:0 "Stability: 100"
-
-# Low stability event localization
-warlord.1001.t:0 "The Realm Trembles"
-warlord.1001.d:0 "Whispers of rebellion poison the halls of power. Ambitious warlords marshal men and steel in the shadows, their banners rising like storm clouds — the realm risks being sundered unless you seize the reins of fate."
-warlord.1001.a:0 "Summon the council — confront the threat"
-warlord.1001.picture:0 "gfx/interface/portraits/medium/portrait_generic_m.tga"
-warlord.1001.background:0 "gfx/interface/event_pictures/backgrounds/bg_realm_unrest.tga"
-
-warlord.1002.t:0 "Banner or Fealty?"
-warlord.1002.d:0 "Order frays and opportunity blooms for those with steel and ambition. Will you raise your standard and carve a realm of your own, or bend the knee and cling to the waning shelter of your liege?"
-warlord.1002.a:0 "Raise your standard — become a warlord"
-warlord.1002.b:0 "Bend the knee — remain loyal"
-
-warlord.1003.t:0 "The Path of the Warlord"
-warlord.1003.d:0 "You have embraced the mantle of warlord, and now the path unfolds before you. With claims secured against your liege, you stand at the crossroads of destiny — will you press forward and claim what is rightfully yours?"
-warlord.1003.a:0 "Continue the path — press your claims"
-warlord.1003.b:0 "Abandon the path — renounce your warlord ambitions"
-
-# Trait localization
-trait_warlord:0 "Warlord"
-trait_warlord_desc:0 "A bold and ruthless commander, the warlord carves power from chaos — feared by liege and vassal alike."
-
-# Opinion localization
-warlord_rebellion_opinion:0 "Rebellious Warlord"
-warlord_rebellion_opinion_desc:0 "This vassal has raised the banner of rebellion as a warlord, threatening the stability of the realm."
-warlord_abandonment_opinion:0 "Abandoned Warlord Ambitions"
-warlord_abandonment_opinion_desc:0 "This former warlord has renounced their rebellious ambitions and returned to the fold."
-
-trait_retiredwarlord:0 "Retired Warlord"
-trait_retiredwarlord_desc:0 "Once a stirring force who sowed chaos across the realm, they have laid down their sword — their days of conquest are done."

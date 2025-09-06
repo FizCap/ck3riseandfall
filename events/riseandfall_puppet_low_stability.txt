@@ -10,6 +10,8 @@ puppet.1001 = {
     desc = puppet.1001.d
     theme = realm
 
+    right_portrait = root
+
     # Add 50 stability to the liege when this event fires
     change_variable = { name = riseandfall_realm_stability_score add = 50 }
 
@@ -33,7 +35,8 @@ puppet.1002 = {
         # Save our liege as a scope for use by effects (so scope:liege is defined)
         liege = { save_scope_as = liege }
     }
-    left_portrait = scope:liege
+    left_portrait = liege
+    right_portrait = root
 
     option = {
         name = puppet.1002.a

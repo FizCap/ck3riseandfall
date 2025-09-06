@@ -7,7 +7,7 @@ warlord.1001 = {
     desc = warlord.1001.d
     theme = realm
 
-    left_portrait = scope:liege
+    left_portrait = root
 
     option = {
         name = warlord.1001.a
@@ -37,6 +37,9 @@ warlord.1002 = {
     title = warlord.1002.t
     desc = warlord.1002.d
     theme = realm
+
+    left_portrait = liege
+    right_portrait = root
 
     immediate = {
         # Present a choice; effects happen in options below
@@ -101,6 +104,9 @@ warlord.1003 = {
     title = warlord.1003.t
     desc = warlord.1003.d
     theme = realm
+
+    left_portrait = liege
+    right_portrait = root
 
     option = {
         name = warlord.1003.a
