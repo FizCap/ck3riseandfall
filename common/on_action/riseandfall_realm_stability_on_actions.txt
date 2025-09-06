@@ -17,6 +17,18 @@ on_game_start_after_lobby = {
     }
 }
 
+on_war_won_attacker = {
+    on_actions = {
+        riseandfall_war_won_attacker
+    }
+}
+
+on_war_won_defender = {
+    on_actions = {
+        riseandfall_war_won_defender
+    }
+}
+
 # React to characters gaining titles by inheritance so newly-inherited rulers
 # get a computed realm stability value instead of the engine defaulting them to 100.
 on_title_gain_inheritance = {
@@ -79,5 +91,24 @@ riseandfall_ai_create_empires = {
     }
     effect = {
         riseandfall_ai_create_empires_se = yes
+    }
+}
+
+# React to wars being won so we can apply immediate +5/-5 war penalties
+riseandfall_war_won_attacker = {
+    trigger = { has_game_rule = riseandfall_realm_stability_enabled }
+    effect = {
+        # Root scope: none; event provides scope:attacker and scope:defender
+    # Apply loss to defender only; winners do not get stability changes
+    scope:defender = { riseandfall_war_loss_se = yes }
+    }
+}
+
+riseandfall_war_won_defender = {
+    trigger = { has_game_rule = riseandfall_realm_stability_enabled }
+    effect = {
+        # Root scope: none; event provides scope:attacker and scope:defender
+    # Apply loss to attacker only; winners do not get stability changes
+    scope:attacker = { riseandfall_war_loss_se = yes }
     }
 }

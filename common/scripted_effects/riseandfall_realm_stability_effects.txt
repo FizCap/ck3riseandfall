@@ -353,6 +353,24 @@ riseandfall_calculate_realm_stability_se = {
     round_variable = { name = tmp_target_score }
     }
 
+    # WAR LOSS / VICTORY PENALTY
+    # Maintain a per-character war penalty variable (negative or zero).
+    # - Losing a war: add -5 (handled in on_actions where the loser is targeted)
+    # - Winning a war: add +5 (handled in on_actions where the winner is targeted)
+    # Decay the penalty by +1 per year (toward 0). Expose for tooltip and include in target.
+    if = { limit = { NOT = { has_variable = riseandfall_realm_stability_war_penalty } } set_variable = { name = riseandfall_realm_stability_war_penalty value = 0 } }
+    # Decay toward zero when this runs yearly
+    if = {
+        limit = { var:riseandfall_realm_stability_war_penalty < 0 }
+        # step back toward zero by 1 per year
+        change_variable = { name = riseandfall_realm_stability_war_penalty add = 1 }
+        # never exceed 0
+        if = { limit = { var:riseandfall_realm_stability_war_penalty > 0 } set_variable = { name = riseandfall_realm_stability_war_penalty value = 0 } }
+    }
+    # Apply war penalty to the target score and expose for tooltip
+    change_variable = { name = tmp_target_score add = var:riseandfall_realm_stability_war_penalty }
+    set_variable = { name = riseandfall_realm_stability_war_penalty value = var:riseandfall_realm_stability_war_penalty }
+
     # Persist the (possibly penalized) target so smoothing moves the current score toward it
     set_variable = { name = riseandfall_realm_stability_target value = var:tmp_target_score }
 
@@ -652,4 +670,25 @@ riseandfall_calculate_realm_stability_se = {
     else_if = { limit = { var:riseandfall_realm_stability_score = 99 } add_character_modifier = { modifier = riseandfall_stability_99 } }
     else = { add_character_modifier = { modifier = riseandfall_stability_100 } }
 
+}
+
+
+# Called on the war winner scope (character) to grant a small positive recovery of war penalty (+5)
+riseandfall_war_victory_se = {
+    # ensure variable exists
+    if = { limit = { NOT = { has_variable = riseandfall_realm_stability_war_penalty } } set_variable = { name = riseandfall_realm_stability_war_penalty value = 0 } }
+    # Add +5 (healing). We only allow the war_penalty to be <= 0, so cap at 0.
+    change_variable = { name = riseandfall_realm_stability_war_penalty add = 5 }
+    if = { limit = { var:riseandfall_realm_stability_war_penalty > 0 } set_variable = { name = riseandfall_realm_stability_war_penalty value = 0 } }
+    # Expose for tooltip (redundant but safe)
+    set_variable = { name = riseandfall_realm_stability_war_penalty value = var:riseandfall_realm_stability_war_penalty }
+}
+
+# Called on the war loser scope (character) to apply -5 immediate penalty. Keep floor at -25.
+riseandfall_war_loss_se = {
+    if = { limit = { NOT = { has_variable = riseandfall_realm_stability_war_penalty } } set_variable = { name = riseandfall_realm_stability_war_penalty value = 0 } }
+    change_variable = { name = riseandfall_realm_stability_war_penalty add = -5 }
+    # Clamp minimum to -25
+    if = { limit = { var:riseandfall_realm_stability_war_penalty < -25 } set_variable = { name = riseandfall_realm_stability_war_penalty value = -25 } }
+    set_variable = { name = riseandfall_realm_stability_war_penalty value = var:riseandfall_realm_stability_war_penalty }
 }
