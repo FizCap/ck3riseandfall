@@ -15,13 +15,12 @@
                 destroy_title = scope:rf_candidate_title
             }
         }
+        # Remove adventurer's gold by scoping to rf_ruler and removing their current gold
+        scope:rf_ruler = {
+            set_variable = { name = adventurer_gold value = gold }
+            # Use the engine-supported remove_gold effect to remove that amount
+            add_gold = -var:adventurer_gold
+            remove_variable = adventurer_gold
+        }
     }
-    
-    # Remove adventurer's gold if more than 1
-    set_variable = { name = adventurer_gold value = gold }
-    if = {
-        limit = { check_variable = { name = adventurer_gold value > 1 } }
-        add_gold = { value = var:adventurer_gold negate = yes }
-    }
-    remove_variable = adventurer_gold
 }
