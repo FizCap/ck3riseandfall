@@ -9,7 +9,7 @@
         decision_group_type = admin
 
         is_shown = {
-            always = yes
+            always = no
         }
 
         is_valid = {
