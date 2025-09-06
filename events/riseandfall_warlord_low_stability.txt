@@ -25,9 +25,9 @@ warlord.1001 = {
                 }
                 trigger_event = { id = warlord.1002 }
             }
+            # Add 50 stability to the liege when this event fires
+            change_variable = { name = riseandfall_realm_stability_score add = 50 }
         }
-    # Add 50 stability to the liege when this event fires
-    change_variable = { name = riseandfall_realm_stability_score add = 50 }
     }
 }
 
