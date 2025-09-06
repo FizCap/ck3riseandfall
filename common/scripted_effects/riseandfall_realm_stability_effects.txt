@@ -30,7 +30,7 @@ riseandfall_calculate_realm_stability_se = {
         limit = { has_diarchy_type = regency }
     # use active diarch's diplomacy but scale weaker (divide by 3)
     set_variable = { name = tmp_add value = scope:diarch.diplomacy }
-        change_variable = { name = tmp_add divide = 3 }
+    change_variable = { name = tmp_add divide = 2 }
         clamp_variable = { name = tmp_add min = 0 max = 10 }
         change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
     }
@@ -47,7 +47,7 @@ riseandfall_calculate_realm_stability_se = {
     if = {
         limit = { has_diarchy_type = regency }
     set_variable = { name = tmp_add value = scope:diarch.martial }
-        change_variable = { name = tmp_add divide = 3 }
+    change_variable = { name = tmp_add divide = 2 }
         clamp_variable = { name = tmp_add min = 0 max = 10 }
         change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
     }
@@ -63,7 +63,7 @@ riseandfall_calculate_realm_stability_se = {
     if = {
         limit = { has_diarchy_type = regency }
     set_variable = { name = tmp_add value = scope:diarch.stewardship }
-        change_variable = { name = tmp_add divide = 3 }
+    change_variable = { name = tmp_add divide = 2 }
         clamp_variable = { name = tmp_add min = 0 max = 10 }
         change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
     }
@@ -79,7 +79,7 @@ riseandfall_calculate_realm_stability_se = {
     if = {
         limit = { has_diarchy_type = regency }
     set_variable = { name = tmp_add value = scope:diarch.intrigue }
-        change_variable = { name = tmp_add divide = 3 }
+    change_variable = { name = tmp_add divide = 2 }
         clamp_variable = { name = tmp_add min = 0 max = 10 }
         change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
     }
@@ -95,7 +95,7 @@ riseandfall_calculate_realm_stability_se = {
     if = {
         limit = { has_diarchy_type = regency }
     set_variable = { name = tmp_add value = scope:diarch.learning }
-        change_variable = { name = tmp_add divide = 3 }
+    change_variable = { name = tmp_add divide = 2 }
         clamp_variable = { name = tmp_add min = 0 max = 10 }
         change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
     }
