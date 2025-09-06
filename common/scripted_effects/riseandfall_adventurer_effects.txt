@@ -23,14 +23,7 @@
                     # Exclude religious/scholarly characters who should not become adventurers
                     NOT = {
                         OR = {
-                            has_trait = devoted
                             has_trait = incapable
-                            has_trait = maester
-                            has_trait = septon
-                            has_trait = high_septon
-                            has_trait = eunuch
-                            has_trait = beardless_eunuch
-                            has_trait = nightswatch
                             has_trait = craven
                             has_character_flag = can_not_marry
                         }
