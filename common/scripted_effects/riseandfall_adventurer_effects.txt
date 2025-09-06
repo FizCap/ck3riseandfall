@@ -32,6 +32,7 @@
                             has_trait = beardless_eunuch
                             has_trait = nightswatch
                             has_trait = craven
+                            has_character_flag = can_not_marry
                         }
                     }
                     age >= 16
