@@ -1,0 +1,62 @@
+﻿##########################
+# Rise and Fall - Puppet Low Stability Event
+# Triggered when low stability roll succeeds. Offers a powerful vassal the chance to become puppet master via regency diarchy.
+
+namespace = puppet
+
+puppet.1001 = {
+    type = character_event
+    title = puppet.1001.t
+    desc = puppet.1001.d
+    theme = realm
+
+    option = {
+        name = puppet.1001.a
+        # Attempt to start a regency diarchy on the liege, then choose a random powerful vassal to offer the puppet
+        try_start_diarchy = regency
+        random_powerful_vassal = {
+            # Defensive limits: ensure we pick a direct, landed, adult vassal (not spouse/courtier/etc.)
+            trigger_event = puppet.1002
+        }
+    }
+}
+
+puppet.1002 = {
+    type = character_event
+    title = puppet.1002.t
+    desc = puppet.1002.d
+    theme = realm
+    immediate = {
+        # Save our liege as a scope for use by effects (so scope:liege is defined)
+        liege = { save_scope_as = liege }
+    }
+    left_portrait = scope:liege
+
+    option = {
+        name = puppet.1002.a
+        ai_chance = {
+            factor = 100  # AI always accepts
+        }
+        # Accept: Have the liege set the chosen (root) character as diarch
+        scope:liege = {
+            set_diarch = root
+            set_diarchy_swing = 100
+        }
+    }
+
+    option = {
+        name = puppet.1002.b
+        ai_chance = {
+            factor = 0  # AI never declines
+        }
+        # Decline: have the liege pick another random powerful vassal (excluding the current root) and trigger the event for them
+        liege = {
+            random_powerful_vassal = {
+                limit = {
+                    NOT = { this = root }
+                }
+                trigger_event = puppet.1002
+            }
+        }
+    }
+}

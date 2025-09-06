@@ -1,0 +1,8 @@
+﻿l_english:
+ puppet.1001.t: "The Empire is Collapsing"
+ puppet.1001.d: "Central authority is starting to collapse. A powerful vassal has decided to restore order and has made my capital his home."
+ puppet.1001.a: "Acknowledge"
+ puppet.1002.t: "Offer to Become Puppet Master"
+ puppet.1002.d: "The emperor's realm is in chaos due to low stability. As a powerful vassal, you have the opportunity to seize control and become the puppet master, ruling through a regency diarchy. Will you accept this chance to stabilize the empire under your guidance?"
+ puppet.1002.a: "Accept and become Puppet Master"
+ puppet.1002.b: "Decline and let another vassal try"

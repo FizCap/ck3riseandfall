@@ -38,9 +38,25 @@ riseandfall_low_stability_roll_se = {
             # Roll once for the independent ruler. If it succeeds, notify the liege and add stability
             random = {
                 chance = var:tmp_chance
-                # Notify the liege (independent_ruler) that warlords are emerging
-                trigger_event = { id = warlord.1001 }
+                # Trigger a random low stability event
+                riseandfall_low_stability_random_event = yes
             }
         }
     }
 
+##########################
+# Rise and Fall - Low Stability Random Event Selector
+# Randomly selects between warlord uprising, peasant unrest, and puppet master offer
+
+riseandfall_low_stability_random_event = {
+    random_list = {
+        1 = {
+            # Warlord uprising event
+            trigger_event = { id = warlord.1001 }
+        }
+        1 = {
+            # Puppet master offer to a random powerful vassal
+            trigger_event = { id = puppet.1001 }
+        }
+    }
+}
