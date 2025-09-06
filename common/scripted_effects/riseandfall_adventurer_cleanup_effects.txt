@@ -16,4 +16,12 @@
             }
         }
     }
+    
+    # Remove adventurer's gold if more than 1
+    set_variable = { name = adventurer_gold value = gold }
+    if = {
+        limit = { check_variable = { name = adventurer_gold value > 1 } }
+        add_gold = { value = var:adventurer_gold negate = yes }
+    }
+    remove_variable = adventurer_gold
 }
