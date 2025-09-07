@@ -82,19 +82,20 @@
                 if = {
                     limit = { var:rf_disqualify = 0 }
 
-                    # Base chance is 0.5%; trait bonuses: dragonrider +2%, ambitious +2%, brave +1%
-                    set_variable = { name = rf_adventurer_trait_chance value = 0 }
-                    if = { limit = { has_trait = dragonrider } change_variable = { name = rf_adventurer_trait_chance add = 2 } }
-                    if = { limit = { has_trait = ambitious } change_variable = { name = rf_adventurer_trait_chance add = 2 } }
-                    if = { limit = { has_trait = brave } change_variable = { name = rf_adventurer_trait_chance add = 1 } }
+                        # Base chance is 0.5%; trait bonuses: dragonrider +2.0%, ambitious +2.0%, brave +1.0%
+                        # Use explicit floats so the engine performs fractional math correctly.
+                        set_variable = { name = rf_adventurer_trait_chance value = 0.0 }
+                        if = { limit = { has_trait = dragonrider } change_variable = { name = rf_adventurer_trait_chance add = 2.0 } }
+                        if = { limit = { has_trait = ambitious } change_variable = { name = rf_adventurer_trait_chance add = 2.0 } }
+                        if = { limit = { has_trait = brave } change_variable = { name = rf_adventurer_trait_chance add = 1.0 } }
 
-                    # Final chance = base 0.0 + trait bonuses + intrigue bonus, clamp to [0,100]
-                    set_variable = { name = rf_adventurer_final_chance value = 0.0 }
-                    change_variable = { name = rf_adventurer_final_chance add = var:rf_adventurer_trait_chance }
-                    # Add intrigue bonus: intrigue * 0.1 (e.g., 10 intrigue = +1.0)
-                    set_variable = { name = intrigue_bonus value = scope:candidate.intrigue }
-                    change_variable = { name = intrigue_bonus multiply = 0.1 }
-                    change_variable = { name = rf_adventurer_final_chance add = var:intrigue_bonus }
+                        # Final chance = base 0.0 + trait bonuses + intrigue bonus, clamp to [0,100]
+                        set_variable = { name = rf_adventurer_final_chance value = 0.0 }
+                        change_variable = { name = rf_adventurer_final_chance add = var:rf_adventurer_trait_chance }
+                        # Add intrigue bonus: intrigue * 0.1 (e.g., 10 intrigue = +1.0 -> 2 intrigue = +0.2)
+                        set_variable = { name = intrigue_bonus value = scope:candidate.intrigue }
+                        change_variable = { name = intrigue_bonus multiply = 0.1 }
+                        change_variable = { name = rf_adventurer_final_chance add = var:intrigue_bonus }
                     # If we selected a claim target and the holder has low legitimacy, increase chance
                     if = {
                         limit = { exists = scope:claim_target_title.holder }
@@ -108,9 +109,6 @@
                             riseandfall_do_create_adventurer_se = yes
                         }
                     }
-                    remove_variable = rf_adventurer_trait_chance
-                    remove_variable = rf_adventurer_final_chance
-                    remove_variable = intrigue_bonus
                 }
                 remove_variable = rf_disqualify
             }
