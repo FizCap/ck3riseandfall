@@ -22,7 +22,10 @@ riseandfall_yearly_adventurer = {
     effect = {
         every_living_character = {
             limit = { any_claim = { count > 0 } }
-            save_scope_as = independent_ruler
+            # Save the iterated character as the candidate (the dynasty member with a claim)
+            save_scope_as = candidate
+            # Call the check effect which will operate using scope:candidate and will
+            # set `independent_ruler` where needed for the claim holder.
             riseandfall_check_dynasty_for_adventurers_se = yes
         }
     }
