@@ -620,10 +620,6 @@ adventurer_claim_cb = {
             scope:attacker = { add_hook = { target = scope:claimant type = favor_hook } }
         }
 
-        scope:attacker = {
-            pay_short_term_gold_reparations_effect = { GOLD_VALUE = 3 }
-        }
-
         setup_claim_cb = { titles = target_titles attacker = scope:attacker defender = scope:defender claimant = scope:claimant victory = no }
 
         modify_all_participants_fame_values = {
