@@ -18,8 +18,7 @@
         # Remove adventurer's gold by scoping to rf_ruler and removing their current gold
         scope:rf_ruler = {
             set_variable = { name = adventurer_gold value = gold }
-            # Use the engine-supported remove_gold effect to remove that amount
-            add_gold = -var:adventurer_gold
+            remove_short_term_gold = var:adventurer_gold
             remove_variable = adventurer_gold
         }
     }

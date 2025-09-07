@@ -120,7 +120,7 @@
 riseandfall_marry_male_target_se = {
     # Expecting character scope (root) — the adventurer leader. Only operate on that character.
     create_character = {
-        location = scope:independent_ruler.capital_province
+        location = scope:adventurer_child.capital_province
         culture = scope:independent_ruler.culture
         faith = scope:independent_ruler.faith
         age = { 16 20 }
