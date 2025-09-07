@@ -407,6 +407,19 @@ adventurer_claim_cb = {
         add_influence_attacker_victory_effect = yes
         scope:attacker = { accolade_attacker_war_end_glory_gain_med_effect = yes }
 
+        scope:attacker = {
+            if = {
+                limit = {
+                    scope:defender = { is_alive = yes }
+                    NOT = { scope:defender = { is_imprisoned = yes } }
+                }
+                imprison = {
+                    target = scope:defender
+                    type = dungeon
+                }
+            }
+        }
+
         scope:defender ?= {
             if = {
                 limit = {
@@ -596,6 +609,19 @@ adventurer_claim_cb = {
         add_legitimacy_attacker_defeat_effect = yes
         add_influence_attacker_defeat_effect = yes
         scope:defender = { accolade_defender_war_end_glory_gain_med_effect = yes }
+
+        scope:defender = {
+            if = {
+                limit = {
+                    scope:attacker = { is_alive = yes }
+                    NOT = { scope:attacker = { is_imprisoned = yes } }
+                }
+                imprison = {
+                    target = scope:attacker
+                    type = dungeon
+                }
+            }
+        }
 
         every_in_list = {
             list = target_titles
