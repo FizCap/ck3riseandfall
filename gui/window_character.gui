@@ -1147,6 +1147,28 @@ window = {
 							}
 						}
 
+						vbox = {
+							tooltip = "ADVENTURER_CHANCE_TOOLTIP"
+							using = tooltip_ne
+							spacing = -3
+							visible = "[GetPlayer.MakeScope.Var('riseandfall_enable_interaction_stability').GetValue]"
+							margin_right = 3
+
+							using = Animation_Character_Window_Refresh
+
+							icon = {
+								name = "adventurer_chance_icon"
+								size = { 32 32 }
+								texture = "gfx/interface/icons/dynasty/legitimist_revolt.dds"
+							}
+
+							text_single = {
+								name = "adventurer_chance_value"
+								text = "[Character.MakeScope.Var('rf_adventurer_final_chance').GetValue|1]"
+								align = nobaseline
+							}
+						}
+
 						divider_light = {
 							layoutpolicy_vertical = expanding
 						}
