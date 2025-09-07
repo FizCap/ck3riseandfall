@@ -1195,6 +1195,23 @@ window = {
 						# EK ADDITION: arcana
 						ek_arcana = { }
 
+						vbox = {
+							spacing = -3
+							using = Animation_Character_Window_Refresh
+
+							icon = {
+								size = { 32 32 }
+								texture = "gfx/interface/icons/dynasty/legitimist_revolt.dds"
+								tooltip = "ADVENTURER_CHANCE_TOOLTIP"
+							}
+
+							text_single = {
+								text = "[Character.MakeScope.Var('rf_adventurer_final_chance').GetValue|1]"
+								default_format = "#low"
+								align = nobaseline
+							}
+						}
+
 						divider_light = {
 							layoutpolicy_vertical = expanding
 						}
