@@ -19,18 +19,8 @@
                             is_noble_family_title = yes
                         }
                     }
-
-                                change_variable = { name = rf_adventurer_final_chance multiply = var:rf_opinion_multiplier }
-
-                                # Persist a display copy of the computed opinion multiplier on the candidate
-                                # so the UI can read and show it (doesn't affect the temporary math vars).
-                                scope:candidate = {
-                                    set_variable = { name = rf_opinion_multiplier_display value = var:rf_opinion_multiplier }
-                                }
-
-                                remove_variable = rf_op_reduction
-                                remove_variable = rf_opinion_multiplier
-                                remove_variable = rf_opinion_value_raw
+                                 
+                    # Exclude religious/scholarly characters who should not become adventurers
                     NOT = {
                         OR = {
                             has_trait = incapable
@@ -100,6 +90,7 @@
 
                         # Final chance = base 0.0 + trait bonuses + intrigue bonus, clamp to [0,100]
                         set_variable = { name = rf_adventurer_final_chance value = 0.0 }
+                        set_variable = { name = rf_opinion_bonus value = 0.0 }
                         change_variable = { name = rf_adventurer_final_chance add = var:rf_adventurer_trait_chance }
                         # Add intrigue bonus: intrigue * 0.1 (e.g., 10 intrigue = +1.0 -> 2 intrigue = +0.2)
                         set_variable = { name = intrigue_bonus value = scope:candidate.intrigue }
@@ -140,7 +131,6 @@
                                 set_variable = { name = rf_opinion_bonus value = var:rf_opinion_value_raw }
                                 change_variable = { name = rf_opinion_bonus multiply = 0.02 }
                                 change_variable = { name = rf_adventurer_final_chance add = var:rf_opinion_bonus }
-                                remove_variable = rf_opinion_bonus
                                 remove_variable = rf_opinion_value_raw
                             }
                             else = {
@@ -159,7 +149,6 @@
                                 change_variable = { name = rf_adventurer_final_chance multiply = var:rf_opinion_multiplier }
 
                                 remove_variable = rf_op_reduction
-                                remove_variable = rf_opinion_multiplier
                                 remove_variable = rf_opinion_value_raw
                             }
                         }

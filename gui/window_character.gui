@@ -1114,7 +1114,7 @@ window = {
 							icon = {
 								size = { 32 32 }
 								texture = "gfx/interface/icons/dynasty/legitimist_revolt.dds"
-								tooltip = "Adventurer Chance: [Character.MakeScope.Var('rf_adventurer_final_chance').GetValue|1]%"
+								tooltip = "ADVENTURER_CHANCE_TOOLTIP"
 							}
 
 							text_single = {
