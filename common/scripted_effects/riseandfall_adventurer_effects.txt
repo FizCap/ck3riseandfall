@@ -88,8 +88,8 @@
                     if = { limit = { has_trait = ambitious } change_variable = { name = rf_adventurer_trait_chance add = 2 } }
                     if = { limit = { has_trait = brave } change_variable = { name = rf_adventurer_trait_chance add = 1 } }
 
-                    # Final chance = base 0.5 + trait bonuses + intrigue bonus, clamp to [0,100]
-                    set_variable = { name = rf_adventurer_final_chance value = 0.5 }
+                    # Final chance = base 0.0 + trait bonuses + intrigue bonus, clamp to [0,100]
+                    set_variable = { name = rf_adventurer_final_chance value = 0.0 }
                     change_variable = { name = rf_adventurer_final_chance add = var:rf_adventurer_trait_chance }
                     # Add intrigue bonus: intrigue * 0.1 (e.g., 10 intrigue = +1.0)
                     set_variable = { name = intrigue_bonus value = scope:candidate.intrigue }
