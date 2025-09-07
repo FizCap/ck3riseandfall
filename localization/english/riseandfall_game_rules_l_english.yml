@@ -53,11 +53,11 @@ setting_riseandfall_ai_kingdom_creation_disabled_desc:0 "AI rulers will not auto
 
 # Interaction Stability (UI marker in interaction menu)
 rule_riseandfall_enable_interaction_stability:0 "Interaction Stability Marker"
-rule_riseandfall_enable_interaction_stability_desc:0 "Controls whether a realm stability marker appears in the character interaction menu. Recommended if other mods override or hide the stability UI in the main character window."
+rule_riseandfall_enable_interaction_stability_desc:0 "Controls whether realm stability and adventurer chance markers appear in the character interaction menu. Recommended if other mods override or hide these UI elements in the main character window."
 setting_riseandfall_interaction_stability_enabled:0 "Enabled"
-setting_riseandfall_interaction_stability_enabled_desc:0 "Will put a stability marker in the character interaction menu (recommended if other mods override the stability UI in the character screen)."
+setting_riseandfall_interaction_stability_enabled_desc:0 "Will put stability and adventurer chance markers in the character interaction menu (recommended if other mods override these UI elements in the character screen)."
 setting_riseandfall_interaction_stability_disabled:0 "Disabled"
-setting_riseandfall_interaction_stability_disabled_desc:0 "Does not show a stability marker in the character interaction menu."
+setting_riseandfall_interaction_stability_disabled_desc:0 "Does not show stability or adventurer chance markers in the character interaction menu."
 
 # Low Stability Events rule
 rule_riseandfall_low_stability_events:0 "Low Stability Events"

@@ -110,6 +110,27 @@ window = {
 							}
 						}
 
+						vbox = {
+							datacontext = "[AccessGameRules.AccessNamedGameRule( 'riseandfall_enable_interaction_stability' ).GetSetting]"
+							# Show only when the current setting does NOT have the disabled flag
+							visible = "[Not( GameRuleSetting.HasFlag( 'riseandfall_interaction_stability_disabled' ) )]"
+							tooltip = "ADVENTURER_CHANCE_TOOLTIP"
+							using = tooltip_ne
+							spacing = -3
+							margin_right = 5
+
+							icon = {
+								size = { 20 20 }
+								texture = "gfx/interface/icons/dynasty/legitimist_revolt.dds"
+							}
+
+							text_single = {
+								text = "[Character.MakeScope.Var('rf_adventurer_final_chance').GetValue|1]"
+								default_format = "#medium"
+								align = nobaseline
+							}
+						}
+
 						button_pin = {
 							name = "button_pin"
 							visible = "[Not(Character.IsPinned)]"
