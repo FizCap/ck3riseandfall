@@ -86,7 +86,6 @@
                         set_variable = { name = rf_adventurer_trait_chance value = 0.0 }
                         if = { limit = { has_trait = dragonrider } change_variable = { name = rf_adventurer_trait_chance add = 2.0 } }
                         if = { limit = { has_trait = ambitious } change_variable = { name = rf_adventurer_trait_chance add = 2.0 } }
-                        if = { limit = { has_trait = brave } change_variable = { name = rf_adventurer_trait_chance add = 1.0 } }
 
                         # Final chance = base 0.0 + trait bonuses + intrigue bonus, clamp to [0,100]
                         set_variable = { name = rf_adventurer_final_chance value = 0.0 }
