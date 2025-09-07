@@ -151,10 +151,16 @@
                                 remove_variable = rf_opinion_value_raw
                             }
                         }
-                    # If we selected a claim target and the holder has low legitimacy, increase chance
+                    # Track legitimacy multiplier for tooltip (default 1; set 2 if low legitimacy)
+                    set_variable = { name = rf_legitimacy_multiplier value = 1.0 }
+                    # If we selected a claim target and the holder has low legitimacy, increase chance and record multiplier
                     if = {
                         limit = { exists = scope:claim_target_title.holder }
-                        if = { limit = { scope:claim_target_title.holder = { legitimacy_level < 3 } } change_variable = { name = rf_adventurer_final_chance multiply = 2 } }
+                        if = {
+                            limit = { scope:claim_target_title.holder = { legitimacy_level < 3 } }
+                            set_variable = { name = rf_legitimacy_multiplier value = 2.0 }
+                            change_variable = { name = rf_adventurer_final_chance multiply = var:rf_legitimacy_multiplier }
+                        }
                     }
                     clamp_variable = { name = rf_adventurer_final_chance min = 0 max = 100 }
 
