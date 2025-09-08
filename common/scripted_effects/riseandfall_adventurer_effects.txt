@@ -2,158 +2,152 @@
     # Called from on_action with the iterated character saved as `candidate`.
     # Tight guard: ensure scope:candidate exists and is a character before doing any character-scoped checks.
     if = {
-        limit = { exists = scope:candidate scope:candidate = { is_character = yes } }
+        limit = {
+            exists = scope:candidate
+            scope:candidate = { is_character = yes }
+        }
         # Operate directly on scope:candidate (not every_dynasty_member). Some characters do not have a dynasty.
         # Scope list: scope:candidate is the person we're testing; independent_ruler will be set to the claim holder when found.
         scope:candidate = {
             # Save the candidate for inner reference
             save_scope_as = candidate
-
             if = {
                 limit = {
-                is_alive = yes
-                is_landed = no
-                is_imprisoned = no
-                NOT = { has_government = landless_adventurer_government }
-
-                # Exclude noble-family title holders (landless playable noble families)
-                NOT = { scope:candidate = { any_held_title = { is_noble_family_title = yes } } }
-
-                # Exclude religious/scholarly characters who should not become adventurers
-                NOT = { OR = { scope:candidate = { has_trait = incapable } scope:candidate = { has_trait = craven } scope:candidate = { has_character_flag = can_not_marry } } }
-
-                age >= 16
-                # Only qualify if they have a claim on an independent ruler title (we'll validate the holder after selection)
-                any_claim = { tier >= tier_kingdom holder = { is_independent_ruler = yes } }
-            }
-
-            # Determine a claim target title and disqualify if candidate is allied/spouse/too-positive toward that claim holder
-            set_variable = { name = rf_disqualify value = 0 }
-            if = {
-                limit = { any_claim = { tier >= tier_kingdom holder = { is_independent_ruler = yes } } }
-                random_claim = {
-                    limit = { tier >= tier_kingdom holder = { is_independent_ruler = yes } }
-                    save_scope_as = claim_target_title
+                    is_alive = yes
+                    is_landed = no
+                    is_imprisoned = no
+                    NOT = { has_government = landless_adventurer_government }
+                    # Exclude noble-family title holders (landless playable noble families)
+                    NOT = { scope:candidate = { any_held_title = { is_noble_family_title = yes } } }
+                    # Exclude religious/scholarly/content characters who should not become adventurers
+                    NOT = {
+                        OR = {
+                            scope:candidate = { has_trait = incapable }
+                            scope:candidate = { has_trait = craven }
+                            scope:candidate = { has_trait = content }
+                            scope:candidate = { has_character_flag = can_not_marry }
+                        }
+                    }
+                    age >= 16
+                    # Only qualify if they have a claim on an independent ruler title (we'll validate the holder after selection)
+                    any_claim = { tier >= tier_kingdom holder = { is_independent_ruler = yes } }
                 }
-
-                # If the selected claim has a valid holder, save that holder for later comparisons
-                if = { limit = { exists = scope:claim_target_title.holder } scope:claim_target_title.holder = { save_scope_as = independent_ruler } }
-
-                # If the selected claim has a valid holder, check relationships and disqualify if needed.
-                # Special rule: if the holder is very old (>100), only spouse and heir relations should disqualify.
+                # Determine a claim target title and disqualify if candidate is allied/spouse/too-positive toward that claim holder
+                set_variable = { name = rf_disqualify value = 0 }
                 if = {
-                    limit = { exists = scope:claim_target_title.holder }
-
-                    # If holder is age <= 100 use full relationship checks
+                    limit = { any_claim = { tier >= tier_kingdom holder = { is_independent_ruler = yes } } }
+                    random_claim = {
+                        limit = { tier >= tier_kingdom holder = { is_independent_ruler = yes } }
+                        save_scope_as = claim_target_title
+                    }
+                    # If the selected claim has a valid holder, save that holder for later comparisons
+                    if = { limit = { exists = scope:claim_target_title.holder } scope:claim_target_title.holder = { save_scope_as = independent_ruler } }
+                    # If the selected claim has a valid holder, check relationships and disqualify if needed.
+                    # Special rule: if the holder is very old (>100), only spouse and heir relations should disqualify.
                     if = {
-                        limit = { scope:claim_target_title.holder = { age <= 100 } }
+                        limit = { exists = scope:claim_target_title.holder }
+                        # If holder is age <= 100 use full relationship checks
                         if = {
-                            limit = { OR = {
-                                is_allied_to = scope:claim_target_title.holder
-                                is_spouse_of = scope:claim_target_title.holder
-                                is_heir_of = scope:claim_target_title.holder
-                                is_primary_heir_of = scope:claim_target_title.holder
-                                is_player_heir_of = scope:claim_target_title.holder
-                            } }
-                            set_variable = { name = rf_disqualify value = 1 }
+                            limit = { scope:claim_target_title.holder = { age <= 100 } }
+                            if = {
+                                limit = {
+                                    OR = {
+                                        is_allied_to = scope:claim_target_title.holder
+                                        is_spouse_of = scope:claim_target_title.holder
+                                        is_heir_of = scope:claim_target_title.holder
+                                        is_primary_heir_of = scope:claim_target_title.holder
+                                        is_player_heir_of = scope:claim_target_title.holder
+                                    }
+                                }
+                                set_variable = { name = rf_disqualify value = 1 }
+                            }
                         }
                     }
                 }
-            }
-
-            # Roll for adventurer creation only if not disqualified
-            if = {
-                limit = { var:rf_disqualify = 0 }
-
-                # Base chance is 0.5%; trait bonuses: dragonrider +2.0%, ambitious +2.0%, brave +1.0%
-                # Use explicit floats so the engine performs fractional math correctly.
-                set_variable = { name = rf_adventurer_trait_chance value = 0.0 }
-                if = { limit = { scope:candidate = { has_trait = dragonrider } } change_variable = { name = rf_adventurer_trait_chance add = 2.0 } }
-                if = { limit = { scope:candidate = { has_trait = ambitious } } change_variable = { name = rf_adventurer_trait_chance add = 2.0 } }
-
-                # Final chance = base 0.0 + trait bonuses + intrigue bonus, clamp to [0,100]
-                set_variable = { name = rf_adventurer_final_chance value = 0.0 }
-                set_variable = { name = rf_opinion_bonus value = 0.0 }
-                change_variable = { name = rf_adventurer_final_chance add = var:rf_adventurer_trait_chance }
-                # Add intrigue bonus: intrigue * 0.1 (e.g., 10 intrigue = +1.0 -> 2 intrigue = +0.2)
-                set_variable = { name = intrigue_bonus value = scope:candidate.intrigue }
-                change_variable = { name = intrigue_bonus multiply = 0.1 }
-                change_variable = { name = rf_adventurer_final_chance add = var:intrigue_bonus }
-
-                # Opinion scaling: if we selected a claim target and it has a holder,
-                # map the candidate's opinion of the holder into a signed raw value where
-                # positive opinion reduces chance (negative raw), and negative opinion
-                # increases chance (positive raw). This keeps math explicit and avoids
-                # relying on raw negative arithmetic elsewhere.
+                # Roll for adventurer creation only if not disqualified
                 if = {
-                    limit = { exists = scope:claim_target_title.holder }
-                    scope:candidate = {
-                        set_variable = { name = rf_opinion_value_raw value = 0 }
-                        # Small reductions for modest positive opinion (1..74) so good-but-not-great
-                        # feelings slightly reduce the chance; stepped mapping keeps behavior predictable.
-                        if = { limit = { opinion = { target = scope:claim_target_title.holder value >= 75 } } set_variable = { name = rf_opinion_value_raw value = -75 } }
-                        else_if = { limit = { opinion = { target = scope:claim_target_title.holder value >= 50 } } set_variable = { name = rf_opinion_value_raw value = -30 } }
-                        else_if = { limit = { opinion = { target = scope:claim_target_title.holder value >= 25 } } set_variable = { name = rf_opinion_value_raw value = -15 } }
-                        else_if = { limit = { opinion = { target = scope:claim_target_title.holder value >= 1 } } set_variable = { name = rf_opinion_value_raw value = -5 } }
-
-                        # Negative opinions -> positive raw values (increase chance)
-                        else_if = { limit = { opinion = { target = scope:claim_target_title.holder value <= -75 } } set_variable = { name = rf_opinion_value_raw value = 75 } }
-                        else_if = { limit = { opinion = { target = scope:claim_target_title.holder value <= -50 } } set_variable = { name = rf_opinion_value_raw value = 50 } }
-                        else_if = { limit = { opinion = { target = scope:claim_target_title.holder value <= -25 } } set_variable = { name = rf_opinion_value_raw value = 25 } }
-                        else_if = { limit = { opinion = { target = scope:claim_target_title.holder value <= -1 } } set_variable = { name = rf_opinion_value_raw value = 10 } }
-                        # If opinion is exactly 0, rf_opinion_value_raw remains 0
-                    }
-
-                    # Apply opinion safely:
+                    limit = { var:rf_disqualify = 0 }
+                    # Base chance is 0.5%; trait bonuses/penalties: dragonrider +2.0%, ambitious +2.0%, deceitful +1.0%, brave +1.0%, lazy -0.5%
+                    # Use explicit floats so the engine performs fractional math correctly.
+                    set_variable = { name = rf_adventurer_trait_chance value = 0.0 }
+                    if = { limit = { scope:candidate = { has_trait = dragonrider } } change_variable = { name = rf_adventurer_trait_chance add = 2.0 } }
+                    if = { limit = { scope:candidate = { has_trait = ambitious } } change_variable = { name = rf_adventurer_trait_chance add = 2.0 } }
+                    if = { limit = { scope:candidate = { has_trait = deceitful } } change_variable = { name = rf_adventurer_trait_chance add = 1.0 } }
+                    if = { limit = { scope:candidate = { has_trait = lazy } } change_variable = { name = rf_adventurer_trait_chance add = -0.5 } }
+                    # Final chance = base 0.0 + trait bonuses + intrigue bonus, clamp to [0,100]
+                    set_variable = { name = rf_adventurer_final_chance value = 0.0 }
+                    set_variable = { name = rf_opinion_bonus value = 0.0 }
+                    change_variable = { name = rf_adventurer_final_chance add = var:rf_adventurer_trait_chance }
+                    # Add intrigue bonus: intrigue * 0.1 (e.g., 10 intrigue = +1.0 -> 2 intrigue = +0.2)
+                    set_variable = { name = intrigue_bonus value = scope:candidate.intrigue }
+                    change_variable = { name = intrigue_bonus multiply = 0.1 }
+                    change_variable = { name = rf_adventurer_final_chance add = var:intrigue_bonus }
+                    # Opinion scaling: if we selected a claim target and it has a holder,
+                    # map the candidate's opinion of the holder into a signed raw value where
+                    # positive opinion reduces chance (negative raw), and negative opinion
+                    # increases chance (positive raw). This keeps math explicit and avoids
+                    # relying on raw negative arithmetic elsewhere.
                     if = {
-                        limit = { var:rf_opinion_value_raw > 0 }
-                        # Hatred increases chance
-                        set_variable = { name = rf_opinion_bonus value = var:rf_opinion_value_raw }
-                        change_variable = { name = rf_opinion_bonus multiply = 0.02 }
-                        change_variable = { name = rf_adventurer_final_chance add = var:rf_opinion_bonus }
-                        remove_variable = rf_opinion_value_raw
+                        limit = { exists = scope:claim_target_title.holder }
+                        scope:candidate = {
+                            set_variable = { name = rf_opinion_value_raw value = 0 }
+                            # Small reductions for modest positive opinion (1..74) so good-but-not-great
+                            # feelings slightly reduce the chance; stepped mapping keeps behavior predictable.
+                            if = { limit = { opinion = { target = scope:claim_target_title.holder value >= 75 } } set_variable = { name = rf_opinion_value_raw value = -75 } }
+                            else_if = { limit = { opinion = { target = scope:claim_target_title.holder value >= 50 } } set_variable = { name = rf_opinion_value_raw value = -30 } }
+                            else_if = { limit = { opinion = { target = scope:claim_target_title.holder value >= 25 } } set_variable = { name = rf_opinion_value_raw value = -15 } }
+                            else_if = { limit = { opinion = { target = scope:claim_target_title.holder value >= 1 } } set_variable = { name = rf_opinion_value_raw value = -5 } }
+                            # Negative opinions -> positive raw values (increase chance)
+                            else_if = { limit = { opinion = { target = scope:claim_target_title.holder value <= -75 } } set_variable = { name = rf_opinion_value_raw value = 75 } }
+                            else_if = { limit = { opinion = { target = scope:claim_target_title.holder value <= -50 } } set_variable = { name = rf_opinion_value_raw value = 50 } }
+                            else_if = { limit = { opinion = { target = scope:claim_target_title.holder value <= -25 } } set_variable = { name = rf_opinion_value_raw value = 25 } }
+                            else_if = { limit = { opinion = { target = scope:claim_target_title.holder value <= -1 } } set_variable = { name = rf_opinion_value_raw value = 10 } }
+                            # If opinion is exactly 0, rf_opinion_value_raw remains 0
+                        }
+                        # Apply opinion safely:
+                        if = {
+                            limit = { var:rf_opinion_value_raw > 0 }
+                            # Hatred increases chance
+                            set_variable = { name = rf_opinion_bonus value = var:rf_opinion_value_raw }
+                            change_variable = { name = rf_opinion_bonus multiply = 0.02 }
+                            change_variable = { name = rf_adventurer_final_chance add = var:rf_opinion_bonus }
+                            remove_variable = rf_opinion_value_raw
+                        }
+                        else = {
+                            limit = { var:rf_opinion_value_raw < 0 }
+                            # Goodwill reduces chance: make reduction = abs(raw) * 0.02, clamp to 0.9 max
+                            set_variable = { name = rf_op_reduction value = var:rf_opinion_value_raw }
+                            change_variable = { name = rf_op_reduction multiply = -1 }
+                            change_variable = { name = rf_op_reduction multiply = 0.02 }
+                            clamp_variable = { name = rf_op_reduction min = 0 max = 0.9 }
+                            # Build multiplier = 1 - reduction safely: multiplier = rf_op_reduction * -1; add 1
+                            set_variable = { name = rf_opinion_multiplier value = var:rf_op_reduction }
+                            change_variable = { name = rf_opinion_multiplier multiply = -1 }
+                            change_variable = { name = rf_opinion_multiplier add = 1 }
+                            change_variable = { name = rf_adventurer_final_chance multiply = var:rf_opinion_multiplier }
+                            remove_variable = rf_op_reduction
+                            remove_variable = rf_opinion_value_raw
+                        }
                     }
-                    else = {
-                        limit = { var:rf_opinion_value_raw < 0 }
-                        # Goodwill reduces chance: make reduction = abs(raw) * 0.02, clamp to 0.9 max
-                        set_variable = { name = rf_op_reduction value = var:rf_opinion_value_raw }
-                        change_variable = { name = rf_op_reduction multiply = -1 }
-                        change_variable = { name = rf_op_reduction multiply = 0.02 }
-                        clamp_variable = { name = rf_op_reduction min = 0 max = 0.9 }
-
-                        # Build multiplier = 1 - reduction safely: multiplier = rf_op_reduction * -1; add 1
-                        set_variable = { name = rf_opinion_multiplier value = var:rf_op_reduction }
-                        change_variable = { name = rf_opinion_multiplier multiply = -1 }
-                        change_variable = { name = rf_opinion_multiplier add = 1 }
-
-                        change_variable = { name = rf_adventurer_final_chance multiply = var:rf_opinion_multiplier }
-
-                        remove_variable = rf_op_reduction
-                        remove_variable = rf_opinion_value_raw
-                    }
-                }
-
-                # Track legitimacy multiplier for tooltip (default 1; set 2 if low legitimacy)
-                set_variable = { name = rf_legitimacy_multiplier value = 1.0 }
-                if = {
-                    limit = { exists = scope:claim_target_title.holder }
+                    # Track legitimacy multiplier for tooltip (default 1; set 2 if low legitimacy)
+                    set_variable = { name = rf_legitimacy_multiplier value = 1.0 }
                     if = {
-                        limit = { scope:claim_target_title.holder = { has_legitimacy = yes legitimacy_level < 3 } }
-                        set_variable = { name = rf_legitimacy_multiplier value = 2.0 }
-                        change_variable = { name = rf_adventurer_final_chance multiply = var:rf_legitimacy_multiplier }
+                        limit = { exists = scope:claim_target_title.holder }
+                        if = {
+                            limit = { scope:claim_target_title.holder = { has_legitimacy = yes legitimacy_level < 3 } }
+                            set_variable = { name = rf_legitimacy_multiplier value = 2.0 }
+                            change_variable = { name = rf_adventurer_final_chance multiply = var:rf_legitimacy_multiplier }
+                        }
+                    }
+                    clamp_variable = { name = rf_adventurer_final_chance min = 0 max = 100 }
+                    random = {
+                        chance = var:rf_adventurer_final_chance
+                        hidden_effect = {
+                            riseandfall_do_create_adventurer_se = yes
+                        }
                     }
                 }
-                clamp_variable = { name = rf_adventurer_final_chance min = 0 max = 100 }
-
-                random = {
-                    chance = var:rf_adventurer_final_chance
-                    hidden_effect = {
-                        riseandfall_do_create_adventurer_se = yes
-                    }
-                }
-            }
-
-            remove_variable = rf_disqualify
+                remove_variable = rf_disqualify
             }
         }
     }
