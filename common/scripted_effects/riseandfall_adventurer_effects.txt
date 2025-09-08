@@ -569,4 +569,11 @@ riseandfall_adventurer_quarterly_income_se = {
 }
 
 
-
+riseandfall_yearly_adventurer_remove_variable_se = {
+    remove_variable = rf_opinion_multiplier
+    remove_variable = rf_legitimacy_multiplier
+    remove_variable = rf_adventurer_trait_chance
+    remove_variable = rf_adventurer_final_chance
+    remove_variable = intrigue_bonus
+    remove_variable = rf_opinion_bonus
+}

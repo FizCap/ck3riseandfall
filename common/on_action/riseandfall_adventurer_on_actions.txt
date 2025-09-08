@@ -6,6 +6,7 @@
         riseandfall_marry_female_target_se
         riseandfall_yearly_adventurer_press_claims
         riseandfall_yearly_adventurer_cleanup_on_action
+        riseandfall_yearly_adventurer_remove_variable
     }
 }
 
@@ -27,6 +28,17 @@ riseandfall_yearly_adventurer = {
             # Call the check effect which will operate using scope:candidate and will
             # set `independent_ruler` where needed for the claim holder.
             riseandfall_check_dynasty_for_adventurers_se = yes
+        }
+    }
+}
+
+riseandfall_yearly_adventurer_remove_variable = {
+    trigger = {
+        has_game_rule = riseandfall_adventurer_creator_enabled
+    }
+    effect = {
+        every_ruler = {
+            riseandfall_yearly_adventurer_remove_variable_se = yes
         }
     }
 }
