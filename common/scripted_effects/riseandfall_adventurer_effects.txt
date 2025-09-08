@@ -2,10 +2,6 @@
     # Called from on_action with the iterated character saved as `candidate`.
     # Tight guard: ensure scope:candidate exists and is a character before doing any character-scoped checks.
     if = {
-        limit = {
-            exists = scope:candidate
-            scope:candidate = { is_character = yes }
-        }
         # Operate directly on scope:candidate (not every_dynasty_member). Some characters do not have a dynasty.
         # Scope list: scope:candidate is the person we're testing; independent_ruler will be set to the claim holder when found.
         scope:candidate = {

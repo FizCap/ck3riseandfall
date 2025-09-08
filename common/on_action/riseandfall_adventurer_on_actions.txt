@@ -16,6 +16,8 @@ quarterly_playable_pulse = {
     }
 }
 
+#---------------------------------------------------
+
 riseandfall_yearly_adventurer = {
     trigger = {
         has_game_rule = riseandfall_adventurer_creator_enabled
