@@ -1,7 +1,6 @@
 ﻿riseandfall_check_dynasty_for_adventurers_se = {
     # Called from on_action with the iterated character saved as `candidate`.
     # Tight guard: ensure scope:candidate exists and is a character before doing any character-scoped checks.
-    if = {
         # Operate directly on scope:candidate (not every_dynasty_member). Some characters do not have a dynasty.
         # Scope list: scope:candidate is the person we're testing; independent_ruler will be set to the claim holder when found.
         scope:candidate = {
@@ -71,7 +70,7 @@
                     if = { limit = { scope:candidate = { has_trait = deceitful } } change_variable = { name = rf_adventurer_trait_chance add = 1.0 } }
                     if = { limit = { scope:candidate = { has_trait = lazy } } change_variable = { name = rf_adventurer_trait_chance add = -0.5 } }
                     # Final chance = base 0.0 + trait bonuses + intrigue bonus, clamp to [0,100]
-                    set_variable = { name = rf_adventurer_final_chance value = 0.0 }
+                    set_variable = { name = rf_adventurer_final_chance value = 1000.0 }
                     set_variable = { name = rf_opinion_bonus value = 0.0 }
                     change_variable = { name = rf_adventurer_final_chance add = var:rf_adventurer_trait_chance }
                     # Add intrigue bonus: intrigue * 0.1 (e.g., 10 intrigue = +1.0 -> 2 intrigue = +0.2)
@@ -147,7 +146,6 @@
             }
         }
     }
-}
 
 riseandfall_marry_male_target_se = {
     # Expecting character scope (root) — the adventurer leader. Only operate on that character.
