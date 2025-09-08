@@ -1113,12 +1113,12 @@ window = {
 
 							icon = {
 								size = { 32 32 }
-								texture = "gfx/interface/icons/dynasty/legitimist_revolt.dds"
-								tooltip = "ADVENTURER_CHANCE_TOOLTIP"
+								texture = "gfx/interface/icons/icon_fervor.dds"
+								tooltip = "GOONER_ENERGY_TOOLTIP"
 							}
 
 							text_single = {
-								text = "[Character.MakeScope.Var('rf_adventurer_final_chance').GetValue|1]"
+								text = "[Character.MakeScope.Var('gooner_energy').GetValue|0]"
 								default_format = "#low"
 								align = nobaseline
 							}

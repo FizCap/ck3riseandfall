@@ -1,0 +1,28 @@
+﻿yearly_global_pulse = {
+    on_actions = {
+        riseandfall_gooner
+        riseandfall_gooner_energy
+    }
+}
+
+riseandfall_gooner = {
+    effect = {
+        every_ruler = {
+            limit = {
+                is_ai = no
+            }
+            riseandfall_gooner_effect = yes
+        }
+    }
+}
+
+riseandfall_gooner_energy = {
+    effect = {
+        every_ruler = {
+            limit = {
+                has_trait = gooner
+            }
+            riseandfall_gooner_energy_effect = yes
+        }
+    }
+}

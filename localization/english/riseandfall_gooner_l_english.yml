@@ -1,0 +1,11 @@
+﻿l_english:
+ gooner.1001.t: "Boredom Strikes"
+ gooner.1001.d: "I am feeling bored, what should I do?"
+ gooner.1001.a: "Crank the hog"
+ gooner.1001.b: "Stay bored"
+ trait_gooner:0 "Gooner"
+ trait_gooner_desc:0 "A character who has embraced the gooner lifestyle, finding endless entertainment in their chosen pursuits."
+ GOONER_ENERGY_TOOLTIP:0 "Gooner Energy\nThe magical energy accumulated by gooner characters. Increases over time and represents their special powers."
+ riseandfall_gooner_summon_companion:0 "Summon Mystical Companion"
+ riseandfall_gooner_summon_companion_desc:0 "Using your accumulated gooner energy, you can summon a mystical female companion to join your court. This will consume 2 gooner energy."
+ riseandfall_gooner_summon_companion_tooltip:0 "Summon a female companion with random positive traits to your court.\nCost: 2 Gooner Energy\nCurrent Energy: [Character.MakeScope.Var('gooner_energy').GetValue|0]"

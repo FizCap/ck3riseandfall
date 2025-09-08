@@ -1,0 +1,18 @@
+﻿riseandfall_gooner_effect = {
+    trigger_event = {
+        id = gooner.1001
+    }
+}
+
+riseandfall_gooner_energy_effect = {
+    # Only initialize gooner_energy variable if it doesn't exist
+    if = {
+        limit = { NOT = { has_variable = gooner_energy } }
+        set_variable = { name = gooner_energy value = 0 }
+    }
+    # Then add 10 energy
+    change_variable = {
+        name = gooner_energy
+        add = 10
+    }
+}

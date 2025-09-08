@@ -141,3 +141,5 @@ riseandfall_yearly_adventurer_cleanup_on_action = {
             riseandfall_adventurer_cleanup_se = yes
         }
     }
+
+

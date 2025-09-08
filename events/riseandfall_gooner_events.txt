@@ -1,0 +1,17 @@
+﻿namespace = gooner
+
+gooner.1001 = {
+    type = character_event
+    title = gooner.1001.t
+    desc = gooner.1001.d
+
+    option = {
+        name = gooner.1001.a
+        add_trait = gooner
+    }
+
+    option = {
+        name = gooner.1001.b
+        # Do nothing
+    }
+}

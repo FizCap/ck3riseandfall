@@ -1,0 +1,71 @@
+# Gooner Magic System Decisions
+
+# Decision to summon a female companion using gooner energy
+riseandfall_gooner_summon_companion = {
+    picture = {
+        reference = "gfx/interface/illustrations/decisions/decision_misc.dds"
+    }
+    sort_order = 200
+    desc = riseandfall_gooner_summon_companion_desc
+    selection_tooltip = riseandfall_gooner_summon_companion_tooltip
+    decision_group_type = admin
+
+    is_shown = {
+        has_trait = gooner
+        has_variable = gooner_energy
+        var:gooner_energy >= 2
+    }
+
+    is_valid = {
+        has_trait = gooner
+        has_variable = gooner_energy
+        var:gooner_energy >= 2
+    }
+
+    effect = {
+        # Consume 2 gooner energy
+        change_variable = {
+            name = gooner_energy
+            add = -2
+        }
+
+        # Create female companion in court
+        create_character = {
+            employer = root
+            location = root.capital_province
+            culture = root.culture
+            faith = root.faith
+            age = { 18 25 }
+            gender = female
+            diplomacy = { 5 15 }
+            martial = { 5 15 }
+            stewardship = { 5 15 }
+            intrigue = { 5 15 }
+            learning = { 5 15 }
+            prowess = { 5 15 }
+            save_scope_as = gooner_companion
+        }
+
+        # Add some flavor traits to make her interesting
+        scope:gooner_companion = {
+            random_list = {
+                20 = { add_trait = beauty_good }
+                15 = { add_trait = patient }
+                15 = { add_trait = ambitious }
+                10 = { add_trait = gregarious }
+                10 = { add_trait = scholarly }
+                10 = { add_trait = mystic }
+                10 = { add_trait = brave }
+                10 = { add_trait = diligent }
+            }
+        }
+    }
+
+    ai_potential = {
+        factor = 0  # AI shouldn't use this magical ability
+    }
+
+    ai_will_do = {
+        base = 0
+    }
+}

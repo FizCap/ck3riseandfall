@@ -24,3 +24,12 @@ retiredwarlord = {
 	shown_in_ruler_designer = no
 
 }
+
+
+gooner = {
+	category = fame
+
+
+	shown_in_ruler_designer = no
+
+}
