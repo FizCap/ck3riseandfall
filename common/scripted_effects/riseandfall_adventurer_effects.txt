@@ -8,7 +8,6 @@
             save_scope_as = candidate
             if = {
                 limit = {
-                    is_alive = yes
                     is_landed = no
                     is_imprisoned = no
                     NOT = { has_government = landless_adventurer_government }
@@ -259,8 +258,8 @@ riseandfall_do_create_adventurer_se = {
             # Determine base levies defensively: prefer claim holder, then independent_ruler, then a small default.
             if = {
                 limit = { exists = scope:claim_target_title.holder }
-                # Defensive: ensure holder is a character before accessing military stats
-                if = { limit = { scope:claim_target_title.holder = { is_character = yes } } set_variable = { name = adventurer_base_levies value = scope:claim_target_title.holder.max_military_strength } }
+                # Defensive: ensure holder is a (living) character before accessing military stats
+                if = { limit = { scope:claim_target_title.holder = { is_alive = yes } } set_variable = { name = adventurer_base_levies value = scope:claim_target_title.holder.max_military_strength } }
             }
             else_if = {
                 limit = { exists = scope:independent_ruler }
@@ -527,8 +526,8 @@ riseandfall_adventurer_quarterly_income_se = {
             limit = { exists = scope:claim_target_title }
             if = {
                 limit = { exists = scope:claim_target_title.holder }
-                # Defensive: ensure holder is a character before reading properties
-                if = { limit = { scope:claim_target_title.holder = { is_character = yes } }
+                # Defensive: ensure holder is a (living) character before reading properties
+                if = { limit = { scope:claim_target_title.holder = { is_alive = yes } }
                     # Base monthly from holder
                     set_variable = { name = rf_holder_monthly value = scope:claim_target_title.holder.monthly_character_income }
                 }
