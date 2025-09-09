@@ -6,5 +6,5 @@ tags={
 }
 name="Rise and Fall"
 picture="thumbnail.png"
-supported_version="1.16.2.3"
+supported_version="1.17.0"
 remote_file_id="3554844335"
