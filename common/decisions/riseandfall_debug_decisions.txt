@@ -43,4 +43,34 @@
         }
     }
 
+    # Developer debug decision: fire low stability random event for testing
+    riseandfall_debug_fire_low_stability_event = {
+        picture = {
+            reference = "gfx/interface/illustrations/decisions/decision_misc.dds"
+        }
+        sort_order = 101
+        desc = riseandfall_debug_fire_low_stability_event_desc
+        selection_tooltip = riseandfall_debug_fire_low_stability_event_tooltip
+        decision_group_type = admin
+
+        is_shown = {
+            always = no
+        }
+
+        is_valid = {
+            always = yes
+        }
+
+        effect = {
+            riseandfall_low_stability_random_event = yes
+        }
+
+        ai_potential = {
+        }
+
+        ai_will_do = {
+            base = 0
+        }
+    }
+
 
