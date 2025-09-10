@@ -1,4 +1,4 @@
-adventurer_claim_cb = {
+﻿adventurer_claim_cb = {
     icon = claim_cb
     group = claim
     # Minor change from vanilla: allow landless adventurer attackers to press multiple claims
