@@ -294,6 +294,7 @@ Project-specific conventions and patterns
 - Scope-first: consult `docs/event_scopes.log` for scope tokens (char, lt, prov, etc.) — many silent failures are mis-scoped triggers.
 - Localization-first: every UI/event key (title/desc/option) must be present under `localization/english/*.yml` using `l_english:` header; missing keys render as raw identifiers in-game.
 - Use `docs/*.log` as the primary reference when choosing triggers/effects; they reflect the local engine surface the mod targets.
+- Variables from other scripted effects or mods: use `var:` to track variables that are not in the current scripted effect.
 
 Critical developer workflows
 - Edit → test in-game: no compile step. Reload the mod in CK3 and test minimal repros for events and triggers.

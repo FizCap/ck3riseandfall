@@ -3,29 +3,28 @@
     # Tight guard: ensure scope:candidate exists and is a character before doing any character-scoped checks.
         # Operate directly on scope:candidate (not every_dynasty_member). Some characters do not have a dynasty.
         # Scope list: scope:candidate is the person we're testing; independent_ruler will be set to the claim holder when found.
-        scope:candidate = {
-            # Save the candidate for inner reference
-            save_scope_as = candidate
-            if = {
-                limit = {
-                    is_landed = no
-                    is_imprisoned = no
-                    NOT = { has_government = landless_adventurer_government }
-                    # Exclude noble-family title holders (landless playable noble families)
-                    NOT = { scope:candidate = { any_held_title = { is_noble_family_title = yes } } }
-                    # Exclude religious/scholarly/content characters who should not become adventurers
-                    NOT = {
-                        OR = {
-                            scope:candidate = { has_trait = incapable }
-                            scope:candidate = { has_trait = craven }
-                            scope:candidate = { has_trait = content }
-                            scope:candidate = { has_character_flag = can_not_marry }
-                        }
+        # Save the candidate for inner reference
+        save_scope_as = candidate
+        if = {
+            limit = {
+                is_landed = no
+                is_imprisoned = no
+                NOT = { has_government = landless_adventurer_government }
+                # Exclude noble-family title holders (landless playable noble families)
+                NOT = { any_held_title = { is_noble_family_title = yes } }
+                # Exclude religious/scholarly/content characters who should not become adventurers
+                NOT = {
+                    OR = {
+                        has_trait = incapable
+                        has_trait = craven
+                        has_trait = content
+                        has_character_flag = can_not_marry
                     }
-                    age >= 16
-                    # Only qualify if they have a claim on a kingdom+ title (holder validation happens after selection)
-                    any_claim = { tier >= tier_kingdom }
                 }
+                age >= 16
+                # Only qualify if they have a claim on a kingdom+ title (holder validation happens after selection)
+                any_claim = { tier >= tier_kingdom }
+            }
                 # Determine a claim target title and disqualify if candidate is allied/spouse/too-positive toward that claim holder
                 set_variable = { name = rf_disqualify value = 0 }
                 if = {
@@ -64,16 +63,16 @@
                     # Base chance is 0.5%; trait bonuses/penalties: dragonrider +2.0%, ambitious +2.0%, deceitful +1.0%, brave +1.0%, lazy -0.5%
                     # Use explicit floats so the engine performs fractional math correctly.
                     set_variable = { name = rf_adventurer_trait_chance value = 0.0 }
-                    if = { limit = { scope:candidate = { has_trait = dragonrider } } change_variable = { name = rf_adventurer_trait_chance add = 2.0 } }
-                    if = { limit = { scope:candidate = { has_trait = ambitious } } change_variable = { name = rf_adventurer_trait_chance add = 2.0 } }
-                    if = { limit = { scope:candidate = { has_trait = deceitful } } change_variable = { name = rf_adventurer_trait_chance add = 1.0 } }
-                    if = { limit = { scope:candidate = { has_trait = lazy } } change_variable = { name = rf_adventurer_trait_chance add = -0.5 } }
+                    if = { limit = { has_trait = dragonrider } change_variable = { name = rf_adventurer_trait_chance add = 2.0 } }
+                    if = { limit = { has_trait = ambitious } change_variable = { name = rf_adventurer_trait_chance add = 2.0 } }
+                    if = { limit = { has_trait = deceitful } change_variable = { name = rf_adventurer_trait_chance add = 1.0 } }
+                    if = { limit = { has_trait = lazy } change_variable = { name = rf_adventurer_trait_chance add = -0.5 } }
                     # Final chance = base 0.0 + trait bonuses + intrigue bonus, clamp to [0,100]
                     set_variable = { name = rf_adventurer_final_chance value = 0.0 }
                     set_variable = { name = rf_opinion_bonus value = 0.0 }
                     change_variable = { name = rf_adventurer_final_chance add = var:rf_adventurer_trait_chance }
                     # Add intrigue bonus: intrigue * 0.1 (e.g., 10 intrigue = +1.0 -> 2 intrigue = +0.2)
-                    set_variable = { name = intrigue_bonus value = scope:candidate.intrigue }
+                    set_variable = { name = intrigue_bonus value = intrigue }
                     change_variable = { name = intrigue_bonus multiply = 0.1 }
                     change_variable = { name = rf_adventurer_final_chance add = var:intrigue_bonus }
                     # Opinion scaling: if we selected a claim target and it has a holder,
@@ -83,21 +82,19 @@
                     # relying on raw negative arithmetic elsewhere.
                     if = {
                         limit = { exists = scope:claim_target_title.holder }
-                        scope:candidate = {
-                            set_variable = { name = rf_opinion_value_raw value = 0 }
-                            # Small reductions for modest positive opinion (1..74) so good-but-not-great
-                            # feelings slightly reduce the chance; stepped mapping keeps behavior predictable.
-                            if = { limit = { opinion = { target = scope:claim_target_title.holder value >= 75 } } set_variable = { name = rf_opinion_value_raw value = -75 } }
-                            else_if = { limit = { opinion = { target = scope:claim_target_title.holder value >= 50 } } set_variable = { name = rf_opinion_value_raw value = -30 } }
-                            else_if = { limit = { opinion = { target = scope:claim_target_title.holder value >= 25 } } set_variable = { name = rf_opinion_value_raw value = -15 } }
-                            else_if = { limit = { opinion = { target = scope:claim_target_title.holder value >= 1 } } set_variable = { name = rf_opinion_value_raw value = -5 } }
-                            # Negative opinions -> positive raw values (increase chance)
-                            else_if = { limit = { opinion = { target = scope:claim_target_title.holder value <= -75 } } set_variable = { name = rf_opinion_value_raw value = 75 } }
-                            else_if = { limit = { opinion = { target = scope:claim_target_title.holder value <= -50 } } set_variable = { name = rf_opinion_value_raw value = 50 } }
-                            else_if = { limit = { opinion = { target = scope:claim_target_title.holder value <= -25 } } set_variable = { name = rf_opinion_value_raw value = 25 } }
-                            else_if = { limit = { opinion = { target = scope:claim_target_title.holder value <= -1 } } set_variable = { name = rf_opinion_value_raw value = 10 } }
-                            # If opinion is exactly 0, rf_opinion_value_raw remains 0
-                        }
+                        set_variable = { name = rf_opinion_value_raw value = 0 }
+                        # Small reductions for modest positive opinion (1..74) so good-but-not-great
+                        # feelings slightly reduce the chance; stepped mapping keeps behavior predictable.
+                        if = { limit = { opinion = { target = scope:claim_target_title.holder value >= 75 } } set_variable = { name = rf_opinion_value_raw value = -75 } }
+                        else_if = { limit = { opinion = { target = scope:claim_target_title.holder value >= 50 } } set_variable = { name = rf_opinion_value_raw value = -30 } }
+                        else_if = { limit = { opinion = { target = scope:claim_target_title.holder value >= 25 } } set_variable = { name = rf_opinion_value_raw value = -15 } }
+                        else_if = { limit = { opinion = { target = scope:claim_target_title.holder value >= 1 } } set_variable = { name = rf_opinion_value_raw value = -5 } }
+                        # Negative opinions -> positive raw values (increase chance)
+                        else_if = { limit = { opinion = { target = scope:claim_target_title.holder value <= -75 } } set_variable = { name = rf_opinion_value_raw value = 75 } }
+                        else_if = { limit = { opinion = { target = scope:claim_target_title.holder value <= -50 } } set_variable = { name = rf_opinion_value_raw value = 50 } }
+                        else_if = { limit = { opinion = { target = scope:claim_target_title.holder value <= -25 } } set_variable = { name = rf_opinion_value_raw value = 25 } }
+                        else_if = { limit = { opinion = { target = scope:claim_target_title.holder value <= -1 } } set_variable = { name = rf_opinion_value_raw value = 10 } }
+                        # If opinion is exactly 0, rf_opinion_value_raw remains 0
                         # Apply opinion safely:
                         if = {
                             limit = { var:rf_opinion_value_raw > 0 }
@@ -123,16 +120,34 @@
                             remove_variable = rf_opinion_value_raw
                         }
                     }
-                    # Track legitimacy multiplier for tooltip (default 1; set 2 if low legitimacy)
-                    set_variable = { name = rf_legitimacy_multiplier value = 1.0 }
+                    # Apply realm stability modifier instead of legitimacy (defensive math):
+                    # - 50 stability -> 0.00% change
+                    # - 0 stability  -> +0.50% chance (increase)
+                    # - 100 stability -> -0.50% chance (decrease)
+                    # rf_stability_modifier = (50 - holder_stability) * 0.01
+                    set_variable = { name = rf_stability_modifier value = 0.0 }
+                    # default holder stability = 50 (neutral)
+                    set_variable = { name = rf_holder_realm_stability value = 50 }
                     if = {
-                        limit = { exists = scope:claim_target_title.holder }
+                        limit = { exists = scope:claim_target_title }
                         if = {
-                            limit = { scope:claim_target_title.holder = { has_legitimacy = yes legitimacy_level < 3 } }
-                            set_variable = { name = rf_legitimacy_multiplier value = 2.0 }
-                            change_variable = { name = rf_adventurer_final_chance multiply = var:rf_legitimacy_multiplier }
+                            limit = { exists = scope:claim_target_title.holder }
+                            # Only read the holder's score if the holder actually has it
+                            if = { limit = { scope:claim_target_title.holder = { has_variable = riseandfall_realm_stability_score } } 
+                                set_variable = { name = rf_holder_realm_stability value = scope:claim_target_title.holder.var:riseandfall_realm_stability_score } 
+                            }
                         }
                     }
+                    # Compute difference = 50 - holder_stability safely
+                    set_variable = { name = rf_stability_diff value = var:rf_holder_realm_stability }
+                    change_variable = { name = rf_stability_diff multiply = -1 }
+                    change_variable = { name = rf_stability_diff add = 50 }
+                    # Convert to percent change (0.01 per point)
+                    set_variable = { name = rf_stability_modifier value = var:rf_stability_diff }
+                    change_variable = { name = rf_stability_modifier multiply = 0.01 }
+                    change_variable = { name = rf_adventurer_final_chance add = var:rf_stability_modifier }
+                    remove_variable = rf_stability_diff
+                    remove_variable = rf_holder_realm_stability
                     # Apply sex-based penalties based on the claim holder's realm laws.
                     # Compute holder law checks at this scope to avoid failed context switches;
                     # then switch into scope:candidate only to set the penalty variable.
@@ -142,22 +157,22 @@
                         # Male-only law: if the claim holder's realm forbids females, zero chance for female candidates
                         if = {
                             limit = { scope:claim_target_title.holder = { has_realm_law = male_only_law } }
-                            scope:candidate = { if = { limit = { is_female = yes } change_variable = { name = rf_sex_penalty add = -100 } } }
+                            if = { limit = { is_female = yes } change_variable = { name = rf_sex_penalty add = -100 } }
                         }
                         # Male-preference law: small penalty for female candidates
                         else_if = {
                             limit = { scope:claim_target_title.holder = { has_realm_law = male_preference_law } }
-                            scope:candidate = { if = { limit = { is_female = yes } change_variable = { name = rf_sex_penalty add = -1.0 } } }
+                            if = { limit = { is_female = yes } change_variable = { name = rf_sex_penalty add = -1.0 } }
                         }
                         # Female-only law: zero chance for male candidates
                         else_if = {
                             limit = { scope:claim_target_title.holder = { has_realm_law = female_only_law } }
-                            scope:candidate = { if = { limit = { is_male = yes } change_variable = { name = rf_sex_penalty add = -100 } } }
+                            if = { limit = { is_male = yes } change_variable = { name = rf_sex_penalty add = -100 } }
                         }
                         # Female-preference law: small penalty for male candidates
                         else_if = {
                             limit = { scope:claim_target_title.holder = { has_realm_law = female_preference_law } }
-                            scope:candidate = { if = { limit = { is_male = yes } change_variable = { name = rf_sex_penalty add = -1.0 } } }
+                            if = { limit = { is_male = yes } change_variable = { name = rf_sex_penalty add = -1.0 } }
                         }
 
                         # Apply the computed sex penalty to the final chance.
@@ -175,7 +190,6 @@
                 remove_variable = rf_disqualify
             }
         }
-    }
 
 riseandfall_marry_male_target_se = {
     # Expecting character scope (root) — the adventurer leader. Only operate on that character.
@@ -595,7 +609,7 @@ riseandfall_adventurer_quarterly_income_se = {
 
 riseandfall_yearly_adventurer_remove_variable_se = {
     remove_variable = rf_opinion_multiplier
-    remove_variable = rf_legitimacy_multiplier
+    remove_variable = rf_stability_modifier
     remove_variable = rf_adventurer_trait_chance
     remove_variable = rf_adventurer_final_chance
     remove_variable = intrigue_bonus
