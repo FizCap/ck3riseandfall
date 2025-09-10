@@ -12,15 +12,8 @@
                 NOT = { has_government = landless_adventurer_government }
                 # Exclude noble-family title holders (landless playable noble families)
                 NOT = { any_held_title = { is_noble_family_title = yes } }
-                # Exclude religious/scholarly/content characters who should not become adventurers
-                NOT = {
-                    OR = {
-                        has_trait = incapable
-                        has_trait = craven
-                        has_trait = content
-                        has_character_flag = can_not_marry
-                    }
-                }
+                # Exclude characters flagged as unable to marry; trait-based penalties are applied below
+                NOT = { has_character_flag = can_not_marry }
                 age >= 16
                 # Only qualify if they have a claim on a kingdom+ title (holder validation happens after selection)
                 any_claim = { tier >= tier_kingdom }
@@ -67,6 +60,10 @@
                     if = { limit = { has_trait = ambitious } change_variable = { name = rf_adventurer_trait_chance add = 2.0 } }
                     if = { limit = { has_trait = deceitful } change_variable = { name = rf_adventurer_trait_chance add = 1.0 } }
                     if = { limit = { has_trait = lazy } change_variable = { name = rf_adventurer_trait_chance add = -0.5 } }
+                    # Additional trait penalties: craven -2%, content -5%, incapable -10%
+                    if = { limit = { has_trait = craven } change_variable = { name = rf_adventurer_trait_chance add = -2.0 } }
+                    if = { limit = { has_trait = content } change_variable = { name = rf_adventurer_trait_chance add = -5.0 } }
+                    if = { limit = { has_trait = incapable } change_variable = { name = rf_adventurer_trait_chance add = -10.0 } }
                     # Final chance = base 0.0 + trait bonuses + intrigue bonus, clamp to [0,100]
                     set_variable = { name = rf_adventurer_final_chance value = 0.0 }
                     set_variable = { name = rf_opinion_bonus value = 0.0 }
@@ -147,7 +144,6 @@
                     change_variable = { name = rf_stability_modifier multiply = 0.01 }
                     change_variable = { name = rf_adventurer_final_chance add = var:rf_stability_modifier }
                     remove_variable = rf_stability_diff
-                    remove_variable = rf_holder_realm_stability
                     # Apply sex-based penalties based on the claim holder's realm laws.
                     # Compute holder law checks at this scope to avoid failed context switches;
                     # then switch into scope:candidate only to set the penalty variable.
