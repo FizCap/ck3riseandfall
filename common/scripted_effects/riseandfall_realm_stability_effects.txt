@@ -224,6 +224,20 @@ riseandfall_calculate_realm_stability_se = {
     set_variable = { name = riseandfall_realm_stability_realm_law_bonus value = var:riseandfall_rs_realm_law_component }
 
     ########################################
+    # 2.6) POPULAR OPINION (-10..10)
+    # Map ruler's county opinion (-100..100) to stability bonus (-10..10)
+    set_variable = { name = riseandfall_rs_popular_opinion_component value = 0 }
+    # Get the county opinion of the ruler
+    set_variable = { name = tmp_county_opinion value = capital_county.county_opinion }
+    # Divide by 10 to map -100..100 to -10..10
+    change_variable = { name = tmp_county_opinion divide = 10 }
+    set_variable = { name = riseandfall_rs_popular_opinion_component value = var:tmp_county_opinion }
+    # Clamp to ensure it's within bounds
+    clamp_variable = { name = riseandfall_rs_popular_opinion_component min = -10 max = 10 }
+    # Expose for tooltip
+    set_variable = { name = riseandfall_realm_stability_popular_opinion_bonus value = var:riseandfall_rs_popular_opinion_component }
+
+    ########################################
     # 3) VASSAL RELATIONS (30 points max)
     # Calculate average vassal opinion across every_vassal (including negative opinions)
     set_variable = { name = riseandfall_rs_vassals_component value = 0 }
@@ -288,12 +302,15 @@ riseandfall_calculate_realm_stability_se = {
     if = { limit = { NOT = { has_variable = riseandfall_rs_legitimacy_component } } set_variable = { name = riseandfall_rs_legitimacy_component value = 0 } }
     if = { limit = { NOT = { has_variable = riseandfall_rs_vassals_component } } set_variable = { name = riseandfall_rs_vassals_component value = 0 } }
     if = { limit = { NOT = { has_variable = riseandfall_rs_realm_law_component } } set_variable = { name = riseandfall_rs_realm_law_component value = 0 } }
+    if = { limit = { NOT = { has_variable = riseandfall_rs_popular_opinion_component } } set_variable = { name = riseandfall_rs_popular_opinion_component value = 0 } }
     set_variable = { name = tmp_target_score value = 0 }
     change_variable = { name = tmp_target_score add = var:riseandfall_rs_stats_component }
     change_variable = { name = tmp_target_score add = var:riseandfall_rs_legitimacy_component }
     change_variable = { name = tmp_target_score add = var:riseandfall_rs_vassals_component }
     # Add realm law component (0..20)
     change_variable = { name = tmp_target_score add = var:riseandfall_rs_realm_law_component }
+    # Add popular opinion component (-10..10)
+    change_variable = { name = tmp_target_score add = var:riseandfall_rs_popular_opinion_component }
 
     # Civil war adjustment applied to the TARGET score (so smoothing moves current toward
     # the penalized target) instead of modifying the persistent current score directly.
@@ -313,9 +330,9 @@ riseandfall_calculate_realm_stability_se = {
 
     # Compute cumulative penalty (years * -5), cap it at a minimum of -25, and subtract from tmp_target_score
     set_variable = { name = tmp_cw_total value = var:riseandfall_rs_civil_war_years }
-    change_variable = { name = tmp_cw_total multiply = -2 }
-    # Cap the civil war penalty so it never goes below -25
-    clamp_variable = { name = tmp_cw_total min = -25 max = 0 }
+    change_variable = { name = tmp_cw_total multiply = -3 }
+    # Cap the civil war penalty so it never goes below -50
+    clamp_variable = { name = tmp_cw_total min = -50 max = 0 }
     change_variable = { name = tmp_target_score add = var:tmp_cw_total }
     # store the displayed cumulative penalty for the tooltip
     set_variable = { name = riseandfall_realm_stability_civil_war_penalty value = var:tmp_cw_total }
@@ -463,6 +480,7 @@ riseandfall_calculate_realm_stability_se = {
 
 
     # Remove any previously-applied fine-grained stability modifiers (1..100)
+    remove_character_modifier = riseandfall_stability_0
     remove_character_modifier = riseandfall_stability_1
     remove_character_modifier = riseandfall_stability_2
     remove_character_modifier = riseandfall_stability_3
