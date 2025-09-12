@@ -224,16 +224,16 @@ riseandfall_calculate_realm_stability_se = {
     set_variable = { name = riseandfall_realm_stability_realm_law_bonus value = var:riseandfall_rs_realm_law_component }
 
     ########################################
-    # 2.6) POPULAR OPINION (-10..10)
-    # Map ruler's county opinion (-100..100) to stability bonus (-10..10)
+    # 2.6) POPULAR OPINION (-10..0)
+    # Map ruler's county opinion (-100..100) to stability bonus (-10..0)
     set_variable = { name = riseandfall_rs_popular_opinion_component value = 0 }
     # Get the county opinion of the ruler
     set_variable = { name = tmp_county_opinion value = capital_county.county_opinion }
     # Divide by 10 to map -100..100 to -10..10
     change_variable = { name = tmp_county_opinion divide = 10 }
     set_variable = { name = riseandfall_rs_popular_opinion_component value = var:tmp_county_opinion }
-    # Clamp to ensure it's within bounds
-    clamp_variable = { name = riseandfall_rs_popular_opinion_component min = -10 max = 10 }
+    # Clamp to ensure it's within bounds (-10..0, no positive bonus)
+    clamp_variable = { name = riseandfall_rs_popular_opinion_component min = -10 max = 0 }
     # Expose for tooltip
     set_variable = { name = riseandfall_realm_stability_popular_opinion_bonus value = var:riseandfall_rs_popular_opinion_component }
 
