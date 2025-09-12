@@ -11,7 +11,6 @@
 
 # Men-at-arms modifier rule
 rule_riseandfall_enable_mma_modifier:0 "Men-at-Arms Modifier"
-rule_riseandfall_enable_mma_modifier_desc:0 "Controls whether Rise and Fall applies a large men-at-arms modifier to every realm. Use with caution — it can be unbalanced."
 setting_riseandfall_mma_modifier_enabled:0 "Enabled"
 setting_riseandfall_mma_modifier_enabled_desc:0 "Apply the men-at-arms increase to all characters."
 setting_riseandfall_mma_modifier_disabled:0 "Disabled"
@@ -19,7 +18,6 @@ setting_riseandfall_mma_modifier_disabled_desc:0 "Does not give the men-at-arms 
 
 # Adventurer cleanup rule
 rule_riseandfall_enable_adventurer_cleanup:0 "Adventurer Cleanup"
-rule_riseandfall_enable_adventurer_cleanup_desc:0 "When enabled, the mod will automatically clean up adventurer titles it created after the founder's death to improve performance. Disable only if you have a very powerful PC or a small world; keeping this enabled is recommended."
 setting_riseandfall_adventurer_cleanup:0 "Enabled"
 setting_riseandfall_adventurer_cleanup_desc:0 "Cleanup of mod-created adventurer titles is active (recommended)."
 setting_riseandfall_adventurer_cleanup_disabled:0 "Disabled"
@@ -28,7 +26,6 @@ setting_riseandfall_adventurer_cleanup_disabled_desc:0 "Adventurer title cleanup
 
 # Realm Stability rule
 rule_riseandfall_enable_realm_stability:0 "Realm Stability"
-rule_riseandfall_enable_realm_stability_desc:0 "Toggle the Rise and Fall realm stability system."
 setting_riseandfall_realm_stability_enabled:0 "Enabled"
 setting_riseandfall_realm_stability_enabled_desc:0 "Realm stability is active; rulers receive a stability rating and corresponding flags."
 setting_riseandfall_realm_stability_disabled:0 "Disabled"
@@ -36,7 +33,6 @@ setting_riseandfall_realm_stability_disabled_desc:0 "Realm stability is inactive
 
 # Men-at-arms cap increase rule (administrative governments)
 rule_riseandfall_enable_mma_limit_modifier:0 "Men-at-Arms Cap Increase (Administrative Titles)"
-rule_riseandfall_enable_mma_limit_modifier_desc:0 "Controls whether Rise and Fall applies a yearly men-at-arms cap increase modifier to administrative governments. Use with caution — it may be unbalanced."
 setting_riseandfall_mma_limit_modifier_enabled:0 "Enabled"
 setting_riseandfall_mma_limit_modifier_enabled_desc:0 "Controls whether Rise and Fall applies a yearly men-at-arms cap increase modifier to administrative governments. Use with caution — it may be unbalanced."
 setting_riseandfall_mma_limit_modifier_disabled:0 "Disabled"
@@ -44,7 +40,6 @@ setting_riseandfall_mma_limit_modifier_disabled_desc:0 "Do not apply the men-at-
 
 # AI Kingdom Creation rule
 rule_riseandfall_enable_ai_kingdom_creation:0 "AI Title Creation"
-rule_riseandfall_enable_ai_kingdom_creation_desc:0 "Enable AI rulers to auto-create higher titles (counts → duchies, kings/emperors → kingdoms/empires) for better realm structure."
 setting_riseandfall_ai_kingdom_creation_enabled:0 "Enabled"
 setting_riseandfall_ai_kingdom_creation_enabled_desc:0 "AI rulers will auto-create higher-tier titles when possible (counts→duchies, kings→kingdoms, emperors→empires) to improve realm structure."
 setting_riseandfall_ai_kingdom_creation_disabled:0 "Disabled"
@@ -53,7 +48,6 @@ setting_riseandfall_ai_kingdom_creation_disabled_desc:0 "AI rulers will not auto
 
 # Interaction Stability (UI marker in interaction menu)
 rule_riseandfall_enable_interaction_stability:0 "Interaction Stability Marker"
-rule_riseandfall_enable_interaction_stability_desc:0 "Controls whether realm stability and adventurer chance markers appear in the character interaction menu. Recommended if other mods override or hide these UI elements in the main character window."
 setting_riseandfall_interaction_stability_enabled:0 "Enabled"
 setting_riseandfall_interaction_stability_enabled_desc:0 "Will put stability and adventurer chance markers in the character interaction menu (recommended if other mods override these UI elements in the character screen)."
 setting_riseandfall_interaction_stability_disabled:0 "Disabled"
@@ -61,7 +55,6 @@ setting_riseandfall_interaction_stability_disabled_desc:0 "Does not show stabili
 
 # Low Stability Events rule
 rule_riseandfall_low_stability_events:0 "Low Stability Events"
-rule_riseandfall_low_stability_events_desc:0 "When enabled, rulers with low realm stability will occasionally trigger disruptive events (warlords, uprisings, etc.). The chance increases as stability decreases, capped at 5% per year."
 setting_riseandfall_low_stability_events_enabled:0 "Enabled"
 setting_riseandfall_low_stability_events_enabled_desc:0 "Low stability events may occur each year for rulers with low stability."
 setting_riseandfall_low_stability_events_disabled:0 "Disabled"
@@ -69,7 +62,6 @@ setting_riseandfall_low_stability_events_disabled_desc:0 "Low stability events w
 
 # Adventurer Chance rule
 rule_riseandfall_adventurer_chance:0 "Adventurer Chance"
-rule_riseandfall_adventurer_chance_desc:0 "Controls the base chance for dynasty members to become adventurers."
 setting_riseandfall_adventurer_chance_low:0 "Low"
 setting_riseandfall_adventurer_chance_low_desc:0 "Low base chance (-1%) for adventurers."
 setting_riseandfall_adventurer_chance_medium:0 "Medium"
