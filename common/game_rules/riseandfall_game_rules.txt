@@ -124,6 +124,26 @@ riseandfall_low_stability_events = {
     }
 }
 
+
+riseandfall_adventurer_chance = {
+
+    categories = {
+        riseandfall
+    }
+
+    # Default: low (-1% base chance)
+    default = riseandfall_adventurer_chance_low
+
+    riseandfall_adventurer_chance_low = {
+    }
+
+    riseandfall_adventurer_chance_medium = {
+    }
+
+    riseandfall_adventurer_chance_high = {
+    }
+}
+
 riseandfall_enable_interaction_stability = {
 
     categories = {

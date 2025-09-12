@@ -66,3 +66,13 @@ setting_riseandfall_low_stability_events_enabled:0 "Enabled"
 setting_riseandfall_low_stability_events_enabled_desc:0 "Low stability events may occur each year for rulers with low stability."
 setting_riseandfall_low_stability_events_disabled:0 "Disabled"
 setting_riseandfall_low_stability_events_disabled_desc:0 "Low stability events will not be triggered by the Rise and Fall mod."
+
+# Adventurer Chance rule
+rule_riseandfall_adventurer_chance:0 "Adventurer Chance"
+rule_riseandfall_adventurer_chance_desc:0 "Controls the base chance for dynasty members to become adventurers."
+setting_riseandfall_adventurer_chance_low:0 "Low"
+setting_riseandfall_adventurer_chance_low_desc:0 "Low base chance (-1%) for adventurers."
+setting_riseandfall_adventurer_chance_medium:0 "Medium"
+setting_riseandfall_adventurer_chance_medium_desc:0 "Medium base chance (0%) for adventurers."
+setting_riseandfall_adventurer_chance_high:0 "High"
+setting_riseandfall_adventurer_chance_high_desc:0 "High base chance (+1%) for adventurers."

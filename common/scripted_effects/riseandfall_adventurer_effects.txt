@@ -64,59 +64,19 @@
                     if = { limit = { has_trait = craven } change_variable = { name = rf_adventurer_trait_chance add = -2.0 } }
                     if = { limit = { has_trait = content } change_variable = { name = rf_adventurer_trait_chance add = -5.0 } }
                     if = { limit = { has_trait = incapable } change_variable = { name = rf_adventurer_trait_chance add = -10.0 } }
-                    # Final chance = base 0.0 + trait bonuses + intrigue bonus, clamp to [0,100]
-                    set_variable = { name = rf_adventurer_final_chance value = 0.0 }
+                    # Set base chance based on game rule: low -1%, medium 0%, high +1%
+                    if = { limit = { has_game_rule = riseandfall_adventurer_chance_low } set_variable = { name = rf_adventurer_base_chance value = -1.0 } }
+                    else_if = { limit = { has_game_rule = riseandfall_adventurer_chance_medium } set_variable = { name = rf_adventurer_base_chance value = 0.0 } }
+                    else_if = { limit = { has_game_rule = riseandfall_adventurer_chance_high } set_variable = { name = rf_adventurer_base_chance value = 1.0 } }
+                    else = { set_variable = { name = rf_adventurer_base_chance value = 0.0 } }  # fallback to medium
+                    # Final chance = base chance + trait bonuses + intrigue bonus, clamp to [0,100]
+                    set_variable = { name = rf_adventurer_final_chance value = var:rf_adventurer_base_chance }
                     set_variable = { name = rf_opinion_bonus value = 0.0 }
                     change_variable = { name = rf_adventurer_final_chance add = var:rf_adventurer_trait_chance }
                     # Add intrigue bonus: intrigue * 0.1 (e.g., 10 intrigue = +1.0 -> 2 intrigue = +0.2)
                     set_variable = { name = intrigue_bonus value = intrigue }
                     change_variable = { name = intrigue_bonus multiply = 0.1 }
                     change_variable = { name = rf_adventurer_final_chance add = var:intrigue_bonus }
-                    # Opinion scaling: if we selected a claim target and it has a holder,
-                    # map the candidate's opinion of the holder into a signed raw value where
-                    # positive opinion reduces chance (negative raw), and negative opinion
-                    # increases chance (positive raw). This keeps math explicit and avoids
-                    # relying on raw negative arithmetic elsewhere.
-                    if = {
-                        limit = { exists = scope:claim_target_title.holder }
-                        set_variable = { name = rf_opinion_value_raw value = 0 }
-                        # Small reductions for modest positive opinion (1..74) so good-but-not-great
-                        # feelings slightly reduce the chance; stepped mapping keeps behavior predictable.
-                        if = { limit = { opinion = { target = scope:claim_target_title.holder value >= 75 } } set_variable = { name = rf_opinion_value_raw value = -75 } }
-                        else_if = { limit = { opinion = { target = scope:claim_target_title.holder value >= 50 } } set_variable = { name = rf_opinion_value_raw value = -30 } }
-                        else_if = { limit = { opinion = { target = scope:claim_target_title.holder value >= 25 } } set_variable = { name = rf_opinion_value_raw value = -15 } }
-                        else_if = { limit = { opinion = { target = scope:claim_target_title.holder value >= 1 } } set_variable = { name = rf_opinion_value_raw value = -5 } }
-                        # Negative opinions -> positive raw values (increase chance)
-                        else_if = { limit = { opinion = { target = scope:claim_target_title.holder value <= -75 } } set_variable = { name = rf_opinion_value_raw value = 75 } }
-                        else_if = { limit = { opinion = { target = scope:claim_target_title.holder value <= -50 } } set_variable = { name = rf_opinion_value_raw value = 50 } }
-                        else_if = { limit = { opinion = { target = scope:claim_target_title.holder value <= -25 } } set_variable = { name = rf_opinion_value_raw value = 25 } }
-                        else_if = { limit = { opinion = { target = scope:claim_target_title.holder value <= -1 } } set_variable = { name = rf_opinion_value_raw value = 10 } }
-                        # If opinion is exactly 0, rf_opinion_value_raw remains 0
-                        # Apply opinion safely:
-                        if = {
-                            limit = { var:rf_opinion_value_raw > 0 }
-                            # Hatred increases chance
-                            set_variable = { name = rf_opinion_bonus value = var:rf_opinion_value_raw }
-                            change_variable = { name = rf_opinion_bonus multiply = 0.02 }
-                            change_variable = { name = rf_adventurer_final_chance add = var:rf_opinion_bonus }
-                            remove_variable = rf_opinion_value_raw
-                        }
-                        else = {
-                            limit = { var:rf_opinion_value_raw < 0 }
-                            # Goodwill reduces chance: make reduction = abs(raw) * 0.02, clamp to 0.9 max
-                            set_variable = { name = rf_op_reduction value = var:rf_opinion_value_raw }
-                            change_variable = { name = rf_op_reduction multiply = -1 }
-                            change_variable = { name = rf_op_reduction multiply = 0.02 }
-                            clamp_variable = { name = rf_op_reduction min = 0 max = 0.9 }
-                            # Build multiplier = 1 - reduction safely: multiplier = rf_op_reduction * -1; add 1
-                            set_variable = { name = rf_opinion_multiplier value = var:rf_op_reduction }
-                            change_variable = { name = rf_opinion_multiplier multiply = -1 }
-                            change_variable = { name = rf_opinion_multiplier add = 1 }
-                            change_variable = { name = rf_adventurer_final_chance multiply = var:rf_opinion_multiplier }
-                            remove_variable = rf_op_reduction
-                            remove_variable = rf_opinion_value_raw
-                        }
-                    }
                     # Apply realm stability modifier instead of legitimacy (defensive math):
                     # - 50 stability -> 0.00% change
                     # - 0 stability  -> +0.50% chance (increase)
@@ -174,6 +134,51 @@
                         # Apply the computed sex penalty to the final chance.
                         if = { limit = { var:rf_sex_penalty <= -100 } set_variable = { name = rf_adventurer_final_chance value = 0 } }
                         else = { change_variable = { name = rf_adventurer_final_chance add = var:rf_sex_penalty } }
+                    }
+                    # Opinion scaling: if we selected a claim target and it has a holder,
+                    # map the candidate's opinion of the holder into a signed raw value where
+                    # positive opinion reduces chance (negative raw), and negative opinion
+                    # increases chance (positive raw). This keeps math explicit and avoids
+                    # relying on raw negative arithmetic elsewhere.
+                    if = {
+                        limit = { exists = scope:claim_target_title.holder }
+                        set_variable = { name = rf_opinion_value_raw value = 0 }
+                        # Small reductions for modest positive opinion (1..74) so good-but-not-great
+                        # feelings slightly reduce the chance; stepped mapping keeps behavior predictable.
+                        if = { limit = { opinion = { target = scope:claim_target_title.holder value >= 75 } } set_variable = { name = rf_opinion_value_raw value = -75 } }
+                        else_if = { limit = { opinion = { target = scope:claim_target_title.holder value >= 50 } } set_variable = { name = rf_opinion_value_raw value = -30 } }
+                        else_if = { limit = { opinion = { target = scope:claim_target_title.holder value >= 25 } } set_variable = { name = rf_opinion_value_raw value = -15 } }
+                        else_if = { limit = { opinion = { target = scope:claim_target_title.holder value >= 1 } } set_variable = { name = rf_opinion_value_raw value = -5 } }
+                        # Negative opinions -> positive raw values (increase chance)
+                        else_if = { limit = { opinion = { target = scope:claim_target_title.holder value <= -75 } } set_variable = { name = rf_opinion_value_raw value = 75 } }
+                        else_if = { limit = { opinion = { target = scope:claim_target_title.holder value <= -50 } } set_variable = { name = rf_opinion_value_raw value = 50 } }
+                        else_if = { limit = { opinion = { target = scope:claim_target_title.holder value <= -25 } } set_variable = { name = rf_opinion_value_raw value = 25 } }
+                        else_if = { limit = { opinion = { target = scope:claim_target_title.holder value <= -1 } } set_variable = { name = rf_opinion_value_raw value = 10 } }
+                        # If opinion is exactly 0, rf_opinion_value_raw remains 0
+                        # Apply opinion safely:
+                        if = {
+                            limit = { var:rf_opinion_value_raw > 0 }
+                            # Hatred increases chance
+                            set_variable = { name = rf_opinion_bonus value = var:rf_opinion_value_raw }
+                            change_variable = { name = rf_opinion_bonus multiply = 0.02 }
+                            change_variable = { name = rf_adventurer_final_chance add = var:rf_opinion_bonus }
+                            remove_variable = rf_opinion_value_raw
+                        }
+                        else = {
+                            limit = { var:rf_opinion_value_raw < 0 }
+                            # Goodwill reduces chance: make reduction = abs(raw) * 0.02, clamp to 0.9 max
+                            set_variable = { name = rf_op_reduction value = var:rf_opinion_value_raw }
+                            change_variable = { name = rf_op_reduction multiply = -1 }
+                            change_variable = { name = rf_op_reduction multiply = 0.02 }
+                            clamp_variable = { name = rf_op_reduction min = 0 max = 0.9 }
+                            # Build multiplier = 1 - reduction safely: multiplier = rf_op_reduction * -1; add 1
+                            set_variable = { name = rf_opinion_multiplier value = var:rf_op_reduction }
+                            change_variable = { name = rf_opinion_multiplier multiply = -1 }
+                            change_variable = { name = rf_opinion_multiplier add = 1 }
+                            change_variable = { name = rf_adventurer_final_chance multiply = var:rf_opinion_multiplier }
+                            remove_variable = rf_op_reduction
+                            remove_variable = rf_opinion_value_raw
+                        }
                     }
                     clamp_variable = { name = rf_adventurer_final_chance min = 0 max = 100 }
                     random = {
@@ -606,6 +611,7 @@ riseandfall_adventurer_quarterly_income_se = {
 riseandfall_yearly_adventurer_remove_variable_se = {
     remove_variable = rf_opinion_multiplier
     remove_variable = rf_stability_modifier
+    remove_variable = rf_adventurer_base_chance
     remove_variable = rf_adventurer_trait_chance
     remove_variable = rf_adventurer_final_chance
     remove_variable = intrigue_bonus
