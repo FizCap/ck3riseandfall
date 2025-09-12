@@ -7,7 +7,7 @@
 	ai_amenity_target_baseline = -0.4
 	ai_boldness = 0.75
 	title_creation_cost_mult = -0.75
-    opinion_of_liege = -30
+    opinion_of_liege = -10
 	same_opinion = -30
 
 	shown_in_ruler_designer = no
