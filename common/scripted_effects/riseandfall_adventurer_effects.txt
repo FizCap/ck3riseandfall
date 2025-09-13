@@ -78,10 +78,10 @@
                     change_variable = { name = intrigue_bonus multiply = 0.1 }
                     change_variable = { name = rf_adventurer_final_chance add = var:intrigue_bonus }
                     # Apply realm stability modifier instead of legitimacy (defensive math):
-                    # - 50 stability -> 0.00% change
-                    # - 0 stability  -> +0.50% chance (increase)
-                    # - 100 stability -> -0.50% chance (decrease)
-                    # rf_stability_modifier = (50 - holder_stability) * 0.01
+                    # Mapping: holder stability 50 => 0.00% change
+                    # - 0 stability  => +1.00% chance (increase)
+                    # - 100 stability => -1.00% chance (decrease)
+                    # rf_stability_modifier = (50 - holder_stability) * 0.02  (maps -1..+1)
                     set_variable = { name = rf_stability_modifier value = 0.0 }
                     # default holder stability = 50 (neutral)
                     set_variable = { name = rf_holder_realm_stability value = 50 }
@@ -101,7 +101,7 @@
                     change_variable = { name = rf_stability_diff add = 50 }
                     # Convert to percent change (0.01 per point)
                     set_variable = { name = rf_stability_modifier value = var:rf_stability_diff }
-                    change_variable = { name = rf_stability_modifier multiply = 0.01 }
+                    change_variable = { name = rf_stability_modifier multiply = 0.02 }
                     change_variable = { name = rf_adventurer_final_chance add = var:rf_stability_modifier }
                     remove_variable = rf_stability_diff
                     # Apply sex-based penalties based on the claim holder's realm laws.
