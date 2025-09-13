@@ -37,6 +37,12 @@ on_title_gain_inheritance = {
     }
 }
 
+on_title_gain = {
+    on_actions = {
+        riseandfall_on_title_gain_inheritance
+    }
+}
+
 riseandfall_on_title_gain_inheritance = {
     # Expected scope: character (the inheritor)
     trigger = {

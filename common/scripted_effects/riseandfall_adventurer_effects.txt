@@ -384,6 +384,24 @@ riseandfall_do_create_adventurer_se = {
             riseandfall_run_create_knights_while_se = yes
             remove_variable = rf_while_counter
             remove_variable = rf_while_loop_target
+
+            # Send notification to all rulers with claims on this adventurer
+            # Use every_claim to iterate through ALL claims and notify their holders
+            every_claim = {
+                limit = {
+                    tier >= tier_kingdom
+                    exists = holder
+                    holder = { is_independent_ruler = yes }
+                }
+                    holder = {
+                    send_interface_popup = {
+                        type = send_interface_message_bad
+                        title = riseandfall_adventurer_camp_created_title
+                        custom_tooltip = riseandfall_adventurer_camp_created_desc
+                        left_icon = scope:adventurer_child
+                    }
+                }
+            }
         }
     }
 }
