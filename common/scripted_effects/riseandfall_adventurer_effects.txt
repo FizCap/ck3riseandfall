@@ -15,8 +15,8 @@
                 # Exclude characters flagged as unable to marry; trait-based penalties are applied below
                 NOT = { has_character_flag = can_not_marry }
                 age >= 16
-                # Only qualify if they have a claim on a kingdom+ title (holder validation happens after selection)
-                any_claim = { tier >= tier_kingdom }
+                # Only qualify if they have a claim on a kingdom+ title held by an independent ruler
+                any_claim = { tier >= tier_kingdom exists = holder holder = { is_independent_ruler = yes } }
             }
                 # Determine a claim target title and disqualify if candidate is allied/spouse/too-positive toward that claim holder
                 set_variable = { name = rf_disqualify value = 0 }
