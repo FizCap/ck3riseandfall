@@ -1,24 +1,47 @@
 ﻿riseandfall_adventurer_cleanup_se = {
-    # Destroy any titles created by this mod by searching each ruler's held titles.
     every_ruler = {
-        limit = {
-            is_ai = yes
-            NOT = { has_character_flag = riseandfall_newadventurer }
-        }
-        save_scope_as = rf_ruler
+        # Destroy any titles created by this mod for AI rulers without the adventurer flag
+        if = {
+            limit = {
+                is_ai = yes
+                NOT = { has_character_flag = riseandfall_newadventurer }
+            }
+            save_scope_as = rf_ruler
 
-        every_held_title = {
-            limit = { has_variable = riseandfall_created_adventurer_title }
-            save_scope_as = rf_candidate_title
-            # Call destroy_title from the ruler character scope (engine-supported pattern)
+            every_held_title = {
+                limit = { has_variable = riseandfall_created_adventurer_title }
+                save_scope_as = rf_candidate_title
+                # Call destroy_title from the ruler character scope (engine-supported pattern)
+                scope:rf_ruler = {
+                    destroy_title = scope:rf_candidate_title
+                }
+            }
+            # Remove adventurer's gold by scoping to rf_ruler and removing their current gold
             scope:rf_ruler = {
-                destroy_title = scope:rf_candidate_title
+                set_variable = { name = adventurer_gold value = gold }
+                if = {
+                    limit = { var:adventurer_gold > 0 }
+                    remove_short_term_gold = var:adventurer_gold
+                }
+                remove_variable = adventurer_gold
             }
         }
-        # Remove adventurer's gold by scoping to rf_ruler and removing their current gold
-        scope:rf_ruler = {
+
+        # Disband legitimist camps for adventurers with no valid claims on independent rulers
+        if = {
+            limit = {
+                has_character_flag = riseandfall_newadventurer
+                has_government = landless_adventurer_government
+                NOT = { any_claim = { tier >= tier_kingdom exists = holder holder = { is_independent_ruler = yes } } }
+            }
+            destroy_title = primary_title
+            remove_character_flag = riseandfall_newadventurer
+            # Remove adventurer's gold
             set_variable = { name = adventurer_gold value = gold }
-            remove_short_term_gold = var:adventurer_gold
+            if = {
+                limit = { var:adventurer_gold > 0 }
+                remove_short_term_gold = var:adventurer_gold
+            }
             remove_variable = adventurer_gold
         }
     }
