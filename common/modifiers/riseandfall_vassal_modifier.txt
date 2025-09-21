@@ -1,0 +1,4 @@
+﻿riseandfall_vassal_limit_bonus = {
+    vassal_limit = 1000
+    icon = intrigue_positive
+}

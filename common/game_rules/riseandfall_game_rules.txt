@@ -144,6 +144,23 @@ riseandfall_adventurer_chance = {
     }
 }
 
+riseandfall_vassal_limit_rule = {
+
+    categories = {
+        riseandfall
+    }
+
+    # Default: disabled
+    default = riseandfall_vassal_limit_enabled
+
+    riseandfall_vassal_limit_enabled = {
+    }
+
+    riseandfall_vassal_limit_disabled = {
+        flag = riseandfall_vassal_limit_disabled
+    }
+}
+
 riseandfall_enable_interaction_stability = {
 
     categories = {

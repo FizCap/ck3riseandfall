@@ -68,3 +68,10 @@ setting_riseandfall_adventurer_chance_medium:0 "Medium"
 setting_riseandfall_adventurer_chance_medium_desc:0 "Medium base chance (0%) for adventurers."
 setting_riseandfall_adventurer_chance_high:0 "High"
 setting_riseandfall_adventurer_chance_high_desc:0 "High base chance (+1%) for adventurers."
+
+# Vassal limit rule
+rule_riseandfall_vassal_limit_rule:0 "Vassal Limit Bonus For Non-Independent Rulers"
+setting_riseandfall_vassal_limit_enabled:0 "Enabled"
+setting_riseandfall_vassal_limit_enabled_desc:0 "When enabled, non-independent rulers receive a permanent vassal limit increase."
+setting_riseandfall_vassal_limit_disabled:0 "Disabled"
+setting_riseandfall_vassal_limit_disabled_desc:0 "Do not apply the vassal limit bonus."

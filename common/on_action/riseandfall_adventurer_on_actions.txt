@@ -7,6 +7,8 @@
         riseandfall_yearly_adventurer_press_claims
         riseandfall_yearly_adventurer_cleanup_on_action
         riseandfall_yearly_adventurer_remove_variable
+        riseandfall_apply_vassal_limit
+        riseandfall_remove_vassal_limit
     }
 }
 
@@ -90,7 +92,6 @@ riseandfall_yearly_remove_adventurer_gold_mod = {
         }
     }
 }
-
 
 # On_action that runs yearly to marry male landless adventurers (creates female spouse)
 riseandfall_marry_male_target_se = {

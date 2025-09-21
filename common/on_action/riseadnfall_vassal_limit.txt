@@ -1,0 +1,45 @@
+﻿yearly_global_pulse = {
+    on_actions = {
+        riseandfall_apply_vassal_limit
+        riseandfall_remove_vassal_limit
+    }
+}
+
+on_title_gain_inheritance = {
+    on_actions = {
+        riseandfall_apply_vassal_limit
+        riseandfall_remove_vassal_limit
+    }
+}
+
+on_title_gain = {
+    on_actions = {
+        riseandfall_apply_vassal_limit
+        riseandfall_remove_vassal_limit
+    }
+}
+
+
+# Apply vassal limit bonus to non-independent rulers when the rule is enabled
+riseandfall_apply_vassal_limit = {
+    trigger = { 
+        has_game_rule = riseandfall_vassal_limit_enabled }
+    effect = {
+        every_ruler = {
+            limit = { NOT = { is_independent_ruler = yes } }
+            add_character_modifier = { modifier = riseandfall_vassal_limit_bonus duration = -1 }
+        }
+    }
+}
+
+# Remove vassal limit bonus from independent rulers
+riseandfall_remove_vassal_limit = {
+    trigger = { 
+        has_game_rule = riseandfall_vassal_limit_enabled }
+    effect = {
+        every_ruler = {
+            limit = { is_independent_ruler = yes }
+            remove_character_modifier = { modifier = riseandfall_vassal_limit_bonus }
+        }
+    }
+}

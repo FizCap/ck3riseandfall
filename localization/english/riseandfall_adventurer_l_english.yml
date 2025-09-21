@@ -17,6 +17,10 @@ riseandfall_yearly_maa_limit_increase_modifier_desc: "Sets the realm's men-at-ar
 riseandfall_yearly_maa_limit_cap_increase_modifier: "Administrative Men-at-Arms Cap Increase"
 riseandfall_yearly_maa_limit_cap_increase_modifier_desc: "Increases the realm men-at-arms cap for administrative governments."
 
+# Vassal limit bonus applied to non-independent rulers
+riseandfall_vassal_limit_bonus: "Vassal Limit Bonus"
+riseandfall_vassal_limit_bonus_desc: "A small permanent increase to vassal limit granted to non-independent rulers by Rise and Fall."
+
 # Reason key for becoming a rival
 riseandfall_adventurer_became_rival: "Became rival due to adventurer uprising"
 

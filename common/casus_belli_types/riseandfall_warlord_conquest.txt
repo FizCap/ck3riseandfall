@@ -137,18 +137,43 @@
         #EP2 accolade glory gain for winning against higher ranked enemy
         scope:attacker = { accolade_attacker_war_end_glory_gain_low_effect = yes }
 
+        # Brute force logic: always transfer the defender's top-tier titles to the attacker,
+        # then vassalize the defender (defender keeps lower titles, drops rank).
+        # This handles all tier combinations robustly.
         create_title_and_vassal_change = {
             type = conquest
             save_scope_as = change
             add_claim_on_loss = yes
         }
 
-        # EP3 Laamp possibility warning
-        scope:defender = { ep3_war_loss_adventurer_tt_effect = yes }
+        # Transfer all titles held by the defender at the same tier as their primary title
+        # (e.g., all kingdom titles if defender is king)
+        scope:defender = {
+            every_held_title = {
+                limit = { tier = scope:defender.primary_title.tier holder = scope:defender }
+                change_title_holder = {
+                    holder = scope:attacker
+                    change = scope:change
+                    take_baronies = yes
+                }
+            }
+            change_liege = {
+                liege = scope:attacker
+                change = scope:change
+            }
+            # Transfer all direct vassals of the defender to the attacker
+            every_vassal = {
+                change_liege = {
+                    liege = scope:attacker
+                    change = scope:change
+                }
+            }
+        }
 
-        # Follow vanilla conquest transfer logic for predictable behavior
+        # Follow vanilla conquest transfer logic for predictable behavior, but only for top-tier titles
         every_in_list = {
             list = target_titles
+            limit = { tier = scope:defender.primary_title.tier }
             custom_tooltip = CONQUEST_CB_TITLE
 
             conquest_cb_title_transfer = {
@@ -156,12 +181,18 @@
             }
         }
 
+        # Only change holders for titles that were actually taken by the war.
         every_in_list = {
             list = titles_taken
-            change_title_holder = {
-                holder = scope:attacker
-                change = scope:change
-                take_baronies = yes
+            # Transfer target titles that are at or above the attacker's primary title tier
+            # (allows a duke to receive kingdom titles if they were part of the war).
+            if = {
+                limit = { tier >= scope:attacker.primary_title.tier holder = scope:defender }
+                change_title_holder = {
+                    holder = scope:attacker
+                    change = scope:change
+                    take_baronies = yes
+                }
             }
         }
 
@@ -175,11 +206,24 @@
 
         resolve_title_and_vassal_change = scope:change
 
-        # Prestige Progress for the Attacker
-        every_in_list = {
-            list = target_titles
+        # EP3 Laamp possibility warning
+        scope:defender = { ep3_war_loss_adventurer_tt_effect = yes }
+
+        # Prestige Progress for the Attacker (higher tier attacker gets more prestige)
+        if = {
+            limit = { scope:attacker.primary_title.tier > scope:defender.primary_title.tier }
             scope:attacker = {
-                add_prestige_experience = minor_prestige_value
+                add_prestige_experience = {
+                    value = medium_prestige_value
+                }
+            }
+        }
+        else = {
+            every_in_list = {
+                list = target_titles
+                scope:attacker = {
+                    add_prestige_experience = minor_prestige_value
+                }
             }
         }
 
@@ -322,9 +366,30 @@
     interface_priority = 79
 
     attacker_wargoal_percentage = 0.8
-    
-    max_defender_score_from_occupation = 150
-    max_attacker_score_from_occupation = 150
+
+    # War score tuning — prioritize battles (cap battles contribution at 90)
+    attacker_ticking_warscore_delay = { months = 12 }    # Delay before ticking warscore increases for attacker
+    defender_ticking_warscore_delay = { months = 12 }    # Delay before ticking warscore increases for defender
+    attacker_ticking_warscore = 0.1                       # Ticking warscore per day for attacker
+    defender_ticking_warscore = 0.1                       # Ticking warscore per day for defender
+
+    # Scales — favor battles over occupation
+    attacker_score_from_occupation_scale = 25
+    defender_score_from_occupation_scale = 25
+    attacker_score_from_battles_scale = 100
+    defender_score_from_battles_scale = 100
+
+    # Hard caps — battles can contribute up to 90 warscore, occupation much less
+    max_attacker_score_from_battles = 90
+    max_defender_score_from_battles = 90
+    max_attacker_score_from_occupation = 100
+    max_defender_score_from_occupation = 100
+
+    # Keep the vanilla/intent behavior flags
+    full_occupation_by_defender_gives_victory = no
+    full_occupation_by_attacker_gives_victory = no
+    landless_attacker_needs_armies = no
+    allow_hostages = yes
 
     max_ai_diplo_distance_to_title = 1500
 
