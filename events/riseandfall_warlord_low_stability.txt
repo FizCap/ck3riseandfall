@@ -121,34 +121,45 @@ warlord.1003 = {
         if = {
             limit = { exists = liege }
             liege = {
-                # Give claims on the liege's own county/duchy/kingdom/empire titles to the warlord
-                every_held_title = {
-                    limit = {
-                        tier = tier_county
-                        NOT = { root = { has_claim_on = prev } }
+                # Give claims only on the highest tier titles the liege holds
+                if = {
+                    limit = { any_held_title = { tier = tier_empire } }
+                    every_held_title = {
+                        limit = {
+                            tier = tier_empire
+                            NOT = { root = { has_claim_on = prev } }
+                        }
+                        root = { add_unpressed_claim = prev }
                     }
-                    root = { add_unpressed_claim = prev }
                 }
-                every_held_title = {
-                    limit = {
-                        tier = tier_duchy
-                        NOT = { root = { has_claim_on = prev } }
+                else_if = {
+                    limit = { any_held_title = { tier = tier_kingdom } }
+                    every_held_title = {
+                        limit = {
+                            tier = tier_kingdom
+                            NOT = { root = { has_claim_on = prev } }
+                        }
+                        root = { add_unpressed_claim = prev }
                     }
-                    root = { add_unpressed_claim = prev }
                 }
-                every_held_title = {
-                    limit = {
-                        tier = tier_kingdom
-                        NOT = { root = { has_claim_on = prev } }
+                else_if = {
+                    limit = { any_held_title = { tier = tier_duchy } }
+                    every_held_title = {
+                        limit = {
+                            tier = tier_duchy
+                            NOT = { root = { has_claim_on = prev } }
+                        }
+                        root = { add_unpressed_claim = prev }
                     }
-                    root = { add_unpressed_claim = prev }
                 }
-                every_held_title = {
-                    limit = {
-                        tier = tier_empire
-                        NOT = { root = { has_claim_on = prev } }
+                else = {
+                    every_held_title = {
+                        limit = {
+                            tier = tier_county
+                            NOT = { root = { has_claim_on = prev } }
+                        }
+                        root = { add_unpressed_claim = prev }
                     }
-                    root = { add_unpressed_claim = prev }
                 }
                 if = {
                     limit = { var:riseandfall_realm_stability_score <= 40 }

@@ -310,7 +310,8 @@ riseandfall_calculate_realm_stability_se = {
     # Add realm law component (0..20)
     change_variable = { name = tmp_target_score add = var:riseandfall_rs_realm_law_component }
     # Add popular opinion component (-10..10)
-    change_variable = { name = tmp_target_score add = var:riseandfall_rs_popular_opinion_component }
+    # Use the tooltip-exposed variable so it's considered 'used' by the engine
+    change_variable = { name = tmp_target_score add = var:riseandfall_realm_stability_popular_opinion_bonus }
 
     # Civil war adjustment applied to the TARGET score (so smoothing moves current toward
     # the penalized target) instead of modifying the persistent current score directly.

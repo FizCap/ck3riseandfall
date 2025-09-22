@@ -202,71 +202,9 @@
     cost = {
         piety = {
             value = 0
-            add = common_cb_impious_piety_cost
         }
         prestige = {
             value = 0
-            add = claim_cb_prestige_cost
-            multiply = common_cb_prestige_cost_multiplier
-
-            if = {
-                limit = {
-                    scope:attacker = {
-                        has_character_flag = temp_no_claim_war_cost
-                    }
-                }
-                multiply = {
-                    value = 0
-                    desc = "not_imprisoned_filter"
-                }
-            }
-
-            multiply = {
-                value = {
-                    value = 0
-                    scope:attacker = {
-                        if = {
-                            limit = { has_legitimacy_flag = reduced_claim_cb_cost }
-                            add = 0.5 
-                        }
-                        else_if = {
-                            limit = { has_legitimacy_flag = very_reduced_claim_cb_cost }
-                            add = 0.25 
-                        }
-                        else_if = {
-                            limit = { has_legitimacy_flag = extra_reduced_claim_cb_cost }
-                            add = 0.15 
-                        }
-                        else = {
-                            add = 1
-                        }
-                    }
-                }
-                desc = legitimacy_high_modifier_tt
-            }
-            multiply = {
-                value = {
-                    value = 0
-                    scope:attacker = {
-                        if = {
-                            limit = { has_legitimacy_flag = massively_increased_claim_cb_cost }
-                            add = 2.5
-                        }
-                        else_if = {
-                            limit = { has_legitimacy_flag = very_increased_claim_cb_cost }
-                            add = 2
-                        }
-                        else_if = {
-                            limit = { has_legitimacy_flag = increased_claim_cb_cost }
-                            add = 1.5
-                        }
-                        else = {
-                            add = 1
-                        }
-                    }
-                }
-                desc = legitimacy_low_modifier_tt
-            }
         }
     }
 
