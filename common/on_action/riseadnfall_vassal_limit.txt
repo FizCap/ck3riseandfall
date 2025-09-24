@@ -27,7 +27,7 @@ riseandfall_apply_vassal_limit = {
     effect = {
         every_ruler = {
             limit = { NOT = { is_independent_ruler = yes } }
-            add_character_modifier = { modifier = riseandfall_vassal_limit_bonus duration = -1 }
+            add_character_modifier = riseandfall_vassal_limit_bonus
         }
     }
 }
@@ -38,8 +38,11 @@ riseandfall_remove_vassal_limit = {
         has_game_rule = riseandfall_vassal_limit_enabled }
     effect = {
         every_ruler = {
-            limit = { is_independent_ruler = yes }
-            remove_character_modifier = { modifier = riseandfall_vassal_limit_bonus }
+            limit = { 
+                is_independent_ruler = yes 
+                has_character_modifier = riseandfall_vassal_limit_bonus 
+            }
+            remove_character_modifier = riseandfall_vassal_limit_bonus
         }
     }
 }
