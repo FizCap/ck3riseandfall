@@ -145,16 +145,18 @@
                         # variable (returns false if target is invalid/null).
                         if = {
                             limit = { save_temporary_opinion_value_as = { name = tmp_candidate_opinion target = scope:claim_target_title.holder } }
-                            # Compute multiplier: rf_opinion_multiplier = 0.01 - (opinion * 0.0001)
-                            # Use a temp var to perform the small-scale arithmetic reliably.
+                            # Desired mapping: opinion -> additive percentage points in range 0.00..2.00
+                            # baseline 1.0pp at opinion=0, -100 -> 2.0pp, +100 -> 0.0pp
+                            # Compute temp = -opinion * 0.01 (so -39 -> 0.39)
                             set_variable = { name = rf_tmp_op value = scope:tmp_candidate_opinion }
-                            # Compute additive opinion adjustment in percentage points:
-                            # rf_opinion_adjust = -opinion * 0.01 (so -100 -> +1.0pp, +100 -> -1.0pp)
                             change_variable = { name = rf_tmp_op multiply = -0.01 }
-                            set_variable = { name = rf_opinion_adjust value = var:rf_tmp_op }
-                            clamp_variable = { name = rf_opinion_adjust min = -1.0 max = 1.0 }
-                            # Apply as additive percentage points (e.g., +0.3 adds 0.3 percentage points)
-                            change_variable = { name = rf_adventurer_final_chance add = var:rf_opinion_adjust }
+                            # rf_opinion_adjust = 1.0 + rf_tmp_op (so -39 -> 1.0 + 0.39 = 1.39)
+                            set_variable = { name = rf_opinion_adjust value = 1.0 }
+                            change_variable = { name = rf_opinion_adjust add = var:rf_tmp_op }
+                            # Clamp to percentage points (0.0 .. 2.0)
+                            clamp_variable = { name = rf_opinion_adjust min = 0.0 max = 2.0 }
+                            # Apply as a multiplier to the final chance (e.g. 1.39x when opinion=-39)
+                            change_variable = { name = rf_adventurer_final_chance multiply = var:rf_opinion_adjust }
                             remove_variable = rf_tmp_op
                         }
                     }
