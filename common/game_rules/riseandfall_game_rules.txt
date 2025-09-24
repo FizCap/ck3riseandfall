@@ -15,6 +15,42 @@
     }
 }
 
+riseandfall_enable_adventurer_cleanup = {
+
+    categories = {
+        riseandfall
+    }
+
+    # Default: enabled (cleanup of mod-created adventurer titles)
+    default = riseandfall_adventurer_cleanup
+
+    riseandfall_adventurer_cleanup = {
+    }
+
+    riseandfall_adventurer_cleanup_disabled = {
+        flag = riseandfall_adventurer_cleanup_disabled
+    }
+}
+
+riseandfall_adventurer_chance = {
+
+    categories = {
+        riseandfall
+    }
+
+    # Default: low (-1% base chance)
+    default = riseandfall_adventurer_chance_low
+
+    riseandfall_adventurer_chance_low = {
+    }
+
+    riseandfall_adventurer_chance_medium = {
+    }
+
+    riseandfall_adventurer_chance_high = {
+    }
+}
+
 riseandfall_enable_mma_modifier = {
 
     categories = {
@@ -35,44 +71,25 @@ riseandfall_enable_mma_modifier = {
     }
 }
 
-
-    riseandfall_enable_mma_limit_modifier = {
-
-        categories = {
-            riseandfall
-        }
-
-        # Default: disabled (men-at-arms cap increases for administrative governments are off by default)
-        default = riseandfall_mma_limit_modifier_disabled
-        
-        # Legacy name (kept for savegame compatibility) — behaves identically to the 'all' option
-        riseandfall_mma_limit_modifier_enabled = {
-            apply_modifier = all:riseandfall_yearly_maa_limit_cap_increase_modifier
-        }
-        
-    # Disabled (no automatic modifier application)
-        riseandfall_mma_limit_modifier_disabled = {
-            flag = riseandfall_mma_limit_modifier_disabled
-        }
-    }
-
-riseandfall_enable_adventurer_cleanup = {
+riseandfall_enable_mma_limit_modifier = {
 
     categories = {
         riseandfall
     }
 
-    # Default: enabled (cleanup of mod-created adventurer titles)
-    default = riseandfall_adventurer_cleanup
+    # Default: disabled (men-at-arms cap increases for administrative governments are off by default)
+    default = riseandfall_mma_limit_modifier_disabled
 
-    riseandfall_adventurer_cleanup = {
+    # Legacy name (kept for savegame compatibility) — behaves identically to the 'all' option
+    riseandfall_mma_limit_modifier_enabled = {
+        apply_modifier = all:riseandfall_yearly_maa_limit_cap_increase_modifier
     }
 
-    riseandfall_adventurer_cleanup_disabled = {
-        flag = riseandfall_adventurer_cleanup_disabled
+    # Disabled (no automatic modifier application)
+    riseandfall_mma_limit_modifier_disabled = {
+        flag = riseandfall_mma_limit_modifier_disabled
     }
 }
-
 
 riseandfall_enable_realm_stability = {
 
@@ -88,23 +105,6 @@ riseandfall_enable_realm_stability = {
 
     riseandfall_realm_stability_disabled = {
         flag = riseandfall_realm_stability_disabled
-    }
-}
-
-riseandfall_enable_ai_kingdom_creation = {
-
-    categories = {
-        riseandfall
-    }
-
-    # Default: enabled (AI rulers will create higher-tier titles: duchies, kingdoms, empires)
-    default = riseandfall_ai_kingdom_creation_enabled
-
-    riseandfall_ai_kingdom_creation_enabled = {
-    }
-
-    riseandfall_ai_kingdom_creation_disabled = {
-        flag = riseandfall_ai_kingdom_creation_disabled
     }
 }
 
@@ -124,23 +124,20 @@ riseandfall_low_stability_events = {
     }
 }
 
-
-riseandfall_adventurer_chance = {
+riseandfall_enable_ai_kingdom_creation = {
 
     categories = {
         riseandfall
     }
 
-    # Default: low (-1% base chance)
-    default = riseandfall_adventurer_chance_low
+    # Default: enabled (AI rulers will create higher-tier titles: duchies, kingdoms, empires)
+    default = riseandfall_ai_kingdom_creation_enabled
 
-    riseandfall_adventurer_chance_low = {
+    riseandfall_ai_kingdom_creation_enabled = {
     }
 
-    riseandfall_adventurer_chance_medium = {
-    }
-
-    riseandfall_adventurer_chance_high = {
+    riseandfall_ai_kingdom_creation_disabled = {
+        flag = riseandfall_ai_kingdom_creation_disabled
     }
 }
 
