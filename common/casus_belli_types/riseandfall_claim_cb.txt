@@ -56,6 +56,10 @@
     # scope:attacker is the attacker
     # scope:defender is the defender
     is_allowed_claim_title = {
+        scope:attacker = { 
+            is_landless_adventurer = yes
+            has_character_flag = riseandfall_newadventurer
+        }
         trigger_if = {
             limit = {
                 scope:attacker = {
