@@ -7,7 +7,8 @@ puppet_regency = {
 	start = { always = yes }
 
 	# Handled via content - this is only for power sharing arrangements we want to end automatically.
-	end = { NOT = { is_independent_ruler = yes } }
+	# End the diarchy when the liege is not an independent ruler anymore.
+	end = { always = no }
 
 	# Mandates
 	## Just the standard suite
@@ -91,6 +92,4 @@ puppet_regency = {
 		vassal_opinion = -20
 	}
 
-	diarch_modifier = {
-	}
 }

@@ -1,5 +1,15 @@
 ﻿riseandfall_puppet_regency_swing_balance = {
 
+    # Default value.
     value = 100
+
+    # If evaluated in a liege scope and the liege is not an independent ruler, reduce to 0.
+    if = {
+        limit = { exists = liege }
+        if = {
+            limit = { liege = { is_independent_ruler = no } }
+            value = 0
+        }
+    }
 
 }
