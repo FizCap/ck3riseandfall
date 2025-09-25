@@ -47,7 +47,8 @@ puppet.1002 = {
         # Accept: Have the liege set the chosen (root) character as diarch
         scope:liege = {
             set_diarch = root
-            set_diarchy_swing = 100
+            set_diarchy_type = puppet_regency
+            set_diarchy_swing = 30
         }
     }
 

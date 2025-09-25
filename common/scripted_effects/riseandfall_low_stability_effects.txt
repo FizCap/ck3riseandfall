@@ -49,14 +49,21 @@ riseandfall_low_stability_roll_se = {
 # Randomly selects between warlord uprising, peasant unrest, and puppet master offer
 
 riseandfall_low_stability_random_event = {
-    random_list = {
-        1 = {
-            # Warlord uprising event
-            trigger_event = { id = warlord.1001 }
+    if = {
+        limit = { NOT = { has_diarchy_type = puppet_regency } }
+        random_list = {
+            1 = {
+                # Warlord uprising event
+                trigger_event = { id = warlord.1001 }
+            }
+            1 = {
+                # Puppet master offer to a random powerful vassal
+                trigger_event = { id = puppet.1001 }
+            }
         }
-        1 = {
-            # Puppet master offer to a random powerful vassal
-            trigger_event = { id = puppet.1001 }
-        }
+    }
+    else = {
+        # If has puppet_regency, only trigger warlord
+        trigger_event = { id = warlord.1001 }
     }
 }

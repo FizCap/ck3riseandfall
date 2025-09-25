@@ -1,0 +1,29 @@
+﻿diarchy_puppet_diarch_succession_score_value = {
+        # Personal ties
+        add = {
+            desc = diarch_succession_score.category.personal_ties
+            # Powerful vassal boost
+            if = { limit = { is_powerful_vassal = yes } add = { value = 30 desc = diarch_succession_score.personal_ties.your_powerful_vassal } }
+            
+        }
+
+        # Stats
+        add = {
+            desc = diarch_succession_score.category.stats
+            value = {
+                value = diplomacy
+                add = martial
+                add = stewardship
+                add = intrigue
+                add = learning
+                add = prowess
+            }
+        }
+
+        # Disqualifiers
+        if = { limit = { is_adult = no } add = { value = hard_disable_diarch_candidate_value desc = diarch_succession_score.disqualifiers.child } }
+        if = { limit = { is_imprisoned = yes } add = { value = hard_disable_diarch_candidate_value desc = diarch_succession_score.disqualifiers.imprisoned } }
+        if = { limit = { OR = { is_incapable = yes has_trait = infirm } } add = { value = hard_disable_diarch_candidate_value desc = diarch_succession_score.disqualifiers.incapable_or_infirm } }
+        if = { limit = { is_landed = no } add = { value = hard_disable_diarch_candidate_value desc = diarch_succession_score.disqualifiers.not_landed } }
+        if = { limit = { exists = root var:diarch_succession_filtered_due_to_incumbents_politicking ?= root } add = { value = hard_disable_diarch_candidate_value desc = diarch_succession_score.disqualifiers.event_filters.incumbent_politicking } }
+}

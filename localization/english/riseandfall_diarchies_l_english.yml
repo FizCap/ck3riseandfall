@@ -1,0 +1,22 @@
+﻿l_english:
+
+# Diarchy type name
+puppet_regency:0 "Puppet Regency"
+
+# Modifiers (mod-unique)
+from_diarch_domain_limit_bonus:0 "Domain Limit Bonus"
+from_diarch_domain_limit_bonus_desc:0 "Increases the domain limit."
+
+to_diarch_stress_gain:0 "Stress Gain"
+to_diarch_stress_gain_desc:0 "Increases stress gain."
+
+# Diarchy succession score
+diarch_succession_score.category.personal_ties:0 "Personal ties"
+diarch_succession_score.category.stats:0 "Stats"
+diarch_succession_score.personal_ties.your_powerful_vassal:0 "Powerful vassal"
+diarch_succession_score.disqualifiers.not_landed:0 "Not landed"
+
+# Puppet diarchy UI
+puppet_regency_diarchy_type:0 "Puppet Regency"
+puppet_regency_diarch_title:0 "Puppet Diarch"
+puppet_regency_diarchy_type_title:0 "Puppet Regency"

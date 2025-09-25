@@ -1,0 +1,5 @@
+﻿riseandfall_puppet_regency_swing_balance = {
+
+    value = 100
+
+}
