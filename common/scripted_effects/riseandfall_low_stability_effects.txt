@@ -7,39 +7,42 @@ riseandfall_low_stability_roll_se = {
     # For every independent ruler, compute chance once using the ruler's stability
         # Perform computations inside the saved scope so scope:independent_ruler variables resolve correctly
         scope:ruler_low_stability = {
-            # Ensure the stability variable exists for this ruler; default to 30 (neutral)
             if = {
-                limit = { NOT = { has_variable = riseandfall_realm_stability_score } }
-                set_variable = { name = riseandfall_realm_stability_score value = 30 }
-            }
-            # Compute chance scaled to stability: stability 30 -> 1%, stability 0 -> 100%.
-            # Formula: tmp_diff = clamp(30 - stability, 0, 30)
-            # tmp_chance = floor((tmp_diff * 99) / 30) + 1  -> yields 1..100
-            # tmp_diff = 30 - stability_score
-            set_variable = { name = tmp_diff value = 0 }
-            change_variable = { name = tmp_diff add = var:riseandfall_realm_stability_score }
-            change_variable = { name = tmp_diff multiply = -1 }
-            change_variable = { name = tmp_diff add = 30 }
-            clamp_variable = { name = tmp_diff min = 0 max = 30 }
+                limit = { NOT = { has_variable = low_stability_cooldown } }
+                # Ensure the stability variable exists for this ruler; default to 30 (neutral)
+                if = {
+                    limit = { NOT = { has_variable = riseandfall_realm_stability_score } }
+                    set_variable = { name = riseandfall_realm_stability_score value = 30 }
+                }
+                # Compute chance scaled to stability: stability 30 -> 1%, stability 0 -> 100%.
+                # Formula: tmp_diff = clamp(30 - stability, 0, 30)
+                # tmp_chance = floor((tmp_diff * 99) / 30) + 1  -> yields 1..100
+                # tmp_diff = 30 - stability_score
+                set_variable = { name = tmp_diff value = 0 }
+                change_variable = { name = tmp_diff add = var:riseandfall_realm_stability_score }
+                change_variable = { name = tmp_diff multiply = -1 }
+                change_variable = { name = tmp_diff add = 30 }
+                clamp_variable = { name = tmp_diff min = 0 max = 30 }
 
-            set_variable = { name = tmp_chance value = 0 }
-            # If stability >= 31, chance should be 0%
-            if = {
-                limit = { var:riseandfall_realm_stability_score >= 31 }
                 set_variable = { name = tmp_chance value = 0 }
-            }
-            else = {
-                change_variable = { name = tmp_chance add = var:tmp_diff }
-                change_variable = { name = tmp_chance multiply = 99 }
-                change_variable = { name = tmp_chance divide = 30 }
-                change_variable = { name = tmp_chance add = 1 }
-            }
+                # If stability >= 31, chance should be 0%
+                if = {
+                    limit = { var:riseandfall_realm_stability_score >= 31 }
+                    set_variable = { name = tmp_chance value = 0 }
+                }
+                else = {
+                    change_variable = { name = tmp_chance add = var:tmp_diff }
+                    change_variable = { name = tmp_chance multiply = 99 }
+                    change_variable = { name = tmp_chance divide = 30 }
+                    change_variable = { name = tmp_chance add = 1 }
+                }
 
-            # Roll once for the independent ruler. If it succeeds, notify the liege and add stability
-            random = {
-                chance = var:tmp_chance
-                # Trigger a random low stability event
-                riseandfall_low_stability_random_event = yes
+                # Roll once for the independent ruler. If it succeeds, notify the liege and add stability
+                random = {
+                    chance = var:tmp_chance
+                    # Trigger a random low stability event
+                    riseandfall_low_stability_random_event = yes
+                }
             }
         }
     }
