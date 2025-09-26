@@ -14,7 +14,6 @@ to_diarch_stress_gain_desc:0 "Increases stress gain."
 diarch_succession_score.category.realm_politics:0 "Realm Influence"
 diarch_succession_score.category.stats:0 "Stats"
 diarch_succession_score.personal_ties.your_powerful_vassal:0 "Powerful vassal"
-diarch_succession_score.realm_size:0 "Realm Size"
 diarch_succession_score.is_councillor:0 "Councillor"
 diarch_succession_score.disqualifiers.not_landed:0 "Not landed"
 

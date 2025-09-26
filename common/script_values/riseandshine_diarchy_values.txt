@@ -6,8 +6,6 @@
             if = { limit = { is_powerful_vassal = yes } add = { value = 50 desc = diarch_succession_score.personal_ties.your_powerful_vassal } }
             # Councillor boost
             if = { limit = { is_councillor = yes } add = { value = 30 desc = diarch_succession_score.is_councillor } }
-            # Realm size
-            add = { value = { value = realm_size add = 1 } desc = diarch_succession_score.realm_size }
         }
 
         # Stats
