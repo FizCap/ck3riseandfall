@@ -18,5 +18,5 @@ diarch_succession_score.disqualifiers.not_landed:0 "Not landed"
 
 # Puppet diarchy UI
 puppet_regency_diarchy_type:0 "Puppet Regency"
-puppet_regency_diarch_title:0 "Puppet Diarch"
+puppet_regency_diarch_title:0 "Puppet Master"
 puppet_regency_diarchy_type_title:0 "Puppet Regency"
