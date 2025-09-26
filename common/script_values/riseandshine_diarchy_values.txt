@@ -1,10 +1,11 @@
 ﻿diarchy_puppet_diarch_succession_score_value = {
-        # Personal ties
+        # Realm Politics
         add = {
-            desc = diarch_succession_score.category.personal_ties
+            desc = diarch_succession_score.category.realm_politics
             # Powerful vassal boost
-            if = { limit = { is_powerful_vassal = yes } add = { value = 30 desc = diarch_succession_score.personal_ties.your_powerful_vassal } }
-            
+            if = { limit = { is_powerful_vassal = yes } add = { value = 50 desc = diarch_succession_score.personal_ties.your_powerful_vassal } }
+            # Realm size
+            add = { value = { value = realm_size add = 1 } desc = diarch_succession_score.realm_size }
         }
 
         # Stats
@@ -16,7 +17,6 @@
                 add = stewardship
                 add = intrigue
                 add = learning
-                add = prowess
             }
         }
 
