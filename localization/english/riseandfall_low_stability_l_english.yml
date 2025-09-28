@@ -46,3 +46,9 @@ warlord_abandonment_opinion_desc:0 "This former warlord has renounced their rebe
 
 trait_retiredwarlord:0 "Retired Warlord"
 trait_retiredwarlord_desc:0 "Once a stirring force who sowed chaos across the realm, they have laid down their sword — their days of conquest are done."
+
+ # Palace Coup localization
+palace_coup.1001.t:0 "Palace Coup Attempt"
+palace_coup.1001.desc:0 "A disloyal knight in your court is staging a palace coup, moving to seize the throne by force. The corridors of your palace run thick with treachery."
+palace_coup.1001.a:0 "Attack the disloyal knight"
+palace_coup.1001.b:0 "Flee the palace"

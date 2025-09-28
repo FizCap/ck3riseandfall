@@ -1,0 +1,274 @@
+﻿namespace = palace_coup
+
+palace_coup.1001 = {
+	type = character_event
+	title = palace_coup.1001.t
+	desc = palace_coup.1001.desc
+	theme = court
+
+	left_portrait = {
+		character = root
+	}
+	right_portrait = {
+		character = scope:challenger
+	}
+
+	immediate = {
+		random_knight = {
+			limit = {
+				is_landed = no
+				is_alive = yes
+			}
+			save_scope_as = challenger
+		}
+		if = {
+			limit = { NOT = { exists = scope:challenger } }
+			random_courtier = {
+				limit = {
+					is_landed = no
+					is_alive = yes
+				}
+				save_scope_as = challenger
+			}
+		}
+		# set a cooldown variable used by the low stability system
+		set_variable = { name = low_stability_cooldown value = 1 }
+		# (duel will be resolved when the player chooses option A)
+	}
+
+	option = {
+		name = palace_coup.1001.a
+
+		# Only show if we actually have a challenger
+		trigger = { exists = scope:challenger }
+
+		duel = {
+			skill = prowess
+			target = scope:challenger
+
+			# Actor (root) wins outcome
+			60 = {
+				compare_modifier = {
+					value = scope:duel_value
+					multiplier = 3.5
+					min = -49
+				}
+
+				# Root kills challenger (non-instant fatality handled by death_reason)
+				scope:challenger = {
+					death = {
+						death_reason = death_duel
+						killer = root
+					}
+				}
+			}
+
+			# Challenger wins outcome
+			35 = {
+				compare_modifier = {
+					value = scope:duel_value
+					multiplier = -3.5
+					min = -49
+				}
+
+				# Challenger seizes titles while root is still alive, then kills root
+				create_title_and_vassal_change = {
+					type = conquest
+					save_scope_as = change
+				}
+				# Transfer all non-barony titles from root to challenger
+				every_held_title = {
+					limit = {
+						holder = root
+						NOT = { tier = tier_barony }
+					}
+					change_title_holder = {
+						holder = scope:challenger
+						change = scope:change
+						take_baronies = yes
+					}
+				}
+				resolve_title_and_vassal_change = scope:change
+				scope:challenger = {
+					if = {
+						limit = { is_playable = yes }
+						add_legitimacy = -1200
+					}
+				}
+				# Kill the ruler after titles have been reassigned
+				death = {
+					death_reason = death_duel
+					killer = scope:challenger
+				}
+				scope:challenger = {
+					add_trait = murderer
+				}
+			}
+
+
+		}
+
+		ai_chance = { base = 100 }
+	}
+
+	option = {
+		name = palace_coup.1001.b
+
+		# Only show if we actually have a challenger
+		trigger = { exists = scope:challenger }
+
+		duel = {
+			skill = intrigue
+			target = scope:challenger
+
+			# Success: root successfully evades/covers their tracks and escapes
+			60 = {
+				compare_modifier = {
+					value = scope:duel_value
+					multiplier = 3.5
+					min = -49
+				}
+
+
+
+				# Transfer root's capital county (if any) to challenger, then transfer all duchy+ titles
+				create_title_and_vassal_change = {
+					type = conquest
+					save_scope_as = change
+				}
+				# Transfer capital county specifically (if it exists and is held by root).
+				# Use an explicit `root = { capital_county = ... }` block so the parser
+				# doesn't attempt to resolve `capital_county` at tooltip-time and
+				# so we operate on root's capital safely.
+				if = {
+					limit = { root = { capital_county = { exists = yes } } }
+					root = {
+						capital_county = {
+							change_title_holder = {
+								holder = scope:challenger
+								change = scope:change
+								take_baronies = yes
+							}
+						}
+					}
+				}
+				# Transfer all duchy+ titles (exclude counties and baronies)
+				every_held_title = {
+					limit = {
+						holder = root
+						NOT = {
+							OR = {
+								tier = tier_county
+								tier = tier_barony
+							}
+						}
+					}
+					change_title_holder = {
+						holder = scope:challenger
+						change = scope:change
+						take_baronies = yes
+					}
+				}
+                
+	                # Make the old ruler (root) a vassal of the challenger and
+	                # transfer direct vassals to the challenger in the same change
+					root = {
+						change_liege = {
+							liege = scope:challenger
+							change = scope:change
+						}
+					}
+				resolve_title_and_vassal_change = scope:change
+				scope:challenger = {
+					if = {
+						limit = { is_playable = yes }
+						add_legitimacy = -1200
+					}
+				}
+
+				# Make root and the challenger rivals of each other (reason key exists in localization)
+				root = {
+					if = {
+						limit = { can_set_relation_rival_trigger = { CHARACTER = scope:challenger } }
+						set_relation_rival = {
+							target = scope:challenger
+							reason = riseandfall_adventurer_became_rival
+						}
+					}
+				}
+				scope:challenger = {
+					if = {
+						limit = { can_set_relation_rival_trigger = { CHARACTER = root } }
+						set_relation_rival = {
+							target = root
+							reason = riseandfall_adventurer_became_rival
+						}
+					}
+				}
+			}
+
+			# Failure: challenger captures/seizes the ruler (transfer titles + kill)
+			40 = {
+				compare_modifier = {
+					value = scope:duel_value
+					multiplier = -3.5
+					min = -49
+				}
+
+				create_title_and_vassal_change = {
+					type = conquest
+					save_scope_as = change
+				}
+				# Transfer all non-barony titles from root to challenger
+				every_held_title = {
+					limit = {
+						holder = root
+						NOT = { tier = tier_barony }
+					}
+					change_title_holder = {
+						holder = scope:challenger
+						change = scope:change
+						take_baronies = yes
+					}
+				}
+					resolve_title_and_vassal_change = scope:change
+					scope:challenger = {
+						if = {
+							limit = { is_playable = yes }
+							add_legitimacy = -1200
+						}
+					}
+				# Make root and the challenger rivals of each other (reason key exists in localization)
+				root = {
+					if = {
+						limit = { can_set_relation_rival_trigger = { CHARACTER = scope:challenger } }
+						set_relation_rival = {
+							target = scope:challenger
+							reason = riseandfall_adventurer_became_rival
+						}
+					}
+				}
+				scope:challenger = {
+					if = {
+						limit = { can_set_relation_rival_trigger = { CHARACTER = root } }
+						set_relation_rival = {
+							target = root
+							reason = riseandfall_adventurer_became_rival
+						}
+					}
+				}
+				# Kill the ruler after titles have been reassigned
+				death = {
+					death_reason = death_duel
+					killer = scope:challenger
+				}
+				scope:challenger = {
+					add_trait = murderer
+				}
+			}
+		}
+
+		ai_chance = { base = 100 }
+	}
+
+}

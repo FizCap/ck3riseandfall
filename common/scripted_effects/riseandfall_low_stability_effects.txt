@@ -67,6 +67,10 @@ riseandfall_low_stability_random_event = {
                 # Adventurer invasion event
                 trigger_event = { id = adventurer.1001 }
             }
+            1 = {
+                # Palace coup event
+                trigger_event = { id = palace_coup.1001 }
+            }
         }
     }
     else = {
@@ -79,6 +83,10 @@ riseandfall_low_stability_random_event = {
             1 = {
                 # Adventurer invasion event
                 trigger_event = { id = adventurer.1001 }
+            }
+            1 = {
+                # Palace coup event
+                trigger_event = { id = palace_coup.1001 }
             }
         }
     }
