@@ -29,6 +29,11 @@ warlord.1003.d:0 "You have embraced the mantle of warlord, and now the path unfo
 warlord.1003.a:0 "Continue the path — press your claims"
 warlord.1003.b:0 "Abandon the path — renounce your warlord ambitions"
 
+ # Adventurer localization
+adventurer.1001.t:0 "Horde of Adventurers"
+adventurer.1001.d:0 "The realm's instability has attracted a swarm of landless adventurers, each with claims to your throne. They gather in the shadows, ready to invade and challenge your rule."
+adventurer.1001.a:0 "Oh dear"
+
  # Trait localization
 trait_warlord:0 "Warlord"
 trait_warlord_desc:0 "A bold and ruthless commander, the warlord carves power from chaos — feared by liege and vassal alike."
