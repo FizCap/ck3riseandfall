@@ -56,7 +56,7 @@
                     # Base chance is 0.5%; trait bonuses/penalties: dragonrider +2.0%, ambitious +2.0%, deceitful +1.0%, brave +1.0%, lazy -0.5%
                     # Use explicit floats so the engine performs fractional math correctly.
                     set_variable = { name = rf_adventurer_trait_chance value = 0.0 }
-                    if = { limit = { has_trait = brave } change_variable = { name = rf_adventurer_trait_chance add = 2.0 } }
+                    if = { limit = { has_trait = dragonrider } change_variable = { name = rf_adventurer_trait_chance add = 2.0 } }
                     if = { limit = { has_trait = ambitious } change_variable = { name = rf_adventurer_trait_chance add = 2.0 } }
                     if = { limit = { has_trait = deceitful } change_variable = { name = rf_adventurer_trait_chance add = 1.0 } }
                     if = { limit = { has_trait = lazy } change_variable = { name = rf_adventurer_trait_chance add = -0.5 } }
