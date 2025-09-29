@@ -114,7 +114,7 @@ riseandfall_low_stability_events = {
     }
 
     # Default: enabled
-    default = riseandfall_low_stability_events_disabled
+    default = riseandfall_low_stability_events_enabled
 
     riseandfall_low_stability_events_enabled = {
     }
