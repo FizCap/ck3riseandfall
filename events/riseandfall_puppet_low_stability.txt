@@ -22,6 +22,10 @@ puppet.1001 = {
         # Attempt to start a regency diarchy on the liege, then choose a random powerful vassal to offer the puppet
         random_powerful_vassal = {
             # Defensive limits: ensure we pick a direct, landed, adult vassal (not spouse/courtier/etc.)
+            limit = {
+                is_landed = yes
+                age >= 16
+            }
             trigger_event = puppet.1002
         }
     }
@@ -35,6 +39,8 @@ puppet.1002 = {
     immediate = {
         # Save our liege as a scope for use by effects (so scope:liege is defined)
         liege = { save_scope_as = liege }
+        # Save the event root (the chosen vassal) so we can reference it in fallbacks
+        root = { save_scope_as = candidate_vassal }
     }
     left_portrait = liege
     right_portrait = root
@@ -46,9 +52,26 @@ puppet.1002 = {
         }
         # Accept: Have the liege set the chosen (root) character as diarch
         scope:liege = {
-            set_diarch = root
-            set_diarchy_type = puppet_regency
-            set_diarchy_swing = 30
+            # Validate candidate is old enough before attempting to set diarch
+            if = {
+                limit = {
+                    scope:candidate_vassal = { age >= 16 }
+                }
+                set_diarch = scope:candidate_vassal
+                set_diarchy_type = puppet_regency
+                set_diarchy_swing = 30
+            }
+            else = {
+                # Candidate invalid for diarchy (e.g. not a landed vassal) — pick another vassal if possible
+                random_powerful_vassal = {
+                    limit = {
+                            NOT = { this = scope:candidate_vassal }
+                            is_landed = yes
+                            age >= 16
+                    }
+                    trigger_event = puppet.1002
+                }
+            }
         }
     }
 
@@ -60,9 +83,7 @@ puppet.1002 = {
         # Decline: have the liege pick another random powerful vassal (excluding the current root) and trigger the event for them
         liege = {
             random_powerful_vassal = {
-                limit = {
-                    NOT = { this = root }
-                }
+                limit = { NOT = { this = scope:candidate_vassal } }
                 trigger_event = puppet.1002
             }
         }

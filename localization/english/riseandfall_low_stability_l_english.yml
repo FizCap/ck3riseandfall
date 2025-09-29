@@ -50,5 +50,10 @@ trait_retiredwarlord_desc:0 "Once a stirring force who sowed chaos across the re
  # Palace Coup localization
 palace_coup.1001.t:0 "Palace Coup Attempt"
 palace_coup.1001.desc:0 "A disloyal knight in your court is staging a palace coup, moving to seize the throne by force. The corridors of your palace run thick with treachery."
-palace_coup.1001.a:0 "Attack the disloyal knight"
+palace_coup.1001.a:0 "Protect the palace"
 palace_coup.1001.b:0 "Flee the palace"
+palace_coup.1002.t:0 "You Have Escaped — Raise the Banners"
+palace_coup.1002.d:0 "You stagger from the smoke-choked corridor into the cold night. Word spreads like wildfire: your life has been spared, but your throne was seized. Now is the hour to reclaim what is yours. Ride forth, call your vassals, and let every horn sound the summons to arms — raise the banners and reclaim the realm!"
+palace_coup.1002.a:0 "Sound the horn — raise the banners"
+death_in_palace_coup:0 "Died in the palace coup"
+death_in_palace_coup_killer:0 "$death_in_palace_coup$ by [TARGET_CHARACTER.GetUIName]"

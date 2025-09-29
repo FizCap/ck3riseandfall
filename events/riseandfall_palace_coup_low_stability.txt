@@ -27,6 +27,8 @@ palace_coup.1001 = {
 				limit = {
 					is_landed = no
 					is_alive = yes
+						NOT = { is_close_family_of = root }
+					age > 16
 				}
 				save_scope_as = challenger
 			}
@@ -61,6 +63,45 @@ palace_coup.1001 = {
 						killer = root
 					}
 				}
+
+				# Purge: some of the ruler's unlanded knights and courtiers die in the chaos
+				root = {
+					# Kill ~50% of unlanded knights in the ruler's court
+					every_courtier = {
+						limit = {
+							is_knight = yes
+							is_landed = no
+							is_alive = yes
+						}
+						random_list = {
+							50 = {
+								death = {
+									death_reason = death_in_palace_coup
+                                    killer = scope:challenger
+								}
+							}
+							50 = { }
+						}
+					}
+
+					# Kill ~20% of the remaining non-knight courtiers
+					every_courtier_or_guest = {
+						limit = {
+							exists = yes
+							is_alive = yes
+							NOT = { is_knight = yes }
+						}
+						random_list = {
+							20 = {
+								death = {
+									death_reason = death_in_palace_coup
+                                    killer = scope:challenger
+								}
+							}
+							80 = { }
+						}
+					}
+				}
 			}
 
 			# Challenger wins outcome
@@ -91,7 +132,7 @@ palace_coup.1001 = {
 				resolve_title_and_vassal_change = scope:change
 				scope:challenger = {
 					if = {
-						limit = { is_playable = yes }
+						limit = { root = { has_legitimacy = yes } }
 						add_legitimacy = -1200
 					}
 				}
@@ -108,14 +149,29 @@ palace_coup.1001 = {
 
 		}
 
-		ai_chance = { base = 100 }
+		ai_chance = {
+			base = 10
+			modifier = {
+				add = 80
+				# Favor the duel if root's prowess is higher than the challenger
+				limit = { NOT = { prowess_diff = { target = scope:challenger value <= 0 } } }
+			}
+			modifier = {
+				add = -40
+				# Discourage duel if root is much weaker in prowess than the challenger
+				limit = { prowess_diff = { target = scope:challenger value <= -1 } }
+			}
+		}
 	}
 
 	option = {
 		name = palace_coup.1001.b
 
 		# Only show if we actually have a challenger
-		trigger = { exists = scope:challenger }
+		trigger = {
+			exists = scope:challenger
+			root = { primary_title = { tier >= tier_duchy } }
+		}
 
 		duel = {
 			skill = intrigue
@@ -179,9 +235,11 @@ palace_coup.1001 = {
 						}
 					}
 				resolve_title_and_vassal_change = scope:change
+				# Trigger escape follow-up: present the reclaim-your-throne event to root
+				trigger_event = { id = palace_coup.1002 }
 				scope:challenger = {
 					if = {
-						limit = { is_playable = yes }
+						limit = { root = { has_legitimacy = yes } }
 						add_legitimacy = -1200
 					}
 				}
@@ -234,7 +292,7 @@ palace_coup.1001 = {
 					resolve_title_and_vassal_change = scope:change
 					scope:challenger = {
 						if = {
-							limit = { is_playable = yes }
+							limit = { root = { has_legitimacy = yes } }
 							add_legitimacy = -1200
 						}
 					}
@@ -261,6 +319,7 @@ palace_coup.1001 = {
 				death = {
 					death_reason = death_duel
 					killer = scope:challenger
+                    
 				}
 				scope:challenger = {
 					add_trait = murderer
@@ -268,7 +327,52 @@ palace_coup.1001 = {
 			}
 		}
 
-		ai_chance = { base = 100 }
+		ai_chance = {
+			base = 10
+			modifier = {
+				add = 80
+				# Favor escape if root's intrigue is higher than the challenger
+				limit = { NOT = { intrigue_diff = { target = scope:challenger value <= 0 } } }
+			}
+			modifier = {
+				add = -40
+				# Discourage escape if root is weaker in intrigue
+				limit = { intrigue_diff = { target = scope:challenger value <= -1 } }
+			}
+		}
 	}
 
+}
+
+palace_coup.1002 = {
+	type = character_event
+	title = palace_coup.1002.t
+	desc = palace_coup.1002.d
+	theme = court
+
+    left_portrait = {
+		character = root
+	}
+
+	immediate = {
+		# Give root unpressed claims on titles recently taken by the challenger
+		every_held_title = {
+			limit = {
+				holder = scope:challenger
+				NOT = { tier = tier_barony }
+			}
+			root = { add_unpressed_claim = prev }
+		}
+		# Fire the warlord event on the challenger to start a rebellion path
+		# Send an interface message or notification could be done by localization and event text
+	}
+
+	option = {
+		name = palace_coup.1002.a
+			# Trigger the warlord path for the challenger only when this option is chosen
+			scope:challenger = {
+				trigger_event = { id = warlord.1001 }
+			}
+			ai_chance = { base = 100 }
+	}
 }
