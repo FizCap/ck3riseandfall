@@ -326,7 +326,7 @@ riseandfall_calculate_realm_stability_se = {
         limit = { is_independent_ruler = yes }
         # Increment or decay the consecutive-years counter depending on whether the ruler
         # is in a civil war this tick. This ensures the TARGET reflects the new year state.
-        if = { limit = { OR = { is_in_civil_war = yes is_at_war = yes war = { is_civil_war = yes } } } change_variable = { name = riseandfall_rs_civil_war_years add = 1 } }
+        if = { limit = { is_in_civil_war = yes } change_variable = { name = riseandfall_rs_civil_war_years add = 1 } }
         else = { if = { limit = { var:riseandfall_rs_civil_war_years > 0 } change_variable = { name = riseandfall_rs_civil_war_years add = -1 } } }
 
     # Compute cumulative penalty (years * -5), cap it at a minimum of -25, and subtract from tmp_target_score
