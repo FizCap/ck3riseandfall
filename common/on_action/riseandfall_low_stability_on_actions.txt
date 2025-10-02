@@ -11,6 +11,7 @@ riseandfall_low_stability_roll = {
     }
     effect = {
         every_independent_ruler = {
+            limit = { is_landed = yes }
             save_scope_as = ruler_low_stability
             riseandfall_low_stability_roll_se = yes
         }
