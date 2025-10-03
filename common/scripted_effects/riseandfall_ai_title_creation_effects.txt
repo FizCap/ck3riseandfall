@@ -146,8 +146,16 @@ riseandfall_ai_create_duchies_se = {
 
                 resolve_title_and_vassal_change = scope:title_change
 
-                # Set as primary title since it's higher tier than county
-                set_primary_title_to = prev
+                # Set as primary title only if the actor's current primary is a county.
+                # This avoids attempting to downgrade a king/empire primary title to a duchy
+                # (which causes script errors). If the actor already has a higher-tier
+                # primary title, leave it unchanged.
+                if = {
+                    limit = {
+                        primary_title.tier = tier_county
+                    }
+                    set_primary_title_to = prev
+                }
             }
         }
     }
