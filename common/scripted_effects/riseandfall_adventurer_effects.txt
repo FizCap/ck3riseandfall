@@ -256,6 +256,7 @@ riseandfall_do_create_adventurer_se = {
             }
             add_character_modifier = { modifier = riseandfall_adventurer_gold_mod }
             add_character_flag = { flag = riseandfall_newadventurer years = 30 }
+            add_character_flag = { flag = riseandfall_adventurer }
             add_character_flag = { flag = riseandfall_newadventurer_war_block years = 10 }
 
             remove_variable = adventurer_starting_gold

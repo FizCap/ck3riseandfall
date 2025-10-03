@@ -14,8 +14,9 @@ palace_coup.1001 = {
 	}
 
 	immediate = {
-		random_knight = {
+		random_courtier = {
 			limit = {
+				is_knight = yes
 				is_landed = no
 				is_alive = yes
 			}
@@ -151,16 +152,16 @@ palace_coup.1001 = {
 
 		ai_chance = {
 			base = 10
-			modifier = {
-				add = 80
-				# Favor the duel if root's prowess is higher than the challenger
-				limit = { NOT = { prowess_diff = { target = scope:challenger value <= 0 } } }
-			}
-			modifier = {
-				add = -40
-				# Discourage duel if root is much weaker in prowess than the challenger
-				limit = { prowess_diff = { target = scope:challenger value <= -1 } }
-			}
+		  modifier = {
+			  add = 80
+			  # Favor the duel if root's prowess is higher than the challenger
+			  NOT = { prowess_diff = { target = scope:challenger value <= 0 } }
+		  }
+		  modifier = {
+			  add = -40
+			  # Discourage duel if root is much weaker in prowess than the challenger
+			  prowess_diff = { target = scope:challenger value <= -1 }
+		  }
 		}
 	}
 
@@ -170,7 +171,7 @@ palace_coup.1001 = {
 		# Only show if we actually have a challenger
 		trigger = {
 			exists = scope:challenger
-			root = { primary_title = { tier >= tier_duchy } }
+			primary_title = { tier >= tier_duchy }
 		}
 
 		duel = {
@@ -329,16 +330,16 @@ palace_coup.1001 = {
 
 		ai_chance = {
 			base = 10
-			modifier = {
-				add = 80
-				# Favor escape if root's intrigue is higher than the challenger
-				limit = { NOT = { intrigue_diff = { target = scope:challenger value <= 0 } } }
-			}
-			modifier = {
-				add = -40
-				# Discourage escape if root is weaker in intrigue
-				limit = { intrigue_diff = { target = scope:challenger value <= -1 } }
-			}
+		  modifier = {
+			  add = 80
+			  # Favor escape if root's intrigue is higher than the challenger
+			  NOT = { intrigue_diff = { target = scope:challenger value <= 0 } }
+		  }
+		  modifier = {
+			  add = -40
+			  # Discourage escape if root is weaker in intrigue
+			  intrigue_diff = { target = scope:challenger value <= -1 }
+		  }
 		}
 	}
 

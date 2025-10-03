@@ -25,6 +25,18 @@ riseandfall_ai_create_kingdoms_se = {
 
             limit = {
                 tier = tier_kingdom
+                if = {
+                    limit = {
+                        scope:acting_ruler = {
+                            OR = {
+                                has_realm_law = partition_succession_law
+                                has_realm_law = confederate_partition_succession_law
+                                has_realm_law = high_partition_succession_law
+                            }
+                        }
+                    }
+                    NOT = { tier = scope:acting_ruler.primary_title.tier }
+                }
             }
 
             # Try to create the kingdom if possible
@@ -96,7 +108,7 @@ riseandfall_ai_create_duchies_se = {
         ordered_alert_creatable_title = {
             order_by = tier
             check_range_bounds = no
-            max = 5  # Limit to prevent excessive duchy creation
+            max = 99  # Limit to prevent excessive duchy creation
 
             limit = {
                 tier = tier_duchy
@@ -150,10 +162,22 @@ riseandfall_ai_create_empires_se = {
         ordered_alert_creatable_title = {
             order_by = tier
             check_range_bounds = no
-            max = 3  # Limit empire creation to prevent excessive titles
+            max = 99  # Limit empire creation to prevent excessive titles
 
             limit = {
                 tier = tier_empire
+                if = {
+                    limit = {
+                        scope:acting_ruler = {
+                            OR = {
+                                has_realm_law = partition_succession_law
+                                has_realm_law = confederate_partition_succession_law
+                                has_realm_law = high_partition_succession_law
+                            }
+                        }
+                    }
+                    NOT = { tier = scope:acting_ruler.primary_title.tier }
+                }
             }
 
             # Try to create the empire if possible

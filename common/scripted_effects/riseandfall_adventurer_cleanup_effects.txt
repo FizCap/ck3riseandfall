@@ -5,6 +5,7 @@
             limit = {
                 is_ai = yes
                 is_landed = no
+                has_character_flag = riseandfall_adventurer
                 NOT = { has_character_flag = riseandfall_newadventurer }
             }
             save_scope_as = rf_ruler
