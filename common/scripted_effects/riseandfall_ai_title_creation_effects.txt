@@ -25,22 +25,28 @@ riseandfall_ai_create_kingdoms_se = {
 
             limit = {
                 tier = tier_kingdom
-                if = {
-                    limit = {
-                        scope:acting_ruler = {
-                            OR = {
-                                has_realm_law = partition_succession_law
-                                has_realm_law = confederate_partition_succession_law
-                                has_realm_law = high_partition_succession_law
-                            }
-                        }
+                scope:acting_ruler = {
+                    OR = {
+                        primary_title.tier = tier_empire
+                        government_allows = administrative
+                        has_realm_law = partition_succession_law
+                        has_realm_law = confederate_partition_succession_law
+                        has_realm_law = high_partition_succession_law
                     }
-                    NOT = { tier = scope:acting_ruler.primary_title.tier }
                 }
+                NOT = { tier = scope:acting_ruler.primary_title.tier }
             }
 
             # Try to create the kingdom if possible
             save_scope_as = target_title
+
+            # Create an important-action alert for the engine/UI so players (and logs) know this title is creatable
+            scope:target_title = {
+                try_create_important_action = {
+                    important_action_type = action_can_create_title
+                    landed_title = this
+                }
+            }
             scope:acting_ruler = {
                 # Use the engine helper used by decisions/events to create titles and transfer holdings
                 create_title_and_vassal_change = {
@@ -94,10 +100,9 @@ riseandfall_ai_create_kingdoms_se = {
 riseandfall_ai_create_duchies_se = {
     # Iterate all rulers (players and AI)
     every_ruler = {
-        # Only run for AI-controlled counts
+        # Allow any ruler (player or AI), regardless of primary title tier, to be considered
+        # for duchy creation, but require the ruler to be landed (is_landed = yes).
         limit = {
-            is_ai = yes
-            primary_title.tier = tier_county
             is_landed = yes
         }
 
@@ -116,6 +121,14 @@ riseandfall_ai_create_duchies_se = {
 
             # Try to create the duchy if possible
             save_scope_as = target_title
+
+            # Create an important-action alert for the engine/UI so players (and logs) know this title is creatable
+            scope:target_title = {
+                try_create_important_action = {
+                    important_action_type = action_can_create_title
+                    landed_title = this
+                }
+            }
             scope:acting_count = {
                 # Use the engine helper used by decisions/events to create titles and transfer holdings
                 create_title_and_vassal_change = {
@@ -166,22 +179,28 @@ riseandfall_ai_create_empires_se = {
 
             limit = {
                 tier = tier_empire
-                if = {
-                    limit = {
-                        scope:acting_ruler = {
-                            OR = {
-                                has_realm_law = partition_succession_law
-                                has_realm_law = confederate_partition_succession_law
-                                has_realm_law = high_partition_succession_law
-                            }
-                        }
+                scope:acting_ruler = {
+                    OR = {
+                        primary_title.tier = tier_empire
+                        government_allows = administrative
+                        has_realm_law = partition_succession_law
+                        has_realm_law = confederate_partition_succession_law
+                        has_realm_law = high_partition_succession_law
                     }
-                    NOT = { tier = scope:acting_ruler.primary_title.tier }
                 }
+                NOT = { tier = scope:acting_ruler.primary_title.tier }
             }
 
             # Try to create the empire if possible
             save_scope_as = target_title
+
+            # Create an important-action alert for the engine/UI so players (and logs) know this title is creatable
+            scope:target_title = {
+                try_create_important_action = {
+                    important_action_type = action_can_create_title
+                    landed_title = this
+                }
+            }
             scope:acting_ruler = {
                 # Use the engine helper used by decisions/events to create titles and transfer holdings
                 create_title_and_vassal_change = {
