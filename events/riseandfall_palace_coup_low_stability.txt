@@ -14,24 +14,80 @@ palace_coup.1001 = {
 	}
 
 	immediate = {
-		random_courtier = {
-			limit = {
-				is_knight = yes
-				is_landed = no
-				is_alive = yes
+		# Select challenger respecting realm sex succession laws on the root's realm.
+		if = {
+			limit = { root = { OR = { has_realm_law = male_only_law has_realm_law = male_preference_law } } }
+			random_courtier = {
+				limit = {
+					is_knight = yes
+					is_landed = no
+					is_alive = yes
+					is_male = yes
+				}
+				save_scope_as = challenger
 			}
-			save_scope_as = challenger
+		}
+		else_if = {
+			limit = { root = { OR = { has_realm_law = female_only_law has_realm_law = female_preference_law } } }
+			random_courtier = {
+				limit = {
+					is_knight = yes
+					is_landed = no
+					is_alive = yes
+					is_female = yes
+				}
+				save_scope_as = challenger
+			}
+		}
+		else = {
+			random_courtier = {
+				limit = {
+					is_knight = yes
+					is_landed = no
+					is_alive = yes
+				}
+				save_scope_as = challenger
+			}
 		}
 		if = {
 			limit = { NOT = { exists = scope:challenger } }
-			random_courtier = {
-				limit = {
-					is_landed = no
-					is_alive = yes
+			# Fallback challenger selection also respects male/female-only succession laws
+			if = {
+				limit = { root = { OR = { has_realm_law = male_only_law has_realm_law = male_preference_law } } }
+				random_courtier = {
+					limit = {
+						is_landed = no
+						is_alive = yes
 						NOT = { is_close_family_of = root }
-					age > 16
+						age > 16
+						is_male = yes
+					}
+					save_scope_as = challenger
 				}
-				save_scope_as = challenger
+			}
+			else_if = {
+				limit = { root = { OR = { has_realm_law = female_only_law has_realm_law = female_preference_law } } }
+				random_courtier = {
+					limit = {
+						is_landed = no
+						is_alive = yes
+						NOT = { is_close_family_of = root }
+						age > 16
+						is_female = yes
+					}
+					save_scope_as = challenger
+				}
+			}
+			else = {
+				random_courtier = {
+					limit = {
+						is_landed = no
+						is_alive = yes
+						NOT = { is_close_family_of = root }
+						age > 16
+					}
+					save_scope_as = challenger
+				}
 			}
 		}
 		# set a cooldown variable used by the low stability system
