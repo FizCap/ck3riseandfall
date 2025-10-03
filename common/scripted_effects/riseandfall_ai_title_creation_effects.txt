@@ -103,6 +103,7 @@ riseandfall_ai_create_duchies_se = {
         # Allow any ruler (player or AI), regardless of primary title tier, to be considered
         # for duchy creation, but require the ruler to be landed (is_landed = yes).
         limit = {
+            is_ai = yes
             is_landed = yes
         }
 
