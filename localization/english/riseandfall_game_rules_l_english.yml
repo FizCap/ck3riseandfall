@@ -75,3 +75,10 @@ setting_riseandfall_vassal_limit_enabled:0 "Enabled"
 setting_riseandfall_vassal_limit_enabled_desc:0 "When enabled, non-independent rulers receive a permanent vassal limit increase."
 setting_riseandfall_vassal_limit_disabled:0 "Disabled"
 setting_riseandfall_vassal_limit_disabled_desc:0 "Do not apply the vassal limit bonus."
+
+# Powerful Vassal Multiplier rule
+rule_riseandfall_enable_powerful_vassal_multiplier:0 "Powerful Vassal Multiplier"
+setting_riseandfall_powerful_vassal_multiplier_enabled:0 "Enabled"
+setting_riseandfall_powerful_vassal_multiplier_enabled_desc:0 "Apply a stability multiplier based on the average opinion of powerful vassals. Negative opinions reduce stability."
+setting_riseandfall_powerful_vassal_multiplier_disabled:0 "Disabled"
+setting_riseandfall_powerful_vassal_multiplier_disabled_desc:0 "Do not apply the powerful vassal opinion multiplier to stability."

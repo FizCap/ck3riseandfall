@@ -296,6 +296,60 @@ riseandfall_calculate_realm_stability_se = {
     clamp_variable = { name = riseandfall_rs_vassals_component min = 0 max = 30 }
 
     ########################################
+    # 3.5) POWERFUL VASSAL OPINION MULTIPLIER (optional via game rule)
+    # Compute average opinion of powerful vassals (tier >= duchy). If average <= 0,
+    # apply a multiplier between 0.5 (for -100 avg) and 1.0 (for 0 or higher). Positive
+    # averages do not boost stability (cap at 1.0).
+    # Expose multiplier for tooltip as percentage (100 = no change, 50 = half stability)
+    # Default to 100% (no change) when rule disabled or no powerful vassals.
+    set_variable = { name = riseandfall_realm_stability_powerful_vassal_multiplier value = 100 }
+    # Dummy use to satisfy engine validation
+    if = { limit = { var:riseandfall_realm_stability_powerful_vassal_multiplier >= 0 } }
+    if = {
+        limit = { has_game_rule = riseandfall_powerful_vassal_multiplier_enabled }
+        # Prepare accumulators
+        set_variable = { name = tmp_pv_count value = 0 }
+        set_variable = { name = tmp_pv_opinion_sum value = 0 }
+
+        # iterate powerful vassals using the engine-provided iterator and sum their opinions of the liege
+        every_powerful_vassal = {
+            # save their opinion of liege (vassal scope)
+            if = {
+                limit = { save_temporary_opinion_value_as = { name = tmp_pv_op target = liege } }
+                scope:ruler = { change_variable = { name = tmp_pv_count add = 1 } }
+                scope:ruler = { change_variable = { name = tmp_pv_opinion_sum add = scope:tmp_pv_op } }
+            }
+        }
+
+        # compute average powerful vassal opinion if any
+        if = { limit = { var:tmp_pv_count > 0 }
+            set_variable = { name = tmp_pv_avg value = var:tmp_pv_opinion_sum }
+            change_variable = { name = tmp_pv_avg divide = var:tmp_pv_count }
+        }
+        else = { set_variable = { name = tmp_pv_avg value = 0 } }
+
+        # If average is negative, compute multiplier: mult = 1.0 + (avg / 200.0)
+        # Implement as percent: percent = floor((1.0 + avg/200) * 100) with bounds 50..100
+        if = {
+            limit = { var:tmp_pv_avg < 0 }
+            # tmp_pv_tmp = avg + 200  (so -100 -> 100, 0 -> 200)
+            set_variable = { name = tmp_pv_tmp value = var:tmp_pv_avg }
+            change_variable = { name = tmp_pv_tmp add = 200 }
+            # percent = (tmp_pv_tmp * 100) / 200  -> simplifies to tmp_pv_tmp / 2
+            set_variable = { name = tmp_pv_percent value = var:tmp_pv_tmp }
+            change_variable = { name = tmp_pv_percent divide = 2 }
+            # clamp percent to 50..100
+            clamp_variable = { name = tmp_pv_percent min = 50 max = 100 }
+            # store tooltip value
+            set_variable = { name = riseandfall_realm_stability_powerful_vassal_multiplier value = var:tmp_pv_percent }
+        }
+        else = {
+            # No negative average -> keep multiplier at 100 (no effect)
+            set_variable = { name = riseandfall_realm_stability_powerful_vassal_multiplier value = 100 }
+        }
+    }
+
+    ########################################
     # 4) Sum components into final 0..100 TARGET score (don't overwrite the persistent current score yet)
     # Ensure component vars exist (safe defaults) to avoid unset-variable engine errors
     if = { limit = { NOT = { has_variable = riseandfall_rs_stats_component } } set_variable = { name = riseandfall_rs_stats_component value = 0 } }
@@ -312,6 +366,12 @@ riseandfall_calculate_realm_stability_se = {
     # Add popular opinion component (-10..10)
     # Use the tooltip-exposed variable so it's considered 'used' by the engine
     change_variable = { name = tmp_target_score add = var:riseandfall_realm_stability_popular_opinion_bonus }
+
+    # Apply powerful vassal multiplier if active (calculated earlier)
+    if = { limit = { var:riseandfall_realm_stability_powerful_vassal_multiplier < 100 }
+        change_variable = { name = tmp_target_score multiply = var:riseandfall_realm_stability_powerful_vassal_multiplier }
+        change_variable = { name = tmp_target_score divide = 100 }
+    }
 
     # Civil war adjustment applied to the TARGET score (so smoothing moves current toward
     # the penalized target) instead of modifying the persistent current score directly.
