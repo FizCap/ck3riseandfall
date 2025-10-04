@@ -183,7 +183,7 @@ riseandfall_enable_powerful_vassal_multiplier = {
     }
 
     # Default: enabled for testing (multiplier based on powerful vassal opinion)
-    default = riseandfall_powerful_vassal_multiplier_enabled
+    default = riseandfall_powerful_vassal_multiplier_disabled
 
     riseandfall_powerful_vassal_multiplier_enabled = {
     }
