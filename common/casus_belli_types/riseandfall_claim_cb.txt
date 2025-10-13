@@ -224,6 +224,13 @@
                 add_achievement_flag_effect = { FLAG = achievement_bad_blood_flag }
             }
         }
+        if = {
+            limit = { scope:attacker = { has_character_flag = riseandfall_newadventurer } }
+            scope:attacker = {
+                set_variable = { name = riseandfall_adventurer_army_size value = var:adventurer_respawn_army_size }
+                add_character_flag = riseandfall_armyrespawn
+            }
+        }
     }
 
     should_invalidate = {

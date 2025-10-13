@@ -65,7 +65,7 @@
                     if = { limit = { has_trait = content } change_variable = { name = rf_adventurer_trait_chance add = -5.0 } }
                     if = { limit = { has_trait = incapable } change_variable = { name = rf_adventurer_trait_chance add = -10.0 } }
                     # Set base chance based on game rule: low -1%, medium 0%, high +1%
-                    if = { limit = { has_game_rule = riseandfall_adventurer_chance_low } set_variable = { name = rf_adventurer_base_chance value = -1.0 } }
+                    if = { limit = { has_game_rule = riseandfall_adventurer_chance_low } set_variable = { name = rf_adventurer_base_chance value = 100 } }
                     else_if = { limit = { has_game_rule = riseandfall_adventurer_chance_medium } set_variable = { name = rf_adventurer_base_chance value = 0.0 } }
                     else_if = { limit = { has_game_rule = riseandfall_adventurer_chance_high } set_variable = { name = rf_adventurer_base_chance value = 1.0 } }
                     else = { set_variable = { name = rf_adventurer_base_chance value = 0.0 } }  # fallback to medium
@@ -313,6 +313,12 @@ riseandfall_do_create_adventurer_se = {
             round_variable = { name = adventurer_army_size nearest = 1 }
             # Ensure at least a single levy to avoid zero-size spawns which can confuse the engine.
             clamp_variable = { name = adventurer_army_size min = 1 max = 1000000 }
+
+            # Calculate respawn army size as 70% of final army size
+            set_variable = { name = adventurer_respawn_army_size value = var:adventurer_army_size }
+            change_variable = { name = adventurer_respawn_army_size multiply = 0.7 }
+            round_variable = { name = adventurer_respawn_army_size nearest = 1 }
+            clamp_variable = { name = adventurer_respawn_army_size min = 1 max = 10000 }
 
             set_variable = { name = adventurer_max_cap value = var:adventurer_base_levies }
             change_variable = { name = adventurer_max_cap multiply = 6 }
@@ -603,4 +609,18 @@ riseandfall_yearly_adventurer_remove_variable_se = {
     remove_variable = rf_adventurer_final_chance
     remove_variable = intrigue_bonus
     remove_variable = rf_sex_penalty
+}
+
+
+riseandfall_siege_respawn_se = {
+    if = {
+        limit = { has_character_flag = riseandfall_armyrespawn }
+        spawn_army = {
+            name = riseandfall_respawn_army_name
+            levies = var:riseandfall_adventurer_army_size
+            location = this.location
+            war_keep_on_attacker_victory = no
+            inheritable = no
+        }
+    }
 }
