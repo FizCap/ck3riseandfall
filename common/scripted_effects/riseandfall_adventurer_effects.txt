@@ -13,7 +13,7 @@
                 # Exclude noble-family title holders (landless playable noble families)
                 NOT = { any_held_title = { is_noble_family_title = yes } }
                 # Exclude characters flagged as unable to marry; trait-based penalties are applied below
-                NOT = { has_character_flag = can_not_marry }
+                NOT = { has_trait_with_flag = can_not_marry }
                 age >= 16
                 # Only qualify if they have a claim on a kingdom+ title held by an independent ruler
                 any_claim = { tier >= tier_kingdom exists = holder holder = { is_independent_ruler = yes } }

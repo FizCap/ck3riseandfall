@@ -52,63 +52,50 @@ riseandfall_low_stability_roll_se = {
 # Randomly selects between warlord uprising, peasant unrest, and puppet master offer
 
 riseandfall_low_stability_random_event = {
+    # Prefilter eligibility into simple flags to guarantee a fallback without chained logic.
+    # rf_puppet_ok = 1 if puppet event is allowed (no existing puppet_regency)
+    # rf_adventurer_ok = 1 if adventurer event is allowed (empire-tier ruler)
+    set_variable = { name = rf_puppet_ok value = 1 }
+    if = { limit = { has_diarchy_type = puppet_regency } set_variable = { name = rf_puppet_ok value = 0 } }
+
+    set_variable = { name = rf_adventurer_ok value = 0 }
+    # Allow adventurer invasion for kingdom-tier rulers or higher (kingdom, empire)
+    if = { limit = { primary_title = { tier >= tier_kingdom } } set_variable = { name = rf_adventurer_ok value = 1 } }
+
+    # Four compact cases depending on eligibility. Each uses a short random_list.
     if = {
-        limit = { NOT = { has_diarchy_type = puppet_regency } }
+        limit = { AND = { var:rf_puppet_ok = 1 var:rf_adventurer_ok = 1 } }
+        # Both options available: include puppet and adventurer
         random_list = {
-            1 = {
-                # Warlord uprising event
-                trigger_event = { id = warlord.1001 }
-            }
-            1 = {
-                # Puppet master offer to a random powerful vassal
-                trigger_event = { id = puppet.1001 }
-            }
-            1 = {
-                # Adventurer invasion event (only for kingdom tier or higher rulers)
-                if = {
-                    limit = { primary_title = { tier >= tier_kingdom } }
-                    trigger_event = { id = adventurer.1001 }
-                }
-                else = {
-                    # Fallback: choose one of the other low-stability events
-                    random_list = {
-                        1 = { trigger_event = { id = warlord.1001 } }
-                        1 = { trigger_event = { id = puppet.1001 } }
-                        1 = { trigger_event = { id = palace_coup.1001 } }
-                    }
-                }
-            }
-            1 = {
-                # Palace coup event
-                trigger_event = { id = palace_coup.1001 }
-            }
+            1 = { trigger_event = { id = warlord.1001 } }
+            1 = { trigger_event = { id = puppet.1001 } }
+            1 = { trigger_event = { id = adventurer.1001 } }
+            1 = { trigger_event = { id = palace_coup.1001 } }
+        }
+    }
+    else_if = {
+        limit = { AND = { var:rf_puppet_ok = 1 var:rf_adventurer_ok = 0 } }
+        # Only puppet allowed
+        random_list = {
+            1 = { trigger_event = { id = warlord.1001 } }
+            1 = { trigger_event = { id = puppet.1001 } }
+            1 = { trigger_event = { id = palace_coup.1001 } }
+        }
+    }
+    else_if = {
+        limit = { AND = { var:rf_puppet_ok = 0 var:rf_adventurer_ok = 1 } }
+        # Only adventurer allowed
+        random_list = {
+            1 = { trigger_event = { id = warlord.1001 } }
+            1 = { trigger_event = { id = adventurer.1001 } }
+            1 = { trigger_event = { id = palace_coup.1001 } }
         }
     }
     else = {
-        # If has puppet_regency, randomly trigger warlord or adventurer (avoid puppet)
+        # Neither allowed: fallback to warlord / palace coup
         random_list = {
-            1 = {
-                # Warlord uprising event
-                trigger_event = { id = warlord.1001 }
-            }
-            1 = {
-                # Adventurer invasion event (only for kingdom tier or higher rulers)
-                if = {
-                    limit = { primary_title = { tier >= tier_kingdom } }
-                    trigger_event = { id = adventurer.1001 }
-                }
-                else = {
-                    # Fallback: choose one of the allowed alternatives (warlord or palace coup)
-                    random_list = {
-                        1 = { trigger_event = { id = warlord.1001 } }
-                        1 = { trigger_event = { id = palace_coup.1001 } }
-                    }
-                }
-            }
-            1 = {
-                # Palace coup event
-                trigger_event = { id = palace_coup.1001 }
-            }
+            1 = { trigger_event = { id = warlord.1001 } }
+            1 = { trigger_event = { id = palace_coup.1001 } }
         }
     }
 }
@@ -203,6 +190,7 @@ riseandfall_create_adventurer_invasion_se = {
                     NOT = { has_government = landless_adventurer_government }
                     age >= 16
                     NOT = { has_character_flag = riseandfall_newadventurer }
+                    NOT = { has_trait_with_flag = can_not_marry }
                 }
                 save_scope_as = adventurer_candidate
             }
@@ -270,6 +258,7 @@ riseandfall_create_adventurer_invasion_se = {
                     is_landed = no
                     NOT = { has_government = landless_adventurer_government }
                     NOT = { has_character_flag = riseandfall_newadventurer }
+                        NOT = { has_trait_with_flag = can_not_marry }
                     NOT = {
                         OR = {
                             is_allied_to = root
