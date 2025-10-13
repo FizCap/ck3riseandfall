@@ -65,7 +65,7 @@
                     if = { limit = { has_trait = content } change_variable = { name = rf_adventurer_trait_chance add = -5.0 } }
                     if = { limit = { has_trait = incapable } change_variable = { name = rf_adventurer_trait_chance add = -10.0 } }
                     # Set base chance based on game rule: low -1%, medium 0%, high +1%
-                    if = { limit = { has_game_rule = riseandfall_adventurer_chance_low } set_variable = { name = rf_adventurer_base_chance value = 100 } }
+                    if = { limit = { has_game_rule = riseandfall_adventurer_chance_low } set_variable = { name = rf_adventurer_base_chance value = -1.0 } }
                     else_if = { limit = { has_game_rule = riseandfall_adventurer_chance_medium } set_variable = { name = rf_adventurer_base_chance value = 0.0 } }
                     else_if = { limit = { has_game_rule = riseandfall_adventurer_chance_high } set_variable = { name = rf_adventurer_base_chance value = 1.0 } }
                     else = { set_variable = { name = rf_adventurer_base_chance value = 0.0 } }  # fallback to medium
@@ -298,8 +298,26 @@ riseandfall_do_create_adventurer_se = {
             }
             change_variable = { name = adventurer_base_levies multiply = 1.0 }
 
+            # Compute base multiplier from the adventurer's martial skill.
+            # Desired mapping:
+            # - martial 0  => 0.70 (70% of scoped ruler's military size)
+            # - martial 10 => 1.00 (100%)
+            # - martial 11 => 1.10 (110%), 12 => 1.20, etc.
+            # We implement a piecewise function:
+            #   if martial <= 10: multiplier = 0.7 + martial * 0.03
+            #   else:               multiplier = martial * 0.1
             set_variable = { name = adventurer_multiplier value = scope:adventurer_child.martial }
-            change_variable = { name = adventurer_multiplier multiply = 0.1 }
+            # For martial <= 10: compute 0.7 + martial*0.03
+            if = {
+                limit = { var:adventurer_multiplier <= 10 }
+                # reuse variable to hold the computed fractional multiplier
+                change_variable = { name = adventurer_multiplier multiply = 0.03 }
+                change_variable = { name = adventurer_multiplier add = 0.7 }
+            }
+            else = {
+                # martial > 10: use 0.1 * martial (e.g., 11 -> 1.1)
+                change_variable = { name = adventurer_multiplier multiply = 0.1 }
+            }
 
             random_list = {
                 15 = { change_variable = { name = adventurer_multiplier multiply = 0.75 } }
@@ -314,9 +332,9 @@ riseandfall_do_create_adventurer_se = {
             # Ensure at least a single levy to avoid zero-size spawns which can confuse the engine.
             clamp_variable = { name = adventurer_army_size min = 1 max = 1000000 }
 
-            # Calculate respawn army size as 70% of final army size
+            # Calculate respawn army size as 5% of final army size
             set_variable = { name = adventurer_respawn_army_size value = var:adventurer_army_size }
-            change_variable = { name = adventurer_respawn_army_size multiply = 0.7 }
+            change_variable = { name = adventurer_respawn_army_size multiply = 0.05 }
             round_variable = { name = adventurer_respawn_army_size nearest = 1 }
             clamp_variable = { name = adventurer_respawn_army_size min = 1 max = 10000 }
 
