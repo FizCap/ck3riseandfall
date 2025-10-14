@@ -18,13 +18,6 @@ quarterly_playable_pulse = {
     }
 }
 
-# On_action for siege completion to respawn adventurer armies
-on_siege_completion = {
-    on_actions = {
-        riseandfall_siege_respawn
-    }
-}
-
 #---------------------------------------------------
 
 riseandfall_yearly_adventurer = {
@@ -149,9 +142,3 @@ riseandfall_yearly_adventurer_cleanup_on_action = {
             riseandfall_adventurer_cleanup_se = yes
         }
     }
-
-riseandfall_siege_respawn = {
-    effect = {
-        riseandfall_siege_respawn_se = yes
-    }
-}

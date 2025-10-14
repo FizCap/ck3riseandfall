@@ -628,17 +628,3 @@ riseandfall_yearly_adventurer_remove_variable_se = {
     remove_variable = intrigue_bonus
     remove_variable = rf_sex_penalty
 }
-
-
-riseandfall_siege_respawn_se = {
-    if = {
-        limit = { has_character_flag = riseandfall_armyrespawn }
-        spawn_army = {
-            name = riseandfall_respawn_army_name
-            levies = var:riseandfall_adventurer_army_size
-            location = this.location
-            war_keep_on_attacker_victory = no
-            inheritable = no
-        }
-    }
-}

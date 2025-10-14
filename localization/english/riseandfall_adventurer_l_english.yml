@@ -4,7 +4,6 @@
 
  # Army names
  riseandfall_adventurer_host_name: "[adventurer_child.GetFirstNamePossessiveNoTooltip] Host"
- riseandfall_respawn_army_name: "Reinforcements"
 
 	# Modifier names and descriptions
  riseandfall_adventurer_gold_mod: "Adventurer Wealth"
