@@ -107,6 +107,7 @@ riseandfall_low_stability_random_event = {
 riseandfall_create_adventurer_invasion_se = {
     # Called on the ruler (root)
     save_scope_as = ruler_root  # Save the ruler for use in iterators
+    scope:ruler_root = { save_scope_as = independent_ruler }
 
     # Initialize variables for tooltip safety
     set_variable = { name = selected value = 0 }
@@ -250,15 +251,15 @@ riseandfall_create_adventurer_invasion_se = {
             var:remaining_courtier_slots > 0
             var:no_more_courtiers == 0
         }
-        scope:ruler_root = { clear_saved_scope = adventurer_candidate }
-        scope:ruler_root = {
+        clear_saved_scope = adventurer_candidate
+        root = {
             every_courtier = {
                 limit = {
                     age >= 16
                     is_landed = no
                     NOT = { has_government = landless_adventurer_government }
                     NOT = { has_character_flag = riseandfall_newadventurer }
-                        NOT = { has_trait_with_flag = can_not_marry }
+                    NOT = { has_trait_with_flag = can_not_marry }
                     NOT = {
                         OR = {
                             is_allied_to = root
@@ -304,7 +305,10 @@ riseandfall_create_adventurer_invasion_se = {
 
                 if = {
                     limit = { var:rf_disqualify == 0 }
-                    riseandfall_do_create_adventurer_se = yes
+                    scope:adventurer_candidate = {
+                        add_unpressed_claim = scope:ruler_root.primary_title
+                        riseandfall_do_create_adventurer_se = yes
+                    }
                     # consume a courtier slot for a successful conscription
                     scope:ruler_root = { change_variable = { name = remaining_courtier_slots subtract = 1 } }
                     root = { change_variable = { name = remaining_courtier_slots subtract = 1 } }
@@ -337,7 +341,6 @@ riseandfall_create_adventurer_invasion_se = {
             gender_female_chance = 50
             save_scope_as = adventurer_candidate
         }
-        root = { save_scope_as = independent_ruler }
         scope:adventurer_candidate = {
             add_unpressed_claim = scope:ruler_root.primary_title
             riseandfall_do_create_adventurer_se = yes
