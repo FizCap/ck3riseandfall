@@ -55,12 +55,12 @@ riseandfall_low_stability_random_event = {
     # Prefilter eligibility into simple flags to guarantee a fallback without chained logic.
     # rf_puppet_ok = 1 if puppet event is allowed (no existing puppet_regency)
     # rf_adventurer_ok = 1 if adventurer event is allowed (empire-tier ruler)
-    set_variable = { name = rf_puppet_ok value = 1 }
-    if = { limit = { has_diarchy_type = puppet_regency } set_variable = { name = rf_puppet_ok value = 0 } }
+    set_variable = { name = rf_puppet_ok value = 1 days = 14 }
+    if = { limit = { has_diarchy_type = puppet_regency } set_variable = { name = rf_puppet_ok value = 0 days = 14 } }
 
-    set_variable = { name = rf_adventurer_ok value = 0 }
+    set_variable = { name = rf_adventurer_ok value = 0 days = 14 }
     # Allow adventurer invasion for kingdom-tier rulers or higher (kingdom, empire)
-    if = { limit = { primary_title = { tier >= tier_kingdom } } set_variable = { name = rf_adventurer_ok value = 1 } }
+    if = { limit = { primary_title = { tier >= tier_kingdom } } set_variable = { name = rf_adventurer_ok value = 1 days = 14 } }
 
     # Four compact cases depending on eligibility. Each uses a short random_list.
     if = {
