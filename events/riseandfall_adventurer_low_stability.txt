@@ -14,7 +14,7 @@ adventurer.1001 = {
 
     immediate = {
         # Set low stability cooldown on the ruler when this event fires
-        set_variable = { name = low_stability_cooldown value = 1 }
+    set_variable = { name = low_stability_cooldown value = yes days = 1825 }
     }
 
     option = {

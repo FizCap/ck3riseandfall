@@ -91,7 +91,7 @@ palace_coup.1001 = {
 			}
 		}
 		# set a cooldown variable used by the low stability system
-		set_variable = { name = low_stability_cooldown value = 1 }
+		set_variable = { name = low_stability_cooldown value = yes days = 1825 }
 		# (duel will be resolved when the player chooses option A)
 	}
 
