@@ -18,6 +18,13 @@ quarterly_playable_pulse = {
     }
 }
 
+on_siege_looting = {
+    on_actions = {
+        riseandfall_siege
+    }
+}
+
+
 #---------------------------------------------------
 
 riseandfall_yearly_adventurer = {
@@ -142,3 +149,16 @@ riseandfall_yearly_adventurer_cleanup_on_action = {
             riseandfall_adventurer_cleanup_se = yes
         }
     }
+
+riseandfall_siege = {
+    effect = {
+        # Save the looted county and barony for use in the scripted effect
+        scope:county = { save_scope_as = rf_looted_county }
+        scope:barony = { save_scope_as = rf_looted_barony }
+        # Save the sieging character (root) as rf_sieger for clarity
+        save_scope_as = rf_sieger
+
+        # Call our scripted effect which will add a test province modifier
+        riseandfall_on_siege_looting_se = yes
+    }
+}

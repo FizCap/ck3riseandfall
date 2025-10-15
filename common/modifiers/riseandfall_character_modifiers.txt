@@ -1,7 +1,0 @@
-# Rise and Fall character modifiers
-
-riseandfall_test_siege_looter_mod = {
-    icon = martial_positive
-    monthly_income = 1
-    # Example effects to show the modifier; tune as needed
-}
