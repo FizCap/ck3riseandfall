@@ -66,7 +66,7 @@
                     if = { limit = { has_trait = incapable } change_variable = { name = rf_adventurer_trait_chance add = -10.0 } }
                     # Set base chance based on game rule: low -1%, medium 0%, high +1%
                     if = { limit = { has_game_rule = riseandfall_adventurer_chance_low } set_variable = { name = rf_adventurer_base_chance value = -1.0 } }
-                    else_if = { limit = { has_game_rule = riseandfall_adventurer_chance_medium } set_variable = { name = rf_adventurer_base_chance value = 0.0 } }
+                    else_if = { limit = { has_game_rule = riseandfall_adventurer_chance_medium } set_variable = { name = rf_adventurer_base_chance value = 100.0 } }
                     else_if = { limit = { has_game_rule = riseandfall_adventurer_chance_high } set_variable = { name = rf_adventurer_base_chance value = 1.0 } }
                     else = { set_variable = { name = rf_adventurer_base_chance value = 0.0 } }  # fallback to medium
                     # Final chance = base chance + trait bonuses + intrigue bonus, clamp to [0,100]
@@ -358,6 +358,7 @@ riseandfall_do_create_adventurer_se = {
                     levies = var:adventurer_army_size
                     war_keep_on_attacker_victory = no
                     inheritable = no
+                    uses_supply = no
                     location = scope:claim_target_title.holder.capital_province
                 } }
             }
@@ -368,6 +369,7 @@ riseandfall_do_create_adventurer_se = {
                     levies = var:adventurer_army_size
                     war_keep_on_attacker_victory = no
                     inheritable = no
+                    uses_supply = no
                     location = scope:independent_ruler.capital_province
                 } }
             }
@@ -377,6 +379,7 @@ riseandfall_do_create_adventurer_se = {
                     levies = var:adventurer_army_size
                     war_keep_on_attacker_victory = no
                     inheritable = no
+                    uses_supply = no
                     location = scope:adventurer_child.capital_province
                 } }
             }
