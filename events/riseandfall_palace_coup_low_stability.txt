@@ -109,7 +109,7 @@ palace_coup.1001 = {
 			5 = {
 				compare_modifier = {
 					value = scope:duel_value
-					multiplier = -3.5
+					multiplier = 3.5
 					min = -49
 				}
 
@@ -165,7 +165,7 @@ palace_coup.1001 = {
 			95 = {
 				compare_modifier = {
 					value = scope:duel_value
-					multiplier = 3.5
+					multiplier = -3.5
 					min = -49
 				}
 
@@ -256,15 +256,16 @@ palace_coup.1001 = {
 		}
 
 		ai_chance = {
-			base = 10
+			# Increase base so negative modifiers can't push the weight below zero.
+			base = 100
 		  modifier = {
 			  add = 80
-			  # Favor the duel if root's prowess is higher than the challenger
+			  # Strongly favor the duel if root's prowess is higher than the challenger
 			  NOT = { prowess_diff = { target = scope:challenger value <= 0 } }
 		  }
 		  modifier = {
-			  add = -40
-			  # Discourage duel if root is much weaker in prowess than the challenger
+			  add = -80
+			  # Strongly discourage duel if root is weaker in prowess than the challenger
 			  prowess_diff = { target = scope:challenger value <= -1 }
 		  }
 		}
@@ -434,16 +435,22 @@ palace_coup.1001 = {
 		}
 
 		ai_chance = {
-			base = 10
+			# Smaller base: intrigue should have limited influence. Prowess check below will dominate.
+			base = 20
 		  modifier = {
-			  add = 80
-			  # Favor escape if root's intrigue is higher than the challenger
+			  add = 10
+			  # Slightly favor escape if root's intrigue is higher than the challenger
 			  NOT = { intrigue_diff = { target = scope:challenger value <= 0 } }
 		  }
 		  modifier = {
-			  add = -40
-			  # Discourage escape if root is weaker in intrigue
+			  add = -10
+			  # Slight penalty if root is weaker in intrigue
 			  intrigue_diff = { target = scope:challenger value <= -1 }
+		  }
+		  modifier = {
+			  add = 100
+			  # If root is notably weaker in prowess than the challenger, strongly favor escape
+			  prowess_diff = { target = scope:challenger value <= -1 }
 		  }
 		}
 	}
