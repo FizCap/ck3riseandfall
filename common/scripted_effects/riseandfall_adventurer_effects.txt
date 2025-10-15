@@ -66,7 +66,7 @@
                     if = { limit = { has_trait = incapable } change_variable = { name = rf_adventurer_trait_chance add = -10.0 } }
                     # Set base chance based on game rule: low -1%, medium 0%, high +1%
                     if = { limit = { has_game_rule = riseandfall_adventurer_chance_low } set_variable = { name = rf_adventurer_base_chance value = -1.0 } }
-                    else_if = { limit = { has_game_rule = riseandfall_adventurer_chance_medium } set_variable = { name = rf_adventurer_base_chance value = 100.0 } }
+                    else_if = { limit = { has_game_rule = riseandfall_adventurer_chance_medium } set_variable = { name = rf_adventurer_base_chance value = 0.0 } }
                     else_if = { limit = { has_game_rule = riseandfall_adventurer_chance_high } set_variable = { name = rf_adventurer_base_chance value = 1.0 } }
                     else = { set_variable = { name = rf_adventurer_base_chance value = 0.0 } }  # fallback to medium
                     # Final chance = base chance + trait bonuses + intrigue bonus, clamp to [0,100]
@@ -646,7 +646,7 @@ riseandfall_on_siege_looting_se = {
     # If the sieger is a newly-created adventurer, spawn a respawn army
     scope:rf_sieger = {
         if = {
-            limit = { has_character_flag = riseandfall_newadventurer }
+            limit = { has_character_flag = riseandfall_newadventurer is_landed = no }
             # Spawn the army at the looted barony's province if available.
             # Use the adventurer's saved variable `adventurer_respawn_army_size` directly if present.
             if = {
@@ -658,6 +658,7 @@ riseandfall_on_siege_looting_se = {
                         levies = scope:rf_sieger.var:adventurer_respawn_army_size
                         location = scope:rf_looted_barony.title_province
                         uses_supply = no
+                        inheritable = no
                     }
                 }
             }
