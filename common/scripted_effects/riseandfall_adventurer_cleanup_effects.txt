@@ -1,5 +1,8 @@
 ﻿riseandfall_adventurer_cleanup_se = {
     every_ruler = {
+        # Save the current ruler as a character scope so we can call character-only
+        # effects (like destroy_title and gold removal) from inside title loops.
+        save_scope_as = rf_ruler
         # Destroy any titles created by this mod for AI rulers without the adventurer flag
         if = {
             limit = {
@@ -32,13 +35,43 @@
         # Disband legitimist camps for adventurers with no valid claims on independent rulers
         if = {
             limit = {
-                has_character_flag = riseandfall_newadventurer
                 has_government = landless_adventurer_government
                 NOT = { any_claim = { tier >= tier_kingdom exists = holder holder = { is_independent_ruler = yes } } }
             }
-            destroy_title = primary_title
-            remove_character_flag = riseandfall_newadventurer
-            # Remove adventurer's gold
+            # Only destroy the primary adventurer title if it was created by this mod
+            primary_title = {
+                limit = { has_variable = riseandfall_created_adventurer_title }
+                save_scope_as = rf_candidate_title
+            }
+            # If the save_scope_as succeeded, destroy the saved title from the
+            # ruler character scope (destroy_title requires a character scope).
+            scope:rf_ruler = {
+                destroy_title = scope:rf_candidate_title
+            }
+
+            # Also handle any held titles created by this mod for this ruler: if a held
+            # title still carries the mod variable but the holder no longer has the
+            # adventurer flags, remove any adventurer gold from the holder and destroy it.
+            every_held_title = {
+                limit = { has_variable = riseandfall_created_adventurer_title }
+                save_scope_as = rf_candidate_title
+                # every_held_title switches scope to the title. Use the saved
+                # ruler scope (rf_ruler) to remove gold and destroy the title.
+                scope:rf_ruler = {
+                    if = {
+                        limit = { NOT = { has_character_flag = riseandfall_adventurer } NOT = { has_character_flag = riseandfall_newadventurer } }
+                        set_variable = { name = adventurer_gold value = gold }
+                        if = {
+                            limit = { var:adventurer_gold > 0 }
+                            remove_short_term_gold = var:adventurer_gold
+                        }
+                        remove_variable = adventurer_gold
+                        destroy_title = scope:rf_candidate_title
+                    }
+                }
+            }
+
+            # Remove adventurer's gold for the current ruler (primary_title case)
             set_variable = { name = adventurer_gold value = gold }
             if = {
                 limit = { var:adventurer_gold > 0 }
