@@ -631,5 +631,7 @@
     max_defender_score_from_occupation = 150
     max_ai_diplo_distance_to_title = 1000
 
+    white_peace_possible = no # If set to "no", white peaces can't happen; only victory, defeat, or invalidation
+
     ai_score_mult = { value = 1 }
 }
