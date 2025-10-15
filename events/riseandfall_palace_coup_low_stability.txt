@@ -105,67 +105,67 @@ palace_coup.1001 = {
 			skill = prowess
 			target = scope:challenger
 
-			# Actor (root) wins outcome
-			60 = {
+			# Actor (root) wins outcome (heavily disfavored)
+			5 = {
 				compare_modifier = {
 					value = scope:duel_value
-					multiplier = 3.5
+					multiplier = -3.5
 					min = -49
 				}
 
-				# Root kills challenger (non-instant fatality handled by death_reason)
-				scope:challenger = {
-					death = {
-						death_reason = death_duel
-						killer = root
-					}
-				}
-
-				# Purge: some of the ruler's unlanded knights and courtiers die in the chaos
-				root = {
-					# Kill ~50% of unlanded knights in the ruler's court
-					every_courtier = {
-						limit = {
-							is_knight = yes
-							is_landed = no
-							is_alive = yes
-						}
-						random_list = {
-							50 = {
-								death = {
-									death_reason = death_in_palace_coup
-                                    killer = scope:challenger
-								}
-							}
-							50 = { }
+				# Hidden: kill challenger and purge courtiers without previewing in the option tooltip
+				hidden_effect = {
+					scope:challenger = {
+						death = {
+							death_reason = death_duel
+							killer = root
 						}
 					}
-
-					# Kill ~20% of the remaining non-knight courtiers
-					every_courtier_or_guest = {
-						limit = {
-							exists = yes
-							is_alive = yes
-							NOT = { is_knight = yes }
-						}
-						random_list = {
-							20 = {
-								death = {
-									death_reason = death_in_palace_coup
-                                    killer = scope:challenger
-								}
+					root = {
+						# Kill ~50% of unlanded knights in the ruler's court
+						every_courtier = {
+							limit = {
+								is_knight = yes
+								is_landed = no
+								is_alive = yes
 							}
-							80 = { }
+							random_list = {
+								50 = {
+									death = {
+										death_reason = death_in_palace_coup
+										killer = scope:challenger
+									}
+								}
+								50 = { }
+							}
+						}
+
+						# Kill ~20% of the remaining non-knight courtiers
+						every_courtier_or_guest = {
+							limit = {
+								exists = yes
+								is_alive = yes
+								NOT = { is_knight = yes }
+							}
+							random_list = {
+								20 = {
+									death = {
+										death_reason = death_in_palace_coup
+										killer = scope:challenger
+									}
+								}
+								80 = { }
+							}
 						}
 					}
 				}
 			}
 
-			# Challenger wins outcome
-			35 = {
+			# Challenger wins outcome (heavily favored)
+			95 = {
 				compare_modifier = {
 					value = scope:duel_value
-					multiplier = -3.5
+					multiplier = 3.5
 					min = -49
 				}
 
@@ -201,6 +201,55 @@ palace_coup.1001 = {
 				scope:challenger = {
 					add_trait = murderer
 				}
+
+				# Hidden purge deaths (so victims aren't previewed) and visible toast
+				hidden_effect = {
+					root = {
+						# Kill ~50% of unlanded knights in the ruler's court
+						every_courtier = {
+							limit = {
+								is_knight = yes
+								is_landed = no
+								is_alive = yes
+							}
+							random_list = {
+								50 = {
+									death = {
+										death_reason = death_in_palace_coup
+										killer = scope:challenger
+									}
+								}
+								50 = { }
+							}
+						}
+
+						# Kill ~50% of the remaining non-knight courtiers
+						every_courtier_or_guest = {
+							limit = {
+								exists = yes
+								is_alive = yes
+								NOT = { is_knight = yes }
+							}
+							random_list = {
+								50 = {
+									death = {
+										death_reason = death_in_palace_coup
+										killer = scope:challenger
+									}
+								}
+								50 = { }
+							}
+						}
+					}
+				}
+
+				# Visible toast informing the player about the purge
+				send_interface_message = {
+					type = event_war_bad
+					title = palace_coup.purge_toast
+					left_icon = root
+					right_icon = scope:challenger
+				}
 			}
 
 
@@ -234,8 +283,8 @@ palace_coup.1001 = {
 			skill = intrigue
 			target = scope:challenger
 
-			# Success: root successfully evades/covers their tracks and escapes
-			60 = {
+			# Success: root successfully evades/covers their tracks and escapes (heavily disfavored)
+			5 = {
 				compare_modifier = {
 					value = scope:duel_value
 					multiplier = 3.5
@@ -322,8 +371,8 @@ palace_coup.1001 = {
 				}
 			}
 
-			# Failure: challenger captures/seizes the ruler (transfer titles + kill)
-			40 = {
+			# Failure: challenger captures/seizes the ruler (heavily favored)
+			95 = {
 				compare_modifier = {
 					value = scope:duel_value
 					multiplier = -3.5
