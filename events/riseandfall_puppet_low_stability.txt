@@ -59,7 +59,7 @@ puppet.1002 = {
                 }
                 set_diarch = scope:candidate_vassal
                 set_diarchy_type = puppet_regency
-                set_diarchy_swing = 30
+                set_diarchy_swing = 90
             }
             else = {
                 # Candidate invalid for diarchy (e.g. not a landed vassal) — pick another vassal if possible
