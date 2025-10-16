@@ -14,6 +14,11 @@ palace_coup.1001 = {
 	}
 
 	immediate = {
+		root = {
+			every_held_title = {
+				add_to_list = lost_titles
+			}
+		}
 		# Select challenger respecting realm sex succession laws on the root's realm.
 		if = {
 			limit = { root = { OR = { has_realm_law = male_only_law has_realm_law = male_preference_law } } }
@@ -109,8 +114,8 @@ palace_coup.1001 = {
 			5 = {
 				compare_modifier = {
 					value = scope:duel_value
-					multiplier = 3.5
-					min = -49
+					multiplier = 1
+					min = -20
 				}
 
 				# Hidden: kill challenger and purge courtiers without previewing in the option tooltip
@@ -165,8 +170,8 @@ palace_coup.1001 = {
 			95 = {
 				compare_modifier = {
 					value = scope:duel_value
-					multiplier = -3.5
-					min = -49
+					multiplier = -1
+					min = -20
 				}
 
 				# Challenger seizes titles while root is still alive, then kills root
@@ -285,7 +290,7 @@ palace_coup.1001 = {
 			target = scope:challenger
 
 			# Success: root successfully evades/covers their tracks and escapes (heavily disfavored)
-			5 = {
+			95 = {
 				compare_modifier = {
 					value = scope:duel_value
 					multiplier = 3.5
@@ -343,7 +348,7 @@ palace_coup.1001 = {
 					}
 				resolve_title_and_vassal_change = scope:change
 				# Trigger escape follow-up: present the reclaim-your-throne event to root
-				trigger_event = { id = palace_coup.1002 }
+				root = { trigger_event = { id = palace_coup.1002 } }
 				scope:challenger = {
 					if = {
 						limit = { root = { has_legitimacy = yes } }
@@ -372,8 +377,8 @@ palace_coup.1001 = {
 				}
 			}
 
-			# Failure: challenger captures/seizes the ruler (heavily favored)
-			95 = {
+			# Failure: challenger captures/seizes the ruler (heavily disfavored)
+			5 = {
 				compare_modifier = {
 					value = scope:duel_value
 					multiplier = -3.5
@@ -467,21 +472,13 @@ palace_coup.1002 = {
 		character = root
 	}
 
-	immediate = {
-		# Give root unpressed claims on titles recently taken by the challenger
-		every_held_title = {
-			limit = {
-				holder = scope:challenger
-				NOT = { tier = tier_barony }
-			}
-			root = { add_unpressed_claim = prev }
-		}
-		# Fire the warlord event on the challenger to start a rebellion path
-		# Send an interface message or notification could be done by localization and event text
-	}
-
 	option = {
 		name = palace_coup.1002.a
+			# Give root strong claims on all titles lost to the challenger (when option chosen)
+			every_in_list = {
+				list = lost_titles
+				root = { make_claim_strong = prev }
+			}
 			# Trigger the warlord path for the challenger only when this option is chosen
 			scope:challenger = {
 				trigger_event = { id = warlord.1001 }
