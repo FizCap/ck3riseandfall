@@ -1,9 +1,0 @@
-# Rise and Fall test province modifiers
-
-riseandfall_test_siege_looted_modifier = {
-    icon = martial_negative
-    build_speed = -0.05
-    development_growth_factor = -0.05
-    tax_mult = -0.1
-    # Keep stacking default behaviour
-}
