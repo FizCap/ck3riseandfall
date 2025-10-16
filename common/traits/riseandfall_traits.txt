@@ -5,17 +5,14 @@
 	ai_war_cooldown = -100
 	ai_amenity_spending = -0.25
 	ai_amenity_target_baseline = -0.4
-	ai_boldness = 0.75
+	ai_boldness = 100.00
+	ai_energy = 100.00
+	ai_honor = -100.00
 	title_creation_cost_mult = -0.75
     opinion_of_liege = -10
 	same_opinion = -30
 	vassal_limit = 1000
-
 	shown_in_ruler_designer = no
-		
-	#ai_greed = 1000
-	#ai_boldness = 1000
-	#ai_honor = -1000
 }
 
 retiredwarlord = {
