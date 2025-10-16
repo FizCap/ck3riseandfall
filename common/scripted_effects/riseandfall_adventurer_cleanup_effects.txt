@@ -40,8 +40,10 @@
             }
             # Only destroy the primary adventurer title if it was created by this mod
             primary_title = {
-                limit = { has_variable = riseandfall_created_adventurer_title }
-                save_scope_as = rf_candidate_title
+                if = {
+                    limit = { has_variable = riseandfall_created_adventurer_title }
+                    save_scope_as = rf_candidate_title
+                }
             }
             # If the save_scope_as succeeded, destroy the saved title from the
             # ruler character scope (destroy_title requires a character scope).
