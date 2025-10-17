@@ -72,14 +72,6 @@
                     }
                 }
             }
-
-            # Remove adventurer's gold for the current ruler (primary_title case)
-            set_variable = { name = adventurer_gold value = gold }
-            if = {
-                limit = { var:adventurer_gold > 0 }
-                remove_short_term_gold = var:adventurer_gold
-            }
-            remove_variable = adventurer_gold
         }
     }
 }
