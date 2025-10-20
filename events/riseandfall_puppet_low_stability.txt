@@ -19,14 +19,52 @@ puppet.1001 = {
 
     option = {
         name = puppet.1001.a
-        # Attempt to start a regency diarchy on the liege, then choose a random powerful vassal to offer the puppet
-        random_powerful_vassal = {
-            # Defensive limits: ensure we pick a direct, landed, adult vassal (not spouse/courtier/etc.)
-            limit = {
-                is_landed = yes
-                age >= 16
+        # Attempt to start a regency diarchy on the liege, then choose the best eligible vassal
+        # Scoring: +30 if is_powerful_vassal = yes. Exclude vassals with a recent decline cooldown.
+        root = {
+            save_scope_as = event_root
+            scope:event_root = { set_variable = { name = tmp_best_vassal_score value = -999 } }
+            every_vassal = {
+                limit = {
+                    is_landed = yes
+                    age >= 16
+                    NOT = { has_variable = puppet_decline_cooldown }
+                }
+                # initialize candidate score from stats (dip + mar + stew + int + lern)
+                set_variable = { name = candidate_total value = diplomacy }
+                change_variable = { name = candidate_total add = martial }
+                change_variable = { name = candidate_total add = stewardship }
+                change_variable = { name = candidate_total add = intrigue }
+                change_variable = { name = candidate_total add = learning }
+                # Bonus if flagged powerful
+                if = { limit = { is_powerful_vassal = yes } change_variable = { name = candidate_total add = 30 } }
+                # copy score onto stable event scope
+                save_scope_as = candidate_for_score
+                scope:event_root = { set_variable = { name = tmp_candidate value = scope:candidate_for_score.var:candidate_total } }
+                if = {
+                    limit = { scope:event_root = { has_variable = tmp_candidate } }
+                    if = {
+                        limit = { scope:event_root.var:tmp_candidate > scope:event_root.var:tmp_best_vassal_score }
+                        save_scope_as = chosen_vassal
+                        scope:event_root = { set_variable = { name = tmp_best_vassal_score value = scope:event_root.var:tmp_candidate } }
+                    }
+                }
             }
-            trigger_event = puppet.1002
+            # If we found a chosen vassal, trigger puppet.1002 on them; otherwise fall back to a random eligible powerful vassal
+            if = {
+                limit = { exists = scope:chosen_vassal }
+                scope:chosen_vassal = { trigger_event = { id = puppet.1002 } }
+            }
+            else = {
+                random_powerful_vassal = {
+                    limit = {
+                        is_landed = yes
+                        age >= 16
+                        NOT = { has_variable = puppet_decline_cooldown }
+                    }
+                    trigger_event = puppet.1002
+                }
+            }
         }
     }
 }
@@ -82,6 +120,11 @@ puppet.1002 = {
         }
         # Decline: have the liege pick another random powerful vassal (excluding the current root) and trigger the event for them
         liege = {
+            # If the liege is the player (human), set a temporary decline cooldown on the candidate so they are not re-offered immediately
+            if = {
+                limit = { is_ai = no }
+                scope:candidate_vassal = { set_variable = { name = puppet_decline_cooldown value = yes days = 365 } }
+            }
             random_powerful_vassal = {
                 limit = { NOT = { this = scope:candidate_vassal } }
                 trigger_event = puppet.1002
