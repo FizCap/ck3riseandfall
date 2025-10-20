@@ -427,63 +427,23 @@ riseandfall_calculate_realm_stability_se = {
 
     }
 
-    # WAR LOSS / VICTORY PENALTY (quarter-precision)
-    # We store the penalty internally in quarter-units (x4) so we can decay by
-    # one quarter per year (0.25) while keeping integer math. External UI
-    # exposure uses the converted value (divided by 4).
-    # - Losing a war: add -5 -> scaled -20 (quarters)
-    # - Winning a war: add +5 -> scaled +20 (quarters)
-    # Ensure the quarter-scale variable exists
-    if = { limit = { NOT = { has_variable = riseandfall_realm_stability_war_penalty_q } } set_variable = { name = riseandfall_realm_stability_war_penalty_q value = 0 } }
-    # Decay toward zero by one quarter per run (one year -> +0.25)
+    # WAR LOSS / VICTORY PENALTY
+    # Maintain a per-character war penalty variable (negative or zero).
+    # - Losing a war: add -5 (handled in on_actions where the loser is targeted)
+    # - Winning a war: add +5 (handled in on_actions where the winner is targeted)
+    # Decay the penalty by +1 per year (toward 0). Expose for tooltip and include in target.
+    if = { limit = { NOT = { has_variable = riseandfall_realm_stability_war_penalty } } set_variable = { name = riseandfall_realm_stability_war_penalty value = 0 } }
+    # Decay toward zero when this runs yearly
     if = {
-        limit = { var:riseandfall_realm_stability_war_penalty_q < 0 }
-        change_variable = { name = riseandfall_realm_stability_war_penalty_q add = 1 }
+        limit = { var:riseandfall_realm_stability_war_penalty < 0 }
+        # step back toward zero by 1 per year
+        change_variable = { name = riseandfall_realm_stability_war_penalty add = 1 }
         # never exceed 0
-        if = { limit = { var:riseandfall_realm_stability_war_penalty_q > 0 } set_variable = { name = riseandfall_realm_stability_war_penalty_q value = 0 } }
+        if = { limit = { var:riseandfall_realm_stability_war_penalty > 0 } set_variable = { name = riseandfall_realm_stability_war_penalty value = 0 } }
     }
-    # Convert quarter-units to int + fractional display parts so we can show
-    # values like 9.75 in the tooltip. Approach:
-    #  - quarter var (q) stores quarters (x4). Example: -39 -> -9.75
-    #  - compute absolute quarters, integer part (abs_q / 4), and remainder (abs_q - int*4)
-    #  - fractional display = remainder * 25 -> 0/25/50/75
-    # Prepare working copies
-    set_variable = { name = tmp_wp_q value = var:riseandfall_realm_stability_war_penalty_q }
-    # Absolute value of quarter units
-    set_variable = { name = tmp_wp_q_abs value = var:tmp_wp_q }
-    if = { limit = { var:tmp_wp_q_abs < 0 } change_variable = { name = tmp_wp_q_abs multiply = -1 } }
-
-    # Integer part (absolute) = tmp_wp_q_abs / 4
-    set_variable = { name = tmp_wp_int_abs value = var:tmp_wp_q_abs }
-    change_variable = { name = tmp_wp_int_abs divide = 4 }
-
-    # Compute tmp_wp_int_times4 = tmp_wp_int_abs * 4
-    set_variable = { name = tmp_wp_int_times4 value = var:tmp_wp_int_abs }
-    change_variable = { name = tmp_wp_int_times4 multiply = 4 }
-
-    # remainder = tmp_wp_q_abs - tmp_wp_int_times4
-    set_variable = { name = tmp_wp_frac_abs value = var:tmp_wp_q_abs }
-    # invert tmp_wp_int_times4 for subtraction
-    set_variable = { name = tmp_wp_int_times4_neg value = var:tmp_wp_int_times4 }
-    change_variable = { name = tmp_wp_int_times4_neg multiply = -1 }
-    change_variable = { name = tmp_wp_frac_abs add = var:tmp_wp_int_times4_neg }
-
-    # fractional display in hundredths = remainder * 25 (0,25,50,75)
-    set_variable = { name = tmp_wp_frac_digits value = var:tmp_wp_frac_abs }
-    change_variable = { name = tmp_wp_frac_digits multiply = 25 }
-
-    # Signed integer part for display: apply sign if original q negative
-    set_variable = { name = tmp_wp_int_display value = var:tmp_wp_int_abs }
-    if = { limit = { var:tmp_wp_q < 0 } change_variable = { name = tmp_wp_int_display multiply = -1 } }
-
-    # Apply integer part to target score (tmp_target_score). Use integer division of quarters by 4
-    set_variable = { name = tmp_wp_for_target value = var:tmp_wp_q }
-    change_variable = { name = tmp_wp_for_target divide = 4 }
-    change_variable = { name = tmp_target_score add = var:tmp_wp_for_target }
-
-    # Expose tooltip variables: integer and fractional parts
-    set_variable = { name = riseandfall_realm_stability_war_penalty_int value = var:tmp_wp_int_display }
-    set_variable = { name = riseandfall_realm_stability_war_penalty_frac value = var:tmp_wp_frac_digits }
+    # Apply war penalty to the target score and expose for tooltip
+    change_variable = { name = tmp_target_score add = var:riseandfall_realm_stability_war_penalty }
+    set_variable = { name = riseandfall_realm_stability_war_penalty value = var:riseandfall_realm_stability_war_penalty }
 
     # Ensure the target stays within 0..100 after applying war penalties
     clamp_variable = { name = tmp_target_score min = 0 max = 100 }
@@ -796,31 +756,20 @@ riseandfall_calculate_realm_stability_se = {
 
 # Called on the war winner scope (character) to grant a small positive recovery of war penalty (+5)
 riseandfall_war_victory_se = {
-    # ensure quarter-scale variable exists
-    if = { limit = { NOT = { has_variable = riseandfall_realm_stability_war_penalty_q } } set_variable = { name = riseandfall_realm_stability_war_penalty_q value = 0 } }
-    # Add +5 points -> +20 quarters (healing). Only allow penalty to be <= 0.
-    change_variable = { name = riseandfall_realm_stability_war_penalty_q add = 20 }
-    if = { limit = { var:riseandfall_realm_stability_war_penalty_q > 0 } set_variable = { name = riseandfall_realm_stability_war_penalty_q value = 0 } }
-    # Expose converted tooltip value (divide by 4)
-    set_variable = { name = tmp_wp_q value = var:riseandfall_realm_stability_war_penalty_q }
-    set_variable = { name = tmp_wp value = var:tmp_wp_q }
-    change_variable = { name = tmp_wp divide = 4 }
-    round_variable = { name = tmp_wp }
-    set_variable = { name = riseandfall_realm_stability_war_penalty value = var:tmp_wp }
+    # ensure variable exists
+    if = { limit = { NOT = { has_variable = riseandfall_realm_stability_war_penalty } } set_variable = { name = riseandfall_realm_stability_war_penalty value = 0 } }
+    # Add +5 (healing). We only allow the war_penalty to be <= 0, so cap at 0.
+    change_variable = { name = riseandfall_realm_stability_war_penalty add = 5 }
+    if = { limit = { var:riseandfall_realm_stability_war_penalty > 0 } set_variable = { name = riseandfall_realm_stability_war_penalty value = 0 } }
+    # Expose for tooltip (redundant but safe)
+    set_variable = { name = riseandfall_realm_stability_war_penalty value = var:riseandfall_realm_stability_war_penalty }
 }
 
 # Called on the war loser scope (character) to apply -5 immediate penalty. Keep floor at -25.
 riseandfall_war_loss_se = {
-    # ensure quarter-scale variable exists
-    if = { limit = { NOT = { has_variable = riseandfall_realm_stability_war_penalty_q } } set_variable = { name = riseandfall_realm_stability_war_penalty_q value = 0 } }
-    # Subtract 5 points -> -20 quarters
-    change_variable = { name = riseandfall_realm_stability_war_penalty_q add = -20 }
-    # Clamp minimum to -100 quarters (-25 points)
-    if = { limit = { var:riseandfall_realm_stability_war_penalty_q < -100 } set_variable = { name = riseandfall_realm_stability_war_penalty_q value = -100 } }
-    # Expose converted tooltip value
-    set_variable = { name = tmp_wp_q value = var:riseandfall_realm_stability_war_penalty_q }
-    set_variable = { name = tmp_wp value = var:tmp_wp_q }
-    change_variable = { name = tmp_wp divide = 4 }
-    round_variable = { name = tmp_wp }
-    set_variable = { name = riseandfall_realm_stability_war_penalty value = var:tmp_wp }
+    if = { limit = { NOT = { has_variable = riseandfall_realm_stability_war_penalty } } set_variable = { name = riseandfall_realm_stability_war_penalty value = 0 } }
+    change_variable = { name = riseandfall_realm_stability_war_penalty add = -5 }
+    # Clamp minimum to -25
+    if = { limit = { var:riseandfall_realm_stability_war_penalty < -25 } set_variable = { name = riseandfall_realm_stability_war_penalty value = -25 } }
+    set_variable = { name = riseandfall_realm_stability_war_penalty value = var:riseandfall_realm_stability_war_penalty }
 }
