@@ -424,18 +424,6 @@ riseandfall_calculate_realm_stability_se = {
         change_variable = { name = tmp_target_score add = var:tmp_sex_penalty }
         set_variable = { name = riseandfall_realm_stability_sex_law_penalty value = var:tmp_sex_penalty }
 
-        # Puppet regency penalty
-        # Ensure penalty variable exists
-        if = { limit = { NOT = { has_variable = riseandfall_rs_puppet_regency_penalty } } set_variable = { name = riseandfall_rs_puppet_regency_penalty value = 0 } }
-        # Add -2 if under puppet regency, else reset to 0
-        if = { limit = { has_diarchy_type = puppet_regency } change_variable = { name = riseandfall_rs_puppet_regency_penalty add = -2 } }
-        else = { set_variable = { name = riseandfall_rs_puppet_regency_penalty value = 0 } }
-        # Clamp to -100..0
-        clamp_variable = { name = riseandfall_rs_puppet_regency_penalty min = -100 max = 0 }
-        # Apply to target
-        change_variable = { name = tmp_target_score add = var:riseandfall_rs_puppet_regency_penalty }
-        # Tooltip
-        set_variable = { name = riseandfall_realm_stability_puppet_regency_penalty value = var:riseandfall_rs_puppet_regency_penalty }
 
     }
 
@@ -547,7 +535,7 @@ riseandfall_calculate_realm_stability_se = {
     # current score here. Ensure the tooltip variable exists.
     if = { limit = { NOT = { has_variable = riseandfall_realm_stability_civil_war_penalty } } set_variable = { name = riseandfall_realm_stability_civil_war_penalty value = 0 } }
 
-    if = { limit = { NOT = { has_variable = riseandfall_realm_stability_puppet_regency_penalty } } set_variable = { name = riseandfall_realm_stability_puppet_regency_penalty value = 0 } }
+    
 
     # Clamp and round the persistent current score (unchanged by civil-war target adjustments here)
     clamp_variable = { name = riseandfall_realm_stability_score min = 0 max = 100 }
