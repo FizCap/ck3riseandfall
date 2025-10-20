@@ -47,13 +47,19 @@ palace_coup.1001 = {
 				# Prowess counts double
 				change_variable = { name = candidate_total add = prowess }
 				change_variable = { name = candidate_total add = prowess }
+				# Copy candidate score to the event_root scope so comparisons are safe
+				save_scope_as = candidate_for_score
+				scope:event_root = { set_variable = { name = tmp_candidate value = scope:candidate_for_score.var:candidate_total } }
 				# If this candidate is better than the saved best, make them the challenger
 				if = {
-					limit = { var:candidate_total > scope:event_root.var:tmp_best_challenger_score }
-					# Save candidate as challenger (saves the current candidate scope)
-					save_scope_as = challenger
-					# Update the best score on the saved event root scope
-					scope:event_root = { set_variable = { name = tmp_best_challenger_score value = var:candidate_total } }
+					limit = { scope:event_root = { has_variable = tmp_candidate } }
+					if = {
+						limit = { scope:event_root.var:tmp_candidate > scope:event_root.var:tmp_best_challenger_score }
+						# Save candidate as challenger (saves the current candidate scope)
+						save_scope_as = challenger
+						# Update the best score on the saved event root scope
+						scope:event_root = { set_variable = { name = tmp_best_challenger_score value = scope:event_root.var:tmp_candidate } }
+					}
 				}
 			}
 		}
@@ -75,10 +81,16 @@ palace_coup.1001 = {
 					# Prowess counts double
 					change_variable = { name = candidate_total add = prowess }
 					change_variable = { name = candidate_total add = prowess }
+				# Copy candidate score to the event_root scope so comparisons are safe
+				save_scope_as = candidate_for_score
+				scope:event_root = { set_variable = { name = tmp_candidate value = scope:candidate_for_score.var:candidate_total } }
 				if = {
-					limit = { var:candidate_total > scope:event_root.var:tmp_best_challenger_score }
-					save_scope_as = challenger
-					scope:event_root = { set_variable = { name = tmp_best_challenger_score value = var:candidate_total } }
+					limit = { scope:event_root = { has_variable = tmp_candidate } }
+					if = {
+						limit = { scope:event_root.var:tmp_candidate > scope:event_root.var:tmp_best_challenger_score }
+						save_scope_as = challenger
+						scope:event_root = { set_variable = { name = tmp_best_challenger_score value = scope:event_root.var:tmp_candidate } }
+					}
 				}
 			}
 		}
@@ -98,10 +110,16 @@ palace_coup.1001 = {
 					# Prowess counts double
 					change_variable = { name = candidate_total add = prowess }
 					change_variable = { name = candidate_total add = prowess }
+				# Copy candidate score to the event_root scope so comparisons are safe
+				save_scope_as = candidate_for_score
+				scope:event_root = { set_variable = { name = tmp_candidate value = scope:candidate_for_score.var:candidate_total } }
 				if = {
-					limit = { var:candidate_total > scope:event_root.var:tmp_best_challenger_score }
-					save_scope_as = challenger
-					scope:event_root = { set_variable = { name = tmp_best_challenger_score value = var:candidate_total } }
+					limit = { scope:event_root = { has_variable = tmp_candidate } }
+					if = {
+						limit = { scope:event_root.var:tmp_candidate > scope:event_root.var:tmp_best_challenger_score }
+						save_scope_as = challenger
+						scope:event_root = { set_variable = { name = tmp_best_challenger_score value = scope:event_root.var:tmp_candidate } }
+					}
 				}
 			}
 		}
