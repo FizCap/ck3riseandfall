@@ -11,7 +11,11 @@ riseandfall_low_stability_roll = {
     }
     effect = {
         every_independent_ruler = {
-            limit = { is_landed = yes }
+            limit = {
+                is_landed = yes
+                # Only rulers whose primary title is duchy or higher (duke+)
+                primary_title.tier >= tier_duchy
+            }
             save_scope_as = ruler_low_stability
             riseandfall_low_stability_roll_se = yes
         }
