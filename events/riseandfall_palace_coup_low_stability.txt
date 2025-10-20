@@ -216,10 +216,6 @@ palace_coup.1002 = {
 		character = scope:challenger
 	}
 
-	immediate = {
-		# (compat) external saved target `palace_coup_target_challenger` removed — not used by this mod
-	}
-
 	option = {
 		name = palace_coup.1002.a
 		custom_tooltip = palace_coup.1002.tooltip
