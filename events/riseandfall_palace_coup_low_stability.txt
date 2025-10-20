@@ -32,8 +32,8 @@ palace_coup.1001 = {
 		# Male-preference/only laws: only consider male courtiers
 		if = {
 			limit = { root = { OR = { has_realm_law = male_only_law has_realm_law = male_preference_law } } }
-			every_courtier = {
-				limit = { is_landed = no is_alive = yes is_male = yes }
+			every_courtier_or_guest = {
+				limit = { is_landed = no is_alive = yes is_male = yes is_adult = yes }
 				# Compute candidate total inside the candidate scope
 				set_variable = { name = candidate_total value = diplomacy }
 					# Martial counts double
@@ -61,8 +61,8 @@ palace_coup.1001 = {
 		else_if = {
 			# Female-preference/only laws: only consider female courtiers
 			limit = { root = { OR = { has_realm_law = female_only_law has_realm_law = female_preference_law } } }
-			every_courtier = {
-				limit = { is_landed = no is_alive = yes is_female = yes }
+			every_courtier_or_guest = {
+				limit = { is_landed = no is_alive = yes is_female = yes is_adult = yes }
 				set_variable = { name = candidate_total value = diplomacy }
 					# Martial counts double
 					change_variable = { name = candidate_total add = martial }
@@ -84,8 +84,8 @@ palace_coup.1001 = {
 		}
 		else = {
 			# No sex-restriction: consider any eligible courtier
-			every_courtier = {
-				limit = { is_landed = no is_alive = yes }
+			every_courtier_or_guest = {
+				limit = { is_landed = no is_alive = yes is_adult = yes }
 				set_variable = { name = candidate_total value = diplomacy }
 					# Martial counts double
 					change_variable = { name = candidate_total add = martial }
