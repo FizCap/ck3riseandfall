@@ -12,8 +12,12 @@ palace_coup.1001 = {
 	right_portrait = {
 		character = scope:challenger
 	}
+    
+
 
 	immediate = {
+		# If a challenger was passed in as an event target, expose it as scope:challenger for compatibility
+		if = { limit = { exists = scope:palace_coup_target_challenger } scope:palace_coup_target_challenger = { save_scope_as = challenger } }
 		root = {
 			every_held_title = {
 				add_to_list = lost_titles
@@ -95,369 +99,59 @@ palace_coup.1001 = {
 				}
 			}
 		}
-		# set a cooldown variable used by the low stability system
-		set_variable = { name = low_stability_cooldown value = yes days = 1825 }
-		# (duel will be resolved when the player chooses option A)
+
+		if = {
+			limit = { exists = scope:challenger }
+
+			hidden_effect = {
+				# Kill ~50% of courtiers and guests
+				root = {
+					every_courtier_or_guest = {
+						limit = {
+							is_alive = yes
+							NOT = { this = root }
+						}
+						random_list = {
+							50 = {
+								death = {
+									death_reason = death_in_palace_coup
+									killer = scope:challenger
+								}
+							}
+							50 = { }
+						}
+					}
+				}
+			}
+		}		# Create a temporary landless adventurer camp for the challenger
+		if = {
+			limit = { exists = scope:challenger }
+			create_adventurer_title = {
+				name = palace_coup_adventurer_camp_name
+				holder = scope:challenger
+				government = landless_adventurer_government
+				save_scope_as = palace_coup_challenger_camp_title
+			}
+			scope:palace_coup_challenger_camp_title = {
+				set_variable = { name = riseandfall_created_adventurer_title value = yes }
+			}
+		}
+
+	# set a cooldown used by the low stability system (on root)
+	set_variable = { name = low_stability_cooldown value = yes days = 1825 }
+
+	# Also set the cooldown variable on the challenger to prevent immediate repeat triggers
+	if = { limit = { exists = scope:challenger } scope:challenger = { set_variable = { name = low_stability_cooldown value = yes days = 1825 } } }
 	}
 
+	# Option to confront the challenger
 	option = {
 		name = palace_coup.1001.a
-
-		# Only show if we actually have a challenger
+		custom_tooltip = "Confront the challenger in a duel or attempt to flee."
 		trigger = { exists = scope:challenger }
-
-		duel = {
-			skill = prowess
-			target = scope:challenger
-
-			# Actor (root) wins outcome (heavily disfavored)
-			5 = {
-				compare_modifier = {
-					value = scope:duel_value
-					multiplier = 1
-					min = -20
-				}
-
-				# Hidden: kill challenger and purge courtiers without previewing in the option tooltip
-				hidden_effect = {
-					scope:challenger = {
-						death = {
-							death_reason = death_duel
-							killer = root
-						}
-					}
-					root = {
-						# Kill ~50% of unlanded knights in the ruler's court
-						every_courtier = {
-							limit = {
-								is_knight = yes
-								is_landed = no
-								is_alive = yes
-							}
-							random_list = {
-								50 = {
-									death = {
-										death_reason = death_in_palace_coup
-										killer = scope:challenger
-									}
-								}
-								50 = { }
-							}
-						}
-
-						# Kill ~20% of the remaining non-knight courtiers
-						every_courtier_or_guest = {
-							limit = {
-								exists = yes
-								is_alive = yes
-								NOT = { is_knight = yes }
-							}
-							random_list = {
-								20 = {
-									death = {
-										death_reason = death_in_palace_coup
-										killer = scope:challenger
-									}
-								}
-								80 = { }
-							}
-						}
-					}
-				}
-			}
-
-			# Challenger wins outcome (heavily favored)
-			95 = {
-				compare_modifier = {
-					value = scope:duel_value
-					multiplier = -1
-					min = -20
-				}
-
-				# Challenger seizes titles while root is still alive, then kills root
-				create_title_and_vassal_change = {
-					type = conquest
-					save_scope_as = change
-				}
-				# Transfer all non-barony titles from root to challenger
-				every_held_title = {
-					limit = {
-						holder = root
-						NOT = { tier = tier_barony }
-					}
-					change_title_holder = {
-						holder = scope:challenger
-						change = scope:change
-						take_baronies = yes
-					}
-				}
-				resolve_title_and_vassal_change = scope:change
-				scope:challenger = {
-					if = {
-						limit = { root = { has_legitimacy = yes } }
-						add_legitimacy = -1200
-					}
-				}
-				# Kill the ruler after titles have been reassigned
-				death = {
-					death_reason = death_duel
-					killer = scope:challenger
-				}
-				scope:challenger = {
-					add_trait = murderer
-				}
-
-				# Hidden purge deaths (so victims aren't previewed) and visible toast
-				hidden_effect = {
-					root = {
-						# Kill ~50% of unlanded knights in the ruler's court
-						every_courtier = {
-							limit = {
-								is_knight = yes
-								is_landed = no
-								is_alive = yes
-							}
-							random_list = {
-								50 = {
-									death = {
-										death_reason = death_in_palace_coup
-										killer = scope:challenger
-									}
-								}
-								50 = { }
-							}
-						}
-
-						# Kill ~50% of the remaining non-knight courtiers
-						every_courtier_or_guest = {
-							limit = {
-								exists = yes
-								is_alive = yes
-								NOT = { is_knight = yes }
-							}
-							random_list = {
-								50 = {
-									death = {
-										death_reason = death_in_palace_coup
-										killer = scope:challenger
-									}
-								}
-								50 = { }
-							}
-						}
-					}
-				}
-
-				# Visible toast informing the player about the purge
-				send_interface_message = {
-					type = event_war_bad
-					title = palace_coup.purge_toast
-					left_icon = root
-					right_icon = scope:challenger
-				}
-			}
-
-
-		}
-
-		ai_chance = {
-			# Increase base so negative modifiers can't push the weight below zero.
-			base = 100
-		  modifier = {
-			  add = 80
-			  # Strongly favor the duel if root's prowess is higher than the challenger
-			  NOT = { prowess_diff = { target = scope:challenger value <= 0 } }
-		  }
-		  modifier = {
-			  add = -80
-			  # Strongly discourage duel if root is weaker in prowess than the challenger
-			  prowess_diff = { target = scope:challenger value <= -1 }
-		  }
-		}
-	}
-
-	option = {
-		name = palace_coup.1001.b
-
-		# Only show if we actually have a challenger
-		trigger = {
-			exists = scope:challenger
-			primary_title = { tier >= tier_duchy }
-		}
-
-		duel = {
-			skill = intrigue
-			target = scope:challenger
-
-			# Success: root successfully evades/covers their tracks and escapes (heavily disfavored)
-			95 = {
-				compare_modifier = {
-					value = scope:duel_value
-					multiplier = 3.5
-					min = -49
-				}
-
-
-
-				# Transfer root's capital county (if any) to challenger, then transfer all duchy+ titles
-				create_title_and_vassal_change = {
-					type = conquest
-					save_scope_as = change
-				}
-				# Transfer capital county specifically (if it exists and is held by root).
-				# Use an explicit `root = { capital_county = ... }` block so the parser
-				# doesn't attempt to resolve `capital_county` at tooltip-time and
-				# so we operate on root's capital safely.
-				if = {
-					limit = { root = { capital_county = { exists = yes } } }
-					root = {
-						capital_county = {
-							change_title_holder = {
-								holder = scope:challenger
-								change = scope:change
-								take_baronies = yes
-							}
-						}
-					}
-				}
-				# Transfer all duchy+ titles (exclude counties and baronies)
-				every_held_title = {
-					limit = {
-						holder = root
-						NOT = {
-							OR = {
-								tier = tier_county
-								tier = tier_barony
-							}
-						}
-					}
-					change_title_holder = {
-						holder = scope:challenger
-						change = scope:change
-						take_baronies = yes
-					}
-				}
-                
-	                # Make the old ruler (root) a vassal of the challenger and
-	                # transfer direct vassals to the challenger in the same change
-					root = {
-						change_liege = {
-							liege = scope:challenger
-							change = scope:change
-						}
-					}
-				resolve_title_and_vassal_change = scope:change
-				# Trigger escape follow-up: present the reclaim-your-throne event to root
-				root = { trigger_event = { id = palace_coup.1002 } }
-				scope:challenger = {
-					if = {
-						limit = { root = { has_legitimacy = yes } }
-						add_legitimacy = -1200
-					}
-				}
-
-				# Make root and the challenger rivals of each other (reason key exists in localization)
-				root = {
-					if = {
-						limit = { can_set_relation_rival_trigger = { CHARACTER = scope:challenger } }
-						set_relation_rival = {
-							target = scope:challenger
-							reason = riseandfall_adventurer_became_rival
-						}
-					}
-				}
-				scope:challenger = {
-					if = {
-						limit = { can_set_relation_rival_trigger = { CHARACTER = root } }
-						set_relation_rival = {
-							target = root
-							reason = riseandfall_adventurer_became_rival
-						}
-					}
-				}
-			}
-
-			# Failure: challenger captures/seizes the ruler (heavily disfavored)
-			5 = {
-				compare_modifier = {
-					value = scope:duel_value
-					multiplier = -3.5
-					min = -49
-				}
-
-				create_title_and_vassal_change = {
-					type = conquest
-					save_scope_as = change
-				}
-				# Transfer all non-barony titles from root to challenger
-				every_held_title = {
-					limit = {
-						holder = root
-						NOT = { tier = tier_barony }
-					}
-					change_title_holder = {
-						holder = scope:challenger
-						change = scope:change
-						take_baronies = yes
-					}
-				}
-					resolve_title_and_vassal_change = scope:change
-					scope:challenger = {
-						if = {
-							limit = { root = { has_legitimacy = yes } }
-							add_legitimacy = -1200
-						}
-					}
-				# Make root and the challenger rivals of each other (reason key exists in localization)
-				root = {
-					if = {
-						limit = { can_set_relation_rival_trigger = { CHARACTER = scope:challenger } }
-						set_relation_rival = {
-							target = scope:challenger
-							reason = riseandfall_adventurer_became_rival
-						}
-					}
-				}
-				scope:challenger = {
-					if = {
-						limit = { can_set_relation_rival_trigger = { CHARACTER = root } }
-						set_relation_rival = {
-							target = root
-							reason = riseandfall_adventurer_became_rival
-						}
-					}
-				}
-				# Kill the ruler after titles have been reassigned
-				death = {
-					death_reason = death_duel
-					killer = scope:challenger
-                    
-				}
-				scope:challenger = {
-					add_trait = murderer
-				}
-			}
-		}
-
-		ai_chance = {
-			# Smaller base: intrigue should have limited influence. Prowess check below will dominate.
-			base = 20
-		  modifier = {
-			  add = 10
-			  # Slightly favor escape if root's intrigue is higher than the challenger
-			  NOT = { intrigue_diff = { target = scope:challenger value <= 0 } }
-		  }
-		  modifier = {
-			  add = -10
-			  # Slight penalty if root is weaker in intrigue
-			  intrigue_diff = { target = scope:challenger value <= -1 }
-		  }
-		  modifier = {
-			  add = 100
-			  # If root is notably weaker in prowess than the challenger, strongly favor escape
-			  prowess_diff = { target = scope:challenger value <= -1 }
-		  }
-		}
+		# Trigger the choice event
+		trigger_event = { id = palace_coup.1002 }
+		ai_chance = { base = 100 }
 	}
 
 }
@@ -468,21 +162,500 @@ palace_coup.1002 = {
 	desc = palace_coup.1002.d
 	theme = court
 
+	left_portrait = {
+		character = root
+	}
+	right_portrait = {
+		character = scope:challenger
+	}
+
+	immediate = {
+		# If the caller passed the challenger as a saved event target, expose it as scope:challenger
+		if = { limit = { exists = scope:palace_coup_target_challenger } scope:palace_coup_target_challenger = { save_scope_as = challenger } }
+	}
+
+	option = {
+		name = palace_coup.1002.a
+		custom_tooltip = "Engage the challenger in a prowess duel. Winning kills the challenger; losing results in your death and loss of titles."
+		trigger = { exists = scope:challenger }
+
+		duel = {
+			skill = prowess
+			target = scope:challenger
+
+			# Root wins duel
+			5 = {
+				compare_modifier = {
+					value = scope:duel_value
+					multiplier = 1
+					min = -20
+				}
+
+				custom_tooltip = "You win the duel and kill the challenger."
+
+				# Kill challenger
+				hidden_effect = {
+					scope:challenger = {
+						death = {
+							death_reason = death_duel
+							killer = root
+						}
+					}
+				}
+			}
+
+			# Challenger wins duel
+			95 = {
+				compare_modifier = {
+					value = scope:duel_value
+					multiplier = -1
+					min = -20
+				}
+
+				custom_tooltip = "The challenger will take all your lands and titles and you will perish."
+
+				hidden_effect = {
+					# Challenger seizes titles while root is still alive
+					create_title_and_vassal_change = {
+						type = conquest
+						save_scope_as = change
+					}
+					# Transfer all non-barony titles from root to challenger
+					every_held_title = {
+						limit = {
+							holder = root
+							NOT = { tier = tier_barony }
+						}
+						change_title_holder = {
+							holder = scope:challenger
+							change = scope:change
+							take_baronies = yes
+						}
+					}
+					resolve_title_and_vassal_change = scope:change
+					scope:challenger = {
+						if = {
+							limit = { root = { has_legitimacy = yes } }
+							add_legitimacy = -1200
+						}
+					}
+
+					scope:challenger = {
+						add_trait = murderer
+					}
+
+					root = {
+						every_courtier_or_guest = {
+							limit = {
+								this != root
+								this != scope:challenger
+							}
+
+							random = {
+								chance = 100
+
+								if = {
+									limit = {
+										employer != scope:challenger
+									}
+
+									set_employer = scope:challenger
+								}
+
+								if = {
+									limit = {
+										not = { exists = involved_activity }
+									}
+
+									set_location_to_default = yes
+								}
+								else = {
+									return_to_court = yes
+								}
+							}
+						}
+					}
+
+					# Trigger death event for root
+					root = { trigger_event = { id = palace_coup.1004 } }
+				}
+			}
+		}
+
+		ai_chance = {
+			base = 0
+			modifier = {
+				add = 5
+				prowess_diff = { target = scope:challenger value >= 1 }
+			}
+			modifier = {
+				add = 5
+				prowess_diff = { target = scope:challenger value >= 2 }
+			}
+			modifier = {
+				add = 5
+				prowess_diff = { target = scope:challenger value >= 3 }
+			}
+			modifier = {
+				add = 5
+				prowess_diff = { target = scope:challenger value >= 4 }
+			}
+			modifier = {
+				add = 5
+				prowess_diff = { target = scope:challenger value >= 5 }
+			}
+			modifier = {
+				add = 5
+				prowess_diff = { target = scope:challenger value >= 6 }
+			}
+			modifier = {
+				add = 5
+				prowess_diff = { target = scope:challenger value >= 7 }
+			}
+			modifier = {
+				add = 5
+				prowess_diff = { target = scope:challenger value >= 8 }
+			}
+			modifier = {
+				add = 5
+				prowess_diff = { target = scope:challenger value >= 9 }
+			}
+			modifier = {
+				add = 5
+				prowess_diff = { target = scope:challenger value >= 10 }
+			}
+			modifier = {
+				add = 5
+				prowess_diff = { target = scope:challenger value >= 11 }
+			}
+			modifier = {
+				add = 5
+				prowess_diff = { target = scope:challenger value >= 12 }
+			}
+			modifier = {
+				add = 5
+				prowess_diff = { target = scope:challenger value >= 13 }
+			}
+			modifier = {
+				add = 5
+				prowess_diff = { target = scope:challenger value >= 14 }
+			}
+			modifier = {
+				add = 5
+				prowess_diff = { target = scope:challenger value >= 15 }
+			}
+			modifier = {
+				add = 5
+				prowess_diff = { target = scope:challenger value >= 16 }
+			}
+			modifier = {
+				add = 5
+				prowess_diff = { target = scope:challenger value >= 17 }
+			}
+			modifier = {
+				add = 5
+				prowess_diff = { target = scope:challenger value >= 18 }
+			}
+			modifier = {
+				add = 5
+				prowess_diff = { target = scope:challenger value >= 19 }
+			}
+			modifier = {
+				add = 5
+				prowess_diff = { target = scope:challenger value >= 20 }
+			}
+		}
+	}
+
+	option = {
+		name = palace_coup.1002.b
+		trigger = { exists = scope:challenger }
+
+		duel = {
+			skill = intrigue
+			target = scope:challenger
+
+			# Success: root escapes
+			95 = {
+				compare_modifier = {
+					value = scope:duel_value
+					multiplier = 3.5
+					min = -49
+				}
+
+				custom_tooltip = "You successfully flee and start a rebellion."
+
+				hidden_effect = {
+					# Transfer root's capital county (if any) to challenger, then transfer all duchy+ titles
+					create_title_and_vassal_change = {
+						type = conquest
+						save_scope_as = change
+					}
+					# Transfer capital county specifically (if it exists and is held by root).
+					if = {
+						limit = { root = { capital_county = { exists = yes } } }
+						root = {
+							capital_county = {
+								change_title_holder = {
+									holder = scope:challenger
+									change = scope:change
+									take_baronies = yes
+								}
+							}
+						}
+					}
+					# Transfer all duchy+ titles (exclude counties and baronies)
+					every_held_title = {
+						limit = {
+							holder = root
+							NOT = {
+								OR = {
+									tier = tier_county
+									tier = tier_barony
+								}
+							}
+						}
+						change_title_holder = {
+							holder = scope:challenger
+							change = scope:change
+							take_baronies = yes
+						}
+					}
+		                
+		                # Make the old ruler (root) a vassal of the challenger and
+		                # transfer direct vassals to the challenger in the same change
+					root = {
+						change_liege = {
+							liege = scope:challenger
+							change = scope:change
+						}
+					}
+					resolve_title_and_vassal_change = scope:change
+
+					# Give root strong claims on all titles lost to the challenger
+					every_in_list = {
+						list = lost_titles
+						root = { make_claim_strong = prev }
+					}
+
+					# Trigger escape follow-up: call banners event for root
+					root = { trigger_event = { id = palace_coup.1003 } }
+
+					scope:challenger = {
+						if = {
+							limit = { root = { has_legitimacy = yes } }
+							add_legitimacy = -1200
+						}
+					}
+
+					# Make root and the challenger rivals of each other
+					root = {
+						if = {
+							limit = { can_set_relation_rival_trigger = { CHARACTER = scope:challenger } }
+							set_relation_rival = {
+								target = scope:challenger
+								reason = riseandfall_adventurer_became_rival
+							}
+						}
+					}
+					scope:challenger = {
+						if = {
+							limit = { can_set_relation_rival_trigger = { CHARACTER = root } }
+							set_relation_rival = {
+								target = root
+								reason = riseandfall_adventurer_became_rival
+							}
+						}
+					}
+
+					root = {
+						every_courtier_or_guest = {
+							limit = {
+								this != root
+								this != scope:challenger
+							}
+
+							random = {
+								chance = 50
+
+								if = {
+									limit = {
+										employer != scope:challenger
+									}
+
+									set_employer = scope:challenger
+								}
+
+								if = {
+									limit = {
+										not = { exists = involved_activity }
+									}
+
+									set_location_to_default = yes
+								}
+								else = {
+									return_to_court = yes
+								}
+							}
+						}
+					}
+				}
+			}			# Failure: challenger captures/seizes the ruler
+			5 = {
+				compare_modifier = {
+					value = scope:duel_value
+					multiplier = -3.5
+					min = -49
+				}
+
+				custom_tooltip = "You get caught and assassinated."
+
+				hidden_effect = {
+					create_title_and_vassal_change = {
+						type = conquest
+						save_scope_as = change
+					}
+					# Transfer all non-barony titles from root to challenger
+					every_held_title = {
+						limit = {
+							holder = root
+							NOT = { tier = tier_barony }
+						}
+						change_title_holder = {
+							holder = scope:challenger
+							change = scope:change
+							take_baronies = yes
+						}
+					}
+					resolve_title_and_vassal_change = scope:change
+					scope:challenger = {
+						if = {
+							limit = { root = { has_legitimacy = yes } }
+							add_legitimacy = -1200
+						}
+					}
+
+					# Make root and the challenger rivals of each other
+					root = {
+						if = {
+							limit = { can_set_relation_rival_trigger = { CHARACTER = scope:challenger } }
+							set_relation_rival = {
+								target = scope:challenger
+								reason = riseandfall_adventurer_became_rival
+							}
+						}
+					}
+					scope:challenger = {
+						if = {
+							limit = { can_set_relation_rival_trigger = { CHARACTER = root } }
+							set_relation_rival = {
+								target = root
+								reason = riseandfall_adventurer_became_rival
+							}
+						}
+						add_trait = murderer
+					}
+
+					root = {
+						every_courtier_or_guest = {
+							limit = {
+								this != root
+								this != scope:challenger
+							}
+
+							random = {
+								chance = 100
+
+								if = {
+									limit = {
+										employer != scope:challenger
+									}
+
+									set_employer = scope:challenger
+								}
+
+								if = {
+									limit = {
+										not = { exists = involved_activity }
+									}
+
+									set_location_to_default = yes
+								}
+								else = {
+									return_to_court = yes
+								}
+							}
+						}
+					}
+
+					# Trigger death event for root
+					root = { trigger_event = { id = palace_coup.1004 } }
+				}
+			}
+		}
+
+		ai_chance = {
+			base = 100
+			modifier = {
+				add = 10
+				NOT = { intrigue_diff = { target = scope:challenger value <= 0 } }
+			}
+			modifier = {
+				add = -10
+				intrigue_diff = { target = scope:challenger value <= -1 }
+			}
+			modifier = {
+				add = 100
+				prowess_diff = { target = scope:challenger value <= -1 }
+			}
+		}
+	}
+}
+
+palace_coup.1003 = {
+	type = character_event
+	title = palace_coup.1003.t
+	desc = palace_coup.1003.d
+	theme = court
+
     left_portrait = {
 		character = root
 	}
 
 	option = {
-		name = palace_coup.1002.a
-			# Give root strong claims on all titles lost to the challenger (when option chosen)
-			every_in_list = {
-				list = lost_titles
-				root = { make_claim_strong = prev }
-			}
-			# Trigger the warlord path for the challenger only when this option is chosen
-			scope:challenger = {
-				trigger_event = { id = warlord.1001 }
-			}
-			ai_chance = { base = 100 }
+		name = palace_coup.1003.a
+		custom_tooltip = "Trigger the warlord event to raise banners against the challenger."
+		# Call the banners / raise the vassal levy
+		# Trigger the warlord path for the challenger (raise banners handled there)
+		scope:challenger = {
+			trigger_event = { id = warlord.1001 }
+		}
+		ai_chance = { base = 100 }
 	}
+}
+
+palace_coup.1004 = {
+	type = character_event
+	title = palace_coup.1004.t
+	desc = palace_coup.1004.d
+	theme = court
+
+	left_portrait = { character = root }
+	right_portrait = { character = scope:challenger }
+
+	option = {
+		name = palace_coup.1004.a
+		custom_tooltip = "Accept your defeat and die."
+		hidden_effect = {
+			# Perform the execution/killing of the old ruler.
+			root = {
+				death = {
+					death_reason = death_duel
+					killer = scope:challenger
+				}
+			}
+		}
+		ai_chance = { base = 100 }
+	}
+
 }
