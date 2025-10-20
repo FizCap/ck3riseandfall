@@ -16,46 +16,75 @@ palace_coup.1001 = {
 
 
 	immediate = {
-		# If a challenger was passed in as an event target, expose it as scope:challenger for compatibility
-		if = { limit = { exists = scope:palace_coup_target_challenger } scope:palace_coup_target_challenger = { save_scope_as = challenger } }
 		root = {
 			every_held_title = {
 				add_to_list = lost_titles
 			}
 		}
-		# Select challenger respecting realm sex succession laws on the root's realm.
+		# Save the event's root scope under a stable name for cross-scope variable access
+		save_scope_as = event_root
+		# Select challenger preferring the courtier with the highest total stats
+		# (Diplomacy + Martial + Stewardship + Intrigue + Learning). If none
+		# match the eligibility filters we fall back to the existing random selection.
+		# Initialize a best-value tracker on the saved event_root scope.
+		scope:event_root = { set_variable = { name = tmp_best_challenger_score value = -999 } }
+
+		# Male-preference/only laws: only consider male courtiers
 		if = {
 			limit = { root = { OR = { has_realm_law = male_only_law has_realm_law = male_preference_law } } }
-			random_courtier = {
-				limit = {
-					is_knight = yes
-					is_landed = no
-					is_alive = yes
-					is_male = yes
+			every_courtier = {
+				limit = { is_knight = yes is_landed = no is_alive = yes is_male = yes }
+				# Compute candidate total inside the candidate scope
+				set_variable = { name = candidate_total value = diplomacy }
+				change_variable = { name = candidate_total add = martial }
+				change_variable = { name = candidate_total add = stewardship }
+				change_variable = { name = candidate_total add = intrigue }
+				change_variable = { name = candidate_total add = learning }
+				change_variable = { name = candidate_total add = prowess }
+				# If this candidate is better than the saved best, make them the challenger
+				if = {
+					limit = { var:candidate_total > scope:event_root.var:tmp_best_challenger_score }
+					# Save candidate as challenger (saves the current candidate scope)
+					save_scope_as = challenger
+					# Update the best score on the saved event root scope
+					scope:event_root = { set_variable = { name = tmp_best_challenger_score value = var:candidate_total } }
 				}
-				save_scope_as = challenger
 			}
 		}
+			
 		else_if = {
+			# Female-preference/only laws: only consider female courtiers
 			limit = { root = { OR = { has_realm_law = female_only_law has_realm_law = female_preference_law } } }
-			random_courtier = {
-				limit = {
-					is_knight = yes
-					is_landed = no
-					is_alive = yes
-					is_female = yes
+			every_courtier = {
+				limit = { is_knight = yes is_landed = no is_alive = yes is_female = yes }
+				set_variable = { name = candidate_total value = diplomacy }
+				change_variable = { name = candidate_total add = martial }
+				change_variable = { name = candidate_total add = stewardship }
+				change_variable = { name = candidate_total add = intrigue }
+				change_variable = { name = candidate_total add = learning }
+				change_variable = { name = candidate_total add = prowess }
+				if = {
+					limit = { var:candidate_total > scope:event_root.var:tmp_best_challenger_score }
+					save_scope_as = challenger
+					scope:event_root = { set_variable = { name = tmp_best_challenger_score value = var:candidate_total } }
 				}
-				save_scope_as = challenger
 			}
 		}
 		else = {
-			random_courtier = {
-				limit = {
-					is_knight = yes
-					is_landed = no
-					is_alive = yes
+			# No sex-restriction: consider any eligible courtier
+			every_courtier = {
+				limit = { is_knight = yes is_landed = no is_alive = yes }
+				set_variable = { name = candidate_total value = diplomacy }
+				change_variable = { name = candidate_total add = martial }
+				change_variable = { name = candidate_total add = stewardship }
+				change_variable = { name = candidate_total add = intrigue }
+				change_variable = { name = candidate_total add = learning }
+				change_variable = { name = candidate_total add = prowess }
+				if = {
+					limit = { var:candidate_total > scope:event_root.var:tmp_best_challenger_score }
+					save_scope_as = challenger
+					scope:event_root = { set_variable = { name = tmp_best_challenger_score value = var:candidate_total } }
 				}
-				save_scope_as = challenger
 			}
 		}
 		if = {
@@ -147,7 +176,7 @@ palace_coup.1001 = {
 	# Option to confront the challenger
 	option = {
 		name = palace_coup.1001.a
-		custom_tooltip = "Confront the challenger in a duel or attempt to flee."
+		custom_tooltip = palace_coup.1001.tooltip
 		trigger = { exists = scope:challenger }
 		# Trigger the choice event
 		trigger_event = { id = palace_coup.1002 }
@@ -170,13 +199,12 @@ palace_coup.1002 = {
 	}
 
 	immediate = {
-		# If the caller passed the challenger as a saved event target, expose it as scope:challenger
-		if = { limit = { exists = scope:palace_coup_target_challenger } scope:palace_coup_target_challenger = { save_scope_as = challenger } }
+		# (compat) external saved target `palace_coup_target_challenger` removed — not used by this mod
 	}
 
 	option = {
 		name = palace_coup.1002.a
-		custom_tooltip = "Engage the challenger in a prowess duel. Winning kills the challenger; losing results in your death and loss of titles."
+		custom_tooltip = palace_coup.1002.tooltip
 		trigger = { exists = scope:challenger }
 
 		duel = {
@@ -191,7 +219,7 @@ palace_coup.1002 = {
 					min = -20
 				}
 
-				custom_tooltip = "You win the duel and kill the challenger."
+				custom_tooltip = palace_coup.1002.win.tooltip
 
 				# Kill challenger
 				hidden_effect = {
@@ -212,7 +240,7 @@ palace_coup.1002 = {
 					min = -20
 				}
 
-				custom_tooltip = "The challenger will take all your lands and titles and you will perish."
+				custom_tooltip = palace_coup.1002.lose.tooltip
 
 				hidden_effect = {
 					# Challenger seizes titles while root is still alive
@@ -383,7 +411,7 @@ palace_coup.1002 = {
 					min = -49
 				}
 
-				custom_tooltip = "You successfully flee and start a rebellion."
+				custom_tooltip = palace_coup.1002.flee_success.tooltip
 
 				hidden_effect = {
 					# Transfer root's capital county (if any) to challenger, then transfer all duchy+ titles
@@ -508,7 +536,7 @@ palace_coup.1002 = {
 					min = -49
 				}
 
-				custom_tooltip = "You get caught and assassinated."
+				custom_tooltip = palace_coup.1002.fail.tooltip
 
 				hidden_effect = {
 					create_title_and_vassal_change = {
@@ -624,7 +652,7 @@ palace_coup.1003 = {
 
 	option = {
 		name = palace_coup.1003.a
-		custom_tooltip = "Trigger the warlord event to raise banners against the challenger."
+		custom_tooltip = palace_coup.1003.tooltip
 		# Call the banners / raise the vassal levy
 		# Trigger the warlord path for the challenger (raise banners handled there)
 		scope:challenger = {
@@ -645,7 +673,7 @@ palace_coup.1004 = {
 
 	option = {
 		name = palace_coup.1004.a
-		custom_tooltip = "Accept your defeat and die."
+		custom_tooltip = palace_coup.1004.tooltip
 		hidden_effect = {
 			# Perform the execution/killing of the old ruler.
 			root = {
