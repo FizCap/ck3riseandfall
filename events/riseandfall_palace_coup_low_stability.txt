@@ -33,13 +33,19 @@ palace_coup.1001 = {
 		if = {
 			limit = { root = { OR = { has_realm_law = male_only_law has_realm_law = male_preference_law } } }
 			every_courtier = {
-				limit = { is_knight = yes is_landed = no is_alive = yes is_male = yes }
+				limit = { is_landed = no is_alive = yes is_male = yes }
 				# Compute candidate total inside the candidate scope
 				set_variable = { name = candidate_total value = diplomacy }
-				change_variable = { name = candidate_total add = martial }
+					# Martial counts double
+					change_variable = { name = candidate_total add = martial }
+					change_variable = { name = candidate_total add = martial }
 				change_variable = { name = candidate_total add = stewardship }
+				# Intrigue counts double
+				change_variable = { name = candidate_total add = intrigue }
 				change_variable = { name = candidate_total add = intrigue }
 				change_variable = { name = candidate_total add = learning }
+				# Prowess counts double
+				change_variable = { name = candidate_total add = prowess }
 				change_variable = { name = candidate_total add = prowess }
 				# If this candidate is better than the saved best, make them the challenger
 				if = {
@@ -56,13 +62,19 @@ palace_coup.1001 = {
 			# Female-preference/only laws: only consider female courtiers
 			limit = { root = { OR = { has_realm_law = female_only_law has_realm_law = female_preference_law } } }
 			every_courtier = {
-				limit = { is_knight = yes is_landed = no is_alive = yes is_female = yes }
+				limit = { is_landed = no is_alive = yes is_female = yes }
 				set_variable = { name = candidate_total value = diplomacy }
-				change_variable = { name = candidate_total add = martial }
+					# Martial counts double
+					change_variable = { name = candidate_total add = martial }
+					change_variable = { name = candidate_total add = martial }
 				change_variable = { name = candidate_total add = stewardship }
+				# Intrigue counts double
+				change_variable = { name = candidate_total add = intrigue }
 				change_variable = { name = candidate_total add = intrigue }
 				change_variable = { name = candidate_total add = learning }
-				change_variable = { name = candidate_total add = prowess }
+					# Prowess counts double
+					change_variable = { name = candidate_total add = prowess }
+					change_variable = { name = candidate_total add = prowess }
 				if = {
 					limit = { var:candidate_total > scope:event_root.var:tmp_best_challenger_score }
 					save_scope_as = challenger
@@ -73,13 +85,19 @@ palace_coup.1001 = {
 		else = {
 			# No sex-restriction: consider any eligible courtier
 			every_courtier = {
-				limit = { is_knight = yes is_landed = no is_alive = yes }
+				limit = { is_landed = no is_alive = yes }
 				set_variable = { name = candidate_total value = diplomacy }
-				change_variable = { name = candidate_total add = martial }
+					# Martial counts double
+					change_variable = { name = candidate_total add = martial }
+					change_variable = { name = candidate_total add = martial }
 				change_variable = { name = candidate_total add = stewardship }
+				# Intrigue counts double
+				change_variable = { name = candidate_total add = intrigue }
 				change_variable = { name = candidate_total add = intrigue }
 				change_variable = { name = candidate_total add = learning }
-				change_variable = { name = candidate_total add = prowess }
+					# Prowess counts double
+					change_variable = { name = candidate_total add = prowess }
+					change_variable = { name = candidate_total add = prowess }
 				if = {
 					limit = { var:candidate_total > scope:event_root.var:tmp_best_challenger_score }
 					save_scope_as = challenger
