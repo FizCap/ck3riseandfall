@@ -13,12 +13,15 @@
             }
             save_scope_as = rf_ruler
 
-            every_held_title = {
+                every_held_title = {
                 limit = { has_variable = riseandfall_created_adventurer_title }
                 save_scope_as = rf_candidate_title
                 # Call destroy_title from the ruler character scope (engine-supported pattern)
                 scope:rf_ruler = {
-                    destroy_title = scope:rf_candidate_title
+                    if = {
+                        limit = { exists = scope:rf_candidate_title }
+                        destroy_title = scope:rf_candidate_title
+                    }
                 }
             }
             # Remove adventurer's gold by scoping to rf_ruler and removing their current gold
@@ -43,18 +46,20 @@
                 if = {
                     limit = { has_variable = riseandfall_created_adventurer_title }
                     save_scope_as = rf_candidate_title
+                    # Call destroy_title from the saved ruler scope, using the saved title scope
+                    scope:rf_ruler = {
+                        if = {
+                            limit = { exists = scope:rf_candidate_title }
+                            destroy_title = scope:rf_candidate_title
+                        }
+                    }
                 }
-            }
-            # If the save_scope_as succeeded, destroy the saved title from the
-            # ruler character scope (destroy_title requires a character scope).
-            scope:rf_ruler = {
-                destroy_title = scope:rf_candidate_title
             }
 
             # Also handle any held titles created by this mod for this ruler: if a held
             # title still carries the mod variable but the holder no longer has the
             # adventurer flags, remove any adventurer gold from the holder and destroy it.
-            every_held_title = {
+                every_held_title = {
                 limit = { has_variable = riseandfall_created_adventurer_title }
                 save_scope_as = rf_candidate_title
                 # every_held_title switches scope to the title. Use the saved
@@ -68,7 +73,10 @@
                             remove_short_term_gold = var:adventurer_gold
                         }
                         remove_variable = adventurer_gold
-                        destroy_title = scope:rf_candidate_title
+                        if = {
+                            limit = { exists = scope:rf_candidate_title }
+                            destroy_title = scope:rf_candidate_title
+                        }
                     }
                 }
             }
