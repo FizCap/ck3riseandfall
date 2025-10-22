@@ -251,29 +251,13 @@ palace_coup.1002 = {
 
 				custom_tooltip = palace_coup.1002.win.tooltip
 
-				# Transfer all challenger's gold to root, then kill the challenger
+				# Root wins duel: do not transfer the challenger's gold; just kill the challenger
 
 				hidden_effect = {
 					if = {
 						limit = { exists = scope:challenger }
-						# Read challenger gold into a variable on the challenger scope
-
+						# Now kill the challenger only
 						scope:challenger = {
-							set_variable = { name = duel_transfer_gold value = gold }
-						}
-						# Add that gold to the root (if any)
-
-						scope:event_root = {
-							if = {
-								limit = { scope:challenger = { has_variable = duel_transfer_gold } }
-								add_short_term_gold = scope:challenger.var:duel_transfer_gold
-							}
-						}
-						# Remove the gold from the challenger and clear the variable
-
-						scope:challenger = {
-							if = { limit = { scope:challenger = { has_variable = duel_transfer_gold } } remove_short_term_gold = scope:challenger.var:duel_transfer_gold }
-							remove_variable = duel_transfer_gold
 							# Now kill the challenger
 							death = {
 								death_reason = death_duel
@@ -361,7 +345,7 @@ palace_coup.1002 = {
 					# Save root gold amount then give it to the challenger (use saved event_root scope)
 
 					scope:event_root = {
-						set_variable = { name = duel_transfer_gold value = gold }
+						if = { limit = { gold > 1 } set_variable = { name = duel_transfer_gold value = gold } }
 					}
 					# Add to challenger from the saved event_root variable
 					scope:challenger = {
@@ -539,10 +523,12 @@ palace_coup.1002 = {
 					# Transfer 50% of root's gold to the challenger when root escapes
 
 					scope:event_root = {
-						set_variable = { name = duel_transfer_gold value = gold }
-						# Reduce to 50% for transfer
-
-						change_variable = { name = duel_transfer_gold multiply = 0.5 }
+						if = {
+							limit = { gold > 1 }
+							# Save root gold amount then reduce to 50% for transfer
+							set_variable = { name = duel_transfer_gold value = gold }
+							change_variable = { name = duel_transfer_gold multiply = 0.5 }
+						}
 					}
 					# Add the 50% to the challenger and remove it from event_root
 
@@ -707,7 +693,7 @@ palace_coup.1002 = {
 					# Transfer all of root's gold to challenger (root will be captured/die)
 
 					scope:event_root = {
-						set_variable = { name = duel_transfer_gold value = gold }
+						if = { limit = { gold > 1 } set_variable = { name = duel_transfer_gold value = gold } }
 					}
 					scope:challenger = {
 						if = { limit = { scope:event_root = { has_variable = duel_transfer_gold } } add_short_term_gold = scope:event_root.var:duel_transfer_gold }
