@@ -12,8 +12,6 @@ palace_coup.1001 = {
 	right_portrait = {
 		character = scope:challenger
 	}
-    
-
 
 	immediate = {
 		root = {
@@ -253,12 +251,34 @@ palace_coup.1002 = {
 
 				custom_tooltip = palace_coup.1002.win.tooltip
 
-				# Kill challenger
+				# Transfer all challenger's gold to root, then kill the challenger
+
 				hidden_effect = {
-					scope:challenger = {
-						death = {
-							death_reason = death_duel
-							killer = root
+					if = {
+						limit = { exists = scope:challenger }
+						# Read challenger gold into a variable on the challenger scope
+
+						scope:challenger = {
+							set_variable = { name = duel_transfer_gold value = gold }
+						}
+						# Add that gold to the root (if any)
+
+						scope:event_root = {
+							if = {
+								limit = { scope:challenger = { has_variable = duel_transfer_gold } }
+								add_short_term_gold = scope:challenger.var:duel_transfer_gold
+							}
+						}
+						# Remove the gold from the challenger and clear the variable
+
+						scope:challenger = {
+							if = { limit = { scope:challenger = { has_variable = duel_transfer_gold } } remove_short_term_gold = scope:challenger.var:duel_transfer_gold }
+							remove_variable = duel_transfer_gold
+							# Now kill the challenger
+							death = {
+								death_reason = death_duel
+								killer = scope:event_root
+							}
 						}
 					}
 				}
@@ -336,7 +356,23 @@ palace_coup.1002 = {
 						}
 					}
 
-					# Trigger death event for root
+					# Transfer all of root's gold to challenger (root will die) then trigger death event for root
+
+					# Save root gold amount then give it to the challenger (use saved event_root scope)
+
+					scope:event_root = {
+						set_variable = { name = duel_transfer_gold value = gold }
+					}
+					# Add to challenger from the saved event_root variable
+					scope:challenger = {
+						if = { limit = { scope:event_root = { has_variable = duel_transfer_gold } } add_short_term_gold = scope:event_root.var:duel_transfer_gold }
+					}
+					# Remove gold from event_root and cleanup variable
+					scope:event_root = {
+						if = { limit = { scope:event_root = { has_variable = duel_transfer_gold } } remove_short_term_gold = scope:event_root.var:duel_transfer_gold }
+						remove_variable = duel_transfer_gold
+					}
+					# Trigger the root death followup
 					root = { trigger_event = { id = palace_coup.1004 } }
 				}
 			}
@@ -498,6 +534,25 @@ palace_coup.1002 = {
 						root = { make_claim_strong = prev }
 					}
 
+
+					# Trigger escape follow-up: call banners event for root
+					# Transfer 50% of root's gold to the challenger when root escapes
+
+					scope:event_root = {
+						set_variable = { name = duel_transfer_gold value = gold }
+						# Reduce to 50% for transfer
+
+						change_variable = { name = duel_transfer_gold multiply = 0.5 }
+					}
+					# Add the 50% to the challenger and remove it from event_root
+
+					scope:challenger = {
+						if = { limit = { scope:event_root = { has_variable = duel_transfer_gold } } add_short_term_gold = scope:event_root.var:duel_transfer_gold }
+					}
+					scope:event_root = {
+						if = { limit = { scope:event_root = { has_variable = duel_transfer_gold } } remove_short_term_gold = scope:event_root.var:duel_transfer_gold }
+						remove_variable = duel_transfer_gold
+					}
 					# Trigger escape follow-up: call banners event for root
 					root = { trigger_event = { id = palace_coup.1003 } }
 
@@ -648,6 +703,19 @@ palace_coup.1002 = {
 						}
 					}
 
+
+					# Transfer all of root's gold to challenger (root will be captured/die)
+
+					scope:event_root = {
+						set_variable = { name = duel_transfer_gold value = gold }
+					}
+					scope:challenger = {
+						if = { limit = { scope:event_root = { has_variable = duel_transfer_gold } } add_short_term_gold = scope:event_root.var:duel_transfer_gold }
+					}
+					scope:event_root = {
+						if = { limit = { scope:event_root = { has_variable = duel_transfer_gold } } remove_short_term_gold = scope:event_root.var:duel_transfer_gold }
+						remove_variable = duel_transfer_gold
+					}
 					# Trigger death event for root
 					root = { trigger_event = { id = palace_coup.1004 } }
 				}
