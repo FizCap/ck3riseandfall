@@ -61,7 +61,10 @@ riseandfall_yearly_realm_stability = {
     }
     effect = {
         every_ruler = {
-            limit = { is_landed = yes }
+            limit = {
+                is_landed = yes
+                tier >= count
+            }
             save_scope_as = independent_ruler
             scope:independent_ruler = {
                 riseandfall_calculate_realm_stability_se = yes
