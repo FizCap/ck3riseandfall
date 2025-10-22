@@ -298,9 +298,9 @@ riseandfall_calculate_realm_stability_se = {
     ########################################
     # 3.5) POWERFUL VASSAL OPINION MULTIPLIER (optional via game rule)
     # Compute average opinion of powerful vassals (tier >= duchy). If average <= 0,
-    # apply a multiplier between 0.5 (for -100 avg) and 1.0 (for 0 or higher). Positive
+    # apply a multiplier between 0.75 (for -100 avg) and 1.0 (for 0 or higher). Positive
     # averages do not boost stability (cap at 1.0).
-    # Expose multiplier for tooltip as percentage (100 = no change, 50 = half stability)
+    # Expose multiplier for tooltip as percentage (100 = no change, 75 = three-quarters stability)
     # Default to 100% (no change) when rule disabled or no powerful vassals.
     set_variable = { name = riseandfall_realm_stability_powerful_vassal_multiplier value = 100 }
     # Dummy use to satisfy engine validation
@@ -329,7 +329,7 @@ riseandfall_calculate_realm_stability_se = {
         else = { set_variable = { name = tmp_pv_avg value = 0 } }
 
         # If average is negative, compute multiplier: mult = 1.0 + (avg / 200.0)
-        # Implement as percent: percent = floor((1.0 + avg/200) * 100) with bounds 50..100
+        # Implement as percent: percent = floor((1.0 + avg/200) * 100) with bounds 75..100
         if = {
             limit = { var:tmp_pv_avg < 0 }
             # tmp_pv_tmp = avg + 200  (so -100 -> 100, 0 -> 200)
@@ -338,8 +338,8 @@ riseandfall_calculate_realm_stability_se = {
             # percent = (tmp_pv_tmp * 100) / 200  -> simplifies to tmp_pv_tmp / 2
             set_variable = { name = tmp_pv_percent value = var:tmp_pv_tmp }
             change_variable = { name = tmp_pv_percent divide = 2 }
-            # clamp percent to 50..100
-            clamp_variable = { name = tmp_pv_percent min = 50 max = 100 }
+            # clamp percent to 75..100
+            clamp_variable = { name = tmp_pv_percent min = 75 max = 100 }
             # store tooltip value
             set_variable = { name = riseandfall_realm_stability_powerful_vassal_multiplier value = var:tmp_pv_percent }
         }
