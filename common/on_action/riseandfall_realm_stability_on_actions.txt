@@ -63,7 +63,7 @@ riseandfall_yearly_realm_stability = {
         every_ruler = {
             limit = {
                 is_landed = yes
-                tier >= count
+                primary_title.tier >= tier_county
             }
             save_scope_as = independent_ruler
             scope:independent_ruler = {
