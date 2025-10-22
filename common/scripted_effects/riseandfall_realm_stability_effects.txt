@@ -224,18 +224,11 @@ riseandfall_calculate_realm_stability_se = {
     set_variable = { name = riseandfall_realm_stability_realm_law_bonus value = var:riseandfall_rs_realm_law_component }
 
     ########################################
-    # 2.6) POPULAR OPINION (-10..0)
-    # Map ruler's county opinion (-100..100) to stability bonus (-10..0)
-    set_variable = { name = riseandfall_rs_popular_opinion_component value = 0 }
-    # Get the county opinion of the ruler
-    set_variable = { name = tmp_county_opinion value = capital_county.county_opinion }
-    # Divide by 10 to map -100..100 to -10..10
-    change_variable = { name = tmp_county_opinion divide = 10 }
-    set_variable = { name = riseandfall_rs_popular_opinion_component value = var:tmp_county_opinion }
-    # Clamp to ensure it's within bounds (-10..0, no positive bonus)
-    clamp_variable = { name = riseandfall_rs_popular_opinion_component min = -10 max = 0 }
-    # Expose for tooltip
-    set_variable = { name = riseandfall_realm_stability_popular_opinion_bonus value = var:riseandfall_rs_popular_opinion_component }
+    # 2.6) POPULAR OPINION REMOVED
+    # Popular opinion (county opinion component) has been removed from the
+    # stability system. Keep placeholder tooltip variable at 0 to avoid
+    # engine errors from references elsewhere.
+    if = { limit = { NOT = { has_variable = riseandfall_realm_stability_popular_opinion_bonus } } set_variable = { name = riseandfall_realm_stability_popular_opinion_bonus value = 0 } }
 
     ########################################
     # 3) VASSAL RELATIONS (30 points max)
@@ -363,9 +356,9 @@ riseandfall_calculate_realm_stability_se = {
     change_variable = { name = tmp_target_score add = var:riseandfall_rs_vassals_component }
     # Add realm law component (0..20)
     change_variable = { name = tmp_target_score add = var:riseandfall_rs_realm_law_component }
-    # Add popular opinion component (-10..10)
-    # Use the tooltip-exposed variable so it's considered 'used' by the engine
-    change_variable = { name = tmp_target_score add = var:riseandfall_realm_stability_popular_opinion_bonus }
+    # Note: popular opinion removed. Keep a no-op addition to ensure the
+    # variable is present for any external references; this adds 0.
+    if = { limit = { has_variable = riseandfall_realm_stability_popular_opinion_bonus } change_variable = { name = tmp_target_score add = var:riseandfall_realm_stability_popular_opinion_bonus } }
 
     # Apply powerful vassal multiplier if active (calculated earlier)
     if = { limit = { var:riseandfall_realm_stability_powerful_vassal_multiplier < 100 }
