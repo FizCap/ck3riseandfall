@@ -41,7 +41,7 @@ setting_riseandfall_mma_limit_modifier_disabled_desc:0 "Do not apply the men-at-
 # AI Kingdom Creation rule
 rule_riseandfall_enable_ai_kingdom_creation:0 "AI Title Creation"
 setting_riseandfall_ai_kingdom_creation_enabled:0 "Enabled"
-setting_riseandfall_ai_kingdom_creation_enabled_desc:0 "AI rulers will auto-create higher-tier titles when possible (counts→duchies, kings→kingdoms, emperors→empires) to improve realm structure."
+setting_riseandfall_ai_kingdom_creation_enabled_desc:0 "AI rulers will auto-create higher-tier titles when possible (counts→duchies, kings→kingdoms, emperors→empires) to improve realm structure, and will also grant eligible kingdoms to de jure vassals using improved selection logic."
 setting_riseandfall_ai_kingdom_creation_disabled:0 "Disabled"
 setting_riseandfall_ai_kingdom_creation_disabled_desc:0 "AI rulers will not automatically create higher-tier titles; they will only create them through normal game prompts."
 
