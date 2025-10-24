@@ -1,0 +1,40 @@
+﻿l_english:
+ riseandfall_enable_auto_create_duchies:0 "Enable Auto-Create Duchies"
+ riseandfall_enable_auto_create_duchies_desc:0 "Enable automatic creation of duchy titles for your rulers"
+ riseandfall_enable_auto_create_duchies_tooltip:0 "Enable automatic duchy creation. When enabled the game will attempt to create valid duchies on a yearly check."
+ riseandfall_enable_auto_create_duchies_confirm:0 "Enable Auto-Create Duchies"
+
+ riseandfall_disable_auto_create_duchies:0 "Disable Auto-Create Duchies"
+ riseandfall_disable_auto_create_duchies_desc:0 "Disable automatic creation of duchy titles for your rulers"
+ riseandfall_disable_auto_create_duchies_tooltip:0 "Disable automatic duchy creation. When disabled the game will not create duchies automatically."
+ riseandfall_disable_auto_create_duchies_confirm:0 "Disable Auto-Create Duchies"
+
+ riseandfall_enable_auto_create_kingdoms:0 "Enable Auto-Create Kingdoms"
+ riseandfall_enable_auto_create_kingdoms_desc:0 "Enable automatic creation of kingdom titles for your rulers"
+ riseandfall_enable_auto_create_kingdoms_tooltip:0 "Enable automatic kingdom creation. When enabled the game will attempt to create valid kingdoms on a yearly check."
+ riseandfall_enable_auto_create_kingdoms_confirm:0 "Enable Auto-Create Kingdoms"
+
+ riseandfall_disable_auto_create_kingdoms:0 "Disable Auto-Create Kingdoms"
+ riseandfall_disable_auto_create_kingdoms_desc:0 "Disable automatic creation of kingdom titles for your rulers"
+ riseandfall_disable_auto_create_kingdoms_tooltip:0 "Disable automatic kingdom creation. When disabled the game will not create kingdoms automatically."
+ riseandfall_disable_auto_create_kingdoms_confirm:0 "Disable Auto-Create Kingdoms"
+
+ riseandfall_enable_auto_grant_duchy:0 "Enable Auto-Grant Duchies"
+ riseandfall_enable_auto_grant_duchy_desc:0 "Enable automatic granting of duchy titles to de jure vassals"
+ riseandfall_enable_auto_grant_duchy_tooltip:0 "When enabled, eligible duchies may be handed out automatically to de jure vassals on a yearly check."
+ riseandfall_enable_auto_grant_duchy_confirm:0 "Enable Auto-Grant Duchies"
+
+ riseandfall_disable_auto_grant_duchy:0 "Disable Auto-Grant Duchies"
+ riseandfall_disable_auto_grant_duchy_desc:0 "Disable automatic granting of duchy titles to de jure vassals"
+ riseandfall_disable_auto_grant_duchy_tooltip:0 "When disabled, duchies will not be granted automatically to vassals."
+ riseandfall_disable_auto_grant_duchy_confirm:0 "Disable Auto-Grant Duchies"
+
+ riseandfall_enable_auto_grant_kingdom:0 "Enable Auto-Grant Kingdoms"
+ riseandfall_enable_auto_grant_kingdom_desc:0 "Enable automatic granting of kingdom titles to de jure vassals"
+ riseandfall_enable_auto_grant_kingdom_tooltip:0 "When enabled, eligible kingdoms may be handed out automatically to de jure vassals on a yearly check."
+ riseandfall_enable_auto_grant_kingdom_confirm:0 "Enable Auto-Grant Kingdoms"
+
+ riseandfall_disable_auto_grant_kingdom:0 "Disable Auto-Grant Kingdoms"
+ riseandfall_disable_auto_grant_kingdom_desc:0 "Disable automatic granting of kingdom titles to de jure vassals"
+ riseandfall_disable_auto_grant_kingdom_tooltip:0 "When disabled, kingdoms will not be granted automatically to vassals."
+ riseandfall_disable_auto_grant_kingdom_confirm:0 "Disable Auto-Grant Kingdoms"

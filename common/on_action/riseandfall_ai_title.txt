@@ -4,6 +4,10 @@
         riseandfall_ai_create_duchies
         riseandfall_ai_create_empires
         riseandfall_ai_title_handout
+        riseandfall_player_create_kingdoms
+        riseandfall_player_create_duchies
+        riseandfall_player_grant_duchies
+        riseandfall_player_grant_kingdoms
     }
 }
 
@@ -44,6 +48,45 @@ riseandfall_ai_title_handout = {
         every_independent_ruler = {
             limit = { is_ai = yes primary_title.tier >= tier_empire }
             riseandfall_ai_title_handout_se = yes
+        }
+    }
+}
+
+
+# Player-side on_action handlers: call the scripted effects added in
+# common/scripted_effects/riseandfall_player_title_automanage_effects.txt
+riseandfall_player_create_kingdoms = {
+    effect = {
+        every_independent_ruler = {
+            limit = { is_ai = no is_landed = yes primary_title.tier >= tier_empire }
+            riseandfall_player_create_kingdoms_se = yes
+        }
+    }
+}
+
+riseandfall_player_create_duchies = {
+    effect = {
+        every_ruler = {
+            limit = { is_ai = no is_landed = yes primary_title.tier >= tier_kingdom }
+            riseandfall_player_create_duchies_se = yes
+        }
+    }
+}
+
+riseandfall_player_grant_duchies = {
+    effect = {
+        every_ruler = {
+            limit = { is_ai = no is_landed = yes primary_title.tier >= tier_kingdom }
+            riseandfall_player_grant_duchies_se = yes
+        }
+    }
+}
+
+riseandfall_player_grant_kingdoms = {
+    effect = {
+        every_independent_ruler = {
+            limit = { is_ai = no is_landed = yes primary_title.tier >= tier_empire }
+            riseandfall_player_grant_kingdoms_se = yes
         }
     }
 }

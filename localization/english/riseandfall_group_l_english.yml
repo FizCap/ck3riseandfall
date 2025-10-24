@@ -1,0 +1,9 @@
+﻿l_english:
+ riseandfall_group:0 "Rise and Fall"
+ riseandfall_group_desc:0 "A grouping of decisions and UI elements added by the Rise and Fall mod."
+
+ # Some UI surfaces expect the key `decision_group_type_<token>` (eg. decision_group_type_riseandfall)
+ decision_group_type_riseandfall:0 "Rise and Fall"
+
+ # Optional short label used in UI lists
+ riseandfall_group_short:0 "Rise & Fall"

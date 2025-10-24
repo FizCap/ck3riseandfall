@@ -1,0 +1,10 @@
+##############################################
+# Rise and Fall mod decision group types
+# Provides a custom group for Rise and Fall mod decisions
+##############################################
+
+riseandfall = {
+    # place this near admin decisions (admin has sort_order = 50 in vanilla)
+    sort_order = 52
+    gui_tags = { big_button }
+}

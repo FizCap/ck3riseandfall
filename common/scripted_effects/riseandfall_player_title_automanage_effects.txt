@@ -1,0 +1,201 @@
+﻿#################################################################################
+# Player-side automatic title automanagement scripted effects
+# These mirror the AI automation logic but are gated by character flags
+# (set/cleared by player decisions). They are invoked from the yearly global
+# pulse on_action registered in `common/on_action/riseandfall_ai_title.txt`.
+#################################################################################
+
+# Player: auto-create kingdom titles when the ruler has the toggle modifier
+riseandfall_player_create_kingdoms_se = {
+    # Called for a specific ruler (the caller should iterate every_ruler is_ai = no).
+    save_scope_as = acting_ruler
+
+    # Only proceed for rulers who enabled auto-create kingdoms and are landed
+    if = {
+        limit = { has_character_flag = riseandfall_auto_create_kingdoms is_landed = yes }
+
+        ordered_alert_creatable_title = {
+            order_by = tier
+            check_range_bounds = no
+            max = 99
+
+            limit = {
+                tier = tier_kingdom
+                scope:acting_ruler = {
+                    OR = {
+                        primary_title.tier = tier_empire
+                        government_allows = administrative
+                        has_realm_law = partition_succession_law
+                        has_realm_law = confederate_partition_succession_law
+                        has_realm_law = high_partition_succession_law
+                    }
+                }
+                NOT = { tier = scope:acting_ruler.primary_title.tier }
+            }
+
+            save_scope_as = target_title
+
+            scope:acting_ruler = {
+                create_title_and_vassal_change = { type = created save_scope_as = title_change add_claim_on_loss = no }
+
+                prev = { change_title_holder = { holder = scope:acting_ruler change = scope:title_change } }
+
+                resolve_title_and_vassal_change = scope:title_change
+
+                if = {
+                    limit = { primary_title.tier = tier_kingdom }
+                    if = {
+                        limit = {
+                            prev = { holder = { monthly_character_income > scope:acting_ruler.primary_title.holder.monthly_character_income } }
+                        }
+                        set_primary_title_to = prev
+                    }
+                }
+            }
+        }
+    }
+}
+
+# Player: auto-create duchies when the ruler/character has the toggle modifier
+riseandfall_player_create_duchies_se = {
+    # Called for a specific ruler (the caller should iterate every_ruler is_ai = no).
+    save_scope_as = acting_count
+
+    if = {
+        limit = { has_character_flag = riseandfall_auto_create_duchies is_landed = yes }
+
+        ordered_alert_creatable_title = {
+            order_by = tier
+            check_range_bounds = no
+            max = 99
+
+            limit = { tier = tier_duchy }
+
+            save_scope_as = target_title
+
+            scope:acting_count = {
+                create_title_and_vassal_change = { type = created save_scope_as = title_change add_claim_on_loss = no }
+
+                prev = { change_title_holder = { holder = scope:acting_count change = scope:title_change } }
+
+                resolve_title_and_vassal_change = scope:title_change
+
+                if = { limit = { primary_title.tier = tier_county } set_primary_title_to = prev }
+            }
+        }
+    }
+}
+
+# Player: auto-grant duchy titles to de jure vassals (uses AI handout logic adapted)
+riseandfall_player_grant_duchies_se = {
+    # Expects to be called in a ruler scope (the caller should iterate every_ruler is_ai = no).
+    save_scope_as = actor
+
+    if = { limit = { has_character_flag = riseandfall_auto_grant_duchy_title is_landed = yes }
+
+        # Iterate de-jure duchies in the realm
+        every_realm_de_jure_duchy = {
+            limit = { exists = this holder = scope:actor }
+            save_scope_as = target_title
+
+            if = {
+                limit = { scope:target_title = { holder = scope:actor } }
+
+                # Don't hand out duchies that contain the actor's capital
+                if = {
+                    limit = { NOT = { scope:target_title = { any_de_jure_county = { this = scope:actor.capital_province.county } } } }
+
+                    scope:target_title = {
+                                        random_dejure_vassal_title_holder = {
+                                            limit = { any_liege_or_above = { this = scope:actor } NOT = { this = scope:actor } highest_held_title_tier >= tier_county }
+                                            save_scope_as = chosen_vassal
+                                        }
+                    }
+
+                    if = {
+                        limit = {
+                            exists = scope:chosen_vassal
+                            scope:chosen_vassal = { any_liege_or_above = { this = scope:actor } }
+                            OR = {
+                                NOT = { scope:chosen_vassal = { government_has_flag = government_is_theocracy } }
+                                scope:actor = { government_has_flag = government_is_theocracy }
+                            }
+                        }
+
+                        create_title_and_vassal_change = { type = granted save_scope_as = change }
+                        scope:target_title = { change_title_holder = { holder = scope:chosen_vassal change = scope:change take_baronies = no } }
+                        resolve_title_and_vassal_change = scope:change
+                        scope:chosen_vassal = { add_opinion = { modifier = received_title_duchy target = scope:actor } }
+                    }
+                    else = {
+                        if = {
+                            limit = {
+                                exists = scope:chosen_vassal
+                                scope:chosen_vassal = { government_has_flag = government_is_theocracy }
+                                NOT = { scope:actor = { government_has_flag = government_is_theocracy } }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+# Player: auto-grant kingdoms when the ruler has the toggle (same adaptation pattern as AI)
+riseandfall_player_grant_kingdoms_se = {
+    # Expects to be called in a ruler scope (the caller should iterate every_ruler is_ai = no).
+    save_scope_as = actor
+
+    if = { limit = { has_character_flag = riseandfall_auto_grant_kingdom_title is_landed = yes }
+
+        every_realm_de_jure_kingdom = {
+            limit = { exists = this holder = scope:actor }
+            save_scope_as = target_title
+
+            if = {
+                limit = { scope:target_title = { holder = scope:actor } }
+
+                if = {
+                    limit = {
+                        NOT = { scope:actor = { primary_title = { de_jure_liege = scope:target_title } } }
+                        NOT = { scope:target_title = { any_de_jure_county = { this = scope:actor.capital_province.county } } }
+                    }
+
+                    scope:target_title = {
+                        random_dejure_vassal_title_holder = {
+                            limit = { any_liege_or_above = { this = scope:actor } NOT = { this = scope:actor } primary_title.tier >= tier_county }
+                            save_scope_as = chosen_vassal
+                        }
+                    }
+
+                    if = {
+                        limit = {
+                            exists = scope:chosen_vassal
+                            scope:chosen_vassal = { any_liege_or_above = { this = scope:actor } }
+                            OR = {
+                                NOT = { scope:chosen_vassal = { government_has_flag = government_is_theocracy } }
+                                scope:actor = { government_has_flag = government_is_theocracy }
+                            }
+                        }
+
+                        create_title_and_vassal_change = { type = granted save_scope_as = change }
+                        scope:target_title = { change_title_holder = { holder = scope:chosen_vassal change = scope:change take_baronies = no } }
+                        resolve_title_and_vassal_change = scope:change
+                        scope:chosen_vassal = { add_opinion = { modifier = received_title_kingdom target = scope:actor } }
+
+                        # Transfer de jure duchies under the granted kingdom to the new holder
+                        scope:target_title = {
+                                every_direct_de_jure_vassal_title = {
+                                    limit = { tier = tier_duchy holder != scope:chosen_vassal }
+                                    create_title_and_vassal_change = { type = granted save_scope_as = duchy_change }
+                                    change_title_holder = { holder = scope:chosen_vassal change = scope:duchy_change take_baronies = no }
+                                    resolve_title_and_vassal_change = scope:duchy_change
+                                }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

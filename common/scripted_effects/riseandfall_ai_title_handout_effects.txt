@@ -48,6 +48,7 @@
                         limit = { 
                             is_landed = yes 
                             is_alive = yes 
+                            highest_held_title_tier >= tier_county
                             any_liege_or_above = { this = scope:emperor }
                             NOT = { this = scope:emperor }
                         } 
