@@ -3,6 +3,7 @@
         riseandfall_ai_create_kingdoms
         riseandfall_ai_create_duchies
         riseandfall_ai_create_empires
+        riseandfall_ai_title_handout
     }
 }
 
@@ -32,5 +33,17 @@ riseandfall_ai_create_empires = {
     }
     effect = {
         riseandfall_ai_create_empires_se = yes
+    }
+}
+
+riseandfall_ai_title_handout = {
+    trigger = {
+        has_game_rule = riseandfall_ai_kingdom_creation_enabled
+    }
+    effect = {
+        every_independent_ruler = {
+            limit = { is_ai = yes primary_title.tier >= tier_empire }
+            riseandfall_ai_title_handout_se = yes
+        }
     }
 }
