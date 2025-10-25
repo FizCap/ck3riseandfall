@@ -1,4 +1,4 @@
-##############################################
+﻿##############################################
 # Rise and Fall mod decision group types
 # Provides a custom group for Rise and Fall mod decisions
 ##############################################

@@ -123,7 +123,7 @@ riseandfall_player_grant_duchies_se = {
                         }
 
                         create_title_and_vassal_change = { type = granted save_scope_as = change }
-                        scope:target_title = { change_title_holder = { holder = scope:chosen_vassal change = scope:change take_baronies = no } }
+                        scope:target_title = { change_title_holder_include_vassals = { holder = scope:chosen_vassal change = scope:change take_baronies = no } }
                         resolve_title_and_vassal_change = scope:change
                         scope:chosen_vassal = { add_opinion = { modifier = received_title_duchy target = scope:actor } }
                     }
@@ -180,7 +180,7 @@ riseandfall_player_grant_kingdoms_se = {
                         }
 
                         create_title_and_vassal_change = { type = granted save_scope_as = change }
-                        scope:target_title = { change_title_holder = { holder = scope:chosen_vassal change = scope:change take_baronies = no } }
+                        scope:target_title = { change_title_holder_include_vassals = { holder = scope:chosen_vassal change = scope:change take_baronies = no } }
                         resolve_title_and_vassal_change = scope:change
                         scope:chosen_vassal = { add_opinion = { modifier = received_title_kingdom target = scope:actor } }
 
@@ -189,7 +189,7 @@ riseandfall_player_grant_kingdoms_se = {
                                 every_direct_de_jure_vassal_title = {
                                     limit = { tier = tier_duchy holder != scope:chosen_vassal }
                                     create_title_and_vassal_change = { type = granted save_scope_as = duchy_change }
-                                    change_title_holder = { holder = scope:chosen_vassal change = scope:duchy_change take_baronies = no }
+                                    change_title_holder_include_vassals = { holder = scope:chosen_vassal change = scope:duchy_change take_baronies = no }
                                     resolve_title_and_vassal_change = scope:duchy_change
                                 }
                         }

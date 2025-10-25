@@ -76,7 +76,7 @@
                     # Create the transfer change and apply it to the saved target title
                     create_title_and_vassal_change = { type = granted save_scope_as = change }
                     scope:target_title = {
-                        change_title_holder = { holder = scope:chosen_vassal change = scope:change take_baronies = no }
+                        change_title_holder_include_vassals = { holder = scope:chosen_vassal change = scope:change take_baronies = no }
                     }
                     resolve_title_and_vassal_change = scope:change
                     
