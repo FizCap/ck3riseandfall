@@ -315,8 +315,8 @@ riseandfall_do_create_adventurer_se = {
                 change_variable = { name = adventurer_multiplier add = 0.7 }
             }
             else = {
-                # martial > 10: use 0.1 * martial (e.g., 11 -> 1.1)
-                change_variable = { name = adventurer_multiplier multiply = 0.1 }
+                # martial > 10: use 0.05 * martial (e.g., 11 -> 0.55) — changed per user's correction
+                change_variable = { name = adventurer_multiplier multiply = 0.05 }
             }
 
             random_list = {
