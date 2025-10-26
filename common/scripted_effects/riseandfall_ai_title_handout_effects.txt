@@ -201,7 +201,6 @@ riseandfall_grant_counties_se = {
                     # For each eligible county, create a new landed character of the liege's culture & faith
                     scope:liege = {
                         create_character = {
-                            location = scope:liege.capital_province
                             culture = scope:liege.culture
                             faith = scope:liege.faith
                             age = { 18 35 }
