@@ -66,8 +66,11 @@ warlord.1002 = {
             opinion = { target = liege value < 50 }
         }
     }
-    # Immediately run the warlord action event for this new warlord
-    trigger_event = { id = warlord.1003 }
+    # Immediately run the warlord action event for this new warlord (only for powerful vassals)
+    if = {
+        limit = { is_powerful_vassal = yes }
+        trigger_event = { id = warlord.1003 }
+    }
     }
 
     option = {
@@ -117,63 +120,66 @@ warlord.1003 = {
                 is_independent_ruler = yes
             }
         }
-        # Give claims on the liege's own titles to the warlord
+        # Give claims on the liege's own titles to the warlord (only for powerful vassals)
         if = {
             limit = { exists = liege }
-            liege = {
-                # Give claims only on the highest tier titles the liege holds
-                if = {
-                    limit = { any_held_title = { tier = tier_empire } }
-                    every_held_title = {
-                        limit = {
-                            tier = tier_empire
-                            NOT = { root = { has_claim_on = prev } }
-                        }
-                        root = { add_unpressed_claim = prev }
-                    }
-                }
-                else_if = {
-                    limit = { any_held_title = { tier = tier_kingdom } }
-                    every_held_title = {
-                        limit = {
-                            tier = tier_kingdom
-                            NOT = { root = { has_claim_on = prev } }
-                        }
-                        root = { add_unpressed_claim = prev }
-                    }
-                }
-                else_if = {
-                    limit = { any_held_title = { tier = tier_duchy } }
-                    every_held_title = {
-                        limit = {
-                            tier = tier_duchy
-                            NOT = { root = { has_claim_on = prev } }
-                        }
-                        root = { add_unpressed_claim = prev }
-                    }
-                }
-                else = {
-                    every_held_title = {
-                        limit = {
-                            tier = tier_county
-                            NOT = { root = { has_claim_on = prev } }
-                        }
-                        root = { add_unpressed_claim = prev }
-                    }
-                }
-                if = {
-                    limit = { var:riseandfall_realm_stability_score <= 40 }
-                    # Only apply legitimacy changes if this liege has a legitimacy system
+            if = {
+                limit = { is_powerful_vassal = yes }
+                liege = {
+                    # Give claims only on the highest tier titles the liege holds
                     if = {
-                        limit = { has_legitimacy = yes }
-                        add_legitimacy = { value = legitimacy divide = 98 multiply = -1 }
+                        limit = { any_held_title = { tier = tier_empire } }
+                        every_held_title = {
+                            limit = {
+                                tier = tier_empire
+                                NOT = { root = { has_claim_on = prev } }
+                            }
+                            root = { add_unpressed_claim = prev }
+                        }
                     }
+                    else_if = {
+                        limit = { any_held_title = { tier = tier_kingdom } }
+                        every_held_title = {
+                            limit = {
+                                tier = tier_kingdom
+                                NOT = { root = { has_claim_on = prev } }
+                            }
+                            root = { add_unpressed_claim = prev }
+                        }
+                    }
+                    else_if = {
+                        limit = { any_held_title = { tier = tier_duchy } }
+                        every_held_title = {
+                            limit = {
+                                tier = tier_duchy
+                                NOT = { root = { has_claim_on = prev } }
+                            }
+                            root = { add_unpressed_claim = prev }
+                        }
+                    }
+                    else = {
+                        every_held_title = {
+                            limit = {
+                                tier = tier_county
+                                NOT = { root = { has_claim_on = prev } }
+                            }
+                            root = { add_unpressed_claim = prev }
+                        }
+                    }
+                    if = {
+                        limit = { var:riseandfall_realm_stability_score <= 40 }
+                        # Only apply legitimacy changes if this liege has a legitimacy system
+                        if = {
+                            limit = { has_legitimacy = yes }
+                            add_legitimacy = { value = legitimacy divide = 98 multiply = -1 }
+                        }
+                    }
+                        
+                        add_opinion = {
+                            target = root
+                            modifier = warlord_rebellion_opinion
+                        }
                 }
-                    
-                    add_opinion = {
-                        target = root
-                        modifier = warlord_rebellion_opinion
-                    }
             }
         }
     }
