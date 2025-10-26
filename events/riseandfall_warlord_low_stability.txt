@@ -58,6 +58,19 @@ warlord.1002 = {
                 }
             }
         }
+        # If not a powerful vassal, remove any existing claims on liege's titles
+        if = {
+            limit = { NOT = { is_powerful_vassal = yes } }
+            if = {
+                limit = { exists = liege }
+                liege = {
+                    every_held_title = {
+                        limit = { root = { has_claim_on = prev } }
+                        root = { remove_claim = prev }
+                    }
+                }
+            }
+        }
     ai_chance = {
         base = 0
         modifier = {
