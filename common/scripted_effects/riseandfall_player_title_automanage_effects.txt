@@ -125,7 +125,7 @@ riseandfall_player_grant_duchies_se = {
                         create_title_and_vassal_change = { type = granted save_scope_as = change }
                         scope:target_title = { change_title_holder_include_vassals = { holder = scope:chosen_vassal change = scope:change take_baronies = no } }
                         resolve_title_and_vassal_change = scope:change
-                        scope:chosen_vassal = { add_opinion = { modifier = received_title_duchy target = scope:actor } }
+                        scope:chosen_vassal = { add_opinion = { modifier = received_title_duchy target = scope:actor days = 365 } }
                     }
                     else = {
                         if = {
@@ -163,9 +163,26 @@ riseandfall_player_grant_kingdoms_se = {
                     }
 
                     scope:target_title = {
+                        # Prefer dukes first, then counts, then kings for player auto-granting of kingdoms.
                         random_dejure_vassal_title_holder = {
-                            limit = { any_liege_or_above = { this = scope:actor } NOT = { this = scope:actor } primary_title.tier >= tier_county }
+                            limit = { is_landed = yes any_liege_or_above = { this = scope:actor } NOT = { this = scope:actor } highest_held_title_tier >= tier_duchy }
                             save_scope_as = chosen_vassal
+                        }
+
+                        if = {
+                            limit = { NOT = { exists = scope:chosen_vassal } }
+                            random_dejure_vassal_title_holder = {
+                                limit = { is_landed = yes any_liege_or_above = { this = scope:actor } NOT = { this = scope:actor } highest_held_title_tier >= tier_county }
+                                save_scope_as = chosen_vassal
+                            }
+                        }
+
+                        if = {
+                            limit = { NOT = { exists = scope:chosen_vassal } }
+                            random_dejure_vassal_title_holder = {
+                                limit = { is_landed = yes any_liege_or_above = { this = scope:actor } NOT = { this = scope:actor } highest_held_title_tier >= tier_kingdom }
+                                save_scope_as = chosen_vassal
+                            }
                         }
                     }
 
@@ -182,7 +199,7 @@ riseandfall_player_grant_kingdoms_se = {
                         create_title_and_vassal_change = { type = granted save_scope_as = change }
                         scope:target_title = { change_title_holder_include_vassals = { holder = scope:chosen_vassal change = scope:change take_baronies = no } }
                         resolve_title_and_vassal_change = scope:change
-                        scope:chosen_vassal = { add_opinion = { modifier = received_title_kingdom target = scope:actor } }
+                        scope:chosen_vassal = { add_opinion = { modifier = received_title_kingdom target = scope:actor days = 365 } }
 
                         # Transfer de jure duchies under the granted kingdom to the new holder
                         scope:target_title = {

@@ -1,15 +1,15 @@
 ﻿riseandfall_ai_title_handout_se = {
     # Called from a yearly on_action when the AI kingdom handout rule is enabled.
-    # For each de jure kingdom in the realm where the holder (AI emperor) is not de jure for that kingdom
+    # Randomly select one de jure kingdom in the realm where the holder (AI emperor) is not de jure for that kingdom
     # AND the emperor's capital is not within that kingdom's territory,
-    # try to hand the title to a random de jure vassal under the EMPEROR.
+    # and try to hand the title to a random de jure vassal under the EMPEROR.
     # CRITICAL: Only grant if the emperor (current scope) is the current holder of the kingdom title.
 
     # Save the current emperor scope for reference
     save_scope_as = emperor
 
     every_realm_de_jure_kingdom = {
-        # Iterate de-jure kingdoms. Check if emperor is the current holder.
+        # Iterate every de-jure kingdom. Check each one to see if the emperor is the current holder.
         limit = { 
             exists = this 
             holder = scope:emperor
@@ -35,6 +35,10 @@
                     NOT = {
                         scope:target_title = { any_de_jure_county = { this = scope:emperor.capital_province.county } }
                     }
+                    # Only consider handing out kingdom titles once the emperor has no remaining domain slots
+                    # (we want the emperor to hand out domains first). domain_limit_available > 0 means the
+                    # emperor still has space; require <= 0 to proceed with kingdom handout.
+                    scope:emperor = { domain_limit_available <= 0 }
                 }
 
                 # Debug: log entry with title and holder
@@ -44,15 +48,45 @@
                 # Look for a de jure vassal holder of THIS KINGDOM (including sub-vassals in the hierarchy).
                 # This iterates through all characters who hold de jure vassal titles under target_kingdom.
                 scope:target_title = {
-                    random_dejure_vassal_title_holder = { 
-                        limit = { 
-                            is_landed = yes 
-                            is_alive = yes 
-                            highest_held_title_tier >= tier_county
+                    # Prioritize dukes first, then counts, then (last) kings when choosing a de jure vassal
+                    # who will receive the kingdom. This avoids handing kingdoms to low-tier holders
+                    # when a higher-tier duke is available.
+                    random_dejure_vassal_title_holder = {
+                        limit = {
+                            is_landed = yes
+                            highest_held_title_tier >= tier_duchy
                             any_liege_or_above = { this = scope:emperor }
                             NOT = { this = scope:emperor }
-                        } 
-                        save_scope_as = chosen_vassal 
+                        }
+                        save_scope_as = chosen_vassal
+                    }
+
+                    # If no duke found, fall back to county-level holders
+                    if = {
+                        limit = { NOT = { exists = scope:chosen_vassal } }
+                        random_dejure_vassal_title_holder = {
+                            limit = {
+                                    is_landed = yes
+                                    highest_held_title_tier >= tier_county
+                                    any_liege_or_above = { this = scope:emperor }
+                                    NOT = { this = scope:emperor }
+                                }
+                            save_scope_as = chosen_vassal
+                        }
+                    }
+
+                    # If still nothing found, as a last resort allow king-level vassals
+                    if = {
+                        limit = { NOT = { exists = scope:chosen_vassal } }
+                        random_dejure_vassal_title_holder = {
+                            limit = {
+                                    is_landed = yes
+                                    highest_held_title_tier >= tier_kingdom
+                                    any_liege_or_above = { this = scope:emperor }
+                                    NOT = { this = scope:emperor }
+                                }
+                            save_scope_as = chosen_vassal
+                        }
                     }
                 }
 
@@ -66,7 +100,7 @@
                     limit = { 
                         exists = scope:chosen_vassal 
                         scope:chosen_vassal = { any_liege_or_above = { this = scope:emperor } }
-                        scope:chosen_vassal = { is_landed = yes is_alive = yes }
+                        scope:chosen_vassal = { is_landed = yes }
                         # Don't grant to theocratic vassals unless emperor is also theocratic
                         OR = {
                             NOT = { scope:chosen_vassal = { government_has_flag = government_is_theocracy } }
@@ -82,10 +116,10 @@
                     
                     # Apply positive opinion modifier from vassal to emperor for receiving the kingdom
                     scope:chosen_vassal = {
-                        add_opinion = { modifier = received_title_kingdom target = scope:emperor }
+                        add_opinion = { modifier = received_title_kingdom target = scope:emperor days = 365 }
                     }
                     
-                    debug_log = "AI handout: granted [scope:target_title] to [scope:chosen_vassal] (+80 opinion for 50 years)"
+                    debug_log = "AI handout: granted [scope:target_title] to [scope:chosen_vassal] (+80 opinion for 1 year)"
                 }
                 else = {
                     # Debug: grant failed - check why
@@ -108,6 +142,89 @@
         else = {
             # The emperor no longer holds this kingdom title, skip it.
             debug_log = "AI handout: emperor [scope:emperor] no longer holds [scope:target_title], skipping"
+        }
+    }
+}
+
+############################################################
+# Rise and Fall: Grant counties scripted effect
+# Grants actor-owned de jure counties to newly created characters
+# created with the liege's culture and faith, excluding counties
+# that belong to the de jure kingdom containing the liege's capital.
+############################################################
+
+riseandfall_grant_counties_se = {
+    # Expecting root scope to be the liege (ruler) who clicked the decision.
+    save_scope_as = liege
+
+    # Save the de jure kingdom that contains the liege's capital province
+    scope:liege = {
+        capital_province = {
+            county = {
+                de_jure_liege = {
+                    de_jure_liege = {
+                        save_scope_as = capital_dejure_kingdom
+                    }
+                }
+            }
+        }
+    }
+
+    # Iterate de-jure duchies in the liege's realm, then examine each duchy's direct de-jure vassal titles
+    # for county-tier titles held by the liege (this is a supported iterator pattern and covers normal
+    # county->duchy hierarchies). Exclude counties that belong to the de jure kingdom containing the liege's capital.
+    scope:liege = {
+        every_realm_de_jure_duchy = {
+            limit = { exists = this }
+            save_scope_as = duchy
+
+            scope:duchy = {
+                every_direct_de_jure_vassal_title = {
+                    limit = {
+                        tier = tier_county
+                        holder = scope:liege
+                        # Exclude counties that belong to the de jure kingdom containing the liege's capital.
+                        # We do this by checking if the county's duchy's kingdom matches the saved capital kingdom.
+                        NOT = {
+                            AND = {
+                                exists = scope:capital_dejure_kingdom
+                                de_jure_liege = {
+                                    de_jure_liege = {
+                                        this = scope:capital_dejure_kingdom
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    save_scope_as = target_county
+
+                    # For each eligible county, create a new landed character of the liege's culture & faith
+                    scope:liege = {
+                        create_character = {
+                            location = scope:liege.capital_province
+                            culture = scope:liege.culture
+                            faith = scope:liege.faith
+                            age = { 18 35 }
+                            gender = male
+                            employer = scope:liege
+                            save_scope_as = created_vassal
+                        }
+                    }
+
+                    # Grant the county to the created character
+                    scope:target_county = {
+                        create_title_and_vassal_change = { type = granted save_scope_as = change }
+                        change_title_holder_include_vassals = { holder = scope:created_vassal change = scope:change take_baronies = no }
+                        resolve_title_and_vassal_change = scope:change
+                    }
+
+                    # Apply a small opinion bonus so the new vassal likes the liege who granted them land
+                    # Reuse the existing received_title_kingdom modifier as a general "received title" bonus.
+                    scope:created_vassal = {
+                        add_opinion = { modifier = received_title_county target = scope:liege days = 365 }
+                    }
+                }
+            }
         }
     }
 }

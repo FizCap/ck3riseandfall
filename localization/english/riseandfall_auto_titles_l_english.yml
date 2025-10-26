@@ -38,3 +38,7 @@
  riseandfall_disable_auto_grant_kingdom_desc:0 "Disable automatic granting of kingdom titles to de jure vassals"
  riseandfall_disable_auto_grant_kingdom_tooltip:0 "When disabled, kingdoms will not be granted automatically to vassals."
  riseandfall_disable_auto_grant_kingdom_confirm:0 "Disable Auto-Grant Kingdoms"
+ 
+ riseandfall_grant_surplus_counties:0 "Grant Surplus Counties"
+ riseandfall_grant_counties_desc:0 "Create suitable vassals of your culture and faith and grant eligible surplus counties to them (excludes counties in the de jure kingdom containing your capital)."
+ riseandfall_grant_surplus_counties_confirm:0 "Grant Surplus Counties"

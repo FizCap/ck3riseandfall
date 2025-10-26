@@ -21,7 +21,7 @@ riseandfall_ai_create_kingdoms_se = {
         ordered_alert_creatable_title = {
             order_by = tier
             check_range_bounds = no
-            max = 99
+            max = 1000
 
             limit = {
                 tier = tier_kingdom
@@ -63,33 +63,6 @@ riseandfall_ai_create_kingdoms_se = {
                 }
 
                 resolve_title_and_vassal_change = scope:title_change
-
-                # Set primary title if the actor is a king and the created kingdom is higher tier or equivalent
-                if = {
-                    limit = {
-                        primary_title.tier = tier_kingdom
-                        prev.tier = tier_kingdom
-                    }
-                    # For kings creating other kingdoms, only set as primary if it's more prestigious
-                    if = {
-                        limit = {
-                            # prev is a title/landed_title scope returned by change_title_holder;
-                            # monthly_character_income is a character trigger, so compare the holder character's income instead
-                            prev = {
-                                holder = {
-                                    monthly_character_income > scope:acting_ruler.primary_title.holder.monthly_character_income
-                                }
-                            }
-                        }
-                        set_primary_title_to = prev
-                    }
-                }
-                else_if = {
-                    limit = {
-                        primary_title.tier = tier_empire
-                    }
-                    # For emperors, don't change primary title - keep the empire
-                }
             }
         }
     }
@@ -114,7 +87,7 @@ riseandfall_ai_create_duchies_se = {
         ordered_alert_creatable_title = {
             order_by = tier
             check_range_bounds = no
-            max = 99  # Limit to prevent excessive duchy creation
+            max = 1000  # Limit to prevent excessive duchy creation
 
             limit = {
                 tier = tier_duchy
@@ -146,17 +119,6 @@ riseandfall_ai_create_duchies_se = {
                 }
 
                 resolve_title_and_vassal_change = scope:title_change
-
-                # Set as primary title only if the actor's current primary is a county.
-                # This avoids attempting to downgrade a king/empire primary title to a duchy
-                # (which causes script errors). If the actor already has a higher-tier
-                # primary title, leave it unchanged.
-                if = {
-                    limit = {
-                        primary_title.tier = tier_county
-                    }
-                    set_primary_title_to = prev
-                }
             }
         }
     }
@@ -226,33 +188,6 @@ riseandfall_ai_create_empires_se = {
                 }
 
                 resolve_title_and_vassal_change = scope:title_change
-
-                # Set as primary title if it's higher tier than current primary
-                if = {
-                    limit = {
-                        primary_title.tier = tier_kingdom
-                        prev.tier = tier_empire
-                    }
-                    set_primary_title_to = prev
-                }
-                else_if = {
-                    limit = {
-                        primary_title.tier = tier_empire
-                        prev.tier = tier_empire
-                    }
-                    # For emperors creating other empires, only set as primary if it's more prestigious
-                    if = {
-                        limit = {
-                            # Compare the income of the holder character of the prev title against the acting ruler's primary title holder
-                            prev = {
-                                holder = {
-                                    monthly_character_income > scope:acting_ruler.primary_title.holder.monthly_character_income
-                                }
-                            }
-                        }
-                        set_primary_title_to = prev
-                    }
-                }
             }
         }
     }

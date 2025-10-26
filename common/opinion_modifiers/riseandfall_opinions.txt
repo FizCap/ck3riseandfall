@@ -1,0 +1,19 @@
+﻿warlord_rebellion_opinion = {
+	opinion = -50
+	imprisonment_reason = yes
+	revoke_title_reason = yes
+	years = 1
+	decaying = no
+}
+
+warlord_loyalty_opinion = {
+	opinion = 30
+	years = 10
+	decaying = yes
+}
+
+adventurer_invasion_opinion = {
+	opinion = -300
+	years = 30
+	decaying = no
+}
