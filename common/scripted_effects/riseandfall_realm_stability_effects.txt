@@ -343,6 +343,25 @@ riseandfall_calculate_realm_stability_se = {
     }
 
     ########################################
+    # 3.6) PUPPET REGENCY MULTIPLIER
+    # Apply a multiplier to stability based on years under puppet regency.
+    # -2% per year, compounding. Default 100% (no effect).
+    set_variable = { name = riseandfall_realm_stability_puppet_regency_multiplier value = 100 }
+    # Track years under puppet regency
+    if = { limit = { NOT = { has_variable = riseandfall_puppet_regency_years } } set_variable = { name = riseandfall_puppet_regency_years value = 0 } }
+    if = { limit = { has_diarchy_type = puppet_regency } change_variable = { name = riseandfall_puppet_regency_years add = 1 } }
+    else = { if = { limit = { var:riseandfall_puppet_regency_years > 0 } change_variable = { name = riseandfall_puppet_regency_years add = -1 } } }
+    # If under puppet regency, compute multiplier
+    if = { limit = { var:riseandfall_puppet_regency_years > 0 }
+        set_variable = { name = tmp_puppet_penalty value = var:riseandfall_puppet_regency_years }
+        change_variable = { name = tmp_puppet_penalty multiply = 2 }
+        change_variable = { name = tmp_puppet_penalty multiply = -1 }
+        set_variable = { name = tmp_factor value = 100 }
+        change_variable = { name = tmp_factor add = var:tmp_puppet_penalty }
+        set_variable = { name = riseandfall_realm_stability_puppet_regency_multiplier value = var:tmp_factor }
+    }
+
+    ########################################
     # 4) Sum components into final 0..100 TARGET score (don't overwrite the persistent current score yet)
     # Ensure component vars exist (safe defaults) to avoid unset-variable engine errors
     if = { limit = { NOT = { has_variable = riseandfall_rs_stats_component } } set_variable = { name = riseandfall_rs_stats_component value = 0 } }
@@ -363,6 +382,12 @@ riseandfall_calculate_realm_stability_se = {
     # Apply powerful vassal multiplier if active (calculated earlier)
     if = { limit = { var:riseandfall_realm_stability_powerful_vassal_multiplier < 100 }
         change_variable = { name = tmp_target_score multiply = var:riseandfall_realm_stability_powerful_vassal_multiplier }
+        change_variable = { name = tmp_target_score divide = 100 }
+    }
+
+    # Apply puppet regency multiplier if active
+    if = { limit = { var:riseandfall_realm_stability_puppet_regency_multiplier < 100 }
+        change_variable = { name = tmp_target_score multiply = var:riseandfall_realm_stability_puppet_regency_multiplier }
         change_variable = { name = tmp_target_score divide = 100 }
     }
 
@@ -424,8 +449,9 @@ riseandfall_calculate_realm_stability_se = {
     # Maintain a per-character war penalty variable (negative or zero).
     # - Losing a war: add -5 (handled in on_actions where the loser is targeted)
     # - Winning a war: add +5 (handled in on_actions where the winner is targeted)
-    # Decay the penalty by +1 per year (toward 0). Expose for tooltip and include in target.
-    if = { limit = { NOT = { has_variable = riseandfall_realm_stability_war_penalty } } set_variable = { name = riseandfall_realm_stability_war_penalty value = 0 } }
+# Decay the penalty by +1 per year (toward 0). Expose for tooltip and include in target.
+if = { limit = { NOT = { has_variable = riseandfall_realm_stability_war_penalty } } set_variable = { name = riseandfall_realm_stability_war_penalty value = 0 } }
+if = { limit = { NOT = { has_variable = riseandfall_realm_stability_puppet_regency_multiplier } } set_variable = { name = riseandfall_realm_stability_puppet_regency_multiplier value = 100 } }
     # Decay toward zero when this runs yearly
     if = {
         limit = { var:riseandfall_realm_stability_war_penalty < 0 }
@@ -434,15 +460,13 @@ riseandfall_calculate_realm_stability_se = {
         # never exceed 0
         if = { limit = { var:riseandfall_realm_stability_war_penalty > 0 } set_variable = { name = riseandfall_realm_stability_war_penalty value = 0 } }
     }
-    # Apply war penalty to the target score and expose for tooltip
-    change_variable = { name = tmp_target_score add = var:riseandfall_realm_stability_war_penalty }
-    set_variable = { name = riseandfall_realm_stability_war_penalty value = var:riseandfall_realm_stability_war_penalty }
+# Apply war penalty to the target score and expose for tooltip
+change_variable = { name = tmp_target_score add = var:riseandfall_realm_stability_war_penalty }
+set_variable = { name = riseandfall_realm_stability_war_penalty value = var:riseandfall_realm_stability_war_penalty }
 
-    # Ensure the target stays within 0..100 after applying war penalties
-    clamp_variable = { name = tmp_target_score min = 0 max = 100 }
-    round_variable = { name = tmp_target_score }
-
-    # Persist the (possibly penalized) target so smoothing moves the current score toward it
+# Ensure the target stays within 0..100 after applying war penalties
+clamp_variable = { name = tmp_target_score min = 0 max = 100 }
+round_variable = { name = tmp_target_score }    # Persist the (possibly penalized) target so smoothing moves the current score toward it
     set_variable = { name = riseandfall_realm_stability_target value = var:tmp_target_score }
 
     # Smooth the persistent current score (`riseandfall_realm_stability_score`) toward the target
