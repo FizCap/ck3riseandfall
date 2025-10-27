@@ -35,10 +35,11 @@
                     NOT = {
                         scope:target_title = { any_de_jure_county = { this = scope:emperor.capital_province.county } }
                     }
-                    # Only consider handing out kingdom titles once the emperor has no remaining domain slots
-                    # (we want the emperor to hand out domains first). domain_limit_available > 0 means the
-                    # emperor still has space; require <= 0 to proceed with kingdom handout.
-                    scope:emperor = { domain_limit_available <= 0 }
+                    # Only consider handing out kingdom titles when the emperor is NOT over their domain limit.
+                    # domain_limit_available is negative when the character is over their domain limit.
+                    # We should NOT hand out titles if the emperor is over their domain limit, so require
+                    # domain_limit_available >= 0 (0 means at the limit, positive means free slots).
+                    scope:emperor = { domain_limit_available >= 0 }
                 }
 
                 # Debug: log entry with title and holder
