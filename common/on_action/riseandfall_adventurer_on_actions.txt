@@ -1,0 +1,166 @@
+﻿yearly_global_pulse = {
+    on_actions = {
+        riseandfall_yearly_adventurer
+        riseandfall_yearly_remove_adventurer_gold_mod
+        riseandfall_marry_male_target_se
+        riseandfall_marry_female_target_se
+        riseandfall_yearly_adventurer_press_claims
+        riseandfall_yearly_adventurer_cleanup_on_action
+        riseandfall_yearly_adventurer_remove_variable
+        riseandfall_apply_vassal_limit
+        riseandfall_remove_vassal_limit
+    }
+}
+
+quarterly_playable_pulse = {
+    on_actions = {
+        riseandfall_quarterly_adventurer_income
+    }
+}
+
+on_siege_looting = {
+    on_actions = {
+        riseandfall_siege
+    }
+}
+
+
+#---------------------------------------------------
+
+riseandfall_yearly_adventurer = {
+    trigger = {
+        has_game_rule = riseandfall_adventurer_creator_enabled
+    }
+    effect = {
+        every_living_character = {
+            limit = { any_claim = { count > 0 } }
+            # Save the iterated character as the candidate (the dynasty member with a claim)
+            save_scope_as = candidate
+            # Call the check effect which will operate using scope:candidate and will
+            # set `independent_ruler` where needed for the claim holder.
+            riseandfall_check_dynasty_for_adventurers_se = yes
+        }
+    }
+}
+
+riseandfall_yearly_adventurer_remove_variable = {
+    trigger = {
+        has_game_rule = riseandfall_adventurer_creator_enabled
+    }
+    effect = {
+        every_ruler = {
+            riseandfall_yearly_adventurer_remove_variable_se = yes
+        }
+    }
+}
+
+riseandfall_yearly_adventurer_press_claims = {
+    effect = {
+        every_ruler = {
+            limit = {
+                has_character_flag = riseandfall_newadventurer
+                is_at_war = no
+                has_realm_law = camp_purpose_legitimists
+                is_imprisoned = no
+            }
+            save_scope_as = independent_adventurer
+            # call the scripted effect on the adventurer leader
+            riseandfall_adventurer_press_claims_se = yes
+        }
+    }
+}
+
+# Helper on_action: iterate adventurers and pay quarterly income
+riseandfall_quarterly_adventurer_income = {
+    effect = {
+        every_ruler = {
+            limit = {
+                has_character_modifier = riseandfall_adventurer_gold_mod
+                has_government = landless_adventurer_government
+                is_landed = no
+                is_imprisoned = no
+            }
+            riseandfall_adventurer_quarterly_income_se = yes
+        }
+    }
+}
+
+
+# Find every character with the adventurer gold modifier and run the removal check
+riseandfall_yearly_remove_adventurer_gold_mod = {
+    effect = {
+        every_ruler = {
+            limit = {
+                has_character_modifier = riseandfall_adventurer_gold_mod
+                NOT = { has_government = landless_adventurer_government }
+            }
+
+            riseandfall_remove_adventurer_gold_mod_if_not_landless_se = yes
+        }
+    }
+}
+
+# On_action that runs yearly to marry male landless adventurers (creates female spouse)
+riseandfall_marry_male_target_se = {
+    effect = {
+        every_ruler = {
+            limit = {
+                NOT = { has_trait_with_flag = can_not_marry }
+                is_male = yes
+                is_adult = yes
+                is_married = no
+                is_betrothed = no
+                has_realm_law = camp_purpose_legitimists
+            }
+
+            save_scope_as = independent_ruler
+
+            # Defer character-level checks to the scripted effect for performance.
+            riseandfall_marry_male_target_se = yes
+        }
+    }
+}
+
+
+# On_action that runs yearly to marry female landless adventurers (creates male spouse)
+riseandfall_marry_female_target_se = {
+    effect = {
+        every_ruler = {
+            limit = {
+                NOT = { has_trait_with_flag = can_not_marry }
+                is_female = yes
+                is_adult = yes
+                is_married = no
+                is_betrothed = no
+                has_realm_law = camp_purpose_legitimists
+            }
+
+            save_scope_as = independent_ruler
+            riseandfall_marry_female_target_se = yes
+        }
+    }
+}
+
+
+# Monthly cleanup: run the adventurer cleanup scripted effect (previously in a separate file)
+riseandfall_yearly_adventurer_cleanup_on_action = {
+    trigger = {
+        has_game_rule = riseandfall_adventurer_cleanup
+    }
+    effect = {
+            riseandfall_adventurer_cleanup_se = yes
+        }
+    }
+
+riseandfall_siege = {
+    effect = {
+        # Save the looted county and barony for use in the scripted effect
+        scope:county = { save_scope_as = rf_looted_county }
+        scope:barony = { save_scope_as = rf_looted_barony }
+        # Save the sieging character (root) as rf_sieger for clarity
+        save_scope_as = rf_sieger
+
+        # Call our scripted effect which will add a test province modifier
+        riseandfall_on_siege_looting_se = yes
+    }
+}

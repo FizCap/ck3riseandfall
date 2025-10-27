@@ -1,0 +1,27 @@
+﻿##########################
+# Rise and Fall - Adventurer Low Stability Event
+# Triggered when low stability roll succeeds. Creates a horde of adventurers invading the ruler's throne.
+
+namespace = adventurer
+
+adventurer.1001 = {
+    type = character_event
+    title = adventurer.1001.t
+    desc = adventurer.1001.d
+    theme = realm
+
+    left_portrait = root
+
+    immediate = {
+        # Set low stability cooldown on the ruler when this event fires
+    set_variable = { name = low_stability_cooldown value = yes days = 1825 }
+    }
+
+    option = {
+        name = adventurer.1001.a
+        ai_chance = { base = 100 }
+        hidden_effect = {
+            riseandfall_create_adventurer_invasion_se = yes
+        }
+    }
+}

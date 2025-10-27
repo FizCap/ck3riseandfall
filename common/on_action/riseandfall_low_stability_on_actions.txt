@@ -1,0 +1,48 @@
+﻿yearly_global_pulse = {
+    on_actions = {
+        riseandfall_low_stability_roll
+        riseandfall_warlord
+    }
+}
+
+riseandfall_low_stability_roll = {
+    trigger = {
+        has_game_rule = riseandfall_low_stability_events_enabled
+    }
+    effect = {
+        every_independent_ruler = {
+            limit = {
+                is_landed = yes
+                # Only rulers whose primary title is duchy or higher (duke+)
+                primary_title.tier >= tier_duchy
+            }
+            save_scope_as = ruler_low_stability
+            riseandfall_low_stability_roll_se = yes
+        }
+    }
+}
+
+
+riseandfall_warlord = {
+    effect = {
+        # For independent rulers who are warlords, mark them retired warlords
+        every_independent_ruler = {
+            limit = { has_trait = warlord }
+            remove_trait = warlord
+            add_trait = retiredwarlord
+        }
+
+        # For non-independent rulers who were retired warlords, restore the warlord trait so they act
+        every_ruler = {
+            limit = { is_independent_ruler = no has_trait = retiredwarlord NOT = { has_trait = warlord } }
+            remove_trait = retiredwarlord
+            add_trait = warlord
+        }
+
+        # For non-independent rulers who are warlords, run the usual scripted effect
+        every_ruler = {
+            limit = { is_independent_ruler = no has_trait = warlord }
+            riseandfall_warlord_roll_se = yes
+        }
+    }
+}

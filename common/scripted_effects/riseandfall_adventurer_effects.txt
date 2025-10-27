@@ -1,0 +1,667 @@
+﻿riseandfall_check_dynasty_for_adventurers_se = {
+    # Called from on_action with the iterated character saved as `candidate`.
+    # Tight guard: ensure scope:candidate exists and is a character before doing any character-scoped checks.
+        # Operate directly on scope:candidate (not every_dynasty_member). Some characters do not have a dynasty.
+        # Scope list: scope:candidate is the person we're testing; independent_ruler will be set to the claim holder when found.
+        # Save the candidate for inner reference
+        save_scope_as = candidate
+        if = {
+            limit = {
+                is_landed = no
+                is_imprisoned = no
+                NOT = { has_government = landless_adventurer_government }
+                # Exclude noble-family title holders (landless playable noble families)
+                NOT = { any_held_title = { is_noble_family_title = yes } }
+                # Exclude characters flagged as unable to marry; trait-based penalties are applied below
+                NOT = { has_trait_with_flag = can_not_marry }
+                age >= 16
+                # Only qualify if they have a claim on a kingdom+ title held by an independent ruler
+                any_claim = { tier >= tier_kingdom exists = holder holder = { is_independent_ruler = yes } }
+            }
+                # Determine a claim target title and disqualify if candidate is allied/spouse/too-positive toward that claim holder
+                set_variable = { name = rf_disqualify value = 0 }
+                if = {
+                    limit = { any_claim = { tier >= tier_kingdom exists = holder holder = { is_independent_ruler = yes } } }
+                    random_claim = {
+                        limit = { tier >= tier_kingdom exists = holder holder = { is_independent_ruler = yes } }
+                        save_scope_as = claim_target_title
+                    }
+                    # If the selected claim has a valid holder, save that holder for later comparisons
+                    if = { limit = { exists = scope:claim_target_title.holder } scope:claim_target_title.holder = { save_scope_as = independent_ruler } }
+                    # If the selected claim has a valid holder, check relationships and disqualify if needed.
+                    # Special rule: if the holder is very old (>100), only spouse and heir relations should disqualify.
+                    if = {
+                        limit = { exists = scope:claim_target_title.holder }
+                        # If holder is age <= 100 use full relationship checks
+                        if = {
+                            limit = { scope:claim_target_title.holder = { age <= 100 } }
+                            if = {
+                                limit = {
+                                    OR = {
+                                        is_allied_to = scope:claim_target_title.holder
+                                        is_spouse_of = scope:claim_target_title.holder
+                                        is_heir_of = scope:claim_target_title.holder
+                                        is_primary_heir_of = scope:claim_target_title.holder
+                                        is_player_heir_of = scope:claim_target_title.holder
+                                    }
+                                }
+                                set_variable = { name = rf_disqualify value = 1 }
+                            }
+                        }
+                    }
+                }
+                # Roll for adventurer creation only if not disqualified
+                if = {
+                    limit = { var:rf_disqualify = 0 }
+                    # Base chance is 0.5%; trait bonuses/penalties: dragonrider +2.0%, ambitious +2.0%, deceitful +1.0%, brave +1.0%, lazy -0.5%
+                    # Use explicit floats so the engine performs fractional math correctly.
+                    set_variable = { name = rf_adventurer_trait_chance value = 0.0 }
+                    if = { limit = { has_trait = dragonrider } change_variable = { name = rf_adventurer_trait_chance add = 2.0 } }
+                    if = { limit = { has_trait = ambitious } change_variable = { name = rf_adventurer_trait_chance add = 2.0 } }
+                    if = { limit = { has_trait = deceitful } change_variable = { name = rf_adventurer_trait_chance add = 1.0 } }
+                    if = { limit = { has_trait = lazy } change_variable = { name = rf_adventurer_trait_chance add = -0.5 } }
+                    # Additional trait penalties: craven -2%, content -5%, incapable -10%
+                    if = { limit = { has_trait = craven } change_variable = { name = rf_adventurer_trait_chance add = -2.0 } }
+                    if = { limit = { has_trait = content } change_variable = { name = rf_adventurer_trait_chance add = -5.0 } }
+                    if = { limit = { has_trait = incapable } change_variable = { name = rf_adventurer_trait_chance add = -10.0 } }
+                    # Set base chance based on game rule: low -1%, medium 0%, high +1%
+                    if = { limit = { has_game_rule = riseandfall_adventurer_chance_low } set_variable = { name = rf_adventurer_base_chance value = -1.0 } }
+                    else_if = { limit = { has_game_rule = riseandfall_adventurer_chance_medium } set_variable = { name = rf_adventurer_base_chance value = 0.0 } }
+                    else_if = { limit = { has_game_rule = riseandfall_adventurer_chance_high } set_variable = { name = rf_adventurer_base_chance value = 1.0 } }
+                    else = { set_variable = { name = rf_adventurer_base_chance value = 0.0 } }  # fallback to medium
+                    # Final chance = base chance + trait bonuses + intrigue bonus, clamp to [0,100]
+                    set_variable = { name = rf_adventurer_final_chance value = var:rf_adventurer_base_chance }
+                    change_variable = { name = rf_adventurer_final_chance add = var:rf_adventurer_trait_chance }
+                    # Add intrigue bonus: intrigue * 0.1 (e.g., 10 intrigue = +1.0 -> 2 intrigue = +0.2)
+                    set_variable = { name = intrigue_bonus value = intrigue }
+                    change_variable = { name = intrigue_bonus multiply = 0.1 }
+                    change_variable = { name = rf_adventurer_final_chance add = var:intrigue_bonus }
+                    # Apply realm stability modifier instead of legitimacy (defensive math):
+                    # Mapping: holder stability 50 => 0.00% change
+                    # - 0 stability  => +1.00% chance (increase)
+                    # - 100 stability => -1.00% chance (decrease)
+                    # rf_stability_modifier = (50 - holder_stability) * 0.02  (maps -1..+1)
+                    set_variable = { name = rf_stability_modifier value = 0.0 }
+                    # default holder stability = 50 (neutral)
+                    set_variable = { name = rf_holder_realm_stability value = 50 }
+                    if = {
+                        limit = { exists = scope:claim_target_title }
+                        if = {
+                            limit = { exists = scope:claim_target_title.holder }
+                            # Only read the holder's score if the holder actually has it
+                            if = { limit = { scope:claim_target_title.holder = { has_variable = riseandfall_realm_stability_score } } 
+                                set_variable = { name = rf_holder_realm_stability value = scope:claim_target_title.holder.var:riseandfall_realm_stability_score } 
+                            }
+                        }
+                    }
+                    # Compute difference = 50 - holder_stability safely
+                    set_variable = { name = rf_stability_diff value = var:rf_holder_realm_stability }
+                    change_variable = { name = rf_stability_diff multiply = -1 }
+                    change_variable = { name = rf_stability_diff add = 50 }
+                    # Convert to percent change (0.01 per point)
+                    set_variable = { name = rf_stability_modifier value = var:rf_stability_diff }
+                    change_variable = { name = rf_stability_modifier multiply = 0.02 }
+                    change_variable = { name = rf_adventurer_final_chance add = var:rf_stability_modifier }
+                    remove_variable = rf_stability_diff
+                    # Apply sex-based penalties based on the claim holder's realm laws.
+                    # Compute holder law checks at this scope to avoid failed context switches;
+                    # then switch into scope:candidate only to set the penalty variable.
+                    set_variable = { name = rf_sex_penalty value = 0 }
+                    if = {
+                        limit = { exists = scope:claim_target_title.holder }
+                        # Male-only law: if the claim holder's realm forbids females, zero chance for female candidates
+                        if = {
+                            limit = { scope:claim_target_title.holder = { has_realm_law = male_only_law } }
+                            if = { limit = { is_female = yes } change_variable = { name = rf_sex_penalty add = -100 } }
+                        }
+                        # Male-preference law: small penalty for female candidates
+                        else_if = {
+                            limit = { scope:claim_target_title.holder = { has_realm_law = male_preference_law } }
+                            if = { limit = { is_female = yes } change_variable = { name = rf_sex_penalty add = -1.0 } }
+                        }
+                        # Female-only law: zero chance for male candidates
+                        else_if = {
+                            limit = { scope:claim_target_title.holder = { has_realm_law = female_only_law } }
+                            if = { limit = { is_male = yes } change_variable = { name = rf_sex_penalty add = -100 } }
+                        }
+                        # Female-preference law: small penalty for male candidates
+                        else_if = {
+                            limit = { scope:claim_target_title.holder = { has_realm_law = female_preference_law } }
+                            if = { limit = { is_male = yes } change_variable = { name = rf_sex_penalty add = -1.0 } }
+                        }
+
+                        # Apply the computed sex penalty to the final chance.
+                        if = { limit = { var:rf_sex_penalty <= -100 } set_variable = { name = rf_adventurer_final_chance value = 0 } }
+                        else = { change_variable = { name = rf_adventurer_final_chance add = var:rf_sex_penalty } }
+                    }
+                    # Opinion scaling: use a safe temporary opinion read and compute a
+                    # single linear multiplier in the range 0.00 .. 0.02 (0%..2%), with
+                    # a baseline of 0.01 (1%) when opinion = 0. Negative opinion (hatred)
+                    # increases the multiplier up to 0.02 at -100. Positive opinion
+                    # decreases the multiplier down to 0.00 at +100.
+                    if = {
+                        limit = { exists = scope:claim_target_title.holder }
+                        # Safely save the candidate's opinion of the claim holder into a temporary
+                        # variable (returns false if target is invalid/null).
+                        if = {
+                            limit = { save_temporary_opinion_value_as = { name = tmp_candidate_opinion target = scope:claim_target_title.holder } }
+                            # Desired mapping: opinion -> additive percentage points in range 0.00..2.00
+                            # baseline 1.0pp at opinion=0, -100 -> 2.0pp, +100 -> 0.0pp
+                            # Compute temp = -opinion * 0.01 (so -39 -> 0.39)
+                            set_variable = { name = rf_tmp_op value = scope:tmp_candidate_opinion }
+                            change_variable = { name = rf_tmp_op multiply = -0.01 }
+                            # rf_opinion_adjust = 1.0 + rf_tmp_op (so -39 -> 1.0 + 0.39 = 1.39)
+                            set_variable = { name = rf_opinion_adjust value = 1.0 }
+                            change_variable = { name = rf_opinion_adjust add = var:rf_tmp_op }
+                            # Clamp to percentage points (0.0 .. 2.0)
+                            clamp_variable = { name = rf_opinion_adjust min = 0.0 max = 2.0 }
+                            # Apply as a multiplier to the final chance (e.g. 1.39x when opinion=-39)
+                            change_variable = { name = rf_adventurer_final_chance multiply = var:rf_opinion_adjust }
+                            remove_variable = rf_tmp_op
+                        }
+                    }
+                    clamp_variable = { name = rf_adventurer_final_chance min = 0 max = 100 }
+                    random = {
+                        chance = var:rf_adventurer_final_chance
+                        hidden_effect = {
+                            riseandfall_do_create_adventurer_se = yes
+                        }
+                    }
+                }
+                remove_variable = rf_disqualify
+            }
+        }
+
+riseandfall_marry_male_target_se = {
+    # Expecting character scope (root) — the adventurer leader. Only operate on that character.
+    # Use the adventurer's saved independent_ruler scope for location/culture/faith so
+    # we don't reference an unset adventurer_child scope when this is called from on_action.
+    create_character = {
+        location = scope:independent_ruler.capital_province
+        culture = scope:independent_ruler.culture
+        faith = scope:independent_ruler.faith
+        age = { 16 20 }
+        gender = female
+        save_scope_as = created_spouse
+    }
+    marry = scope:created_spouse
+}
+
+
+riseandfall_marry_female_target_se = {
+    # Expecting character scope (root) — the adventurer leader. Only operate on that character.
+    create_character = {
+        location = scope:independent_ruler.capital_province
+        culture = scope:independent_ruler.culture
+        faith = scope:independent_ruler.faith
+        age = { 16 20 }
+        gender = male
+        save_scope_as = created_spouse
+    }
+    marry_matrilineal = scope:created_spouse
+}
+
+
+### Dedicated creation effect (guarded to avoid double-creation if multiple chances hit)
+riseandfall_do_create_adventurer_se = {
+    # Ensure we haven't already made this character into an adventurer (guard against multiple triggers)
+    if = {
+        limit = { NOT = { has_character_flag = riseandfall_newadventurer } }
+
+        save_scope_as = adventurer_child
+
+        create_adventurer_title = {
+            name = riseandfall_adventurer_title_name
+            holder = scope:adventurer_child
+            save_scope_as = created_adventurer_title
+        }
+
+        # Mark the title object and store the title scope as a variable on the adventurer
+        scope:created_adventurer_title = {
+            set_variable = { name = riseandfall_created_adventurer_title value = yes }
+        }
+
+        scope:adventurer_child = {
+            # Only create a legitimist camp if we saved a valid claim target whose holder is
+            # an independent ruler. This prevents creating legitimist camps for non-independent
+            # titles or when no claim target was carried over into this effect.
+            if = {
+                limit = { exists = scope:claim_target_title.holder scope:claim_target_title.holder = { is_independent_ruler = yes } }
+                add_realm_law = camp_purpose_legitimists
+            }
+
+            # Defensive: independent_ruler may not exist (vacant title or missing saved scope).
+            # Use holder's monthly income if we have an independent_ruler, otherwise default to 0.
+            if = {
+                limit = { exists = scope:independent_ruler }
+                set_variable = { name = adventurer_base_year_income value = scope:independent_ruler.monthly_character_income }
+            }
+            else = {
+                set_variable = { name = adventurer_base_year_income value = 0 }
+            }
+            change_variable = { name = adventurer_base_year_income multiply = 60 }
+
+            set_variable = { name = adventurer_start_gold_mult value = scope:adventurer_child.stewardship }
+            change_variable = { name = adventurer_start_gold_mult multiply = 0.1 }
+
+            set_variable = { name = adventurer_starting_gold value = var:adventurer_base_year_income }
+            change_variable = { name = adventurer_starting_gold multiply = var:adventurer_start_gold_mult }
+            round_variable = { name = adventurer_starting_gold nearest = 1 }
+
+            # Clamp starting gold to avoid negative add_gold errors reported by the engine
+            clamp_variable = { name = adventurer_starting_gold min = 0 max = 1000000 }
+            if = {
+                limit = { var:adventurer_starting_gold > 0 }
+                add_gold = var:adventurer_starting_gold
+            }
+            add_character_modifier = { modifier = riseandfall_adventurer_gold_mod }
+            add_character_flag = { flag = riseandfall_newadventurer years = 30 }
+            add_character_flag = { flag = riseandfall_adventurer }
+            add_character_flag = { flag = riseandfall_newadventurer_war_block years = 10 }
+
+            remove_variable = adventurer_starting_gold
+            remove_variable = adventurer_base_year_income
+            remove_variable = adventurer_start_gold_mult
+        }
+
+        scope:adventurer_child = {
+            # Prefer scaling to the holder of a claim this adventurer has (empire first, then kingdom).
+            # Save a claim target title for strength scaling only; fallback to independent_ruler if none.
+            if = {
+                limit = { any_claim = { tier >= tier_empire exists = holder holder = { is_independent_ruler = yes } } }
+                random_claim = {
+                    limit = { tier >= tier_empire exists = holder holder = { is_independent_ruler = yes } }
+                    save_scope_as = claim_target_title
+                }
+            }
+            else_if = {
+                limit = { any_claim = { tier >= tier_kingdom exists = holder holder = { is_independent_ruler = yes } } }
+                random_claim = {
+                    limit = { tier >= tier_kingdom exists = holder holder = { is_independent_ruler = yes } }
+                    save_scope_as = claim_target_title
+                }
+            }
+
+            # Determine base levies defensively: prefer claim holder, then independent_ruler, then a small default.
+            if = {
+                limit = { exists = scope:claim_target_title.holder }
+                # Defensive: ensure holder is a (living) character before accessing military stats
+                if = { limit = { scope:claim_target_title.holder = { is_alive = yes } } set_variable = { name = adventurer_base_levies value = scope:claim_target_title.holder.max_military_strength } }
+            }
+            else_if = {
+                limit = { exists = scope:independent_ruler }
+                set_variable = { name = adventurer_base_levies value = scope:independent_ruler.max_military_strength }
+            }
+            else = {
+                # Fallback small levy pool to ensure spawned host has at least minimal strength.
+                set_variable = { name = adventurer_base_levies value = 10 }
+            }
+            change_variable = { name = adventurer_base_levies multiply = 1.0 }
+
+            # Compute base multiplier from the adventurer's martial skill.
+            # Desired mapping:
+            # - martial 0  => 0.70 (70% of scoped ruler's military size)
+            # - martial 10 => 1.00 (100%)
+            # - martial 11 => 1.10 (110%), 12 => 1.20, etc.
+            # We implement a piecewise function:
+            #   if martial <= 10: multiplier = 0.7 + martial * 0.03
+            #   else:               multiplier = martial * 0.1
+            set_variable = { name = adventurer_multiplier value = scope:adventurer_child.martial }
+            # For martial <= 10: compute 0.7 + martial*0.03
+            if = {
+                limit = { var:adventurer_multiplier <= 10 }
+                # reuse variable to hold the computed fractional multiplier
+                change_variable = { name = adventurer_multiplier multiply = 0.03 }
+                change_variable = { name = adventurer_multiplier add = 0.7 }
+            }
+            else = {
+                # martial > 10: use 0.05 * martial (e.g., 11 -> 0.55) — changed per user's correction
+                change_variable = { name = adventurer_multiplier multiply = 0.05 }
+            }
+
+            random_list = {
+                15 = { change_variable = { name = adventurer_multiplier multiply = 0.75 } }
+                70 = { }
+                10 = { change_variable = { name = adventurer_multiplier multiply = 1.25 } }
+                5 = { change_variable = { name = adventurer_multiplier multiply = 1.75 } }
+            }
+
+            set_variable = { name = adventurer_army_size value = var:adventurer_base_levies }
+            change_variable = { name = adventurer_army_size multiply = var:adventurer_multiplier }
+            round_variable = { name = adventurer_army_size nearest = 1 }
+            # Ensure at least a single levy to avoid zero-size spawns which can confuse the engine.
+            clamp_variable = { name = adventurer_army_size min = 1 max = 1000000 }
+
+            # Calculate respawn army size as 5% of final army size
+            set_variable = { name = adventurer_respawn_army_size value = var:adventurer_army_size }
+            change_variable = { name = adventurer_respawn_army_size multiply = 0.05 }
+            round_variable = { name = adventurer_respawn_army_size nearest = 1 }
+            clamp_variable = { name = adventurer_respawn_army_size min = 1 max = 10000 }
+
+            set_variable = { name = adventurer_max_cap value = var:adventurer_base_levies }
+            change_variable = { name = adventurer_max_cap multiply = 6 }
+
+            remove_variable = adventurer_base_levies
+            remove_variable = adventurer_max_cap
+
+            # Spawn the adventurer host at the claim holder's capital if available,
+            # otherwise fall back to the independent_ruler's capital province.
+            # Spawn the adventurer host at the claim holder's capital if available,
+            # else use independent_ruler if present, else fall back to the adventurer's capital.
+            if = {
+                limit = { exists = scope:claim_target_title.holder }
+                # Only spawn if the holder has a valid capital province
+                if = { limit = { exists = scope:claim_target_title.holder.capital_province } }
+                else = { }
+                if = { limit = { exists = scope:claim_target_title.holder.capital_province } spawn_army = {
+                    name = riseandfall_adventurer_host_name
+                    levies = var:adventurer_army_size
+                    war_keep_on_attacker_victory = no
+                    inheritable = no
+                    uses_supply = no
+                    location = scope:claim_target_title.holder.capital_province
+                } }
+            }
+            else_if = {
+                limit = { exists = scope:independent_ruler }
+                if = { limit = { exists = scope:independent_ruler.capital_province } spawn_army = {
+                    name = riseandfall_adventurer_host_name
+                    levies = var:adventurer_army_size
+                    war_keep_on_attacker_victory = no
+                    inheritable = no
+                    uses_supply = no
+                    location = scope:independent_ruler.capital_province
+                } }
+            }
+            else = {
+                if = { limit = { exists = scope:adventurer_child.capital_province } spawn_army = {
+                    name = riseandfall_adventurer_host_name
+                    levies = var:adventurer_army_size
+                    war_keep_on_attacker_victory = no
+                    inheritable = no
+                    uses_supply = no
+                    location = scope:adventurer_child.capital_province
+                } }
+            }
+            remove_variable = adventurer_army_size
+            remove_variable = adventurer_multiplier
+
+            set_variable = { name = rf_while_counter value = 0 }
+            set_variable = { name = rf_while_loop_target value = scope:adventurer_child.diplomacy }
+            clamp_variable = { name = rf_while_loop_target min = 0 max = 20 }
+            riseandfall_run_create_knights_while_se = yes
+            remove_variable = rf_while_counter
+            remove_variable = rf_while_loop_target
+
+            # Send notification to all rulers with claims on this adventurer
+            # Use every_claim to iterate through ALL claims and notify their holders
+            every_claim = {
+                limit = {
+                    tier >= tier_kingdom
+                    exists = holder
+                    holder = { is_independent_ruler = yes }
+                }
+                    holder = {
+                    send_interface_popup = {
+                        type = send_interface_message_bad
+                        title = riseandfall_adventurer_camp_created_title
+                        custom_tooltip = riseandfall_adventurer_camp_created_desc
+                        left_icon = scope:adventurer_child
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+riseandfall_adventurer_press_claims_se = {
+    # Called with saved scope: scope:independent_adventurer = the adventurer character
+    # To avoid mixing landed_title and character scopes, perform all claim selection
+    # and war-declaration logic inside the character-specified scope.
+    scope:independent_adventurer = {
+        # Choose a claim target from the adventurer's own claims (empire preferred, else kingdom)
+        if = {
+            limit = { any_claim = { tier >= tier_empire exists = holder holder = { is_independent_ruler = yes } } }
+            random_claim = { limit = { tier >= tier_empire exists = holder holder = { is_independent_ruler = yes } } save_scope_as = claim_target_title }
+        }
+        else_if = {
+            limit = { any_claim = { tier >= tier_kingdom exists = holder holder = { is_independent_ruler = yes } } }
+            random_claim = { limit = { tier >= tier_kingdom exists = holder holder = { is_independent_ruler = yes } } save_scope_as = claim_target_title }
+        }
+
+        # If we have a valid claim target title, evaluate war options
+        if = {
+            limit = { exists = scope:claim_target_title.holder }
+
+            # If stronger than the holder, attempt a direct declare (respect truces/alliances and war block)
+            if = {
+                limit = { scope:independent_adventurer.military_power > scope:claim_target_title.holder.military_power }
+                if = {
+                    limit = { NOT = { OR = { scope:independent_adventurer = { has_truce = scope:claim_target_title.holder } scope:independent_adventurer = { is_allied_to = scope:claim_target_title.holder } } } }
+                        if = { limit = { NOT = { has_character_flag = riseandfall_newadventurer_war_block } NOT = { scope:independent_adventurer = { is_at_war_with = scope:claim_target_title.holder } } }
+                            start_war = { casus_belli = adventurer_claim_cb target = scope:claim_target_title.holder claimant = scope:independent_adventurer target_title = scope:claim_target_title }
+                        }
+                }
+            }
+            else = {
+                # Not stronger: small chance, respect truces/alliances
+                random_list = {
+                    5 = {
+                        if = {
+                            limit = { any_claim = { tier >= tier_kingdom } }
+                                    # Ensure the randomly chosen kingdom claim has an independent holder
+                                    random_claim = { limit = { tier >= tier_kingdom exists = holder holder = { is_independent_ruler = yes } } save_scope_as = claim_target_title }
+                            if = {
+                                limit = { NOT = { OR = { scope:independent_adventurer = { has_truce = scope:claim_target_title.holder } scope:independent_adventurer = { is_allied_to = scope:claim_target_title.holder } } } }
+                                    if = { limit = { NOT = { has_character_flag = riseandfall_newadventurer_war_block } NOT = { scope:independent_adventurer = { is_at_war_with = scope:claim_target_title.holder } } }
+                                        start_war = { casus_belli = adventurer_claim_cb target = scope:claim_target_title.holder claimant = scope:independent_adventurer target_title = scope:claim_target_title }
+                                    }
+                            }
+                        }
+                    }
+                    95 = { }
+                }
+            }
+        }
+    }
+}
+
+
+riseandfall_remove_adventurer_gold_mod_if_not_landless_se = {
+    # Expecting character scope (the ruler). Remove the adventurer gold modifier when no longer landless.
+    remove_character_modifier = riseandfall_adventurer_gold_mod
+}
+
+
+# Create a single knight companion for the adventurer and add them to the adventurer's travel plan.
+# Expects to be called from a context where `adventurer_child` saved scope exists (save_scope_as = adventurer_child)
+riseandfall_create_adventurer_knight_se = {
+    # Guard: requires a saved adventurer_child scope. If not present, do nothing.
+    if = { limit = { exists = scope:adventurer_child } 
+        # Create a single knight near the independent ruler's capital and save scope for adding as companion
+    # Compute martial and prowess for the knight based on the adventurer's learning skill.
+    # Formula: multiplier randomly chosen between ~0.5 and 1.5, so learning=10 -> ~5..15, learning=20 -> ~10..30
+    set_variable = { name = rf_knight_learning value = scope:adventurer_child.learning }
+
+    # Choose a random multiplier for martial
+    set_variable = { name = rf_knight_multiplier value = 1 }
+    random_list = {
+        10 = { change_variable = { name = rf_knight_multiplier multiply = 0.5 } }
+        10 = { change_variable = { name = rf_knight_multiplier multiply = 0.6 } }
+        10 = { change_variable = { name = rf_knight_multiplier multiply = 0.7 } }
+        10 = { change_variable = { name = rf_knight_multiplier multiply = 0.8 } }
+        10 = { change_variable = { name = rf_knight_multiplier multiply = 0.9 } }
+        10 = { change_variable = { name = rf_knight_multiplier multiply = 1.0 } }
+        10 = { change_variable = { name = rf_knight_multiplier multiply = 1.1 } }
+        10 = { change_variable = { name = rf_knight_multiplier multiply = 1.2 } }
+        10 = { change_variable = { name = rf_knight_multiplier multiply = 1.3 } }
+        10 = { change_variable = { name = rf_knight_multiplier multiply = 1.5 } }
+    }
+
+    set_variable = { name = rf_knight_martial value = var:rf_knight_learning }
+    change_variable = { name = rf_knight_martial multiply = var:rf_knight_multiplier }
+    round_variable = { name = rf_knight_martial nearest = 1 }
+
+    # Choose a random (independent) multiplier for prowess
+    set_variable = { name = rf_knight_multiplier2 value = 1 }
+    random_list = {
+        10 = { change_variable = { name = rf_knight_multiplier2 multiply = 0.5 } }
+        10 = { change_variable = { name = rf_knight_multiplier2 multiply = 0.6 } }
+        10 = { change_variable = { name = rf_knight_multiplier2 multiply = 0.7 } }
+        10 = { change_variable = { name = rf_knight_multiplier2 multiply = 0.8 } }
+        10 = { change_variable = { name = rf_knight_multiplier2 multiply = 0.9 } }
+        10 = { change_variable = { name = rf_knight_multiplier2 multiply = 1.0 } }
+        10 = { change_variable = { name = rf_knight_multiplier2 multiply = 1.1 } }
+        10 = { change_variable = { name = rf_knight_multiplier2 multiply = 1.2 } }
+        10 = { change_variable = { name = rf_knight_multiplier2 multiply = 1.3 } }
+        10 = { change_variable = { name = rf_knight_multiplier2 multiply = 1.5 } }
+    }
+
+    set_variable = { name = rf_knight_prowess value = var:rf_knight_learning }
+    change_variable = { name = rf_knight_prowess multiply = var:rf_knight_multiplier2 }
+    round_variable = { name = rf_knight_prowess nearest = 1 }
+
+    create_character = {
+        employer = scope:adventurer_child
+        culture = scope:adventurer_child.culture
+        faith = scope:adventurer_child.faith
+        age = { 18 35 }
+        gender = male
+        martial = var:rf_knight_martial
+        prowess = var:rf_knight_prowess
+        # Give a small chance for knightly traits via random_traits_list if desired; keep simple for now
+        save_scope_as = created_knight
+    }
+
+        # Clean up temporary variables
+        remove_variable = rf_knight_learning
+        remove_variable = rf_knight_multiplier
+        remove_variable = rf_knight_martial
+        remove_variable = rf_knight_multiplier2
+        remove_variable = rf_knight_prowess
+    }
+}
+
+# Recursive runner: create knights until rf_while_counter >= rf_while_loop_target
+riseandfall_run_create_knights_while_se = {
+    # Guard: only run loop if adventurer_child exists and loop target > counter
+    if = {
+        limit = { AND = { exists = scope:adventurer_child var:rf_while_counter < var:rf_while_loop_target } }
+        # Create one knight
+        riseandfall_create_adventurer_knight_se = yes
+        # increment counter
+        change_variable = { name = rf_while_counter add = 1 }
+        # recurse
+        riseandfall_run_create_knights_while_se = yes
+    }
+}
+
+
+# Pay quarterly income to adventurers equal to 3x the monthly income of their primary claim target's holder,
+# scaled by the adventurer's stewardship (multiplier = stewardship * 0.1). If no valid claim holder, pay 0.
+# Expects ROOT = the adventurer character. Safe to call broadly; does nothing if not landless adventurer or lacks the gold mod.
+riseandfall_adventurer_quarterly_income_se = {
+    if = {
+    limit = { NOT = { has_character_flag = rf_adventurer_income_recent } }
+
+        # Select a claim target title (prefer empire, then kingdom) where holder is an independent ruler
+        set_variable = { name = rf_income_amount value = 0 }
+
+        if = {
+            limit = { any_claim = { tier >= tier_empire exists = holder holder = { is_independent_ruler = yes } } }
+            random_claim = {
+                limit = { tier >= tier_empire exists = holder holder = { is_independent_ruler = yes } }
+                save_scope_as = claim_target_title
+            }
+        }
+        else_if = {
+            limit = { any_claim = { tier >= tier_kingdom exists = holder holder = { is_independent_ruler = yes } } }
+            random_claim = {
+                limit = { tier >= tier_kingdom exists = holder holder = { is_independent_ruler = yes } }
+                save_scope_as = claim_target_title
+            }
+        }
+
+        if = {
+            limit = { exists = scope:claim_target_title }
+            if = {
+                limit = { exists = scope:claim_target_title.holder }
+                # Defensive: ensure holder is a (living) character before reading properties
+                if = { limit = { scope:claim_target_title.holder = { is_alive = yes } }
+                    # Base monthly from holder
+                    set_variable = { name = rf_holder_monthly value = scope:claim_target_title.holder.monthly_character_income }
+                }
+                # Stewardship multiplier = stewardship * 0.1 (minimum 0.1 so stake > 0)
+                set_variable = { name = rf_mult value = stewardship }
+                change_variable = { name = rf_mult multiply = 0.1 }
+                clamp_variable = { name = rf_mult min = 0.1 max = 100 }
+
+                # Quarterly payout = monthly * 3 * multiplier (scale down to 20% of computed payout)
+                set_variable = { name = rf_income_amount value = var:rf_holder_monthly }
+                change_variable = { name = rf_income_amount multiply = 1 }
+                change_variable = { name = rf_income_amount multiply = var:rf_mult }
+                # Reduce payout to 20% of the computed amount
+                change_variable = { name = rf_income_amount multiply = 0.2 }
+                clamp_variable = { name = rf_income_amount min = 0 max = 10000 }
+                round_variable = { name = rf_income_amount nearest = 1 }
+            }
+        }
+
+        if = {
+            limit = { var:rf_income_amount > 0 }
+            add_gold = var:rf_income_amount
+        }
+
+    # Cooldown so this can only pay once per ~quarter even if misfired by another hook
+    add_character_flag = { flag = rf_adventurer_income_recent days = 30 }
+
+        remove_variable = rf_holder_monthly
+        remove_variable = rf_mult
+        remove_variable = rf_income_amount
+    }
+}
+
+
+riseandfall_yearly_adventurer_remove_variable_se = {
+    remove_variable = rf_stability_modifier
+    remove_variable = rf_adventurer_base_chance
+    remove_variable = rf_adventurer_trait_chance
+    remove_variable = rf_adventurer_final_chance
+    remove_variable = intrigue_bonus
+    remove_variable = rf_sex_penalty
+}
+
+
+###############################
+# Rise and Fall: Siege effects
+###############################
+
+# Scripted effect called by on_siege_looting. Expects the following saved scopes:
+# - scope:rf_looted_county (province owner county)
+# - scope:rf_looted_barony (the specific barony looted)
+# - scope:rf_sieger (root, the sieging character)
+
+riseandfall_on_siege_looting_se = {
+    # If the sieger is a newly-created adventurer, spawn a respawn army
+    scope:rf_sieger = {
+        if = {
+            limit = { has_character_flag = riseandfall_newadventurer is_landed = no }
+            # Spawn the army at the looted barony's province if available.
+            # Use the adventurer's saved variable `adventurer_respawn_army_size` directly if present.
+            if = {
+                limit = { exists = scope:rf_looted_barony }
+                if = {
+                    limit = { scope:rf_sieger = { has_variable = adventurer_respawn_army_size } }
+                    spawn_army = {
+                        name = riseandfall_adventurer_respawn_army_name
+                        levies = scope:rf_sieger.var:adventurer_respawn_army_size
+                        location = scope:rf_looted_barony.title_province
+                        uses_supply = no
+                        inheritable = no
+                    }
+                }
+            }
+        }
+    }
+}
