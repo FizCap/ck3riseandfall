@@ -5469,14 +5469,14 @@ types CharacterWindow
 		}
 
 		divider_light = {
-			visible = "[And( Character.HasLandedTitles, And( Not( Character.GetGovernment.IsType( 'landless_adventurer_government' ) ), Not( GameRuleSetting.HasFlag( 'riseandfall_realm_stability_disabled' ) ) ) )]"
+			visible = no
 			layoutpolicy_vertical = expanding
 		}
 
 		# Stability
 		widget = {
 			datacontext = "[AccessGameRules.AccessNamedGameRule( 'riseandfall_enable_realm_stability' ).GetSetting]"
-			visible = "[And( Character.HasLandedTitles, And( Not( Character.GetGovernment.IsType( 'landless_adventurer_government' ) ), Not( GameRuleSetting.HasFlag( 'riseandfall_realm_stability_disabled' ) ) ) )]"
+			visible = "[And( GreaterThan_CFixedPoint(Character.MakeScope.Var('riseandfall_realm_stability_score').GetValue, '(CFixedPoint)0'), And( GreaterThan_CFixedPoint(Character.MakeScope.Var('riseandfall_realm_stability_target').GetValue, '(CFixedPoint)0'), And( Character.HasLandedTitles, And( Not( Character.GetGovernment.IsType( 'landless_adventurer_government' ) ), Not( GameRuleSetting.HasFlag( 'riseandfall_realm_stability_disabled' ) ) ) ) ) )]"
 			size = { 72 32 }
 
 			tooltip = "REALM_STABILITY_TOOLTIP"

@@ -26,22 +26,40 @@ Common building blocks (tokens & primitives)
 - Animation & states: `state = { name = _show ... using = Animation_* }`, `delay/duration/next/on_start` to chain animations, `PdxGuiTriggerAllAnimations` or `PdxGuiWidget.FindChild(...).TriggerAnimation(...)` for programmatic triggers.
 - Variable UI toggles: `GetVariableSystem` / `VariableSystem.Toggle('key')` for ephemeral UI state.
 
-Delta: Game rule-driven visibility (Interaction Stability Marker)
-- Problem: `GameRuleSetting.HasFlag('foo')` only works when the widget’s datacontext is a GameRuleSetting. Calling it without a proper context makes the check ineffective.
-- Fix: Bind to the current GameRuleSetting via the global rules accessor, then call `HasFlag` on that context. Prefer checking the disabled-flag and negating it.
+Delta: Adding conditional widgets to existing stats bars (Stability Box)
+- Problem: Need to add mod-specific stats (e.g., stability) as standalone boxes in character window stats bars, with proper visibility guards and no empty spaces.
+- Fix: Modify the `blockoverride` for the stats bar (e.g., `hbox_character_view_secondary_stats_bar`) to include a new conditional `widget` with icon, text, tooltip, and size matching other stats. Use `datacontext` for game rules and complex `visible` conditions checking variables and flags.
 - Working snippet (copypasta):
-  vbox = {
-    datacontext = "[AccessGameRules.AccessNamedGameRule( 'riseandfall_enable_interaction_stability' ).GetSetting]"
-    visible = "[Not( GameRuleSetting.HasFlag( 'riseandfall_interaction_stability_disabled' ) )]"
-    # ... UI content ...
+  blockoverride "hbox_character_view_secondary_stats_bar"
+  {
+    # ... existing widgets ...
+    divider_light = {
+      visible = no  # Hide divider to avoid empty boxes
+      layoutpolicy_vertical = expanding
+    }
+    # Stability
+    widget = {
+      datacontext = "[AccessGameRules.AccessNamedGameRule( 'riseandfall_enable_realm_stability' ).GetSetting]"
+      visible = "[Complex condition checking variables >0, landed titles, etc.]"
+      size = { 72 32 }
+      tooltip = "REALM_STABILITY_TOOLTIP"
+      using = tooltip_es
+      hbox = {
+        spacing = 3
+        expand = {}
+        icon = { size = { 30 30 } texture = "gfx/interface/icons/scale_of_power.dds" }
+        text_single = { text = "[Character.MakeScope.Var('riseandfall_realm_stability_score').GetValue|0]/[Character.MakeScope.Var('riseandfall_realm_stability_target').GetValue|0]" default_format = "#high" align = center|nobaseline fontsize_min = 12 max_width = 50 }
+        expand = {}
+      }
+    }
   }
-- Notes: Game rules lock per-save; change in the frontend and start a new game. Apply settings, and restart the game if GUI caching interferes.
+- Notes: Place after existing stats like military strength. Ensure visibility checks prevent showing for unlanded or when values are zero. Hide dividers to avoid gaps.
 
 Mini contract for this pattern
-- Inputs: rule key ('riseandfall_enable_interaction_stability'), setting flags ('enable_riseandfall_ui', 'riseandfall_interaction_stability_disabled').
-- Output: a `visible` guard that reflects the selected setting reliably in any GUI.
-- Error modes: wrong context (no-op), testing in old saves, missing flag on setting.
-- Success: toggling the rule in a new game shows/hides the widget predictably.
+- Inputs: stat name, variable names, icon texture, tooltip key, visibility conditions.
+- Output: integrated widget in stats bar with proper guards.
+- Error modes: empty boxes (hide dividers), wrong visibility (check all conditions), layout issues (match sizes).
+- Success: stat appears as a clean box next to vanilla stats when conditions met.
 
 Common patterns & examples (minimal, LLM-ready snippets)
 - Minimal window skeleton (concept):
