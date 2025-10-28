@@ -168,7 +168,10 @@
                         }
                     }
                 }
-                remove_variable = rf_disqualify
+                if = {
+                    limit = { has_variable = rf_disqualify var:rf_disqualify = 1 }
+                    remove_variable = rf_disqualify
+                }
             }
         }
 
