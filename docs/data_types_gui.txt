@@ -2915,12 +2915,6 @@ Return type: bool
 
 -----------------------
 
-LobbyView.CanMakeLandlessCharacter
-Definition type: Function
-Return type: bool
-
------------------------
-
 LobbyView.CanReady
 Definition type: Function
 Return type: bool
@@ -3020,12 +3014,6 @@ Return type: int32
 LobbyView.GetTransferSpeedSettingOptions
 Definition type: Function
 Return type: [unregistered]
-
------------------------
-
-LobbyView.GetTryStartLandlessDesigningDesc( Arg0 )
-Definition type: Function
-Return type: CString
 
 -----------------------
 
@@ -3833,6 +3821,18 @@ Return type: void
 OosWindow.IsLocalOos
 Definition type: Function
 Return type: bool
+
+-----------------------
+
+OosWindow.IsMultiplayerHost
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+OosWindow.Resync
+Definition type: Function
+Return type: void
 
 -----------------------
 

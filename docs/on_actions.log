@@ -14,12 +14,6 @@ Expected Scope: none
 
 --------------------
 
-agot_administrative_setup:
-From Code: No
-Expected Scope: none
-
---------------------
-
 stress_loss_confider:
 From Code: No
 Expected Scope: character
@@ -38,19 +32,7 @@ Expected Scope: character
 
 --------------------
 
-agot_on_title_gain_iron_throne:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_filler_yearly_global_sea:
-From Code: No
-Expected Scope: character
-
---------------------
-
-agot_laamp_camp_locations:
+tgp_potent_physick:
 From Code: No
 Expected Scope: none
 
@@ -62,20 +44,44 @@ Expected Scope: none
 
 --------------------
 
+natural_disaster_warning_events:
+From Code: No
+Expected Scope: character
+
+--------------------
+
+on_action_mandala_realm_contract_0008:
+From Code: No
+Expected Scope: none
+
+--------------------
+
+riseandfall_yearly_realm_stability:
+From Code: No
+Expected Scope: none
+
+--------------------
+
+ep3_mad_prophet:
+From Code: No
+Expected Scope: none
+
+--------------------
+
 on_death_relation_best_friend:
 From Code: No
 Expected Scope: none
 
 --------------------
 
-agot_unlanded_ai_try_to_deepen_bond_dragon_quarterly:
-From Code: No
-Expected Scope: character
+on_rank_down:
+From Code: Yes
+Expected Scope: none
 
 --------------------
 
-on_rank_down:
-From Code: Yes
+ep3_inept_mayor:
+From Code: No
 Expected Scope: none
 
 --------------------
@@ -86,25 +92,19 @@ Expected Scope: none
 
 --------------------
 
-agot_dummy_rulers:
+fp2_lyonese_monk_events_phase_controversy_events:
+From Code: No
+Expected Scope: character
+
+--------------------
+
+tgp_confusion_of_tongues:
 From Code: No
 Expected Scope: none
 
 --------------------
 
 petition_liege_0201:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_on_title_gain_goldcloaks:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_on_title_gain_free_city_attached_titles:
 From Code: No
 Expected Scope: none
 
@@ -134,19 +134,13 @@ Expected Scope: character
 
 --------------------
 
-on_castle_keeper_start:
-From Code: No
-Expected Scope: none
-
---------------------
-
 convert_to_witchcraft_failure_outcome:
 From Code: No
 Expected Scope: character
 
 --------------------
 
-woc_quarterly_county_pulse:
+tgp_seditious_storytelling:
 From Code: No
 Expected Scope: none
 
@@ -164,8 +158,14 @@ Expected Scope: character
 
 --------------------
 
+riseandfall_player_grant_duchies:
+From Code: No
+Expected Scope: none
+
+--------------------
+
 on_confederation_leave:
-From Code: Yes
+From Code: No
 Expected Scope: none
 
 --------------------
@@ -176,19 +176,7 @@ Expected Scope: character
 
 --------------------
 
-TFE_on_game_start:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_citadel_election:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_on_artifact_created_by_merchant:
+fp2_lyonese_monk_events_cycle:
 From Code: No
 Expected Scope: none
 
@@ -200,13 +188,19 @@ Expected Scope: character
 
 --------------------
 
-gptl_on_action_fes:
+ongoing_harrying_aetheling_events:
+From Code: No
+Expected Scope: character
+
+--------------------
+
+on_hostage_depart_travel_planner_exit:
 From Code: No
 Expected Scope: none
 
 --------------------
 
-on_hostage_depart_travel_planner_exit:
+tgp_medieval_medicine:
 From Code: No
 Expected Scope: none
 
@@ -218,7 +212,19 @@ Expected Scope: none
 
 --------------------
 
+riseandfall_yearly_adventurer_press_claims:
+From Code: No
+Expected Scope: none
+
+--------------------
+
 standard_claim_throne_method_setup:
+From Code: No
+Expected Scope: character
+
+--------------------
+
+coronation_first_phase_host_events:
 From Code: No
 Expected Scope: character
 
@@ -248,6 +254,12 @@ Expected Scope: character
 
 --------------------
 
+on_action_mandala_realm_contract_0033:
+From Code: No
+Expected Scope: none
+
+--------------------
+
 ongoing_admin_eunuch_reaction_events:
 From Code: No
 Expected Scope: character
@@ -260,37 +272,13 @@ Expected Scope: none
 
 --------------------
 
-soulmate_status_changes:
-From Code: No
-Expected Scope: character
-
---------------------
-
-agot_canon_children_content_personality_gain:
-From Code: No
-Expected Scope: character
-
---------------------
-
-agot_vassal_contracts:
-From Code: No
-Expected Scope: none
-
---------------------
-
-mrb_on_title_gain_inheritance:
-From Code: No
-Expected Scope: none
-
---------------------
-
 on_scheme_agent_discovered:
 From Code: Yes
 Expected Scope: none
 
 --------------------
 
-on_lmf_in_law_remove:
+tgp_fraud_in_broad_daylight:
 From Code: No
 Expected Scope: none
 
@@ -308,20 +296,14 @@ Expected Scope: character
 
 --------------------
 
-agot_nf_estate_locations:
-From Code: No
-Expected Scope: none
-
---------------------
-
 on_faith_monthly:
 From Code: Yes
 Expected Scope: faith
 
 --------------------
 
-rv_rescue_war_declaration:
-From Code: No
+on_great_building_rebuilt:
+From Code: Yes
 Expected Scope: none
 
 --------------------
@@ -333,12 +315,6 @@ Expected Scope: character
 --------------------
 
 petition_liege_0401:
-From Code: No
-Expected Scope: none
-
---------------------
-
-woc_on_county_occupied:
 From Code: No
 Expected Scope: none
 
@@ -356,33 +332,15 @@ Expected Scope: none
 
 --------------------
 
-agot_filler_yearly_region_westerlands:
-From Code: No
-Expected Scope: character
-
---------------------
-
-esr_on_war_started_for_threat:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_assign_slave_master:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_canon_children_humble_personality_gain:
-From Code: No
-Expected Scope: character
-
---------------------
-
 wedding_ceremony_ending_event_pulse:
 From Code: No
 Expected Scope: character
+
+--------------------
+
+on_action_mandala_realm_contract_0002:
+From Code: No
+Expected Scope: none
 
 --------------------
 
@@ -392,9 +350,9 @@ Expected Scope: none
 
 --------------------
 
-gptl_on_action_rel_start_vassal:
+fp2_struggle_council_toledo_organize:
 From Code: No
-Expected Scope: none
+Expected Scope: character
 
 --------------------
 
@@ -416,37 +374,25 @@ Expected Scope: artifact
 
 --------------------
 
-agot_set_stormlands_legacies:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_nicknames_pulse:
-From Code: No
-Expected Scope: character
-
---------------------
-
 on_war_invalidated:
 From Code: Yes
 Expected Scope: none
 
 --------------------
 
-agot_canon_children_curious_personality_gain:
-From Code: No
-Expected Scope: character
-
---------------------
-
-agot_set_crownlands_legacies:
+debate_opening_on_action:
 From Code: No
 Expected Scope: none
 
 --------------------
 
 manage_domain_setup:
+From Code: No
+Expected Scope: character
+
+--------------------
+
+ep3_restored_rome_on_action:
 From Code: No
 Expected Scope: character
 
@@ -464,12 +410,6 @@ Expected Scope: character
 
 --------------------
 
-esr_on_become_rival:
-From Code: No
-Expected Scope: none
-
---------------------
-
 fp3_yearly_events:
 From Code: No
 Expected Scope: character
@@ -482,37 +422,19 @@ Expected Scope: none
 
 --------------------
 
-stress_loss_uncouth:
-From Code: No
-Expected Scope: character
-
---------------------
-
 contest_bout_board_game_pivotal_pulse:
 From Code: No
 Expected Scope: character
 
 --------------------
 
-on_action_clear_notification:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_btw_petition_on_death:
+on_remove_relation_disciple:
 From Code: No
 Expected Scope: none
 
 --------------------
 
 murder_success_pre_filter_on_action:
-From Code: No
-Expected Scope: none
-
---------------------
-
-gptl_on_action_dip:
 From Code: No
 Expected Scope: none
 
@@ -525,6 +447,12 @@ Expected Scope: character
 --------------------
 
 chariot_spectator_on_action:
+From Code: No
+Expected Scope: character
+
+--------------------
+
+ongoing_temujin_flavor_events:
 From Code: No
 Expected Scope: character
 
@@ -548,13 +476,7 @@ Expected Scope: character
 
 --------------------
 
-esr_record_on_become_best_friend:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_after_death_on_action:
+pledge_loyalty_to_liege_start:
 From Code: No
 Expected Scope: none
 
@@ -566,13 +488,13 @@ Expected Scope: none
 
 --------------------
 
-on_remove_relation_rival:
+coerce_and_leverage_contribution_ongoing:
 From Code: No
-Expected Scope: none
+Expected Scope: character
 
 --------------------
 
-on_lmf_birth_complications:
+on_remove_relation_rival:
 From Code: No
 Expected Scope: none
 
@@ -592,6 +514,12 @@ Expected Scope: character
 
 on_mercenary_company_hired:
 From Code: Yes
+Expected Scope: none
+
+--------------------
+
+natural_disaster_maintenance_global_pulse:
+From Code: No
 Expected Scope: none
 
 --------------------
@@ -620,18 +548,6 @@ Expected Scope: none
 
 --------------------
 
-esr_on_become_rival_for_social_standing:
-From Code: No
-Expected Scope: none
-
---------------------
-
-on_remove_relation_agot_story_dragon:
-From Code: No
-Expected Scope: none
-
---------------------
-
 task_organize_raiders_side_effects:
 From Code: No
 Expected Scope: character
@@ -647,18 +563,6 @@ Expected Scope: character
 on_leave_court:
 From Code: Yes
 Expected Scope: character
-
---------------------
-
-agot_pentos_treaty_on_action:
-From Code: No
-Expected Scope: none
-
---------------------
-
-interactive_game_start:
-From Code: No
-Expected Scope: none
 
 --------------------
 
@@ -680,19 +584,13 @@ Expected Scope: character
 
 --------------------
 
-agot_on_title_gain_house_name_generation:
-From Code: No
-Expected Scope: none
-
---------------------
-
 murder_ongoing:
 From Code: No
 Expected Scope: character
 
 --------------------
 
-rv_hard_imprison:
+on_action_mandala_realm_contract_0023:
 From Code: No
 Expected Scope: none
 
@@ -704,21 +602,21 @@ Expected Scope: character
 
 --------------------
 
-on_lmf_lover_setup:
-From Code: No
-Expected Scope: none
-
---------------------
-
 stewardship_duty_special_2000_mediation_stage_2:
 From Code: No
 Expected Scope: character
 
 --------------------
 
-gptl_on_action_tax_vassal:
+on_action_mandala_realm_contract_0034:
 From Code: No
 Expected Scope: none
+
+--------------------
+
+diarchy_mandate_promote_might_random:
+From Code: No
+Expected Scope: character
 
 --------------------
 
@@ -728,33 +626,9 @@ Expected Scope: character
 
 --------------------
 
-agot_filler_yearly_region_dorne:
-From Code: No
-Expected Scope: character
-
---------------------
-
 murder_success_imprisoned_event_list_on_action:
 From Code: No
 Expected Scope: character
-
---------------------
-
-esr_on_become_best_friend:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_shattered_kingdom_formed:
-From Code: No
-Expected Scope: none
-
---------------------
-
-gptl_on_action_urb_vassal:
-From Code: No
-Expected Scope: none
 
 --------------------
 
@@ -788,12 +662,6 @@ Expected Scope: none
 
 --------------------
 
-agot_yearly_dragon_mate_pulse:
-From Code: No
-Expected Scope: none
-
---------------------
-
 on_set_relation_blood_brother:
 From Code: No
 Expected Scope: none
@@ -806,13 +674,19 @@ Expected Scope: character
 
 --------------------
 
+dynastic_cycle_yearly_pulse:
+From Code: No
+Expected Scope: none
+
+--------------------
+
 travel_events_on_action:
 From Code: No
 Expected Scope: character
 
 --------------------
 
-agot_maintenance_pulse:
+buddhist_arrival_events:
 From Code: No
 Expected Scope: character
 
@@ -836,37 +710,19 @@ Expected Scope: character
 
 --------------------
 
-agot_on_title_gain_silent_sister:
+dynastic_cycle_monthly_pulse:
 From Code: No
 Expected Scope: none
 
 --------------------
 
-on_lmf_lover_death_check:
+natural_disaster_flood_maintenance_pulse:
 From Code: No
 Expected Scope: none
 
 --------------------
 
-gptl_on_action_events:
-From Code: No
-Expected Scope: none
-
---------------------
-
-on_lmf_traveling_visit_war_start_check:
-From Code: No
-Expected Scope: none
-
---------------------
-
-on_lmf_lover_end_check:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_on_artifact_destroyed_by_merchant:
+tgp_doddering_magistrate:
 From Code: No
 Expected Scope: none
 
@@ -878,9 +734,9 @@ Expected Scope: character
 
 --------------------
 
-agot_btw_nw_petition_return_random_event:
+tgp_hoarding_grain:
 From Code: No
-Expected Scope: character
+Expected Scope: none
 
 --------------------
 
@@ -908,6 +764,12 @@ Expected Scope: none
 
 --------------------
 
+on_primary_title_change:
+From Code: Yes
+Expected Scope: none
+
+--------------------
+
 on_influence_level_loss:
 From Code: Yes
 Expected Scope: none
@@ -926,33 +788,15 @@ Expected Scope: character
 
 --------------------
 
-woc_on_title_gain_after:
+natural_disaster_impact_events:
 From Code: No
-Expected Scope: none
-
---------------------
-
-gptl_on_action_vig_start:
-From Code: No
-Expected Scope: none
-
---------------------
-
-esr_on_divorce:
-From Code: No
-Expected Scope: none
+Expected Scope: character
 
 --------------------
 
 ongoing_turkic_tribe_events:
 From Code: No
 Expected Scope: character
-
---------------------
-
-rv_revenge_list_construction:
-From Code: No
-Expected Scope: none
 
 --------------------
 
@@ -992,7 +836,7 @@ Expected Scope: none
 
 --------------------
 
-agot_war_won_attacker_on_action:
+silk_road_market_visit_travel_planner_cancel_on_action:
 From Code: No
 Expected Scope: none
 
@@ -1001,12 +845,6 @@ Expected Scope: none
 stress_threshold_level_3_event:
 From Code: No
 Expected Scope: character
-
---------------------
-
-esr_on_become_best_friend_for_social_standing:
-From Code: No
-Expected Scope: none
 
 --------------------
 
@@ -1022,15 +860,27 @@ Expected Scope: character
 
 --------------------
 
-on_lmf_invitation_death_check:
+ep3_wartime_measures:
 From Code: No
 Expected Scope: none
 
 --------------------
 
-on_dragon_specific_birthday:
+debate_prep_opening_on_action:
+From Code: No
+Expected Scope: none
+
+--------------------
+
+on_action_roman_restoration_pulse:
 From Code: No
 Expected Scope: character
+
+--------------------
+
+tgp_missing_equipment:
+From Code: No
+Expected Scope: none
 
 --------------------
 
@@ -1040,27 +890,15 @@ Expected Scope: character
 
 --------------------
 
-agot_canon_children_brave_personality_gain:
+petition_ceremonial_liege_start:
+From Code: No
+Expected Scope: none
+
+--------------------
+
+natural_disaster_flavor_events:
 From Code: No
 Expected Scope: character
-
---------------------
-
-on_set_relation_bodyguard:
-From Code: No
-Expected Scope: none
-
---------------------
-
-free_city_term_kingdom:
-From Code: No
-Expected Scope: none
-
---------------------
-
-on_lmf_faith_change_bastard_check:
-From Code: No
-Expected Scope: none
 
 --------------------
 
@@ -1073,6 +911,12 @@ Expected Scope: character
 on_alliance_added:
 From Code: Yes
 Expected Scope: none
+
+--------------------
+
+faith_heresy_events_pulse:
+From Code: No
+Expected Scope: faith
 
 --------------------
 
@@ -1094,7 +938,7 @@ Expected Scope: character
 
 --------------------
 
-Population_Control_Debug_otherrheir:
+coronation_failed_oath_on_action:
 From Code: No
 Expected Scope: none
 
@@ -1106,15 +950,9 @@ Expected Scope: character
 
 --------------------
 
-on_birthday_coin_flip:
+on_action_mandala_realm_contract_0035:
 From Code: No
 Expected Scope: none
-
---------------------
-
-agot_canon_children_vengeful_personality_gain:
-From Code: No
-Expected Scope: character
 
 --------------------
 
@@ -1124,14 +962,14 @@ Expected Scope: none
 
 --------------------
 
-on_pregnancy_mother:
-From Code: Yes
-Expected Scope: character
+faith_fervor_events_pulse:
+From Code: No
+Expected Scope: faith
 
 --------------------
 
-on_lmf_pregnancy_check:
-From Code: No
+on_pregnancy_mother:
+From Code: Yes
 Expected Scope: character
 
 --------------------
@@ -1148,33 +986,27 @@ Expected Scope: character
 
 --------------------
 
+on_action_mandala_realm_contract_0005:
+From Code: No
+Expected Scope: none
+
+--------------------
+
 task_explore_cultures_side_effects:
 From Code: No
 Expected Scope: character
 
 --------------------
 
-agot_canon_children_bossy_personality_gain:
+riseandfall_siege:
 From Code: No
-Expected Scope: character
+Expected Scope: none
 
 --------------------
 
 on_yearly_invisible_events:
 From Code: No
 Expected Scope: character
-
---------------------
-
-agot_dynamic_claimant_kings_transfer:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_pentos_treaty_pentos_destroyed_on_action:
-From Code: No
-Expected Scope: none
 
 --------------------
 
@@ -1202,43 +1034,13 @@ Expected Scope: character
 
 --------------------
 
-on_lmf_5yr_courtier_scheme_check:
-From Code: No
-Expected Scope: character
-
---------------------
-
-cpa_on_action:
-From Code: No
-Expected Scope: character
-
---------------------
-
 learning_lifestyle_ongoing_events:
 From Code: No
 Expected Scope: character
 
 --------------------
 
-agot_set_westerlands_legacies:
-From Code: No
-Expected Scope: none
-
---------------------
-
-on_nw_lord_commander_death:
-From Code: No
-Expected Scope: none
-
---------------------
-
 contest_bout_joust_pivotal_pulse:
-From Code: No
-Expected Scope: character
-
---------------------
-
-agot_filler_yearly_region_vale:
 From Code: No
 Expected Scope: character
 
@@ -1256,9 +1058,9 @@ Expected Scope: army
 
 --------------------
 
-gptl_on_action_sla_start_vassal:
+fp2_struggle_council_toledo_debate:
 From Code: No
-Expected Scope: none
+Expected Scope: character
 
 --------------------
 
@@ -1268,15 +1070,15 @@ Expected Scope: character
 
 --------------------
 
-social_relation_expanded_start:
-From Code: No
-Expected Scope: none
-
---------------------
-
 contest_bout_board_game_random_pulse:
 From Code: No
 Expected Scope: character
+
+--------------------
+
+on_action_mandala_realm_contract_0026:
+From Code: No
+Expected Scope: none
 
 --------------------
 
@@ -1322,7 +1124,7 @@ Expected Scope: character
 
 --------------------
 
-on_dragon_14th_birthday:
+imperial_examination_pulse:
 From Code: No
 Expected Scope: character
 
@@ -1334,19 +1136,13 @@ Expected Scope: character
 
 --------------------
 
-on_10th_birthday_tame_canon_dragon:
-From Code: No
-Expected Scope: character
-
---------------------
-
 on_title_gain_usurpation:
 From Code: Yes
-Expected Scope: character
+Expected Scope: none
 
 --------------------
 
-gptl_on_action_com_vassal:
+tgp_dam_in_disrepair:
 From Code: No
 Expected Scope: none
 
@@ -1364,21 +1160,9 @@ Expected Scope: none
 
 --------------------
 
-on_dayne_birthday_sotm:
-From Code: No
-Expected Scope: none
-
---------------------
-
 on_stress_level_3:
 From Code: No
 Expected Scope: character
-
---------------------
-
-agot_set_vale_legacies:
-From Code: No
-Expected Scope: none
 
 --------------------
 
@@ -1400,18 +1184,6 @@ Expected Scope: character
 
 --------------------
 
-on_wall_breach_chance_debug:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_ps_manage_domain_task_on_action:
-From Code: No
-Expected Scope: character
-
---------------------
-
 murder_success_incapable_event_list_on_action:
 From Code: No
 Expected Scope: character
@@ -1424,27 +1196,15 @@ Expected Scope: character
 
 --------------------
 
+on_apply_inherited_confederation:
+From Code: Yes
+Expected Scope: none
+
+--------------------
+
 random_yearly_playable_pulse:
 From Code: Yes
 Expected Scope: character
-
---------------------
-
-on_death_relation_agot_squire:
-From Code: No
-Expected Scope: none
-
---------------------
-
-rv_demanded_list_removal_on_death:
-From Code: No
-Expected Scope: none
-
---------------------
-
-pillage_development_degrade:
-From Code: No
-Expected Scope: none
 
 --------------------
 
@@ -1454,27 +1214,21 @@ Expected Scope: army
 
 --------------------
 
+imperial_examination_prep_events:
+From Code: No
+Expected Scope: character
+
+--------------------
+
 on_death:
 From Code: Yes
 Expected Scope: character
 
 --------------------
 
-gptl_on_action_vig_start_vassal:
-From Code: No
-Expected Scope: none
-
---------------------
-
 commander_death_events_pulse:
 From Code: No
 Expected Scope: character
-
---------------------
-
-agot_dynamic_claimant_kings_end:
-From Code: No
-Expected Scope: none
 
 --------------------
 
@@ -1496,18 +1250,6 @@ Expected Scope: character
 
 --------------------
 
-ai_employ_spy_pulse:
-From Code: No
-Expected Scope: none
-
---------------------
-
-on_bottleneck_start:
-From Code: No
-Expected Scope: none
-
---------------------
-
 intrigue_lifestyle_rare_events:
 From Code: No
 Expected Scope: character
@@ -1520,15 +1262,15 @@ Expected Scope: none
 
 --------------------
 
-agot_yearly_playable_pulse:
+riseandfall_low_stability_roll:
 From Code: No
-Expected Scope: character
+Expected Scope: none
 
 --------------------
 
-on_wall_breach_chance:
+coronation_first_phase_guest_events:
 From Code: No
-Expected Scope: none
+Expected Scope: character
 
 --------------------
 
@@ -1544,45 +1286,15 @@ Expected Scope: character
 
 --------------------
 
-on_wall_maintenance:
-From Code: No
-Expected Scope: none
-
---------------------
-
-on_set_relation_paramour:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_filler_yearly_lys:
-From Code: No
-Expected Scope: character
-
---------------------
-
-on_leave_court_nights_watch:
-From Code: No
-Expected Scope: none
-
---------------------
-
 stress_pulse:
 From Code: No
 Expected Scope: none
 
 --------------------
 
-ongoing_widowed_events:
+on_action_mandala_realm_contract_0025:
 From Code: No
-Expected Scope: character
-
---------------------
-
-agot_canon_children_calm_personality_gain:
-From Code: No
-Expected Scope: character
+Expected Scope: none
 
 --------------------
 
@@ -1598,39 +1310,9 @@ Expected Scope: none
 
 --------------------
 
-esr_on_title_change:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_on_title_gain_kingsguard:
-From Code: No
-Expected Scope: none
-
---------------------
-
-esr_on_remove_lover_for_social_standing:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_canon_children_honest_personality_gain:
+study_confucian_classics_failure:
 From Code: No
 Expected Scope: character
-
---------------------
-
-agot_on_title_gain_inheritance:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_on_merchant_added_gold:
-From Code: No
-Expected Scope: none
 
 --------------------
 
@@ -1646,19 +1328,7 @@ Expected Scope: character
 
 --------------------
 
-woc_on_county_faith_change:
-From Code: No
-Expected Scope: none
-
---------------------
-
 ongoing_witch_hunt_events:
-From Code: No
-Expected Scope: character
-
---------------------
-
-agot_canon_children_wrathful_personality_gain:
 From Code: No
 Expected Scope: character
 
@@ -1672,18 +1342,6 @@ Expected Scope: none
 
 on_birth_father:
 From Code: Yes
-Expected Scope: character
-
---------------------
-
-agot_on_title_lost_silent_sister:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_on_title_lost_mega_wars_action:
-From Code: No
 Expected Scope: none
 
 --------------------
@@ -1700,7 +1358,7 @@ Expected Scope: character
 
 --------------------
 
-agot_set_legacies:
+tgp_food_shortage:
 From Code: No
 Expected Scope: none
 
@@ -1708,13 +1366,7 @@ Expected Scope: none
 
 on_betrothal_broken:
 From Code: Yes
-Expected Scope: character
-
---------------------
-
-on_lmf_heir_training:
-From Code: No
-Expected Scope: character
+Expected Scope: none
 
 --------------------
 
@@ -1724,15 +1376,15 @@ Expected Scope: none
 
 --------------------
 
-on_war_white_peace:
-From Code: Yes
-Expected Scope: none
+norse_arrival_events:
+From Code: No
+Expected Scope: character
 
 --------------------
 
-agot_canon_children_paranoid_personality_gain:
-From Code: No
-Expected Scope: character
+on_war_white_peace:
+From Code: Yes
+Expected Scope: none
 
 --------------------
 
@@ -1772,13 +1424,7 @@ Expected Scope: character
 
 --------------------
 
-agot_filler_ruins_five_year_rebuild:
-From Code: No
-Expected Scope: character
-
---------------------
-
-agot_starting_legitimacy:
+tgp_forced_conscription:
 From Code: No
 Expected Scope: none
 
@@ -1796,7 +1442,13 @@ Expected Scope: character
 
 --------------------
 
-mrb_on_accolade_new_acclaimed_knight:
+ep3_prov_investment:
+From Code: No
+Expected Scope: none
+
+--------------------
+
+on_action_mandala_realm_contract_0040:
 From Code: No
 Expected Scope: none
 
@@ -1808,7 +1460,7 @@ Expected Scope: character
 
 --------------------
 
-gptl_on_action_intro_vassal:
+riseandfall_player_create_duchies:
 From Code: No
 Expected Scope: none
 
@@ -1820,14 +1472,8 @@ Expected Scope: character
 
 --------------------
 
-on_lmf_traveling_heir_title_check:
-From Code: No
-Expected Scope: none
-
---------------------
-
-gptl_on_action_rel:
-From Code: No
+on_barter_action_start:
+From Code: Yes
 Expected Scope: none
 
 --------------------
@@ -1835,18 +1481,6 @@ Expected Scope: none
 on_tour_travel:
 From Code: No
 Expected Scope: character
-
---------------------
-
-on_citadel_start:
-From Code: No
-Expected Scope: none
-
---------------------
-
-gptl_on_action_wom:
-From Code: No
-Expected Scope: none
 
 --------------------
 
@@ -1886,30 +1520,6 @@ Expected Scope: character
 
 --------------------
 
-on_1st_birthday:
-From Code: No
-Expected Scope: none
-
---------------------
-
-gptl_on_action_rel_vassal:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_filler_harrenhal_curse:
-From Code: No
-Expected Scope: character
-
---------------------
-
-gptl_on_action_tax_start_vassal:
-From Code: No
-Expected Scope: none
-
---------------------
-
 on_hostage_depart_for_home_court:
 From Code: No
 Expected Scope: none
@@ -1934,24 +1544,6 @@ Expected Scope: none
 
 --------------------
 
-esr_on_remove_best_friend:
-From Code: No
-Expected Scope: none
-
---------------------
-
-Population_Control_Debug:
-From Code: No
-Expected Scope: none
-
---------------------
-
-on_set_relation_agot_squire:
-From Code: No
-Expected Scope: none
-
---------------------
-
 on_set_relation_soulmate:
 From Code: No
 Expected Scope: none
@@ -1959,6 +1551,12 @@ Expected Scope: none
 --------------------
 
 on_stress_level_4:
+From Code: No
+Expected Scope: character
+
+--------------------
+
+coerce_tributary_ongoing:
 From Code: No
 Expected Scope: character
 
@@ -1982,7 +1580,7 @@ Expected Scope: character
 
 --------------------
 
-agot_canon_children_callous_personality_gain:
+pilgrimage_travel_events:
 From Code: No
 Expected Scope: character
 
@@ -1991,6 +1589,12 @@ Expected Scope: character
 contest_ongoing_event_archery_pivotal_pulse:
 From Code: No
 Expected Scope: character
+
+--------------------
+
+on_action_mandala_realm_contract_0030:
+From Code: No
+Expected Scope: none
 
 --------------------
 
@@ -2018,31 +1622,25 @@ Expected Scope: none
 
 --------------------
 
-agot_canon_children_lustful_personality_gain:
-From Code: No
-Expected Scope: character
-
---------------------
-
 befriend_ongoing:
 From Code: No
 Expected Scope: character
 
 --------------------
 
-esr_on_war_started:
-From Code: No
-Expected Scope: none
-
---------------------
-
-on_the_neck_friendly_terrain:
-From Code: No
-Expected Scope: none
-
---------------------
-
 intrigue_lifestyle_common_events:
+From Code: No
+Expected Scope: character
+
+--------------------
+
+riseandfall_ai_create_empires:
+From Code: No
+Expected Scope: none
+
+--------------------
+
+hindu_arrival_events:
 From Code: No
 Expected Scope: character
 
@@ -2066,13 +1664,7 @@ Expected Scope: character
 
 --------------------
 
-on_bank_location_siege_complete:
-From Code: No
-Expected Scope: none
-
---------------------
-
-esr_record_on_become_lover:
+on_action_mandala_realm_contract_0031:
 From Code: No
 Expected Scope: none
 
@@ -2090,31 +1682,13 @@ Expected Scope: character
 
 --------------------
 
-agot_remove_realms:
-From Code: No
-Expected Scope: none
-
---------------------
-
 pick_unique_murder_intercept_on_action:
 From Code: No
 Expected Scope: character
 
 --------------------
 
-gptl_on_action_wom_vassal:
-From Code: No
-Expected Scope: none
-
---------------------
-
-on_6th_birthday_sibling_betrothal:
-From Code: No
-Expected Scope: none
-
---------------------
-
-on_join_court_silent_sisterhood:
+on_action_mandala_realm_contract_0039:
 From Code: No
 Expected Scope: none
 
@@ -2138,7 +1712,7 @@ Expected Scope: character
 
 --------------------
 
-agot_yearly_owned_dragon_pulse:
+fp2_lyonese_monk_events_phase_teachings_events:
 From Code: No
 Expected Scope: character
 
@@ -2156,32 +1730,8 @@ Expected Scope: character
 
 --------------------
 
-interactive_title_holders:
-From Code: No
-Expected Scope: none
-
---------------------
-
-on_lmf_guardian_check:
-From Code: No
-Expected Scope: character
-
---------------------
-
 on_diarch_change:
 From Code: Yes
-Expected Scope: none
-
---------------------
-
-agot_canon_children_deceitful_personality_gain:
-From Code: No
-Expected Scope: character
-
---------------------
-
-esr_yearly_playable_pulse:
-From Code: No
 Expected Scope: none
 
 --------------------
@@ -2204,12 +1754,6 @@ Expected Scope: character
 
 --------------------
 
-on_lmf_family_dinner_event:
-From Code: No
-Expected Scope: character
-
---------------------
-
 stress_loss_improvident:
 From Code: No
 Expected Scope: character
@@ -2228,21 +1772,9 @@ Expected Scope: character
 
 --------------------
 
-agot_filler_yearly_westeros:
-From Code: No
-Expected Scope: character
-
---------------------
-
 murder_failure_standard_event_list_on_action:
 From Code: No
 Expected Scope: character
-
---------------------
-
-esr_on_marriage:
-From Code: No
-Expected Scope: none
 
 --------------------
 
@@ -2270,9 +1802,9 @@ Expected Scope: character
 
 --------------------
 
-at_random_yearly_everyone_pulse:
+palace_examination_prep_events:
 From Code: No
-Expected Scope: none
+Expected Scope: character
 
 --------------------
 
@@ -2288,24 +1820,6 @@ Expected Scope: character
 
 --------------------
 
-on_dragon_lay_master_on_action:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_on_title_gain_iron_throne_appoint_high_septon:
-From Code: No
-Expected Scope: none
-
---------------------
-
-on_gulltown_siege_complete:
-From Code: No
-Expected Scope: none
-
---------------------
-
 on_player_select_destiny_confirmed:
 From Code: Yes
 Expected Scope: none
@@ -2318,27 +1832,21 @@ Expected Scope: character
 
 --------------------
 
+on_house_relation_created:
+From Code: Yes
+Expected Scope: none
+
+--------------------
+
+on_action_mandala_realm_contract_0037:
+From Code: No
+Expected Scope: none
+
+--------------------
+
 on_title_lost:
 From Code: Yes
 Expected Scope: character
-
---------------------
-
-on_lmf_in_law_check:
-From Code: No
-Expected Scope: none
-
---------------------
-
-woc_task_accept_culture_side_effects:
-From Code: No
-Expected Scope: character
-
---------------------
-
-gptl_on_action_sec_start_vassal:
-From Code: No
-Expected Scope: none
 
 --------------------
 
@@ -2360,15 +1868,9 @@ Expected Scope: character
 
 --------------------
 
-agot_megawar_lite_action:
+el_cid_landless_on_action:
 From Code: No
-Expected Scope: none
-
---------------------
-
-agot_yearly_dragon_cull:
-From Code: No
-Expected Scope: none
+Expected Scope: character
 
 --------------------
 
@@ -2378,21 +1880,15 @@ Expected Scope: character
 
 --------------------
 
-agot_on_artifact_bought:
+imperial_examination_exam_entrant_events:
 From Code: No
-Expected Scope: none
+Expected Scope: character
 
 --------------------
 
 sway_ongoing:
 From Code: No
 Expected Scope: character
-
---------------------
-
-gptl_on_action_sec_vassal:
-From Code: No
-Expected Scope: none
 
 --------------------
 
@@ -2414,18 +1910,6 @@ Expected Scope: character
 
 --------------------
 
-agot_knight_on_16th_birthday:
-From Code: No
-Expected Scope: character
-
---------------------
-
-on_lmf_wedding_night:
-From Code: No
-Expected Scope: none
-
---------------------
-
 on_birthday_childhood:
 From Code: No
 Expected Scope: character
@@ -2444,27 +1928,9 @@ Expected Scope: character
 
 --------------------
 
-agot_canon_children_zealous_personality_gain:
-From Code: No
-Expected Scope: character
-
---------------------
-
-rv_demanded_list_removal_on_release:
-From Code: No
-Expected Scope: none
-
---------------------
-
 steal_back_artifact_ongoing:
 From Code: No
 Expected Scope: character
-
---------------------
-
-interactive_civil_wars:
-From Code: No
-Expected Scope: none
 
 --------------------
 
@@ -2474,13 +1940,13 @@ Expected Scope: character
 
 --------------------
 
-esr_on_rank_down:
+task_find_secrets_outcome:
 From Code: No
-Expected Scope: none
+Expected Scope: character
 
 --------------------
 
-task_find_secrets_outcome:
+fp2_struggle_council_toledo_attend:
 From Code: No
 Expected Scope: character
 
@@ -2492,6 +1958,12 @@ Expected Scope: character
 
 --------------------
 
+on_action_mandala_realm_contract_0010:
+From Code: No
+Expected Scope: none
+
+--------------------
+
 on_character_culture_change:
 From Code: Yes
 Expected Scope: none
@@ -2499,12 +1971,6 @@ Expected Scope: none
 --------------------
 
 ongoing_conqueror_events:
-From Code: No
-Expected Scope: character
-
---------------------
-
-woc_quarterly_playable_pulse:
 From Code: No
 Expected Scope: character
 
@@ -2522,18 +1988,6 @@ Expected Scope: character
 
 --------------------
 
-esr_on_death_nemesis:
-From Code: No
-Expected Scope: none
-
---------------------
-
-gather_secrets_pulse:
-From Code: No
-Expected Scope: none
-
---------------------
-
 inspiration_completed_events:
 From Code: No
 Expected Scope: character
@@ -2546,19 +2000,19 @@ Expected Scope: character
 
 --------------------
 
+riseandfall_apply_vassal_limit:
+From Code: No
+Expected Scope: none
+
+--------------------
+
 fp2_yearly_events:
 From Code: No
 Expected Scope: character
 
 --------------------
 
-esr_on_death_for_social_standing:
-From Code: No
-Expected Scope: none
-
---------------------
-
-on_join_court_ruin:
+tgp_burdensome_taxes:
 From Code: No
 Expected Scope: none
 
@@ -2606,20 +2060,20 @@ Expected Scope: character
 
 --------------------
 
-gptl_on_action_urb:
+ep3_wild_predators:
 From Code: No
 Expected Scope: none
 
 --------------------
 
-dragon_strengthen_bonding_ongoing:
-From Code: No
-Expected Scope: character
+on_holy_order_hired:
+From Code: Yes
+Expected Scope: none
 
 --------------------
 
-on_holy_order_hired:
-From Code: Yes
+tgp_disaster_displacement:
+From Code: No
 Expected Scope: none
 
 --------------------
@@ -2636,27 +2090,15 @@ Expected Scope: none
 
 --------------------
 
-gptl_on_action_pun:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_set_dorne_legacies:
-From Code: No
+on_house_relation_level_changed:
+From Code: Yes
 Expected Scope: none
 
 --------------------
 
 on_great_holy_war_invalidation:
 From Code: Yes
-Expected Scope: none
-
---------------------
-
-on_silent_sister_succession:
-From Code: No
-Expected Scope: none
+Expected Scope: ghw
 
 --------------------
 
@@ -2666,37 +2108,7 @@ Expected Scope: character
 
 --------------------
 
-at_on_artifact_destroyed:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_on_title_gain_lp_destroy:
-From Code: No
-Expected Scope: none
-
---------------------
-
-ub_on_death:
-From Code: No
-Expected Scope: none
-
---------------------
-
 chariot_race_betting_events:
-From Code: No
-Expected Scope: character
-
---------------------
-
-Population_Control_Debug_line:
-From Code: No
-Expected Scope: none
-
---------------------
-
-on_lmf_3yr_courtier_marriage_check:
 From Code: No
 Expected Scope: character
 
@@ -2732,19 +2144,13 @@ Expected Scope: character
 
 --------------------
 
-agot_yearly_wild_dragon_pulse:
-From Code: No
-Expected Scope: character
-
---------------------
-
 on_inactive_accolade_succession:
 From Code: Yes
 Expected Scope: none
 
 --------------------
 
-esr_on_birth_child:
+on_action_mandala_realm_contract_0038:
 From Code: No
 Expected Scope: none
 
@@ -2768,36 +2174,6 @@ Expected Scope: character
 
 --------------------
 
-gptl_on_action_urb_start_vassal:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_filler_yearly_region_riverlands:
-From Code: No
-Expected Scope: character
-
---------------------
-
-Population_Control_Debug_dyna:
-From Code: No
-Expected Scope: none
-
---------------------
-
-on_join_court_wildlings:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_qohorik_weaponsmith_pulse:
-From Code: No
-Expected Scope: none
-
---------------------
-
 on_became_dynasty_head:
 From Code: Yes
 Expected Scope: none
@@ -2816,25 +2192,19 @@ Expected Scope: character
 
 --------------------
 
-gptl_on_action_off:
-From Code: No
-Expected Scope: none
-
---------------------
-
-dragon_bonding_failure:
-From Code: No
-Expected Scope: character
-
---------------------
-
-on_nw_start:
+riseandfall_yearly_adventurer_remove_variable:
 From Code: No
 Expected Scope: none
 
 --------------------
 
 befriend_rival_ongoing:
+From Code: No
+Expected Scope: character
+
+--------------------
+
+tgp_japan_poetry_events:
 From Code: No
 Expected Scope: character
 
@@ -2852,39 +2222,15 @@ Expected Scope: character
 
 --------------------
 
-on_6th_birthday_strong_seed:
+on_action_mandala_realm_contract_0011:
 From Code: No
 Expected Scope: none
 
 --------------------
 
-agot_filler_yearly_region_crownlands:
+fp2_struggle_council_toledo_fallback:
 From Code: No
 Expected Scope: character
-
---------------------
-
-gptl_on_action_dip_vassal:
-From Code: No
-Expected Scope: none
-
---------------------
-
-at_on_artifact_bought:
-From Code: No
-Expected Scope: none
-
---------------------
-
-gptl_on_action_tax:
-From Code: No
-Expected Scope: none
-
---------------------
-
-gptl_on_action_sla:
-From Code: No
-Expected Scope: none
 
 --------------------
 
@@ -2894,13 +2240,13 @@ Expected Scope: none
 
 --------------------
 
-at_on_game_start:
+on_hostage_arrive_at_warden:
 From Code: No
 Expected Scope: none
 
 --------------------
 
-on_hostage_arrive_at_warden:
+spawn_mandala_realm_contract_on_action:
 From Code: No
 Expected Scope: none
 
@@ -2927,12 +2273,6 @@ Expected Scope: character
 kurultai_succession_chaotic_minor:
 From Code: No
 Expected Scope: character
-
---------------------
-
-gptl_on_action_dip_start_vassal:
-From Code: No
-Expected Scope: none
 
 --------------------
 
@@ -2978,12 +2318,6 @@ Expected Scope: character
 
 --------------------
 
-agot_on_title_gain_citadel:
-From Code: No
-Expected Scope: none
-
---------------------
-
 seduce_generic_success:
 From Code: No
 Expected Scope: character
@@ -2992,36 +2326,6 @@ Expected Scope: character
 
 on_stress_level_reduced:
 From Code: Yes
-Expected Scope: none
-
---------------------
-
-agot_dragonrider_xp_pulse:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_pentos_treaty_on_action_title_lost:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_wildling_wall:
-From Code: No
-Expected Scope: none
-
---------------------
-
-on_lmf_intro_death_check:
-From Code: No
-Expected Scope: none
-
---------------------
-
-on_dragon_birthday:
-From Code: No
 Expected Scope: none
 
 --------------------
@@ -3035,24 +2339,6 @@ Expected Scope: none
 quarterly_playable_pulse:
 From Code: Yes
 Expected Scope: character
-
---------------------
-
-esr_on_remove_rival_for_social_standing:
-From Code: No
-Expected Scope: none
-
---------------------
-
-interactive_oathbreakers:
-From Code: No
-Expected Scope: none
-
---------------------
-
-on_arrive_from_pool_wildlings:
-From Code: No
-Expected Scope: none
 
 --------------------
 
@@ -3074,12 +2360,6 @@ Expected Scope: none
 
 --------------------
 
-agot_canon_children_pensive_personality_gain:
-From Code: No
-Expected Scope: character
-
---------------------
-
 random_survey_mid_event_pulse:
 From Code: No
 Expected Scope: character
@@ -3092,19 +2372,13 @@ Expected Scope: none
 
 --------------------
 
-on_lmf_yearly_courtier_scheme_check:
+natural_disaster_earthquake_maintenance_pulse:
 From Code: No
-Expected Scope: character
+Expected Scope: none
 
 --------------------
 
-mpo_season_events_quarterly_playable_pulse:
-From Code: No
-Expected Scope: character
-
---------------------
-
-gptl_on_action_mor:
+tribute_mission_start:
 From Code: No
 Expected Scope: none
 
@@ -3116,15 +2390,9 @@ Expected Scope: character
 
 --------------------
 
-gptl_on_action_for_start_vassal:
+tgp_jail_inspection:
 From Code: No
 Expected Scope: none
-
---------------------
-
-ongoing_lmf_lover_far_off_events:
-From Code: No
-Expected Scope: character
 
 --------------------
 
@@ -3146,37 +2414,13 @@ Expected Scope: none
 
 --------------------
 
-gptl_on_action_fes_start_vassal:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_canon_children_generous_personality_gain:
+el_cid_landless_or_landed_on_action:
 From Code: No
 Expected Scope: character
 
 --------------------
 
-agot_ps_court_politics_task_on_action:
-From Code: No
-Expected Scope: character
-
---------------------
-
-agot_on_title_gain_tyroshi_landing:
-From Code: No
-Expected Scope: none
-
---------------------
-
-on_lmf_in_law_setup:
-From Code: No
-Expected Scope: none
-
---------------------
-
-rv_revenge_war_declaration:
+tgp_unsafe_highways:
 From Code: No
 Expected Scope: none
 
@@ -3188,25 +2432,19 @@ Expected Scope: character
 
 --------------------
 
-agot_on_title_gain_black_brother_iron_throne:
+ep3_overdue_taxes:
 From Code: No
 Expected Scope: none
 
 --------------------
 
-agot_filler_yearly_region_stormlands:
+ep3_akolouthos_on_action:
 From Code: No
 Expected Scope: character
 
 --------------------
 
-woc_on_game_start_after_lobby:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_on_title_gain_artifacts_sell:
+on_action_mandala_realm_contract_0009:
 From Code: No
 Expected Scope: none
 
@@ -3215,12 +2453,6 @@ Expected Scope: none
 standard_abduct_method_setup:
 From Code: No
 Expected Scope: character
-
---------------------
-
-esr_on_death_rival:
-From Code: No
-Expected Scope: none
 
 --------------------
 
@@ -3242,37 +2474,7 @@ Expected Scope: character
 
 --------------------
 
-gptl_on_action_pun_start:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_small_council_title_lost:
-From Code: No
-Expected Scope: none
-
---------------------
-
-Population_Control_Debug_lcs:
-From Code: No
-Expected Scope: none
-
---------------------
-
-esr_on_remove_nemesis:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_canon_children_forgiving_personality_gain:
-From Code: No
-Expected Scope: character
-
---------------------
-
-tenet_ritual_wars_check:
+ep3_rampant_bandits:
 From Code: No
 Expected Scope: none
 
@@ -3281,12 +2483,6 @@ Expected Scope: none
 on_noble_family_title_created:
 From Code: Yes
 Expected Scope: none
-
---------------------
-
-task_kingsguard_side_effects:
-From Code: No
-Expected Scope: character
 
 --------------------
 
@@ -3303,18 +2499,6 @@ Expected Scope: character
 --------------------
 
 diplomacy_foreign_special_1010_court_visit_events:
-From Code: No
-Expected Scope: character
-
---------------------
-
-gptl_on_action_intro_liege_ai:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_dragon_quarterly_playable_pulse:
 From Code: No
 Expected Scope: character
 
@@ -3338,13 +2522,19 @@ Expected Scope: none
 
 --------------------
 
-mpo_the_great_steppe_yearly_pulse_random:
+riseandfall_yearly_adventurer_cleanup_on_action:
 From Code: No
 Expected Scope: none
 
 --------------------
 
-agot_dynamic_claimant_kings_start:
+on_action_mandala_realm_contract_0032:
+From Code: No
+Expected Scope: none
+
+--------------------
+
+mpo_the_great_steppe_yearly_pulse_random:
 From Code: No
 Expected Scope: none
 
@@ -3362,7 +2552,7 @@ Expected Scope: none
 
 --------------------
 
-on_set_relation_agot_dragon:
+imperial_examination_opening_on_action:
 From Code: No
 Expected Scope: none
 
@@ -3392,27 +2582,21 @@ Expected Scope: faith
 
 --------------------
 
-gptl_on_action_mor_vassal:
-From Code: No
-Expected Scope: none
-
---------------------
-
 commit_suicide:
 From Code: No
 Expected Scope: character
 
 --------------------
 
-on_lmf_faith_change_oath_check:
-From Code: No
-Expected Scope: none
-
---------------------
-
 adventurer_talent_scouting_on_action:
 From Code: No
 Expected Scope: character
+
+--------------------
+
+riseandfall_war_won_defender:
+From Code: No
+Expected Scope: none
 
 --------------------
 
@@ -3446,51 +2630,33 @@ Expected Scope: character
 
 --------------------
 
-agot_artifacts_sell:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_war_invalidated_on_action:
-From Code: No
-Expected Scope: none
-
---------------------
-
 tournament_locale_settlement_events:
 From Code: No
 Expected Scope: character
 
 --------------------
 
-agot_yearly_high_val_conversion:
+ep3_titles_sale:
 From Code: No
 Expected Scope: none
 
 --------------------
 
-gptl_on_action_mor_start_vassal:
+on_action_mandala_realm_contract_0028:
 From Code: No
 Expected Scope: none
 
 --------------------
 
-on_death_relation_bodyguard_target:
+pledge_loyalty_to_liege_travel_planner_exit:
 From Code: No
 Expected Scope: none
 
 --------------------
 
-task_debug_unused_on_action:
+tengri_arrival_events:
 From Code: No
-Expected Scope: none
-
---------------------
-
-on_16th_birthday_fulfill_betrothal:
-From Code: No
-Expected Scope: none
+Expected Scope: character
 
 --------------------
 
@@ -3500,21 +2666,15 @@ Expected Scope: character
 
 --------------------
 
-on_remove_relation_nemesis:
-From Code: No
-Expected Scope: none
-
---------------------
-
 learn_language_ongoing:
 From Code: No
 Expected Scope: character
 
 --------------------
 
-ongoing_lmf_lover_simplified_events:
-From Code: No
-Expected Scope: character
+on_house_aspiration_upgraded:
+From Code: Yes
+Expected Scope: none
 
 --------------------
 
@@ -3524,21 +2684,15 @@ Expected Scope: character
 
 --------------------
 
-agot_on_16th_birthday:
+tgp_contested_inheritance:
 From Code: No
-Expected Scope: character
+Expected Scope: none
 
 --------------------
 
 on_combat_end_winner:
 From Code: Yes
 Expected Scope: combat_side
-
---------------------
-
-woc_on_death:
-From Code: No
-Expected Scope: none
 
 --------------------
 
@@ -3549,24 +2703,6 @@ Expected Scope: none
 --------------------
 
 pilgrimage_journey_events:
-From Code: No
-Expected Scope: character
-
---------------------
-
-agot_on_title_gain_mega_wars_action:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_canon_children_ambitious_personality_gain:
-From Code: No
-Expected Scope: character
-
---------------------
-
-agot_unlanded_ai_try_to_bond_dragon_quarterly:
 From Code: No
 Expected Scope: character
 
@@ -3584,15 +2720,15 @@ Expected Scope: none
 
 --------------------
 
-agot_on_title_gain_wildfire:
-From Code: No
-Expected Scope: none
-
---------------------
-
 intrigue_lifestyle_uncommon_events:
 From Code: No
 Expected Scope: character
+
+--------------------
+
+on_action_mandala_realm_contract_0001:
+From Code: No
+Expected Scope: none
 
 --------------------
 
@@ -3602,51 +2738,15 @@ Expected Scope: character
 
 --------------------
 
-woc_on_raid_action_completion:
+on_action_mandala_realm_contract_0014:
 From Code: No
 Expected Scope: none
-
---------------------
-
-agot_filler_yearly_region_free_cities:
-From Code: No
-Expected Scope: character
-
---------------------
-
-interactive_external_wars:
-From Code: No
-Expected Scope: none
-
---------------------
-
-woc_on_county_culture_change:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_canon_children_charming_personality_gain:
-From Code: No
-Expected Scope: character
 
 --------------------
 
 feast_new_event_selection_tombola:
 From Code: No
 Expected Scope: character
-
---------------------
-
-pr_on_culture_migrate:
-From Code: No
-Expected Scope: none
-
---------------------
-
-on_remove_relation_agot_squire:
-From Code: No
-Expected Scope: none
 
 --------------------
 
@@ -3662,39 +2762,9 @@ Expected Scope: character
 
 --------------------
 
-agot_on_title_gain_iron_throne_reconquer:
-From Code: No
-Expected Scope: none
-
---------------------
-
 on_remove_relation_guardian:
 From Code: No
 Expected Scope: none
-
---------------------
-
-agot_canon_children_greedy_personality_gain:
-From Code: No
-Expected Scope: character
-
---------------------
-
-rv_rescue_list_construction:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_knight_on_combat_end_winner:
-From Code: No
-Expected Scope: combat_side
-
---------------------
-
-on_lmf_5yr_courtier_marriage_check:
-From Code: No
-Expected Scope: character
 
 --------------------
 
@@ -3704,55 +2774,13 @@ Expected Scope: character
 
 --------------------
 
-agot_ps_patronage_task_on_action:
-From Code: No
-Expected Scope: character
-
---------------------
-
-agot_mw_death_on_action:
-From Code: No
-Expected Scope: none
-
---------------------
-
 on_migration_travel_end:
 From Code: Yes
 Expected Scope: character
 
 --------------------
 
-esr_on_release_from_prison:
-From Code: No
-Expected Scope: none
-
---------------------
-
-on_castle_keeper_title_gain:
-From Code: No
-Expected Scope: none
-
---------------------
-
 rival_quarterly_pulse:
-From Code: No
-Expected Scope: character
-
---------------------
-
-esr_on_become_lover_for_social_standing:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_king_is_dying:
-From Code: No
-Expected Scope: none
-
---------------------
-
-ongoing_squire_events:
 From Code: No
 Expected Scope: character
 
@@ -3766,7 +2794,7 @@ Expected Scope: none
 
 on_visited_ep3_monument:
 From Code: No
-Expected Scope: none
+Expected Scope: character
 
 --------------------
 
@@ -3788,27 +2816,15 @@ Expected Scope: character
 
 --------------------
 
-gptl_on_action_wom_start_vassal:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_filler_five_year_pulse:
-From Code: No
-Expected Scope: character
-
---------------------
-
-on_arrive_from_pool_ruins:
-From Code: No
-Expected Scope: none
-
---------------------
-
 random_survey_first_event_pulse:
 From Code: No
 Expected Scope: character
+
+--------------------
+
+tgp_unsanctioned_deity:
+From Code: No
+Expected Scope: none
 
 --------------------
 
@@ -3824,45 +2840,33 @@ Expected Scope: character
 
 --------------------
 
-esr_record_on_remove_best_friend:
-From Code: No
-Expected Scope: none
-
---------------------
-
-on_remove_relation_paramour:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_on_explicit_claim_gain:
-From Code: No
-Expected Scope: none
-
---------------------
-
-pilgrimage_intent_travel_events:
+muslim_arrival_events:
 From Code: No
 Expected Scope: character
 
 --------------------
 
-on_birthday_tomboy:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_set_reach_legacies:
-From Code: No
-Expected Scope: none
-
---------------------
-
-on_yearly_btw_maintenance:
+hajj_journey_events:
 From Code: No
 Expected Scope: character
+
+--------------------
+
+on_barter_action_completion:
+From Code: Yes
+Expected Scope: none
+
+--------------------
+
+pledge_loyalty_to_liege_invalid_on_action:
+From Code: No
+Expected Scope: character
+
+--------------------
+
+ep3_hungry_times:
+From Code: No
+Expected Scope: none
 
 --------------------
 
@@ -3875,12 +2879,6 @@ Expected Scope: character
 peasant_affair_looking_for_peasant:
 From Code: No
 Expected Scope: character
-
---------------------
-
-agot_yearly_dragon_aging:
-From Code: No
-Expected Scope: none
 
 --------------------
 
@@ -3908,18 +2906,6 @@ Expected Scope: none
 
 --------------------
 
-ub_on_inheritance:
-From Code: No
-Expected Scope: none
-
---------------------
-
-esr_on_remove_rival:
-From Code: No
-Expected Scope: none
-
---------------------
-
 sway_failure:
 From Code: No
 Expected Scope: character
@@ -3938,27 +2924,21 @@ Expected Scope: none
 
 --------------------
 
-nw_ranger_history_on_lc_death:
-From Code: No
-Expected Scope: none
-
---------------------
-
 tournament_locale_visitor_camp_events:
 From Code: No
 Expected Scope: character
 
 --------------------
 
-agot_on_title_gain:
-From Code: No
-Expected Scope: none
-
---------------------
-
 map_painting_event_selection:
 From Code: No
 Expected Scope: character
+
+--------------------
+
+riseandfall_on_title_gain_inheritance:
+From Code: No
+Expected Scope: none
 
 --------------------
 
@@ -3998,6 +2978,12 @@ Expected Scope: none
 
 --------------------
 
+ep3_public_land:
+From Code: No
+Expected Scope: none
+
+--------------------
+
 on_faith_conversion:
 From Code: Yes
 Expected Scope: character
@@ -4010,43 +2996,19 @@ Expected Scope: none
 
 --------------------
 
-agot_house_dna:
-From Code: No
-Expected Scope: none
-
---------------------
-
-mrb_on_accolade_rank_change:
-From Code: No
-Expected Scope: none
-
---------------------
-
 pilgrimage_destination_events:
 From Code: No
 Expected Scope: character
 
 --------------------
 
-woc_monthly_county_pulse:
-From Code: No
-Expected Scope: character
-
---------------------
-
 on_confederation_join:
-From Code: Yes
-Expected Scope: none
-
---------------------
-
-agot_on_title_gain_unique_crown:
 From Code: No
 Expected Scope: none
 
 --------------------
 
-on_1st_birthday_sibling_betrothal:
+tgp_crumbling_bridge:
 From Code: No
 Expected Scope: none
 
@@ -4058,27 +3020,9 @@ Expected Scope: none
 
 --------------------
 
-on_lmf_army_event_check:
-From Code: No
-Expected Scope: none
-
---------------------
-
-on_birthday_sibling_or_dynasty_betrothal:
-From Code: No
-Expected Scope: none
-
---------------------
-
 on_courtier_ready_to_move_to_pool:
 From Code: Yes
 Expected Scope: character
-
---------------------
-
-on_wall_election:
-From Code: No
-Expected Scope: none
 
 --------------------
 
@@ -4094,6 +3038,12 @@ Expected Scope: character
 
 --------------------
 
+on_action_mandala_realm_contract_0015:
+From Code: No
+Expected Scope: none
+
+--------------------
+
 mentor_student_relation_changes:
 From Code: No
 Expected Scope: character
@@ -4106,19 +3056,7 @@ Expected Scope: character
 
 --------------------
 
-loyalist_faction_action:
-From Code: No
-Expected Scope: none
-
---------------------
-
 tournament_locale_tavern_events:
-From Code: No
-Expected Scope: character
-
---------------------
-
-agot_canon_children_rowdy_personality_gain:
 From Code: No
 Expected Scope: character
 
@@ -4144,19 +3082,7 @@ Expected Scope: character
 
 on_potential_great_holy_war_invalidation:
 From Code: Yes
-Expected Scope: none
-
---------------------
-
-pillage_army_movement_friendly:
-From Code: No
-Expected Scope: none
-
---------------------
-
-on_lmf_traveling_heir_imprison_check:
-From Code: No
-Expected Scope: none
+Expected Scope: ghw
 
 --------------------
 
@@ -4169,18 +3095,6 @@ Expected Scope: none
 contest_bout_wrestling_random_pulse:
 From Code: No
 Expected Scope: character
-
---------------------
-
-gptl_on_action_dip_start:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_set_iron_islands_legacies:
-From Code: No
-Expected Scope: none
 
 --------------------
 
@@ -4214,6 +3128,12 @@ Expected Scope: character
 
 --------------------
 
+ongoing_harrying_hereward_events:
+From Code: No
+Expected Scope: character
+
+--------------------
+
 feast_start_events:
 From Code: No
 Expected Scope: character
@@ -4226,15 +3146,15 @@ Expected Scope: character
 
 --------------------
 
-on_arrive_from_pool_valyrian_lowborns:
+tgp_ravaged_buildings:
 From Code: No
 Expected Scope: none
 
 --------------------
 
-agot_on_game_start:
+on_action_orthodox_pentarchy_pulse:
 From Code: No
-Expected Scope: none
+Expected Scope: character
 
 --------------------
 
@@ -4247,12 +3167,6 @@ Expected Scope: character
 on_6th_birthday:
 From Code: No
 Expected Scope: character
-
---------------------
-
-esr_on_vassal_gained:
-From Code: No
-Expected Scope: none
 
 --------------------
 
@@ -4274,7 +3188,7 @@ Expected Scope: culture
 
 --------------------
 
-esr_record_on_game_start:
+on_set_relation_elder:
 From Code: No
 Expected Scope: none
 
@@ -4292,49 +3206,13 @@ Expected Scope: character
 
 --------------------
 
-agot_canon_children_arrogant_personality_gain:
-From Code: No
-Expected Scope: character
-
---------------------
-
-esr_record_on_become_rival:
-From Code: No
-Expected Scope: none
-
---------------------
-
 commission_epic_ongoing:
 From Code: No
 Expected Scope: character
 
 --------------------
 
-free_city_term_empire:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_filler_dragonkeepers:
-From Code: No
-Expected Scope: character
-
---------------------
-
-on_arrive_from_pool_nights_watch:
-From Code: No
-Expected Scope: none
-
---------------------
-
 admin_confirmation_invalid_on_action:
-From Code: No
-Expected Scope: character
-
---------------------
-
-agot_filler_yearly_region_btw:
 From Code: No
 Expected Scope: character
 
@@ -4352,33 +3230,21 @@ Expected Scope: character
 
 --------------------
 
-on_leave_court_silent_sisterhood:
-From Code: No
-Expected Scope: none
-
---------------------
-
 culture_hybridization_emergence_events:
 From Code: No
 Expected Scope: character
 
 --------------------
 
-agot_canon_children_assign_canon_guardian:
-From Code: No
-Expected Scope: character
-
---------------------
-
-gptl_on_action_rel_start:
-From Code: No
-Expected Scope: none
-
---------------------
-
 story_cycle_dog_pet_decision_on_actions:
 From Code: No
 Expected Scope: character
+
+--------------------
+
+on_action_mandala_realm_contract_0016:
+From Code: No
+Expected Scope: none
 
 --------------------
 
@@ -4394,32 +3260,8 @@ Expected Scope: character
 
 --------------------
 
-agot_on_title_gain_ruins:
-From Code: No
-Expected Scope: none
-
---------------------
-
 yearly_global_pulse:
 From Code: Yes
-Expected Scope: none
-
---------------------
-
-agot_filler_yearly_the_wall:
-From Code: No
-Expected Scope: character
-
---------------------
-
-Population_Control_death:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_legitimate_house_maintenance:
-From Code: No
 Expected Scope: none
 
 --------------------
@@ -4427,12 +3269,6 @@ Expected Scope: none
 mystic_communion_side_effect_events:
 From Code: No
 Expected Scope: character
-
---------------------
-
-agot_on_title_inheritance_lannister_baratheon_coa:
-From Code: No
-Expected Scope: none
 
 --------------------
 
@@ -4454,9 +3290,21 @@ Expected Scope: character
 
 --------------------
 
+on_action_mandala_realm_contract_0012:
+From Code: No
+Expected Scope: none
+
+--------------------
+
 breed_warhorse:
 From Code: No
 Expected Scope: character
+
+--------------------
+
+on_action_mandala_realm_contract_0024:
+From Code: No
+Expected Scope: none
 
 --------------------
 
@@ -4472,31 +3320,19 @@ Expected Scope: none
 
 --------------------
 
-on_lmf_traveling_heir_death_check:
+jain_arrival_events:
+From Code: No
+Expected Scope: character
+
+--------------------
+
+fp2_lyonese_monk_events_cycle_no_valid_events_fallback:
 From Code: No
 Expected Scope: none
 
 --------------------
 
-agot_on_title_lost_iron_throne:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_set_riverlands_legacies:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_on_title_gain_uhyrosh_coast:
-From Code: No
-Expected Scope: none
-
---------------------
-
-interactive_claims:
+on_action_mandala_realm_contract_0027:
 From Code: No
 Expected Scope: none
 
@@ -4526,9 +3362,9 @@ Expected Scope: none
 
 --------------------
 
-agot_instability:
+on_action_mandala_realm_contract_0020:
 From Code: No
-Expected Scope: character
+Expected Scope: none
 
 --------------------
 
@@ -4540,23 +3376,23 @@ Expected Scope: none
 
 five_year_struggle_playable_pulse:
 From Code: Yes
-Expected Scope: none
-
---------------------
-
-agot_spoils_demands:
-From Code: No
-Expected Scope: none
+Expected Scope: character
 
 --------------------
 
 on_government_change:
 From Code: Yes
+Expected Scope: none
+
+--------------------
+
+jewish_arrival_events:
+From Code: No
 Expected Scope: character
 
 --------------------
 
-on_lmf_new_ruler_lover_check:
+ep3_hoarding_mayor:
 From Code: No
 Expected Scope: none
 
@@ -4570,11 +3406,17 @@ Expected Scope: character
 
 on_great_holy_war_countdown_end:
 From Code: Yes
-Expected Scope: none
+Expected Scope: ghw
 
 --------------------
 
-agot_canon_children_stubborn_personality_gain:
+diarchy_mandate_promote_merit_random:
+From Code: No
+Expected Scope: character
+
+--------------------
+
+imperial_examination_exam_host_events:
 From Code: No
 Expected Scope: character
 
@@ -4592,21 +3434,9 @@ Expected Scope: none
 
 --------------------
 
-agot_canon_children_lazy_personality_gain:
+on_action_mandala_realm_contract_0036:
 From Code: No
-Expected Scope: character
-
---------------------
-
-on_lmf_3yr_courtier_scheme_check:
-From Code: No
-Expected Scope: character
-
---------------------
-
-pilgrimage_temptation_travel_events:
-From Code: No
-Expected Scope: character
+Expected Scope: none
 
 --------------------
 
@@ -4616,15 +3446,15 @@ Expected Scope: character
 
 --------------------
 
-on_set_relation_agot_story_dragon:
-From Code: No
-Expected Scope: none
-
---------------------
-
 fp1_trade_events_random:
 From Code: No
 Expected Scope: character
+
+--------------------
+
+spawn_celestial_military_governance_contract_on_action:
+From Code: No
+Expected Scope: none
 
 --------------------
 
@@ -4676,9 +3506,9 @@ Expected Scope: character
 
 --------------------
 
-agot_filler_yearly_region_reach:
+spawn_celestial_civic_governance_contract_on_action:
 From Code: No
-Expected Scope: character
+Expected Scope: none
 
 --------------------
 
@@ -4736,12 +3566,6 @@ Expected Scope: character
 
 --------------------
 
-agot_banking:
-From Code: No
-Expected Scope: none
-
---------------------
-
 on_pregnancy_father:
 From Code: Yes
 Expected Scope: none
@@ -4760,15 +3584,9 @@ Expected Scope: character
 
 --------------------
 
-esr_on_become_soulmate_for_social_standing:
+tgp_mandala_yearly_events:
 From Code: No
-Expected Scope: none
-
---------------------
-
-Population_Control_presetting:
-From Code: No
-Expected Scope: none
+Expected Scope: character
 
 --------------------
 
@@ -4784,21 +3602,15 @@ Expected Scope: character
 
 --------------------
 
-esr_on_nemesis_to_friend:
-From Code: No
-Expected Scope: none
-
---------------------
-
 task_help_herders_on_action:
 From Code: No
 Expected Scope: character
 
 --------------------
 
-agot_dornish_desert_malus:
+zoroastrian_arrival_events:
 From Code: No
-Expected Scope: none
+Expected Scope: character
 
 --------------------
 
@@ -4808,21 +3620,9 @@ Expected Scope: character
 
 --------------------
 
-agot_jon_snow_learns:
-From Code: No
-Expected Scope: none
-
---------------------
-
 stress_threshold_level_2_event:
 From Code: No
 Expected Scope: character
-
---------------------
-
-esr_on_death_rival_for_social_standing:
-From Code: No
-Expected Scope: none
 
 --------------------
 
@@ -4856,25 +3656,13 @@ Expected Scope: character
 
 --------------------
 
-on_14th_birthday:
-From Code: No
-Expected Scope: character
-
---------------------
-
 on_court_grandeur_level_changed:
 From Code: Yes
 Expected Scope: character
 
 --------------------
 
-on_remove_relation_soulmate:
-From Code: No
-Expected Scope: none
-
---------------------
-
-mrb_on_birthday_childhood:
+tribute_mission_travel_planner_exit:
 From Code: No
 Expected Scope: none
 
@@ -4898,44 +3686,20 @@ Expected Scope: character
 
 --------------------
 
+riseandfall_marry_female_target_se:
+From Code: No
+Expected Scope: none
+
+--------------------
+
 seduce_ongoing_milestone_2:
 From Code: No
 Expected Scope: character
 
 --------------------
 
-agot_on_title_gain_iron_throne_created:
-From Code: No
-Expected Scope: none
-
---------------------
-
-on_lmf_special_trait_check:
-From Code: No
-Expected Scope: none
-
---------------------
-
-woc_county_pop_events:
-From Code: No
-Expected Scope: character
-
---------------------
-
-on_courtinventory_start:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_canon_children_arbitrary_personality_gain:
-From Code: No
-Expected Scope: character
-
---------------------
-
-agot_on_game_start_after_lobby:
-From Code: No
+on_merit_level_gain:
+From Code: Yes
 Expected Scope: none
 
 --------------------
@@ -4946,21 +3710,15 @@ Expected Scope: none
 
 --------------------
 
-mrb_on_accolade_deactivated:
-From Code: No
-Expected Scope: none
-
---------------------
-
 murder_success_child_event_list_on_action:
 From Code: No
 Expected Scope: character
 
 --------------------
 
-gptl_on_action_mor_start:
+fp2_lyonese_monk_events_phase_schism_events:
 From Code: No
-Expected Scope: none
+Expected Scope: character
 
 --------------------
 
@@ -4976,12 +3734,6 @@ Expected Scope: character
 
 --------------------
 
-agot_north_holding_cost:
-From Code: No
-Expected Scope: none
-
---------------------
-
 petition_liege_start:
 From Code: No
 Expected Scope: none
@@ -4994,33 +3746,9 @@ Expected Scope: character
 
 --------------------
 
-dragon_bonding_ongoing:
-From Code: No
-Expected Scope: character
-
---------------------
-
 childhood_education:
 From Code: No
 Expected Scope: character
-
---------------------
-
-esr_on_death_best_friend:
-From Code: No
-Expected Scope: none
-
---------------------
-
-TFE_on_game_start_woc:
-From Code: No
-Expected Scope: none
-
---------------------
-
-Population_Control_On_Action:
-From Code: No
-Expected Scope: none
 
 --------------------
 
@@ -5030,25 +3758,25 @@ Expected Scope: character
 
 --------------------
 
+riseandfall_player_grant_kingdoms:
+From Code: No
+Expected Scope: none
+
+--------------------
+
 task_integrate_title_side_effects:
 From Code: No
 Expected Scope: character
 
 --------------------
 
-esr_on_death_friend:
+on_set_relation_disciple:
 From Code: No
 Expected Scope: none
 
 --------------------
 
 on_army_combat_finished:
-From Code: No
-Expected Scope: none
-
---------------------
-
-on_silent_sister_election:
 From Code: No
 Expected Scope: none
 
@@ -5063,12 +3791,6 @@ Expected Scope: none
 on_piety_level_gain:
 From Code: Yes
 Expected Scope: none
-
---------------------
-
-agot_knight_quarterly_playable_pulse:
-From Code: No
-Expected Scope: character
 
 --------------------
 
@@ -5108,7 +3830,7 @@ Expected Scope: none
 
 --------------------
 
-esr_record_on_remove_lover:
+riseandfall_quarterly_adventurer_income:
 From Code: No
 Expected Scope: none
 
@@ -5126,7 +3848,7 @@ Expected Scope: none
 
 --------------------
 
-gptl_on_action_intro_liege:
+tgp_escaped_justice:
 From Code: No
 Expected Scope: none
 
@@ -5138,61 +3860,25 @@ Expected Scope: character
 
 --------------------
 
-agot_canon_children_just_personality_gain:
-From Code: No
-Expected Scope: character
-
---------------------
-
-unfinished_business_start:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_canon_children_cynical_personality_gain:
-From Code: No
-Expected Scope: character
-
---------------------
-
 murder_failure_incapable_event_list_on_action:
 From Code: No
 Expected Scope: character
 
 --------------------
 
-gptl_on_action_off_vassal:
-From Code: No
-Expected Scope: none
-
---------------------
-
-gptl_on_action_for:
-From Code: No
-Expected Scope: none
-
---------------------
-
-on_remove_relation_bodyguard:
-From Code: No
-Expected Scope: none
-
---------------------
-
-on_dragon_cooldown_pass:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_war_won_defender_on_action:
+on_action_mandala_realm_contract_0041:
 From Code: No
 Expected Scope: none
 
 --------------------
 
 stress_loss_drunkard:
+From Code: No
+Expected Scope: character
+
+--------------------
+
+festival_random_pulse:
 From Code: No
 Expected Scope: character
 
@@ -5210,13 +3896,19 @@ Expected Scope: none
 
 --------------------
 
-interactive_war_participants:
+debate_discussion_events:
 From Code: No
-Expected Scope: none
+Expected Scope: character
 
 --------------------
 
-on_dragon_3rd_birthday:
+pagan_conversion_pulse:
+From Code: No
+Expected Scope: character
+
+--------------------
+
+debate_events:
 From Code: No
 Expected Scope: character
 
@@ -5228,33 +3920,21 @@ Expected Scope: character
 
 --------------------
 
+riseandfall_player_create_kingdoms:
+From Code: No
+Expected Scope: none
+
+--------------------
+
 on_adventurer_ai_war_target_arrival:
 From Code: No
 Expected Scope: none
 
 --------------------
 
-on_wall_succession:
+riseandfall_yearly_remove_adventurer_gold_mod:
 From Code: No
 Expected Scope: none
-
---------------------
-
-agot_canon_children_trusting_personality_gain:
-From Code: No
-Expected Scope: character
-
---------------------
-
-gptl_on_action_pun_start_vassal:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_birthplace_nicknames_pulse:
-From Code: No
-Expected Scope: character
 
 --------------------
 
@@ -5264,7 +3944,7 @@ Expected Scope: none
 
 --------------------
 
-agot_secret_child_on_title_gain:
+ep3_buried_treasure:
 From Code: No
 Expected Scope: none
 
@@ -5300,13 +3980,7 @@ Expected Scope: character
 
 --------------------
 
-esr_on_rival_to_friend:
-From Code: No
-Expected Scope: none
-
---------------------
-
-gptl_on_action_tax_start:
+tgp_quaking_in_panic:
 From Code: No
 Expected Scope: none
 
@@ -5320,17 +3994,11 @@ Expected Scope: character
 
 on_title_destroyed:
 From Code: Yes
-Expected Scope: character
+Expected Scope: none
 
 --------------------
 
-agot_ai_character_pulse:
-From Code: No
-Expected Scope: character
-
---------------------
-
-agot_on_title_gain_iron_throne_kingslanding:
+tgp_minister_manage_talent_on_action:
 From Code: No
 Expected Scope: none
 
@@ -5342,45 +4010,27 @@ Expected Scope: character
 
 --------------------
 
-agot_citadel_find_lowborns:
-From Code: No
-Expected Scope: none
-
---------------------
-
 sell_titles_side_effect_events:
 From Code: No
 Expected Scope: character
 
 --------------------
 
-esr_on_death_friend_for_social_standing:
+coronation_third_phase_host_events:
 From Code: No
-Expected Scope: none
+Expected Scope: character
 
 --------------------
 
 on_army_monthly:
 From Code: Yes
-Expected Scope: character
+Expected Scope: none
 
 --------------------
 
 on_accolade_glory_change:
 From Code: Yes
 Expected Scope: none
-
---------------------
-
-on_silent_sister_start:
-From Code: No
-Expected Scope: none
-
---------------------
-
-on_lmf_yearly_courtier_marriage_check:
-From Code: No
-Expected Scope: character
 
 --------------------
 
@@ -5396,15 +4046,15 @@ Expected Scope: character
 
 --------------------
 
-set_starting_dynasty_levels:
-From Code: No
-Expected Scope: none
-
---------------------
-
 organize_the_levies_marshal_task_side_effects:
 From Code: No
 Expected Scope: character
+
+--------------------
+
+on_action_mandala_realm_contract_0021:
+From Code: No
+Expected Scope: none
 
 --------------------
 
@@ -5414,15 +4064,15 @@ Expected Scope: character
 
 --------------------
 
-on_death_relation_agot_story_dragon:
+tgp_lines_in_the_soil:
 From Code: No
 Expected Scope: none
 
 --------------------
 
-agot_canon_children_gregarious_personality_gain:
+spawn_admin_governance_contract_on_action:
 From Code: No
-Expected Scope: character
+Expected Scope: none
 
 --------------------
 
@@ -5432,21 +4082,9 @@ Expected Scope: none
 
 --------------------
 
-agot_canon_children_patient_personality_gain:
+fp2_iberian_struggle_random_events:
 From Code: No
 Expected Scope: character
-
---------------------
-
-esr_on_become_nemesis:
-From Code: No
-Expected Scope: none
-
---------------------
-
-gptl_on_action_com:
-From Code: No
-Expected Scope: none
 
 --------------------
 
@@ -5462,19 +4100,13 @@ Expected Scope: character
 
 --------------------
 
-esr_record_on_become_nemesis:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_unlanded_ai_tame_dragon_quarterly:
+learn_commander_trait_success:
 From Code: No
 Expected Scope: character
 
 --------------------
 
-learn_commander_trait_success:
+imperial_examination_assembly_events:
 From Code: No
 Expected Scope: character
 
@@ -5487,12 +4119,6 @@ Expected Scope: character
 --------------------
 
 steal_back_artifact_success:
-From Code: No
-Expected Scope: character
-
---------------------
-
-pilgrimage_religious_travel_events:
 From Code: No
 Expected Scope: character
 
@@ -5516,21 +4142,27 @@ Expected Scope: character
 
 --------------------
 
-AGOT_random_filler_yearly_pulse:
+on_action_mandala_realm_contract_0019:
+From Code: No
+Expected Scope: none
+
+--------------------
+
+ongoing_violet_poet_owner_events:
 From Code: No
 Expected Scope: character
 
 --------------------
 
-province_county_setting:
+riseandfall_yearly_adventurer:
 From Code: No
 Expected Scope: none
 
 --------------------
 
-agot_on_title_gain_iron_throne_dragonstone:
+tgp_japan_yearly_events:
 From Code: No
-Expected Scope: none
+Expected Scope: character
 
 --------------------
 
@@ -5540,31 +4172,13 @@ Expected Scope: character
 
 --------------------
 
-esr_on_friend_to_rival:
-From Code: No
-Expected Scope: none
-
---------------------
-
 on_game_start_after_lobby:
 From Code: Yes
 Expected Scope: none
 
 --------------------
 
-agot_filler_yearly_region_tyrosh:
-From Code: No
-Expected Scope: character
-
---------------------
-
 on_specific_birthday:
-From Code: No
-Expected Scope: character
-
---------------------
-
-agot_knight_on_birthday:
 From Code: No
 Expected Scope: character
 
@@ -5594,12 +4208,6 @@ Expected Scope: artifact
 
 --------------------
 
-coronation_ceremony_ongoing_event_pulse:
-From Code: No
-Expected Scope: character
-
---------------------
-
 on_birth_mother:
 From Code: Yes
 Expected Scope: character
@@ -5618,15 +4226,15 @@ Expected Scope: none
 
 --------------------
 
-agot_canon_children_craven_personality_gain:
+on_yearly_common_events:
 From Code: No
 Expected Scope: character
 
 --------------------
 
-on_yearly_common_events:
+tgp_irregular_accounting:
 From Code: No
-Expected Scope: character
+Expected Scope: none
 
 --------------------
 
@@ -5636,9 +4244,9 @@ Expected Scope: character
 
 --------------------
 
-agot_yearly_events:
+on_action_mandala_realm_contract_0029:
 From Code: No
-Expected Scope: character
+Expected Scope: none
 
 --------------------
 
@@ -5654,12 +4262,6 @@ Expected Scope: none
 
 --------------------
 
-pilgrimage_generic_travel_events:
-From Code: No
-Expected Scope: character
-
---------------------
-
 contest_bout_wrestling_outcome_pulse:
 From Code: No
 Expected Scope: character
@@ -5672,43 +4274,13 @@ Expected Scope: none
 
 --------------------
 
-agot_kingsguard_employer_lost:
+riseandfall_ai_county_handout:
 From Code: No
 Expected Scope: none
 
 --------------------
 
-stress_loss_summerhall:
-From Code: No
-Expected Scope: character
-
---------------------
-
-pr_on_culture_created:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_on_title_gain_usurpation:
-From Code: No
-Expected Scope: none
-
---------------------
-
-on_silent_sister_sm_death:
-From Code: No
-Expected Scope: none
-
---------------------
-
-on_remove_relation_agot_dragon:
-From Code: No
-Expected Scope: none
-
---------------------
-
-esr_on_rank_up:
+tgp_salt_smugglers:
 From Code: No
 Expected Scope: none
 
@@ -5721,18 +4293,6 @@ Expected Scope: none
 --------------------
 
 on_ward_depart_for_guardian:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_canon_children_impatient_personality_gain:
-From Code: No
-Expected Scope: character
-
---------------------
-
-gptl_on_action_sla_start:
 From Code: No
 Expected Scope: none
 
@@ -5762,12 +4322,6 @@ Expected Scope: none
 
 --------------------
 
-gptl_on_action_vig_vassal:
-From Code: No
-Expected Scope: none
-
---------------------
-
 on_migration_war_end:
 From Code: Yes
 Expected Scope: none
@@ -5780,67 +4334,19 @@ Expected Scope: character
 
 --------------------
 
-agot_ps_court_intrigue_task_on_action:
-From Code: No
-Expected Scope: character
-
---------------------
-
-agot_canon_children_sadistic_personality_gain:
-From Code: No
-Expected Scope: character
-
---------------------
-
-pillage_start:
+riseandfall_marry_male_target_se:
 From Code: No
 Expected Scope: none
 
 --------------------
 
-agot_silly_mode:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_house_feuds:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_title_destroyed_mega_wars_on_action:
-From Code: No
-Expected Scope: none
-
---------------------
-
-woc_on_raid_loot_delivered:
-From Code: No
-Expected Scope: army
-
---------------------
-
-agot_canon_children_temperate_personality_gain:
-From Code: No
-Expected Scope: character
-
---------------------
-
-woc_on_siege_completion:
+tgp_china_yearly_events:
 From Code: No
 Expected Scope: character
 
 --------------------
 
 on_death_relation_guardian:
-From Code: No
-Expected Scope: none
-
---------------------
-
-your_accept_culture_yearly_add_on_action:
 From Code: No
 Expected Scope: none
 
@@ -5858,21 +4364,15 @@ Expected Scope: none
 
 --------------------
 
-agot_on_arrival_councillor_travel:
-From Code: No
-Expected Scope: none
-
---------------------
-
 tournament_locale_tournament_grounds_events:
 From Code: No
 Expected Scope: character
 
 --------------------
 
-ongoing_lmf_lover_events:
+on_action_mandala_realm_contract_0013:
 From Code: No
-Expected Scope: character
+Expected Scope: none
 
 --------------------
 
@@ -5882,27 +4382,9 @@ Expected Scope: none
 
 --------------------
 
-agot_culture_maintenance:
-From Code: No
-Expected Scope: none
-
---------------------
-
 task_manage_fertility_side_effects:
 From Code: No
 Expected Scope: character
-
---------------------
-
-on_join_court_nights_watch:
-From Code: No
-Expected Scope: none
-
---------------------
-
-esr_record_on_remove_nemesis:
-From Code: No
-Expected Scope: none
 
 --------------------
 
@@ -5915,6 +4397,12 @@ Expected Scope: none
 claim_throne_setup:
 From Code: No
 Expected Scope: character
+
+--------------------
+
+on_action_mandala_realm_contract_0006:
+From Code: No
+Expected Scope: none
 
 --------------------
 
@@ -5954,20 +4442,8 @@ Expected Scope: character
 
 --------------------
 
-gptl_on_action_com_start:
-From Code: No
-Expected Scope: none
-
---------------------
-
-gptl_on_action_urb_start:
-From Code: No
-Expected Scope: none
-
---------------------
-
-lgc_setup:
-From Code: No
+on_house_aspiration_changed:
+From Code: Yes
 Expected Scope: none
 
 --------------------
@@ -5984,39 +4460,15 @@ Expected Scope: character
 
 --------------------
 
-mrb_on_accolade_created:
-From Code: No
-Expected Scope: none
-
---------------------
-
-gptl_on_action_pun_vassal:
-From Code: No
-Expected Scope: none
-
---------------------
-
-soulmate_quarterly_pulse:
-From Code: No
-Expected Scope: character
-
---------------------
-
 on_county_occupied:
 From Code: Yes
 Expected Scope: none
 
 --------------------
 
-agot_canon_children_chaste_personality_gain:
+diarchy_mandate_placate_movements_random:
 From Code: No
 Expected Scope: character
-
---------------------
-
-gptl_on_action_sec:
-From Code: No
-Expected Scope: none
 
 --------------------
 
@@ -6026,21 +4478,15 @@ Expected Scope: character
 
 --------------------
 
-esr_on_title_lost:
-From Code: No
-Expected Scope: none
-
---------------------
-
-esr_on_best_friend_to_rival:
-From Code: No
-Expected Scope: none
-
---------------------
-
 intrigue_lifestyle_unavailable_events:
 From Code: No
 Expected Scope: none
+
+--------------------
+
+coronation_third_phase_guest_events:
+From Code: No
+Expected Scope: character
 
 --------------------
 
@@ -6056,26 +4502,8 @@ Expected Scope: none
 
 --------------------
 
-on_join_court_dragonriders:
-From Code: No
-Expected Scope: none
-
---------------------
-
 on_culture_created:
 From Code: Yes
-Expected Scope: none
-
---------------------
-
-agot_artifact_market_management:
-From Code: No
-Expected Scope: none
-
---------------------
-
-on_lmf_heir_in_training_check:
-From Code: No
 Expected Scope: none
 
 --------------------
@@ -6086,7 +4514,13 @@ Expected Scope: none
 
 --------------------
 
-on_lmf_traveling_visit_check:
+tgp_monopoly_in_the_marketplace:
+From Code: No
+Expected Scope: none
+
+--------------------
+
+imperial_examination_exam_on_action:
 From Code: No
 Expected Scope: none
 
@@ -6104,18 +4538,6 @@ Expected Scope: character
 
 --------------------
 
-gptl_on_action_sla_vassal:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_yearly_dragon_pulse:
-From Code: No
-Expected Scope: character
-
---------------------
-
 on_death_relation_soulmate:
 From Code: No
 Expected Scope: none
@@ -6128,31 +4550,19 @@ Expected Scope: character
 
 --------------------
 
-interactive_call_player:
-From Code: No
+on_barter_action_weekly:
+From Code: Yes
 Expected Scope: none
 
 --------------------
 
-agot_btw_nw_petition_random_event:
+riseandfall_warlord:
 From Code: No
-Expected Scope: character
+Expected Scope: none
 
 --------------------
 
 on_vassal_become_powerful:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_filler_magic:
-From Code: No
-Expected Scope: character
-
---------------------
-
-pillage_army_movement_hostile:
 From Code: No
 Expected Scope: none
 
@@ -6164,19 +4574,7 @@ Expected Scope: none
 
 --------------------
 
-woc_monthly_county_immigration_change:
-From Code: No
-Expected Scope: none
-
---------------------
-
 task_collect_taxes_side_effects:
-From Code: No
-Expected Scope: character
-
---------------------
-
-agot_filler_yearly_region_braavos:
 From Code: No
 Expected Scope: character
 
@@ -6188,13 +4586,13 @@ Expected Scope: character
 
 --------------------
 
-agot_on_title_gain_nightswatch:
-From Code: No
+on_house_relation_destroyed:
+From Code: Yes
 Expected Scope: none
 
 --------------------
 
-on_10th_birthday_sibling_betrothal:
+coronation_second_phase_events:
 From Code: No
 Expected Scope: none
 
@@ -6203,12 +4601,6 @@ Expected Scope: none
 learning_lifestyle_uncommon_events:
 From Code: No
 Expected Scope: character
-
---------------------
-
-agot_on_title_gain_high_septon:
-From Code: No
-Expected Scope: none
 
 --------------------
 
@@ -6236,12 +4628,6 @@ Expected Scope: character
 
 --------------------
 
-agot_set_north_legacies:
-From Code: No
-Expected Scope: none
-
---------------------
-
 train_commanders_success_effect:
 From Code: No
 Expected Scope: character
@@ -6249,18 +4635,6 @@ Expected Scope: character
 --------------------
 
 on_ward_depart_travel_planner_exit:
-From Code: No
-Expected Scope: none
-
---------------------
-
-gptl_on_action_wom_start:
-From Code: No
-Expected Scope: none
-
---------------------
-
-on_10th_birthday_heir_betrothal:
 From Code: No
 Expected Scope: none
 
@@ -6284,27 +4658,27 @@ Expected Scope: none
 
 --------------------
 
-woc_on_title_gain:
+spawn_celestial_governance_contract_on_action:
 From Code: No
 Expected Scope: none
 
 --------------------
 
-on_lmf_traveling_intro_check:
+on_action_mandala_realm_contract_0017:
 From Code: No
 Expected Scope: none
 
 --------------------
 
-agot_filler_valyrian_culture:
+ep3_raiding_peasants:
 From Code: No
-Expected Scope: character
+Expected Scope: none
 
 --------------------
 
-on_lmf_childhood_events:
+on_action_mandala_realm_contract_0003:
 From Code: No
-Expected Scope: character
+Expected Scope: none
 
 --------------------
 
@@ -6314,37 +4688,7 @@ Expected Scope: character
 
 --------------------
 
-agot_on_title_gain_crownlands_inheritance:
-From Code: No
-Expected Scope: none
-
---------------------
-
 on_guardian_arrive_at_ward:
-From Code: No
-Expected Scope: none
-
---------------------
-
-esr_on_remove_friend:
-From Code: No
-Expected Scope: none
-
---------------------
-
-interactive_civil_war_prev:
-From Code: No
-Expected Scope: none
-
---------------------
-
-gptl_on_action_off_start:
-From Code: No
-Expected Scope: none
-
---------------------
-
-woc_on_debug_title_gain_after:
 From Code: No
 Expected Scope: none
 
@@ -6353,30 +4697,6 @@ Expected Scope: none
 learn_language_failure:
 From Code: No
 Expected Scope: character
-
---------------------
-
-woc_county_culture_events:
-From Code: No
-Expected Scope: character
-
---------------------
-
-agot_war_white_peace_on_action:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_filler_yearly_region_iron_islands:
-From Code: No
-Expected Scope: character
-
---------------------
-
-on_immigration_leader_on_arrival:
-From Code: No
-Expected Scope: none
 
 --------------------
 
@@ -6392,7 +4712,31 @@ Expected Scope: none
 
 --------------------
 
+riseandfall_ai_create_duchies:
+From Code: No
+Expected Scope: none
+
+--------------------
+
 realm_maintenance_quarterly_pulse:
+From Code: No
+Expected Scope: none
+
+--------------------
+
+on_yearly_tutorial_events:
+From Code: No
+Expected Scope: character
+
+--------------------
+
+on_merit_level_loss:
+From Code: Yes
+Expected Scope: none
+
+--------------------
+
+petition_ceremonial_liege_travel_planner_exit:
 From Code: No
 Expected Scope: none
 
@@ -6400,12 +4744,6 @@ Expected Scope: none
 
 on_join_war_as_secondary:
 From Code: Yes
-Expected Scope: character
-
---------------------
-
-agot_canon_children_shy_personality_gain:
-From Code: No
 Expected Scope: character
 
 --------------------
@@ -6423,12 +4761,6 @@ Expected Scope: none
 --------------------
 
 on_remove_relation_ward:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_pentos_treaty_on_action_independence:
 From Code: No
 Expected Scope: none
 
@@ -6464,27 +4796,9 @@ Expected Scope: none
 
 --------------------
 
-esr_record_on_vassal_gained:
-From Code: No
-Expected Scope: none
-
---------------------
-
-nw_ranger_death:
-From Code: No
-Expected Scope: none
-
---------------------
-
 ongoing_hunt_mystical_animal_events:
 From Code: No
 Expected Scope: character
-
---------------------
-
-fp2_btw_struggle_starting_events:
-From Code: No
-Expected Scope: struggle
 
 --------------------
 
@@ -6494,33 +4808,9 @@ Expected Scope: none
 
 --------------------
 
-agot_barony_ruins:
-From Code: No
-Expected Scope: none
-
---------------------
-
-esr_on_become_friend_for_social_standing:
-From Code: No
-Expected Scope: none
-
---------------------
-
-esr_remove_threat:
-From Code: No
-Expected Scope: none
-
---------------------
-
 learn_language_success:
 From Code: No
 Expected Scope: character
-
---------------------
-
-agot_on_rank_up:
-From Code: No
-Expected Scope: none
 
 --------------------
 
@@ -6536,12 +4826,6 @@ Expected Scope: character
 
 --------------------
 
-on_lmf_traveling_heir_war_start_check:
-From Code: No
-Expected Scope: none
-
---------------------
-
 on_accolade_rank_change:
 From Code: Yes
 Expected Scope: none
@@ -6554,13 +4838,19 @@ Expected Scope: character
 
 --------------------
 
+varangian_ongoing:
+From Code: No
+Expected Scope: character
+
+--------------------
+
 on_alliance_broken:
 From Code: Yes
 Expected Scope: none
 
 --------------------
 
-gptl_on_action_for_start:
+riseandfall_war_won_attacker:
 From Code: No
 Expected Scope: none
 
@@ -6568,12 +4858,6 @@ Expected Scope: none
 
 on_natural_death_second_chance:
 From Code: Yes
-Expected Scope: none
-
---------------------
-
-on_artifact_manager_start:
-From Code: No
 Expected Scope: none
 
 --------------------
@@ -6592,12 +4876,6 @@ Expected Scope: character
 
 on_county_culture_change:
 From Code: Yes
-Expected Scope: none
-
---------------------
-
-gptl_on_action_sec_start:
-From Code: No
 Expected Scope: none
 
 --------------------
@@ -6626,12 +4904,6 @@ Expected Scope: character
 
 --------------------
 
-esr_record_on_remove_rival:
-From Code: No
-Expected Scope: none
-
---------------------
-
 on_travel_activity_arrival_too_late:
 From Code: Yes
 Expected Scope: none
@@ -6650,19 +4922,13 @@ Expected Scope: character
 
 --------------------
 
+on_defeat_barter_army:
+From Code: Yes
+Expected Scope: none
+
+--------------------
+
 learn_commander_trait_failure:
-From Code: No
-Expected Scope: character
-
---------------------
-
-agot_canon_children_diligent_personality_gain:
-From Code: No
-Expected Scope: character
-
---------------------
-
-personal_steward_councillor_default_on_action:
 From Code: No
 Expected Scope: character
 
@@ -6674,7 +4940,7 @@ Expected Scope: none
 
 --------------------
 
-agot_form_special_titles:
+natural_disaster_join_events:
 From Code: No
 Expected Scope: character
 
@@ -6686,31 +4952,25 @@ Expected Scope: character
 
 --------------------
 
+ongoing_harrying_owner_events:
+From Code: No
+Expected Scope: character
+
+--------------------
+
 prison_maintenance_pulse:
 From Code: No
 Expected Scope: none
 
 --------------------
 
-agot_visit_house_of_baw:
+ep3_discontent_soldiers:
 From Code: No
 Expected Scope: none
 
 --------------------
 
-mytm_on_raid_loot_delivered_auto:
-From Code: No
-Expected Scope: none
-
---------------------
-
-gptl_on_action_com_start_vassal:
-From Code: No
-Expected Scope: none
-
---------------------
-
-gptl_on_action_fes_vassal:
+on_action_mandala_realm_contract_0004:
 From Code: No
 Expected Scope: none
 
@@ -6728,13 +4988,25 @@ Expected Scope: character
 
 --------------------
 
+spawn_natural_disaster_contract_on_action:
+From Code: No
+Expected Scope: none
+
+--------------------
+
+ep3_miraculous_healing:
+From Code: No
+Expected Scope: none
+
+--------------------
+
 roaming_mid_activity_event_pulse:
 From Code: No
 Expected Scope: character
 
 --------------------
 
-esr_on_title_gain_inheritance:
+riseandfall_ai_title_handout:
 From Code: No
 Expected Scope: none
 
@@ -6758,27 +5030,9 @@ Expected Scope: none
 
 --------------------
 
-esr_on_title_gain:
-From Code: No
-Expected Scope: none
-
---------------------
-
 stewardship_lifestyle_domesday:
 From Code: No
 Expected Scope: character
-
---------------------
-
-pillage_siege_completion:
-From Code: No
-Expected Scope: none
-
---------------------
-
-on_move_birthplace:
-From Code: No
-Expected Scope: none
 
 --------------------
 
@@ -6791,12 +5045,6 @@ Expected Scope: none
 on_graceful_aging_birthday:
 From Code: No
 Expected Scope: character
-
---------------------
-
-esr_on_become_friend:
-From Code: No
-Expected Scope: none
 
 --------------------
 
@@ -6824,24 +5072,6 @@ Expected Scope: character
 
 --------------------
 
-agot_canon_children_fickle_personality_gain:
-From Code: No
-Expected Scope: character
-
---------------------
-
-on_lmf_traveling_heir_war_join_check:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_on_join_war_as_secondary_action:
-From Code: No
-Expected Scope: none
-
---------------------
-
 on_domicile_building_started:
 From Code: Yes
 Expected Scope: none
@@ -6860,15 +5090,15 @@ Expected Scope: character
 
 --------------------
 
-steal_herd_success:
+fp2_iberian_struggle_starting_events:
 From Code: No
-Expected Scope: character
+Expected Scope: struggle
 
 --------------------
 
-agot_on_title_gain_moat_cailin:
+steal_herd_success:
 From Code: No
-Expected Scope: none
+Expected Scope: character
 
 --------------------
 
@@ -6878,31 +5108,13 @@ Expected Scope: character
 
 --------------------
 
-agot_canon_children_compassionate_personality_gain:
-From Code: No
-Expected Scope: character
-
---------------------
-
-agot_citadel_find_lost_maesters:
-From Code: No
+on_barter_loot_delivered:
+From Code: Yes
 Expected Scope: none
 
 --------------------
 
-agot_canon_children_eccentric_personality_gain:
-From Code: No
-Expected Scope: character
-
---------------------
-
-agot_canon_children_gluttonous_personality_gain:
-From Code: No
-Expected Scope: character
-
---------------------
-
-woc_random_yearly_playable_pulse:
+study_confucian_classics_success:
 From Code: No
 Expected Scope: character
 
@@ -6914,21 +5126,15 @@ Expected Scope: character
 
 --------------------
 
-coronation_banquet_ongoing_event_pulse:
-From Code: No
-Expected Scope: character
-
---------------------
-
 on_marriage:
 From Code: Yes
 Expected Scope: character
 
 --------------------
 
-esr_on_become_nemesis_for_social_standing:
+hajj_arrival_events:
 From Code: No
-Expected Scope: none
+Expected Scope: character
 
 --------------------
 
@@ -6956,19 +5162,7 @@ Expected Scope: character
 
 --------------------
 
-agot_random_filler_yearly_pulse:
-From Code: No
-Expected Scope: character
-
---------------------
-
-interactive_bannermen:
-From Code: No
-Expected Scope: none
-
---------------------
-
-esr_record_on_remove_friend:
+riseandfall_remove_vassal_limit:
 From Code: No
 Expected Scope: none
 
@@ -6977,12 +5171,6 @@ Expected Scope: none
 task_manage_fertility_on_action:
 From Code: No
 Expected Scope: character
-
---------------------
-
-gptl_on_action_fes_start:
-From Code: No
-Expected Scope: none
 
 --------------------
 
@@ -6998,27 +5186,21 @@ Expected Scope: none
 
 --------------------
 
-gptl_on_action_off_start_vassal:
-From Code: No
-Expected Scope: none
-
---------------------
-
-gptl_on_action_for_vassal:
-From Code: No
-Expected Scope: none
-
---------------------
-
 on_travel_plan_start:
 From Code: Yes
 Expected Scope: character
 
 --------------------
 
+ep3_evil_presence:
+From Code: No
+Expected Scope: none
+
+--------------------
+
 on_great_holy_war_participant_replaced:
 From Code: Yes
-Expected Scope: none
+Expected Scope: character
 
 --------------------
 
@@ -7046,21 +5228,21 @@ Expected Scope: character
 
 --------------------
 
-on_lmf_will_not_wed_check:
+on_artifact_broken_through_decay:
+From Code: Yes
+Expected Scope: artifact
+
+--------------------
+
+on_action_mandala_realm_contract_0018:
 From Code: No
 Expected Scope: none
 
 --------------------
 
-agot_ps_chivalry_task_on_action:
+riseandfall_ai_create_kingdoms:
 From Code: No
-Expected Scope: character
-
---------------------
-
-on_artifact_broken_through_decay:
-From Code: Yes
-Expected Scope: artifact
+Expected Scope: none
 
 --------------------
 
@@ -7070,15 +5252,9 @@ Expected Scope: character
 
 --------------------
 
-on_death_relation_paramour:
+disbelieve_mandala_ongoing:
 From Code: No
-Expected Scope: none
-
---------------------
-
-esr_on_join_war_as_secondary:
-From Code: No
-Expected Scope: none
+Expected Scope: character
 
 --------------------
 
@@ -7097,12 +5273,6 @@ Expected Scope: character
 wounded_recovery_pulse:
 From Code: No
 Expected Scope: character
-
---------------------
-
-agot_crown_authority:
-From Code: No
-Expected Scope: none
 
 --------------------
 
@@ -7136,25 +5306,7 @@ Expected Scope: artifact
 
 --------------------
 
-esr_on_death_lover_for_social_standing:
-From Code: No
-Expected Scope: none
-
---------------------
-
-woc_on_holding_razed:
-From Code: No
-Expected Scope: none
-
---------------------
-
 abduct_setup:
-From Code: No
-Expected Scope: character
-
---------------------
-
-on_lmf_ai_intro_check:
 From Code: No
 Expected Scope: character
 
@@ -7172,15 +5324,21 @@ Expected Scope: none
 
 --------------------
 
+on_death_relation_disciple:
+From Code: No
+Expected Scope: none
+
+--------------------
+
 map_painting_outcome:
 From Code: No
 Expected Scope: character
 
 --------------------
 
-esr_record_on_become_friend:
+christian_arrival_events:
 From Code: No
-Expected Scope: none
+Expected Scope: character
 
 --------------------
 
@@ -7196,19 +5354,13 @@ Expected Scope: character
 
 --------------------
 
-agot_filler_yearly_region_north:
-From Code: No
-Expected Scope: character
-
---------------------
-
 on_tour_festival_vassal:
 From Code: No
 Expected Scope: character
 
 --------------------
 
-agot_on_title_gain_high_valyrian:
+on_action_mandala_realm_contract_0022:
 From Code: No
 Expected Scope: none
 
@@ -7226,25 +5378,7 @@ Expected Scope: character
 
 --------------------
 
-on_join_court_valyrian_lowborns:
-From Code: No
-Expected Scope: none
-
---------------------
-
-on_nw_holder_death:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_citadel_yearly_pulse:
-From Code: No
-Expected Scope: none
-
---------------------
-
-agot_on_title_lost_nightswatch:
+petition_ceremonial_liege_ghosted:
 From Code: No
 Expected Scope: none
 
@@ -7256,13 +5390,7 @@ Expected Scope: character
 
 --------------------
 
-agot_faegon_invasion:
-From Code: No
-Expected Scope: none
-
---------------------
-
-on_death_relation_agot_dragon:
+on_action_mandala_realm_contract_0007:
 From Code: No
 Expected Scope: none
 
@@ -7274,7 +5402,7 @@ Expected Scope: character
 
 --------------------
 
-esr_on_remove_friend_for_social_standing:
+tgp_combat_train_monks:
 From Code: No
 Expected Scope: none
 
@@ -7304,18 +5432,6 @@ Expected Scope: character
 
 --------------------
 
-agot_blackfyre_bastard_formation_on_action:
-From Code: No
-Expected Scope: none
-
---------------------
-
-pillage_sack_rival_barony:
-From Code: No
-Expected Scope: character
-
---------------------
-
 seduce_ongoing_milestone_1:
 From Code: No
 Expected Scope: character
@@ -7325,12 +5441,6 @@ Expected Scope: character
 stewardship_lifestyle_unavailable_events:
 From Code: No
 Expected Scope: character
-
---------------------
-
-on_starpike_siege_complete:
-From Code: No
-Expected Scope: none
 
 --------------------
 
@@ -7346,7 +5456,7 @@ Expected Scope: none
 
 --------------------
 
-gptl_on_action_vig:
+ep3_bountiful_harvest:
 From Code: No
 Expected Scope: none
 
