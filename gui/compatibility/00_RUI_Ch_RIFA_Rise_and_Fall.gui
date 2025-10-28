@@ -30,7 +30,7 @@ types CharacterWindow
 	type RUI_Ch_RIFA_type_02 = vbox {
 		name = "stability"
 		spacing = -2
-		visible = "[And(AccessGameRules.AccessNamedGameRule('riseandfall_enable_interaction_stability').GetSetting, Not(GameRuleSetting.HasFlag('riseandfall_interaction_stability_disabled')))]"
+		visible = "[AccessGameRules.AccessNamedGameRule('riseandfall_enable_realm_stability').GetSetting]"
 		tooltip = "REALM_STABILITY_TOOLTIP"
 		icon = {
 			name = "icon_stability"
