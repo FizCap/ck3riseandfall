@@ -1107,26 +1107,22 @@ window = {
 							}
 						}
 
-                        # Rise and Fall mod edit: Only show adventurer chance if character has rf_disqualify variable set and value is not 1
+                        # Rise and Fall mod edit: Only show adventurer chance if character has rf_disqualify variable set and value is 0 (qualified)
                         vbox = {
-                            visible = "[Character.MakeScope.Var('rf_disqualify').IsSet]"
-                            spacing = -3
+                            tooltip = "ADVENTURER_CHANCE_TOOLTIP"
                             using = Animation_Character_Window_Refresh
+                            spacing = -3
+                            visible = "[And( Character.MakeScope.Var('rf_disqualify').IsSet, Not(EqualTo_CFixedPoint(Character.MakeScope.Var('rf_disqualify').GetValue, '(CFixedPoint)1')) ) ]"
 
-                            vbox = {
-                                visible = "[Not(EqualTo_CFixedPoint(Character.MakeScope.Var('rf_disqualify').GetValue, '(CFixedPoint)1'))]"
+                            icon = {
+                                size = { 32 32 }
+                                texture = "gfx/interface/icons/dynasty/legitimist_revolt.dds"
+                            }
 
-                                icon = {
-                                    size = { 32 32 }
-                                    texture = "gfx/interface/icons/dynasty/legitimist_revolt.dds"
-                                    tooltip = "ADVENTURER_CHANCE_TOOLTIP"
-                                }
-
-                                text_single = {
-                                    text = "[Character.MakeScope.Var('rf_adventurer_final_chance').GetValue|1]"
-                                    default_format = "#high"
-                                    align = nobaseline
-                                }
+                            text_single = {
+                                text = "[Character.MakeScope.Var('rf_adventurer_final_chance').GetValue|1]"
+                                default_format = "#high"
+                                align = nobaseline
                             }
                         }						divider_light = {
 							layoutpolicy_vertical = expanding
