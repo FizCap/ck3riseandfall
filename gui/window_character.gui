@@ -5476,7 +5476,7 @@ types CharacterWindow
 		# Stability
 		widget = {
 			datacontext = "[AccessGameRules.AccessNamedGameRule( 'riseandfall_enable_realm_stability' ).GetSetting]"
-			visible = "[And( Not( Character.GetGovernment.IsType( 'landless_adventurer_government' ) ), Not( GameRuleSetting.HasFlag( 'riseandfall_realm_stability_disabled' ) ) )]"
+			visible = "[And( Character.HasLandedTitles, And( Not( Character.GetGovernment.IsType( 'landless_adventurer_government' ) ), Not( GameRuleSetting.HasFlag( 'riseandfall_realm_stability_disabled' ) ) ) )]"
 			size = { 72 32 }
 
 			tooltip = "REALM_STABILITY_TOOLTIP"
