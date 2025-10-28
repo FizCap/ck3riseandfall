@@ -1107,20 +1107,26 @@ window = {
 							}
 						}
 
+                        # Rise and Fall mod edit: Only show adventurer chance if character has rf_disqualify variable set and value is not 1
                         vbox = {
+                            visible = "[Character.MakeScope.Var('rf_disqualify').IsSet]"
                             spacing = -3
                             using = Animation_Character_Window_Refresh
 
-                            icon = {
-                                size = { 32 32 }
-                                texture = "gfx/interface/icons/dynasty/legitimist_revolt.dds"
-                                tooltip = "ADVENTURER_CHANCE_TOOLTIP"
-                            }
+                            vbox = {
+                                visible = "[Not(EqualTo_CFixedPoint(Character.MakeScope.Var('rf_disqualify').GetValue, '(CFixedPoint)1'))]"
 
-                            text_single = {
-                                text = "[Character.MakeScope.Var('rf_adventurer_final_chance').GetValue|1]"
-                                default_format = "#high"
-                                align = nobaseline
+                                icon = {
+                                    size = { 32 32 }
+                                    texture = "gfx/interface/icons/dynasty/legitimist_revolt.dds"
+                                    tooltip = "ADVENTURER_CHANCE_TOOLTIP"
+                                }
+
+                                text_single = {
+                                    text = "[Character.MakeScope.Var('rf_adventurer_final_chance').GetValue|1]"
+                                    default_format = "#high"
+                                    align = nobaseline
+                                }
                             }
                         }						divider_light = {
 							layoutpolicy_vertical = expanding
@@ -1378,7 +1384,7 @@ window = {
 
 						vbox = {
 							datacontext = "[CharacterWindow.GetCharacter]"
-							visible = "[And( Not( Character.GetPrimaryTitle.HasFaction ), And( Character.HasLandedTitles, Character.IsAlive ) )]"
+							visible = "[And( Not( Character.GetPrimaryTitle.HasFaction ), And( Character.IsAlive, And( Character.HasLandedTitles, Not( Character.GetPrimaryTitle.IsBarony ) ) ) )]"
 							tooltip = "[Character.GetDomainLimitTooltip]"
 							spacing = -2
 
@@ -1404,10 +1410,13 @@ window = {
 								spacing = 5
 								margin_top = 3
 
+								# Rise and Fall mod edit: Only show stability if 'riseandfall_enable_realm_stability' game rule is enabled and character does not have landless adventurer government
 								vbox = {
+									datacontext = "[AccessGameRules.AccessNamedGameRule( 'riseandfall_enable_realm_stability' ).GetSetting]"
 									tooltip = "REALM_STABILITY_TOOLTIP"
 									using = tooltip_ne
 									spacing = -3
+									visible = "[And( Not( Character.GetGovernment.IsType( 'landless_adventurer_government' ) ), Not( GameRuleSetting.HasFlag( 'riseandfall_realm_stability_disabled' ) ) )]"
 
 									icon = {
 										name = "icon_stability"
