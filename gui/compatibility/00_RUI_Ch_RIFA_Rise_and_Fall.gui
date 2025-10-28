@@ -1,0 +1,49 @@
+﻿# MOD名 / MOD Name .......... Rise and Fall
+# 互換性ID / Comp ID ........ *RIFA
+# 作成者 / Author ........... Mr. Balls Johnson
+# Workshop ID ............... 3554844335
+# 対応日付 / Support Date ... 2025/10/28
+
+types CharacterWindow
+{
+	type RUI_Ch_RIFA_type_01 = vbox {
+		name = "adventurer_chance"
+		spacing = -3
+		visible = "[AccessGameRules.AccessNamedGameRule('riseandfall_enable_adventurer').GetSetting]"
+
+		icon = {
+			name = "adventurer_icon"
+			size = { 32 32 }
+			texture = "gfx/interface/icons/dynasty/legitimist_revolt.dds"
+		}
+
+		text_single = {
+			name = "adventurer_value"
+			text = "[Character.MakeScope.Var('rf_adventurer_final_chance').GetValue|1]"
+			align = nobaseline
+			max_width = 40
+			default_format = "#high"
+		}
+
+		tooltip = "ADVENTURER_CHANCE_TOOLTIP"
+	}
+	type RUI_Ch_RIFA_type_02 = vbox {
+		name = "stability"
+		spacing = -2
+		visible = "[And(AccessGameRules.AccessNamedGameRule('riseandfall_enable_interaction_stability').GetSetting, Not(GameRuleSetting.HasFlag('riseandfall_interaction_stability_disabled')))]"
+		tooltip = "REALM_STABILITY_TOOLTIP"
+		icon = {
+			name = "icon_stability"
+			size = { 32 32 }
+			texture = "gfx/interface/icons/scale_of_power.dds"
+		}
+		text_single = {
+			name = "stability_value"
+			text = "[Character.MakeScope.Var('riseandfall_realm_stability_score').GetValue|0]/[Character.MakeScope.Var('riseandfall_realm_stability_target').GetValue|0]"
+			align = center|nobaseline
+			fontsize = 16
+			default_format = "#high"
+			max_width = 50
+		}
+	}
+}
