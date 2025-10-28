@@ -223,6 +223,15 @@ riseandfall_grant_counties_se = {
                     scope:created_vassal = {
                         add_opinion = { modifier = received_title_county target = scope:liege days = 365 }
                     }
+
+                    # If the liege is AI-controlled, give the liege a temporary vassal limit bonus
+                    # to keep realms stable after mass grants. Only apply if they don't already have it.
+                    scope:liege = {
+                        if = {
+                            limit = { is_ai = yes }
+                            add_character_modifier = { modifier = riseandfall_vassal_limit_bonus_temp years = 5 }
+                        }
+                    }
                 }
             }
         }

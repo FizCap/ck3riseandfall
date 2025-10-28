@@ -2,3 +2,8 @@
     vassal_limit = 1000
     icon = intrigue_positive
 }
+
+riseandfall_vassal_limit_bonus_temp = {
+    vassal_limit = 1000
+    icon = intrigue_positive
+}

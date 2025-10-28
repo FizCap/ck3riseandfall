@@ -155,10 +155,8 @@ riseandfall_grant_surplus_counties = {
 
     # AI: only consider this decision if AI and they're over the domain limit
     # domain_limit_available is negative when above the limit; require <= -1 (>=1 county over)
-    ai_potential = {
-        domain_limit_available <= -1
-    }
+    ai_potential = { }
 
     # Make AI very likely to pick this when ai_potential is true
-    ai_will_do = { base = 100 }
+    ai_will_do = { base = 0 }
 }

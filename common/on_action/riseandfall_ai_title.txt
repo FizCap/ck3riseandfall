@@ -11,6 +11,12 @@
     }
 }
 
+on_game_start_after_lobby = {
+    on_actions = {
+        riseandfall_ai_county_handout
+    }
+}
+
 
 
 riseandfall_ai_create_kingdoms = {
@@ -45,13 +51,24 @@ riseandfall_ai_title_handout = {
         has_game_rule = riseandfall_ai_kingdom_creation_enabled
     }
     effect = {
-        every_independent_ruler = {
-            limit = { is_ai = yes primary_title.tier >= tier_empire }
+        every_ruler = {
+            limit = { is_ai = yes }
             riseandfall_ai_title_handout_se = yes
         }
     }
 }
 
+riseandfall_ai_county_handout = {
+    trigger = {
+        has_game_rule = riseandfall_ai_kingdom_creation_enabled
+    }
+    effect = {
+        every_ruler = {
+            limit = { is_ai = yes domain_limit_available < -10 }
+            riseandfall_grant_counties_se = yes
+        }
+    }
+}
 
 # Player-side on_action handlers: call the scripted effects added in
 # common/scripted_effects/riseandfall_player_title_automanage_effects.txt
