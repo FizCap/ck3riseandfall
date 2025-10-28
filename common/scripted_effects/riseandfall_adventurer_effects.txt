@@ -633,6 +633,7 @@ riseandfall_yearly_adventurer_remove_variable_se = {
     remove_variable = rf_adventurer_final_chance
     remove_variable = intrigue_bonus
     remove_variable = rf_sex_penalty
+    remove_variable = rf_disqualify
 }
 
 
