@@ -143,6 +143,7 @@ riseandfall_disable_auto_grant_kingdom = {
 riseandfall_grant_surplus_counties = {
     picture = { reference = "gfx/interface/illustrations/decisions/decision_misc.dds" }
     sort_order = 18
+    ai_check_interval = 12
     desc = riseandfall_grant_counties_desc
     selection_tooltip = riseandfall_grant_counties_desc
     decision_group_type = riseandfall
@@ -154,9 +155,9 @@ riseandfall_grant_surplus_counties = {
     effect = { riseandfall_grant_counties_se = yes }
 
     # AI: only consider this decision if AI and they're over the domain limit
-    # domain_limit_available is negative when above the limit; require <= -1 (>=1 county over)
-    ai_potential = { }
+    # domain_limit_available is negative when above the limit; this AI check wants strongly over the limit
+    ai_potential = { domain_limit_available < -20 }
 
     # Make AI very likely to pick this when ai_potential is true
-    ai_will_do = { base = 0 }
+    ai_will_do = { base = 100 }
 }
