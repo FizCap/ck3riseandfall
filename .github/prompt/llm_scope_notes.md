@@ -54,3 +54,20 @@ Purpose
 ---
 
 Keep this file short and add new patterns as you learn them from future engine logs.
+
+9) Recent issue: title-variable scope gotchas
+- Symptom: Script errors like "Failed to fetch variable ... due to not being set" or "Event target link 'var' returned an unset scope" during on_action handlers (for example on_title_gain).
+- Root cause: reading/writing `var:` variables across different scopes without saving the source scope. Example: entering a `primary_title = { ... }` block and attempting to read `var:riseandfall_realm_stability_score` directly inside the title scope — the engine looks for that var in the title scope and fails.
+- Fix pattern used in this repo:
+  1. Reading a title-stored var into a character:
+     - save the primary title into a tmp scope and use title-var syntax:
+       primary_title = { save_scope_as = tmp_title }
+       if = { limit = { scope:tmp_title = { has_variable = riseandfall_realm_stability_score } } set_variable = { name = riseandfall_realm_stability_score value = scope:tmp_title.var:riseandfall_realm_stability_score } }
+  2. Writing a character var back to the primary title safely:
+     - save the character scope, then set the title var using scope reference:
+       save_scope_as = char_scope
+       primary_title = { set_variable = { name = riseandfall_realm_stability_score value = scope:char_scope.var:riseandfall_realm_stability_score } }
+  3. Guards: check `primary_title.exists = yes` before saving/reading title vars and fall back to computed defaults when missing.
+- Why this works: `save_scope_as` captures the necessary object scope so the engine can resolve `scope:tmp_title.var:...` and `scope:char_scope.var:...` correctly instead of looking up an unset var in the wrong event target.
+
+Add this note whenever you persist per-realm or per-title variables in scripts; it's a recurring source of subtle runtime errors.
