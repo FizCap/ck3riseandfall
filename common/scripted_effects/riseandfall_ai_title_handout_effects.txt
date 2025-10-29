@@ -8,7 +8,10 @@
     # Save the current emperor scope for reference
     save_scope_as = emperor
 
-    every_realm_de_jure_kingdom = {
+    # Only attempt kingdom handouts if the saved emperor scope actually holds an empire-tier title
+    if = {
+        limit = { scope:emperor = { highest_held_title_tier >= tier_empire } }
+        every_realm_de_jure_kingdom = {
         # Iterate every de-jure kingdom. Check each one to see if the emperor is the current holder.
         limit = { 
             exists = this 
@@ -144,6 +147,12 @@
             # The emperor no longer holds this kingdom title, skip it.
             debug_log = "AI handout: emperor [scope:emperor] no longer holds [scope:target_title], skipping"
         }
+        }
+    }
+    else = {
+        # Not an emperor-tier holder; skip kingdom handout to avoid accidental grants
+        debug_log = "AI handout: scope is not emperor-tier or higher, skipping kingdom handout"
+        debug_log_scopes = yes
     }
 }
 
