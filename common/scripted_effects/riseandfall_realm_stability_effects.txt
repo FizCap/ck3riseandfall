@@ -15,158 +15,298 @@ riseandfall_calculate_realm_stability_se = {
     remove_variable = riseandfall_rs_vassals_component
 
     ########################################
-    # 1) RULER STATS (50 points max)
-    # Simplified rule: each 1 stat ≈ 0.6667 stability points (15 stat -> 10 points), capped at 10 per stat
+    # 1) RULER STATS (per-stat -10..+10, total -50..+50)
+    # New rule: for each stat, contribution = stat - 10, clamped to [-10,10].
+    #   - stat < 10 => negative contribution of -1 per point below 10 (cap -10)
+    #   - stat > 10 => positive contribution of +1 per point above 10 (cap +10)
+    # Total stats component is the sum of Diplomacy/Martial/Stewardship/Intrigue/Learning
     set_variable = { name = riseandfall_rs_stats_component value = 0 }
 
-    # If ruler is under regency, save the active diarch scope so we can read their stats
+    # If ruler is under regency/puppet_regency, save the active diarch scope so we can read their stats.
     if = {
-        limit = { OR = { has_diarchy_type = regency has_diarchy_type = puppet_regency } }
+        limit = {
+            AND = {
+                OR = { has_diarchy_type = regency has_diarchy_type = puppet_regency }
+            }
+        }
         diarch = { save_scope_as = diarch }
+        set_variable = { name = riseandfall_rs_use_diarch_stats value = 1 }
     }
+    else = { set_variable = { name = riseandfall_rs_use_diarch_stats value = 0 } }
 
+    # Helper macro-like repeated block for each stat: compute tmp_add = source_stat - 10 and apply
+    # More aggressive negative scaling: lower stats (far below 10) penalize much more.
+    # Positive scaling increased so good stats help more.
     # Diplomacy
+    if = { limit = { var:riseandfall_rs_use_diarch_stats = 1 }
+        # Puppet regency gets 2x diarch stats bonus
+        if = { limit = { has_diarchy_type = puppet_regency }
+            set_variable = { name = tmp_add value = scope:diarch.diplomacy }
+            change_variable = { name = tmp_add multiply = 2 }
+        }
+        else = {
+            # Regular regency: use diarch stats as-is
+            set_variable = { name = tmp_add value = scope:diarch.diplomacy }
+        }
+    }
+    else = { set_variable = { name = tmp_add value = diplomacy } }
+    change_variable = { name = tmp_add add = -10 }
+    # Positive contributions (tmp_add > 1): stronger multiplier (x2)
     if = {
-        limit = { OR = { has_diarchy_type = regency has_diarchy_type = puppet_regency } }
-    # use active diarch's diplomacy but scale weaker (divide by 3)
-    set_variable = { name = tmp_add value = scope:diarch.diplomacy }
-    change_variable = { name = tmp_add divide = 2 }
-        clamp_variable = { name = tmp_add min = 0 max = 10 }
-        change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
+        limit = { var:tmp_add > 1 }
+        set_variable = { name = tmp_stat_pos value = var:tmp_add }
+        change_variable = { name = tmp_stat_pos multiply = 2 }
+        clamp_variable = { name = tmp_stat_pos min = -10 max = 20 }
+        set_variable = { name = tmp_stat_contrib value = var:tmp_stat_pos }
+        change_variable = { name = riseandfall_rs_stats_component add = var:tmp_stat_contrib }
+    }
+    else_if = {
+        limit = { var:tmp_add < -1 }
+        # Convert to positive distance below 10
+        set_variable = { name = tmp_neg value = var:tmp_add }
+        change_variable = { name = tmp_neg multiply = -1 }
+        # Piecewise stronger penalties for lower stats (store in tmp_stat_contrib)
+        if = { limit = { var:tmp_neg >= 7 } set_variable = { name = tmp_stat_contrib value = -10 } }
+        else_if = { limit = { var:tmp_neg >= 5 } set_variable = { name = tmp_stat_contrib value = -8 } }
+        else_if = { limit = { var:tmp_neg >= 3 } set_variable = { name = tmp_stat_contrib value = -5 } }
+        else = { set_variable = { name = tmp_stat_contrib value = -2 } }
+        change_variable = { name = riseandfall_rs_stats_component add = var:tmp_stat_contrib }
     }
     else = {
-        set_variable = { name = tmp_add value = diplomacy }
-        # approximate multiply 0.6667 by multiplying by 2 then dividing by 3
-        change_variable = { name = tmp_add multiply = 2 }
-        change_variable = { name = tmp_add divide = 3 }
-        clamp_variable = { name = tmp_add min = 0 max = 10 }
-        change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
+        # within [-1,1] -> treat as zero (no contribution)
+        set_variable = { name = tmp_stat_contrib value = 0 }
+        change_variable = { name = riseandfall_rs_stats_component add = var:tmp_stat_contrib }
     }
 
     # Martial
+    if = { limit = { var:riseandfall_rs_use_diarch_stats = 1 }
+        # Puppet regency gets 2x diarch stats bonus
+        if = { limit = { has_diarchy_type = puppet_regency }
+            set_variable = { name = tmp_add value = scope:diarch.martial }
+            change_variable = { name = tmp_add multiply = 2 }
+        }
+        else = {
+            # Regular regency: use diarch stats as-is
+            set_variable = { name = tmp_add value = scope:diarch.martial }
+        }
+    }
+    else = { set_variable = { name = tmp_add value = martial } }
+    change_variable = { name = tmp_add add = -10 }
     if = {
-        limit = { OR = { has_diarchy_type = regency has_diarchy_type = puppet_regency } }
-    set_variable = { name = tmp_add value = scope:diarch.martial }
-    change_variable = { name = tmp_add divide = 2 }
-        clamp_variable = { name = tmp_add min = 0 max = 10 }
-        change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
+        limit = { var:tmp_add > 1 }
+        set_variable = { name = tmp_stat_pos value = var:tmp_add }
+        change_variable = { name = tmp_stat_pos multiply = 2 }
+        clamp_variable = { name = tmp_stat_pos min = -10 max = 20 }
+        set_variable = { name = tmp_stat_contrib value = var:tmp_stat_pos }
+        change_variable = { name = riseandfall_rs_stats_component add = var:tmp_stat_contrib }
+    }
+    else_if = {
+        limit = { var:tmp_add < -1 }
+        set_variable = { name = tmp_neg value = var:tmp_add }
+        change_variable = { name = tmp_neg multiply = -1 }
+        if = { limit = { var:tmp_neg >= 7 } set_variable = { name = tmp_stat_contrib value = -10 } }
+        else_if = { limit = { var:tmp_neg >= 5 } set_variable = { name = tmp_stat_contrib value = -8 } }
+        else_if = { limit = { var:tmp_neg >= 3 } set_variable = { name = tmp_stat_contrib value = -5 } }
+        else = { set_variable = { name = tmp_stat_contrib value = -2 } }
+        change_variable = { name = riseandfall_rs_stats_component add = var:tmp_stat_contrib }
     }
     else = {
-        set_variable = { name = tmp_add value = martial }
-        change_variable = { name = tmp_add multiply = 2 }
-        change_variable = { name = tmp_add divide = 3 }
-        clamp_variable = { name = tmp_add min = 0 max = 10 }
-        change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
+        set_variable = { name = tmp_stat_contrib value = 0 }
+        change_variable = { name = riseandfall_rs_stats_component add = var:tmp_stat_contrib }
     }
 
     # Stewardship
+    if = { limit = { var:riseandfall_rs_use_diarch_stats = 1 }
+        # Puppet regency gets 2x diarch stats bonus
+        if = { limit = { has_diarchy_type = puppet_regency }
+            set_variable = { name = tmp_add value = scope:diarch.stewardship }
+            change_variable = { name = tmp_add multiply = 2 }
+        }
+        else = {
+            # Regular regency: use diarch stats as-is
+            set_variable = { name = tmp_add value = scope:diarch.stewardship }
+        }
+    }
+    else = { set_variable = { name = tmp_add value = stewardship } }
+    change_variable = { name = tmp_add add = -10 }
     if = {
-        limit = { OR = { has_diarchy_type = regency has_diarchy_type = puppet_regency } }
-    set_variable = { name = tmp_add value = scope:diarch.stewardship }
-    change_variable = { name = tmp_add divide = 2 }
-        clamp_variable = { name = tmp_add min = 0 max = 10 }
-        change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
+        limit = { var:tmp_add > 1 }
+        set_variable = { name = tmp_stat_pos value = var:tmp_add }
+        change_variable = { name = tmp_stat_pos multiply = 2 }
+        clamp_variable = { name = tmp_stat_pos min = -10 max = 20 }
+        set_variable = { name = tmp_stat_contrib value = var:tmp_stat_pos }
+        change_variable = { name = riseandfall_rs_stats_component add = var:tmp_stat_contrib }
+    }
+    else_if = {
+        limit = { var:tmp_add < -1 }
+        set_variable = { name = tmp_neg value = var:tmp_add }
+        change_variable = { name = tmp_neg multiply = -1 }
+        if = { limit = { var:tmp_neg >= 7 } set_variable = { name = tmp_stat_contrib value = -10 } }
+        else_if = { limit = { var:tmp_neg >= 5 } set_variable = { name = tmp_stat_contrib value = -8 } }
+        else_if = { limit = { var:tmp_neg >= 3 } set_variable = { name = tmp_stat_contrib value = -5 } }
+        else = { set_variable = { name = tmp_stat_contrib value = -2 } }
+        change_variable = { name = riseandfall_rs_stats_component add = var:tmp_stat_contrib }
     }
     else = {
-        set_variable = { name = tmp_add value = stewardship }
-        change_variable = { name = tmp_add multiply = 2 }
-        change_variable = { name = tmp_add divide = 3 }
-        clamp_variable = { name = tmp_add min = 0 max = 10 }
-        change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
+        set_variable = { name = tmp_stat_contrib value = 0 }
+        change_variable = { name = riseandfall_rs_stats_component add = var:tmp_stat_contrib }
     }
 
     # Intrigue
+    if = { limit = { var:riseandfall_rs_use_diarch_stats = 1 }
+        # Puppet regency gets 2x diarch stats bonus
+        if = { limit = { has_diarchy_type = puppet_regency }
+            set_variable = { name = tmp_add value = scope:diarch.intrigue }
+            change_variable = { name = tmp_add multiply = 2 }
+        }
+        else = {
+            # Regular regency: use diarch stats as-is
+            set_variable = { name = tmp_add value = scope:diarch.intrigue }
+        }
+    }
+    else = { set_variable = { name = tmp_add value = intrigue } }
+    change_variable = { name = tmp_add add = -10 }
     if = {
-        limit = { OR = { has_diarchy_type = regency has_diarchy_type = puppet_regency } }
-    set_variable = { name = tmp_add value = scope:diarch.intrigue }
-    change_variable = { name = tmp_add divide = 2 }
-        clamp_variable = { name = tmp_add min = 0 max = 10 }
-        change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
+        limit = { var:tmp_add > 1 }
+        set_variable = { name = tmp_stat_pos value = var:tmp_add }
+        change_variable = { name = tmp_stat_pos multiply = 2 }
+        clamp_variable = { name = tmp_stat_pos min = -10 max = 20 }
+        set_variable = { name = tmp_stat_contrib value = var:tmp_stat_pos }
+        change_variable = { name = riseandfall_rs_stats_component add = var:tmp_stat_contrib }
+    }
+    else_if = {
+        limit = { var:tmp_add < -1 }
+        set_variable = { name = tmp_neg value = var:tmp_add }
+        change_variable = { name = tmp_neg multiply = -1 }
+        if = { limit = { var:tmp_neg >= 7 } set_variable = { name = tmp_stat_contrib value = -10 } }
+        else_if = { limit = { var:tmp_neg >= 5 } set_variable = { name = tmp_stat_contrib value = -8 } }
+        else_if = { limit = { var:tmp_neg >= 3 } set_variable = { name = tmp_stat_contrib value = -5 } }
+        else = { set_variable = { name = tmp_stat_contrib value = -2 } }
+        change_variable = { name = riseandfall_rs_stats_component add = var:tmp_stat_contrib }
     }
     else = {
-        set_variable = { name = tmp_add value = intrigue }
-        change_variable = { name = tmp_add multiply = 2 }
-        change_variable = { name = tmp_add divide = 3 }
-        clamp_variable = { name = tmp_add min = 0 max = 10 }
-        change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
+        set_variable = { name = tmp_stat_contrib value = 0 }
+        change_variable = { name = riseandfall_rs_stats_component add = var:tmp_stat_contrib }
     }
 
     # Learning
+    if = { limit = { var:riseandfall_rs_use_diarch_stats = 1 }
+        # Puppet regency gets 2x diarch stats bonus
+        if = { limit = { has_diarchy_type = puppet_regency }
+            set_variable = { name = tmp_add value = scope:diarch.learning }
+            change_variable = { name = tmp_add multiply = 2 }
+        }
+        else = {
+            # Regular regency: use diarch stats as-is
+            set_variable = { name = tmp_add value = scope:diarch.learning }
+        }
+    }
+    else = { set_variable = { name = tmp_add value = learning } }
+    change_variable = { name = tmp_add add = -10 }
     if = {
-        limit = { OR = { has_diarchy_type = regency has_diarchy_type = puppet_regency } }
-    set_variable = { name = tmp_add value = scope:diarch.learning }
-    change_variable = { name = tmp_add divide = 2 }
-        clamp_variable = { name = tmp_add min = 0 max = 10 }
-        change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
+        limit = { var:tmp_add > 1 }
+        set_variable = { name = tmp_stat_pos value = var:tmp_add }
+        change_variable = { name = tmp_stat_pos multiply = 2 }
+        clamp_variable = { name = tmp_stat_pos min = -10 max = 20 }
+        set_variable = { name = tmp_stat_contrib value = var:tmp_stat_pos }
+        change_variable = { name = riseandfall_rs_stats_component add = var:tmp_stat_contrib }
+    }
+    else_if = {
+        limit = { var:tmp_add < -1 }
+        set_variable = { name = tmp_neg value = var:tmp_add }
+        change_variable = { name = tmp_neg multiply = -1 }
+        if = { limit = { var:tmp_neg >= 7 } set_variable = { name = tmp_stat_contrib value = -10 } }
+        else_if = { limit = { var:tmp_neg >= 5 } set_variable = { name = tmp_stat_contrib value = -8 } }
+        else_if = { limit = { var:tmp_neg >= 3 } set_variable = { name = tmp_stat_contrib value = -5 } }
+        else = { set_variable = { name = tmp_stat_contrib value = -2 } }
+        change_variable = { name = riseandfall_rs_stats_component add = var:tmp_stat_contrib }
     }
     else = {
-        set_variable = { name = tmp_add value = learning }
-        change_variable = { name = tmp_add multiply = 2 }
-        change_variable = { name = tmp_add divide = 3 }
-        clamp_variable = { name = tmp_add min = 0 max = 10 }
-        change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
+        set_variable = { name = tmp_stat_contrib value = 0 }
+        change_variable = { name = riseandfall_rs_stats_component add = var:tmp_stat_contrib }
     }
 
-    # Clamp stats component to 0..50
-    clamp_variable = { name = riseandfall_rs_stats_component min = 0 max = 50 }
+    # Clamp stats component to -50..+50 (sum of five per-stat ranges centered at 0)
+    clamp_variable = { name = riseandfall_rs_stats_component min = -50 max = 50 }
 
 
 
 
 
     ########################################
-    # 2) LEGITIMACY (0..20) - based on ruler's legitimacy level
-    # Map legitimacy levels 1-5 to stability points (scaled to 0..20):
-    # 1=0, 2=4, 3=8, 4=14, 5=20  (approximate scaling from previous 0..25 mapping)
+    # 2) LEGITIMACY - manual lookup mapping
+    # We no longer compute via linear arithmetic. Instead we assign explicit
+    # component values per discrete legitimacy/piety/celestial/influence level.
+    # Standard mapping for levels (0..5):
+    #   0 -> -20
+    #   1 -> -15
+    #   2 -> -8
+    #   3 -> 0
+    #   4 -> 8
+    #   5 -> 20
     set_variable = { name = riseandfall_rs_legitimacy_component value = 0 }
 
-    # Check legitimacy level and assign corresponding points
-    # Theocracy governments get full legitimacy automatically (piety -> 0..20)
+    # Theocracy uses piety_level (0..5) mapped via the same manual table
     if = {
         limit = { has_government = theocracy_government }
         set_variable = { name = tmp_piety_level value = piety_level }
-        change_variable = { name = tmp_piety_level add = -1 }
-        change_variable = { name = tmp_piety_level multiply = 4 }
-        clamp_variable = { name = tmp_piety_level min = 0 max = 20 }
-        set_variable = { name = riseandfall_rs_legitimacy_component value = var:tmp_piety_level }
+        if = { limit = { var:tmp_piety_level = 0 } set_variable = { name = tmp_piety_mapped value = -20 } }
+        else_if = { limit = { var:tmp_piety_level = 1 } set_variable = { name = tmp_piety_mapped value = -15 } }
+        else_if = { limit = { var:tmp_piety_level = 2 } set_variable = { name = tmp_piety_mapped value = -8 } }
+        else_if = { limit = { var:tmp_piety_level = 3 } set_variable = { name = tmp_piety_mapped value = 0 } }
+        else_if = { limit = { var:tmp_piety_level = 4 } set_variable = { name = tmp_piety_mapped value = 8 } }
+        else_if = { limit = { var:tmp_piety_level = 5 } set_variable = { name = tmp_piety_mapped value = 20 } }
+        else = { set_variable = { name = tmp_piety_mapped value = 0 } }
+        set_variable = { name = riseandfall_rs_legitimacy_component value = var:tmp_piety_mapped }
     }
     else = {
-        # Prefer legitimacy if available, else fall back to influence
+        # If the realm has a legitimacy mechanic, check for celestial vs standard
         if = {
             limit = { has_legitimacy = yes }
             if = {
                 limit = { has_government = celestial_government }
-                # Celestial government: legitimacy levels 1-7, with 7=20, 6=16, curved scale
-                if = { limit = { legitimacy_level = 1 } set_variable = { name = riseandfall_rs_legitimacy_component value = 1 } }
-                else_if = { limit = { legitimacy_level = 2 } set_variable = { name = riseandfall_rs_legitimacy_component value = 3 } }
-                else_if = { limit = { legitimacy_level = 3 } set_variable = { name = riseandfall_rs_legitimacy_component value = 6 } }
-                else_if = { limit = { legitimacy_level = 4 } set_variable = { name = riseandfall_rs_legitimacy_component value = 9 } }
-                else_if = { limit = { legitimacy_level = 5 } set_variable = { name = riseandfall_rs_legitimacy_component value = 12 } }
-                else_if = { limit = { legitimacy_level = 6 } set_variable = { name = riseandfall_rs_legitimacy_component value = 16 } }
-                else_if = { limit = { legitimacy_level = 7 } set_variable = { name = riseandfall_rs_legitimacy_component value = 20 } }
+                # Celestial uses 0..7. Apply manual mapping for 0..5 as above and
+                # clamp higher levels to the max positive (20).
+                set_variable = { name = tmp_cel value = legitimacy_level }
+                if = { limit = { var:tmp_cel = 0 } set_variable = { name = tmp_cel_mapped value = -20 } }
+                else_if = { limit = { var:tmp_cel = 1 } set_variable = { name = tmp_cel_mapped value = -15 } }
+                else_if = { limit = { var:tmp_cel = 2 } set_variable = { name = tmp_cel_mapped value = -8 } }
+                else_if = { limit = { var:tmp_cel = 3 } set_variable = { name = tmp_cel_mapped value = 0 } }
+                else_if = { limit = { var:tmp_cel = 4 } set_variable = { name = tmp_cel_mapped value = 8 } }
+                else_if = { limit = { var:tmp_cel = 5 } set_variable = { name = tmp_cel_mapped value = 20 } }
+                else_if = { limit = { var:tmp_cel = 6 } set_variable = { name = tmp_cel_mapped value = 20 } }
+                else_if = { limit = { var:tmp_cel = 7 } set_variable = { name = tmp_cel_mapped value = 20 } }
+                else = { set_variable = { name = tmp_cel_mapped value = 0 } }
+                set_variable = { name = riseandfall_rs_legitimacy_component value = var:tmp_cel_mapped }
             }
             else = {
-                # Other governments: standard mapping
-                if = { limit = { legitimacy_level = 2 } set_variable = { name = riseandfall_rs_legitimacy_component value = 4 } }
-                else_if = { limit = { legitimacy_level = 3 } set_variable = { name = riseandfall_rs_legitimacy_component value = 8 } }
-                else_if = { limit = { legitimacy_level = 4 } set_variable = { name = riseandfall_rs_legitimacy_component value = 14 } }
-                else_if = { limit = { legitimacy_level = 5 } set_variable = { name = riseandfall_rs_legitimacy_component value = 20 } }
+                # Standard legitimacy_level 0..5 -> manual mapping
+                set_variable = { name = tmp_leg value = legitimacy_level }
+                if = { limit = { var:tmp_leg = 0 } set_variable = { name = tmp_leg_mapped value = -20 } }
+                else_if = { limit = { var:tmp_leg = 1 } set_variable = { name = tmp_leg_mapped value = -15 } }
+                else_if = { limit = { var:tmp_leg = 2 } set_variable = { name = tmp_leg_mapped value = -8 } }
+                else_if = { limit = { var:tmp_leg = 3 } set_variable = { name = tmp_leg_mapped value = 0 } }
+                else_if = { limit = { var:tmp_leg = 4 } set_variable = { name = tmp_leg_mapped value = 8 } }
+                else_if = { limit = { var:tmp_leg = 5 } set_variable = { name = tmp_leg_mapped value = 20 } }
+                else = { set_variable = { name = tmp_leg_mapped value = 0 } }
+                set_variable = { name = riseandfall_rs_legitimacy_component value = var:tmp_leg_mapped }
             }
         }
         else = {
-            # No legitimacy available, use influence_level mapping if present
+            # No legitimacy mechanic available; fall back to influence_level (0..6)
+            # Map 0..5 per table and cap 6 to max positive.
             if = {
-                limit = { influence_level > 0 }
-                set_variable = { name = riseandfall_rs_legitimacy_component value = 0 }
-                if = { limit = { influence_level = 1 } set_variable = { name = riseandfall_rs_legitimacy_component value = 2 } }
-                else_if = { limit = { influence_level = 2 } set_variable = { name = riseandfall_rs_legitimacy_component value = 4 } }
-                else_if = { limit = { influence_level = 3 } set_variable = { name = riseandfall_rs_legitimacy_component value = 8 } }
-                else_if = { limit = { influence_level = 4 } set_variable = { name = riseandfall_rs_legitimacy_component value = 14 } }
-                else_if = { limit = { influence_level = 5 } set_variable = { name = riseandfall_rs_legitimacy_component value = 20 } }
-                else_if = { limit = { influence_level = 6 } set_variable = { name = riseandfall_rs_legitimacy_component value = 20 } }
-            }
-            else = {
-                # No legitimacy or influence available - keep component at 0
+                limit = { influence_level >= 0 }
+                set_variable = { name = tmp_inf value = influence_level }
+                if = { limit = { var:tmp_inf = 0 } set_variable = { name = tmp_inf_mapped value = -20 } }
+                else_if = { limit = { var:tmp_inf = 1 } set_variable = { name = tmp_inf_mapped value = -15 } }
+                else_if = { limit = { var:tmp_inf = 2 } set_variable = { name = tmp_inf_mapped value = -8 } }
+                else_if = { limit = { var:tmp_inf = 3 } set_variable = { name = tmp_inf_mapped value = 0 } }
+                else_if = { limit = { var:tmp_inf = 4 } set_variable = { name = tmp_inf_mapped value = 8 } }
+                else_if = { limit = { var:tmp_inf = 5 } set_variable = { name = tmp_inf_mapped value = 20 } }
+                else_if = { limit = { var:tmp_inf = 6 } set_variable = { name = tmp_inf_mapped value = 20 } }
+                else = { set_variable = { name = tmp_inf_mapped value = 0 } }
+                set_variable = { name = riseandfall_rs_legitimacy_component value = var:tmp_inf_mapped }
             }
         }
     }
@@ -237,51 +377,40 @@ riseandfall_calculate_realm_stability_se = {
     set_variable = { name = riseandfall_realm_stability_realm_law_bonus value = var:riseandfall_rs_realm_law_component }
 
     ########################################
-    # 2.6) POPULAR OPINION REMOVED
-    # Popular opinion (county opinion component) has been removed from the
-    # stability system. Keep placeholder tooltip variable at 0 to avoid
-    # engine errors from references elsewhere.
-    if = { limit = { NOT = { has_variable = riseandfall_realm_stability_popular_opinion_bonus } } set_variable = { name = riseandfall_realm_stability_popular_opinion_bonus value = 0 } }
-
-    ########################################
-    # 3) VASSAL RELATIONS (30 points max)
-    # Calculate average vassal opinion across every_vassal (including negative opinions)
+    # 3) VASSAL RELATIONS (-30..+30)
+    # Now we compute the average vassal opinion including negatives, map -100..+100 -> -30..+30
     set_variable = { name = riseandfall_rs_vassals_component value = 0 }
-    # Prepare accumulators - count vassals we actually process
+    # Prepare accumulators - count vassals we actually process and sum their opinions (including negatives)
     set_variable = { name = tmp_vassal_count value = 0 }
     set_variable = { name = tmp_opinion_sum value = 0 }
 
     # Save ruler scope first so vassals can modify the ruler's variables
     save_scope_as = ruler
-    
-    # If there are any vassals, iterate them and add their opinion to the sum
+
     every_vassal = {
-        # Increment the count of vassals we're processing
-        scope:ruler = {
-            change_variable = { name = tmp_vassal_count add = 1 }
-        }
-        # Save the vassal's opinion of their liege and add it to the sum (including negative opinions)
+        # For each vassal: save their opinion of the liege and add to the running sum.
+        # Powerful vassals count double (both in numerator and denominator) so their
+        # opinion has greater weight.
         if = {
-            limit = {
-                save_temporary_opinion_value_as = { name = tmp_vassal_opinion target = liege }
-            }
-            # Only add positive opinions; treat negative opinions as 0 so they don't reduce the vassal component
+            limit = { save_temporary_opinion_value_as = { name = tmp_vassal_opinion target = liege } }
+            # If this vassal is powerful, add opinion twice and increment count by 2
             if = {
-                limit = { scope:tmp_vassal_opinion > 0 }
-                scope:ruler = {
-                    change_variable = { name = tmp_opinion_sum add = scope:tmp_vassal_opinion }
-                }
+                limit = { is_powerful_vassal = yes }
+                # prepare doubled opinion in a tmp variable in vassal scope
+                # powerful vassal: count twice and add their opinion twice to the sum
+                scope:ruler = { change_variable = { name = tmp_vassal_count add = 2 } }
+                scope:ruler = { change_variable = { name = tmp_opinion_sum add = scope:tmp_vassal_opinion } }
+                scope:ruler = { change_variable = { name = tmp_opinion_sum add = scope:tmp_vassal_opinion } }
             }
             else = {
-                scope:ruler = {
-                    change_variable = { name = tmp_opinion_sum add = 0 }
-                }
+                # Normal vassal: add opinion once and increment count by 1
+                scope:ruler = { change_variable = { name = tmp_vassal_count add = 1 } }
+                scope:ruler = { change_variable = { name = tmp_opinion_sum add = scope:tmp_vassal_opinion } }
             }
         }
     }
 
-    # Compute average (if there are vassals) and scale to 0..30
-    # initialize tmp_avg_opinion so clamp/divide calls are safe when there are no vassals
+    # Compute average (if there are vassals) and map to -30..+30
     set_variable = { name = tmp_avg_opinion value = 0 }
     if = {
         limit = { var:tmp_vassal_count > 0 }
@@ -289,90 +418,29 @@ riseandfall_calculate_realm_stability_se = {
         change_variable = { name = tmp_avg_opinion divide = var:tmp_vassal_count }
     }
     else = {
-        # If no vassals, give a default of 33.33 opinion (which will scale to 10 points out of 30)
-        set_variable = { name = tmp_avg_opinion value = 33 }
+        # No vassals -> neutral opinion
+        set_variable = { name = tmp_avg_opinion value = 0 }
     }
-    # scale raw average (0..100) to component range 0..30
-    # multiply by 0.3 implemented as multiply=3 then divide=10 to avoid decimal literals
-    change_variable = { name = tmp_avg_opinion multiply = 3 }
-    change_variable = { name = tmp_avg_opinion divide = 10 }
-    # store scaled average (0..30)
+
+    # Map -100..+100 to -50..+50 by dividing by 2 (half the opinion)
+    # This makes an average opinion of -68 -> -34, +80 -> +40
+    change_variable = { name = tmp_avg_opinion divide = 2 }
     set_variable = { name = riseandfall_rs_vassals_component value = var:tmp_avg_opinion }
 
-    clamp_variable = { name = riseandfall_rs_vassals_component min = 0 max = 30 }
+    clamp_variable = { name = riseandfall_rs_vassals_component min = -50 max = 50 }
 
     ########################################
-    # 3.5) POWERFUL VASSAL OPINION MULTIPLIER (optional via game rule)
-    # Compute average opinion of powerful vassals (tier >= duchy). If average <= 0,
-    # apply a multiplier between 0.75 (for -100 avg) and 1.0 (for 0 or higher). Positive
-    # averages do not boost stability (cap at 1.0).
-    # Expose multiplier for tooltip as percentage (100 = no change, 75 = three-quarters stability)
-    # Default to 100% (no change) when rule disabled or no powerful vassals.
-    set_variable = { name = riseandfall_realm_stability_powerful_vassal_multiplier value = 100 }
-    # Dummy use to satisfy engine validation
-    if = { limit = { var:riseandfall_realm_stability_powerful_vassal_multiplier >= 0 } }
-    if = {
-        limit = { has_game_rule = riseandfall_powerful_vassal_multiplier_enabled }
-        # Prepare accumulators
-        set_variable = { name = tmp_pv_count value = 0 }
-        set_variable = { name = tmp_pv_opinion_sum value = 0 }
-
-        # iterate powerful vassals using the engine-provided iterator and sum their opinions of the liege
-        every_powerful_vassal = {
-            # save their opinion of liege (vassal scope)
-            if = {
-                limit = { save_temporary_opinion_value_as = { name = tmp_pv_op target = liege } }
-                scope:ruler = { change_variable = { name = tmp_pv_count add = 1 } }
-                scope:ruler = { change_variable = { name = tmp_pv_opinion_sum add = scope:tmp_pv_op } }
-            }
-        }
-
-        # compute average powerful vassal opinion if any
-        if = { limit = { var:tmp_pv_count > 0 }
-            set_variable = { name = tmp_pv_avg value = var:tmp_pv_opinion_sum }
-            change_variable = { name = tmp_pv_avg divide = var:tmp_pv_count }
-        }
-        else = { set_variable = { name = tmp_pv_avg value = 0 } }
-
-        # If average is negative, compute multiplier: mult = 1.0 + (avg / 200.0)
-        # Implement as percent: percent = floor((1.0 + avg/200) * 100) with bounds 75..100
-        if = {
-            limit = { var:tmp_pv_avg < 0 }
-            # tmp_pv_tmp = avg + 200  (so -100 -> 100, 0 -> 200)
-            set_variable = { name = tmp_pv_tmp value = var:tmp_pv_avg }
-            change_variable = { name = tmp_pv_tmp add = 200 }
-            # percent = (tmp_pv_tmp * 100) / 200  -> simplifies to tmp_pv_tmp / 2
-            set_variable = { name = tmp_pv_percent value = var:tmp_pv_tmp }
-            change_variable = { name = tmp_pv_percent divide = 2 }
-            # clamp percent to 75..100
-            clamp_variable = { name = tmp_pv_percent min = 75 max = 100 }
-            # store tooltip value
-            set_variable = { name = riseandfall_realm_stability_powerful_vassal_multiplier value = var:tmp_pv_percent }
-        }
-        else = {
-            # No negative average -> keep multiplier at 100 (no effect)
-            set_variable = { name = riseandfall_realm_stability_powerful_vassal_multiplier value = 100 }
-        }
-    }
-
-    ########################################
-    # 3.6) PUPPET REGENCY MULTIPLIER
-    # Apply a multiplier to stability based on years under puppet regency.
-    # -2% per year, compounding. Default 100% (no effect).
-    set_variable = { name = riseandfall_realm_stability_puppet_regency_multiplier value = 100 }
-    # Track years under puppet regency
+    # 3.6) PUPPET REGENCY TRACKING
+    # Track years under puppet regency (used for decay calculation later)
     if = { limit = { NOT = { has_variable = riseandfall_puppet_regency_years } } set_variable = { name = riseandfall_puppet_regency_years value = 0 } }
     if = { limit = { has_diarchy_type = puppet_regency } change_variable = { name = riseandfall_puppet_regency_years add = 1 } }
     else = { if = { limit = { var:riseandfall_puppet_regency_years > 0 } change_variable = { name = riseandfall_puppet_regency_years add = -1 } } }
-    # If under puppet regency, compute multiplier
-    if = { limit = { var:riseandfall_puppet_regency_years > 0 }
-        set_variable = { name = tmp_puppet_penalty value = var:riseandfall_puppet_regency_years }
-        change_variable = { name = tmp_puppet_penalty multiply = 2 }
-        change_variable = { name = tmp_puppet_penalty multiply = -1 }
-        set_variable = { name = tmp_factor value = 100 }
-        change_variable = { name = tmp_factor add = var:tmp_puppet_penalty }
-        set_variable = { name = riseandfall_realm_stability_puppet_regency_multiplier value = var:tmp_factor }
-    }
+    
+    # Initialize puppet regency multiplier for tooltip (no penalty applied here)
+    set_variable = { name = riseandfall_realm_stability_puppet_regency_multiplier value = 100 }
+    # Ensure tooltip years variable exists for localization display
+    if = { limit = { has_variable = riseandfall_puppet_regency_years } set_variable = { name = riseandfall_realm_stability_puppet_regency_years_tooltip value = var:riseandfall_puppet_regency_years } }
+    else = { set_variable = { name = riseandfall_realm_stability_puppet_regency_years_tooltip value = 0 } }
 
     ########################################
     # 4) Sum components into final 0..100 TARGET score (don't overwrite the persistent current score yet)
@@ -382,26 +450,37 @@ riseandfall_calculate_realm_stability_se = {
     if = { limit = { NOT = { has_variable = riseandfall_rs_vassals_component } } set_variable = { name = riseandfall_rs_vassals_component value = 0 } }
     if = { limit = { NOT = { has_variable = riseandfall_rs_realm_law_component } } set_variable = { name = riseandfall_rs_realm_law_component value = 0 } }
     if = { limit = { NOT = { has_variable = riseandfall_rs_popular_opinion_component } } set_variable = { name = riseandfall_rs_popular_opinion_component value = 0 } }
-    set_variable = { name = tmp_target_score value = 0 }
+    # Start from 50 as the equilibrium midpoint; components shift toward 0 or 100
+    set_variable = { name = tmp_target_score value = 50 }
     change_variable = { name = tmp_target_score add = var:riseandfall_rs_stats_component }
     change_variable = { name = tmp_target_score add = var:riseandfall_rs_legitimacy_component }
     change_variable = { name = tmp_target_score add = var:riseandfall_rs_vassals_component }
     # Add realm law component (0..20)
     change_variable = { name = tmp_target_score add = var:riseandfall_rs_realm_law_component }
-    # Note: popular opinion removed. Keep a no-op addition to ensure the
-    # variable is present for any external references; this adds 0.
-    if = { limit = { has_variable = riseandfall_realm_stability_popular_opinion_bonus } change_variable = { name = tmp_target_score add = var:riseandfall_realm_stability_popular_opinion_bonus } }
 
-    # Apply powerful vassal multiplier if active (calculated earlier)
-    if = { limit = { var:riseandfall_realm_stability_powerful_vassal_multiplier < 100 }
-        change_variable = { name = tmp_target_score multiply = var:riseandfall_realm_stability_powerful_vassal_multiplier }
-        change_variable = { name = tmp_target_score divide = 100 }
+
+    # Puppet regency multiplier is now applied during per-stat calculation (section 1).
+    # Keep the tooltip variable intact but do not apply an additional multiplier here.
+
+    # Apply puppet regency linear multiplier to the TARGET score: 2% per year (linear)
+    # e.g., 5 years -> 100 - 2*5 = 90% (tmp_target_score * 0.90)
+    if = {
+        limit = { has_variable = riseandfall_puppet_regency_years }
+        set_variable = { name = tmp_pr_years value = var:riseandfall_puppet_regency_years }
+        # tmp_pr_years = -2 * years (we'll add this to 100)
+        change_variable = { name = tmp_pr_years multiply = -2 }
+        set_variable = { name = tmp_pr_mult_pct value = 100 }
+        change_variable = { name = tmp_pr_mult_pct add = var:tmp_pr_years }
+        # Prevent negative multiplier
+        clamp_variable = { name = tmp_pr_mult_pct min = 0 max = 100 }
+    # Expose for tooltip (percent) — store the computed percent in the persistent var
+    set_variable = { name = riseandfall_realm_stability_puppet_regency_multiplier value = var:tmp_pr_mult_pct }
+    # Apply percent multiplier to target score using the persistent tooltip variable
+    change_variable = { name = tmp_target_score multiply = var:riseandfall_realm_stability_puppet_regency_multiplier }
+    change_variable = { name = tmp_target_score divide = 100 }
     }
-
-    # Apply puppet regency multiplier if active
-    if = { limit = { var:riseandfall_realm_stability_puppet_regency_multiplier < 100 }
-        change_variable = { name = tmp_target_score multiply = var:riseandfall_realm_stability_puppet_regency_multiplier }
-        change_variable = { name = tmp_target_score divide = 100 }
+    else = {
+        if = { limit = { NOT = { has_variable = riseandfall_realm_stability_puppet_regency_multiplier } } set_variable = { name = riseandfall_realm_stability_puppet_regency_multiplier value = 100 } }
     }
 
     # Civil war adjustment applied to the TARGET score (so smoothing moves current toward
@@ -458,24 +537,18 @@ riseandfall_calculate_realm_stability_se = {
 
     }
 
-    # WAR LOSS / VICTORY PENALTY
-    # Maintain a per-character war penalty variable (negative or zero).
-    # - Losing a war: add -5 (handled in on_actions where the loser is targeted)
-    # - Winning a war: add +5 (handled in on_actions where the winner is targeted)
-# Decay the penalty by +1 per year (toward 0). Expose for tooltip and include in target.
-if = { limit = { NOT = { has_variable = riseandfall_realm_stability_war_penalty } } set_variable = { name = riseandfall_realm_stability_war_penalty value = 0 } }
-if = { limit = { NOT = { has_variable = riseandfall_realm_stability_puppet_regency_multiplier } } set_variable = { name = riseandfall_realm_stability_puppet_regency_multiplier value = 100 } }
-    # Decay toward zero when this runs yearly
-    if = {
-        limit = { var:riseandfall_realm_stability_war_penalty < 0 }
-        # step back toward zero by 1 per year
-        change_variable = { name = riseandfall_realm_stability_war_penalty add = 1 }
-        # never exceed 0
-        if = { limit = { var:riseandfall_realm_stability_war_penalty > 0 } set_variable = { name = riseandfall_realm_stability_war_penalty value = 0 } }
-    }
-# Apply war penalty to the target score and expose for tooltip
-change_variable = { name = tmp_target_score add = var:riseandfall_realm_stability_war_penalty }
-set_variable = { name = riseandfall_realm_stability_war_penalty value = var:riseandfall_realm_stability_war_penalty }
+    # WAR MULTIPLIER (wins/losses change a persistent multiplier)
+    # We maintain a per-character multiplier (percent) that modifies the computed
+    # TARGET score multiplicatively. Winning a war multiplies by 110/100 (+10%),
+    # losing a war multiplies by 90/100 (-10%). This multiplier is persistent and
+    # applied to the tmp_target_score here. By default it is 100 (no change).
+    if = { limit = { NOT = { has_variable = riseandfall_realm_stability_war_multiplier } } set_variable = { name = riseandfall_realm_stability_war_multiplier value = 100 } }
+    if = { limit = { NOT = { has_variable = riseandfall_realm_stability_puppet_regency_multiplier } } set_variable = { name = riseandfall_realm_stability_puppet_regency_multiplier value = 100 } }
+    # Apply the multiplier to the target score (percent math)
+    change_variable = { name = tmp_target_score multiply = var:riseandfall_realm_stability_war_multiplier }
+    change_variable = { name = tmp_target_score divide = 100 }
+    # Store the multiplier back to itself to expose for the tooltip (no-op assignment)
+    set_variable = { name = riseandfall_realm_stability_war_multiplier value = var:riseandfall_realm_stability_war_multiplier }
 
 # Ensure the target stays within 0..100 after applying war penalties
 clamp_variable = { name = tmp_target_score min = 0 max = 100 }
@@ -491,29 +564,12 @@ round_variable = { name = tmp_target_score }    # Persist the (possibly penalize
         limit = { NOT = { has_variable = riseandfall_rs_adjust_months } }
         set_variable = { name = riseandfall_rs_adjust_months value = 0 }
     }
-    # If the persistent current score doesn't exist yet, try to inherit it from the primary title
-    # so stability travels with the crown. If the primary title has a stored stability value,
-    # use that; otherwise initialize to the calculated target.
+    # If the persistent current score doesn't exist yet, initialize it to the computed TARGET
+    # (baseline 50 + component offsets). This avoids inheriting stale title-stored values
+    # that could make newly-loaded rulers start with an unexpectedly low stability.
     if = {
         limit = { NOT = { has_variable = riseandfall_realm_stability_score } }
-        # If the ruler has a primary title, save it to a temp scope and inspect its variables safely
-        if = {
-            limit = { primary_title = { exists = yes } }
-            primary_title = { save_scope_as = tmp_title }
-            if = {
-                limit = { scope:tmp_title = { has_variable = riseandfall_realm_stability_score } }
-                # Read the title-stored value into the character variable using title-var syntax
-                set_variable = { name = riseandfall_realm_stability_score value = scope:tmp_title.var:riseandfall_realm_stability_score }
-            }
-            else = {
-                # No persisted title value -> initialize to computed target
-                set_variable = { name = riseandfall_realm_stability_score value = var:riseandfall_realm_stability_target }
-            }
-        }
-        else = {
-            # No primary title -> initialize to computed target
-            set_variable = { name = riseandfall_realm_stability_score value = var:riseandfall_realm_stability_target }
-        }
+        set_variable = { name = riseandfall_realm_stability_score value = var:riseandfall_realm_stability_target }
     }
     else = {
         # increment month counter each run
@@ -572,6 +628,7 @@ round_variable = { name = tmp_target_score }    # Persist the (possibly penalize
             # Use the predicted change variable in-script (clamp/round) so the engine treats it as used
             clamp_variable = { name = riseandfall_realm_stability_predicted_change min = -100 max = 100 }
             round_variable = { name = riseandfall_realm_stability_predicted_change }
+            # Puppet regency: simplified — only tooltip tracking, no automatic decay applied here
         }
     }
 
@@ -584,8 +641,19 @@ round_variable = { name = tmp_target_score }    # Persist the (possibly penalize
         limit = { primary_title = { exists = yes } }
         # save the current character scope so we can reference the character variable from inside the title scope
         save_scope_as = char_scope
+        scope:char_scope = { highest_title = { save_scope_as = highest_title_scope } }
+        # Only persist to the primary title if the primary title's tier is >= the character's highest title tier.
+        # This prevents a higher-ranked character from writing their stability onto a lower-tier title they temporarily hold.
         primary_title = {
-            set_variable = { name = riseandfall_realm_stability_score value = scope:char_scope.var:riseandfall_realm_stability_score }
+            if = {
+                limit = { tier > scope:highest_title_scope.tier }
+                set_variable = { name = riseandfall_realm_stability_score value = scope:char_scope.var:riseandfall_realm_stability_score }
+                # Also persist puppet regency years to the primary title so future holders
+                # who inherit this title can pick up the puppet regency history.
+                if = { limit = { scope:char_scope = { has_variable = riseandfall_puppet_regency_years } }
+                    set_variable = { name = riseandfall_puppet_regency_years value = scope:char_scope.var:riseandfall_puppet_regency_years }
+                }
+            }
         }
     }
 
@@ -813,22 +881,39 @@ round_variable = { name = tmp_target_score }    # Persist the (possibly penalize
 }
 
 
-# Called on the war winner scope (character) to grant a small positive recovery of war penalty (+5)
+# Called on the war winner scope (character) to increase the war multiplier by +10%
 riseandfall_war_victory_se = {
-    # ensure variable exists
-    if = { limit = { NOT = { has_variable = riseandfall_realm_stability_war_penalty } } set_variable = { name = riseandfall_realm_stability_war_penalty value = 0 } }
-    # Add +5 (healing). We only allow the war_penalty to be <= 0, so cap at 0.
-    change_variable = { name = riseandfall_realm_stability_war_penalty add = 5 }
-    if = { limit = { var:riseandfall_realm_stability_war_penalty > 0 } set_variable = { name = riseandfall_realm_stability_war_penalty value = 0 } }
-    # Expose for tooltip (redundant but safe)
-    set_variable = { name = riseandfall_realm_stability_war_penalty value = var:riseandfall_realm_stability_war_penalty }
+    if = { limit = { NOT = { has_variable = riseandfall_realm_stability_war_multiplier } } set_variable = { name = riseandfall_realm_stability_war_multiplier value = 100 } }
+    # Defensive: if a war scope exists and it's a peasant war, don't apply victory multiplier.
+    if = {
+        limit = { scope:war = { using_cb = peasant_war } }
+        # do nothing for peasant wars
+    }
+    else = {
+        # Increase by +10 percentage points (additive)
+        change_variable = { name = riseandfall_realm_stability_war_multiplier add = 10 }
+        # Clamp bounds so the multiplier cannot exceed 100% and can drop to 0% (0..100)
+        if = { limit = { var:riseandfall_realm_stability_war_multiplier < 0 } set_variable = { name = riseandfall_realm_stability_war_multiplier value = 0 } }
+        if = { limit = { var:riseandfall_realm_stability_war_multiplier > 100 } set_variable = { name = riseandfall_realm_stability_war_multiplier value = 100 } }
+        # Expose for tooltip
+        set_variable = { name = riseandfall_realm_stability_war_multiplier value = var:riseandfall_realm_stability_war_multiplier }
+    }
 }
 
-# Called on the war loser scope (character) to apply -5 immediate penalty. Keep floor at -25.
+# Called on the war loser scope (character) to decrease the war multiplier by -10%
 riseandfall_war_loss_se = {
-    if = { limit = { NOT = { has_variable = riseandfall_realm_stability_war_penalty } } set_variable = { name = riseandfall_realm_stability_war_penalty value = 0 } }
-    change_variable = { name = riseandfall_realm_stability_war_penalty add = -5 }
-    # Clamp minimum to -25
-    if = { limit = { var:riseandfall_realm_stability_war_penalty < -25 } set_variable = { name = riseandfall_realm_stability_war_penalty value = -25 } }
-    set_variable = { name = riseandfall_realm_stability_war_penalty value = var:riseandfall_realm_stability_war_penalty }
+    if = { limit = { NOT = { has_variable = riseandfall_realm_stability_war_multiplier } } set_variable = { name = riseandfall_realm_stability_war_multiplier value = 100 } }
+    # Defensive: if a war scope exists and it's a peasant war, don't apply loss multiplier here
+    if = {
+        limit = { scope:war = { using_cb = peasant_war } }
+        # do nothing for peasant wars
+    }
+    else = {
+        # Decrease by -10 percentage points (additive)
+        change_variable = { name = riseandfall_realm_stability_war_multiplier add = -10 }
+        # Clamp bounds so the multiplier cannot exceed 100% and can drop to 0% (0..100)
+        if = { limit = { var:riseandfall_realm_stability_war_multiplier < 0 } set_variable = { name = riseandfall_realm_stability_war_multiplier value = 0 } }
+        if = { limit = { var:riseandfall_realm_stability_war_multiplier > 100 } set_variable = { name = riseandfall_realm_stability_war_multiplier value = 100 } }
+        set_variable = { name = riseandfall_realm_stability_war_multiplier value = var:riseandfall_realm_stability_war_multiplier }
+    }
 }

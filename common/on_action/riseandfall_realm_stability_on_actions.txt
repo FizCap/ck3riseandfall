@@ -77,8 +77,10 @@ riseandfall_war_won_attacker = {
     trigger = { has_game_rule = riseandfall_realm_stability_enabled }
     effect = {
         # Root scope: none; event provides scope:attacker and scope:defender
-    # Apply loss to defender only; winners do not get stability changes
+    # Apply loss to defender. Apply victory effect to attacker only when the
+    # war is NOT a peasant rebellion (peasant wars should not count as valid wins).
     scope:defender = { riseandfall_war_loss_se = yes }
+    if = { limit = { scope:war = { NOT = { using_cb = peasant_war } } } scope:attacker = { riseandfall_war_victory_se = yes } }
     }
 }
 
@@ -86,7 +88,8 @@ riseandfall_war_won_defender = {
     trigger = { has_game_rule = riseandfall_realm_stability_enabled }
     effect = {
         # Root scope: none; event provides scope:attacker and scope:defender
-    # Apply loss to attacker only; winners do not get stability changes
+    # Apply loss to attacker. Apply victory effect to defender only for non-peasant wars
     scope:attacker = { riseandfall_war_loss_se = yes }
+    if = { limit = { scope:war = { NOT = { using_cb = peasant_war } } } scope:defender = { riseandfall_war_victory_se = yes } }
     }
 }

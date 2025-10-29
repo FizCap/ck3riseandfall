@@ -5476,7 +5476,12 @@ types CharacterWindow
 		# Stability
 		widget = {
 			datacontext = "[AccessGameRules.AccessNamedGameRule( 'riseandfall_enable_realm_stability' ).GetSetting]"
-			visible = "[And( GreaterThan_CFixedPoint(Character.MakeScope.Var('riseandfall_realm_stability_score').GetValue, '(CFixedPoint)0'), And( GreaterThan_CFixedPoint(Character.MakeScope.Var('riseandfall_realm_stability_target').GetValue, '(CFixedPoint)0'), And( Character.HasLandedTitles, And( Not( Character.GetGovernment.IsType( 'landless_adventurer_government' ) ), Not( GameRuleSetting.HasFlag( 'riseandfall_realm_stability_disabled' ) ) ) ) ) )]"
+		# Show stability HUD for landed rulers while the feature is enabled.
+		# Previously this required both score and target > 0; that hides the HUD
+		# when components produce non-positive values under the new math. Relax
+		# the condition to show for landed rulers (not adventurers) while the
+		# feature is enabled.
+		visible = "[And( Character.HasLandedTitles, And( Not( Character.GetGovernment.IsType( 'landless_adventurer_government' ) ), Not( GameRuleSetting.HasFlag( 'riseandfall_realm_stability_disabled' ) ) ) )]"
 			size = { 72 32 }
 
 			tooltip = "REALM_STABILITY_TOOLTIP"

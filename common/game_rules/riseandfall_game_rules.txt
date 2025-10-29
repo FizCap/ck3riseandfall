@@ -176,19 +176,4 @@ riseandfall_enable_interaction_stability = {
     }
 }
 
-riseandfall_enable_powerful_vassal_multiplier = {
-
-    categories = {
-        riseandfall
-    }
-
-    # Default: enabled for testing (multiplier based on powerful vassal opinion)
-    default = riseandfall_powerful_vassal_multiplier_disabled
-
-    riseandfall_powerful_vassal_multiplier_enabled = {
-    }
-
-    riseandfall_powerful_vassal_multiplier_disabled = {
-        flag = riseandfall_powerful_vassal_multiplier_disabled
-    }
-}
+/* Powerful vassal multiplier game rule removed */
