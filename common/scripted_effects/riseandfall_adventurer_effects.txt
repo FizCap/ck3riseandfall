@@ -268,9 +268,16 @@ riseandfall_do_create_adventurer_se = {
         }
 
         scope:adventurer_child = {
-            # Prefer scaling to the holder of a claim this adventurer has (empire first, then kingdom).
+            # Prefer scaling to the holder of a claim this adventurer has (hegemony first, then empire, then kingdom).
             # Save a claim target title for strength scaling only; fallback to independent_ruler if none.
             if = {
+                limit = { any_claim = { tier >= tier_hegemony exists = holder holder = { is_independent_ruler = yes } } }
+                random_claim = {
+                    limit = { tier >= tier_hegemony exists = holder holder = { is_independent_ruler = yes } }
+                    save_scope_as = claim_target_title
+                }
+            }
+            else_if = {
                 limit = { any_claim = { tier >= tier_empire exists = holder holder = { is_independent_ruler = yes } } }
                 random_claim = {
                     limit = { tier >= tier_empire exists = holder holder = { is_independent_ruler = yes } }
@@ -423,8 +430,12 @@ riseandfall_adventurer_press_claims_se = {
     # To avoid mixing landed_title and character scopes, perform all claim selection
     # and war-declaration logic inside the character-specified scope.
     scope:independent_adventurer = {
-        # Choose a claim target from the adventurer's own claims (empire preferred, else kingdom)
+        # Choose a claim target from the adventurer's own claims (hegemony preferred, then empire, else kingdom)
         if = {
+            limit = { any_claim = { tier >= tier_hegemony exists = holder holder = { is_independent_ruler = yes } } }
+            random_claim = { limit = { tier >= tier_hegemony exists = holder holder = { is_independent_ruler = yes } } save_scope_as = claim_target_title }
+        }
+        else_if = {
             limit = { any_claim = { tier >= tier_empire exists = holder holder = { is_independent_ruler = yes } } }
             random_claim = { limit = { tier >= tier_empire exists = holder holder = { is_independent_ruler = yes } } save_scope_as = claim_target_title }
         }
