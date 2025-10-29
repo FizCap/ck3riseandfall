@@ -134,11 +134,24 @@ riseandfall_calculate_realm_stability_se = {
         # Prefer legitimacy if available, else fall back to influence
         if = {
             limit = { has_legitimacy = yes }
-            # Use legitimacy_level mapping
-            if = { limit = { legitimacy_level = 2 } set_variable = { name = riseandfall_rs_legitimacy_component value = 4 } }
-            else_if = { limit = { legitimacy_level = 3 } set_variable = { name = riseandfall_rs_legitimacy_component value = 8 } }
-            else_if = { limit = { legitimacy_level = 4 } set_variable = { name = riseandfall_rs_legitimacy_component value = 14 } }
-            else_if = { limit = { legitimacy_level = 5 } set_variable = { name = riseandfall_rs_legitimacy_component value = 20 } }
+            if = {
+                limit = { has_government = celestial_government }
+                # Celestial government: legitimacy levels 1-7, with 7=20, 6=16, curved scale
+                if = { limit = { legitimacy_level = 1 } set_variable = { name = riseandfall_rs_legitimacy_component value = 1 } }
+                else_if = { limit = { legitimacy_level = 2 } set_variable = { name = riseandfall_rs_legitimacy_component value = 3 } }
+                else_if = { limit = { legitimacy_level = 3 } set_variable = { name = riseandfall_rs_legitimacy_component value = 6 } }
+                else_if = { limit = { legitimacy_level = 4 } set_variable = { name = riseandfall_rs_legitimacy_component value = 9 } }
+                else_if = { limit = { legitimacy_level = 5 } set_variable = { name = riseandfall_rs_legitimacy_component value = 12 } }
+                else_if = { limit = { legitimacy_level = 6 } set_variable = { name = riseandfall_rs_legitimacy_component value = 16 } }
+                else_if = { limit = { legitimacy_level = 7 } set_variable = { name = riseandfall_rs_legitimacy_component value = 20 } }
+            }
+            else = {
+                # Other governments: standard mapping
+                if = { limit = { legitimacy_level = 2 } set_variable = { name = riseandfall_rs_legitimacy_component value = 4 } }
+                else_if = { limit = { legitimacy_level = 3 } set_variable = { name = riseandfall_rs_legitimacy_component value = 8 } }
+                else_if = { limit = { legitimacy_level = 4 } set_variable = { name = riseandfall_rs_legitimacy_component value = 14 } }
+                else_if = { limit = { legitimacy_level = 5 } set_variable = { name = riseandfall_rs_legitimacy_component value = 20 } }
+            }
         }
         else = {
             # No legitimacy available, use influence_level mapping if present
