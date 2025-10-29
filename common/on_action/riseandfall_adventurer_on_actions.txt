@@ -36,7 +36,8 @@ riseandfall_yearly_adventurer = {
             limit = { 
                 any_claim = { count > 0 }
                 is_landed = no
-                tier < tier_barony
+                # character-scoped check: compare the character's highest held title tier
+                highest_held_title_tier < tier_barony
             }
             riseandfall_check_dynasty_for_adventurers_se = yes
         }
