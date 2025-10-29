@@ -491,10 +491,29 @@ round_variable = { name = tmp_target_score }    # Persist the (possibly penalize
         limit = { NOT = { has_variable = riseandfall_rs_adjust_months } }
         set_variable = { name = riseandfall_rs_adjust_months value = 0 }
     }
-    # If the persistent current score doesn't exist yet, set it equal to the target immediately
+    # If the persistent current score doesn't exist yet, try to inherit it from the primary title
+    # so stability travels with the crown. If the primary title has a stored stability value,
+    # use that; otherwise initialize to the calculated target.
     if = {
         limit = { NOT = { has_variable = riseandfall_realm_stability_score } }
-        set_variable = { name = riseandfall_realm_stability_score value = var:riseandfall_realm_stability_target }
+        # If the ruler has a primary title, save it to a temp scope and inspect its variables safely
+        if = {
+            limit = { primary_title = { exists = yes } }
+            primary_title = { save_scope_as = tmp_title }
+            if = {
+                limit = { scope:tmp_title = { has_variable = riseandfall_realm_stability_score } }
+                # Read the title-stored value into the character variable using title-var syntax
+                set_variable = { name = riseandfall_realm_stability_score value = scope:tmp_title.var:riseandfall_realm_stability_score }
+            }
+            else = {
+                # No persisted title value -> initialize to computed target
+                set_variable = { name = riseandfall_realm_stability_score value = var:riseandfall_realm_stability_target }
+            }
+        }
+        else = {
+            # No primary title -> initialize to computed target
+            set_variable = { name = riseandfall_realm_stability_score value = var:riseandfall_realm_stability_target }
+        }
     }
     else = {
         # increment month counter each run
@@ -559,6 +578,16 @@ round_variable = { name = tmp_target_score }    # Persist the (possibly penalize
     # Ensure current score remains clamped and integer
     clamp_variable = { name = riseandfall_realm_stability_score min = 0 max = 100 }
     round_variable = { name = riseandfall_realm_stability_score }
+
+    # Persist the current score onto the primary title so future holders inherit it
+    if = {
+        limit = { primary_title = { exists = yes } }
+        # save the current character scope so we can reference the character variable from inside the title scope
+        save_scope_as = char_scope
+        primary_title = {
+            set_variable = { name = riseandfall_realm_stability_score value = scope:char_scope.var:riseandfall_realm_stability_score }
+        }
+    }
 
     ########################################
     # Civil war penalty is applied to the TARGET now; we do not modify the persistent
