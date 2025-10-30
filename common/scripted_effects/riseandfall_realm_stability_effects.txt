@@ -897,19 +897,7 @@ riseandfall_inherit_stability_score_se = {
             set_variable = { name = riseandfall_rs_adjust_months value = 0 }
             set_variable = { name = riseandfall_rs_civil_war_years value = 0 }
             set_variable = { name = riseandfall_puppet_regency_years value = 0 }
-            
-            # Copy over war multiplier (favorable/unfavorable) from predecessor
-            # This preserves the momentum of the predecessor's realm state
-            if = {
-                limit = { scope:predecessor = { has_variable = riseandfall_realm_stability_war_multiplier } }
-                set_variable = {
-                    name = riseandfall_realm_stability_war_multiplier
-                    value = scope:predecessor.var:riseandfall_realm_stability_war_multiplier
-                }
-            }
-            else = {
-                set_variable = { name = riseandfall_realm_stability_war_multiplier value = 100 }
-            }
+            set_variable = { name = riseandfall_realm_stability_war_multiplier value = 100 }
         }
         else = {
             # Predecessor had no stability score; initialize heir to baseline
