@@ -46,8 +46,6 @@
                 }
 
                 # Debug: log entry with title and holder
-                debug_log = "AI handout: processing kingdom [scope:target_title] (not de jure to emperor, doesn't contain capital, checking theocratic compatibility)"
-                debug_log_scopes = yes
 
                 # Look for a de jure vassal holder of THIS KINGDOM (including sub-vassals in the hierarchy).
                 # This iterates through all characters who hold de jure vassal titles under target_kingdom.
@@ -95,8 +93,7 @@
                 }
 
                 # Debug: log whether we found a chosen_vassal
-                if = { limit = { exists = scope:chosen_vassal } debug_log = "AI handout: found de jure vassal [scope:chosen_vassal]" }
-                if = { limit = { NOT = { exists = scope:chosen_vassal } } debug_log = "AI handout: no de jure vassal found for [scope:target_title]" }
+                if = { limit = { NOT = { exists = scope:chosen_vassal } } }
 
                 # If we have a chosen_vassal, perform the transfer.
                 # Double-check they are ultimately a vassal of the emperor (including sub-vassals) before granting.
@@ -122,37 +119,22 @@
                     scope:chosen_vassal = {
                         add_opinion = { modifier = received_title_kingdom target = scope:emperor days = 365 }
                     }
-                    
-                    debug_log = "AI handout: granted [scope:target_title] to [scope:chosen_vassal] (+80 opinion for 1 year)"
                 }
                 else = {
                     # Debug: grant failed - check why
-                    if = {
-                        limit = { 
-                            exists = scope:chosen_vassal 
-                            scope:chosen_vassal = { government_has_flag = government_is_theocracy }
-                            NOT = { scope:emperor = { government_has_flag = government_is_theocracy } }
-                        }
-                        debug_log = "AI handout: skipped granting [scope:target_title] to [scope:chosen_vassal] - theocratic vassal but emperor is not theocratic"
-                    }
                 }
             }
             else = {
                 # Debug: kingdom contains emperor's capital or is de jure to emperor
-                debug_log = "AI handout: skipping kingdom [scope:target_title] - contains capital or is de jure to emperor"
-                debug_log_scopes = yes
             }
         }
         else = {
             # The emperor no longer holds this kingdom title, skip it.
-            debug_log = "AI handout: emperor [scope:emperor] no longer holds [scope:target_title], skipping"
         }
         }
     }
     else = {
         # Not an emperor-tier holder; skip kingdom handout to avoid accidental grants
-        debug_log = "AI handout: scope is not emperor-tier or higher, skipping kingdom handout"
-        debug_log_scopes = yes
     }
 }
 
