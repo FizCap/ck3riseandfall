@@ -175,5 +175,3 @@ riseandfall_enable_interaction_stability = {
         flag = riseandfall_interaction_stability_disabled
     }
 }
-
-/* Powerful vassal multiplier game rule removed */
