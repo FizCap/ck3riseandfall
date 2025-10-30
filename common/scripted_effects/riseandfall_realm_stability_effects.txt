@@ -635,27 +635,7 @@ round_variable = { name = tmp_target_score }    # Persist the (possibly penalize
     # Ensure current score remains clamped and integer
     clamp_variable = { name = riseandfall_realm_stability_score min = 0 max = 100 }
     round_variable = { name = riseandfall_realm_stability_score }
-
-    # Persist the current score onto the primary title so future holders inherit it
-    if = {
-        limit = { primary_title = { exists = yes } }
-        # save the current character scope so we can reference the character variable from inside the title scope
-        save_scope_as = char_scope
-        scope:char_scope = { highest_title = { save_scope_as = highest_title_scope } }
-        # Only persist to the primary title if the primary title's tier is >= the character's highest title tier.
-        # This prevents a higher-ranked character from writing their stability onto a lower-tier title they temporarily hold.
-        primary_title = {
-            if = {
-                limit = { tier > scope:highest_title_scope.tier }
-                set_variable = { name = riseandfall_realm_stability_score value = scope:char_scope.var:riseandfall_realm_stability_score }
-                # Also persist puppet regency years to the primary title so future holders
-                # who inherit this title can pick up the puppet regency history.
-                if = { limit = { scope:char_scope = { has_variable = riseandfall_puppet_regency_years } }
-                    set_variable = { name = riseandfall_puppet_regency_years value = scope:char_scope.var:riseandfall_puppet_regency_years }
-                }
-            }
-        }
-    }
+    
 
     ########################################
     # Civil war penalty is applied to the TARGET now; we do not modify the persistent
