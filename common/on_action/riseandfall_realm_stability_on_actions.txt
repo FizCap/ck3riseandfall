@@ -41,12 +41,6 @@ on_title_gain_inheritance = {
     }
 }
 
-on_title_gain = {
-    on_actions = {
-        riseandfall_on_title_gain_inheritance
-    }
-}
-
 riseandfall_on_death_stability_inheritance = {
     # Expected scope: character (who is dying)
     # Root scope: the dying character
@@ -85,6 +79,8 @@ riseandfall_on_death_stability_inheritance = {
 
 riseandfall_on_title_gain_inheritance = {
     # Expected scope: character (the inheritor)
+    # Available only in on_title_gain_inheritance event: scope:previous_holder
+    # NOT available in other contexts
     trigger = {
         has_game_rule = riseandfall_realm_stability_enabled
     }
@@ -96,6 +92,7 @@ riseandfall_on_title_gain_inheritance = {
             limit = {
                 NOT = { has_variable = riseandfall_realm_stability_score }
                 holds_landed_title = yes
+                exists = scope:previous_holder
                 scope:previous_holder = { has_variable = riseandfall_realm_stability_score }
             }
             # Inherit from the previous holder of this specific title
