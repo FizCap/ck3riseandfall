@@ -137,10 +137,20 @@ warlord.1003 = {
         if = {
             limit = { exists = liege }
             if = {
-                limit = { is_powerful_vassal = yes }
+                limit = { OR = { is_powerful_vassal = yes is_powerful_family = yes } }
                 liege = {
                     # Give claims only on the highest tier titles the liege holds
                     if = {
+                        limit = { any_held_title = { tier = tier_hegemony } }
+                        every_held_title = {
+                            limit = {
+                                tier = tier_hegemony
+                                NOT = { root = { has_claim_on = prev } }
+                            }
+                            root = { add_unpressed_claim = prev }
+                        }
+                    }
+                    else_if = {
                         limit = { any_held_title = { tier = tier_empire } }
                         every_held_title = {
                             limit = {

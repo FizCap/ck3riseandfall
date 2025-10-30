@@ -17,6 +17,7 @@
 			is_ruler = yes
 			is_independent_ruler = no
 			has_trait = warlord
+			is_landed = yes
 		}
 		scope:recipient = {
 			this != scope:actor
@@ -24,6 +25,7 @@
 			is_ruler = yes
 			is_independent_ruler = no
 			has_trait = warlord
+			is_landed = yes
 		}
 		# Require same direct liege for both parties
 		scope:recipient = { liege = scope:actor.liege }
@@ -34,11 +36,13 @@
 			is_ruler = yes
 			is_independent_ruler = no
 			has_trait = warlord
+			is_landed = yes
 		}
 		scope:recipient = {
 			is_ruler = yes
 			is_independent_ruler = no
 			has_trait = warlord
+			is_landed = yes
 		}
 		# Require same direct liege for both parties
 		scope:recipient = { liege = scope:actor.liege }
@@ -762,17 +766,43 @@
 			desc = LIEGE_REASON
 		}
 
+		# Military power difference: apply -1 modifier per 1000 military_power difference (absolute)
 		modifier = {
-	  	  	add = {
-				value = 1
-				subtract = {
-					value = scope:recipient.max_military_strength # For foreign diplomacy, consider recipients max
-					divide = { value = scope:actor.current_military_strength min = 1 }
+			scope:recipient = {
+				military_power >= scope:actor.military_power
+			}
+			add = {
+				value = 0
+				add = {
+					value = scope:actor.military_power
+					divide = { value = 1000 min = 1 }
 				}
-				multiply = 20
+				subtract = {
+					value = scope:recipient.military_power
+					divide = { value = 1000 min = 1 }
+				}
 				min = -1000
 				max = 100
-	  		}
+			}
+			desc = AI_MILITARY_BALANCE_REASON
+		}
+		modifier = {
+			scope:recipient = {
+				military_power < scope:actor.military_power
+			}
+			add = {
+				value = 0
+				add = {
+					value = scope:recipient.military_power
+					divide = { value = 1000 min = 1 }
+				}
+				subtract = {
+					value = scope:actor.military_power
+					divide = { value = 1000 min = 1 }
+				}
+				min = -1000
+				max = 100
+			}
 			desc = AI_MILITARY_BALANCE_REASON
 		}
 		# Recipient is a Claimant to Actor's titles.
@@ -802,6 +832,22 @@
 				}
 			}
 			desc = IS_CLAIMANT_TO_ACTORS_TITLES
+		}
+
+		# If both actor and recipient are claimants against the liege, heavily penalize acceptance
+		modifier = {
+			add = -100
+			scope:actor = {
+				any_claim = {
+					holder = scope:actor.liege
+				}
+			}
+			scope:recipient = {
+				any_claim = {
+					holder = scope:actor.liege
+				}
+			}
+			desc = CLAIM_ON_LIEGE_PRIMARY_TITLE_REASON
 		}
 		#Actor has claims on recipient's titles.
 		modifier = {
@@ -1078,34 +1124,7 @@
 	}
 
 	ai_will_do = {
-		base = 0
-
-		modifier = {
-			add = 100
-			any_ally = {
-				count < 2
-			}
-			scope:recipient = { # Don't propose alliances to tiny insignificant rulers just because
-				OR = {
-					current_military_strength >= scope:actor.eighty_percent_of_current_military_strength
-					primary_title.tier >= scope:actor.primary_title.tier
-					AND = {
-						primary_title.tier >= tier_duchy
-						scope:actor.primary_title.tier < tier_empire
-					}
-				}
-			}
-		}
-
-		modifier = { # Clans always want alliances with Vassals
-			add = 100
-			scope:actor = {
-				government_has_flag = government_is_clan
-			}
-			scope:recipient = {
-				is_vassal_of = scope:actor
-			}
-		}
+		base = 100
 
 		# Unity modifiers
 		evaluate_action_increasing_house_unity = {
