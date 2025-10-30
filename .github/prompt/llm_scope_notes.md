@@ -71,3 +71,13 @@ Keep this file short and add new patterns as you learn them from future engine l
 - Why this works: `save_scope_as` captures the necessary object scope so the engine can resolve `scope:tmp_title.var:...` and `scope:char_scope.var:...` correctly instead of looking up an unset var in the wrong event target.
 
 Add this note whenever you persist per-realm or per-title variables in scripts; it's a recurring source of subtle runtime errors.
+
+10) Recent bug: inheritance tier/scope mismatch
+- Symptom: Rulers of a higher rank (for example an emperor) were inheriting realm stability from much lower-ranked predecessors (for example a count). This happened despite guards intended to block such transfers.
+- Root cause: incorrect assumptions about tier numbering and mismatched scope comparisons. The project had used comparisons that assumed lower numeric tier = higher rank. In CK3 this repo uses the script_values mapping where higher numeric values mean higher ranks (see `common/script_values/00_title_tiers_values.txt`). Additionally, some guards compared the inheritor's `highest_held_title_tier` against the predecessor's `primary_title.tier`, which can be the wrong target in certain on_action contexts.
+- Fix applied: replaced the inverted comparisons with strict checks using `highest_held_title_tier` on the inheritor vs `scope:predecessor.highest_held_title_tier` on the predecessor and required a strict lower-than (`<`) relation so that:
+  - inheritance only happens when inheritor_highest_held_title_tier < predecessor_highest_held_title_tier (i.e., inheritor is strictly lower-ranked), and
+  - same-tier inheritance is blocked (kings will not inherit other kings).
+- Files changed: `common/on_action/riseandfall_realm_stability_on_actions.txt` (tightened both death-path and title-gain-path guards to use correct tier comparisons).
+- How to test: reload the mod and reproduce the case where the bug occurred (e.g., an emperor inheriting a count's title via death or title transfer). Verify the emperor no longer receives the deceased's stability score. If it still happens, enable the optional debug instrumentation (see below).
+- Optional debug instrumentation: if the issue persists, add temporary set_variable calls inside `riseandfall_inherit_stability_score_se` to record `scope:predecessor.highest_held_title_tier` and `highest_held_title_tier` on the heir at runtime; this will make it trivial to see what numeric tiers the engine used and which event path invoked the effect.

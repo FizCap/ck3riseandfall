@@ -39,10 +39,9 @@ riseandfall_calculate_realm_stability_se = {
     # Positive scaling increased so good stats help more.
     # Diplomacy
     if = { limit = { var:riseandfall_rs_use_diarch_stats = 1 }
-        # Puppet regency gets 2x diarch stats bonus
+        # Use diarch stats (same weighting for regency and puppet regency)
         if = { limit = { has_diarchy_type = puppet_regency }
             set_variable = { name = tmp_add value = scope:diarch.diplomacy }
-            change_variable = { name = tmp_add multiply = 2 }
         }
         else = {
             # Regular regency: use diarch stats as-is
@@ -80,10 +79,9 @@ riseandfall_calculate_realm_stability_se = {
 
     # Martial
     if = { limit = { var:riseandfall_rs_use_diarch_stats = 1 }
-        # Puppet regency gets 2x diarch stats bonus
+        # Use diarch stats (same weighting for regency and puppet regency)
         if = { limit = { has_diarchy_type = puppet_regency }
             set_variable = { name = tmp_add value = scope:diarch.martial }
-            change_variable = { name = tmp_add multiply = 2 }
         }
         else = {
             # Regular regency: use diarch stats as-is
@@ -117,10 +115,9 @@ riseandfall_calculate_realm_stability_se = {
 
     # Stewardship
     if = { limit = { var:riseandfall_rs_use_diarch_stats = 1 }
-        # Puppet regency gets 2x diarch stats bonus
+        # Use diarch stats (same weighting for regency and puppet regency)
         if = { limit = { has_diarchy_type = puppet_regency }
             set_variable = { name = tmp_add value = scope:diarch.stewardship }
-            change_variable = { name = tmp_add multiply = 2 }
         }
         else = {
             # Regular regency: use diarch stats as-is
@@ -154,10 +151,9 @@ riseandfall_calculate_realm_stability_se = {
 
     # Intrigue
     if = { limit = { var:riseandfall_rs_use_diarch_stats = 1 }
-        # Puppet regency gets 2x diarch stats bonus
+        # Use diarch stats (same weighting for regency and puppet regency)
         if = { limit = { has_diarchy_type = puppet_regency }
             set_variable = { name = tmp_add value = scope:diarch.intrigue }
-            change_variable = { name = tmp_add multiply = 2 }
         }
         else = {
             # Regular regency: use diarch stats as-is
@@ -191,10 +187,9 @@ riseandfall_calculate_realm_stability_se = {
 
     # Learning
     if = { limit = { var:riseandfall_rs_use_diarch_stats = 1 }
-        # Puppet regency gets 2x diarch stats bonus
+        # Use diarch stats (same weighting for regency and puppet regency)
         if = { limit = { has_diarchy_type = puppet_regency }
             set_variable = { name = tmp_add value = scope:diarch.learning }
-            change_variable = { name = tmp_add multiply = 2 }
         }
         else = {
             # Regular regency: use diarch stats as-is
@@ -422,12 +417,16 @@ riseandfall_calculate_realm_stability_se = {
         set_variable = { name = tmp_avg_opinion value = 0 }
     }
 
-    # Map -100..+100 to -50..+50 by dividing by 2 (half the opinion)
-    # This makes an average opinion of -68 -> -34, +80 -> +40
-    change_variable = { name = tmp_avg_opinion divide = 2 }
+    # Map -100..+100 to -30..+30 by scaling: value * 30 / 100 (implemented as *3 /10)
+    # This makes an average opinion of -68 -> -20 (approx), +80 -> +24
+    # Use integer math: multiply first then divide to preserve precision.
+    change_variable = { name = tmp_avg_opinion multiply = 3 }
+    change_variable = { name = tmp_avg_opinion divide = 10 }
+    # Round the scaled value to keep the component integer
+    round_variable = { name = tmp_avg_opinion }
     set_variable = { name = riseandfall_rs_vassals_component value = var:tmp_avg_opinion }
 
-    clamp_variable = { name = riseandfall_rs_vassals_component min = -50 max = 50 }
+    clamp_variable = { name = riseandfall_rs_vassals_component min = -30 max = 30 }
 
     ########################################
     # 3.6) PUPPET REGENCY TRACKING
