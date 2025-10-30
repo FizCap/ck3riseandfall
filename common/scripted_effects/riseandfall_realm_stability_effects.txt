@@ -860,6 +860,68 @@ round_variable = { name = tmp_target_score }    # Persist the (possibly penalize
 
 }
 
+# Inherit realm stability from predecessor
+# Root scope: the heir/new character who should inherit
+# scope:predecessor (or saved scope) should contain the character whose stability is being transferred
+# This effect transfers 100% of the predecessor's stability score to the heir,
+# then initializes the calculation for the new ruler (fresh components, then apply inherited bonus)
+riseandfall_inherit_stability_score_se = {
+    # Require that realm stability is enabled
+    if = {
+        limit = { has_game_rule = riseandfall_realm_stability_enabled }
+        # Check if predecessor has a stability score to transfer
+        if = {
+            limit = {
+                scope:predecessor = {
+                    has_variable = riseandfall_realm_stability_score
+                    var:riseandfall_realm_stability_score > 0
+                }
+            }
+            # Save predecessor's score for calculation
+            save_scope_value_as = {
+                name = predecessor_stability_score
+                value = scope:predecessor.var:riseandfall_realm_stability_score
+            }
+            # Save predecessor's score for tooltip
+            save_scope_value_as = {
+                name = predecessor_stability_amount
+                value = scope:predecessor.var:riseandfall_realm_stability_score
+            }
+            
+            # Transfer 100% of predecessor's stability to heir (initialize inherited score)
+            # This becomes the starting point for the heir; it will be adjusted next recalculation
+            set_variable = {
+                name = riseandfall_realm_stability_score
+                value = scope:predecessor_stability_score
+            }
+            # Also initialize other variables the heir might need
+            set_variable = { name = riseandfall_rs_adjust_months value = 0 }
+            set_variable = { name = riseandfall_rs_civil_war_years value = 0 }
+            set_variable = { name = riseandfall_puppet_regency_years value = 0 }
+            
+            # Copy over war multiplier (favorable/unfavorable) from predecessor
+            # This preserves the momentum of the predecessor's realm state
+            if = {
+                limit = { scope:predecessor = { has_variable = riseandfall_realm_stability_war_multiplier } }
+                set_variable = {
+                    name = riseandfall_realm_stability_war_multiplier
+                    value = scope:predecessor.var:riseandfall_realm_stability_war_multiplier
+                }
+            }
+            else = {
+                set_variable = { name = riseandfall_realm_stability_war_multiplier value = 100 }
+            }
+        }
+        else = {
+            # Predecessor had no stability score; initialize heir to baseline
+            set_variable = { name = riseandfall_rs_adjust_months value = 0 }
+            set_variable = { name = riseandfall_rs_civil_war_years value = 0 }
+            set_variable = { name = riseandfall_puppet_regency_years value = 0 }
+            set_variable = { name = riseandfall_realm_stability_war_multiplier value = 100 }
+        }
+    }
+}
+
 
 # Called on the war winner scope (character) to increase the war multiplier by +10%
 riseandfall_war_victory_se = {

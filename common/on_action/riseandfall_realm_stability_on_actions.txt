@@ -26,6 +26,13 @@ on_war_won_defender = {
     }
 }
 
+# React to character death: transfer stability score from predecessor to heir
+on_death = {
+    on_actions = {
+        riseandfall_on_death_stability_inheritance
+    }
+}
+
 # React to characters gaining titles by inheritance so newly-inherited rulers
 # get a computed realm stability value instead of the engine defaulting them to 100.
 on_title_gain_inheritance = {
@@ -40,17 +47,68 @@ on_title_gain = {
     }
 }
 
+riseandfall_on_death_stability_inheritance = {
+    # Expected scope: character (who is dying)
+    # Root scope: the dying character
+    # Available: scope:killer (if killed), player_heir (if exists), primary_heir (if exists)
+    trigger = {
+        has_game_rule = riseandfall_realm_stability_enabled
+        is_ruler = yes
+        has_variable = riseandfall_realm_stability_score
+    }
+    effect = {
+        # Save the dying character as the predecessor for heir to reference
+        save_scope_as = predecessor
+        # If a primary heir exists, transfer stability to them
+        if = {
+            limit = {
+                exists = primary_heir
+                primary_heir = { is_alive = yes }
+            }
+            primary_heir = {
+                riseandfall_inherit_stability_score_se = yes
+            }
+        }
+        # Also check player_heir if different from primary_heir
+        else_if = {
+            limit = {
+                exists = player_heir
+                player_heir = { is_alive = yes }
+                player_heir != primary_heir
+            }
+            player_heir = {
+                riseandfall_inherit_stability_score_se = yes
+            }
+        }
+    }
+}
+
 riseandfall_on_title_gain_inheritance = {
     # Expected scope: character (the inheritor)
     trigger = {
         has_game_rule = riseandfall_realm_stability_enabled
     }
     effect = {
-        # Only run the calculation for characters who don't already have a stability score
-        # and who actually hold a landed title (avoid courtiers inheriting minor artifacts).
+        # When a landed character inherits a title and doesn't have a stability score yet,
+        # check if the previous holder had one and inherit it.
+        # This handles title-by-title transfers (e.g., primary title vs vassal titles)
         if = {
-            limit = { NOT = { has_variable = riseandfall_realm_stability_score } }
-            if = { limit = { holds_landed_title = yes } riseandfall_calculate_realm_stability_se = yes }
+            limit = {
+                NOT = { has_variable = riseandfall_realm_stability_score }
+                holds_landed_title = yes
+                scope:previous_holder = { has_variable = riseandfall_realm_stability_score }
+            }
+            # Inherit from the previous holder of this specific title
+            scope:previous_holder = { save_scope_as = predecessor }
+            riseandfall_inherit_stability_score_se = yes
+        }
+        else_if = {
+            limit = {
+                NOT = { has_variable = riseandfall_realm_stability_score }
+                holds_landed_title = yes
+            }
+            # No previous holder data; initialize fresh calculation
+            riseandfall_calculate_realm_stability_se = yes
         }
     }
 }
