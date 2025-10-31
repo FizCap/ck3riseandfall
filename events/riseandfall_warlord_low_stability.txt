@@ -232,7 +232,7 @@ warlord.1003 = {
                 add = 100
                 liege = {
                     has_variable = riseandfall_realm_stability_score
-                    var:riseandfall_realm_stability_score > 50
+                    var:riseandfall_realm_stability_score > 60
                 }
             }
         }
