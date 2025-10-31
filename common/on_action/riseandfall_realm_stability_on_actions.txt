@@ -81,6 +81,7 @@ riseandfall_on_death_stability_inheritance = {
                     }
                     riseandfall_inherit_stability_score_se = yes
                 }
+                riseandfall_inherit_warlord_trait_se = yes
             }
         }
         # Also check player_heir if different from primary_heir
@@ -101,6 +102,7 @@ riseandfall_on_death_stability_inheritance = {
                     }
                     riseandfall_inherit_stability_score_se = yes
                 }
+                riseandfall_inherit_warlord_trait_se = yes
             }
         }
     }
@@ -139,6 +141,7 @@ riseandfall_on_title_gain_inheritance = {
             # Inherit from the previous holder of this specific title
             scope:previous_holder = { save_scope_as = predecessor }
             riseandfall_inherit_stability_score_se = yes
+            riseandfall_inherit_warlord_trait_se = yes
         }
         else_if = {
             limit = {

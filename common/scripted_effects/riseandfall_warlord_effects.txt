@@ -1,3 +1,17 @@
 ﻿riseandfall_warlord_roll_se = {
     trigger_event = { id = warlord.1003 }
 }
+
+riseandfall_inherit_warlord_trait_se = {
+    # Inherit warlord trait from predecessor if the heir is not an independent ruler
+    # Expected scope: heir
+    # scope:predecessor should be saved as the predecessor
+    if = {
+        limit = {
+            exists = scope:predecessor
+            scope:predecessor = { has_trait = warlord }
+            NOT = { is_independent_ruler = yes }  # heir is not an independent ruler
+        }
+        add_trait = warlord
+    }
+}
