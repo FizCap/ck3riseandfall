@@ -34,7 +34,25 @@ riseandfall_steal_gold_interaction = {
 	# Immediate execution (hidden)
 	on_accept = {
 		custom_tooltip = { text = riseandfall_steal_gold_interaction_desc }
-		hidden_effect = { riseandfall_steal_gold_effect = yes }
+		hidden_effect = {
+			riseandfall_steal_gold_effect = yes
+			scope:recipient = {
+				send_interface_popup = {
+					type = send_interface_message_bad
+					title = riseandfall_steal_gold_popup_title
+					custom_tooltip = riseandfall_steal_gold_popup_desc
+					left_icon = scope:actor
+				}
+				every_vassal = {
+					send_interface_message = {
+						type = send_interface_message_bad
+						title = riseandfall_steal_gold_vassal_notification_title
+						custom_tooltip = riseandfall_steal_gold_vassal_notification_desc
+						left_icon = scope:actor
+					}
+				}
+			}
+		}
 	}
 
 	# AI should always consider using it when available
@@ -87,7 +105,25 @@ riseandfall_curry_favor_interaction = {
 
 	on_accept = {
 		custom_tooltip = { text = riseandfall_curry_favor_interaction_desc }
-		hidden_effect = { riseandfall_curry_favor_effect = yes }
+		hidden_effect = {
+			riseandfall_curry_favor_effect = yes
+			scope:recipient = {
+				send_interface_popup = {
+					type = send_interface_message_bad
+					title = riseandfall_curry_favor_popup_title
+					custom_tooltip = riseandfall_curry_favor_popup_desc
+					left_icon = scope:actor
+				}
+				every_vassal = {
+					send_interface_message = {
+						type = send_interface_message_bad
+						title = riseandfall_curry_favor_vassal_notification_title
+						custom_tooltip = riseandfall_curry_favor_vassal_notification_desc
+						left_icon = scope:actor
+					}
+				}
+			}
+		}
 	}
 	# How often AI considers this by top-title tier (months)
 	ai_frequency_by_tier = {
@@ -137,7 +173,25 @@ riseandfall_overthrow_liege_interaction = {
 
 	on_accept = {
 		custom_tooltip = { text = riseandfall_overthrow_liege_interaction_desc }
-		hidden_effect = { riseandfall_overthrow_liege_effect = yes }
+		hidden_effect = {
+			riseandfall_overthrow_liege_effect = yes
+			scope:recipient = {
+				send_interface_popup = {
+					type = send_interface_message_bad
+					title = riseandfall_overthrow_liege_popup_title
+					custom_tooltip = riseandfall_overthrow_liege_popup_desc
+					left_icon = scope:actor
+				}
+				every_vassal = {
+					send_interface_message = {
+						type = send_interface_message_bad
+						title = riseandfall_overthrow_liege_vassal_notification_title
+						custom_tooltip = riseandfall_overthrow_liege_vassal_notification_desc
+						left_icon = scope:actor
+					}
+				}
+			}
+		}
 	}
 	# How often AI considers this by top-title tier (months)
 	ai_frequency_by_tier = {

@@ -24,3 +24,21 @@
   riseandfall_no_existing_hook:0 "Cannot have an existing hook on the liege."
   riseandfall_liege_stability_below_30:0 "Liege's stability must be below 30."
   riseandfall_liege_has_gold:0 "Liege must have more than 0 gold."
+
+  # Steal Gold popup and notification
+  riseandfall_steal_gold_popup_title:0 "Gold Stolen by Puppet Master"
+  riseandfall_steal_gold_popup_desc:0 "Your puppet master has stolen a portion of your gold reserves."
+  riseandfall_steal_gold_vassal_notification_title:0 "Liege's Gold Stolen"
+  riseandfall_steal_gold_vassal_notification_desc:0 "Your liege's puppet master has stolen gold from them."
+
+  # Curry Favor popup and notification
+  riseandfall_curry_favor_popup_title:0 "Puppet Master Gains Favor"
+  riseandfall_curry_favor_popup_desc:0 "Your puppet master has gained a strong favor hook on you."
+  riseandfall_curry_favor_vassal_notification_title:0 "Liege Influenced by Puppet Master"
+  riseandfall_curry_favor_vassal_notification_desc:0 "Your liege's puppet master has gained significant influence over them."
+
+  # Overthrow Liege popup and notification
+  riseandfall_overthrow_liege_popup_title:0 "Overthrown by Puppet Master"
+  riseandfall_overthrow_liege_popup_desc:0 "Your puppet master has overthrown you and seized your titles."
+  riseandfall_overthrow_liege_vassal_notification_title:0 "Liege Overthrown"
+  riseandfall_overthrow_liege_vassal_notification_desc:0 "Your liege has been overthrown by their puppet master."
