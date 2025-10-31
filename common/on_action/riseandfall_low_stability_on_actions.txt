@@ -5,6 +5,13 @@
     }
 }
 
+on_imprison = {
+    effect = {
+        # Call the scripted effect which handles warlord trait removal when a liege imprisons a vassal
+        riseandfall_warlord_imprisoned_se = yes
+    }
+}
+
 riseandfall_low_stability_roll = {
     trigger = {
         has_game_rule = riseandfall_low_stability_events_enabled
@@ -46,3 +53,9 @@ riseandfall_warlord = {
         }
     }
 }
+
+# Rise and Fall: respond to imprison actions
+# root = prisoner, scope:imprisoner = the character who imprisoned them
+# If a warlord is imprisoned by their liege, remove the warlord trait so they stop behaving as an independent warlord
+
+
