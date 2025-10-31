@@ -1,0 +1,54 @@
+﻿##################################################
+# Rise and Fall — Puppet Master scripted triggers
+# NOTE: Some of these are placeholders; replace with your canonical diarchy/regency tokens.
+
+# Is the actor the (current) diarch of the recipient
+riseandfall_is_actor_diarch_of_recipient = {
+	# Expected scopes: root = actor (diarch), recipient = liege
+	# TODO: Replace with your canonical trigger (e.g., riseandfall_is_current_diarch_of_recipient)
+	# Stubbed to always for now to avoid invalid base tokens
+	always = yes
+}
+
+# Is a Puppet Regency active on the recipient
+# Uses liege_modifier name from puppet_regency definition: "Puppet"
+riseandfall_liege_has_puppet_regency = {
+	# TODO: Replace with your canonical regency/diarchy check (e.g., has_diarchy_type = puppet_regency)
+	always = yes
+}
+
+# Liege stability below 30 (recipient variable)
+riseandfall_liege_stability_below_30 = {
+    # Show a friendly tooltip when this trigger fails — place the actual condition inside custom_tooltip
+    custom_tooltip = {
+        text = riseandfall_liege_stability_below_30
+        scope:recipient = { var:riseandfall_realm_stability_score < 30 }
+    }
+}
+
+# No cooldown active
+riseandfall_no_cooldown = {
+	# Friendly failure text for cooldown checks — put the check inside the tooltip block
+	custom_tooltip = {
+		text = riseandfall_no_cooldown
+		NOT = { has_variable = puppet_master_cooldown }
+	}
+}
+
+# Liege has more than 0 gold
+riseandfall_liege_has_gold = {
+	# Friendly failure text when liege has no gold
+	custom_tooltip = {
+		text = riseandfall_liege_has_gold
+		scope:recipient = { gold > 0 }
+	}
+}
+
+# No existing hook on recipient (check in recipient scope whether they have a hook on the actor/root)
+riseandfall_no_existing_hook = {
+    # Friendly failure text when the recipient already has a hook on the actor; condition inside custom_tooltip
+    custom_tooltip = {
+        text = riseandfall_no_existing_hook
+        scope:recipient = { NOT = { has_hook = scope:actor } }
+    }
+}

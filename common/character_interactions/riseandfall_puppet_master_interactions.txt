@@ -1,0 +1,161 @@
+﻿##################################################
+# Rise and Fall — Puppet Master interactions
+# Note: Some tokens here are placeholders pending your scripted effects/triggers; adjust as needed.
+
+# Interaction: Steal Gold
+riseandfall_steal_gold_interaction = {
+	interface_priority = 100
+	common_interaction = yes
+	category = interaction_category_diarch
+	icon = icon_personal
+	show_effects_in_notification = yes
+	desc = riseandfall_steal_gold_interaction_desc
+	diarch_interaction = yes
+
+	# Show only to the active diarch targeting their liege while a puppet regency is active
+	is_shown = {
+		scope:recipient = { has_diarchy_type = puppet_regency }
+	}
+
+	# Basic validity (no additional UI failures)
+	is_valid_showing_failures_only = { scope:recipient = { riseandfall_no_cooldown = yes riseandfall_liege_has_gold = yes } }
+	is_valid = { scope:recipient = { riseandfall_no_cooldown = yes riseandfall_liege_has_gold = yes } }
+
+	# Auto-accept: this is a unilateral diarch action
+	auto_accept = yes
+
+	# Can send (AI and players)
+	can_send = {
+		# Ensure we have something to steal — leave precise value check to effect
+		always = yes
+	}
+	# Allow AI to consider this interaction
+	ai_potential = { always = yes }
+	# Immediate execution (hidden)
+	on_accept = {
+		custom_tooltip = { text = riseandfall_steal_gold_interaction_desc }
+		hidden_effect = { riseandfall_steal_gold_effect = yes }
+	}
+
+	# AI should always consider using it when available
+	# How often AI considers this by top-title tier (months)
+	ai_frequency_by_tier = {
+		barony = 12
+		county = 12
+		duchy = 12
+		kingdom = 12
+		empire = 12
+		hegemony = 12
+	}
+
+    ai_targets = {
+		ai_recipients = liege
+		max = 1
+	}
+
+	ai_will_do = { base = 100 }
+}
+
+# Interaction: Curry Favor (gain a strong favor hook)
+riseandfall_curry_favor_interaction = {
+	interface_priority = 90
+	common_interaction = yes
+	category = interaction_category_diarch
+	icon = icon_personal
+	show_effects_in_notification = yes
+	desc = riseandfall_curry_favor_interaction_desc
+	diarch_interaction = yes
+
+	is_shown = {
+		scope:recipient = { has_diarchy_type = puppet_regency }
+	}
+
+	is_valid_showing_failures_only = { 
+		scope:recipient = { 
+			riseandfall_no_cooldown = yes
+			riseandfall_no_existing_hook = yes
+		} 
+	}
+	is_valid = { 
+		scope:recipient = { 
+			riseandfall_no_cooldown = yes
+			riseandfall_no_existing_hook = yes
+		} 
+	}
+
+	auto_accept = yes
+
+	on_accept = {
+		custom_tooltip = { text = riseandfall_curry_favor_interaction_desc }
+		hidden_effect = { riseandfall_curry_favor_effect = yes }
+	}
+	# How often AI considers this by top-title tier (months)
+	ai_frequency_by_tier = {
+		barony = 12
+		county = 12
+		duchy = 12
+		kingdom = 12
+		empire = 12
+		hegemony = 12
+	}
+	# Allow AI to consider this interaction
+	ai_potential = { always = yes }
+
+    ai_targets = {
+		ai_recipients = liege
+		max = 1
+	}
+
+	ai_will_do = { base = 100 }
+}
+
+# Interaction: Overthrow Liege (transfer all titles to diarch)
+riseandfall_overthrow_liege_interaction = {
+	interface_priority = 80
+	common_interaction = no
+	category = interaction_category_diarch
+	icon = icon_personal
+	show_effects_in_notification = yes
+	desc = riseandfall_overthrow_liege_interaction_desc
+		diarch_interaction = yes
+
+	is_shown = {
+		scope:recipient = { has_diarchy_type = puppet_regency }
+	}
+
+	# Gate on stability < 30
+	is_valid_showing_failures_only = {
+		riseandfall_liege_stability_below_30 = yes
+		scope:recipient = { riseandfall_no_cooldown = yes }
+	}
+	is_valid = {
+		riseandfall_liege_stability_below_30 = yes
+		scope:recipient = { riseandfall_no_cooldown = yes }
+	}
+
+	auto_accept = yes
+
+	on_accept = {
+		custom_tooltip = { text = riseandfall_overthrow_liege_interaction_desc }
+		hidden_effect = { riseandfall_overthrow_liege_effect = yes }
+	}
+	# How often AI considers this by top-title tier (months)
+	ai_frequency_by_tier = {
+		barony = 12
+		county = 12
+		duchy = 12
+		kingdom = 12
+		empire = 12
+		hegemony = 12
+	}
+	# Allow AI to consider this interaction
+	ai_potential = { always = yes }
+
+    ai_targets = {
+		ai_recipients = liege
+		max = 1
+	}
+
+	# Rare/conditional
+	ai_will_do = { base = 100 }
+}

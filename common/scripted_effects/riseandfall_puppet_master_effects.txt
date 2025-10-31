@@ -1,0 +1,58 @@
+﻿##################################################
+# Rise and Fall — Puppet Master scripted effects
+# NOTE: Placeholder math/tokens; adjust to your mod's canonical script_values and effects
+
+# Steal 50% of liege short-term gold and give it to diarch
+riseandfall_steal_gold_effect = {
+	# actor = diarch, recipient = liege
+	# Based on palace coup gold transfer
+	scope:recipient = {
+		if = { limit = { gold > 1 } set_variable = { name = rf_transfer_gold value = gold } }
+		change_variable = { name = rf_transfer_gold multiply = 0.5 }
+	}
+	# Give to diarch
+	if = { limit = { scope:recipient = { has_variable = rf_transfer_gold } } scope:actor = { add_short_term_gold = scope:recipient.var:rf_transfer_gold } }
+	# Remove from liege
+	scope:recipient = {
+		if = { limit = { has_variable = rf_transfer_gold } remove_short_term_gold = var:rf_transfer_gold }
+		remove_variable = rf_transfer_gold
+	}
+	# Add cooldown
+	scope:recipient = { set_variable = { name = puppet_master_cooldown value = yes days = 365 } }
+}
+
+# Grant a strong hook on the liege to the diarch
+riseandfall_curry_favor_effect = {
+	# Give the actor a strong favor hook on the recipient
+	scope:actor = {
+		add_hook = {
+			target = scope:recipient
+			type = strong_favor_hook
+		}
+	}
+	# Add cooldown on the recipient (so the liege cannot be targeted again immediately)
+	scope:recipient = { set_variable = { name = puppet_master_cooldown value = yes days = 365 } }
+}
+
+# Transfer all titles from liege to diarch (violent usurpation)
+riseandfall_overthrow_liege_effect = {
+	# Based on palace coup overthrow
+	create_title_and_vassal_change = {
+		type = conquest
+		save_scope_as = change
+	}
+	# Transfer all held titles from recipient to actor
+	scope:recipient = {
+		every_held_title = {
+			limit = { always = yes }
+			change_title_holder = {
+				holder = scope:actor
+				change = scope:change
+				take_baronies = yes
+			}
+		}
+	}
+	resolve_title_and_vassal_change = scope:change
+	# Add cooldown
+	scope:recipient = { set_variable = { name = puppet_master_cooldown value = yes days = 365 } }
+}

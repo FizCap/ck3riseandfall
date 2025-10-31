@@ -1,0 +1,26 @@
+﻿l_english:
+  # Category / filter
+  interaction_category_puppet_master:0 "Puppet Master"
+  interaction_category_power_sharing:0 "Power Sharing"
+  puppet_master_filter_tag_desc:0 "Puppet Master"
+
+  # Steal Gold
+  riseandfall_steal_gold_interaction:0 "Steal Gold"
+  riseandfall_steal_gold_interaction_desc:0 "Steal 50% of your liege's gold, transferring it to your treasury. This action has a 1-year cooldown."
+  riseandfall_steal_gold_interaction_notification_text:0 "You redirect funds from [recipient.GetShortUINamePossessive] treasury."
+
+  # Curry Favor
+  riseandfall_curry_favor_interaction:0 "Curry Favor"
+  riseandfall_curry_favor_interaction_desc:0 "Gain a Strong Favor Hook on your liege, allowing you to influence their decisions. Requires no existing hook and has a 1-year cooldown."
+  riseandfall_curry_favor_interaction_notification_text:0 "You secure leverage over [recipient.GetShortUIName]."
+
+  # Overthrow Liege
+  riseandfall_overthrow_liege_interaction:0 "Overthrow Liege"
+  riseandfall_overthrow_liege_interaction_desc:0 "Usurp all titles held by your liege, transferring them to you. Requires liege stability below 30 and has a 1-year cooldown."
+  riseandfall_overthrow_liege_interaction_notification_text:0 "You overthrow [recipient.GetShortUIName] and seize their lands."
+
+  # Failure reasons
+  riseandfall_no_cooldown:0 "This interaction is on cooldown."
+  riseandfall_no_existing_hook:0 "Cannot have an existing hook on the liege."
+  riseandfall_liege_stability_below_30:0 "Liege's stability must be below 30."
+  riseandfall_liege_has_gold:0 "Liege must have more than 0 gold."
