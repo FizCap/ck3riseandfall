@@ -836,7 +836,6 @@
 
 		# If both actor and recipient are claimants against the liege, heavily penalize acceptance
 		modifier = {
-			add = -100
 			scope:actor = {
 				any_claim = {
 					holder = scope:actor.liege
@@ -844,9 +843,10 @@
 			}
 			scope:recipient = {
 				any_claim = {
-					holder = scope:actor.liege
+					holder = scope:recipient.liege
 				}
 			}
+			add = -100
 			desc = CLAIM_ON_LIEGE_PRIMARY_TITLE_REASON
 		}
 		#Actor has claims on recipient's titles.
