@@ -137,7 +137,9 @@ warlord.1003 = {
         if = {
             limit = { exists = liege }
             if = {
-                limit = { OR = { is_powerful_vassal = yes is_powerful_family = yes } }
+                # Only proceed for powerful vassals. Avoid scope:root context switches in tooltip
+                # validation by using a single character-scoped token that is safe to evaluate.
+                limit = { is_powerful_vassal = yes }
                 liege = {
                     # Give claims only on the highest tier titles the liege holds
                     if = {
@@ -190,13 +192,16 @@ warlord.1003 = {
                         }
                     }
                     if = {
-                        limit = { var:riseandfall_realm_stability_score <= 40 }
-                        # Only apply legitimacy changes if this liege has a legitimacy system
-                        if = {
-                            limit = { has_legitimacy = yes }
-                            add_legitimacy = { value = legitimacy divide = 98 multiply = -1 }
+                            limit = { has_variable = riseandfall_realm_stability_score }
+                            # Only apply legitimacy changes if this liege has a legitimacy system
+                            if = {
+                                limit = { var:riseandfall_realm_stability_score <= 40 }
+                                if = {
+                                    limit = { has_legitimacy = yes }
+                                    add_legitimacy = { value = legitimacy divide = 98 multiply = -1 }
+                                }
+                            }
                         }
-                    }
                         
                         add_opinion = {
                             target = root

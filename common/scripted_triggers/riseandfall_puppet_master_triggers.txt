@@ -19,11 +19,15 @@ riseandfall_liege_has_puppet_regency = {
 
 # Liege stability below 30 (recipient variable)
 riseandfall_liege_stability_below_30 = {
-    # Show a friendly tooltip when this trigger fails — place the actual condition inside custom_tooltip
-    custom_tooltip = {
-        text = riseandfall_liege_stability_below_30
-        scope:recipient = { var:riseandfall_realm_stability_score < 30 }
-    }
+	# Show a friendly tooltip when this trigger fails — place the actual condition inside custom_tooltip
+	custom_tooltip = {
+		text = riseandfall_liege_stability_below_30
+		scope:recipient = {
+			# Guard against unset variable to avoid engine errors when stability hasn't been initialized
+			has_variable = riseandfall_realm_stability_score
+			var:riseandfall_realm_stability_score < 30
+		}
+	}
 }
 
 # No cooldown active

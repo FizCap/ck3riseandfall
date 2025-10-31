@@ -437,9 +437,6 @@ riseandfall_calculate_realm_stability_se = {
     
     # Initialize puppet regency multiplier for tooltip (no penalty applied here)
     set_variable = { name = riseandfall_realm_stability_puppet_regency_multiplier value = 100 }
-    # Ensure tooltip years variable exists for localization display
-    if = { limit = { has_variable = riseandfall_puppet_regency_years } set_variable = { name = riseandfall_realm_stability_puppet_regency_years_tooltip value = var:riseandfall_puppet_regency_years } }
-    else = { set_variable = { name = riseandfall_realm_stability_puppet_regency_years_tooltip value = 0 } }
 
     ########################################
     # 4) Sum components into final 0..100 TARGET score (don't overwrite the persistent current score yet)

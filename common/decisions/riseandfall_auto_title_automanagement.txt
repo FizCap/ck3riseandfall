@@ -7,6 +7,7 @@
 riseandfall_enable_auto_create_duchies = {
     picture = { reference = "gfx/interface/illustrations/decisions/decision_misc.dds" }
     sort_order = 10
+    ai_check_interval = 0
     desc = riseandfall_enable_auto_create_duchies_desc
     selection_tooltip = riseandfall_enable_auto_create_duchies_tooltip
     decision_group_type = riseandfall
@@ -24,6 +25,7 @@ riseandfall_enable_auto_create_duchies = {
 riseandfall_disable_auto_create_duchies = {
     picture = { reference = "gfx/interface/illustrations/decisions/decision_misc.dds" }
     sort_order = 11
+    ai_check_interval = 0
     desc = riseandfall_disable_auto_create_duchies_desc
     selection_tooltip = riseandfall_disable_auto_create_duchies_tooltip
     decision_group_type = riseandfall
@@ -41,6 +43,7 @@ riseandfall_disable_auto_create_duchies = {
 riseandfall_enable_auto_create_kingdoms = {
     picture = { reference = "gfx/interface/illustrations/decisions/decision_misc.dds" }
     sort_order = 12
+    ai_check_interval = 0
     desc = riseandfall_enable_auto_create_kingdoms_desc
     selection_tooltip = riseandfall_enable_auto_create_kingdoms_tooltip
     decision_group_type = riseandfall
@@ -58,6 +61,7 @@ riseandfall_enable_auto_create_kingdoms = {
 riseandfall_disable_auto_create_kingdoms = {
     picture = { reference = "gfx/interface/illustrations/decisions/decision_misc.dds" }
     sort_order = 13
+    ai_check_interval = 0
     desc = riseandfall_disable_auto_create_kingdoms_desc
     selection_tooltip = riseandfall_disable_auto_create_kingdoms_tooltip
     decision_group_type = riseandfall
@@ -75,6 +79,7 @@ riseandfall_disable_auto_create_kingdoms = {
 riseandfall_enable_auto_grant_duchy = {
     picture = { reference = "gfx/interface/illustrations/decisions/decision_misc.dds" }
     sort_order = 14
+    ai_check_interval = 0
     desc = riseandfall_enable_auto_grant_duchy_desc
     selection_tooltip = riseandfall_enable_auto_grant_duchy_tooltip
     decision_group_type = riseandfall
@@ -92,6 +97,7 @@ riseandfall_enable_auto_grant_duchy = {
 riseandfall_disable_auto_grant_duchy = {
     picture = { reference = "gfx/interface/illustrations/decisions/decision_misc.dds" }
     sort_order = 15
+    ai_check_interval = 0
     desc = riseandfall_disable_auto_grant_duchy_desc
     selection_tooltip = riseandfall_disable_auto_grant_duchy_tooltip
     decision_group_type = riseandfall
@@ -109,6 +115,7 @@ riseandfall_disable_auto_grant_duchy = {
 riseandfall_enable_auto_grant_kingdom = {
     picture = { reference = "gfx/interface/illustrations/decisions/decision_misc.dds" }
     sort_order = 16
+    ai_check_interval = 0
     desc = riseandfall_enable_auto_grant_kingdom_desc
     selection_tooltip = riseandfall_enable_auto_grant_kingdom_tooltip
     decision_group_type = riseandfall
@@ -126,6 +133,7 @@ riseandfall_enable_auto_grant_kingdom = {
 riseandfall_disable_auto_grant_kingdom = {
     picture = { reference = "gfx/interface/illustrations/decisions/decision_misc.dds" }
     sort_order = 17
+    ai_check_interval = 0
     desc = riseandfall_disable_auto_grant_kingdom_desc
     selection_tooltip = riseandfall_disable_auto_grant_kingdom_tooltip
     decision_group_type = riseandfall

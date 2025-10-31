@@ -4,6 +4,7 @@
             reference = "gfx/interface/illustrations/decisions/decision_misc.dds"
         }
         sort_order = 100
+    ai_check_interval = 0
         desc = riseandfall_debug_reduce_stability_10_desc
         selection_tooltip = riseandfall_debug_reduce_stability_10_tooltip
         decision_group_type = admin
@@ -49,6 +50,7 @@
             reference = "gfx/interface/illustrations/decisions/decision_misc.dds"
         }
         sort_order = 101
+    ai_check_interval = 0
         desc = riseandfall_debug_fire_low_stability_event_desc
         selection_tooltip = riseandfall_debug_fire_low_stability_event_tooltip
         decision_group_type = admin

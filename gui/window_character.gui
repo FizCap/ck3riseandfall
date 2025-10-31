@@ -5482,7 +5482,7 @@ types CharacterWindow
 	# the condition to show for landed rulers (not adventurers) while the
 	# feature is enabled. Also hide for lowest-tier rulers (barons) so small
 	# landed holders like baronies don't show the realm stability HUD.
-	visible = "[And( Character.HasLandedTitles, NotEqualTo_int32( Character.GetPrimaryTitle.GetTierFrame, '(int32)2' ), And( Not( Character.GetGovernment.IsType( 'landless_adventurer_government' ) ), Not( GameRuleSetting.HasFlag( 'riseandfall_realm_stability_disabled' ) ) ) )]"
+		visible = "[And( And( Character.HasLandedTitles, NotEqualTo_int32( Character.GetPrimaryTitle.GetTierFrame, '(int32)2' ) ), And( Not( Character.GetGovernment.IsType( 'landless_adventurer_government' ) ), Not( GameRuleSetting.HasFlag( 'riseandfall_realm_stability_disabled' ) ) ) )]"
 			size = { 72 32 }
 
 			tooltip = "REALM_STABILITY_TOOLTIP"
