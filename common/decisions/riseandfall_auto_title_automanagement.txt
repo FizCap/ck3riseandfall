@@ -75,7 +75,7 @@ riseandfall_grant_kingdoms = {
     is_valid = { is_landed = yes }
 
     # Manual grant: run the player kingdom grant scripted effect immediately
-    effect = { riseandfall_player_create_kingdoms_se = yes }
+    effect = { riseandfall_player_grant_kingdoms_se = yes }
 
     ai_potential = {}
     ai_will_do = { base = 0 }
