@@ -109,11 +109,15 @@
                         }
                     }
                     # Create the transfer change and apply it to the saved target title
-                    create_title_and_vassal_change = { type = granted save_scope_as = change }
-                    scope:target_title = {
-                        change_title_holder_include_vassals = { holder = scope:chosen_vassal change = scope:change take_baronies = no }
+                    # Skip granting if the target title has the giveaway-block variable AND the emperor is a human player.
+                    if = {
+                        limit = { NOT = { AND = { scope:target_title = { has_variable = Riseandfall_giveaway_blocked } scope:emperor = { is_ai = no } } } }
+                        create_title_and_vassal_change = { type = granted save_scope_as = change }
+                        scope:target_title = {
+                            change_title_holder_include_vassals = { holder = scope:chosen_vassal change = scope:change take_baronies = no }
+                        }
+                        resolve_title_and_vassal_change = scope:change
                     }
-                    resolve_title_and_vassal_change = scope:change
                     
                     # Apply positive opinion modifier from vassal to emperor for receiving the kingdom
                     scope:chosen_vassal = {
@@ -175,14 +179,20 @@ riseandfall_grant_counties_se = {
                     limit = {
                         tier = tier_county
                         holder = scope:liege
-                        # Exclude counties that belong to the de jure kingdom containing the liege's capital.
-                        # We do this by checking if the county's duchy's kingdom matches the saved capital kingdom.
-                        NOT = {
-                            AND = {
-                                exists = scope:capital_dejure_kingdom
-                                de_jure_liege = {
+                        # Never grant the liege's capital county.
+                        NOT = { this = scope:liege.capital_province.county }
+                        # Allow player lieges to grant counties that are de jure to the capital's kingdom.
+                        # For AI lieges, continue to exclude counties that belong to the de jure kingdom
+                        # containing the liege's capital.
+                        OR = {
+                            scope:liege = { is_ai = no }
+                            NOT = {
+                                AND = {
+                                    exists = scope:capital_dejure_kingdom
                                     de_jure_liege = {
-                                        this = scope:capital_dejure_kingdom
+                                        de_jure_liege = {
+                                            this = scope:capital_dejure_kingdom
+                                        }
                                     }
                                 }
                             }
@@ -203,10 +213,23 @@ riseandfall_grant_counties_se = {
                     }
 
                     # Grant the county to the created character
+                    # Skip granting if the target county/title has the giveaway-block variable AND the liege is a human player.
                     scope:target_county = {
-                        create_title_and_vassal_change = { type = granted save_scope_as = change }
-                        change_title_holder_include_vassals = { holder = scope:created_vassal change = scope:change take_baronies = no }
-                        resolve_title_and_vassal_change = scope:change
+                        if = {
+                            limit = { NOT = { AND = { has_variable = Riseandfall_giveaway_blocked scope:liege = { is_ai = no } } } }
+                            create_title_and_vassal_change = { type = granted save_scope_as = change }
+                            change_title_holder_include_vassals = { holder = scope:created_vassal change = scope:change take_baronies = no }
+                            resolve_title_and_vassal_change = scope:change
+                            # Notify the liege with the county name granted (post-action popup)
+                            scope:liege = {
+                                send_interface_message = {
+                                    type = send_interface_message_good
+                                    title = riseandfall_grant_county_popup_title
+                                    custom_tooltip = { text = riseandfall_grant_county_popup_desc subject = scope:target_county }
+                                    left_icon = scope:created_vassal
+                                }
+                            }
+                        }
                     }
 
                     # Apply a small opinion bonus so the new vassal likes the liege who granted them land

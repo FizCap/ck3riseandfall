@@ -10,9 +10,9 @@ riseandfall_player_create_kingdoms_se = {
     # Called for a specific ruler (the caller should iterate every_ruler is_ai = no).
     save_scope_as = acting_ruler
 
-    # Only proceed for rulers who enabled auto-create kingdoms and are landed
+    # Only proceed for rulers who are landed (manual create behavior)
     if = {
-        limit = { has_character_flag = riseandfall_auto_create_kingdoms is_landed = yes }
+        limit = { is_landed = yes }
 
         ordered_alert_creatable_title = {
             order_by = tier
@@ -62,7 +62,7 @@ riseandfall_player_create_duchies_se = {
     save_scope_as = acting_count
 
     if = {
-        limit = { has_character_flag = riseandfall_auto_create_duchies is_landed = yes }
+        limit = { is_landed = yes }
 
         ordered_alert_creatable_title = {
             order_by = tier
@@ -91,7 +91,7 @@ riseandfall_player_grant_duchies_se = {
     # Expects to be called in a ruler scope (the caller should iterate every_ruler is_ai = no).
     save_scope_as = actor
 
-    if = { limit = { has_character_flag = riseandfall_auto_grant_duchy_title is_landed = yes }
+    if = { limit = { is_landed = yes }
 
         # Iterate de-jure duchies in the realm
         every_realm_de_jure_duchy = {
@@ -122,10 +122,14 @@ riseandfall_player_grant_duchies_se = {
                             }
                         }
 
-                        create_title_and_vassal_change = { type = granted save_scope_as = change }
-                        scope:target_title = { change_title_holder_include_vassals = { holder = scope:chosen_vassal change = scope:change take_baronies = no } }
-                        resolve_title_and_vassal_change = scope:change
-                        scope:chosen_vassal = { add_opinion = { modifier = received_title_duchy target = scope:actor days = 365 } }
+                        # Don't grant titles that have giveaway blocked when the actor is a human player.
+                        if = {
+                            limit = { NOT = { AND = { scope:target_title = { has_variable = Riseandfall_giveaway_blocked } scope:actor = { is_ai = no } } } }
+                            create_title_and_vassal_change = { type = granted save_scope_as = change }
+                            scope:target_title = { change_title_holder_include_vassals = { holder = scope:chosen_vassal change = scope:change take_baronies = no } }
+                            resolve_title_and_vassal_change = scope:change
+                            scope:chosen_vassal = { add_opinion = { modifier = received_title_duchy target = scope:actor days = 365 } }
+                        }
                     }
                     else = {
                         if = {
@@ -147,7 +151,7 @@ riseandfall_player_grant_kingdoms_se = {
     # Expects to be called in a ruler scope (the caller should iterate every_ruler is_ai = no).
     save_scope_as = actor
 
-    if = { limit = { has_character_flag = riseandfall_auto_grant_kingdom_title is_landed = yes }
+    if = { limit = { is_landed = yes }
 
         every_realm_de_jure_kingdom = {
             limit = { exists = this holder = scope:actor }
@@ -196,19 +200,23 @@ riseandfall_player_grant_kingdoms_se = {
                             }
                         }
 
-                        create_title_and_vassal_change = { type = granted save_scope_as = change }
-                        scope:target_title = { change_title_holder_include_vassals = { holder = scope:chosen_vassal change = scope:change take_baronies = no } }
-                        resolve_title_and_vassal_change = scope:change
-                        scope:chosen_vassal = { add_opinion = { modifier = received_title_kingdom target = scope:actor days = 365 } }
+                        # Skip granting if the target title has the giveaway-block variable AND the actor is a human player.
+                        if = {
+                            limit = { NOT = { AND = { scope:target_title = { has_variable = Riseandfall_giveaway_blocked } scope:actor = { is_ai = no } } } }
+                            create_title_and_vassal_change = { type = granted save_scope_as = change }
+                            scope:target_title = { change_title_holder_include_vassals = { holder = scope:chosen_vassal change = scope:change take_baronies = no } }
+                            resolve_title_and_vassal_change = scope:change
+                            scope:chosen_vassal = { add_opinion = { modifier = received_title_kingdom target = scope:actor days = 365 } }
 
-                        # Transfer de jure duchies under the granted kingdom to the new holder
-                        scope:target_title = {
-                                every_direct_de_jure_vassal_title = {
-                                    limit = { tier = tier_duchy holder != scope:chosen_vassal }
-                                    create_title_and_vassal_change = { type = granted save_scope_as = duchy_change }
-                                    change_title_holder_include_vassals = { holder = scope:chosen_vassal change = scope:duchy_change take_baronies = no }
-                                    resolve_title_and_vassal_change = scope:duchy_change
-                                }
+                            # Transfer de jure duchies under the granted kingdom to the new holder
+                            scope:target_title = {
+                                    every_direct_de_jure_vassal_title = {
+                                        limit = { tier = tier_duchy holder != scope:chosen_vassal }
+                                        create_title_and_vassal_change = { type = granted save_scope_as = duchy_change }
+                                        change_title_holder_include_vassals = { holder = scope:chosen_vassal change = scope:duchy_change take_baronies = no }
+                                        resolve_title_and_vassal_change = scope:duchy_change
+                                    }
+                            }
                         }
                     }
                 }

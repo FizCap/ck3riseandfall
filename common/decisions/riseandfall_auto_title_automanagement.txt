@@ -12,34 +12,17 @@ riseandfall_enable_auto_create_duchies = {
     selection_tooltip = riseandfall_enable_auto_create_duchies_tooltip
     decision_group_type = riseandfall
 
-    is_shown = { NOT = { has_character_flag = riseandfall_auto_create_duchies } }
+    is_shown = { always = yes }
 
     is_valid = { is_landed = yes }
 
-    effect = { add_character_flag = { flag = riseandfall_auto_create_duchies } }
+    effect = { riseandfall_player_create_duchies_se = yes }
 
     ai_potential = {}
     ai_will_do = { base = 0 }
 }
 
-riseandfall_disable_auto_create_duchies = {
-    picture = { reference = "gfx/interface/illustrations/decisions/decision_misc.dds" }
-    sort_order = 11
-    ai_check_interval = 0
-    desc = riseandfall_disable_auto_create_duchies_desc
-    selection_tooltip = riseandfall_disable_auto_create_duchies_tooltip
-    decision_group_type = riseandfall
-
-    is_shown = { has_character_flag = riseandfall_auto_create_duchies }
-
-    is_valid = { is_landed = yes }
-
-    effect = { remove_character_flag = riseandfall_auto_create_duchies }
-
-    ai_potential = {}
-    ai_will_do = { base = 0 }
-}
-
+ 
 riseandfall_enable_auto_create_kingdoms = {
     picture = { reference = "gfx/interface/illustrations/decisions/decision_misc.dds" }
     sort_order = 12
@@ -48,107 +31,60 @@ riseandfall_enable_auto_create_kingdoms = {
     selection_tooltip = riseandfall_enable_auto_create_kingdoms_tooltip
     decision_group_type = riseandfall
 
-    is_shown = { NOT = { has_character_flag = riseandfall_auto_create_kingdoms } }
+    is_shown = { always = yes }
 
     is_valid = { is_landed = yes }
 
-    effect = { add_character_flag = { flag = riseandfall_auto_create_kingdoms } }
+    effect = { riseandfall_ai_create_kingdoms_se = yes }
 
     ai_potential = {}
     ai_will_do = { base = 0 }
 }
 
-riseandfall_disable_auto_create_kingdoms = {
-    picture = { reference = "gfx/interface/illustrations/decisions/decision_misc.dds" }
-    sort_order = 13
-    ai_check_interval = 0
-    desc = riseandfall_disable_auto_create_kingdoms_desc
-    selection_tooltip = riseandfall_disable_auto_create_kingdoms_tooltip
-    decision_group_type = riseandfall
-
-    is_shown = { has_character_flag = riseandfall_auto_create_kingdoms }
-
-    is_valid = { is_landed = yes }
-
-    effect = { remove_character_flag = riseandfall_auto_create_kingdoms }
-
-    ai_potential = {}
-    ai_will_do = { base = 0 }
-}
-
-riseandfall_enable_auto_grant_duchy = {
+ 
+riseandfall_grant_duchies = {
     picture = { reference = "gfx/interface/illustrations/decisions/decision_misc.dds" }
     sort_order = 14
     ai_check_interval = 0
-    desc = riseandfall_enable_auto_grant_duchy_desc
-    selection_tooltip = riseandfall_enable_auto_grant_duchy_tooltip
+    desc = riseandfall_grant_duchies_desc
+    selection_tooltip = riseandfall_grant_duchies_tooltip
     decision_group_type = riseandfall
 
-    is_shown = { NOT = { has_character_flag = riseandfall_auto_grant_duchy_title } }
+    is_shown = { is_landed = yes }
 
     is_valid = { is_landed = yes }
 
-    effect = { add_character_flag = { flag = riseandfall_auto_grant_duchy_title } }
+    # Manual grant: run the player duchy grant scripted effect immediately
+    effect = { riseandfall_player_grant_duchies_se = yes }
 
     ai_potential = {}
     ai_will_do = { base = 0 }
 }
 
-riseandfall_disable_auto_grant_duchy = {
-    picture = { reference = "gfx/interface/illustrations/decisions/decision_misc.dds" }
-    sort_order = 15
-    ai_check_interval = 0
-    desc = riseandfall_disable_auto_grant_duchy_desc
-    selection_tooltip = riseandfall_disable_auto_grant_duchy_tooltip
-    decision_group_type = riseandfall
 
-    is_shown = { has_character_flag = riseandfall_auto_grant_duchy_title }
-
-    is_valid = { is_landed = yes }
-
-    effect = { remove_character_flag = riseandfall_auto_grant_duchy_title }
-
-    ai_potential = {}
-    ai_will_do = { base = 0 }
-}
-
-riseandfall_enable_auto_grant_kingdom = {
+riseandfall_grant_kingdoms = {
     picture = { reference = "gfx/interface/illustrations/decisions/decision_misc.dds" }
     sort_order = 16
     ai_check_interval = 0
-    desc = riseandfall_enable_auto_grant_kingdom_desc
-    selection_tooltip = riseandfall_enable_auto_grant_kingdom_tooltip
+    desc = riseandfall_grant_kingdoms_desc
+    selection_tooltip = riseandfall_grant_kingdoms_tooltip
     decision_group_type = riseandfall
 
-    is_shown = { NOT = { has_character_flag = riseandfall_auto_grant_kingdom_title } }
+    is_shown = { is_landed = yes }
 
     is_valid = { is_landed = yes }
 
-    effect = { add_character_flag = { flag = riseandfall_auto_grant_kingdom_title } }
+    # Manual grant: run the player kingdom grant scripted effect immediately
+    effect = { hidden_effect = {
+        riseandfall_player_grant_kingdoms_se = yes } }
 
     ai_potential = {}
     ai_will_do = { base = 0 }
 }
 
-riseandfall_disable_auto_grant_kingdom = {
-    picture = { reference = "gfx/interface/illustrations/decisions/decision_misc.dds" }
-    sort_order = 17
-    ai_check_interval = 0
-    desc = riseandfall_disable_auto_grant_kingdom_desc
-    selection_tooltip = riseandfall_disable_auto_grant_kingdom_tooltip
-    decision_group_type = riseandfall
 
-    is_shown = { has_character_flag = riseandfall_auto_grant_kingdom_title }
 
-    is_valid = { is_landed = yes }
-
-    effect = { remove_character_flag = riseandfall_auto_grant_kingdom_title }
-
-    ai_potential = {}
-    ai_will_do = { base = 0 }
-}
-
-riseandfall_grant_surplus_counties = {
+riseandfall_grant_counties = {
     picture = { reference = "gfx/interface/illustrations/decisions/decision_misc.dds" }
     sort_order = 18
     ai_check_interval = 12
@@ -160,6 +96,7 @@ riseandfall_grant_surplus_counties = {
 
     is_valid = { is_landed = yes }
 
+    # Manual grant: run the counties grant scripted effect immediately
     effect = { riseandfall_grant_counties_se = yes }
 
     # AI: only consider this decision if AI and they're over the domain limit

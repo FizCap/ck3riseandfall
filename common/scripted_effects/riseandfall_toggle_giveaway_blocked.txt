@@ -1,0 +1,11 @@
+﻿riseandfall_toggle_giveaway_blocked = {
+	if = {
+		limit = { has_variable = Riseandfall_giveaway_blocked }
+		remove_variable = Riseandfall_giveaway_blocked
+		custom_tooltip = riseandfall_toggle_giveaway_blocked_removed
+	}
+	else = {
+		set_variable = { name = Riseandfall_giveaway_blocked value = 1 }
+		custom_tooltip = riseandfall_toggle_giveaway_blocked_added
+	}
+}

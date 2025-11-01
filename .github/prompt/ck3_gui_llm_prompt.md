@@ -154,3 +154,12 @@ Notes for LLM usage
 - Always include an engineering contract and QA gates for each generated change.
 - When suggesting exact promote/function names (e.g., `GetPlayer`, `Character.GetID`), prefer verifying with `dump_data_types` before committing code.
 
+## Delta: Title view giveaway toggle (window_title.gui)
+- Problem: Needed a per-title toggle in the Title window to flip the scripted variable `Riseandfall_giveaway_blocked` while showing the current state. Direct inline GUI expressions like ternaries, `SelectString`, or `Title.HasVariable` failed to parse.
+- Fix: Added a round button in `gui/window_title.gui` that calls a scripted GUI wrapper (`ScriptedGui.Execute('riseandfall_toggle_giveaway_blocked', Title.MakeScope)`), which in turn runs a scripted effect to flip the variable and fire localized feedback tooltips.
+- State display: Replaced unsupported inline logic with two stacked icons whose `visible`/`alpha` blocks check `Title.MakeScope.Var('Riseandfall_giveaway_blocked').GetValue` using the documented comparison helpers (`GreaterThan_CFixedPoint`, `IsZero_CFixedPoint`). This mirrors vanilla patterns for scope vars and avoids ternary syntax.
+- Lessons:
+  - GUI scope access works through `MakeScope` + `Var('key').GetValue` and numeric helpers; avoid unlogged GUI-only functions.
+  - Scripted GUIs are safer for mutating game state—keep GUI files declarative and delegate side-effects to `common/scripted_guis/` + `common/scripted_effects/`.
+  - Always provide localization for toggle feedback (`custom_tooltip` in the scripted effect) so users get immediate confirmation.
+
