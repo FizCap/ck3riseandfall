@@ -121,9 +121,7 @@
                     
                     # Apply positive opinion modifier from vassal to emperor for receiving the kingdom
                     scope:chosen_vassal = {
-                        hidden_effect = {
-                            add_opinion = { modifier = received_title_kingdom target = scope:emperor days = 365 }
-                        }
+                        add_opinion = { modifier = received_title_kingdom target = scope:emperor days = 365 }
                     }
                 }
                 else = {
