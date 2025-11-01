@@ -121,7 +121,9 @@
                     
                     # Apply positive opinion modifier from vassal to emperor for receiving the kingdom
                     scope:chosen_vassal = {
-                        add_opinion = { modifier = received_title_kingdom target = scope:emperor days = 365 }
+                        hidden_effect = {
+                            add_opinion = { modifier = received_title_kingdom target = scope:emperor days = 365 }
+                        }
                     }
                 }
                 else = {
@@ -235,7 +237,9 @@ riseandfall_grant_counties_se = {
                     # Apply a small opinion bonus so the new vassal likes the liege who granted them land
                     # Reuse the existing received_title_kingdom modifier as a general "received title" bonus.
                     scope:created_vassal = {
-                        add_opinion = { modifier = received_title_county target = scope:liege days = 365 }
+                        hidden_effect = {
+                            add_opinion = { modifier = received_title_county target = scope:liege days = 365 }
+                        }
                     }
 
                     # If the liege is AI-controlled, give the liege a temporary vassal limit bonus
