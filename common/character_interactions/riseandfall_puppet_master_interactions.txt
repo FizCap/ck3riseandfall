@@ -18,8 +18,8 @@ riseandfall_steal_gold_interaction = {
 	}
 
 	# Basic validity (no additional UI failures)
-	is_valid_showing_failures_only = { scope:recipient = { riseandfall_no_cooldown = yes riseandfall_liege_has_gold = yes } }
-	is_valid = { scope:recipient = { riseandfall_no_cooldown = yes riseandfall_liege_has_gold = yes } }
+	is_valid_showing_failures_only = { riseandfall_liege_stability_below_50 = yes scope:recipient = { riseandfall_no_cooldown = yes riseandfall_liege_has_gold = yes } }
+	is_valid = { riseandfall_liege_stability_below_50 = yes scope:recipient = { riseandfall_no_cooldown = yes riseandfall_liege_has_gold = yes } }
 
 	# Auto-accept: this is a unilateral diarch action
 	auto_accept = yes
@@ -163,10 +163,12 @@ riseandfall_overthrow_liege_interaction = {
 	is_valid_showing_failures_only = {
 		riseandfall_liege_stability_below_30 = yes
 		scope:recipient = { riseandfall_no_cooldown = yes }
+		riseandfall_no_low_stability_cooldown = yes
 	}
 	is_valid = {
 		riseandfall_liege_stability_below_30 = yes
 		scope:recipient = { riseandfall_no_cooldown = yes }
+		riseandfall_no_low_stability_cooldown = yes
 	}
 
 	auto_accept = yes

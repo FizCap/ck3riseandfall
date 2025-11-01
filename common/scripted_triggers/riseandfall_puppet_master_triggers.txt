@@ -30,6 +30,19 @@ riseandfall_liege_stability_below_30 = {
 	}
 }
 
+# Liege stability below 50 (recipient variable)
+riseandfall_liege_stability_below_50 = {
+	# Show a friendly tooltip when this trigger fails — place the actual condition inside custom_tooltip
+	custom_tooltip = {
+		text = riseandfall_liege_stability_below_50
+		scope:recipient = {
+			# Guard against unset variable to avoid engine errors when stability hasn't been initialized
+			has_variable = riseandfall_realm_stability_score
+			var:riseandfall_realm_stability_score < 50
+		}
+	}
+}
+
 # No cooldown active
 riseandfall_no_cooldown = {
 	# Friendly failure text for cooldown checks — put the check inside the tooltip block
@@ -55,4 +68,13 @@ riseandfall_no_existing_hook = {
         text = riseandfall_no_existing_hook
         scope:recipient = { NOT = { has_hook = scope:actor } }
     }
+}
+
+# No low stability cooldown on actor
+riseandfall_no_low_stability_cooldown = {
+	# Friendly failure text for low stability cooldown checks — put the check inside the tooltip block
+	custom_tooltip = {
+		text = riseandfall_no_low_stability_cooldown
+		scope:recipient = { NOT = { has_variable = low_stability_cooldown } }
+	}
 }

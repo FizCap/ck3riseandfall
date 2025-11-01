@@ -23,7 +23,9 @@
   riseandfall_no_cooldown:0 "This interaction is on cooldown."
   riseandfall_no_existing_hook:0 "Cannot have an existing hook on the liege."
   riseandfall_liege_stability_below_30:0 "Liege's stability must be below 30."
+  riseandfall_liege_stability_below_50:0 "Liege's stability must be below 50."
   riseandfall_liege_has_gold:0 "Liege must have more than 0 gold."
+  riseandfall_no_low_stability_cooldown:0 "Liege is under low stability cooldown."
 
   # Steal Gold popup and notification
   riseandfall_steal_gold_popup_title:0 "Gold Stolen by Puppet Master"
