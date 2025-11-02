@@ -716,7 +716,8 @@ window = {
 									alwaystransparent = yes
 								}
 							}
-
+							
+							#riseandfall giveaway block toggle
 							button_round = {
 								name = "toggle_giveaway_block"
 								datacontext = "[GetScriptedGui( 'riseandfall_toggle_giveaway_blocked_gui' )]"
