@@ -556,79 +556,78 @@ round_variable = { name = tmp_target_score }    # Persist the (possibly penalize
     set_variable = { name = riseandfall_realm_stability_target value = var:tmp_target_score }
 
     # Smooth the persistent current score (`riseandfall_realm_stability_score`) toward the target
-    # by +/-1 per year. We assume this scripted_effect runs monthly; use an integer month
-    # counter `riseandfall_rs_adjust_months` to apply one step every 12 runs.
+    # This runs once per year (the on_action is scheduled yearly). We compute a signed delta
+    # (target - current), convert to an absolute distance and move the current score toward
+    # the target by step = max(0, ceil(abs(delta) / 5)) (zero when already equal). We also
+    # expose the signed predicted change for UI clarity.
 
     # Initialize months counter if missing
     if = {
         limit = { NOT = { has_variable = riseandfall_rs_adjust_months } }
         set_variable = { name = riseandfall_rs_adjust_months value = 0 }
     }
-    # If the persistent current score doesn't exist yet, initialize it to the computed TARGET
-    # (baseline 50 + component offsets). This avoids inheriting stale title-stored values
-    # that could make newly-loaded rulers start with an unexpectedly low stability.
+
+    # Initialize persistent current score to target on first run
     if = {
         limit = { NOT = { has_variable = riseandfall_realm_stability_score } }
         set_variable = { name = riseandfall_realm_stability_score value = var:riseandfall_realm_stability_target }
+        # No predicted change on initialization
+        set_variable = { name = riseandfall_realm_stability_predicted_change value = 0 }
     }
     else = {
-        # increment month counter each run
+        # advance month counter; this mod runs yearly so this triggers each year
         change_variable = { name = riseandfall_rs_adjust_months add = 1 }
-        # only apply an adjustment when we've accumulated the configured period.
-        # This mod schedules the on_action yearly, so check for >= 1 run (one year).
         if = {
             limit = { var:riseandfall_rs_adjust_months >= 1 }
-            # reset months counter so we apply at most one adjustment now
+            # reset counter
             set_variable = { name = riseandfall_rs_adjust_months value = 0 }
-            # Move current score toward target by a distance-scaled step so it reaches the target
-            # within at most 5 runs (years). Compute step = ceil(abs(delta) / 5), min 1.
-            # compute delta = target - current
+
+            # compute signed delta = target - current
             set_variable = { name = tmp_rs_delta value = var:riseandfall_realm_stability_target }
             set_variable = { name = tmp_rs_current value = var:riseandfall_realm_stability_score }
             change_variable = { name = tmp_rs_current multiply = -1 }
             change_variable = { name = tmp_rs_delta add = var:tmp_rs_current }
 
-            # Compute absolute delta into tmp_rs_delta_abs
-            if = {
-                limit = { var:tmp_rs_delta >= 0 }
-                set_variable = { name = tmp_rs_delta_abs value = var:tmp_rs_delta }
-            }
-            else = {
-                set_variable = { name = tmp_rs_delta_abs value = var:tmp_rs_delta }
-                change_variable = { name = tmp_rs_delta_abs multiply = -1 }
-            }
+            # compute absolute value of delta
+            if = { limit = { var:tmp_rs_delta >= 0 } set_variable = { name = tmp_rs_delta_abs value = var:tmp_rs_delta } }
+            else = { set_variable = { name = tmp_rs_delta_abs value = var:tmp_rs_delta } change_variable = { name = tmp_rs_delta_abs multiply = -1 } }
 
-            # step = ceil(tmp_rs_delta_abs / 5) implemented as integer: (abs + 4) / 5
+            # compute step = ceil(abs(delta)/5) implemented as (abs + 4) / 5 using integer math
             set_variable = { name = tmp_rs_step_numer value = var:tmp_rs_delta_abs }
             change_variable = { name = tmp_rs_step_numer add = 4 }
             set_variable = { name = tmp_rs_step value = var:tmp_rs_step_numer }
             change_variable = { name = tmp_rs_step divide = 5 }
 
-            # Ensure at least 1 when there is a non-zero delta
+            # ensure step is zero when delta is zero, otherwise at least 1
             if = {
-                limit = { var:tmp_rs_step < 1 }
-                if = { limit = { var:tmp_rs_delta_abs > 0 } set_variable = { name = tmp_rs_step value = 1 } }
+                limit = { var:tmp_rs_delta_abs = 0 }
+                set_variable = { name = tmp_rs_step value = 0 }
+            }
+            else = {
+                if = { limit = { var:tmp_rs_step < 1 } set_variable = { name = tmp_rs_step value = 1 } }
             }
 
-            # Apply the step toward the target (respect sign of delta)
+            # apply the step toward the target and expose predicted change (signed)
             if = {
                 limit = { var:tmp_rs_delta > 0 }
                 change_variable = { name = riseandfall_realm_stability_score add = var:tmp_rs_step }
-                # Store predicted positive change for UI
                 set_variable = { name = riseandfall_realm_stability_predicted_change value = var:tmp_rs_step }
             }
-            else = {
-                # negative delta -> subtract step
+            else_if = {
+                limit = { var:tmp_rs_delta < 0 }
+                # make signed negative step
                 set_variable = { name = tmp_rs_step_neg value = var:tmp_rs_step }
                 change_variable = { name = tmp_rs_step_neg multiply = -1 }
                 change_variable = { name = riseandfall_realm_stability_score add = var:tmp_rs_step_neg }
-                # Store predicted negative change for UI
                 set_variable = { name = riseandfall_realm_stability_predicted_change value = var:tmp_rs_step_neg }
             }
-            # Use the predicted change variable in-script (clamp/round) so the engine treats it as used
+            else = {
+                # no change needed
+                set_variable = { name = riseandfall_realm_stability_predicted_change value = 0 }
+            }
+
             clamp_variable = { name = riseandfall_realm_stability_predicted_change min = -100 max = 100 }
             round_variable = { name = riseandfall_realm_stability_predicted_change }
-            # Puppet regency: simplified — only tooltip tracking, no automatic decay applied here
         }
     }
 
