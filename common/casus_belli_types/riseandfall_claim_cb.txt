@@ -572,11 +572,20 @@
             scope:claimant = { remove_claim = prev }
         }
 
-        # Remove all claims the attacker has on titles held by the defender
+        # Remove all claims the attacker has on kingdom-tier titles held by the defender or their vassals
         scope:defender = {
+            # Defender's own held titles (kingdom+)
             every_held_title = {
-                limit = { tier >= tier_county }
+                limit = { tier >= tier_kingdom }
                 scope:attacker = { remove_claim = prev }
+            }
+
+            # Titles held by every vassal (recursive), includes vassal kingdoms
+            every_vassal_or_below = {
+                every_held_title = {
+                    limit = { tier >= tier_kingdom }
+                    scope:attacker = { remove_claim = prev }
+                }
             }
         }
 
