@@ -423,7 +423,7 @@ riseandfall_calculate_realm_stability_se = {
     change_variable = { name = tmp_avg_opinion multiply = 3 }
     change_variable = { name = tmp_avg_opinion divide = 10 }
     # Round the scaled value to keep the component integer
-    round_variable = { name = tmp_avg_opinion }
+    round_variable = { name = tmp_avg_opinion nearest = 1 }
     set_variable = { name = riseandfall_rs_vassals_component value = var:tmp_avg_opinion }
 
     clamp_variable = { name = riseandfall_rs_vassals_component min = -30 max = 30 }
@@ -552,7 +552,7 @@ riseandfall_calculate_realm_stability_se = {
 
 # Ensure the target stays within 0..100 after applying war penalties
 clamp_variable = { name = tmp_target_score min = 0 max = 100 }
-round_variable = { name = tmp_target_score }    # Persist the (possibly penalized) target so smoothing moves the current score toward it
+round_variable = { name = tmp_target_score nearest = 1 }    # Persist the (possibly penalized) target so smoothing moves the current score toward it
     set_variable = { name = riseandfall_realm_stability_target value = var:tmp_target_score }
 
     # Smooth the persistent current score (`riseandfall_realm_stability_score`) toward the target
@@ -627,13 +627,13 @@ round_variable = { name = tmp_target_score }    # Persist the (possibly penalize
             }
 
             clamp_variable = { name = riseandfall_realm_stability_predicted_change min = -100 max = 100 }
-            round_variable = { name = riseandfall_realm_stability_predicted_change }
+            round_variable = { name = riseandfall_realm_stability_predicted_change nearest = 1 }
         }
     }
 
     # Ensure current score remains clamped and integer
     clamp_variable = { name = riseandfall_realm_stability_score min = 0 max = 100 }
-    round_variable = { name = riseandfall_realm_stability_score }
+    round_variable = { name = riseandfall_realm_stability_score nearest = 1 }
     
 
     ########################################
