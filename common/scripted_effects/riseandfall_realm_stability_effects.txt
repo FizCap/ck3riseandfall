@@ -24,11 +24,7 @@ riseandfall_calculate_realm_stability_se = {
 
     # If ruler is under regency/puppet_regency, save the active diarch scope so we can read their stats.
     if = {
-        limit = {
-            AND = {
-                OR = { has_diarchy_type = regency has_diarchy_type = puppet_regency }
-            }
-        }
+        limit = { OR = { has_diarchy_type = regency has_diarchy_type = puppet_regency } }
         diarch = { save_scope_as = diarch }
         set_variable = { name = riseandfall_rs_use_diarch_stats value = 1 }
     }
