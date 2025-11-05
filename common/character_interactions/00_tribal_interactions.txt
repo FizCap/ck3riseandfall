@@ -13,15 +13,14 @@
 	is_shown = {
 		scope:actor = {
 			OR = {
-				NOR = {
-					government_has_flag = government_is_tribal
-					government_has_flag = government_is_nomadic
-					government_has_flag = government_is_herder
-				}
-				AND = {
-					is_liege_or_above_of = scope:recipient.holder
-					is_independent_ruler = yes
-				}
+					NOR = {
+						government_has_flag = government_is_tribal
+						government_has_flag = government_is_nomadic
+						government_has_flag = government_is_herder
+					}
+					AND = {
+						is_liege_or_above_of = scope:recipient
+					}
 			}
 		}
 	}
