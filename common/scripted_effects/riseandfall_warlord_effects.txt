@@ -15,3 +15,19 @@ riseandfall_inherit_warlord_trait_se = {
         add_trait = warlord
     }
 }
+
+# Called from on_imprison when a liege imprisons one of their vassals.
+# root = prisoner, scope:imprisoner = the imprisoning character
+riseandfall_warlord_imprisoned_se = {
+    # If the prisoner had the warlord trait and was imprisoned by their liege
+    # remove warlord and mark them retired so they stop behaving as an
+    # independent warlord while imprisoned.
+    if = {
+        limit = {
+            has_trait = warlord
+            # Check from the prisoner's scope: is the imprisoner the liege or above?
+            target_is_liege_or_above = scope:imprisoner
+        }
+        remove_trait = warlord
+    }
+}
