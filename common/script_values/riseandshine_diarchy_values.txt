@@ -21,9 +21,10 @@
         }
 
         # Disqualifiers
-        if = { limit = { is_adult = no } add = { value = hard_disable_diarch_candidate_value desc = diarch_succession_score.disqualifiers.child } }
-        if = { limit = { is_imprisoned = yes } add = { value = hard_disable_diarch_candidate_value desc = diarch_succession_score.disqualifiers.imprisoned } }
-        if = { limit = { OR = { is_incapable = yes has_trait = infirm } } add = { value = hard_disable_diarch_candidate_value desc = diarch_succession_score.disqualifiers.incapable_or_infirm } }
-        if = { limit = { is_landed = no } add = { value = hard_disable_diarch_candidate_value desc = diarch_succession_score.disqualifiers.not_landed } }
-        if = { limit = { exists = root var:diarch_succession_filtered_due_to_incumbents_politicking ?= root } add = { value = hard_disable_diarch_candidate_value desc = diarch_succession_score.disqualifiers.event_filters.incumbent_politicking } }
+    if = { limit = { is_adult = no } add = { value = hard_disable_diarch_candidate_value desc = diarch_succession_score.disqualifiers.child } }
+    if = { limit = { is_imprisoned = yes } add = { value = hard_disable_diarch_candidate_value desc = diarch_succession_score.disqualifiers.imprisoned } }
+    if = { limit = { OR = { is_incapable = yes has_trait = infirm } } add = { value = hard_disable_diarch_candidate_value desc = diarch_succession_score.disqualifiers.incapable_or_infirm } }
+    # Landless candidates get a -50 penalty instead of an outright disqualification
+    if = { limit = { is_landed = no } add = { value = -50 desc = diarch_succession_score.disqualifiers.not_landed } }
+    if = { limit = { exists = root var:diarch_succession_filtered_due_to_incumbents_politicking ?= root } add = { value = hard_disable_diarch_candidate_value desc = diarch_succession_score.disqualifiers.event_filters.incumbent_politicking } }
 }
