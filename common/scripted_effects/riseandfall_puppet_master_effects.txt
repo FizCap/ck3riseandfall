@@ -44,7 +44,11 @@ riseandfall_overthrow_liege_effect = {
 	# Transfer all held titles from recipient to actor
 	scope:recipient = {
 		every_held_title = {
-			limit = { always = yes }
+			limit = {
+				holder = scope:recipient
+				NOT = { is_head_of_faith = yes }
+				NOT = { is_noble_family_title = yes }
+			}
 			change_title_holder = {
 				holder = scope:actor
 				change = scope:change
