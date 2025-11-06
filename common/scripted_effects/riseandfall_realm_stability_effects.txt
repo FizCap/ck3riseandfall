@@ -46,13 +46,15 @@ riseandfall_calculate_realm_stability_se = {
     }
     else = { set_variable = { name = tmp_add value = diplomacy } }
     change_variable = { name = tmp_add add = -10 }
-    # Positive contributions (tmp_add > 1): stronger multiplier (x2)
+    # Positive contributions (tmp_add > 1): apply curved scaling mirroring the negative side
+    # Use piecewise thresholds so high stats get diminishing returns instead of a linear x2
     if = {
         limit = { var:tmp_add > 1 }
-        set_variable = { name = tmp_stat_pos value = var:tmp_add }
-        change_variable = { name = tmp_stat_pos multiply = 2 }
-        clamp_variable = { name = tmp_stat_pos min = -10 max = 20 }
-        set_variable = { name = tmp_stat_contrib value = var:tmp_stat_pos }
+        set_variable = { name = tmp_pos value = var:tmp_add }
+        if = { limit = { var:tmp_pos >= 7 } set_variable = { name = tmp_stat_contrib value = 10 } }
+        else_if = { limit = { var:tmp_pos >= 5 } set_variable = { name = tmp_stat_contrib value = 8 } }
+        else_if = { limit = { var:tmp_pos >= 3 } set_variable = { name = tmp_stat_contrib value = 5 } }
+        else = { set_variable = { name = tmp_stat_contrib value = 2 } }
         change_variable = { name = riseandfall_rs_stats_component add = var:tmp_stat_contrib }
     }
     else_if = {
@@ -88,10 +90,11 @@ riseandfall_calculate_realm_stability_se = {
     change_variable = { name = tmp_add add = -10 }
     if = {
         limit = { var:tmp_add > 1 }
-        set_variable = { name = tmp_stat_pos value = var:tmp_add }
-        change_variable = { name = tmp_stat_pos multiply = 2 }
-        clamp_variable = { name = tmp_stat_pos min = -10 max = 20 }
-        set_variable = { name = tmp_stat_contrib value = var:tmp_stat_pos }
+        set_variable = { name = tmp_pos value = var:tmp_add }
+        if = { limit = { var:tmp_pos >= 7 } set_variable = { name = tmp_stat_contrib value = 10 } }
+        else_if = { limit = { var:tmp_pos >= 5 } set_variable = { name = tmp_stat_contrib value = 8 } }
+        else_if = { limit = { var:tmp_pos >= 3 } set_variable = { name = tmp_stat_contrib value = 5 } }
+        else = { set_variable = { name = tmp_stat_contrib value = 2 } }
         change_variable = { name = riseandfall_rs_stats_component add = var:tmp_stat_contrib }
     }
     else_if = {
@@ -124,10 +127,11 @@ riseandfall_calculate_realm_stability_se = {
     change_variable = { name = tmp_add add = -10 }
     if = {
         limit = { var:tmp_add > 1 }
-        set_variable = { name = tmp_stat_pos value = var:tmp_add }
-        change_variable = { name = tmp_stat_pos multiply = 2 }
-        clamp_variable = { name = tmp_stat_pos min = -10 max = 20 }
-        set_variable = { name = tmp_stat_contrib value = var:tmp_stat_pos }
+        set_variable = { name = tmp_pos value = var:tmp_add }
+        if = { limit = { var:tmp_pos >= 7 } set_variable = { name = tmp_stat_contrib value = 10 } }
+        else_if = { limit = { var:tmp_pos >= 5 } set_variable = { name = tmp_stat_contrib value = 8 } }
+        else_if = { limit = { var:tmp_pos >= 3 } set_variable = { name = tmp_stat_contrib value = 5 } }
+        else = { set_variable = { name = tmp_stat_contrib value = 2 } }
         change_variable = { name = riseandfall_rs_stats_component add = var:tmp_stat_contrib }
     }
     else_if = {
@@ -160,10 +164,11 @@ riseandfall_calculate_realm_stability_se = {
     change_variable = { name = tmp_add add = -10 }
     if = {
         limit = { var:tmp_add > 1 }
-        set_variable = { name = tmp_stat_pos value = var:tmp_add }
-        change_variable = { name = tmp_stat_pos multiply = 2 }
-        clamp_variable = { name = tmp_stat_pos min = -10 max = 20 }
-        set_variable = { name = tmp_stat_contrib value = var:tmp_stat_pos }
+        set_variable = { name = tmp_pos value = var:tmp_add }
+        if = { limit = { var:tmp_pos >= 7 } set_variable = { name = tmp_stat_contrib value = 10 } }
+        else_if = { limit = { var:tmp_pos >= 5 } set_variable = { name = tmp_stat_contrib value = 8 } }
+        else_if = { limit = { var:tmp_pos >= 3 } set_variable = { name = tmp_stat_contrib value = 5 } }
+        else = { set_variable = { name = tmp_stat_contrib value = 2 } }
         change_variable = { name = riseandfall_rs_stats_component add = var:tmp_stat_contrib }
     }
     else_if = {
@@ -196,10 +201,11 @@ riseandfall_calculate_realm_stability_se = {
     change_variable = { name = tmp_add add = -10 }
     if = {
         limit = { var:tmp_add > 1 }
-        set_variable = { name = tmp_stat_pos value = var:tmp_add }
-        change_variable = { name = tmp_stat_pos multiply = 2 }
-        clamp_variable = { name = tmp_stat_pos min = -10 max = 20 }
-        set_variable = { name = tmp_stat_contrib value = var:tmp_stat_pos }
+        set_variable = { name = tmp_pos value = var:tmp_add }
+        if = { limit = { var:tmp_pos >= 7 } set_variable = { name = tmp_stat_contrib value = 10 } }
+        else_if = { limit = { var:tmp_pos >= 5 } set_variable = { name = tmp_stat_contrib value = 8 } }
+        else_if = { limit = { var:tmp_pos >= 3 } set_variable = { name = tmp_stat_contrib value = 5 } }
+        else = { set_variable = { name = tmp_stat_contrib value = 2 } }
         change_variable = { name = riseandfall_rs_stats_component add = var:tmp_stat_contrib }
     }
     else_if = {
