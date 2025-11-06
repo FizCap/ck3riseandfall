@@ -327,24 +327,53 @@ riseandfall_palace_coup_root_flees_success = {
 			}
 		}
 	}
-	# Transfer all duchy+ titles (exclude counties and baronies)
-	# but do not transfer head-of-faith titles
-	every_held_title = {
-		limit = {
-			holder = root
-			NOT = {
-				OR = {
-					tier = tier_county
-					tier = tier_barony
+	# If the root has an administrative government, they should lose all
+	# titles except their duchies and counties (but the capital county is
+	# transferred above). For administrative roots transfer everything
+	# that is NOT a duchy or county (this includes baronies, kingdoms, empires).
+	# For non-administrative roots, keep the prior behavior (transfer duchy+).
+	if = {
+		limit = { root = { is_landed_or_landless_administrative = yes } }
+		# Administrative branch: transfer all titles that are NOT duchy or county
+		every_held_title = {
+			limit = {
+				holder = root
+				NOT = {
+					OR = {
+						tier = tier_duchy
+						tier = tier_county
+					}
 				}
+				NOT = { is_head_of_faith = yes }
+				NOT = { is_noble_family_title = yes }
 			}
-			NOT = { is_head_of_faith = yes }
-			NOT = { is_noble_family_title = yes }
+			change_title_holder = {
+				holder = scope:challenger
+				change = scope:change
+				take_baronies = yes
+			}
 		}
-		change_title_holder = {
-			holder = scope:challenger
-			change = scope:change
-			take_baronies = yes
+	else = {
+		# Non-administrative branch: transfer duchy+ as before
+		# Transfer all duchy+ titles (exclude counties and baronies)
+		# but do not transfer head-of-faith titles
+		every_held_title = {
+			limit = {
+				holder = root
+				NOT = {
+					OR = {
+						tier = tier_county
+						tier = tier_barony
+					}
+				}
+				NOT = { is_head_of_faith = yes }
+				NOT = { is_noble_family_title = yes }
+			}
+			change_title_holder = {
+				holder = scope:challenger
+				change = scope:change
+				take_baronies = yes
+			}
 		}
 	}
 		                
@@ -356,13 +385,17 @@ riseandfall_palace_coup_root_flees_success = {
 			change = scope:change
 		}
 	}
-	# Transfer all direct vassals of the old ruler to the challenger
-	# while preserving noble-family titles on root.
-	root = {
-		every_vassal = {
-			change_liege = {
-				liege = scope:challenger
-				change = scope:change
+	# Transfer direct vassals for non-administrative roots only. For
+	# administrative rulers we keep their vassals so duchies/counties remain
+	# intact under the root.
+	if = {
+		limit = { NOT = { root = { is_landed_or_landless_administrative = yes } } }
+		root = {
+			every_vassal = {
+				change_liege = {
+					liege = scope:challenger
+					change = scope:change
+				}
 			}
 		}
 	}
@@ -457,7 +490,7 @@ riseandfall_palace_coup_root_flees_success = {
 		}
 	}
 }
-
+}
 ##########################
 # Rise and Fall - Palace Coup Root Flees Failure
 # Transfers all titles, vassals, gold, makes rivals, and imprisons root when root fails to flee
