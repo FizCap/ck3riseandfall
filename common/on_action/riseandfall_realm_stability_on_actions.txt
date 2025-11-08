@@ -11,6 +11,7 @@ yearly_global_pulse = {
 on_game_start_after_lobby = {
     on_actions = {
         riseandfall_yearly_realm_stability
+        riseandfall_low_stability_grace_period
     }
 }
 
@@ -171,6 +172,16 @@ riseandfall_yearly_realm_stability = {
         }
     }
 }
+
+riseandfall_low_stability_grace_period = {
+    trigger = {
+        has_game_rule = riseandfall_realm_stability_enabled
+    }
+    effect = {
+            riseandfall_low_stability_grace_period_se = yes
+    }
+}
+
 # React to wars being won so we can apply immediate +5/-5 war penalties
 riseandfall_war_won_attacker = {
     trigger = { has_game_rule = riseandfall_realm_stability_enabled }

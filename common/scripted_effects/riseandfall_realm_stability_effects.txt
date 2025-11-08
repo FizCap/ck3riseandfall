@@ -911,6 +911,14 @@ riseandfall_inherit_stability_score_se = {
     }
 }
 
+#External Scripts
+
+riseandfall_low_stability_grace_period_se = {
+    every_independent_ruler = {
+        set_variable = { name = low_stability_cooldown value = yes years = 5}
+    }
+}
+
 
 # Called on the war winner scope (character) to increase the war multiplier by +10%
 riseandfall_war_victory_se = {
@@ -948,3 +956,4 @@ riseandfall_war_loss_se = {
         set_variable = { name = riseandfall_realm_stability_war_multiplier value = var:riseandfall_realm_stability_war_multiplier }
     }
 }
+
