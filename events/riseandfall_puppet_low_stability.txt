@@ -29,6 +29,8 @@ puppet.1001 = {
                     is_landed = yes
                     age >= 16
                     NOT = { has_variable = puppet_decline_cooldown }
+                    # Exclude vassals currently at war with the liege
+                    NOT = { is_at_war_with = scope:event_root }
                 }
                 # initialize candidate score from stats (dip + mar + stew + int + lern)
                 set_variable = { name = candidate_total value = diplomacy }
@@ -61,6 +63,8 @@ puppet.1001 = {
                         is_landed = yes
                         age >= 16
                         NOT = { has_variable = puppet_decline_cooldown }
+                        # Exclude vassals currently at war with the liege
+                        NOT = { is_at_war_with = scope:event_root }
                     }
                     trigger_event = puppet.1002
                 }
@@ -106,6 +110,8 @@ puppet.1002 = {
                             NOT = { this = scope:candidate_vassal }
                             is_landed = yes
                             age >= 16
+                            # Exclude vassals currently at war with the liege
+                            NOT = { is_at_war_with = scope:liege }
                     }
                     trigger_event = puppet.1002
                 }
@@ -126,7 +132,9 @@ puppet.1002 = {
                 scope:candidate_vassal = { set_variable = { name = puppet_decline_cooldown value = yes days = 365 } }
             }
             random_powerful_vassal = {
-                limit = { NOT = { this = scope:candidate_vassal } }
+                limit = { NOT = { this = scope:candidate_vassal } 
+                          # Exclude vassals currently at war with the liege
+                          NOT = { is_at_war_with = scope:liege } }
                 trigger_event = puppet.1002
             }
         }
