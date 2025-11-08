@@ -43,9 +43,24 @@ riseandfall_overthrow_liege_effect = {
 	}
 	# Transfer all held titles from recipient to actor
 	scope:recipient = {
+        # If the recipient has a capital county, transfer that county first
+        if = {
+            limit = { scope:recipient = { capital_county = { exists = yes } } }
+            scope:recipient = {
+                capital_county = {
+                    change_title_holder = {
+                        holder = scope:actor
+                        change = scope:change
+                        take_baronies = yes
+                    }
+                }
+            }
+        }
 		every_held_title = {
 			limit = {
 				holder = scope:recipient
+				# Avoid changing barony-level titles directly (engine requires changing the county instead)
+				NOT = { tier = tier_barony }
 				NOT = { is_head_of_faith = yes }
 				NOT = { is_noble_family_title = yes }
 			}
