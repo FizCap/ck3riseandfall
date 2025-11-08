@@ -2,8 +2,8 @@
     on_actions = {
         riseandfall_yearly_adventurer
         riseandfall_yearly_remove_adventurer_gold_mod
-        riseandfall_marry_male_target_se
-        riseandfall_marry_female_target_se
+        riseandfall_marry_male_target
+        riseandfall_marry_female_target
         riseandfall_yearly_adventurer_press_claims
         riseandfall_yearly_adventurer_cleanup_on_action
         riseandfall_yearly_adventurer_remove_variable
@@ -102,20 +102,19 @@ riseandfall_yearly_remove_adventurer_gold_mod = {
 }
 
 # On_action that runs yearly to marry male landless adventurers (creates female spouse)
-riseandfall_marry_male_target_se = {
+riseandfall_marry_male_target = {
     effect = {
-        every_ruler = {
+        every_independent_ruler = {
             limit = {
+                has_realm_law = camp_purpose_legitimists
                 NOT = { has_trait_with_flag = can_not_marry }
+                is_imprisoned = no
                 is_male = yes
                 is_adult = yes
                 is_married = no
                 is_betrothed = no
-                has_realm_law = camp_purpose_legitimists
             }
-
             save_scope_as = independent_ruler
-
             # Defer character-level checks to the scripted effect for performance.
             riseandfall_marry_male_target_se = yes
         }
@@ -124,18 +123,18 @@ riseandfall_marry_male_target_se = {
 
 
 # On_action that runs yearly to marry female landless adventurers (creates male spouse)
-riseandfall_marry_female_target_se = {
+riseandfall_marry_female_target = {
     effect = {
-        every_ruler = {
+        every_independent_ruler = {
             limit = {
+                has_realm_law = camp_purpose_legitimists
                 NOT = { has_trait_with_flag = can_not_marry }
+                is_imprisoned = no
                 is_female = yes
                 is_adult = yes
                 is_married = no
                 is_betrothed = no
-                has_realm_law = camp_purpose_legitimists
             }
-
             save_scope_as = independent_ruler
             riseandfall_marry_female_target_se = yes
         }
