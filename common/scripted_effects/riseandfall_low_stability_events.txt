@@ -1,9 +1,6 @@
 ﻿##########################
 # Rise and Fall - Low Stability Events Scripted Effects
 # Contains scripted effects related to low stability events
-
-##########################
-# Rise and Fall - Palace Coup Setup
 # Sets up the challenger selection, kills courtiers, creates adventurer title, and sets cooldowns
 
 riseandfall_palace_coup_setup = {
@@ -334,29 +331,26 @@ riseandfall_palace_coup_root_flees_success = {
 		}
 	}
 	# If the root has an administrative government, they should lose all
-	# titles except their duchies and counties (but the capital county is
-	# transferred above). For administrative roots transfer everything
-	# that is NOT a duchy or county (this includes baronies, kingdoms, empires).
-	# For non-administrative roots, keep the prior behavior (transfer duchy+).
+	# titles except their counties (the capital county is transferred above).
+	# Transfer any remaining duchy+ titles so the challenger outranks root
+	# for the subsequent vassalage change. For non-administrative roots,
+	# keep the prior behavior (transfer duchy+).
 	if = {
 		limit = { root = { is_landed_or_landless_administrative = yes } }
-		# Administrative branch: transfer all titles that are NOT duchy or county
+		# Administrative branch: transfer all titles above the county tier
 		every_held_title = {
 			limit = {
 				holder = root
-				NOT = {
-					OR = {
-						tier = tier_duchy
-						tier = tier_county
-					}
-				}
+				NOT = { tier = tier_county }
+				NOT = { tier = tier_barony }
 				NOT = { is_head_of_faith = yes }
 				NOT = { is_noble_family_title = yes }
 			}
-			change_title_holder = {
+				change_title_holder = {
 				holder = scope:challenger
 				change = scope:change
 				take_baronies = yes
+			}
 			}
 		}
 	else = {
@@ -496,7 +490,7 @@ riseandfall_palace_coup_root_flees_success = {
 		}
 	}
 }
-}
+
 ##########################
 # Rise and Fall - Palace Coup Root Flees Failure
 # Transfers all titles, vassals, gold, makes rivals, and imprisons root when root fails to flee
@@ -518,6 +512,7 @@ riseandfall_palace_coup_root_flees_failure = {
 	every_held_title = {
 		limit = {
 			holder = root
+			NOT = { tier = tier_barony }
 			NOT = { is_head_of_faith = yes }
 			NOT = { is_noble_family_title = yes }
 		}
@@ -611,7 +606,7 @@ riseandfall_palace_coup_root_flees_failure = {
 		remove_variable = duel_transfer_gold
 	}
 	# Imprison the root: challenger captures/seizes the ruler
-	scope:challenger = { imprison = { target = root reason = tyranny type = dungeon } }
+	scope:challenger = { imprison = { target = root type = dungeon } }
 }
 
 ##########################
