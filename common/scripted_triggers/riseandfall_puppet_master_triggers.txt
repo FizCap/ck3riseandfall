@@ -78,3 +78,17 @@ riseandfall_no_low_stability_cooldown = {
 		scope:recipient = { NOT = { has_variable = low_stability_cooldown } }
 	}
 }
+
+# Puppet regency years — require the recipient to have been a puppet regent for at least 5 years
+# Use this trigger in interactions that require a minimum puppet regency duration.
+riseandfall_puppet_regency_years_at_least_5 = {
+	# Friendly failure text for UI tooltips; actual condition lives inside the tooltip block
+	custom_tooltip = {
+		text = riseandfall_puppet_regency_years_at_least_5
+		scope:recipient = {
+			# Guard against unset variable to avoid engine errors
+			has_variable = riseandfall_puppet_regency_years
+			var:riseandfall_puppet_regency_years >= 5
+		}
+	}
+}

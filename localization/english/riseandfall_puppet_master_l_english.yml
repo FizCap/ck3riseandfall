@@ -26,6 +26,7 @@
   riseandfall_liege_stability_below_50:0 "Liege's stability must be below 50."
   riseandfall_liege_has_gold:0 "Liege must have more than 0 gold."
   riseandfall_no_low_stability_cooldown:0 "Liege is under low stability cooldown."
+  riseandfall_puppet_regency_years_at_least_5:0 "Recipient must have served as puppet regent for at least 5 years."
 
   # Steal Gold popup and notification
   riseandfall_steal_gold_popup_title:0 "Gold Stolen by Puppet Master"
