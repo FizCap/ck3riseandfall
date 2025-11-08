@@ -74,7 +74,13 @@ riseandfall_palace_coup_setup = {
 		# calling has_claim_on with a null target.
 		if = {
 			limit = { scope:tmp_primary_title = { exists = yes } }
-			if = { limit = { has_claim_on = scope:tmp_primary_title } change_variable = { name = candidate_total add = 1000 } }
+			# If candidate holds a claim on the saved primary title, increase score by 50%
+			if = { limit = { has_claim_on = scope:tmp_primary_title } change_variable = { name = candidate_total multiply = 1.5 } }
+		}
+		# Knights get a 1.5x multiplier to reflect martial/discipline training
+		if = {
+			limit = { is_knight = yes }
+			change_variable = { name = candidate_total multiply = 1.5 }
 		}
 		# Copy candidate score to the event_root scope so comparisons are safe
 		save_scope_as = candidate_for_score
