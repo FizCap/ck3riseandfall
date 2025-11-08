@@ -57,14 +57,7 @@ riseandfall_steal_gold_interaction = {
 
 	# AI should always consider using it when available
 	# How often AI considers this by top-title tier (months)
-	ai_frequency_by_tier = {
-		barony = 12
-		county = 12
-		duchy = 12
-		kingdom = 12
-		empire = 12
-		hegemony = 12
-	}
+	ai_frequency = 12
 
     ai_targets = {
 		ai_recipients = liege
@@ -126,14 +119,7 @@ riseandfall_curry_favor_interaction = {
 		}
 	}
 	# How often AI considers this by top-title tier (months)
-	ai_frequency_by_tier = {
-		barony = 12
-		county = 12
-		duchy = 12
-		kingdom = 12
-		empire = 12
-		hegemony = 12
-	}
+	ai_frequency = 12
 	# Allow AI to consider this interaction
 	ai_potential = { always = yes }
 
@@ -196,14 +182,7 @@ riseandfall_overthrow_liege_interaction = {
 		}
 	}
 	# How often AI considers this by top-title tier (months)
-	ai_frequency_by_tier = {
-		barony = 12
-		county = 12
-		duchy = 12
-		kingdom = 12
-		empire = 12
-		hegemony = 12
-	}
+	ai_frequency = 12
 	# Allow AI to consider this interaction
 	ai_potential = { always = yes }
 
