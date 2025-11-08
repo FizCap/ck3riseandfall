@@ -5494,25 +5494,6 @@ types CharacterWindow
 				expand = {}
 
 				container = {
-					size = { 30 30 }
-					icon = {
-						size = { 30 30 }
-						texture = "gfx/interface/component_masks/mask_circle.dds"
-						color = { 0 1 0 0.5 }
-						visible = "[GreaterThanOrEqualTo( Character.MakeScope.Var('riseandfall_realm_stability_score').GetValue / Max(Character.MakeScope.Var('riseandfall_realm_stability_target').GetValue, 1), 0.67 )]"
-					}
-					icon = {
-						size = { 30 30 }
-						texture = "gfx/interface/component_masks/mask_circle.dds"
-						color = { 1 1 0 0.5 }
-						visible = "[And( GreaterThanOrEqualTo( Character.MakeScope.Var('riseandfall_realm_stability_score').GetValue / Max(Character.MakeScope.Var('riseandfall_realm_stability_target').GetValue, 1), 0.33 ), LessThan( Character.MakeScope.Var('riseandfall_realm_stability_score').GetValue / Max(Character.MakeScope.Var('riseandfall_realm_stability_target').GetValue, 1), 0.67 ) )]"
-					}
-					icon = {
-						size = { 30 30 }
-						texture = "gfx/interface/component_masks/mask_circle.dds"
-						color = { 1 0 0 0.5 }
-						visible = "[LessThan( Character.MakeScope.Var('riseandfall_realm_stability_score').GetValue / Max(Character.MakeScope.Var('riseandfall_realm_stability_target').GetValue, 1), 0.33 )]"
-					}
 					icon = {
 						size = { 30 30 }
 						texture = "gfx/interface/icons/scale_of_power.dds"
