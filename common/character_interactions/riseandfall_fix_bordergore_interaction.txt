@@ -79,7 +79,7 @@
         }
     }
 
-    ai_frequency = 1
+    ai_frequency = 12
 
     # Allow the AI to consider this interaction when populating potential actions
     ai_potential = { always = yes }
