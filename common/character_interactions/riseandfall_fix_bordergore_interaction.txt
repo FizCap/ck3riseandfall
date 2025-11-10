@@ -14,6 +14,7 @@
         }
         scope:recipient = {
             government_has_flag = government_is_administrative
+            is_ai = yes
             liege = { this = scope:actor }
             NOT = { is_at_war_with = scope:actor }
             # Visibility gate: recipient OR their direct vassals hold a county whose immediate de jure duchy is NOT held by recipient
