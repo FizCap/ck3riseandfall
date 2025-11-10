@@ -28,6 +28,8 @@ riseandfall_fix_bordergore_se = {
                 NOT = { de_jure_liege = { de_jure_liege = { de_jure_liege = { de_jure_liege = { holder = scope:recipient } } } } }
                 # Don't process if already held by liege
                 NOT = { holder = scope:liege }
+                # Do not take titles from human players
+                NOT = { holder = { is_ai = no } }
             }
             create_title_and_vassal_change = { type = granted save_scope_as = change }
             change_title_holder_include_vassals = { holder = scope:liege change = scope:change take_baronies = no }
@@ -47,6 +49,8 @@ riseandfall_fix_bordergore_se = {
                 NOT = { de_jure_liege = { de_jure_liege = { de_jure_liege = { holder = scope:recipient } } } }
                 NOT = { de_jure_liege = { de_jure_liege = { de_jure_liege = { de_jure_liege = { holder = scope:recipient } } } } }
                 NOT = { holder = scope:liege }
+                # Do not take counties held by human players
+                NOT = { holder = { is_ai = no } }
                 NOT = { holder = scope:recipient }
                 NOT = { this = scope:liege.capital_province.county }
                 NOT = { this = scope:recipient.capital_province.county }

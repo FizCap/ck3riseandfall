@@ -182,10 +182,9 @@ riseandfall_enable_interaction_stability = {
     }
 
     # Default: enabled (show stability in interaction menu)
-    default = riseandfall_interaction_stability_enabled
+    default = riseandfall_interaction_stability_disabled
 
     riseandfall_interaction_stability_enabled = {
-        flag = enable_riseandfall_ui
     }
 
     riseandfall_interaction_stability_disabled = {
