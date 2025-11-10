@@ -1,0 +1,123 @@
+﻿############################################################
+# Rise and Fall: Fix Bordergore scripted effects
+# Called by a character interaction where a liege fixes vassal-held duchies/kingdoms
+# Behavior: iterate titles held by the recipient (duchy+). If the title's de jure liege
+# is the actor (the liege), transfer the title (and vassals) to the liege.
+############################################################
+
+riseandfall_fix_bordergore_se = {
+    # Expect the interaction to be run with scope:actor = liege and scope:recipient = vassal
+    save_scope_as = liege
+
+    # Defensive guard: ensure liege still exists
+    scope:liege = {
+        # Iterate the recipient's held titles (only county-tier titles — do NOT transfer duchies or higher)
+        scope:recipient = {
+            every_held_title = {
+                limit = {
+                    tier = tier_county
+                    exists = de_jure_liege
+                    holder = scope:recipient
+                    # Skip counties that are de jure to the recipient (duchy/kingdom/emperor)
+                    NOT = {
+                        de_jure_liege = { holder = scope:recipient }
+                    }
+                    NOT = {
+                        de_jure_liege = { de_jure_liege = { holder = scope:recipient } }
+                    }
+                    NOT = {
+                        de_jure_liege = { de_jure_liege = { de_jure_liege = { holder = scope:recipient } } }
+                    }
+                    # Only consider titles whose de jure liege title is currently held by the liege (duchy/kingdom/emperor)
+                    OR = {
+                        de_jure_liege = { holder = scope:liege }
+                        de_jure_liege = { de_jure_liege = { holder = scope:liege } }
+                        de_jure_liege = { de_jure_liege = { de_jure_liege = { holder = scope:liege } } }
+                    }
+                }
+                # Save the current title for notifications
+                save_scope_as = problematic_title
+
+                # Create and apply a title-change that grants the saved title to the liege
+                # Use the same pattern as other title transfers in this mod
+                create_title_and_vassal_change = { type = granted save_scope_as = change }
+
+                # We're in the title scope (this), change holder to the liege
+                change_title_holder_include_vassals = { holder = scope:liege change = scope:change take_baronies = no }
+                resolve_title_and_vassal_change = scope:change
+
+                # Mark that we made at least one change so we can send a single aggregate notification later
+                scope:liege = {
+                    set_variable = { name = riseandfall_fix_bordergore_made_changes value = 1 }
+                }
+            }
+        }
+    }
+
+    # Additionally, transfer county-tier titles held anywhere in the recipient's sub-realm
+    # (recipient + vassals) that are de jure to the liege. This covers counties held by
+    # vassals which the simple every_held_title loop would miss.
+    scope:liege = {
+        scope:recipient = {
+            every_sub_realm_county = {
+                limit = {
+                    exists = this
+                    exists = de_jure_liege
+                    # Skip counties that are de jure to the recipient (duchy/kingdom/emperor)
+                    NOT = {
+                        de_jure_liege = { holder = scope:recipient }
+                    }
+                    NOT = {
+                        de_jure_liege = { de_jure_liege = { holder = scope:recipient } }
+                    }
+                    NOT = {
+                        de_jure_liege = { de_jure_liege = { de_jure_liege = { holder = scope:recipient } } }
+                    }
+                    # Only transfer counties whose de jure chain ultimately points to the liege
+                    OR = {
+                        de_jure_liege = { holder = scope:liege }
+                        de_jure_liege = { de_jure_liege = { holder = scope:liege } }
+                        de_jure_liege = { de_jure_liege = { de_jure_liege = { holder = scope:liege } } }
+                    }
+                    NOT = { holder = scope:liege } # skip counties already held by the liege
+                    NOT = { holder = scope:recipient } # skip counties held directly by the recipient to avoid duplicates
+                    NOT = { this = scope:liege.capital_province.county } # skip liege's capital county
+                    NOT = { this = scope:recipient.capital_province.county } # skip recipient's capital county
+                }
+                save_scope_as = target_county
+
+                # Skip transfer if giveaway-block is present and the liege is a human player
+                if = {
+                    limit = { NOT = { AND = { scope:target_county = { has_variable = Riseandfall_giveaway_blocked } scope:liege = { is_ai = no } } } }
+
+                    create_title_and_vassal_change = { type = granted save_scope_as = change }
+
+                    # Change the county holder to the liege (do not take baronies)
+                    scope:target_county = {
+                        change_title_holder_include_vassals = { holder = scope:liege change = scope:change take_baronies = no }
+                    }
+                    resolve_title_and_vassal_change = scope:change
+
+                    # Mark that we made at least one change so we can send a single aggregate notification later
+                    scope:liege = {
+                        set_variable = { name = riseandfall_fix_bordergore_made_changes value = 1 }
+                    }
+                }
+            }
+        }
+    }
+
+    # If any transfers happened, send one aggregated interface message rather than spamming one per title
+    scope:liege = {
+        if = {
+            limit = { has_variable = riseandfall_fix_bordergore_made_changes }
+            send_interface_message = {
+                type = send_interface_message_good
+                title = riseandfall_fix_bordergore_notification_title
+                custom_tooltip = { text = riseandfall_fix_bordergore_notification_desc_aggregate }
+                left_icon = scope:liege
+            }
+            remove_variable = riseandfall_fix_bordergore_made_changes
+        }
+    }
+}

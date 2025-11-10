@@ -158,6 +158,23 @@ riseandfall_vassal_limit_rule = {
     }
 }
 
+riseandfall_enable_bordergore_fix = {
+
+    categories = {
+        riseandfall
+    }
+
+    # Default: enabled
+    default = riseandfall_bordergore_fix_enabled
+
+    riseandfall_bordergore_fix_enabled = {
+    }
+
+    riseandfall_bordergore_fix_disabled = {
+        flag = riseandfall_bordergore_fix_disabled
+    }
+}
+
 riseandfall_enable_interaction_stability = {
 
     categories = {

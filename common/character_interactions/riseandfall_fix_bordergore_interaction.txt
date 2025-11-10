@@ -1,0 +1,56 @@
+﻿riseandfall_fix_bordergore_interaction = {
+    category = interaction_category_diarch
+    auto_accept = yes
+    desc = riseandfall_fix_bordergore_interaction_desc
+    target_type = character
+
+    # Only top lieges (king or above) can use this on their vassals
+    is_shown = {
+        scope:actor = {
+            highest_held_title_tier >= tier_kingdom
+            is_liege_or_above_of = scope:recipient
+            government_has_flag = government_is_administrative
+            is_independent_ruler = yes
+        }
+        scope:recipient = {
+            government_has_flag = government_is_administrative
+            liege = { this = scope:actor }
+        }
+    }
+
+    is_valid = {
+        scope:actor = {
+            highest_held_title_tier >= tier_kingdom
+            is_liege_or_above_of = scope:recipient
+            government_has_flag = government_is_administrative
+        }
+        scope:recipient = {
+            is_landed = yes
+            government_has_flag = government_is_administrative
+            NOT = { has_trait = warlord }  # Cannot use on warlords
+            # Recipient may be a king (doesn't need to personally hold a duchy)
+            liege = { this = scope:actor }
+        }
+    }
+
+    on_accept = {
+        # Run the scripted effect under the actor scope; effect will reference scope:recipient
+        scope:actor = {
+            riseandfall_fix_bordergore_se = yes
+        }
+    }
+
+    ai_frequency = 1
+
+    # Allow the AI to consider this interaction when populating potential actions
+    ai_potential = { always = yes }
+
+    ai_targets = {
+        # Which characters does the ai consider as recipient for the interaction
+        # Use a built-in target list; 'vassals' will make the AI consider vassals of the actor
+        ai_recipients = vassals
+        max = 100
+    }
+
+    ai_will_do = { base = 100 }
+}
