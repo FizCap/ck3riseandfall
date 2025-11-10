@@ -328,3 +328,43 @@ Quick actionable additions (what this AI agent can do next)
 
 Feedback
 - If anything here is too terse or you want line-level examples from specific event files, tell me which file and I will expand this guidance.
+
+Verify tokens in vanilla game & docs
+-----------------------------------
+
+When adding or using engine tokens (triggers, effects, modifiers, on_action names, event targets, etc.) always verify they exist in the vanilla `game/` files or in the authoritative `docs/` logs before adding them to the mod. Below are a short contract and concrete examples you can copy in PowerShell (Windows) or a POSIX shell (grep) to check availability.
+
+Minimal verification contract (2–4 bullets)
+- Inputs: token name(s) to verify (e.g. `is_heir`, `create_character`, `spawn_army`, `on_character_death`), search paths (`game/` install path and `docs/` logs).
+- Outputs: list of files/lines where the token appears, plus a note whether the token appears in `docs/*.log` (authoritative).
+- Data shape: simple lines with filename:lineno:matched_text; or empty result if not found.
+- Error modes: token missing (do not use); token only present in third-party content (treat with caution); ambiguous multiple-token matches (inspect the context manually).
+
+PowerShell (Windows) examples — search the installed vanilla game files and the local `docs/` logs:
+
+Select-String -Path "C:\Program Files (x86)\Steam\steamapps\common\Crusader Kings III\game\**\*.txt" -Pattern "is_heir" -SimpleMatch -List
+Select-String -Path "./docs/*.log" -Pattern "is_heir" -SimpleMatch -List
+
+To search the mod workspace instead (faster when working offline):
+
+Select-String -Path ".\game\**\*.txt" -Pattern "spawn_army" -SimpleMatch -List
+Select-String -Path ".\docs\*.log" -Pattern "spawn_army" -SimpleMatch -List
+
+POSIX / Git Bash (grep) examples:
+
+grep -RIn -- "is_heir" "/path/to/Crusader Kings III/game"
+grep -RIn -- "spawn_army" ./docs
+
+Quick checks and example tokens to verify before use
+- Triggers: is_heir, is_monarch, has_dynasty
+- Effects: create_character, spawn_army, add_modifier, remove_modifier
+- On_actions: on_character_death, on_title_created (search `docs/on_actions.log` for correct names)
+- Event targets/scopes: capital_province, capital_barony (verify in `docs/event_targets.log` and `docs/event_scopes.log`)
+
+What to do if a token is not found
+- If the token does not appear in `game/` or `docs/`, do NOT use it. Prefer copying the exact vanilla syntax you find in `game/` files. If a required behavior is missing, implement it using supported tokens (consult `docs/` for alternatives) or ask for guidance with the exact missing token and intended scope.
+
+Notes
+- Searching `docs/` logs is authoritative — if a token appears there it is supported by the engine and you should check the listed supported scopes.
+- If a token does not appear in the installed `game/` files, check `docs/` next — some tokens are present in the engine-generated `docs/` logs but not in the local vanilla files; treat these with caution and verify scopes before using them.
+- Prefer examples from `game/common/` (vanilla) when choosing formatting/spacing for complex constructs.
