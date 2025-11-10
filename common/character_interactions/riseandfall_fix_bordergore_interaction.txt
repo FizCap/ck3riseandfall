@@ -15,6 +15,7 @@
         scope:recipient = {
             government_has_flag = government_is_administrative
             liege = { this = scope:actor }
+            NOT = { is_at_war_with = scope:actor }
         }
     }
 
@@ -28,6 +29,7 @@
             is_landed = yes
             government_has_flag = government_is_administrative
             NOT = { has_trait = warlord }  # Cannot use on warlords
+            NOT = { is_at_war_with = scope:actor }
             # Recipient may be a king (doesn't need to personally hold a duchy)
             liege = { this = scope:actor }
         }

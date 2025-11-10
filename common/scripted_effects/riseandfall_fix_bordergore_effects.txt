@@ -6,119 +6,63 @@
 ############################################################
 
 riseandfall_fix_bordergore_se = {
-    # Expect the interaction to be run with scope:actor = liege and scope:recipient = vassal
+    # CONTRACT (inputs/outputs/data/error)
+    # Inputs: scope:actor (liege), scope:recipient (vassal)
+    # Outputs: Non–de jure counties (direct or sub‑realm) moved to liege; aggregate notification if any moved.
+    # Data shape: title holder changes via create_title_and_vassal_change / change_title_holder_include_vassals.
+    # Error modes: Missing scopes (no action), no non–de jure counties (no message), invalid token (engine log error).
+
     save_scope_as = liege
 
-    # Only apply to vassals who hold duchies or higher titles
-    if = {
-        limit = { scope:recipient = { any_held_title = { OR = { tier = tier_duchy tier = tier_kingdom tier = tier_empire } } } }
-        # Defensive guard: ensure liege still exists
-        scope:liege = {
-        # Iterate the recipient's held titles (only county-tier titles — do NOT transfer duchies or higher)
-        scope:recipient = {
-            every_held_title = {
-                limit = {
-                    tier = tier_county
-                    exists = de_jure_liege
-                    holder = scope:recipient
-                    # Skip counties that are de jure to the recipient (duchy/kingdom/emperor)
-                    NOT = {
-                        de_jure_liege = { holder = scope:recipient }
-                    }
-                    NOT = {
-                        de_jure_liege = { de_jure_liege = { holder = scope:recipient } }
-                    }
-                    NOT = {
-                        de_jure_liege = { de_jure_liege = { de_jure_liege = { holder = scope:recipient } } }
-                    }
-                    NOT = {
-                        de_jure_liege = { de_jure_liege = { de_jure_liege = { de_jure_liege = { holder = scope:recipient } } } }
-                    }
-                    # Only consider titles whose de jure liege title is currently held by the liege (duchy/kingdom/emperor)
-                    OR = {
-                        de_jure_liege = { holder = scope:liege }
-                        de_jure_liege = { de_jure_liege = { holder = scope:liege } }
-                        de_jure_liege = { de_jure_liege = { de_jure_liege = { holder = scope:liege } } }
-                        de_jure_liege = { de_jure_liege = { de_jure_liege = { de_jure_liege = { holder = scope:liege } } } }
-                    }
-                }
-                # Save the current title for notifications
-                save_scope_as = problematic_title
+    # 1. Directly held counties by recipient that are outside ALL recipient de jure chains, but not already held by liege.
+    scope:recipient = {
+        every_held_title = {
+            limit = {
+                tier = tier_county
+                exists = de_jure_liege
+                holder = scope:recipient
+                # Exclude any county whose de jure chain (up to empire) is held by the recipient
+                NOT = { de_jure_liege = { holder = scope:recipient } }
+                NOT = { de_jure_liege = { de_jure_liege = { holder = scope:recipient } } }
+                NOT = { de_jure_liege = { de_jure_liege = { de_jure_liege = { holder = scope:recipient } } } }
+                NOT = { de_jure_liege = { de_jure_liege = { de_jure_liege = { de_jure_liege = { holder = scope:recipient } } } } }
+                # Don't process if already held by liege
+                NOT = { holder = scope:liege }
+            }
+            create_title_and_vassal_change = { type = granted save_scope_as = change }
+            change_title_holder_include_vassals = { holder = scope:liege change = scope:change take_baronies = no }
+            resolve_title_and_vassal_change = scope:change
+            scope:liege = { set_variable = { name = riseandfall_fix_bordergore_made_changes value = 1 } }
+        }
+    }
 
-                # Create and apply a title-change that grants the saved title to the liege
-                # Use the same pattern as other title transfers in this mod
+    # 2. Sub‑realm counties (held by recipient's vassals) outside recipient de jure chains.
+    scope:recipient = {
+        every_sub_realm_county = {
+            limit = {
+                exists = this
+                exists = de_jure_liege
+                NOT = { de_jure_liege = { holder = scope:recipient } }
+                NOT = { de_jure_liege = { de_jure_liege = { holder = scope:recipient } } }
+                NOT = { de_jure_liege = { de_jure_liege = { de_jure_liege = { holder = scope:recipient } } } }
+                NOT = { de_jure_liege = { de_jure_liege = { de_jure_liege = { de_jure_liege = { holder = scope:recipient } } } } }
+                NOT = { holder = scope:liege }
+                NOT = { holder = scope:recipient }
+                NOT = { this = scope:liege.capital_province.county }
+                NOT = { this = scope:recipient.capital_province.county }
+            }
+            save_scope_as = target_county
+            if = {
+                limit = { NOT = { AND = { scope:target_county = { has_variable = Riseandfall_giveaway_blocked } scope:liege = { is_ai = no } } } }
                 create_title_and_vassal_change = { type = granted save_scope_as = change }
-
-                # We're in the title scope (this), change holder to the liege
-                change_title_holder_include_vassals = { holder = scope:liege change = scope:change take_baronies = no }
+                scope:target_county = { change_title_holder_include_vassals = { holder = scope:liege change = scope:change take_baronies = no } }
                 resolve_title_and_vassal_change = scope:change
-
-                # Mark that we made at least one change so we can send a single aggregate notification later
-                scope:liege = {
-                    set_variable = { name = riseandfall_fix_bordergore_made_changes value = 1 }
-                }
+                scope:liege = { set_variable = { name = riseandfall_fix_bordergore_made_changes value = 1 } }
             }
         }
     }
 
-    # Additionally, transfer county-tier titles held anywhere in the recipient's sub-realm
-    # (recipient + vassals) that are de jure to the liege. This covers counties held by
-    # vassals which the simple every_held_title loop would miss.
-    scope:liege = {
-        scope:recipient = {
-            every_sub_realm_county = {
-                limit = {
-                    exists = this
-                    exists = de_jure_liege
-                    # Skip counties that are de jure to the recipient (duchy/kingdom/emperor)
-                    NOT = {
-                        de_jure_liege = { holder = scope:recipient }
-                    }
-                    NOT = {
-                        de_jure_liege = { de_jure_liege = { holder = scope:recipient } }
-                    }
-                    NOT = {
-                        de_jure_liege = { de_jure_liege = { de_jure_liege = { holder = scope:recipient } } }
-                    }
-                    NOT = {
-                        de_jure_liege = { de_jure_liege = { de_jure_liege = { de_jure_liege = { holder = scope:recipient } } } }
-                    }
-                    # Only transfer counties whose de jure chain ultimately points to the liege
-                    OR = {
-                        de_jure_liege = { holder = scope:liege }
-                        de_jure_liege = { de_jure_liege = { holder = scope:liege } }
-                        de_jure_liege = { de_jure_liege = { de_jure_liege = { holder = scope:liege } } }
-                        de_jure_liege = { de_jure_liege = { de_jure_liege = { de_jure_liege = { holder = scope:liege } } } }
-                    }
-                    NOT = { holder = scope:liege } # skip counties already held by the liege
-                    NOT = { holder = scope:recipient } # skip counties held directly by the recipient to avoid duplicates
-                    NOT = { this = scope:liege.capital_province.county } # skip liege's capital county
-                    NOT = { this = scope:recipient.capital_province.county } # skip recipient's capital county
-                }
-                save_scope_as = target_county
-
-                # Skip transfer if giveaway-block is present and the liege is a human player
-                if = {
-                    limit = { NOT = { AND = { scope:target_county = { has_variable = Riseandfall_giveaway_blocked } scope:liege = { is_ai = no } } } }
-
-                    create_title_and_vassal_change = { type = granted save_scope_as = change }
-
-                    # Change the county holder to the liege (do not take baronies)
-                    scope:target_county = {
-                        change_title_holder_include_vassals = { holder = scope:liege change = scope:change take_baronies = no }
-                    }
-                    resolve_title_and_vassal_change = scope:change
-
-                    # Mark that we made at least one change so we can send a single aggregate notification later
-                    scope:liege = {
-                        set_variable = { name = riseandfall_fix_bordergore_made_changes value = 1 }
-                    }
-                }
-            }
-        }
-    }
-
-    # If any transfers happened, send one aggregated interface message rather than spamming one per title
+    # 3. Aggregate notification.
     scope:liege = {
         if = {
             limit = { has_variable = riseandfall_fix_bordergore_made_changes }
@@ -130,6 +74,5 @@ riseandfall_fix_bordergore_se = {
             }
             remove_variable = riseandfall_fix_bordergore_made_changes
         }
-    }
     }
 }
