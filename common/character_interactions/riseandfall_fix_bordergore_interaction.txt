@@ -49,7 +49,7 @@
         # Which characters does the ai consider as recipient for the interaction
         # Use a built-in target list; 'vassals' will make the AI consider vassals of the actor
         ai_recipients = vassals
-        max = 100
+        max = 99
     }
 
     ai_will_do = { base = 100 }

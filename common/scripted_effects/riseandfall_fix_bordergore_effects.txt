@@ -9,8 +9,11 @@ riseandfall_fix_bordergore_se = {
     # Expect the interaction to be run with scope:actor = liege and scope:recipient = vassal
     save_scope_as = liege
 
-    # Defensive guard: ensure liege still exists
-    scope:liege = {
+    # Only apply to vassals who hold duchies or higher titles
+    if = {
+        limit = { scope:recipient = { any_held_title = { OR = { tier = tier_duchy tier = tier_kingdom tier = tier_empire } } } }
+        # Defensive guard: ensure liege still exists
+        scope:liege = {
         # Iterate the recipient's held titles (only county-tier titles — do NOT transfer duchies or higher)
         scope:recipient = {
             every_held_title = {
@@ -28,11 +31,15 @@ riseandfall_fix_bordergore_se = {
                     NOT = {
                         de_jure_liege = { de_jure_liege = { de_jure_liege = { holder = scope:recipient } } }
                     }
+                    NOT = {
+                        de_jure_liege = { de_jure_liege = { de_jure_liege = { de_jure_liege = { holder = scope:recipient } } } }
+                    }
                     # Only consider titles whose de jure liege title is currently held by the liege (duchy/kingdom/emperor)
                     OR = {
                         de_jure_liege = { holder = scope:liege }
                         de_jure_liege = { de_jure_liege = { holder = scope:liege } }
                         de_jure_liege = { de_jure_liege = { de_jure_liege = { holder = scope:liege } } }
+                        de_jure_liege = { de_jure_liege = { de_jure_liege = { de_jure_liege = { holder = scope:liege } } } }
                     }
                 }
                 # Save the current title for notifications
@@ -73,11 +80,15 @@ riseandfall_fix_bordergore_se = {
                     NOT = {
                         de_jure_liege = { de_jure_liege = { de_jure_liege = { holder = scope:recipient } } }
                     }
+                    NOT = {
+                        de_jure_liege = { de_jure_liege = { de_jure_liege = { de_jure_liege = { holder = scope:recipient } } } }
+                    }
                     # Only transfer counties whose de jure chain ultimately points to the liege
                     OR = {
                         de_jure_liege = { holder = scope:liege }
                         de_jure_liege = { de_jure_liege = { holder = scope:liege } }
                         de_jure_liege = { de_jure_liege = { de_jure_liege = { holder = scope:liege } } }
+                        de_jure_liege = { de_jure_liege = { de_jure_liege = { de_jure_liege = { holder = scope:liege } } } }
                     }
                     NOT = { holder = scope:liege } # skip counties already held by the liege
                     NOT = { holder = scope:recipient } # skip counties held directly by the recipient to avoid duplicates
@@ -119,5 +130,6 @@ riseandfall_fix_bordergore_se = {
             }
             remove_variable = riseandfall_fix_bordergore_made_changes
         }
+    }
     }
 }
