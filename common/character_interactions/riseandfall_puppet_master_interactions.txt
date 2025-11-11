@@ -6,8 +6,8 @@
 riseandfall_steal_gold_interaction = {
 	interface_priority = 100
 	common_interaction = yes
-	category = interaction_category_diarch
-	icon = icon_personal
+	category = interaction_riseandfall
+	icon = icon_riseandfall
 	show_effects_in_notification = yes
 	desc = riseandfall_steal_gold_interaction_desc
 	diarch_interaction = yes
@@ -18,8 +18,20 @@ riseandfall_steal_gold_interaction = {
 	}
 
 	# Basic validity (no additional UI failures)
-	is_valid_showing_failures_only = { riseandfall_liege_stability_below_50 = yes scope:recipient = { riseandfall_no_cooldown = yes riseandfall_liege_has_gold = yes } }
-	is_valid = { riseandfall_liege_stability_below_50 = yes scope:recipient = { riseandfall_no_cooldown = yes riseandfall_liege_has_gold = yes } }
+	is_valid_showing_failures_only = {
+		riseandfall_liege_stability_below_50 = yes
+		scope:recipient = {
+			riseandfall_no_cooldown = yes
+			riseandfall_liege_has_gold = yes
+		}
+	}
+	is_valid = {
+		riseandfall_liege_stability_below_50 = yes
+		scope:recipient = {
+			riseandfall_no_cooldown = yes
+			riseandfall_liege_has_gold = yes
+		}
+	}
 
 	# Auto-accept: this is a unilateral diarch action
 	auto_accept = yes
@@ -71,8 +83,8 @@ riseandfall_steal_gold_interaction = {
 riseandfall_curry_favor_interaction = {
 	interface_priority = 90
 	common_interaction = yes
-	category = interaction_category_diarch
-	icon = icon_personal
+	category = interaction_riseandfall
+	icon = icon_riseandfall
 	show_effects_in_notification = yes
 	desc = riseandfall_curry_favor_interaction_desc
 	diarch_interaction = yes
@@ -135,11 +147,11 @@ riseandfall_curry_favor_interaction = {
 riseandfall_overthrow_liege_interaction = {
 	interface_priority = 80
 	common_interaction = no
-	category = interaction_category_diarch
-	icon = icon_personal
+	category = interaction_riseandfall
+	icon = icon_riseandfall
 	show_effects_in_notification = yes
 	desc = riseandfall_overthrow_liege_interaction_desc
-		diarch_interaction = yes
+	diarch_interaction = yes
 
 	is_shown = {
 		scope:recipient = { has_diarchy_type = puppet_regency }

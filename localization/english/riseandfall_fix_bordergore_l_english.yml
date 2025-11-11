@@ -1,6 +1,6 @@
 ﻿l_english:
 	riseandfall_fix_bordergore_interaction_desc:0 "Fix bordergore: force vassal-held duchies and kingdoms that are de jure to you back under your direct control. Use with care — this will transfer titles from the target vassal to you."
 	riseandfall_fix_bordergore_notification_title:0 "Bordergore fixed"
-		riseandfall_fix_bordergore_notification_desc:0 "You have taken direct control of:\n[SCOPE.sTitle('subject').GetNameNoTierNoTooltip] to fix de jure border inconsistencies."
-		riseandfall_fix_bordergore_notification_desc_aggregate:0 "You have taken direct control of several titles to fix de jure border inconsistencies."
-		riseandfall_fix_bordergore_interaction:0 "Fix Bordergore"
+	riseandfall_fix_bordergore_notification_desc:0 "You have taken direct control of:\n[SCOPE.sTitle('subject').GetNameNoTierNoTooltip] to fix de jure border inconsistencies."
+	riseandfall_fix_bordergore_notification_desc_aggregate:0 "You have taken direct control of several titles to fix de jure border inconsistencies."
+	riseandfall_fix_bordergore_interaction:0 "Fix Bordergore"

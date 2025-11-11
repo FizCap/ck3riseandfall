@@ -1,6 +1,7 @@
 ﻿riseandfall_fix_bordergore_interaction = {
-    category = interaction_category_diarch
+    category = interaction_riseandfall
     auto_accept = yes
+    icon = icon_riseandfall
     desc = riseandfall_fix_bordergore_interaction_desc
     target_type = character
 
@@ -17,22 +18,6 @@
             is_ai = yes
             liege = { this = scope:actor }
             NOT = { is_at_war_with = scope:actor }
-            # Visibility gate: recipient OR their direct vassals hold a county whose immediate de jure duchy is NOT held by recipient
-            OR = {
-                any_held_title = {
-                    tier = tier_county
-                    NOT = { de_jure_liege = { holder = scope:recipient } }
-                    # Exclude counties whose holder is already a direct vassal of the actor (liege); actor can act directly
-                    NOT = { holder = { liege = { this = scope:actor } } }
-                }
-                any_vassal = {
-                    any_held_title = {
-                        tier = tier_county
-                        NOT = { de_jure_liege = { holder = scope:recipient } }
-                        NOT = { holder = { liege = { this = scope:actor } } }
-                    }
-                }
-            }
         }
     }
 
