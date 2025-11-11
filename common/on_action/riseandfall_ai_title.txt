@@ -3,6 +3,7 @@
         riseandfall_ai_create_kingdoms
         riseandfall_ai_create_duchies
         riseandfall_ai_create_empires
+        riseandfall_ai_usurp_titles
         riseandfall_ai_title_handout
     }
 }
@@ -39,6 +40,15 @@ riseandfall_ai_create_empires = {
     }
     effect = {
         riseandfall_ai_create_empires_se = yes
+    }
+}
+
+riseandfall_ai_usurp_titles = {
+    trigger = {
+        has_game_rule = riseandfall_ai_kingdom_creation_enabled
+    }
+    effect = {
+        riseandfall_ai_usurp_titles_se = yes
     }
 }
 
