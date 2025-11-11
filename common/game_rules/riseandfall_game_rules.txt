@@ -165,7 +165,7 @@ riseandfall_enable_bordergore_fix = {
     }
 
     # Default: enabled
-    default = riseandfall_bordergore_fix_enabled
+    default = riseandfall_bordergore_fix_disabled
 
     riseandfall_bordergore_fix_enabled = {
     }
