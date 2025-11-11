@@ -203,7 +203,6 @@ riseandfall_ai_create_empires_se = {
                         government_has_flag = government_is_administrative
                     }
                 }
-                NOT = { tier = scope:acting_ruler.primary_title.tier }
             }
 
             # Try to create the empire if possible
