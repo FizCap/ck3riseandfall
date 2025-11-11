@@ -33,6 +33,9 @@
             NOT = { has_trait = warlord }  # Cannot use on warlords
             NOT = { is_at_war_with = scope:actor }
             liege = { this = scope:actor }
+            # Allow direct-count vassals too — counts may hold stray counties that cause bordergore.
+            # The earlier OR checks (any_held_title / any_vassal) will detect stray counties;
+            # removing the direct-count exclusion lets those checks operate for counts as well.
             # Validity gate: stray county directly held OR by a direct vassal beyond full de jure chain (up to empire)
             OR = {
                 any_held_title = {
@@ -41,16 +44,59 @@
                     NOT = { de_jure_liege = { de_jure_liege = { holder = scope:recipient } } }
                     NOT = { de_jure_liege = { de_jure_liege = { de_jure_liege = { holder = scope:recipient } } } }
                     NOT = { de_jure_liege = { de_jure_liege = { de_jure_liege = { de_jure_liege = { holder = scope:recipient } } } } }
-                    NOT = { holder = { liege = { this = scope:actor } } }
                 }
-                any_vassal = {
+                # Check any vassal at ANY depth (direct or indirect) for counties outside THEIR own de jure chain
+                any_vassal_or_below = {
                     any_held_title = {
                         tier = tier_county
-                        NOT = { de_jure_liege = { holder = scope:recipient } }
-                        NOT = { de_jure_liege = { de_jure_liege = { holder = scope:recipient } } }
-                        NOT = { de_jure_liege = { de_jure_liege = { de_jure_liege = { holder = scope:recipient } } } }
-                        NOT = { de_jure_liege = { de_jure_liege = { de_jure_liege = { de_jure_liege = { holder = scope:recipient } } } } }
-                        NOT = { holder = { liege = { this = scope:actor } } }
+                        # Test against the vassal's own de_jure chain ("this" refers to the vassal in this iterator)
+                        NOT = { de_jure_liege = { holder = THIS } }
+                        NOT = { de_jure_liege = { de_jure_liege = { holder = THIS } } }
+                        NOT = { de_jure_liege = { de_jure_liege = { de_jure_liege = { holder = THIS } } } }
+                        NOT = { de_jure_liege = { de_jure_liege = { de_jure_liege = { de_jure_liege = { holder = THIS } } } } }
+                    }
+                }
+                # If the recipient is a duke who holds an entire duchy (owns all de jure counties),
+                # allow the interaction — the effect will transfer such duchies to the liege.
+                any_held_title = {
+                    tier = tier_duchy
+                    save_scope_as = candidate_duchy
+                    scope:candidate_duchy = {
+                        every_de_jure_county = {
+                            limit = { NOT = { holder = scope:recipient } }
+                            # mark if any de jure county is missing from the recipient
+                            set_variable = { name = riseandfall_duchy_missing_counties value = 1 }
+                        }
+                        # only valid if the duchy's de jure liege is the actor (the liege) AND no missing counties
+                        NOT = { has_variable = riseandfall_duchy_missing_counties }
+                        de_jure_liege = { holder = scope:actor }
+                        remove_variable = riseandfall_duchy_missing_counties
+                    }
+                }
+                # If the recipient is a count, allow if they hold any county outside the de jure kingdom
+                # that contains their capital. This prevents counts from creating bordergore by holding
+                # counties in other kingdoms than their capital's kingdom.
+                AND = {
+                    highest_held_title_tier = tier_county
+                    # Save the recipient's capital county's de jure kingdom for comparison
+                    capital_province = {
+                        county = {
+                            de_jure_liege = {
+                                de_jure_liege = {
+                                    save_scope_as = recipient_capital_dejure_kingdom
+                                }
+                            }
+                        }
+                    }
+                    any_held_title = {
+                        tier = tier_county
+                        NOT = {
+                            de_jure_liege = {
+                                de_jure_liege = {
+                                    this = scope:recipient_capital_dejure_kingdom
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -73,7 +119,7 @@
         # Which characters does the ai consider as recipient for the interaction
         # Use a built-in target list; 'vassals' will make the AI consider vassals of the actor
         ai_recipients = vassals
-        max = 99
+        max = 100
     }
 
     ai_will_do = { base = 100 }
