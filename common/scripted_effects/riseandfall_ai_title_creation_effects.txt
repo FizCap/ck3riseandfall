@@ -27,14 +27,15 @@ riseandfall_ai_create_kingdoms_se = {
                 tier = tier_kingdom
                 scope:acting_ruler = {
                     OR = {
-                        primary_title.tier = tier_empire
-                        government_allows = administrative
-                        has_realm_law = partition_succession_law
-                        has_realm_law = confederate_partition_succession_law
-                        has_realm_law = high_partition_succession_law
+                        NOR = {
+                            has_realm_law = partition_succession_law
+                            has_realm_law = confederate_partition_succession_law
+                            has_realm_law = high_partition_succession_law
+                        }
+                        has_realm_law = single_heir_succession_law
+                        government_has_flag = government_is_administrative
                     }
                 }
-                NOT = { tier = scope:acting_ruler.primary_title.tier }
             }
 
             # Try to create the kingdom if possible
@@ -48,11 +49,32 @@ riseandfall_ai_create_kingdoms_se = {
                 }
             }
             scope:acting_ruler = {
-                # Use the engine helper used by decisions/events to create titles and transfer holdings
-                create_title_and_vassal_change = {
-                    type = created
-                    save_scope_as = title_change
-                    add_claim_on_loss = no
+                # If the engine considers this title usurpable by the acting ruler, add a usurp important action
+                if = {
+                    limit = { ordered_alert_usurpable_title = { limit = { this = scope:target_title } } }
+                    scope:target_title = {
+                        try_create_important_action = {
+                            important_action_type = action_can_usurp_title
+                            landed_title = this
+                        }
+                    }
+                }
+                # Use engine alert to decide if the AI should usurp (conquest) or create the title.
+                # If `ordered_alert_usurpable_title` lists this title for the acting ruler, attempt conquest/usurp.
+                if = {
+                    limit = { ordered_alert_usurpable_title = { limit = { this = scope:target_title } } }
+                    create_title_and_vassal_change = {
+                        type = conquest
+                        save_scope_as = title_change
+                        add_claim_on_loss = no
+                    }
+                }
+                else = {
+                    create_title_and_vassal_change = {
+                        type = created
+                        save_scope_as = title_change
+                        add_claim_on_loss = no
+                    }
                 }
 
                 prev = {
@@ -104,11 +126,31 @@ riseandfall_ai_create_duchies_se = {
                 }
             }
             scope:acting_count = {
-                # Use the engine helper used by decisions/events to create titles and transfer holdings
-                create_title_and_vassal_change = {
-                    type = created
-                    save_scope_as = title_change
-                    add_claim_on_loss = no
+                # If the engine considers this duchy usurpable by the acting count, add a usurp important action
+                if = {
+                    limit = { ordered_alert_usurpable_title = { limit = { this = scope:target_title } } }
+                    scope:target_title = {
+                        try_create_important_action = {
+                            important_action_type = action_can_usurp_title
+                            landed_title = this
+                        }
+                    }
+                }
+                # Use engine alert to decide if the AI should usurp (conquest) or create the duchy.
+                if = {
+                    limit = { ordered_alert_usurpable_title = { limit = { this = scope:target_title } } }
+                    create_title_and_vassal_change = {
+                        type = conquest
+                        save_scope_as = title_change
+                        add_claim_on_loss = no
+                    }
+                }
+                else = {
+                    create_title_and_vassal_change = {
+                        type = created
+                        save_scope_as = title_change
+                        add_claim_on_loss = no
+                    }
                 }
 
                 prev = {
@@ -152,11 +194,13 @@ riseandfall_ai_create_empires_se = {
                 tier = tier_empire
                 scope:acting_ruler = {
                     OR = {
-                        primary_title.tier = tier_empire
-                        government_allows = administrative
-                        has_realm_law = partition_succession_law
-                        has_realm_law = confederate_partition_succession_law
-                        has_realm_law = high_partition_succession_law
+                        NOR = {
+                            has_realm_law = partition_succession_law
+                            has_realm_law = confederate_partition_succession_law
+                            has_realm_law = high_partition_succession_law
+                        }
+                        has_realm_law = single_heir_succession_law
+                        government_has_flag = government_is_administrative
                     }
                 }
                 NOT = { tier = scope:acting_ruler.primary_title.tier }
@@ -173,11 +217,31 @@ riseandfall_ai_create_empires_se = {
                 }
             }
             scope:acting_ruler = {
-                # Use the engine helper used by decisions/events to create titles and transfer holdings
-                create_title_and_vassal_change = {
-                    type = created
-                    save_scope_as = title_change
-                    add_claim_on_loss = no
+                # If the engine considers this empire usurpable by the acting ruler, add a usurp important action
+                if = {
+                    limit = { ordered_alert_usurpable_title = { limit = { this = scope:target_title } } }
+                    scope:target_title = {
+                        try_create_important_action = {
+                            important_action_type = action_can_usurp_title
+                            landed_title = this
+                        }
+                    }
+                }
+                # Use engine alert to decide if the AI should usurp (conquest) or create the empire.
+                if = {
+                    limit = { ordered_alert_usurpable_title = { limit = { this = scope:target_title } } }
+                    create_title_and_vassal_change = {
+                        type = conquest
+                        save_scope_as = title_change
+                        add_claim_on_loss = no
+                    }
+                }
+                else = {
+                    create_title_and_vassal_change = {
+                        type = created
+                        save_scope_as = title_change
+                        add_claim_on_loss = no
+                    }
                 }
 
                 prev = {
