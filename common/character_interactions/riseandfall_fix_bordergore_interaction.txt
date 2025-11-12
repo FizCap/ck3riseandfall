@@ -56,13 +56,10 @@
                         NOT = { holder = scope:liege }
                         NOT = { holder = { is_ai = no } }
                         NOT = { scope:recipient = { highest_held_title_tier = tier_county } }  # Do not transfer direct counties from counts
-                        AND = {
-                            NOT = { de_jure_liege = { holder = scope:recipient } }
-                            NOT = { de_jure_liege = { de_jure_liege = { holder = scope:recipient } } }
-                            NOT = { de_jure_liege = { de_jure_liege = { de_jure_liege = { holder = scope:recipient } } } }
-                            NOT = { de_jure_liege = { de_jure_liege = { de_jure_liege = { de_jure_liege = { holder = scope:recipient } } } } }
-                            NOT = { AND = { scope:recipient = { highest_held_title_tier = tier_county } de_jure_liege = { de_jure_liege = { this = scope:recipient_capital_dejure_kingdom } } } }
-                        }
+                            AND = {
+                                # Fast, reliable check: county's de jure kingdom is NOT the recipient's capital de jure kingdom
+                                NOT = { de_jure_liege = { de_jure_liege = { this = scope:recipient_capital_dejure_kingdom } } }
+                            }
                     }
                 }
                 # Subrealm counties (held by direct vassals) that would be transferred
@@ -78,13 +75,11 @@
                             NOT = { holder = scope:recipient }
                             NOT = { this = scope:liege.capital_province.county }
                             NOT = { this = scope:recipient.capital_province.county }
-                            AND = {
-                                NOT = { de_jure_liege = { holder = scope:recipient } }
-                                NOT = { de_jure_liege = { de_jure_liege = { holder = scope:recipient } } }
-                                NOT = { de_jure_liege = { de_jure_liege = { de_jure_liege = { holder = scope:recipient } } } }
-                                NOT = { de_jure_liege = { de_jure_liege = { de_jure_liege = { de_jure_liege = { holder = scope:recipient } } } } }
-                                NOT = { AND = { scope:recipient = { highest_held_title_tier = tier_county } de_jure_liege = { de_jure_liege = { this = scope:recipient_capital_dejure_kingdom } } } }
-                            }
+                                AND = {
+                                    # Treat a vassal-held county as bordergore candidate when its de jure kingdom
+                                    # does not match the recipient's capital de jure kingdom.
+                                    NOT = { de_jure_liege = { de_jure_liege = { this = scope:recipient_capital_dejure_kingdom } } }
+                                }
                             NOT = { AND = { has_variable = Riseandfall_giveaway_blocked scope:liege = { is_ai = no } } }
                         }
                     }
