@@ -1,4 +1,7 @@
 ﻿l_english:
+ riseandfall_fix_bordergore.recipient_direct_counties.tooltip:0 "Any directly held counties of the vassal would be transferred to you by this action."
+ riseandfall_fix_bordergore.vassal_direct_counties.tooltip:0 "One or more counties held by the vassal's own vassals would be transferred to you by this action."
+l_english:
 	riseandfall_fix_bordergore_interaction_desc:0 "Fix bordergore: force vassal-held duchies and kingdoms that are de jure to you back under your direct control. Use with care — this will transfer titles from the target vassal to you."
 	riseandfall_fix_bordergore_notification_title:0 "Bordergore fixed"
 	riseandfall_fix_bordergore_notification_desc:0 "You have taken direct control of:\n[SCOPE.sTitle('subject').GetNameNoTierNoTooltip] to fix de jure border inconsistencies."
