@@ -35,16 +35,32 @@ riseandfall_ai_create_kingdoms_se = {
                         government_allows = administrative
                         # Partition laws only allow creation of higher-tier titles (e.g. count -> duchy -> kingdom),
                         # but are allowed when creating a kingdom for a ruler whose primary tier is lower.
-                        AND = {
+                        # Partition laws only allow creation of higher-tier titles (e.g. count -> duchy -> kingdom).
+                        # We check the partition law in the character scope, but title `tier` must be evaluated
+                        # in the landed_title scope. Compare that below after the acting_ruler check.
+                        OR = {
+                            has_realm_law = partition_succession_law
+                            has_realm_law = confederate_partition_succession_law
+                            has_realm_law = high_partition_succession_law
+                        }
+                    }
+                }
+                # If a partition law is present then we must ensure the kingdom isn't the same tier as the acting ruler's
+                # primary title (partition is for creating higher-tier titles). Evaluate the `tier` comparison at
+                # the landed_title scope (the root here) to avoid wrong-scope triggers.
+                NOT = {
+                    AND = {
+                        scope:acting_ruler = {
                             OR = {
                                 has_realm_law = partition_succession_law
                                 has_realm_law = confederate_partition_succession_law
                                 has_realm_law = high_partition_succession_law
                             }
-                            NOT = { tier = scope:acting_ruler.primary_title.tier }
                         }
+                        tier = scope:acting_ruler.primary_title.tier
                     }
                 }
+
                 # Prevent creating a kingdom with the same tier as the acting ruler's primary title unless the
                 # acting ruler has single-heir succession. This matches the intent: only single-heir realm law
                 # allows duplicating the same-tier title.
@@ -114,17 +130,31 @@ riseandfall_ai_create_duchies_se = {
                         # Single-heir can create same-tier (additional duchy) or higher.
                         has_realm_law = single_heir_succession_law
                         # Partition laws: only if creating higher-tier while primary is lower (count -> duchy). Block dukes.
-                        AND = {
+                        # Partition laws only allow creating a higher-tier title; the `tier` comparison must
+                        # be outside of the character scope. See the outer compare below.
+                        OR = {
+                            has_realm_law = partition_succession_law
+                            has_realm_law = confederate_partition_succession_law
+                            has_realm_law = high_partition_succession_law
+                        }
+                        # Administrative governments are NOT allowed to create duchy-tier titles (or lower).
+                    }
+                }
+                # If a partition law is present then ensure the duchy isn't the same tier as the acting ruler's
+                # primary title. Evaluate `tier` at the landed_title scope.
+                NOT = {
+                    AND = {
+                        scope:acting_count = {
                             OR = {
                                 has_realm_law = partition_succession_law
                                 has_realm_law = confederate_partition_succession_law
                                 has_realm_law = high_partition_succession_law
                             }
-                            NOT = { tier = scope:acting_count.primary_title.tier }
                         }
-                        # Administrative governments are NOT allowed to create duchy-tier titles (or lower).
+                        tier = scope:acting_count.primary_title.tier
                     }
                 }
+
                 # Prevent creating a duchy with the same tier as the acting ruler's primary title unless the
                 # acting ruler has single-heir succession.
                 NOT = {
@@ -196,22 +226,28 @@ riseandfall_ai_create_empires_se = {
                         # Single-heir can create same-tier (additional empire) or higher (king -> empire).
                         has_realm_law = single_heir_succession_law
                         # Partition succession: only allow if target tier is higher (king -> empire), block emperor duplicates.
-                        AND = {
-                            OR = {
-                                has_realm_law = partition_succession_law
-                                has_realm_law = confederate_partition_succession_law
-                                has_realm_law = high_partition_succession_law
-                            }
-                            NOT = { tier = scope:acting_ruler.primary_title.tier }
+                        OR = {
+                            has_realm_law = partition_succession_law
+                            has_realm_law = confederate_partition_succession_law
+                            has_realm_law = high_partition_succession_law
                         }
                                 # Administrative governments are NOT allowed to create empire-tier titles.
                     }
                 }
                         # Prevent creating an empire with the same tier as the acting ruler's primary title unless the
                         # acting ruler has single-heir succession.
+                        # Partition-specific rule: when partition laws exist, require the target tier not be
+                        # equal to the acting ruler's primary title tier. ``tier`` must be evaluated at the
+                        # landed_title scope, so it's performed here.
                         NOT = {
                             AND = {
-                                NOT = { scope:acting_ruler = { has_realm_law = single_heir_succession_law } }
+                                scope:acting_ruler = {
+                                    OR = {
+                                        has_realm_law = partition_succession_law
+                                        has_realm_law = confederate_partition_succession_law
+                                        has_realm_law = high_partition_succession_law
+                                    }
+                                }
                                 tier = scope:acting_ruler.primary_title.tier
                             }
                         }
@@ -268,25 +304,38 @@ riseandfall_ai_usurp_titles_se = {
             check_range_bounds = no
             max = 1000
 
-            limit = {
-                scope:acting_ruler = {
-                    OR = {
-                        has_realm_law = single_heir_succession_law
-                        AND = {
+                limit = {
+                    # Check for single-heir and partition laws in acting_ruler scope; don't compare ``tier`` here.
+                    scope:acting_ruler = {
+                        OR = {
+                            has_realm_law = single_heir_succession_law
                             OR = {
                                 has_realm_law = partition_succession_law
                                 has_realm_law = confederate_partition_succession_law
                                 has_realm_law = high_partition_succession_law
                             }
-                            tier = scope:acting_ruler.primary_title.tier
-                        }
-                        AND = {
                             government_has_flag = government_is_administrative
-                            NOT = { tier = scope:acting_ruler.primary_title.tier }
                         }
                     }
+
+                    # If a partition law flows through, ensure the target title tier matches the acting ruler's primary title.
+                    AND = {
+                        scope:acting_ruler = {
+                            OR = {
+                                has_realm_law = partition_succession_law
+                                has_realm_law = confederate_partition_succession_law
+                                has_realm_law = high_partition_succession_law
+                            }
+                        }
+                        tier = scope:acting_ruler.primary_title.tier
+                    }
+
+                    # If the government is administrative, block duplicates when the target title's tier equals acting's primary.
+                    AND = {
+                        scope:acting_ruler = { government_has_flag = government_is_administrative }
+                        NOT = { tier = scope:acting_ruler.primary_title.tier }
+                    }
                 }
-            }
 
             # Try to usurp the title if possible
             save_scope_as = target_title
