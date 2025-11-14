@@ -31,9 +31,27 @@ riseandfall_ai_create_kingdoms_se = {
                     OR = {
                         # Single-heir can create same-tier (additional kingdom) or higher (handled in empire creation effect).
                         has_realm_law = single_heir_succession_law
-                        # Partition laws only allow creation of higher-tier titles; since target is same-tier kingdom, block kings on partition.
-                        # (No branch for partition here intentionally.)
-                        # Administrative governments also blocked for same-tier kingdom creation.
+                        # Also allow administrative governments (matches player-side auto-create behavior).
+                        government_allows = administrative
+                        # Partition laws only allow creation of higher-tier titles (e.g. count -> duchy -> kingdom),
+                        # but are allowed when creating a kingdom for a ruler whose primary tier is lower.
+                        AND = {
+                            OR = {
+                                has_realm_law = partition_succession_law
+                                has_realm_law = confederate_partition_succession_law
+                                has_realm_law = high_partition_succession_law
+                            }
+                            NOT = { tier = scope:acting_ruler.primary_title.tier }
+                        }
+                    }
+                }
+                # Prevent creating a kingdom with the same tier as the acting ruler's primary title unless the
+                # acting ruler has single-heir succession. This matches the intent: only single-heir realm law
+                # allows duplicating the same-tier title.
+                NOT = {
+                    AND = {
+                        NOT = { scope:acting_ruler = { has_realm_law = single_heir_succession_law } }
+                        tier = scope:acting_ruler.primary_title.tier
                     }
                 }
             }
@@ -107,6 +125,14 @@ riseandfall_ai_create_duchies_se = {
                         # Administrative governments are NOT allowed to create duchy-tier titles (or lower).
                     }
                 }
+                # Prevent creating a duchy with the same tier as the acting ruler's primary title unless the
+                # acting ruler has single-heir succession.
+                NOT = {
+                    AND = {
+                        NOT = { scope:acting_count = { has_realm_law = single_heir_succession_law } }
+                        tier = scope:acting_count.primary_title.tier
+                    }
+                }
             }
 
             # Try to create the duchy if possible
@@ -178,9 +204,17 @@ riseandfall_ai_create_empires_se = {
                             }
                             NOT = { tier = scope:acting_ruler.primary_title.tier }
                         }
-                        # Administrative governments are NOT allowed to create empire-tier titles.
+                                # Administrative governments are NOT allowed to create empire-tier titles.
                     }
                 }
+                        # Prevent creating an empire with the same tier as the acting ruler's primary title unless the
+                        # acting ruler has single-heir succession.
+                        NOT = {
+                            AND = {
+                                NOT = { scope:acting_ruler = { has_realm_law = single_heir_succession_law } }
+                                tier = scope:acting_ruler.primary_title.tier
+                            }
+                        }
             }
 
             # Try to create the empire if possible
