@@ -3,10 +3,10 @@
 # Computes a 0..100 realm stability score and stores it on the ruler as
 # riseandfall_realm_stability_score
 # Weighting (user spec):
-#  - 50% ruler stats (Diplomacy/Martial/Stewardship/Intrigue/Learning)
+#  - 30% ruler stats (Diplomacy/Martial/Stewardship/Intrigue/Learning)
 #    For every full 10 points in a stat -> +10 (max 50)
-#  - 20% legitimacy (based on ruler's legitimacy level: 1=0, 2=4, 3=8, 4=14, 5=20)
-#  - 30% vassal relations (average direct vassal opinion -100..100 mapped to 0..30)
+#  - 20% legitimacy (multiplier applied to base: 50%..100%)
+#  - 50% vassal relations (average direct vassal opinion -100..100 mapped to -50..+50)
 
 riseandfall_calculate_realm_stability_se = {
     # Root scope: called from an every_ruler on_action, so root is the ruler
@@ -231,30 +231,29 @@ riseandfall_calculate_realm_stability_se = {
 
 
     ########################################
-    # 2) LEGITIMACY - manual lookup mapping
-    # We no longer compute via linear arithmetic. Instead we assign explicit
-    # component values per discrete legitimacy/piety/celestial/influence level.
-    # Standard mapping for levels (0..5):
-    #   0 -> -20
-    #   1 -> -15
-    #   2 -> -8
-    #   3 -> 0
-    #   4 -> 8
-    #   5 -> 20
+    # 2) LEGITIMACY (now a multiplicative factor)
+    # Instead of an additive component, legitimacy (or piety/influence/celestial)
+    # now acts as a multiplier on the computed tmp_target_score.
+    # Range mapping (percent): standard legitimacy 0..5 -> 50%..100%.
+    # We keep an additive legacy var at 0 for compatibility but expose
+    # a new percent multiplier: riseandfall_rs_legitimacy_multiplier
     set_variable = { name = riseandfall_rs_legitimacy_component value = 0 }
+    set_variable = { name = riseandfall_rs_legitimacy_multiplier value = 100 }
 
     # Theocracy uses piety_level (0..5) mapped via the same manual table
     if = {
         limit = { has_government = theocracy_government }
         set_variable = { name = tmp_piety_level value = piety_level }
-        if = { limit = { var:tmp_piety_level = 0 } set_variable = { name = tmp_piety_mapped value = -20 } }
-        else_if = { limit = { var:tmp_piety_level = 1 } set_variable = { name = tmp_piety_mapped value = -15 } }
-        else_if = { limit = { var:tmp_piety_level = 2 } set_variable = { name = tmp_piety_mapped value = -8 } }
-        else_if = { limit = { var:tmp_piety_level = 3 } set_variable = { name = tmp_piety_mapped value = 0 } }
-        else_if = { limit = { var:tmp_piety_level = 4 } set_variable = { name = tmp_piety_mapped value = 8 } }
-        else_if = { limit = { var:tmp_piety_level = 5 } set_variable = { name = tmp_piety_mapped value = 20 } }
+        # Map piety -> multiplicative % (0 -> 50% .. 5 -> 100%).
+        if = { limit = { var:tmp_piety_level = 0 } set_variable = { name = tmp_piety_mapped value = 50 } }
+        else_if = { limit = { var:tmp_piety_level = 1 } set_variable = { name = tmp_piety_mapped value = 58 } }
+        else_if = { limit = { var:tmp_piety_level = 2 } set_variable = { name = tmp_piety_mapped value = 66 } }
+        else_if = { limit = { var:tmp_piety_level = 3 } set_variable = { name = tmp_piety_mapped value = 74 } }
+        else_if = { limit = { var:tmp_piety_level = 4 } set_variable = { name = tmp_piety_mapped value = 86 } }
+        else_if = { limit = { var:tmp_piety_level = 5 } set_variable = { name = tmp_piety_mapped value = 100 } }
         else = { set_variable = { name = tmp_piety_mapped value = 0 } }
-        set_variable = { name = riseandfall_rs_legitimacy_component value = var:tmp_piety_mapped }
+                set_variable = { name = riseandfall_rs_legitimacy_multiplier value = var:tmp_piety_mapped }
+                debug_log = "riseandfall: piety_leg_multiplier applied (piety mapping)"
     }
     else = {
         # If the realm has a legitimacy mechanic, check for celestial vs standard
@@ -265,28 +264,34 @@ riseandfall_calculate_realm_stability_se = {
                 # Celestial uses 0..7. Apply manual mapping for 0..5 as above and
                 # clamp higher levels to the max positive (20).
                 set_variable = { name = tmp_cel value = legitimacy_level }
-                if = { limit = { var:tmp_cel = 0 } set_variable = { name = tmp_cel_mapped value = -20 } }
-                else_if = { limit = { var:tmp_cel = 1 } set_variable = { name = tmp_cel_mapped value = -15 } }
-                else_if = { limit = { var:tmp_cel = 2 } set_variable = { name = tmp_cel_mapped value = -8 } }
-                else_if = { limit = { var:tmp_cel = 3 } set_variable = { name = tmp_cel_mapped value = 0 } }
-                else_if = { limit = { var:tmp_cel = 4 } set_variable = { name = tmp_cel_mapped value = 8 } }
-                else_if = { limit = { var:tmp_cel = 5 } set_variable = { name = tmp_cel_mapped value = 20 } }
-                else_if = { limit = { var:tmp_cel = 6 } set_variable = { name = tmp_cel_mapped value = 20 } }
-                else_if = { limit = { var:tmp_cel = 7 } set_variable = { name = tmp_cel_mapped value = 20 } }
+                # Celestial mapping (0..7): treat 0..5 as the lower half of the scale,
+                # then 6..7 are the high rarer tiers.
+                if = { limit = { var:tmp_cel = 0 } set_variable = { name = tmp_cel_mapped value = 50 } }
+                else_if = { limit = { var:tmp_cel = 1 } set_variable = { name = tmp_cel_mapped value = 58 } }
+                else_if = { limit = { var:tmp_cel = 2 } set_variable = { name = tmp_cel_mapped value = 66 } }
+                else_if = { limit = { var:tmp_cel = 3 } set_variable = { name = tmp_cel_mapped value = 74 } }
+                else_if = { limit = { var:tmp_cel = 4 } set_variable = { name = tmp_cel_mapped value = 86 } }
+                else_if = { limit = { var:tmp_cel = 5 } set_variable = { name = tmp_cel_mapped value = 93 } }
+                else_if = { limit = { var:tmp_cel = 6 } set_variable = { name = tmp_cel_mapped value = 97 } }
+                else_if = { limit = { var:tmp_cel = 7 } set_variable = { name = tmp_cel_mapped value = 100 } }
                 else = { set_variable = { name = tmp_cel_mapped value = 0 } }
-                set_variable = { name = riseandfall_rs_legitimacy_component value = var:tmp_cel_mapped }
+                set_variable = { name = riseandfall_rs_legitimacy_multiplier value = var:tmp_cel_mapped }
+                debug_log = "riseandfall: celestial_leg_multiplier applied (celestial mapping)"
             }
             else = {
                 # Standard legitimacy_level 0..5 -> manual mapping
                 set_variable = { name = tmp_leg value = legitimacy_level }
-                if = { limit = { var:tmp_leg = 0 } set_variable = { name = tmp_leg_mapped value = -20 } }
-                else_if = { limit = { var:tmp_leg = 1 } set_variable = { name = tmp_leg_mapped value = -15 } }
-                else_if = { limit = { var:tmp_leg = 2 } set_variable = { name = tmp_leg_mapped value = -8 } }
-                else_if = { limit = { var:tmp_leg = 3 } set_variable = { name = tmp_leg_mapped value = 0 } }
-                else_if = { limit = { var:tmp_leg = 4 } set_variable = { name = tmp_leg_mapped value = 8 } }
-                else_if = { limit = { var:tmp_leg = 5 } set_variable = { name = tmp_leg_mapped value = 20 } }
+                # Standard mapping for legitimacy 0..5 -> percents
+                if = { limit = { var:tmp_leg = 0 } set_variable = { name = tmp_leg_mapped value = 50 } }
+                else_if = { limit = { var:tmp_leg = 1 } set_variable = { name = tmp_leg_mapped value = 58 } }
+                else_if = { limit = { var:tmp_leg = 2 } set_variable = { name = tmp_leg_mapped value = 66 } }
+                else_if = { limit = { var:tmp_leg = 3 } set_variable = { name = tmp_leg_mapped value = 74 } }
+                else_if = { limit = { var:tmp_leg = 4 } set_variable = { name = tmp_leg_mapped value = 86 } }
+                else_if = { limit = { var:tmp_leg = 5 } set_variable = { name = tmp_leg_mapped value = 100 } }
                 else = { set_variable = { name = tmp_leg_mapped value = 0 } }
-                set_variable = { name = riseandfall_rs_legitimacy_component value = var:tmp_leg_mapped }
+                # Store the percent as a multiplier for later use
+                set_variable = { name = riseandfall_rs_legitimacy_multiplier value = var:tmp_leg_mapped }
+                debug_log = "riseandfall: legit_multiplier applied (standard mapping)"
             }
         }
         else = {
@@ -303,75 +308,13 @@ riseandfall_calculate_realm_stability_se = {
                 else_if = { limit = { var:tmp_inf = 5 } set_variable = { name = tmp_inf_mapped value = 20 } }
                 else_if = { limit = { var:tmp_inf = 6 } set_variable = { name = tmp_inf_mapped value = 20 } }
                 else = { set_variable = { name = tmp_inf_mapped value = 0 } }
-                set_variable = { name = riseandfall_rs_legitimacy_component value = var:tmp_inf_mapped }
+                # Influence mapping returns -20..+20 — convert to percent (100 +/- value)
+                if = { limit = { NOT = { has_variable = riseandfall_rs_legitimacy_multiplier } } set_variable = { name = riseandfall_rs_legitimacy_multiplier value = 100 } }
+                change_variable = { name = riseandfall_rs_legitimacy_multiplier add = var:tmp_inf_mapped }
+                debug_log = "riseandfall: influence_leg_multiplier applied (influence mapping)"
             }
         }
     }
-
-    ########################################
-    # 2.5) REALM LAW (0..20)
-    # Map authority law levels to a small stability bonus exposed in the tooltip
-    # Check the scoped character's authority level for different government types
-    set_variable = { name = riseandfall_rs_realm_law_component value = 0 }
-    # Check crown authority (feudal)
-    if = {
-        limit = { has_realm_law = crown_authority_3 }
-        set_variable = { name = riseandfall_rs_realm_law_component value = 15 }
-    }
-    else_if = {
-        limit = { has_realm_law = crown_authority_2 }
-        set_variable = { name = riseandfall_rs_realm_law_component value = 10 }
-    }
-    else_if = {
-        limit = { has_realm_law = crown_authority_1 }
-        set_variable = { name = riseandfall_rs_realm_law_component value = 5 }
-    }
-    # Check tribal authority
-    else_if = {
-        limit = { has_realm_law = tribal_authority_3 }
-        set_variable = { name = riseandfall_rs_realm_law_component value = 15 }
-    }
-    else_if = {
-        limit = { has_realm_law = tribal_authority_2 }
-        set_variable = { name = riseandfall_rs_realm_law_component value = 10 }
-    }
-    else_if = {
-        limit = { has_realm_law = tribal_authority_1 }
-        set_variable = { name = riseandfall_rs_realm_law_component value = 5 }
-    }
-    # Check imperial bureaucracy
-    else_if = {
-        limit = { has_realm_law = imperial_bureaucracy_3 }
-        set_variable = { name = riseandfall_rs_realm_law_component value = 15 }
-    }
-    else_if = {
-        limit = { has_realm_law = imperial_bureaucracy_2 }
-        set_variable = { name = riseandfall_rs_realm_law_component value = 10 }
-    }
-    else_if = {
-        limit = { has_realm_law = imperial_bureaucracy_1 }
-        set_variable = { name = riseandfall_rs_realm_law_component value = 5 }
-    }
-    # Check nomadic authority (has 5 levels, so scale to 20 max)
-    else_if = {
-        limit = { has_realm_law = nomadic_authority_5 }
-        set_variable = { name = riseandfall_rs_realm_law_component value = 20 }
-    }
-    else_if = {
-        limit = { has_realm_law = nomadic_authority_4 }
-        set_variable = { name = riseandfall_rs_realm_law_component value = 15 }
-    }
-    else_if = {
-        limit = { has_realm_law = nomadic_authority_3 }
-        set_variable = { name = riseandfall_rs_realm_law_component value = 10 }
-    }
-    else_if = {
-        limit = { has_realm_law = nomadic_authority_2 }
-        set_variable = { name = riseandfall_rs_realm_law_component value = 5 }
-    }
-    else = { set_variable = { name = riseandfall_rs_realm_law_component value = 0 } }
-    # Expose the chosen authority bonus for the tooltip
-    set_variable = { name = riseandfall_realm_stability_realm_law_bonus value = var:riseandfall_rs_realm_law_component }
 
     ########################################
     # 3) VASSAL RELATIONS (-30..+30)
@@ -419,16 +362,16 @@ riseandfall_calculate_realm_stability_se = {
         set_variable = { name = tmp_avg_opinion value = 0 }
     }
 
-    # Map -100..+100 to -30..+30 by scaling: value * 30 / 100 (implemented as *3 /10)
+    # Map -100..+100 to -50..+50 by scaling: value * 50 / 100 (implemented as *50 / 100)
     # This makes an average opinion of -68 -> -20 (approx), +80 -> +24
     # Use integer math: multiply first then divide to preserve precision.
-    change_variable = { name = tmp_avg_opinion multiply = 3 }
-    change_variable = { name = tmp_avg_opinion divide = 10 }
+    change_variable = { name = tmp_avg_opinion multiply = 50 }
+    change_variable = { name = tmp_avg_opinion divide = 100 }
     # Round the scaled value to keep the component integer
     round_variable = { name = tmp_avg_opinion nearest = 1 }
     set_variable = { name = riseandfall_rs_vassals_component value = var:tmp_avg_opinion }
 
-    clamp_variable = { name = riseandfall_rs_vassals_component min = -30 max = 30 }
+    clamp_variable = { name = riseandfall_rs_vassals_component min = -50 max = 50 }
 
     ########################################
     # 3.6) PUPPET REGENCY TRACKING
@@ -449,20 +392,32 @@ riseandfall_calculate_realm_stability_se = {
     # Ensure component vars exist (safe defaults) to avoid unset-variable engine errors
     if = { limit = { NOT = { has_variable = riseandfall_rs_stats_component } } set_variable = { name = riseandfall_rs_stats_component value = 0 } }
     if = { limit = { NOT = { has_variable = riseandfall_rs_legitimacy_component } } set_variable = { name = riseandfall_rs_legitimacy_component value = 0 } }
+    if = { limit = { NOT = { has_variable = riseandfall_rs_legitimacy_multiplier } } set_variable = { name = riseandfall_rs_legitimacy_multiplier value = 100 } }
     if = { limit = { NOT = { has_variable = riseandfall_rs_vassals_component } } set_variable = { name = riseandfall_rs_vassals_component value = 0 } }
-    if = { limit = { NOT = { has_variable = riseandfall_rs_realm_law_component } } set_variable = { name = riseandfall_rs_realm_law_component value = 0 } }
     if = { limit = { NOT = { has_variable = riseandfall_rs_popular_opinion_component } } set_variable = { name = riseandfall_rs_popular_opinion_component value = 0 } }
     # Start from 50 as the equilibrium midpoint; components shift toward 0 or 100
     set_variable = { name = tmp_target_score value = 50 }
-    change_variable = { name = tmp_target_score add = var:riseandfall_rs_stats_component }
-    change_variable = { name = tmp_target_score add = var:riseandfall_rs_legitimacy_component }
+    # Scale stats component down to account for new weighting: stats now 30%.
+    set_variable = { name = tmp_stats_scaled value = var:riseandfall_rs_stats_component }
+    change_variable = { name = tmp_stats_scaled multiply = 60 }
+    change_variable = { name = tmp_stats_scaled divide = 100 }
+    change_variable = { name = tmp_target_score add = var:tmp_stats_scaled }
+    # NOTE: legitimacy multiplier will be applied after realm law/vassal additions to scale the
+    # final target (see below). For now we leave the multiplier application to the later stage.
+    # Vassal relations are now 50% of calculation; add scaled vassal component mapped to -50..+50
     change_variable = { name = tmp_target_score add = var:riseandfall_rs_vassals_component }
-    # Add realm law component (0..20)
-    change_variable = { name = tmp_target_score add = var:riseandfall_rs_realm_law_component }
+    # (It no longer contributes directly; stability is now dominated by stats and vassals, with
+    # legitimacy as a multiplier applied below.)
 
 
     # Puppet regency multiplier is now applied during per-stat calculation (section 1).
     # Keep the tooltip variable intact but do not apply an additional multiplier here.
+
+    # Now apply the legitimacy multiplier to the current target score (percent math).
+    if = { limit = { has_variable = riseandfall_rs_legitimacy_multiplier }
+        change_variable = { name = tmp_target_score multiply = var:riseandfall_rs_legitimacy_multiplier }
+        change_variable = { name = tmp_target_score divide = 100 }
+    }
 
     # Apply puppet regency linear multiplier to the TARGET score: 2% per year (linear)
     # e.g., 5 years -> 100 - 2*5 = 90% (tmp_target_score * 0.90)
@@ -491,8 +446,6 @@ riseandfall_calculate_realm_stability_se = {
     if = { limit = { NOT = { has_variable = riseandfall_rs_civil_war_years } } set_variable = { name = riseandfall_rs_civil_war_years value = 0 } }
     # Ensure sex-law penalty tooltip var exists
     if = { limit = { NOT = { has_variable = riseandfall_realm_stability_sex_law_penalty } } set_variable = { name = riseandfall_realm_stability_sex_law_penalty value = 0 } }
-    # Ensure realm-law (crown authority) tooltip var exists
-    if = { limit = { NOT = { has_variable = riseandfall_realm_stability_realm_law_bonus } } set_variable = { name = riseandfall_realm_stability_realm_law_bonus value = 0 } }
 
     if = {
         limit = { is_independent_ruler = yes }
