@@ -850,9 +850,16 @@ riseandfall_inherit_stability_score_se = {
             }
             # Also initialize other variables the heir might need
             set_variable = { name = riseandfall_rs_adjust_months value = 0 }
-            set_variable = { name = riseandfall_rs_civil_war_years value = 0 }
-            set_variable = { name = riseandfall_puppet_regency_years value = 0 }
-            set_variable = { name = riseandfall_realm_stability_war_multiplier value = 100 }
+            # Copy companion history from predecessor: civil war years, puppet regency years, and war multiplier
+            if = { limit = { scope:predecessor = { has_variable = riseandfall_rs_civil_war_years } } set_variable = { name = riseandfall_rs_civil_war_years value = scope:predecessor.var:riseandfall_rs_civil_war_years } }
+            debug_log = "riseandfall: inherited civil_war_years (predecessor->heir) -> %d" var:riseandfall_rs_civil_war_years
+            else = { set_variable = { name = riseandfall_rs_civil_war_years value = 0 } }
+            if = { limit = { scope:predecessor = { has_variable = riseandfall_puppet_regency_years } } set_variable = { name = riseandfall_puppet_regency_years value = scope:predecessor.var:riseandfall_puppet_regency_years } }
+            debug_log = "riseandfall: inherited puppet_regency_years (predecessor->heir) -> %d" var:riseandfall_puppet_regency_years
+            else = { set_variable = { name = riseandfall_puppet_regency_years value = 0 } }
+            if = { limit = { scope:predecessor = { has_variable = riseandfall_realm_stability_war_multiplier } } set_variable = { name = riseandfall_realm_stability_war_multiplier value = scope:predecessor.var:riseandfall_realm_stability_war_multiplier } }
+            debug_log = "riseandfall: inherited war_multiplier (predecessor->heir) -> %d" var:riseandfall_realm_stability_war_multiplier
+            else = { set_variable = { name = riseandfall_realm_stability_war_multiplier value = 100 } }
         }
         else = {
             # Predecessor had no stability score; initialize heir to baseline

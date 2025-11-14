@@ -146,6 +146,21 @@ riseandfall_on_title_gain_inheritance = {
         }
         else_if = {
             limit = {
+                has_variable = riseandfall_realm_stability_score
+                holds_landed_title = yes
+                exists = scope:previous_holder
+                scope:previous_holder = { has_variable = riseandfall_realm_stability_score }
+                OR = {
+                    scope:previous_holder = { is_landed = no }
+                    highest_held_title_tier < scope:previous_holder.highest_held_title_tier
+                }
+            }
+            # He already has a stability score; only inherit secondary history variables
+            scope:previous_holder = { save_scope_as = predecessor }
+            riseandfall_inherit_realm_history_se = yes
+        }
+        else_if = {
+            limit = {
                 NOT = { has_variable = riseandfall_realm_stability_score }
                 holds_landed_title = yes
             }
