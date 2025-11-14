@@ -3,7 +3,6 @@
     auto_accept = yes
     icon = icon_riseandfall
     desc = riseandfall_fix_bordergore_interaction_desc
-    target_type = character
 
     # Only top lieges (king or above) can use this on their vassals
     is_shown = {
@@ -16,7 +15,7 @@
         scope:recipient = {
             government_has_flag = government_is_administrative
             is_ai = yes
-            liege = { this = scope:actor }
+            liege = scope:actor
             NOT = { is_at_war_with = scope:actor }
         }
     }
@@ -32,18 +31,8 @@
             government_has_flag = government_is_administrative
             NOT = { has_trait = warlord }  # Cannot use on warlords
             NOT = { is_at_war_with = scope:actor }
-            liege = { this = scope:actor }
+            liege = scope:actor
             NOT = { highest_held_title_tier = tier_county }  # Counts are not eligible for bordergore fix
-            # Save recipient's capital county's de jure kingdom
-            capital_province = {
-                county = {
-                    de_jure_liege = {
-                        de_jure_liege = {
-                            save_scope_as = recipient_capital_dejure_kingdom
-                        }
-                    }
-                }
-            }
             OR = {
                 # Directly held counties by recipient that would be transferred
                 custom_tooltip = {
@@ -53,13 +42,30 @@
                         tier = tier_county
                         exists = de_jure_liege
                         holder = scope:recipient
-                        NOT = { holder = scope:liege }
+                        NOT = { holder = scope:recipient.liege }
                         NOT = { holder = { is_ai = no } }
                         NOT = { scope:recipient = { highest_held_title_tier = tier_county } }  # Do not transfer direct counties from counts
-                            AND = {
-                                # Fast, reliable check: county's de jure kingdom is NOT the recipient's capital de jure kingdom
-                                NOT = { de_jure_liege = { de_jure_liege = { this = scope:recipient_capital_dejure_kingdom } } }
+                        # Check if county's de jure kingdom is NOT the recipient's capital de jure kingdom
+                        NOT = {
+                            de_jure_liege = {
+                                de_jure_liege = {
+                                    this = scope:recipient.capital_province.county.de_jure_liege.de_jure_liege
+                                }
                             }
+                        }
+                    }
+                }
+                # Relaxed check: any directly held county whose de jure liege differs
+                custom_tooltip = {
+                    text = riseandfall_fix_bordergore.recipient_outside_dejure.tooltip
+                    subject = scope:recipient
+                    any_held_title = {
+                        tier = tier_county
+                        exists = de_jure_liege
+                        holder = scope:recipient
+                        NOT = {
+                            de_jure_liege = scope:recipient.capital_province.county.de_jure_liege
+                        }
                     }
                 }
                 # Subrealm counties (held by direct vassals) that would be transferred
@@ -70,17 +76,20 @@
                         any_held_title = {
                             tier = tier_county
                             exists = de_jure_liege
-                            NOT = { holder = scope:liege }
+                            NOT = { holder = scope:recipient.liege }
                             NOT = { holder = { is_ai = no } }
                             NOT = { holder = scope:recipient }
-                            NOT = { this = scope:liege.capital_province.county }
+                            NOT = { this = scope:recipient.liege.capital_province.county }
                             NOT = { this = scope:recipient.capital_province.county }
-                                AND = {
-                                    # Treat a vassal-held county as bordergore candidate when its de jure kingdom
-                                    # does not match the recipient's capital de jure kingdom.
-                                    NOT = { de_jure_liege = { de_jure_liege = { this = scope:recipient_capital_dejure_kingdom } } }
+                            # Check if county's de jure kingdom is NOT the recipient's capital de jure kingdom
+                            NOT = {
+                                de_jure_liege = {
+                                    de_jure_liege = {
+                                        this = scope:recipient.capital_province.county.de_jure_liege.de_jure_liege
+                                    }
                                 }
-                            NOT = { AND = { has_variable = Riseandfall_giveaway_blocked scope:liege = { is_ai = no } } }
+                            }
+                            NOT = { AND = { has_variable = Riseandfall_giveaway_blocked scope:recipient.liege = { is_ai = no } } }
                         }
                     }
                 }
