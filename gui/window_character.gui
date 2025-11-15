@@ -235,6 +235,8 @@ window = {
 					expand = {}
 				}
 
+				# divider for stability now handled after military widget
+
 				### Hostage Home Court
 				vbox = {
 					name = "hostage_home_court"
@@ -5597,13 +5599,12 @@ types CharacterWindow
 		widget = {
 			visible = "[Character.HasLandedTitles]"
 			size = { 170 36 }
-
-			tooltip = CHARACTER_WINDOW_MILITARY_STRENGTH_TOOLTIP
-			using = tooltip_es
 			#AGOT Added; Displays relevant dragons in faux military breakdown
 			agot_dragon_army_composition = {}
 
-			hbox = {
+				hbox = {
+					tooltip = CHARACTER_WINDOW_MILITARY_STRENGTH_TOOLTIP
+					using = tooltip_es
 				#AGOT Added
 				visible = "[Not(GetScriptedGui('agot_can_see_dragon_military_view').IsShown(GuiScope.SetRoot(CharacterWindow.GetCharacter.MakeScope).End))]"
 				spacing = 6
@@ -5638,13 +5639,19 @@ types CharacterWindow
 
 				expand = {}
 
+				divider_light = {
+					visible = "[And( Character.HasLandedTitles, Character.MakeScope.Var('riseandfall_realm_stability_score').IsSet )]"
+					layoutpolicy_vertical = expanding
+				}
+
 				# Stability (modernized: icon + compact progress bar + ratio)
 				vbox = {
 					name = "stability_vbox"
+					size = { 86 32 }
 					datacontext = "[AccessGameRules.AccessNamedGameRule( 'riseandfall_enable_realm_stability' ).GetSetting]"
-					visible = "[And( And( Character.HasLandedTitles, NotEqualTo_int32( Character.GetPrimaryTitle.GetTierFrame, '(int32)2' ) ), And( Not( Character.GetGovernment.IsType( 'landless_adventurer_government' ) ), Not( GameRuleSetting.HasFlag( 'riseandfall_realm_stability_disabled' ) ) ), Character.MakeScope.Var('riseandfall_realm_stability_score').IsSet )]"
-					layoutpolicy_horizontal = expanding
-					layoutpolicy_vertical = expanding
+					tooltip = "REALM_STABILITY_TOOLTIP"
+					using = tooltip_es
+					visible = "[And( And( And( Character.HasLandedTitles, NotEqualTo_int32( Character.GetPrimaryTitle.GetTierFrame, '(int32)2' ) ), And( Not( Character.GetGovernment.IsType( 'landless_adventurer_government' ) ), Not( GameRuleSetting.HasFlag( 'riseandfall_realm_stability_disabled' ) ) ) ), Character.MakeScope.Var('riseandfall_realm_stability_score').IsSet )]"
 					spacing = 0
 
 					hbox = {
@@ -5705,14 +5712,14 @@ types CharacterWindow
 								default_format = "#high"
 								align = center|nobaseline
 								fontsize_min = 12
-								max_width = 80
-								tooltip = "REALM_STABILITY_TOOLTIP"
+								max_width = 60
+								# tooltip moved to vbox to show when hovering the entire stability box
 
 								progressbar_green = {
 									name = "stability_progress"
 									parentanchor = bottom|hcenter
 									position = { 0 5 }
-									size = { 50 8 }
+									size = { 40 8 }
 									min = 0
 									max = 100
 									value = "[FixedPointToProgressbarValue( Divide_CFixedPoint( Character.MakeScope.Var('riseandfall_realm_stability_score').GetValue, '(CFixedPoint)100' ) )]"
