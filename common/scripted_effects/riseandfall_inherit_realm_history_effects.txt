@@ -7,17 +7,17 @@ riseandfall_inherit_realm_history_se = {
     if = { limit = { has_game_rule = riseandfall_realm_stability_enabled }
         # Copy civil war years
         if = { limit = { scope:predecessor = { has_variable = riseandfall_rs_civil_war_years } } set_variable = { name = riseandfall_rs_civil_war_years value = scope:predecessor.var:riseandfall_rs_civil_war_years } }
-        debug_log = "riseandfall: inherited civil_war_years -> %d" var:riseandfall_rs_civil_war_years
+        
         else = { set_variable = { name = riseandfall_rs_civil_war_years value = 0 } }
 
         # Copy puppet regency years
         if = { limit = { scope:predecessor = { has_variable = riseandfall_puppet_regency_years } } set_variable = { name = riseandfall_puppet_regency_years value = scope:predecessor.var:riseandfall_puppet_regency_years } }
-        debug_log = "riseandfall: inherited puppet_regency_years -> %d" var:riseandfall_puppet_regency_years
+        
         else = { set_variable = { name = riseandfall_puppet_regency_years value = 0 } }
 
         # Copy the war multiplier; clamp to sane bounds
         if = { limit = { scope:predecessor = { has_variable = riseandfall_realm_stability_war_multiplier } } set_variable = { name = riseandfall_realm_stability_war_multiplier value = scope:predecessor.var:riseandfall_realm_stability_war_multiplier } }
-        debug_log = "riseandfall: inherited war_multiplier -> %d" var:riseandfall_realm_stability_war_multiplier
+        
         else = { set_variable = { name = riseandfall_realm_stability_war_multiplier value = 100 } }
     }
 }

@@ -253,7 +253,7 @@ riseandfall_calculate_realm_stability_se = {
         else_if = { limit = { var:tmp_piety_level = 5 } set_variable = { name = tmp_piety_mapped value = 100 } }
         else = { set_variable = { name = tmp_piety_mapped value = 0 } }
                 set_variable = { name = riseandfall_rs_legitimacy_multiplier value = var:tmp_piety_mapped }
-                debug_log = "riseandfall: piety_leg_multiplier applied (piety mapping)"
+                
     }
     else = {
         # If the realm has a legitimacy mechanic, check for celestial vs standard
@@ -276,7 +276,7 @@ riseandfall_calculate_realm_stability_se = {
                 else_if = { limit = { var:tmp_cel = 7 } set_variable = { name = tmp_cel_mapped value = 100 } }
                 else = { set_variable = { name = tmp_cel_mapped value = 0 } }
                 set_variable = { name = riseandfall_rs_legitimacy_multiplier value = var:tmp_cel_mapped }
-                debug_log = "riseandfall: celestial_leg_multiplier applied (celestial mapping)"
+                
             }
             else = {
                 # Standard legitimacy_level 0..5 -> manual mapping
@@ -291,7 +291,7 @@ riseandfall_calculate_realm_stability_se = {
                 else = { set_variable = { name = tmp_leg_mapped value = 0 } }
                 # Store the percent as a multiplier for later use
                 set_variable = { name = riseandfall_rs_legitimacy_multiplier value = var:tmp_leg_mapped }
-                debug_log = "riseandfall: legit_multiplier applied (standard mapping)"
+                
             }
         }
         else = {
@@ -311,7 +311,7 @@ riseandfall_calculate_realm_stability_se = {
                 # Influence mapping returns -20..+20 — convert to percent (100 +/- value)
                 if = { limit = { NOT = { has_variable = riseandfall_rs_legitimacy_multiplier } } set_variable = { name = riseandfall_rs_legitimacy_multiplier value = 100 } }
                 change_variable = { name = riseandfall_rs_legitimacy_multiplier add = var:tmp_inf_mapped }
-                debug_log = "riseandfall: influence_leg_multiplier applied (influence mapping)"
+                
             }
         }
     }
@@ -852,13 +852,13 @@ riseandfall_inherit_stability_score_se = {
             set_variable = { name = riseandfall_rs_adjust_months value = 0 }
             # Copy companion history from predecessor: civil war years, puppet regency years, and war multiplier
             if = { limit = { scope:predecessor = { has_variable = riseandfall_rs_civil_war_years } } set_variable = { name = riseandfall_rs_civil_war_years value = scope:predecessor.var:riseandfall_rs_civil_war_years } }
-            debug_log = "riseandfall: inherited civil_war_years (predecessor->heir) -> %d" var:riseandfall_rs_civil_war_years
+            
             else = { set_variable = { name = riseandfall_rs_civil_war_years value = 0 } }
             if = { limit = { scope:predecessor = { has_variable = riseandfall_puppet_regency_years } } set_variable = { name = riseandfall_puppet_regency_years value = scope:predecessor.var:riseandfall_puppet_regency_years } }
-            debug_log = "riseandfall: inherited puppet_regency_years (predecessor->heir) -> %d" var:riseandfall_puppet_regency_years
+            
             else = { set_variable = { name = riseandfall_puppet_regency_years value = 0 } }
             if = { limit = { scope:predecessor = { has_variable = riseandfall_realm_stability_war_multiplier } } set_variable = { name = riseandfall_realm_stability_war_multiplier value = scope:predecessor.var:riseandfall_realm_stability_war_multiplier } }
-            debug_log = "riseandfall: inherited war_multiplier (predecessor->heir) -> %d" var:riseandfall_realm_stability_war_multiplier
+            
             else = { set_variable = { name = riseandfall_realm_stability_war_multiplier value = 100 } }
         }
         else = {
