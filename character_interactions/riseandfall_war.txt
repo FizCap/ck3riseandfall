@@ -10,20 +10,15 @@
 	desc = declare_war_desc
 
 	is_shown = {
-		OR = {
-			scope:recipient != scope:actor
-			scope:recipient = {
-				is_playable_character = yes
-			}
-			scope:actor = {
-				NOT = {
-					is_at_war_with = scope:recipient
-				}
-			}
-			# Warlords can always see/attempt to declare war
-			scope:actor = { has_trait = warlord }
+		scope:recipient != scope:actor
+		scope:recipient = {
+			is_playable_character = yes
 		}
-	}
+		scope:actor = {
+			NOT = {
+				is_at_war_with = scope:recipient
+			}
+		}
 
 		#AGOT Added, no non-human interactions
 		scope:actor = { is_human = yes }
@@ -64,7 +59,6 @@
 	}
 
 	is_valid_showing_failures_only = {
-		OR = {
 		scope:actor = {
 			custom_tooltip = {
 				text = sworn_peace_tt
@@ -194,6 +188,7 @@
 			trigger_if = {
 				limit = {
 					NOT = { government_allows = administrative }
+					NOT = { has_trait = warlord }
 					liege ?= {
 						has_realm_law_flag = vassal_all_wars_banned_permanent
 						this != scope:actor
@@ -216,6 +211,7 @@
 					# 		has_participant_group_parameter = dynastic_cycle_vassal_internal_wars_allowed
 					# 	}
 					# }
+					NOT = { has_trait = warlord }
 				}
 				custom_tooltip = {
 					text = admin_cannot_declare_internal_wars
@@ -230,6 +226,7 @@
 						this != scope:recipient.top_liege
 						has_realm_law_flag = admin_vassal_wars_restricted
 					}
+					NOT = { has_trait = warlord }
 				}
 				custom_tooltip = {
 					text = admin_all_vassal_wars_banned
@@ -251,6 +248,7 @@
 						has_realm_law_flag = admin_vassal_wars_permission_only
 						NOT = { has_realm_law_flag = admin_vassal_wars_banned }
 					}
+					NOT = { has_trait = warlord }
 				}
 				custom_tooltip = {
 					text = admin_vassal_wars_permission_only_desc
@@ -268,6 +266,7 @@
 						this != scope:recipient.top_liege
 						has_realm_law_flag = admin_vassal_wars_banned
 					}
+					NOT = { has_trait = warlord }
 				}
 				custom_tooltip = {
 					text = admin_all_vassal_wars_banned
@@ -351,13 +350,9 @@
 				}
 			}
 		}
-		# Warlords bypass validation checks
-		scope:actor = { has_trait = warlord }
-		}
 	}
 
 	has_valid_target_showing_failures_only = {
-		OR = {
 		custom_description = {
 			text = "declare_war_hook_on_liege"
 			OR = {
@@ -377,8 +372,6 @@
 				}
 			}
 		}
-		# Warlords bypass target validity checks
-		scope:actor = { has_trait = warlord }
 	}
 
 	send_options_exclusive = no
