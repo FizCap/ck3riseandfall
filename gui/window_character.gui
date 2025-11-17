@@ -5597,47 +5597,70 @@ types CharacterWindow
 
 		# Military Strength
 		widget = {
-			visible = "[Character.HasLandedTitles]"
+			visible = "[Or( Character.HasLandedTitles, GetScriptedGui('agot_can_see_dragon_military_view').IsShown(GuiScope.SetRoot(CharacterWindow.GetCharacter.MakeScope).End) )]"
 			size = { 170 36 }
 			#AGOT Added; Displays relevant dragons in faux military breakdown
-			agot_dragon_army_composition = {}
 
 				hbox = {
 					tooltip = CHARACTER_WINDOW_MILITARY_STRENGTH_TOOLTIP
 					using = tooltip_es
-				#AGOT Added
-				visible = "[Not(GetScriptedGui('agot_can_see_dragon_military_view').IsShown(GuiScope.SetRoot(CharacterWindow.GetCharacter.MakeScope).End))]"
-				spacing = 6
+					spacing = 6
 
-				expand = {}
+					# Keep the stability control visible even if the scripted dragon military
+					# view is shown. Only hide the normal military details when dragons are
+					# visible — do this by wrapping the normal icon + number in a
+					# container with the scriptedGui visibility guard. To ensure the
+					# military widget keeps its original centered layout we place
+					# expand blocks around the container (not inside it) so the
+					# container's contents are centered in the hbox like the
+					# original design.
 
-				icon = {
-					name = "icon_combat_strength"
-					size = { 30 30 }
-					texture = "gfx/interface/icons/icon_soldier.dds"
-				}
+					expand = {}
 
-				text_single = {
-					name = "military_total_strength"
-					text = "[CharacterWindow.GetCachedMilitaryStrengthText]"
-					default_format = "#high"
-					align = center|nobaseline
-					fontsize_min = 12
-					max_width = 80
+					container = {
+						visible = "[Not(GetScriptedGui('agot_can_see_dragon_military_view').IsShown(GuiScope.SetRoot(CharacterWindow.GetCharacter.MakeScope).End))]"
+						layoutpolicy_horizontal = expanding
 
-					progressbar_standard = {
-						name = "soldiers_max"
-						visible = "[NotEqualTo_int32(CharacterWindow.GetMaxSoldiers, '(int32)0')]"
-						parentanchor = bottom|hcenter
-						position = { 0 5 }
-						size = { 33 8 }
-						min = 0
-						max = "[IntToFloat(CharacterWindow.GetMaxSoldiers)]"
-						value = "[IntToFloat(CharacterWindow.GetCurrentSoldiers)]"
+						hbox = {
+							spacing = 3
+
+							icon = {
+								name = "icon_combat_strength"
+								size = { 30 30 }
+								texture = "gfx/interface/icons/icon_soldier.dds"
+							}
+
+							text_single = {
+								name = "military_total_strength"
+								text = "[CharacterWindow.GetCachedMilitaryStrengthText]"
+								default_format = "#high"
+								align = center|nobaseline
+								fontsize_min = 12
+								max_width = 80
+
+								progressbar_standard = {
+									name = "soldiers_max"
+									visible = "[NotEqualTo_int32(CharacterWindow.GetMaxSoldiers, '(int32)0')]"
+									parentanchor = bottom|hcenter
+									position = { 0 5 }
+									size = { 33 8 }
+									min = 0
+									max = "[IntToFloat(CharacterWindow.GetMaxSoldiers)]"
+									value = "[IntToFloat(CharacterWindow.GetCurrentSoldiers)]"
+								}
+							}
+						}
 					}
-				}
 
-				expand = {}
+					# When the scripted dragon view is shown, display the dragon
+					# composition widget in the same center space as the military
+					# details. Put it between the expand markers so it is centered
+					# just like the normal military container.
+					agot_dragon_army_composition = {
+						visible = "[GetScriptedGui('agot_can_see_dragon_military_view').IsShown(GuiScope.SetRoot(CharacterWindow.GetCharacter.MakeScope).End)]"
+					}
+
+					expand = {}
 
 				divider_light = {
 					visible = "[And( Character.HasLandedTitles, Character.MakeScope.Var('riseandfall_realm_stability_score').IsSet )]"
