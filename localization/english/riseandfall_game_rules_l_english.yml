@@ -82,3 +82,10 @@ setting_riseandfall_bordergore_fix_enabled:0 "Enabled"
 setting_riseandfall_bordergore_fix_enabled_desc:0 "When enabled, AI rulers will automatically fix bordergore in administrative realms; players will also be given a character interaction to perform the same fixes manually."
 setting_riseandfall_bordergore_fix_disabled:0 "Disabled"
 setting_riseandfall_bordergore_fix_disabled_desc:0 "AI will not automatically fix bordergore and the player will not see the manual 'Fix Bordergore' interaction."
+
+# Lite Mode rule (lighter experience)
+rule_riseandfall_lite_mode:0 "Lite Mode"
+setting_riseandfall_lite_mode_enabled:0 "Enabled"
+setting_riseandfall_lite_mode_enabled_desc:0 "Disables player 'Fix Bordergore' and 'Puppet Master' interactions; AI will still use them. Enable if right‑click crashes occur due to conflicting interaction categories."
+setting_riseandfall_lite_mode_disabled:0 "Disabled"
+setting_riseandfall_lite_mode_disabled_desc:0 "Full Rise and Fall features (player interactions enabled). Enable this if the game crashes when right‑clicking."

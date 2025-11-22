@@ -6,12 +6,22 @@
 
     # Only top lieges (king or above) can use this on their vassals
     is_shown = {
+        # Show to AI actors always, and to human players only when Lite Mode is disabled
+        OR = {
+            scope:actor = { is_ai = yes }
+            AND = {
+                scope:actor = { is_ai = no }
+                has_game_rule = riseandfall_lite_mode_disabled
+            }
+        }
+
         scope:actor = {
             highest_held_title_tier >= tier_kingdom
             is_liege_or_above_of = scope:recipient
             government_has_flag = government_is_administrative
             is_independent_ruler = yes
         }
+
         scope:recipient = {
             government_has_flag = government_is_administrative
             is_ai = yes

@@ -14,6 +14,15 @@ riseandfall_steal_gold_interaction = {
 
 	# Show only to the active diarch targeting their liege while a puppet regency is active
 	is_shown = {
+		# Show to AI actors always, and to human players only when Lite Mode is disabled
+		OR = {
+			scope:actor = { is_ai = yes }
+			AND = {
+				scope:actor = { is_ai = no }
+				has_game_rule = riseandfall_lite_mode_disabled
+			}
+		}
+
 		scope:recipient = { has_diarchy_type = puppet_regency }
 	}
 
@@ -90,6 +99,14 @@ riseandfall_curry_favor_interaction = {
 	diarch_interaction = yes
 
 	is_shown = {
+		OR = {
+			scope:actor = { is_ai = yes }
+			AND = {
+				scope:actor = { is_ai = no }
+				has_game_rule = riseandfall_lite_mode_disabled
+			}
+		}
+
 		scope:recipient = { has_diarchy_type = puppet_regency }
 	}
 
@@ -154,6 +171,14 @@ riseandfall_overthrow_liege_interaction = {
 	diarch_interaction = yes
 
 	is_shown = {
+		OR = {
+			scope:actor = { is_ai = yes }
+			AND = {
+				scope:actor = { is_ai = no }
+				has_game_rule = riseandfall_lite_mode_disabled
+			}
+		}
+
 		scope:recipient = { has_diarchy_type = puppet_regency }
 	}
 

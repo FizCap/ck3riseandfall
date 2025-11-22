@@ -191,3 +191,20 @@ riseandfall_enable_interaction_stability = {
         flag = riseandfall_interaction_stability_disabled
     }
 }
+
+riseandfall_lite_mode = {
+
+    categories = {
+        riseandfall
+    }
+
+    # Default: disabled (lighter experience with some systems turned off)
+    default = riseandfall_lite_mode_disabled
+
+    riseandfall_lite_mode_enabled = {
+    }
+
+    riseandfall_lite_mode_disabled = {
+        flag = riseandfall_lite_mode_disabled
+    }
+}
