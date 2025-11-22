@@ -1,0 +1,5 @@
+﻿interaction_riseandfall = {
+    index = 16
+    desc = "RISEANDFALL_ACTIONS"
+    color = { 1 0 1 1 } # Byzantine purple (approx)
+}
