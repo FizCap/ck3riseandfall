@@ -13,7 +13,7 @@ puppet.1001 = {
     right_portrait = root
     immediate = {
         # Set low stability cooldown on the liege when this event fires
-    set_variable = { name = low_stability_cooldown value = yes days = 1825 }
+    set_variable = { name = low_stability_cooldown value = yes years = 5 }
         try_start_diarchy = regency
     }
 

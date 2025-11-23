@@ -26,7 +26,7 @@ warlord.1001 = {
                 trigger_event = { id = warlord.1002 }
             }
             # Set low stability cooldown on the liege when this event fires
-            set_variable = { name = low_stability_cooldown value = yes days = 1825 }
+            set_variable = { name = low_stability_cooldown value = yes years = 5 }
         }
     }
 }
