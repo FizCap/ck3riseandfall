@@ -1,4 +1,4 @@
-﻿##########################
+##########################
 # Rise and Fall - Low Stability Events Scripted Effects
 # Contains scripted effects related to low stability events
 # Sets up the challenger selection, kills courtiers, creates adventurer title, and sets cooldowns
@@ -10,7 +10,11 @@ riseandfall_palace_coup_setup = {
 		}
 	}
 	# Save the event's root scope under a stable name for cross-scope variable access
-	save_scope_as = event_root
+	root = { save_scope_as = event_root }
+
+	# Initialize best challenger score on the saved event_root scope so
+	# comparisons using var:tmp_best_challenger_score are always valid
+	scope:event_root = { set_variable = { name = tmp_best_challenger_score value = -9999 } }
 
 	# Save root's primary title (if any) into a temporary title scope so
 	# has_claim_on checks never receive a null title (engine validation fails)
@@ -19,80 +23,54 @@ riseandfall_palace_coup_setup = {
 		root = { primary_title = { save_scope_as = tmp_primary_title } }
 	}
 	# Select challenger preferring the courtier with the highest total stats
-	# (Diplomacy + Martial + Stewardship + Intrigue + Learning). If none
-	# match the eligibility filters we fall back to the existing random selection.
-	# Initialize a best-value tracker on the saved event_root scope.
-	scope:event_root = { set_variable = { name = tmp_best_challenger_score value = -999 } }
+	# (Diplomacy + Martial + Stewardship + Intrigue + Learning).
+	root = {
+		every_courtier_or_guest = {
+			limit = {
+				is_alive = yes
+				NOT = { is_close_family_of = root }
+				age > 16
+			}
+			# Initialize candidate score from stats
+			set_variable = { name = candidate_total value = diplomacy }
+			change_variable = { name = candidate_total add = martial }
+			change_variable = { name = candidate_total add = stewardship }
+			change_variable = { name = candidate_total add = intrigue }
+			change_variable = { name = candidate_total add = learning }
 
-	every_courtier_or_guest = {
-		limit = {
-			is_landed = no
-			is_alive = yes
-			is_adult = yes
-			# Exclude close relations to the root so they are not considered as challenger
-			NOT = {
-				has_relation_best_friend = root
-				has_relation_blood_brother = root
-				has_relation_friend = root
+			# Apply realm succession law penalties (if not eligible, penalize heavily)
+			if = { limit = { root = { has_realm_law = female_preference_law } } 
+				if = { limit = { NOT = { is_female = yes } } change_variable = { name = candidate_total add = -1000 } }
 			}
-		}
-		# Compute candidate total inside the candidate scope
-		set_variable = { name = candidate_total value = diplomacy }
-			# Martial counts double
-			change_variable = { name = candidate_total add = martial }
-			change_variable = { name = candidate_total add = martial }
-		change_variable = { name = candidate_total add = stewardship }
-		# Intrigue counts double
-		change_variable = { name = candidate_total add = intrigue }
-		change_variable = { name = candidate_total add = intrigue }
-		change_variable = { name = candidate_total add = learning }
-		# Prowess counts double
-		change_variable = { name = candidate_total add = prowess }
-		change_variable = { name = candidate_total add = prowess }
-		# Adjust for gender laws
-		if = {
-			limit = { root = { has_realm_law = male_preference_law } }
-			if = { limit = { NOT = { is_male = yes } } change_variable = { name = candidate_total add = -1000 } }
-		}
-		if = {
-			limit = { root = { has_realm_law = female_preference_law } }
-			if = { limit = { NOT = { is_female = yes } } change_variable = { name = candidate_total add = -1000 } }
-		}
-		if = {
-			limit = { root = { has_realm_law = male_only_law } }
-			if = { limit = { NOT = { is_male = yes } } set_variable = { name = candidate_total value = -9999 } }
-		}
-		if = {
-			limit = { root = { has_realm_law = female_only_law } }
-			if = { limit = { NOT = { is_female = yes } } set_variable = { name = candidate_total value = -9999 } }
-		}
-		# If the root had a primary title saved above, give +10 to any candidate
-		# that holds a claim on that title. Use the saved title scope to avoid
-		# calling has_claim_on with a null target.
-		if = {
-			limit = { scope:tmp_primary_title = { exists = yes } }
-			# If candidate holds a claim on the saved primary title, increase score by 50%
-			if = { limit = { has_claim_on = scope:tmp_primary_title } change_variable = { name = candidate_total multiply = 1.5 } }
-		}
-		# Knights get a 1.5x multiplier to reflect martial/discipline training
-		if = {
-			limit = { is_knight = yes }
-			change_variable = { name = candidate_total multiply = 1.5 }
-		}
-		# Copy candidate score to the event_root scope so comparisons are safe
-		save_scope_as = candidate_for_score
-		scope:event_root = { set_variable = { name = tmp_candidate value = scope:candidate_for_score.var:candidate_total } }
-		# If this candidate is better than the saved best, make them the challenger
-		if = {
-			limit = { scope:event_root = { has_variable = tmp_candidate } }
-			if = {
-				limit = { scope:event_root.var:tmp_candidate > scope:event_root.var:tmp_best_challenger_score }
-				# Save candidate as challenger (saves the current candidate scope)
-				save_scope_as = challenger
-				# Update the best score on the saved event root scope
-				scope:event_root = { set_variable = { name = tmp_best_challenger_score value = scope:event_root.var:tmp_candidate } }
+			if = { limit = { root = { has_realm_law = male_only_law } } 
+				if = { limit = { NOT = { is_male = yes } } set_variable = { name = candidate_total value = -9999 } }
 			}
-		}
+			# Penalize female candidates in male-preference realms so males are preferred
+			if = { limit = { root = { has_realm_law = male_preference_law } }
+				if = { limit = { NOT = { is_male = yes } } change_variable = { name = candidate_total add = -1000 } }
+			}
+			if = { limit = { root = { has_realm_law = female_only_law } } 
+				if = { limit = { NOT = { is_female = yes } } set_variable = { name = candidate_total value = -9999 } }
+			}
+
+			# If the root had a primary title saved above, give a multiplier to candidates who hold a claim
+			if = { limit = { scope:tmp_primary_title = { exists = yes } } 
+				if = { limit = { has_claim_on = scope:tmp_primary_title } change_variable = { name = candidate_total multiply = 1.5 } }
+			}
+
+			# Knights get a 1.5x multiplier
+			if = { limit = { is_knight = yes } change_variable = { name = candidate_total multiply = 1.5 } }
+
+			# Save candidate score to event_root and update best challenger if applicable
+			save_scope_as = candidate_for_score
+			scope:event_root = { set_variable = { name = tmp_candidate value = scope:candidate_for_score.var:candidate_total } }
+			if = { limit = { scope:event_root = { has_variable = tmp_candidate } } 
+				if = { limit = { scope:event_root.var:tmp_candidate > scope:event_root.var:tmp_best_challenger_score } 
+					save_scope_as = challenger
+					scope:event_root = { set_variable = { name = tmp_best_challenger_score value = scope:event_root.var:tmp_candidate } }
+				}
+			}
+			}
 	}
 	if = {
 		limit = { NOT = { exists = scope:challenger } }
@@ -136,59 +114,126 @@ riseandfall_palace_coup_setup = {
 		}
 	}
 
+	# Last-resort: if no challenger found yet, pick any alive courtier (including landed)
+	if = {
+		limit = { NOT = { exists = scope:challenger } }
+		root = {
+			random_courtier = {
+				limit = { is_adult = yes }
+				save_scope_as = challenger
+			}
+		}
+	}
+
 	if = {
 		limit = { exists = scope:challenger }
 
+		# Create a temporary landless adventurer camp for the challenger early
+		# so the challenger has a title before we set employer relationships.
+		if = {
+			limit = { exists = scope:challenger }
+			scope:challenger = {
+				if = {
+					limit = { is_alive = yes }
+					create_adventurer_title = {
+						name = palace_coup_adventurer_camp_name
+						holder = scope:challenger
+						government = landless_adventurer_government
+						save_scope_as = palace_coup_challenger_camp_title
+					}
+					# Mark that we created the title
+					scope:palace_coup_challenger_camp_title = {
+						set_variable = { name = riseandfall_created_adventurer_title value = yes }
+					}
+				}
+			}
+			# Set a flag on event_root to indicate the camp was created
+			scope:event_root = { set_variable = { name = challenger_camp_created value = yes } }
+		}
+
+		# If any claimant has a child who is present in root's court (a child),
+		# install that child as the nominal ruler and make the challenger the
+		# puppet master. We protect the child by making them employed by
+		# the challenger (employer) so they won't be killed during the purge.
+		# This scans courtiers for children whose parent has a claim on the
+		# saved primary title (`tmp_primary_title`). Stops after the first match.
+		if = {
+			limit = { scope:tmp_primary_title = { exists = yes } }
+			# Priority 1: prefer any child of the root that is present in the court
+			scope:event_root = {
+				every_courtier_or_guest = {
+					limit = { NOT = { scope:event_root = { has_variable = installed_child_found } } NOT = { is_adult = yes } is_child_of = root }
+					# Install the first matching child of the root
+					save_scope_as = installed_child
+					# record we found one to avoid multiple installations
+					scope:event_root = { set_variable = { name = installed_child_found value = yes } }
+
+					# If we already selected a challenger, make the child employed by them
+					if = { limit = { scope:event_root = { has_variable = challenger_camp_created } } 
+						if = { limit = { exists = scope:challenger scope:challenger = { is_alive = yes NOT = { is_ruler = yes } has_title = scope:palace_coup_challenger_camp_title } } 
+							set_employer = scope:challenger }
+					}
+				}
+				# Priority 2: otherwise fall back to children whose parent holds a claim
+				every_courtier_or_guest = {
+					limit = { NOT = { scope:event_root = { has_variable = installed_child_found } } NOT = { is_adult = yes } }
+					# Check if any parent of this court child has a claim on the primary title
+					if = { limit = { any_parent = { has_claim_on = scope:tmp_primary_title } }
+						save_scope_as = installed_child
+						# record we found one to avoid multiple installations
+						scope:event_root = { set_variable = { name = installed_child_found value = yes } }
+								# If we already selected a challenger, make the child employed by them
+								if = { limit = { scope:event_root = { has_variable = challenger_camp_created } } 
+									if = { limit = { exists = scope:challenger scope:challenger = { is_alive = yes NOT = { is_ruler = yes } has_title = scope:palace_coup_challenger_camp_title } } 
+										set_employer = scope:challenger }
+								}
+					}
+				}
+			}
+		}
+
 		hidden_effect = {
 			# Kill ~50% of courtiers and guests
-			root = {
+			scope:event_root = {
 				every_courtier_or_guest = {
 					limit = {
 						is_alive = yes
 						NOT = { this = root }
 						# Don't accidentally kill the challenger during the purge
 						NOT = { this = scope:challenger }
+						# Also protect the installed child and anyone already employed by the challenger
+						NOT = { this = scope:installed_child }
+						NOT = { employer = scope:challenger }
 					}
-					random_list = {
-						50 = {
-							death = {
-								death_reason = death_in_palace_coup
-								killer = scope:challenger
-							}
+						# Assign employer - prefer installed child if one is installed, otherwise the challenger
+						if = {
+							limit = { employer != scope:challenger scope:event_root = { has_variable = challenger_camp_created } }
+							if = { limit = { exists = scope:installed_child scope:installed_child = { is_alive = yes NOT = { is_ruler = yes } is_landed = yes } } set_employer = scope:installed_child }
+							else_if = { limit = { exists = scope:challenger scope:challenger = { is_alive = yes NOT = { is_ruler = yes } has_title = scope:palace_coup_challenger_camp_title } } set_employer = scope:challenger }
 						}
-						50 = { }
-					}
+						# Then randomize deaths
+						random_list = {
+							50 = {
+								death = {
+									death_reason = death_in_palace_coup
+									killer = scope:challenger
+								}
+							}
+							50 = { }
+						}
 				}
 			}
 		}
-	}		# Create a temporary landless adventurer camp for the challenger
-			# Create a temporary landless adventurer camp for the challenger, but only
-			# if the challenger still exists and is alive (the earlier purge can kill
-			# many courtiers; we must not give titles to dead characters).
-			if = {
-				limit = { exists = scope:challenger }
-				scope:challenger = {
-					if = {
-						limit = { is_alive = yes }
-						create_adventurer_title = {
-							name = palace_coup_adventurer_camp_name
-							holder = scope:challenger
-							government = landless_adventurer_government
-							save_scope_as = palace_coup_challenger_camp_title
-						}
-						# Mark that we created the title
-						scope:palace_coup_challenger_camp_title = {
-							set_variable = { name = riseandfall_created_adventurer_title value = yes }
-						}
-					}
-				}
-			}
+	}
 
 	# set a cooldown used by the low stability system (on root)
-	set_variable = { name = low_stability_cooldown value = yes days = 1825 }
+	set_variable = { name = low_stability_cooldown value = yes years = 5 }
 
 	# Also set the cooldown variable on the challenger to prevent immediate repeat triggers
-	if = { limit = { exists = scope:challenger } scope:challenger = { set_variable = { name = low_stability_cooldown value = yes days = 1825 } } }
+	if = { limit = { exists = scope:challenger } scope:challenger = { set_variable = { name = low_stability_cooldown value = yes years = 5 } } }
+
+	# Also set the cooldown variable on the installed child to prevent immediate repeat triggers
+	if = { limit = { exists = scope:installed_child } scope:installed_child = { set_variable = { name = low_stability_cooldown value = yes years = 5 } } }
 }
 
 ##########################
@@ -217,6 +262,7 @@ riseandfall_palace_coup_challenger_wins_prowess_duel = {
 		type = conquest
 		save_scope_as = change
 	}
+	# Normally transfer titles next (child keeps top-level if installed)
 	# Transfer all non-barony titles from root to challenger
 	# but do not transfer head-of-faith titles
 	every_held_title = {
@@ -226,10 +272,20 @@ riseandfall_palace_coup_challenger_wins_prowess_duel = {
 			NOT = { is_head_of_faith = yes }
 			NOT = { is_noble_family_title = yes }
 		}
-		change_title_holder = {
-			holder = scope:challenger
-			change = scope:change
-			take_baronies = yes
+		if = {
+			limit = { exists = scope:installed_child }
+			change_title_holder = {
+				holder = scope:installed_child
+				change = scope:change
+				take_baronies = yes
+			}
+		}
+		else = {
+			change_title_holder = {
+				holder = scope:challenger
+				change = scope:change
+				take_baronies = yes
+			}
 		}
 	}
 	# Transfer all direct vassals of the old ruler to the challenger
@@ -237,9 +293,12 @@ riseandfall_palace_coup_challenger_wins_prowess_duel = {
 	# family duchy remains with the dynasty but without actual vassals.
 	root = {
 		every_vassal = {
-			change_liege = {
-				liege = scope:challenger
-				change = scope:change
+			if = {
+				limit = { exists = scope:installed_child }
+				change_liege = { liege = scope:installed_child change = scope:change }
+			}
+			else = {
+				change_liege = { liege = scope:challenger change = scope:change }
 			}
 		}
 	}
@@ -255,23 +314,23 @@ riseandfall_palace_coup_challenger_wins_prowess_duel = {
 		add_trait = murderer
 	}
 
-	root = {
-		every_courtier_or_guest = {
-			limit = {
-				this != root
-				this != scope:challenger
-			}
+			scope:event_root = {
+					every_courtier_or_guest = {
+						limit = {
+							is_alive = yes
+							this != root
+							this != scope:challenger
+							this != scope:installed_child
+						}
 
-			random = {
-				chance = 100
-
-				if = {
-					limit = {
-						employer != scope:challenger
-					}
-
-					set_employer = scope:challenger
-				}
+							# Assign employer to challenger (or installed child if present)
+							if = {
+								limit = { employer != scope:challenger scope:event_root = { has_variable = challenger_camp_created } }
+								if = { limit = { exists = scope:installed_child scope:installed_child = { is_alive = yes NOT = { is_ruler = yes } is_landed = yes } } set_employer = scope:installed_child }
+								else_if = { limit = { exists = scope:challenger scope:challenger = { is_alive = yes NOT = { is_ruler = yes } has_title = scope:palace_coup_challenger_camp_title } } set_employer = scope:challenger }
+							}
+				random = {
+					chance = 100
 
 				if = {
 					limit = {
@@ -305,6 +364,52 @@ riseandfall_palace_coup_challenger_wins_prowess_duel = {
 	}
 	# Trigger the root death followup
 	root = { trigger_event = { id = palace_coup.1004 } }
+
+	# Clean up: if we installed a child, make sure they are seated at their court
+	if = {
+		limit = { exists = scope:installed_child }
+		scope:installed_child = { set_location_to_default = yes }
+	}
+
+	# (moved) Clean up: destroy the temporary adventurer camp title if it exists � moved after diarchy & transfers
+
+	# If we installed a child and challenger is alive, make the challenger a puppet diarch
+	if = {
+		limit = { exists = scope:installed_child scope:challenger = { is_alive = yes } }
+		scope:installed_child = {
+			set_diarch = scope:challenger
+			set_diarchy_type = puppet_regency
+			set_diarchy_swing = 90
+		}
+	}
+
+	# Move challenger courtiers/followers to installed child's court when challenge becomes puppet master
+	if = {
+		limit = { exists = scope:installed_child scope:challenger = { is_alive = yes } }
+				scope:challenger = {
+								scope:event_root = {
+								every_courtier_or_guest = {
+								limit = { NOT = { this = scope:installed_child } NOT = { this = scope:challenger } }
+								if = { limit = { exists = scope:installed_child scope:installed_child = { is_alive = yes NOT = { is_ruler = yes } is_landed = yes } } set_employer = scope:installed_child }
+				if = {
+					limit = { not = { exists = involved_activity } }
+					set_location_to_default = yes
+				}
+				else = { return_to_court = yes }
+			}
+		}
+	}
+
+	# Clean up: destroy the temporary adventurer camp title if it exists (after moving courtiers)
+	if = {
+		limit = { scope:event_root = { has_variable = challenger_camp_created } scope:challenger = { is_alive = yes } }
+		scope:challenger = { destroy_title = scope:palace_coup_challenger_camp_title }
+	}
+	else_if = {
+		limit = { scope:event_root = { has_variable = challenger_camp_created } }
+		root = { destroy_title = scope:palace_coup_challenger_camp_title }
+		}
+	}
 }
 
 ##########################
@@ -322,10 +427,20 @@ riseandfall_palace_coup_root_flees_success = {
 		limit = { root = { capital_county = { exists = yes } } }
 		root = {
 			capital_county = {
-				change_title_holder = {
-					holder = scope:challenger
-					change = scope:change
-					take_baronies = yes
+				if = {
+					limit = { exists = scope:installed_child }
+					change_title_holder = {
+						holder = scope:installed_child
+						change = scope:change
+						take_baronies = yes
+					}
+				}
+				else = {
+					change_title_holder = {
+						holder = scope:challenger
+						change = scope:change
+						take_baronies = yes
+					}
 				}
 			}
 		}
@@ -346,11 +461,21 @@ riseandfall_palace_coup_root_flees_success = {
 				NOT = { is_head_of_faith = yes }
 				NOT = { is_noble_family_title = yes }
 			}
-				change_title_holder = {
-				holder = scope:challenger
-				change = scope:change
-				take_baronies = yes
-			}
+				if = {
+					limit = { exists = scope:installed_child }
+					change_title_holder = {
+						holder = scope:installed_child
+						change = scope:change
+						take_baronies = yes
+					}
+				}
+				else = {
+					change_title_holder = {
+						holder = scope:challenger
+						change = scope:change
+						take_baronies = yes
+					}
+				}
 			}
 		}
 	else = {
@@ -369,10 +494,20 @@ riseandfall_palace_coup_root_flees_success = {
 				NOT = { is_head_of_faith = yes }
 				NOT = { is_noble_family_title = yes }
 			}
-			change_title_holder = {
-				holder = scope:challenger
-				change = scope:change
-				take_baronies = yes
+			if = {
+				limit = { exists = scope:installed_child }
+				change_title_holder = {
+					holder = scope:installed_child
+					change = scope:change
+					take_baronies = yes
+				}
+			}
+			else = {
+				change_title_holder = {
+					holder = scope:challenger
+					change = scope:change
+					take_baronies = yes
+				}
 			}
 		}
 	}
@@ -380,9 +515,19 @@ riseandfall_palace_coup_root_flees_success = {
 	# Make the old ruler (root) a vassal of the challenger and
 	# transfer direct vassals to the challenger in the same change
 	root = {
-		change_liege = {
-			liege = scope:challenger
-			change = scope:change
+		# If we installed a child, make root a vassal of the child; otherwise make root a vassal of the challenger
+		if = {
+			limit = { exists = scope:installed_child }
+			change_liege = {
+				liege = scope:installed_child
+				change = scope:change
+			}
+		}
+		else = {
+			change_liege = {
+				liege = scope:challenger
+				change = scope:change
+			}
 		}
 	}
 	# Transfer direct vassals for non-administrative roots only. For
@@ -431,6 +576,14 @@ riseandfall_palace_coup_root_flees_success = {
 	# Trigger escape follow-up: call banners event for root
 	root = { trigger_event = { id = palace_coup.1003 } }
 
+	# Clean up: if we installed a child, make sure they are seated at their court
+	if = {
+		limit = { exists = scope:installed_child }
+		scope:installed_child = { set_location_to_default = yes }
+	}
+
+	# (moved) Clean up: destroy the temporary adventurer camp title if it still exists � moved after diarchy & transfers
+
 	scope:challenger = {
 		if = {
 			limit = { root = { has_legitimacy = yes } }
@@ -448,6 +601,49 @@ riseandfall_palace_coup_root_flees_success = {
 			}
 		}
 	}
+
+	# If installed child and challenger alive, ensure child is seated and challenger puppet master
+	if = {
+		limit = { exists = scope:installed_child scope:challenger = { is_alive = yes } }
+		scope:installed_child = { set_location_to_default = yes }
+		# Make the challenger the diarch (puppet regency)
+		scope:installed_child = {
+			set_diarch = scope:challenger
+			set_diarchy_type = puppet_regency
+			set_diarchy_swing = 90
+		}
+
+		# Move challenger courtiers/followers to installed child's court when challenge becomes puppet master
+		if = {
+			limit = { exists = scope:installed_child scope:challenger = { is_alive = yes } }
+				scope:challenger = {
+							scope:event_root = {
+							every_courtier_or_guest = {
+								limit = { is_alive = yes NOT = { this = scope:installed_child } NOT = { this = scope:challenger } }
+							if = { limit = { exists = scope:installed_child scope:installed_child = { is_alive = yes NOT = { is_ruler = yes } is_landed = yes } } set_employer = scope:installed_child }
+					if = {
+						limit = { not = { exists = involved_activity } }
+						set_location_to_default = yes
+					}
+					else = { return_to_court = yes }
+				}
+			}
+		}
+
+		# Clean up: destroy the temporary adventurer camp title if it still exists (after moving courtiers)
+		if = {
+			limit = { scope:event_root = { has_variable = challenger_camp_created } scope:challenger = { is_alive = yes } }
+			scope:challenger = { destroy_title = scope:palace_coup_challenger_camp_title }
+		}
+		else_if = {
+			limit = { scope:event_root = { has_variable = challenger_camp_created } }
+			root = { destroy_title = scope:palace_coup_challenger_camp_title }
+		}
+
+		# Child keeps top realm titles; challenger will be made puppet diarch instead
+	}
+
+	# (diarchy already applied above for installed child)
 	scope:challenger = {
 		if = {
 			limit = { can_set_relation_rival_trigger = { CHARACTER = root } }
@@ -458,23 +654,22 @@ riseandfall_palace_coup_root_flees_success = {
 		}
 	}
 
-	root = {
+	scope:event_root = {
 		every_courtier_or_guest = {
 			limit = {
 				this != root
 				this != scope:challenger
+				this != scope:installed_child
 			}
 
-			random = {
-				chance = 50
-
-				if = {
-					limit = {
-						employer != scope:challenger
+					# Assign employer to challenger when possible
+					if = {
+						limit = { employer != scope:challenger scope:event_root = { has_variable = challenger_camp_created } }
+							if = { limit = { exists = scope:installed_child scope:installed_child = { is_alive = yes NOT = { is_ruler = yes } } } set_employer = scope:installed_child }
+								else_if = { limit = { exists = scope:challenger scope:challenger = { is_alive = yes NOT = { is_ruler = yes } has_title = scope:palace_coup_challenger_camp_title } } set_employer = scope:challenger }
 					}
-
-					set_employer = scope:challenger
-				}
+				random = {
+					chance = 50
 
 				if = {
 					limit = {
@@ -485,6 +680,7 @@ riseandfall_palace_coup_root_flees_success = {
 				}
 				else = {
 					return_to_court = yes
+					}
 				}
 			}
 		}
@@ -500,13 +696,18 @@ riseandfall_palace_coup_root_flees_failure = {
 		type = conquest
 		save_scope_as = change
 	}
-	# Make the old ruler a vassal of the challenger
+	# Make the old ruler a vassal of the challenger, or of the installed child if present
 	root = {
-		change_liege = {
-			liege = scope:challenger
-			change = scope:change
+		if = {
+			limit = { exists = scope:installed_child }
+			change_liege = { liege = scope:installed_child change = scope:change }
+		}
+		else = {
+			change_liege = { liege = scope:challenger change = scope:change }
 		}
 	}
+	# (No top realm transfer here when we installed a child � the child should retain top titles)
+
 	# Transfer all titles from root to challenger
 	# but do not transfer head-of-faith titles
 	every_held_title = {
@@ -516,19 +717,32 @@ riseandfall_palace_coup_root_flees_failure = {
 			NOT = { is_head_of_faith = yes }
 			NOT = { is_noble_family_title = yes }
 		}
-		change_title_holder = {
-			holder = scope:challenger
-			change = scope:change
-			take_baronies = yes
+		if = {
+			limit = { exists = scope:installed_child }
+			change_title_holder = {
+				holder = scope:installed_child
+				change = scope:change
+				take_baronies = yes
+			}
+		}
+		else = {
+			change_title_holder = {
+				holder = scope:challenger
+				change = scope:change
+				take_baronies = yes
+			}
 		}
 	}
 	# Transfer all direct vassals of the old ruler to the challenger
 	# while preserving noble-family titles on root.
 	root = {
 		every_vassal = {
-			change_liege = {
-				liege = scope:challenger
-				change = scope:change
+			if = {
+				limit = { exists = scope:installed_child }
+				change_liege = { liege = scope:installed_child change = scope:change }
+			}
+			else = {
+				change_liege = { liege = scope:challenger change = scope:change }
 			}
 		}
 	}
@@ -560,12 +774,13 @@ riseandfall_palace_coup_root_flees_failure = {
 		}
 	}
 
-	root = {
-		every_courtier_or_guest = {
-			limit = {
-				this != root
-				this != scope:challenger
-			}
+			root = {
+				every_courtier_or_guest = {
+					limit = {
+						is_alive = yes
+						this != root
+						this != scope:challenger
+					}
 
 			random = {
 				chance = 100
@@ -573,9 +788,12 @@ riseandfall_palace_coup_root_flees_failure = {
 				if = {
 					limit = {
 						employer != scope:challenger
+						scope:event_root = { has_variable = challenger_camp_created }
 					}
-
-					set_employer = scope:challenger
+						if = { limit = { exists = scope:installed_child } 
+							if = { limit = { exists = scope:installed_child scope:installed_child = { is_alive = yes NOT = { is_ruler = yes } } } set_employer = scope:installed_child }
+									else_if = { limit = { exists = scope:challenger scope:challenger = { is_alive = yes NOT = { is_ruler = yes } has_title = scope:palace_coup_challenger_camp_title } } set_employer = scope:challenger }
+						}
 				}
 
 				if = {
@@ -607,6 +825,53 @@ riseandfall_palace_coup_root_flees_failure = {
 	}
 	# Imprison the root: challenger captures/seizes the ruler
 	scope:challenger = { imprison = { target = root type = dungeon } }
+
+	# If we installed a child, make the challenger the child's puppet (diarch) and seat the child
+	if = {
+		limit = { exists = scope:installed_child scope:challenger = { is_alive = yes } }
+		scope:installed_child = { set_location_to_default = yes }
+		scope:installed_child = {
+			set_diarch = scope:challenger
+			set_diarchy_type = puppet_regency
+			set_diarchy_swing = 90
+		}
+	}
+
+		# Move challenger courtiers/followers to installed child's court when challenge becomes puppet master
+		if = {
+			limit = { exists = scope:installed_child scope:challenger = { is_alive = yes } }
+			scope:challenger = {
+						scope:event_root = {
+						every_courtier_or_guest = {
+							limit = { is_alive = yes NOT = { this = scope:installed_child } NOT = { this = scope:challenger } }
+									if = { limit = { exists = scope:installed_child scope:installed_child = { is_alive = yes NOT = { is_ruler = yes } } } set_employer = scope:installed_child }
+					if = {
+						limit = { not = { exists = involved_activity } }
+						set_location_to_default = yes
+					}
+					else = { return_to_court = yes }
+				}
+			}
+		}
+
+		# Clean up: destroy the temporary adventurer camp title if it still exists (after moving courtiers)
+		if = {
+			limit = { scope:event_root = { has_variable = challenger_camp_created } scope:challenger = { is_alive = yes } }
+			scope:challenger = { destroy_title = scope:palace_coup_challenger_camp_title }
+		}
+		else_if = {
+			limit = { scope:event_root = { has_variable = challenger_camp_created } }
+			root = { destroy_title = scope:palace_coup_challenger_camp_title }
+		}
+
+	# Clean up: if we installed a child, make sure they are seated at their court
+	if = {
+		limit = { exists = scope:installed_child }
+		scope:installed_child = { set_location_to_default = yes }
+	}
+
+	# (removed duplicate) Cleanup handled above after transfers
+	}
 }
 
 ##########################
@@ -614,8 +879,13 @@ riseandfall_palace_coup_root_flees_failure = {
 # Triggers the warlord event for the challenger to call banners
 
 riseandfall_palace_coup_challenger_calls_banners = {
-	scope:challenger = {
-		trigger_event = { id = warlord.1001 }
+	# If a child was installed, the child is the liege � trigger warlord event for the liege (child)
+	if = {
+		limit = { exists = scope:installed_child }
+		scope:installed_child = { trigger_event = { id = warlord.1001 } }
+	}
+	else = {
+		scope:challenger = { trigger_event = { id = warlord.1001 } }
 	}
 }
 
