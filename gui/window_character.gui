@@ -5472,6 +5472,9 @@ types CharacterWindow
 			visible = "[Character.HasLandedTitles]"
 			size = { 72 32 }
 
+			tooltip = CHARACTER_WINDOW_MILITARY_STRENGTH_TOOLTIP
+			using = tooltip_es
+
 			hbox = {
 				spacing = 3
 
