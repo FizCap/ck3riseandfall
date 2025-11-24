@@ -108,6 +108,36 @@ riseandfall_enable_realm_stability = {
     }
 }
 
+riseandfall_realm_stability_difficulty = {
+
+    categories = {
+        riseandfall
+    }
+
+    # Default: Normal (1.0x)
+    default = riseandfall_realm_stability_normal
+
+    riseandfall_realm_stability_very_unstable = {
+        flag = riseandfall_realm_stability_very_unstable
+    }
+
+    riseandfall_realm_stability_unstable = {
+        flag = riseandfall_realm_stability_unstable
+    }
+
+    riseandfall_realm_stability_normal = {
+        flag = riseandfall_realm_stability_normal
+    }
+
+    riseandfall_realm_stability_stable = {
+        flag = riseandfall_realm_stability_stable
+    }
+
+    riseandfall_realm_stability_very_stable = {
+        flag = riseandfall_realm_stability_very_stable
+    }
+}
+
 riseandfall_low_stability_events = {
     categories = {
         riseandfall

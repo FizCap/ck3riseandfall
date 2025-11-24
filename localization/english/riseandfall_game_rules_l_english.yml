@@ -31,6 +31,19 @@ setting_riseandfall_realm_stability_enabled_desc:0 "Realm stability is active; r
 setting_riseandfall_realm_stability_disabled:0 "Disabled"
 setting_riseandfall_realm_stability_disabled_desc:0 "Realm stability is inactive; no stability flags will be applied."
 
+# Realm Stability Settings (difficulty options)
+rule_riseandfall_realm_stability_difficulty:0 "Realm Stability Diffuclty"
+setting_riseandfall_realm_stability_very_unstable:0 "Very Unstable"
+setting_riseandfall_realm_stability_very_unstable_desc:0 "Realm stability calculations are more punishing."
+setting_riseandfall_realm_stability_unstable:0 "Unstable"
+setting_riseandfall_realm_stability_unstable_desc:0 "Slightly harder to maintain high stability."
+setting_riseandfall_realm_stability_normal:0 "Normal"
+setting_riseandfall_realm_stability_normal_desc:0 "Default realm stability behavior."
+setting_riseandfall_realm_stability_stable:0 "Stable"
+setting_riseandfall_realm_stability_stable_desc:0 "Generally easier to keep high stability."
+setting_riseandfall_realm_stability_very_stable:0 "Very Stable"
+setting_riseandfall_realm_stability_very_stable_desc:0 "Realm stability is easier to maintain."
+
 # Men-at-arms cap increase rule (administrative governments)
 rule_riseandfall_enable_mma_limit_modifier:0 "Men-at-Arms Cap Increase (Administrative Titles)"
 setting_riseandfall_mma_limit_modifier_enabled:0 "Enabled"

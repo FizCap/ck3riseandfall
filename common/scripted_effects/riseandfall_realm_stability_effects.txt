@@ -501,11 +501,41 @@ riseandfall_calculate_realm_stability_se = {
     # applied to the tmp_target_score here. By default it is 100 (no change).
     if = { limit = { NOT = { has_variable = riseandfall_realm_stability_war_multiplier } } set_variable = { name = riseandfall_realm_stability_war_multiplier value = 100 } }
     if = { limit = { NOT = { has_variable = riseandfall_realm_stability_puppet_regency_multiplier } } set_variable = { name = riseandfall_realm_stability_puppet_regency_multiplier value = 100 } }
+    # DIFFICULTY MULTIPLIER (configured via game rule)
+    if = { limit = { NOT = { has_variable = riseandfall_rs_difficulty_multiplier } } set_variable = { name = riseandfall_rs_difficulty_multiplier value = 100 } }
+    if = { limit = { NOT = { has_variable = riseandfall_rs_difficulty_multiplier_display } } set_variable = { name = riseandfall_rs_difficulty_multiplier_display value = 1.0 } }
+    # Map selected game rule to the per-character difficulty multiplier
+    if = { limit = { has_game_rule = riseandfall_realm_stability_very_unstable }
+        set_variable = { name = riseandfall_rs_difficulty_multiplier value = 80 }
+        set_variable = { name = riseandfall_rs_difficulty_multiplier_display value = 0.8 }
+    }
+    else_if = { limit = { has_game_rule = riseandfall_realm_stability_unstable }
+        set_variable = { name = riseandfall_rs_difficulty_multiplier value = 90 }
+        set_variable = { name = riseandfall_rs_difficulty_multiplier_display value = 0.9 }
+    }
+    else_if = { limit = { has_game_rule = riseandfall_realm_stability_normal }
+        set_variable = { name = riseandfall_rs_difficulty_multiplier value = 100 }
+        set_variable = { name = riseandfall_rs_difficulty_multiplier_display value = 1.0 }
+    }
+    else_if = { limit = { has_game_rule = riseandfall_realm_stability_stable }
+        set_variable = { name = riseandfall_rs_difficulty_multiplier value = 110 }
+        set_variable = { name = riseandfall_rs_difficulty_multiplier_display value = 1.1 }
+    }
+    else_if = { limit = { has_game_rule = riseandfall_realm_stability_very_stable }
+        set_variable = { name = riseandfall_rs_difficulty_multiplier value = 120 }
+        set_variable = { name = riseandfall_rs_difficulty_multiplier_display value = 1.2 }
+    }
     # Apply the multiplier to the target score (percent math)
     change_variable = { name = tmp_target_score multiply = var:riseandfall_realm_stability_war_multiplier }
     change_variable = { name = tmp_target_score divide = 100 }
     # Store the multiplier back to itself to expose for the tooltip (no-op assignment)
     set_variable = { name = riseandfall_realm_stability_war_multiplier value = var:riseandfall_realm_stability_war_multiplier }
+    # Apply difficulty game rule multiplier
+    change_variable = { name = tmp_target_score multiply = var:riseandfall_rs_difficulty_multiplier }
+    change_variable = { name = tmp_target_score divide = 100 }
+    # Ensure we expose the difficulty multiplier for tooltip/use
+    set_variable = { name = riseandfall_rs_difficulty_multiplier value = var:riseandfall_rs_difficulty_multiplier }
+    set_variable = { name = riseandfall_rs_difficulty_multiplier_display value = var:riseandfall_rs_difficulty_multiplier_display }
 
 # Ensure the target stays within 0..100 after applying war penalties
 clamp_variable = { name = tmp_target_score min = 0 max = 100 }
@@ -862,6 +892,10 @@ riseandfall_inherit_stability_score_se = {
             if = { limit = { scope:predecessor = { has_variable = riseandfall_realm_stability_war_multiplier } } set_variable = { name = riseandfall_realm_stability_war_multiplier value = scope:predecessor.var:riseandfall_realm_stability_war_multiplier } }
             
             else = { set_variable = { name = riseandfall_realm_stability_war_multiplier value = 100 } }
+            if = { limit = { scope:predecessor = { has_variable = riseandfall_rs_difficulty_multiplier } } set_variable = { name = riseandfall_rs_difficulty_multiplier value = scope:predecessor.var:riseandfall_rs_difficulty_multiplier } }
+            else = { set_variable = { name = riseandfall_rs_difficulty_multiplier value = 100 } }
+            if = { limit = { scope:predecessor = { has_variable = riseandfall_rs_difficulty_multiplier_display } } set_variable = { name = riseandfall_rs_difficulty_multiplier_display value = scope:predecessor.var:riseandfall_rs_difficulty_multiplier_display } }
+            else = { set_variable = { name = riseandfall_rs_difficulty_multiplier_display value = 1.0 } }
         }
         else = {
             # Predecessor had no stability score; initialize heir to baseline
