@@ -174,6 +174,28 @@ riseandfall_palace_coup_setup = {
 							set_employer = scope:challenger }
 					}
 				}
+
+				# After we have a challenger and (optionally) created the temporary adventurer
+				# title/camp, employ 50% of the courtiers from root's court and move them
+				# to the challenger's court (protects them from the purge and sets up the camp's follow-up).
+				if = {
+					limit = { scope:event_root = { has_variable = challenger_camp_created } exists = scope:challenger }
+					scope:event_root = {
+						every_courtier = {
+							limit = {
+								is_alive = yes
+								NOT = { this = root }
+								NOT = { this = scope:challenger }
+								NOT = { this = scope:installed_child }
+								employer != scope:challenger
+							}
+							random_list = {
+								50 = { set_employer = scope:challenger }
+								50 = { }
+							}
+						}
+					}
+				}
 				# Priority 2: otherwise fall back to children whose parent holds a claim
 				every_courtier_or_guest = {
 					limit = { NOT = { scope:event_root = { has_variable = installed_child_found } } NOT = { is_adult = yes } }
@@ -373,14 +395,10 @@ riseandfall_palace_coup_challenger_wins_prowess_duel = {
 
 	# (moved) Clean up: destroy the temporary adventurer camp title if it exists � moved after diarchy & transfers
 
-	# If we installed a child and challenger is alive, make the challenger a puppet diarch
+	# If we installed a child and challenger is alive, seat the child and prepare to make the challenger a puppet diarch (set after clean-up)
 	if = {
 		limit = { exists = scope:installed_child scope:challenger = { is_alive = yes } }
-		scope:installed_child = {
-			set_diarch = scope:challenger
-			set_diarchy_type = puppet_regency
-			set_diarchy_swing = 90
-		}
+		scope:installed_child = { set_location_to_default = yes }
 	}
 
 	# Move challenger courtiers/followers to installed child's court when challenge becomes puppet master
@@ -410,6 +428,17 @@ riseandfall_palace_coup_challenger_wins_prowess_duel = {
 		root = { destroy_title = scope:palace_coup_challenger_camp_title }
 		}
 	}
+
+		# If a child was installed, set the child as the employer of the challenger after their temporary title is destroyed and then make the challenger the puppet diarch
+		if = {
+			limit = { exists = scope:installed_child scope:challenger = { is_alive = yes } }
+			scope:challenger = { set_employer = scope:installed_child }
+			scope:installed_child = {
+				set_diarch = scope:challenger
+				set_diarchy_type = puppet_regency
+				set_diarchy_swing = 90
+			}
+		}
 }
 
 ##########################
@@ -574,7 +603,20 @@ riseandfall_palace_coup_root_flees_success = {
 		remove_variable = duel_transfer_gold
 	}
 	# Trigger escape follow-up: call banners event for root
+	# Trigger the follow-up event for the deposed root to display the escape UI
 	root = { trigger_event = { id = palace_coup.1003 } }
+
+	# Also call the warlord path for the new liege (installed child) or the challenger
+	# while the scope variables are still present. This ensures the warlord event
+	# is triggered on the correct character instead of relying solely on follow-up
+	# events which lack the saved challenger scope.
+	if = {
+		limit = { exists = scope:installed_child }
+		scope:installed_child = { trigger_event = { id = warlord.1001 } }
+	}
+	else = {
+		scope:challenger = { trigger_event = { id = warlord.1001 } }
+	}
 
 	# Clean up: if we installed a child, make sure they are seated at their court
 	if = {
@@ -602,30 +644,47 @@ riseandfall_palace_coup_root_flees_success = {
 		}
 	}
 
-	# If installed child and challenger alive, ensure child is seated and challenger puppet master
+	# If installed child and challenger alive, ensure child is seated (diarchy set after cleanup)
 	if = {
 		limit = { exists = scope:installed_child scope:challenger = { is_alive = yes } }
 		scope:installed_child = { set_location_to_default = yes }
-		# Make the challenger the diarch (puppet regency)
-		scope:installed_child = {
-			set_diarch = scope:challenger
-			set_diarchy_type = puppet_regency
-			set_diarchy_swing = 90
-		}
 
 		# Move challenger courtiers/followers to installed child's court when challenge becomes puppet master
 		if = {
 			limit = { exists = scope:installed_child scope:challenger = { is_alive = yes } }
-				scope:challenger = {
-							scope:event_root = {
-							every_courtier_or_guest = {
-								limit = { is_alive = yes NOT = { this = scope:installed_child } NOT = { this = scope:challenger } }
-							if = { limit = { exists = scope:installed_child scope:installed_child = { is_alive = yes NOT = { is_ruler = yes } is_landed = yes } } set_employer = scope:installed_child }
-					if = {
-						limit = { not = { exists = involved_activity } }
-						set_location_to_default = yes
+			scope:challenger = {
+				scope:event_root = {
+					every_courtier_or_guest = {
+						limit = { is_alive = yes NOT = { this = scope:installed_child } NOT = { this = scope:challenger } }
+						if = { limit = { exists = scope:installed_child scope:installed_child = { is_alive = yes NOT = { is_ruler = yes } is_landed = yes } } set_employer = scope:installed_child }
+						if = {
+							limit = { not = { exists = involved_activity } }
+							set_location_to_default = yes
+						}
+						else = { return_to_court = yes }
 					}
-					else = { return_to_court = yes }
+				}
+			}
+
+		# Ensure challenger's own courtiers are employed by the installed child BEFORE destroying the temporary adventurer title
+		if = {
+			limit = { exists = scope:installed_child scope:challenger = { is_alive = yes } }
+			scope:challenger = {
+				every_courtier_or_guest = {
+					limit = { is_alive = yes NOT = { this = scope:installed_child } NOT = { this = scope:challenger } }
+					set_employer = scope:installed_child
+				}
+			}
+		}
+		}
+
+		# Ensure challenger's own courtiers are employed by the installed child BEFORE destroying the temporary adventurer title
+		if = {
+			limit = { exists = scope:installed_child scope:challenger = { is_alive = yes } }
+			scope:challenger = {
+				every_courtier_or_guest = {
+					limit = { is_alive = yes NOT = { this = scope:installed_child } NOT = { this = scope:challenger } }
+					set_employer = scope:installed_child
 				}
 			}
 		}
@@ -640,10 +699,17 @@ riseandfall_palace_coup_root_flees_success = {
 			root = { destroy_title = scope:palace_coup_challenger_camp_title }
 		}
 
-		# Child keeps top realm titles; challenger will be made puppet diarch instead
+		# If a child was installed, set the child as the employer of the challenger after their temporary title is destroyed and then set them as puppet master (diarch)
+		if = {
+			limit = { exists = scope:installed_child scope:challenger = { is_alive = yes } }
+			scope:challenger = { set_employer = scope:installed_child }
+			scope:installed_child = {
+				set_diarch = scope:challenger
+				set_diarchy_type = puppet_regency
+				set_diarchy_swing = 90
+			}
+		}
 	}
-
-	# (diarchy already applied above for installed child)
 	scope:challenger = {
 		if = {
 			limit = { can_set_relation_rival_trigger = { CHARACTER = root } }
@@ -685,7 +751,7 @@ riseandfall_palace_coup_root_flees_success = {
 			}
 		}
 	}
-}
+
 
 ##########################
 # Rise and Fall - Palace Coup Root Flees Failure
@@ -782,19 +848,17 @@ riseandfall_palace_coup_root_flees_failure = {
 						this != scope:challenger
 					}
 
+			if = {
+				limit = {
+					employer != scope:challenger
+					scope:event_root = { has_variable = challenger_camp_created }
+				}
+					if = { limit = { exists = scope:installed_child scope:installed_child = { is_alive = yes NOT = { is_ruler = yes } } } set_employer = scope:installed_child }
+					else_if = { limit = { exists = scope:challenger scope:challenger = { is_alive = yes NOT = { is_ruler = yes } has_title = scope:palace_coup_challenger_camp_title } } set_employer = scope:challenger }
+			}
+
 			random = {
 				chance = 100
-
-				if = {
-					limit = {
-						employer != scope:challenger
-						scope:event_root = { has_variable = challenger_camp_created }
-					}
-						if = { limit = { exists = scope:installed_child } 
-							if = { limit = { exists = scope:installed_child scope:installed_child = { is_alive = yes NOT = { is_ruler = yes } } } set_employer = scope:installed_child }
-									else_if = { limit = { exists = scope:challenger scope:challenger = { is_alive = yes NOT = { is_ruler = yes } has_title = scope:palace_coup_challenger_camp_title } } set_employer = scope:challenger }
-						}
-				}
 
 				if = {
 					limit = {
@@ -826,15 +890,10 @@ riseandfall_palace_coup_root_flees_failure = {
 	# Imprison the root: challenger captures/seizes the ruler
 	scope:challenger = { imprison = { target = root type = dungeon } }
 
-	# If we installed a child, make the challenger the child's puppet (diarch) and seat the child
+	# If we installed a child, seat the child as the nominal ruler (diarch will be set after cleanup)
 	if = {
 		limit = { exists = scope:installed_child scope:challenger = { is_alive = yes } }
 		scope:installed_child = { set_location_to_default = yes }
-		scope:installed_child = {
-			set_diarch = scope:challenger
-			set_diarchy_type = puppet_regency
-			set_diarchy_swing = 90
-		}
 	}
 
 		# Move challenger courtiers/followers to installed child's court when challenge becomes puppet master
@@ -854,6 +913,17 @@ riseandfall_palace_coup_root_flees_failure = {
 			}
 		}
 
+		# Ensure challenger's own courtiers are employed by the installed child BEFORE destroying the temporary adventurer title
+		if = {
+			limit = { exists = scope:installed_child scope:challenger = { is_alive = yes } }
+			scope:challenger = {
+				every_courtier_or_guest = {
+					limit = { is_alive = yes NOT = { this = scope:installed_child } NOT = { this = scope:challenger } }
+					set_employer = scope:installed_child
+				}
+			}
+		}
+
 		# Clean up: destroy the temporary adventurer camp title if it still exists (after moving courtiers)
 		if = {
 			limit = { scope:event_root = { has_variable = challenger_camp_created } scope:challenger = { is_alive = yes } }
@@ -864,13 +934,15 @@ riseandfall_palace_coup_root_flees_failure = {
 			root = { destroy_title = scope:palace_coup_challenger_camp_title }
 		}
 
-	# Clean up: if we installed a child, make sure they are seated at their court
+	# If a child was installed, set the child as the employer of the challenger after their temporary title is destroyed and then set them as puppet master (diarch)
 	if = {
-		limit = { exists = scope:installed_child }
-		scope:installed_child = { set_location_to_default = yes }
-	}
-
-	# (removed duplicate) Cleanup handled above after transfers
+		limit = { exists = scope:installed_child scope:challenger = { is_alive = yes } }
+		scope:challenger = { set_employer = scope:installed_child }
+		scope:installed_child = {
+			set_diarch = scope:challenger
+			set_diarchy_type = puppet_regency
+			set_diarchy_swing = 90
+		}
 	}
 }
 
