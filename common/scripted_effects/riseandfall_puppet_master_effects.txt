@@ -21,6 +21,28 @@ riseandfall_steal_gold_effect = {
 	scope:recipient = { set_variable = { name = puppet_master_cooldown value = yes days = 365 } }
 }
 
+# When a guest arrives at a court, ensure a visiting puppet master (diarch)
+# who is a foreign guest (not already a courtier) becomes employed by the host
+# so they are treated as a courtier in that court.
+# Expected invocation context: root = guest, host = host
+riseandfall_set_guest_puppet_master_employer_se = {
+	# Run in the guest scope (root)
+	root = {
+		if = {
+			limit = {
+				# Is the root character the active diarch of the host?
+				is_diarch_of_target = scope:host
+				# Is the root a foreign court guest of the host (they have a liege)
+				is_foreign_court_guest_of = scope:host
+				# Make sure they are not already a courtier of the host
+				NOT = { is_courtier_of = scope:host }
+			}
+			# Move the guest into the host's court (set them as employed by the host)
+			set_employer = scope:host
+		}
+	}
+}
+
 # Grant a strong hook on the liege to the diarch
 riseandfall_curry_favor_effect = {
 	# Give the actor a strong favor hook on the recipient
@@ -74,4 +96,93 @@ riseandfall_overthrow_liege_effect = {
 	resolve_title_and_vassal_change = scope:change
 	# Add cooldown
 	scope:recipient = { set_variable = { name = puppet_master_cooldown value = yes days = 365 } }
+}
+
+# Force liege to abdicate by transferring their titles to a chosen successor (youngest unlanded child; fallback to dynasty in court)
+riseandfall_force_abdicate_effect = {
+	# Create the title change scope used by change_title_holder calls
+	create_title_and_vassal_change = {
+		type = conquest
+		save_scope_as = change
+	}
+
+	scope:recipient = {
+		# initialize a big age to find the youngest
+		set_variable = { name = rf_candidate_best_age value = 999 }
+		# iterate over children to find the youngest unlanded child
+		every_child = {
+			limit = { is_landed = no }
+			# store this child's age into a variable on the child scope
+			set_variable = { name = candidate_age value = age }
+			save_scope_as = candidate_for_score
+			# push the child's age into recipient scope for comparison
+			scope:recipient = { set_variable = { name = tmp_candidate_age value = scope:candidate_for_score.var:candidate_age } }
+			# If the child's age is less than the current best (younger), choose them
+			if = {
+				limit = { scope:recipient = { var:tmp_candidate_age < var:rf_candidate_best_age } }
+				save_scope_as = chosen_successor
+				scope:recipient = { set_variable = { name = rf_candidate_best_age value = scope:recipient.var:tmp_candidate_age } }
+			}
+		}
+
+		# If we did not find an unlanded child, fallback to dynasty members in the recipient's court (pick the first valid adult member)
+		if = {
+			limit = { NOT = { exists = scope:chosen_successor } }
+			every_dynasty_member = {
+				# Save the current dynasty member as a temporary candidate
+				save_scope_as = candidate_for_score
+				# Ensure the candidate is an adult, not a ruler, and present in the recipient's court
+				if = {
+					limit = { is_adult = yes NOT = { is_ruler = yes } scope:recipient = { any_courtier = { this = scope:candidate_for_score } } }
+					# pick the first valid candidate
+					save_scope_as = chosen_successor
+				}
+			}
+		}
+
+		# If we still have no candidate, abort the effect gracefully
+		if = {
+			limit = { exists = scope:chosen_successor }
+			# proceed to transfer all held titles from recipient to chosen_successor
+			# Transfer the county capital first if present
+			if = {
+				limit = { scope:recipient = { capital_county = { exists = yes } } }
+				scope:recipient = {
+					capital_county = {
+						change_title_holder = {
+							holder = scope:chosen_successor
+							change = scope:change
+							take_baronies = yes
+						}
+					}
+				}
+			}
+			every_held_title = {
+				limit = {
+					holder = scope:recipient
+					NOT = { tier = tier_barony }
+					NOT = { is_noble_family_title = yes }
+				}
+				change_title_holder = {
+					holder = scope:chosen_successor
+					change = scope:change
+					take_baronies = yes
+				}
+			}
+			resolve_title_and_vassal_change = scope:change
+			# Add cooldown on the recipient to prevent immediate re-uses
+			scope:recipient = { set_variable = { name = puppet_master_cooldown value = yes days = 365 } }
+
+			# Re-establish puppet regency on the new liege so the puppet master stays in power
+			# (make the actor the diarch of the chosen_successor and set the puppet_regency type)
+			if = {
+				limit = { exists = scope:chosen_successor }
+				scope:chosen_successor = {
+					set_diarch = scope:actor
+					set_diarchy_type = puppet_regency
+					set_diarchy_swing = 90
+				}
+			}
+		}
+	}
 }

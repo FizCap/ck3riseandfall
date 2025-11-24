@@ -34,13 +34,6 @@ riseandfall_steal_gold_interaction = {
 			riseandfall_liege_has_gold = yes
 		}
 	}
-	is_valid = {
-		riseandfall_liege_stability_below_50 = yes
-		scope:recipient = {
-			riseandfall_no_cooldown = yes
-			riseandfall_liege_has_gold = yes
-		}
-	}
 
 	# Auto-accept: this is a unilateral diarch action
 	auto_accept = yes
@@ -116,12 +109,6 @@ riseandfall_curry_favor_interaction = {
 			riseandfall_no_existing_hook = yes
 		} 
 	}
-	is_valid = { 
-		scope:recipient = { 
-			riseandfall_no_cooldown = yes
-			riseandfall_no_existing_hook = yes
-		} 
-	}
 
 	auto_accept = yes
 
@@ -188,11 +175,6 @@ riseandfall_overthrow_liege_interaction = {
 		riseandfall_puppet_regency_years_at_least_5 = yes
 		riseandfall_no_low_stability_cooldown = yes
 	}
-	is_valid = {
-		riseandfall_liege_stability_below_30 = yes
-		riseandfall_puppet_regency_years_at_least_5 = yes
-		riseandfall_no_low_stability_cooldown = yes
-	}
 
 	auto_accept = yes
 
@@ -229,5 +211,65 @@ riseandfall_overthrow_liege_interaction = {
 	}
 
 	# Rare/conditional
+	ai_will_do = { base = 100 }
+}
+
+# Interaction: Force Liege to Abdicate (use poor health to influence abdication)
+riseandfall_force_abdicate_interaction = {
+	interface_priority = 85
+	common_interaction = yes
+	category = interaction_riseandfall
+	icon = icon_riseandfall
+	show_effects_in_notification = yes
+	desc = riseandfall_force_abdicate_interaction_desc
+	diarch_interaction = yes
+
+	is_shown = {
+		OR = {
+			scope:actor = { is_ai = yes }
+			AND = {
+				scope:actor = { is_ai = no }
+				has_game_rule = riseandfall_lite_mode_disabled
+			}
+		}
+		scope:recipient = { has_diarchy_type = puppet_regency }
+	}
+
+	# Show only when liege has poor health and no cooldown
+	is_valid_showing_failures_only = {
+		scope:recipient = {
+			riseandfall_liege_has_poor_health = yes
+		}
+	}
+
+	auto_accept = yes
+
+	on_accept = {
+		custom_tooltip = { text = riseandfall_force_abdicate_interaction_desc }
+		hidden_effect = {
+			riseandfall_force_abdicate_effect = yes
+			scope:recipient = {
+				send_interface_popup = {
+					type = send_interface_message_bad
+					title = riseandfall_force_abdicate_popup_title
+					custom_tooltip = riseandfall_force_abdicate_popup_desc
+					left_icon = scope:actor
+				}
+				every_vassal = {
+					send_interface_message = {
+						type = send_interface_message_bad
+						title = riseandfall_force_abdicate_vassal_notification_title
+						custom_tooltip = riseandfall_force_abdicate_vassal_notification_desc
+						left_icon = scope:actor
+					}
+				}
+			}
+		}
+	}
+
+	# How often AI considers this by top-title tier (months)
+	ai_frequency = 12
+	ai_potential = { always = yes }
+	ai_targets = { ai_recipients = liege max = 1 }
 	ai_will_do = { base = 100 }
 }

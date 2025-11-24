@@ -45,3 +45,16 @@
   riseandfall_overthrow_liege_popup_desc:0 "Your puppet master has overthrown you and seized your titles."
   riseandfall_overthrow_liege_vassal_notification_title:0 "Liege Overthrown"
   riseandfall_overthrow_liege_vassal_notification_desc:0 "Your liege has been overthrown by their puppet master."
+
+  # Force Abdication (health-based)
+  riseandfall_force_abdicate_interaction:0 "Force Abdication"
+  riseandfall_force_abdicate_interaction_desc:0 "Force your liege to step down if their health is poor, transferring their titles to a chosen dynasty member (youngest unlanded child preferred)."
+  riseandfall_force_abdicate_interaction_notification_text:0 "You force [recipient.GetShortUIName] to abdicate in favor of a chosen successor."
+
+  riseandfall_force_abdicate_popup_title:0 "Liege Forced to Abdicate"
+  riseandfall_force_abdicate_popup_desc:0 "Your puppet master has forced you to abdicate due to poor health. Their chosen successor will inherit titles."
+  riseandfall_force_abdicate_vassal_notification_title:0 "Liege Abdication by Puppet Master"
+  riseandfall_force_abdicate_vassal_notification_desc:0 "Your liege has been forced to abdicate by their puppet master due to poor health."
+
+  # Failure text for poor health check
+  riseandfall_liege_has_poor_health:0 "Liege must have poor or worse health."
