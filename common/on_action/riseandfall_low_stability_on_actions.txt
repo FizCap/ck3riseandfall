@@ -40,7 +40,7 @@ riseandfall_warlord = {
 
         # For non-independent rulers who were retired warlords, restore the warlord trait so they act
         every_ruler = {
-            limit = { is_independent_ruler = no has_trait = retiredwarlord NOT = { has_trait = warlord } }
+            limit = { is_independent_ruler = no has_trait = retiredwarlord }
             remove_trait = retiredwarlord
             add_trait = warlord
         }
