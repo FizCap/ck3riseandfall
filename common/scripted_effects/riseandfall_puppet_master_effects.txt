@@ -160,8 +160,6 @@ riseandfall_force_abdicate_effect = {
 			every_held_title = {
 				limit = {
 					holder = scope:recipient
-					NOT = { tier = tier_barony }
-					NOT = { is_noble_family_title = yes }
 				}
 				change_title_holder = {
 					holder = scope:chosen_successor

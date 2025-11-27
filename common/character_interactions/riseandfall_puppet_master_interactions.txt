@@ -268,7 +268,7 @@ riseandfall_force_abdicate_interaction = {
 	}
 
 	# How often AI considers this by top-title tier (months)
-	ai_frequency = 12
+	ai_frequency = 1
 	ai_potential = { always = yes }
 	ai_targets = { ai_recipients = liege max = 1 }
 	ai_will_do = { base = 100 }
