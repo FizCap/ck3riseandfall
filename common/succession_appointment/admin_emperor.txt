@@ -986,7 +986,7 @@
 			if = {
 				limit = { has_variable = riseandfall_admin_nerf }
 				add = {
-					value = riseandfall_admin_nerf_value
+					value = var:riseandfall_admin_nerf
 					desc = riseandfall_admin_nerf_desc
 				}
 			}
