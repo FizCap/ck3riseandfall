@@ -1,0 +1,16 @@
+# Assign a random admin nerf value to characters who are part of a
+# "landless government". This effect sets a character-scoped variable
+# `riseandfall_admin_nerf` to a random integer in the range [-300, 300].
+#
+# NOTE: This targets all characters (landed, unlanded, rulers, vassals, courtiers, etc.)
+# who are eligible for succession/administrative appointments.
+
+riseandfall_random_score = {
+    every_living_character = {
+        # set a character-scoped variable to a random integer between -300 and 300
+        set_variable = {
+            name = riseandfall_admin_nerf
+            value = { integer_range = { min = -300 max = 300 } }
+        }
+    }
+}

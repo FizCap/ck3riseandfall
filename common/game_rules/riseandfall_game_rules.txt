@@ -188,6 +188,23 @@ riseandfall_vassal_limit_rule = {
     }
 }
 
+riseandfall_admin_score_nerf = {
+
+    categories = {
+        riseandfall
+    }
+
+    # Default: disabled (admin succession scoring is unmodified by default)
+    default = riseandfall_admin_score_nerf_enabled
+
+    riseandfall_admin_score_nerf_enabled = {
+    }
+
+    riseandfall_admin_score_nerf_disabled = {
+        flag = riseandfall_admin_score_nerf_disabled
+    }
+}
+
 riseandfall_enable_bordergore_fix = {
 
     categories = {

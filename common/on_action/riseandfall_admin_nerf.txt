@@ -1,0 +1,21 @@
+﻿yearly_global_pulse = {
+    on_actions = {
+        riseandfall_admin_score
+    }
+}
+
+on_game_start_after_lobby = {
+    on_actions = {
+        riseandfall_admin_score
+    }
+}
+
+# On_Actions
+
+riseandfall_admin_score = {
+    # Only run the admin random score if the game rule is enabled
+    trigger = { has_game_rule = riseandfall_admin_score_nerf_enabled }
+    effect = {
+        riseandfall_random_score = yes
+    }
+}
