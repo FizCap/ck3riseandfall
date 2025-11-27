@@ -1,5 +1,5 @@
 ﻿admin_governor = {
-	default_candidates = { holder_close_family holder_councilor }
+	default_candidates = { holder_close_family }
 
 	candidate_score = {
 		value = {
@@ -487,7 +487,7 @@
 			if = {
 				limit = { has_variable = riseandfall_admin_nerf }
 				add = {
-					value = var:riseandfall_admin_nerf
+					value = riseandfall_admin_nerf_value
 					desc = riseandfall_admin_nerf_desc
 				}
 			}

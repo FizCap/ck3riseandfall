@@ -1,5 +1,5 @@
 ﻿admin_emperor = {
-	default_candidates = { holder_close_family landed_vassal holder_councilor }
+	default_candidates = { holder_close_family landed_vassal }
 
 	allow_children = yes
 
@@ -986,7 +986,7 @@
 			if = {
 				limit = { has_variable = riseandfall_admin_nerf }
 				add = {
-					value = var:riseandfall_admin_nerf
+					value = riseandfall_admin_nerf_value
 					desc = riseandfall_admin_nerf_desc
 				}
 			}

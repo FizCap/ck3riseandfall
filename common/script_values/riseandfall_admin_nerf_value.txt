@@ -1,0 +1,3 @@
+﻿riseandfall_admin_nerf_value = {
+    value = var:riseandfall_admin_nerf
+}
