@@ -1,8 +1,6 @@
 ﻿yearly_global_pulse = {
     on_actions = {
-        riseandfall_ai_create_kingdoms
-        riseandfall_ai_create_duchies
-        riseandfall_ai_create_empires
+        riseandfall_ai_create_titles
         riseandfall_ai_usurp_titles
         riseandfall_ai_title_handout
     }
@@ -16,30 +14,12 @@ on_game_start_after_lobby = {
 
 
 
-riseandfall_ai_create_kingdoms = {
+riseandfall_ai_create_titles = {
     trigger = {
         has_game_rule = riseandfall_ai_kingdom_creation_enabled
     }
     effect = {
-        riseandfall_ai_create_kingdoms_se = yes
-    }
-}
-
-riseandfall_ai_create_duchies = {
-    trigger = {
-        has_game_rule = riseandfall_ai_kingdom_creation_enabled
-    }
-    effect = {
-        riseandfall_ai_create_duchies_se = yes
-    }
-}
-
-riseandfall_ai_create_empires = {
-    trigger = {
-        has_game_rule = riseandfall_ai_kingdom_creation_enabled
-    }
-    effect = {
-        riseandfall_ai_create_empires_se = yes
+        riseandfall_ai_create_titles_se = yes
     }
 }
 

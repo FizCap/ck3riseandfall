@@ -1,81 +1,80 @@
-﻿# Auto-create kingdom titles for AI emperors, hegemons, and kings
-# Runs on the yearly global pulse (riseandfall_ai_create_kingdoms on_action)
-
-riseandfall_ai_create_kingdoms_se = {
-    # Iterate all rulers (players and AI)
+﻿# Combined auto-create titles for AI counts (duchy), rulers (kingdom), and kings (empire)
+# This single effect consolidates duplication and can be called by the old entrypoint scripts
+# or directly by the on_action registration.
+riseandfall_ai_create_titles_se = {
+    # Iterate all rulers (player and AI will be further filtered per-tier)
     every_ruler = {
-        # Allow emperors, hegemons, and kings to create kingdom-tier titles.
-        # Single-heir can create same-tier kingdoms; partition laws are blocked here (lower tier not allowed).
-        limit = {
-            is_ai = yes
-            OR = {
-                primary_title.tier = tier_empire
-                primary_title.tier = tier_kingdom
-                primary_title.tier = tier_hegemony
-            }
-            is_landed = yes
-        }
-
-        # Save scope for use inside iterators
+        limit = { is_landed = yes }
         save_scope_as = acting_ruler
 
-        # Iterate all creatable titles and try to create kingdoms
+        # Duchies (AI rulers of at least kingdom tier can create duchies)
         ordered_alert_creatable_title = {
             order_by = tier
             check_range_bounds = no
             max = 1000
+            limit = {
+                tier = tier_duchy
+                scope:acting_ruler = {
+                    is_ai = yes
+                    OR = {
+                        primary_title.tier = tier_kingdom
+                        primary_title.tier = tier_empire
+                        primary_title.tier = tier_hegemony
+                    }
+                    government_allows = administrative
+                }
+                # Prevent same-tier creation by default; single-heir realm law allows duplicating the tier
+                NOT = {
+                    AND = {
+                        tier = scope:acting_ruler.primary_title.tier
+                        NOT = { scope:acting_ruler = { has_realm_law = single_heir_succession_law } }
+                    }
+                }
+            }
+            save_scope_as = target_title
+            scope:target_title = {
+                try_create_important_action = {
+                    important_action_type = action_can_create_title
+                    landed_title = this
+                }
+            }
+            scope:acting_ruler = {
+                create_title_and_vassal_change = {
+                    type = created
+                    save_scope_as = title_change
+                    add_claim_on_loss = no
+                }
+                prev = {
+                    change_title_holder = {
+                        holder = scope:acting_ruler
+                        change = scope:title_change
+                    }
+                }
+                resolve_title_and_vassal_change = scope:title_change
+            }
+        }
 
+        # Kingdoms (AI emperors and hegemons creating kingdoms)
+        ordered_alert_creatable_title = {
+            order_by = tier
+            check_range_bounds = no
+            max = 1000
             limit = {
                 tier = tier_kingdom
                 scope:acting_ruler = {
-                    OR = {
-                        # Single-heir can create same-tier (additional kingdom) or higher (handled in empire creation effect).
-                        has_realm_law = single_heir_succession_law
-                        # Also allow administrative governments (matches player-side auto-create behavior).
-                        government_allows = administrative
-                        # Partition laws only allow creation of higher-tier titles (e.g. count -> duchy -> kingdom).
-                        # Only allow partition-based creation when the target tier is greater than the acting ruler's primary.
-                        AND = {
-                            OR = {
-                                has_realm_law = partition_succession_law
-                                has_realm_law = confederate_partition_succession_law
-                                has_realm_law = high_partition_succession_law
-                            }
-                            NOT = { tier = scope:acting_ruler.primary_title.tier }
-                        }
-                    }
+                    is_ai = yes
+                    OR = { primary_title.tier = tier_empire primary_title.tier = tier_hegemony }
+                    government_allows = administrative
                 }
-                # If a partition law is present then we must ensure the kingdom isn't the same tier as the acting ruler's
-                # primary title (partition is for creating higher-tier titles). Evaluate the `tier` comparison at
-                # the landed_title scope (the root here) to avoid wrong-scope triggers.
+                # Prevent same-tier creation by default; single-heir realm law allows duplicating the tier
                 NOT = {
                     AND = {
-                        scope:acting_ruler = {
-                            OR = {
-                                has_realm_law = partition_succession_law
-                                has_realm_law = confederate_partition_succession_law
-                                has_realm_law = high_partition_succession_law
-                            }
-                        }
                         tier = scope:acting_ruler.primary_title.tier
-                    }
-                }
-
-                # Prevent creating a kingdom with the same tier as the acting ruler's primary title unless the
-                # acting ruler has single-heir succession. This matches the intent: only single-heir realm law
-                # allows duplicating the same-tier title.
-                NOT = {
-                    AND = {
                         NOT = { scope:acting_ruler = { has_realm_law = single_heir_succession_law } }
-                        tier = scope:acting_ruler.primary_title.tier
                     }
                 }
             }
-
-            # Try to create the kingdom if possible
             save_scope_as = target_title
-
-            # Create an important-action alert for the engine/UI so players (and logs) know this title is creatable
             scope:target_title = {
                 try_create_important_action = {
                     important_action_type = action_can_create_title
@@ -88,179 +87,39 @@ riseandfall_ai_create_kingdoms_se = {
                     save_scope_as = title_change
                     add_claim_on_loss = no
                 }
-
                 prev = {
                     change_title_holder = {
                         holder = scope:acting_ruler
                         change = scope:title_change
                     }
                 }
-
                 resolve_title_and_vassal_change = scope:title_change
             }
         }
-    }
-}
 
-# Auto-create duchy titles for AI counts
-# Also runs on the yearly global pulse
-riseandfall_ai_create_duchies_se = {
-    # Iterate all rulers (players and AI)
-    every_ruler = {
-        # Allow any ruler (player or AI), regardless of primary title tier, to be considered
-        # for duchy creation, but require the ruler to be landed (is_landed = yes).
-        limit = {
-            is_ai = yes
-            is_landed = yes
-        }
-
-        # Save scope for use inside iterators
-        save_scope_as = acting_count
-
-        # Iterate all creatable titles and try to create duchies
+        # Empires (AI kings promoting to empire)
         ordered_alert_creatable_title = {
             order_by = tier
             check_range_bounds = no
-            max = 1000  # Limit to prevent excessive duchy creation
-
-            limit = {
-                tier = tier_duchy
-                scope:acting_count = {
-                    OR = {
-                        # Single-heir can create same-tier (additional duchy) or higher.
-                        has_realm_law = single_heir_succession_law
-                        # Administrative governments are NOT allowed to create duchy-tier titles (or lower).
-                        # Partition laws: only allow creation if the target tier is higher than the acting's primary title tier.
-                        AND = {
-                            OR = {
-                                has_realm_law = partition_succession_law
-                                has_realm_law = confederate_partition_succession_law
-                                has_realm_law = high_partition_succession_law
-                            }
-                            NOT = { tier = scope:acting_count.primary_title.tier }
-                        }
-                    }
-                }
-                # If a partition law is present then ensure the duchy isn't the same tier as the acting ruler's
-                # primary title. Evaluate `tier` at the landed_title scope.
-                NOT = {
-                    AND = {
-                        scope:acting_count = {
-                            OR = {
-                                has_realm_law = partition_succession_law
-                                has_realm_law = confederate_partition_succession_law
-                                has_realm_law = high_partition_succession_law
-                            }
-                        }
-                        tier = scope:acting_count.primary_title.tier
-                    }
-                }
-
-                # Prevent creating a duchy with the same tier as the acting ruler's primary title unless the
-                # acting ruler has single-heir succession.
-                NOT = {
-                    AND = {
-                        NOT = { scope:acting_count = { has_realm_law = single_heir_succession_law } }
-                        tier = scope:acting_count.primary_title.tier
-                    }
-                }
-            }
-
-            # Try to create the duchy if possible
-            save_scope_as = target_title
-
-            # Create an important-action alert for the engine/UI so players (and logs) know this title is creatable
-            scope:target_title = {
-                try_create_important_action = {
-                    important_action_type = action_can_create_title
-                    landed_title = this
-                }
-            }
-            scope:acting_count = {
-                create_title_and_vassal_change = {
-                    type = created
-                    save_scope_as = title_change
-                    add_claim_on_loss = no
-                }
-
-                prev = {
-                    change_title_holder = {
-                        holder = scope:acting_count
-                        change = scope:title_change
-                    }
-                }
-
-                resolve_title_and_vassal_change = scope:title_change
-            }
-        }
-    }
-}
-
-# Auto-create empire titles for AI emperors and kings  
-# Also runs on the yearly global pulse
-riseandfall_ai_create_empires_se = {
-    # Iterate all rulers (players and AI)
-    every_ruler = {
-        # Only run for AI-controlled rulers whose primary title is kingdom or empire tier
-        limit = {
-            is_ai = yes
-            OR = {
-                primary_title.tier = tier_empire
-                primary_title.tier = tier_kingdom
-            }
-            is_landed = yes
-        }
-
-        # Save scope for use inside iterators
-        save_scope_as = acting_ruler
-
-        # Iterate all creatable titles and try to create empires
-        ordered_alert_creatable_title = {
-            order_by = tier
-            check_range_bounds = no
-            max = 99  # Limit empire creation to prevent excessive titles
-
+            max = 99
             limit = {
                 tier = tier_empire
                 scope:acting_ruler = {
-                    OR = {
-                        # Single-heir can create same-tier (additional empire) or higher (king -> empire).
-                        has_realm_law = single_heir_succession_law
-                        # Administrative governments are NOT allowed to create empire-tier titles.
-                        # Partition succession: only allow if target tier is higher than the acting ruler's primary tier.
-                        AND = {
-                            OR = {
-                                has_realm_law = partition_succession_law
-                                has_realm_law = confederate_partition_succession_law
-                                has_realm_law = high_partition_succession_law
-                            }
-                            NOT = { tier = scope:acting_ruler.primary_title.tier }
-                        }
+                    is_ai = yes
+                    primary_title.tier = tier_kingdom
+                    government_allows = administrative
+                }
+                # Prevent same-tier creation by default; single-heir realm law allows duplicating the tier
+                NOT = {
+                    AND = {
+                        tier = scope:acting_ruler.primary_title.tier
+                        NOT = { scope:acting_ruler = { has_realm_law = single_heir_succession_law } }
                     }
                 }
-                        # Prevent creating an empire with the same tier as the acting ruler's primary title unless the
-                        # acting ruler has single-heir succession.
-                        # Partition-specific rule: when partition laws exist, require the target tier not be
-                        # equal to the acting ruler's primary title tier. ``tier`` must be evaluated at the
-                        # landed_title scope, so it's performed here.
-                        NOT = {
-                            AND = {
-                                scope:acting_ruler = {
-                                    OR = {
-                                        has_realm_law = partition_succession_law
-                                        has_realm_law = confederate_partition_succession_law
-                                        has_realm_law = high_partition_succession_law
-                                    }
-                                }
-                                tier = scope:acting_ruler.primary_title.tier
-                            }
-                        }
+                # Hegemons must not create empires (extra guard)
+                NOT = { scope:acting_ruler = { primary_title.tier = tier_hegemony } }
             }
-
-            # Try to create the empire if possible
             save_scope_as = target_title
-
-            # Create an important-action alert for the engine/UI so players (and logs) know this title is creatable
             scope:target_title = {
                 try_create_important_action = {
                     important_action_type = action_can_create_title
@@ -273,20 +132,23 @@ riseandfall_ai_create_empires_se = {
                     save_scope_as = title_change
                     add_claim_on_loss = no
                 }
-
                 prev = {
                     change_title_holder = {
                         holder = scope:acting_ruler
                         change = scope:title_change
                     }
                 }
-
                 resolve_title_and_vassal_change = scope:title_change
             }
         }
     }
+# Rules enforced:
+# - AI should create titles when possible, but they must NOT create a title that is the same tier as their
+#   own primary title unless their realm uses the single-heir succession law (single_heir_succession_law).
+# - Creators for each target tier remain the same as before: duchies are created by rulers at kingdom+ tier,
+#   kingdoms by empire/hegemon, and empires (promotions) by kings.
+# - When in doubt, prefer lower-tier creation unless explicit promotion (king -> empire) is intended.
 }
-
 # Auto-usurp titles for AI rulers
 # Runs on the yearly global pulse (riseandfall_ai_usurp_titles on_action)
 
@@ -334,6 +196,14 @@ riseandfall_ai_usurp_titles_se = {
                         tier = scope:acting_ruler.primary_title.tier
                     }
 
+                    # Prevent hegemons from attempting to usurp empire-tier titles
+                    NOT = {
+                        AND = {
+                            tier = tier_empire
+                            scope:acting_ruler = { primary_title.tier = tier_hegemony }
+                        }
+                    }
+
                     # If the government is administrative, block duplicates when the target title's tier equals acting's primary.
                     AND = {
                         scope:acting_ruler = { government_has_flag = government_is_administrative }
@@ -370,3 +240,8 @@ riseandfall_ai_usurp_titles_se = {
         }
     }
 }
+
+# Backwards-compatibility thin wrappers: preserve old effect names
+riseandfall_ai_create_kingdoms_se = { riseandfall_ai_create_titles_se = yes }
+riseandfall_ai_create_duchies_se = { riseandfall_ai_create_titles_se = yes }
+riseandfall_ai_create_empires_se = { riseandfall_ai_create_titles_se = yes }
