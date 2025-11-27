@@ -70,6 +70,10 @@ palace_coup.1002.b:0 "Attempt to Flee"
 palace_coup.1003.a:0 "Sound the horn — raise the banners"
 palace_coup.1004.a:0 "Accept Death"
 
+# Child-specific option when ruler is a child
+palace_coup.1002.c:0 "Yield to the challenger"
+palace_coup.1002.child_tooltip:0 "The ruler is a child — yield and accept the challenger as puppet master."
+
  # UI tooltips used by options/duel outcomes
 palace_coup.1001.tooltip:0 "Confront the challenger in a duel or attempt to flee."
 palace_coup.1002.tooltip:0 "Engage the challenger in a prowess duel. Winning kills the challenger; losing results in your death and loss of titles."

@@ -45,7 +45,7 @@ palace_coup.1002 = {
 	option = {
 		name = palace_coup.1002.a
 		custom_tooltip = palace_coup.1002.tooltip
-		trigger = { exists = scope:challenger }
+		trigger = { exists = scope:challenger root = { is_adult = yes } }
 
 		duel = {
 			skill = prowess
@@ -171,7 +171,7 @@ palace_coup.1002 = {
 
 	option = {
 		name = palace_coup.1002.b
-		trigger = { exists = scope:challenger }
+		trigger = { exists = scope:challenger root = { is_adult = yes } }
 
 		duel = {
 			skill = intrigue
@@ -221,6 +221,16 @@ palace_coup.1002 = {
 				prowess_diff = { target = scope:challenger value <= -1 }
 			}
 		}
+	}
+
+	# If the current ruler is a child, they cannot duel or flee — they should simply yield
+	option = {
+		name = palace_coup.1002.c
+		custom_tooltip = palace_coup.1002.child_tooltip
+		trigger = { exists = scope:challenger root = { is_adult = no } }
+		# Challenger keeps the child on the throne as a puppet master
+		hidden_effect = { riseandfall_palace_coup_child_yields = yes }
+		ai_chance = { base = 100 }
 	}
 }
 
