@@ -109,15 +109,25 @@ riseandfall_force_abdicate_effect = {
 	scope:recipient = {
 		# initialize a big age to find the youngest
 		set_variable = { name = rf_candidate_best_age value = 999 }
-		# iterate over children to find the youngest unlanded child
-		every_child = {
-			limit = { is_landed = no }
-			# store this child's age into a variable on the child scope
+		# iterate over close/extended family to find the youngest unlanded child
+		# allow children who are educated at other courts as long as their
+		# employer/liege/top_liege is the recipient
+		every_close_or_extended_family_member = {
+			limit = {
+				is_landed = no
+				NOT = { is_adult = yes }
+				OR = {
+					employer = scope:recipient
+					liege = scope:recipient
+					top_liege = scope:recipient
+				}
+			}
+			# store this family member's age into a variable on their scope
 			set_variable = { name = candidate_age value = age }
 			save_scope_as = candidate_for_score
-			# push the child's age into recipient scope for comparison
+			# push the candidate age into recipient scope for comparison
 			scope:recipient = { set_variable = { name = tmp_candidate_age value = scope:candidate_for_score.var:candidate_age } }
-			# If the child's age is less than the current best (younger), choose them
+			# If the candidate's age is less than the current best (younger), choose them
 			if = {
 				limit = { scope:recipient = { var:tmp_candidate_age < var:rf_candidate_best_age } }
 				save_scope_as = chosen_successor
