@@ -78,7 +78,18 @@ riseandfall_steal_gold_interaction = {
 		max = 1
 	}
 
-	ai_will_do = { base = 100 }
+	ai_will_do = {
+		# Opportunistic: steal gold from a liege. Prefer greedy / deceitful actors and disliked/weak lieges.
+		base = 40
+
+		modifier = { scope:actor = { has_trait = greedy } add = 40 }
+		modifier = { scope:actor = { has_trait = deceitful } add = 30 }
+		modifier = { scope:actor = { has_trait = ambitious } add = 20 }
+		modifier = { scope:actor = { has_trait = honest } add = -30 }
+
+		modifier = { scope:recipient = { opinion = { target = scope:actor value < 0 } } add = 45 }
+		modifier = { scope:actor = { is_at_war = yes } add = -50 }
+	}
 }
 
 # Interaction: Curry Favor (gain a strong favor hook)
@@ -144,7 +155,22 @@ riseandfall_curry_favor_interaction = {
 		max = 1
 	}
 
-	ai_will_do = { base = 100 }
+	ai_will_do = {
+		# Curry favor: manipulation to gain hooks. Preferred by ambitious/deceitful actors; penalize honest/just actors.
+		base = 40
+
+		modifier = { scope:actor = { has_trait = ambitious } add = 30 }
+		modifier = { scope:actor = { has_trait = deceitful } add = 30 }
+		modifier = { scope:actor = { has_trait = greedy } add = 20 }
+		modifier = { scope:actor = { has_trait = honest } add = -30 }
+		modifier = { scope:actor = { has_trait = just } add = -20 }
+
+		# If the liege already likes the diarch, easier to curry favor; otherwise it's harder.
+		modifier = { scope:recipient = { opinion = { target = scope:actor value >= 30 } } add = 20 }
+		modifier = { scope:recipient = { opinion = { target = scope:actor value <= -20 } } add = -20 }
+
+		modifier = { scope:actor = { is_at_war = yes } add = -30 }
+	}
 }
 
 # Interaction: Overthrow Liege (transfer all titles to diarch)
@@ -211,7 +237,24 @@ riseandfall_overthrow_liege_interaction = {
 	}
 
 	# Rare/conditional
-	ai_will_do = { base = 100 }
+	ai_will_do = {
+		# Overthrow: major action — usually rare but strong when conditions are favorable (ambitious actors, weak liege)
+		base = -1000
+
+		modifier = { scope:actor = { has_trait = ambitious } add = 300 }
+		modifier = { scope:actor = { has_trait = greedy } add = 200 }
+		modifier = { scope:actor = { has_trait = vengeful } add = 150 }
+		modifier = { scope:actor = { has_trait = deceitful } add = 80 }
+		modifier = { scope:actor = { has_trait = honest } add = -200 }
+
+		# If liege dislikes the diarch, more impetus to overthrow
+		modifier = { scope:recipient = { opinion = { target = scope:actor value < 0 } } add = 200 }
+
+		# Military strength comparisons removed: Puppetmaster operates politically rather than through direct force
+
+		# Penalize if actor is at war (avoid opening the realm to internal conflict)
+		modifier = { scope:actor = { is_at_war = yes } add = -200 }
+	}
 }
 
 # Interaction: Force Liege to Abdicate (use poor health to influence abdication)
@@ -271,5 +314,18 @@ riseandfall_force_abdicate_interaction = {
 	ai_frequency = 1
 	ai_potential = { always = yes }
 	ai_targets = { ai_recipients = liege max = 1 }
-	ai_will_do = { base = 100 }
+	ai_will_do = {
+		# Force abdicate: pushing a weak liege to abdicate. Prefer ambitious/vengeful actors targeting weak/disliked lieges.
+		base = 20
+
+		modifier = { scope:actor = { has_trait = ambitious } add = 60 }
+		modifier = { scope:actor = { has_trait = vengeful } add = 40 }
+		modifier = { scope:actor = { has_trait = greedy } add = 20 }
+		modifier = { scope:actor = { has_trait = honest } add = -40 }
+		modifier = { scope:actor = { has_trait = just } add = -30 }
+
+		modifier = { scope:recipient = { opinion = { target = scope:actor value < 0 } } add = 35 }
+		modifier = { scope:recipient = { opinion = { target = scope:actor value >= 60 } } add = -30 }
+		modifier = { scope:actor = { is_at_war = yes } add = -60 }
+	}
 }

@@ -126,5 +126,54 @@
         max = 100
     }
 
-    ai_will_do = { base = 100 }
+    ai_will_do = {
+        # Lower base so chosen modifiers make a meaningful difference; this is a targeted administrative operation
+        base = 60
+
+        # Actor-scope modifiers — who the liege is
+        modifier = {
+            scope:actor = { has_trait = just }
+            add = 40
+        }
+        modifier = {
+            scope:actor = { has_trait = honest }
+            add = 25
+        }
+        modifier = {
+            scope:actor = { has_trait = arbitrary }
+            add = -25
+        }
+        modifier = {
+            scope:actor = { has_trait = greedy }
+            add = 10
+        }
+
+        # Recipient-scope modifiers — we want to weaken problematic vassals
+        modifier = {
+            scope:recipient = { has_trait = ambitious }
+            add = 60
+        }
+        modifier = {
+            scope:recipient = { has_trait = greedy }
+            add = 40
+        }
+        modifier = {
+            scope:recipient = { highest_held_title_tier >= tier_duchy }
+            add = 40
+        }
+        modifier = {
+            scope:recipient = { opinion = { target = scope:actor value < 0 } }
+            add = 45
+        }
+        modifier = {
+            scope:recipient = { opinion = { target = scope:actor value >= 60 } }
+            add = -40
+        }
+
+        # Contextual factors
+        modifier = {
+            scope:actor = { is_at_war = yes }
+            add = -50
+        }
+    }
 }
