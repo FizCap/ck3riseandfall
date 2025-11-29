@@ -1,0 +1,57 @@
+riseandfall_create_adventurer_camp_interaction = {
+    category = interaction_riseandfall
+    common_interaction = yes
+    interface_priority = 95
+    icon = icon_riseandfall
+
+    desc = riseandfall_create_adventurer_camp_interaction_desc
+    notification_text = riseandfall_create_adventurer_camp_notification
+
+    # Only show/useable for the player (human), unlanded characters converting themselves
+    is_shown = {
+        scope:actor = {
+            is_ai = no
+            is_landed = no
+            has_game_rule = riseandfall_adventurer_creator_enabled
+        }
+        scope:recipient = scope:actor # Self-targeting: actor == recipient
+    }
+
+    is_valid = {
+        scope:actor = {
+            is_ai = no
+            is_landed = no
+            has_game_rule = riseandfall_adventurer_creator_enabled
+        }
+        scope:recipient = scope:actor
+    }
+
+    # Do not let AI perform this
+    ai_potential = { always = no }
+    ai_min_reply_days = 0
+    ai_max_reply_days = 0
+
+    send_options_exclusive = no
+    auto_accept = yes
+
+    # The action: turn actor into an adventurer by creating a landless adventurer title for them
+    on_accept = {
+        scope:actor = {
+            create_adventurer_title = {
+                name = riseandfall_adventurer_title_name_player
+                holder = scope:actor
+                save_scope_as = riseandfall_created_adventurer_title
+            }
+
+            # Send immediate UI confirmation to the player
+            hidden_effect = {
+                send_interface_toast = {
+                    type = event_toast_effect_good
+                    title = riseandfall_create_adventurer_camp_notification_title
+                    left_icon = scope:actor
+                    custom_tooltip = riseandfall_create_adventurer_camp_notification_tooltip
+                }
+            }
+        }
+    }
+}
