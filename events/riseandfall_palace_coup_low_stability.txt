@@ -42,21 +42,58 @@ palace_coup.1002 = {
 		character = scope:challenger
 	}
 
+	immediate = {
+		riseandfall_calculate_total_side_prowess = yes
+		scope:challenger = { riseandfall_calculate_total_side_prowess = yes }
+
+		# Copy calculated totals from event_root into the root and challenger characters so localization can read them
+		if = {
+			limit = { scope:event_root = { has_variable = riseandfall_total_prowess_root } }
+			root = { set_variable = { name = riseandfall_total_prowess_root value = scope:event_root.var:riseandfall_total_prowess_root } }
+		}
+		if = {
+			limit = { scope:event_root = { has_variable = riseandfall_total_prowess_chall } }
+			scope:challenger = { set_variable = { name = riseandfall_total_prowess_chall value = scope:event_root.var:riseandfall_total_prowess_chall } }
+			# Also copy challenger's total onto the root character so a single tooltip subject can show both values
+			root = { set_variable = { name = riseandfall_total_prowess_chall value = scope:event_root.var:riseandfall_total_prowess_chall } }
+		}
+
+		# For intrigue-based flee option, use individual character intrigue values (not a team total)
+		# Copy challenger's intrigue into a temporary var on the challenger for safe referencing
+		scope:challenger = { set_variable = { name = riseandfall_chall_intrigue value = intrigue } }
+		# compute AI add variables on root (clamped) for the duel and the intrigue flee choice
+		root = {
+			# Duel weight
+			set_variable = { name = riseandfall_ai_duel_add value = 0 }
+			change_variable = { name = riseandfall_ai_duel_add add = var:riseandfall_total_prowess_root }
+			change_variable = { name = riseandfall_ai_duel_add subtract = var:riseandfall_total_prowess_chall }
+			change_variable = { name = riseandfall_ai_duel_add multiply = 1 }
+			clamp_variable = { name = riseandfall_ai_duel_add min = -50 max = 50 }
+
+			# Intrigue weight: compute from character intrigue only (root.intrigue - challenger.intrigue)
+			set_variable = { name = riseandfall_ai_intrigue_add value = intrigue }
+			change_variable = { name = riseandfall_ai_intrigue_add subtract = var:riseandfall_chall_intrigue }
+			clamp_variable = { name = riseandfall_ai_intrigue_add min = -50 max = 50 }
+		}
+	}
+
 	option = {
 		name = palace_coup.1002.a
-		custom_tooltip = palace_coup.1002.tooltip
 		trigger = { exists = scope:challenger root = { is_adult = yes } }
 
+		# Casualties & injuries are handled by a scripted effect to keep the event file clean
+		hidden_effect = { riseandfall_palace_coup_casualties = yes }
+
 		duel = {
-			skill = prowess
+			challenge_variable = riseandfall_total_prowess
 			target = scope:challenger
 
 			# Root wins duel
-			5 = {
+			40 = {
 				compare_modifier = {
 					value = scope:duel_value
 					multiplier = 1
-					min = -20
+					min = -999
 				}
 
 				custom_tooltip = palace_coup.1002.win.tooltip
@@ -69,11 +106,11 @@ palace_coup.1002 = {
 			}
 
 			# Challenger wins duel
-			95 = {
+			60 = {
 				compare_modifier = {
 					value = scope:duel_value
 					multiplier = -1
-					min = -20
+					min = -999
 				}
 
 				custom_tooltip = palace_coup.1002.lose.tooltip
@@ -85,93 +122,14 @@ palace_coup.1002 = {
 		}
 
 		ai_chance = {
-			base = 0
-			modifier = {
-				add = 5
-				prowess_diff = { target = scope:challenger value >= 1 }
-			}
-			modifier = {
-				add = 5
-				prowess_diff = { target = scope:challenger value >= 2 }
-			}
-			modifier = {
-				add = 5
-				prowess_diff = { target = scope:challenger value >= 3 }
-			}
-			modifier = {
-				add = 5
-				prowess_diff = { target = scope:challenger value >= 4 }
-			}
-			modifier = {
-				add = 5
-				prowess_diff = { target = scope:challenger value >= 5 }
-			}
-			modifier = {
-				add = 5
-				prowess_diff = { target = scope:challenger value >= 6 }
-			}
-			modifier = {
-				add = 5
-				prowess_diff = { target = scope:challenger value >= 7 }
-			}
-			modifier = {
-				add = 5
-				prowess_diff = { target = scope:challenger value >= 8 }
-			}
-			modifier = {
-				add = 5
-				prowess_diff = { target = scope:challenger value >= 9 }
-			}
-			modifier = {
-				add = 5
-				prowess_diff = { target = scope:challenger value >= 10 }
-			}
-			modifier = {
-				add = 5
-				prowess_diff = { target = scope:challenger value >= 11 }
-			}
-			modifier = {
-				add = 5
-				prowess_diff = { target = scope:challenger value >= 12 }
-			}
-			modifier = {
-				add = 5
-				prowess_diff = { target = scope:challenger value >= 13 }
-			}
-			modifier = {
-				add = 5
-				prowess_diff = { target = scope:challenger value >= 14 }
-			}
-			modifier = {
-				add = 5
-				prowess_diff = { target = scope:challenger value >= 15 }
-			}
-			modifier = {
-				add = 5
-				prowess_diff = { target = scope:challenger value >= 16 }
-			}
-			modifier = {
-				add = 5
-				prowess_diff = { target = scope:challenger value >= 17 }
-			}
-			modifier = {
-				add = 5
-				prowess_diff = { target = scope:challenger value >= 18 }
-			}
-			modifier = {
-				add = 5
-				prowess_diff = { target = scope:challenger value >= 19 }
-			}
-			modifier = {
-				add = 5
-				prowess_diff = { target = scope:challenger value >= 20 }
-			}
+			base = 50
+			modifier = { add = var:riseandfall_ai_duel_add }
 		}
 	}
 
 	option = {
-		name = palace_coup.1002.b
-		trigger = { exists = scope:challenger root = { is_adult = yes } }
+	name = palace_coup.1002.b
+	trigger = { exists = scope:challenger root = { is_adult = yes } }
 
 		duel = {
 			skill = intrigue
@@ -207,19 +165,8 @@ palace_coup.1002 = {
 		}
 
 		ai_chance = {
-			base = 100
-			modifier = {
-				add = 10
-				NOT = { intrigue_diff = { target = scope:challenger value <= 0 } }
-			}
-			modifier = {
-				add = -10
-				intrigue_diff = { target = scope:challenger value <= -1 }
-			}
-			modifier = {
-				add = 100
-				prowess_diff = { target = scope:challenger value <= -1 }
-			}
+			base = 50
+			modifier = { add = var:riseandfall_ai_intrigue_add }
 		}
 	}
 

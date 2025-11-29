@@ -1,4 +1,4 @@
-##########################
+﻿##########################
 # Rise and Fall - Low Stability Events Scripted Effects
 # Contains scripted effects related to low stability events
 # Sets up the challenger selection, kills courtiers, creates adventurer title, and sets cooldowns
@@ -207,42 +207,6 @@ riseandfall_palace_coup_setup = {
 					random_list = {
 						50 = { set_employer = scope:challenger }
 						50 = { }
-					}
-				}
-			}
-		}
-
-		# -----------------------------------------------------
-		# THE PURGE
-		# -----------------------------------------------------
-		hidden_effect = {
-			scope:event_root = {
-				every_courtier_or_guest = {
-					limit = {
-						is_alive = yes
-						NOT = { this = root }
-						NOT = { this = scope:challenger }
-						NOT = { this = scope:installed_child }
-						NOT = { employer = scope:challenger }
-					}
-					# Assign employer - prefer installed child if one is installed, otherwise the challenger
-					if = {
-						limit = { employer != scope:challenger scope:event_root = { has_variable = challenger_camp_created } }
-						if = { limit = { exists = scope:installed_child scope:installed_child = { is_alive = yes NOT = { is_ruler = yes } is_landed = yes } } set_employer = scope:installed_child }
-						else_if = { limit = { exists = scope:challenger scope:challenger = { is_alive = yes NOT = { is_ruler = yes } has_title = scope:palace_coup_challenger_camp_title } } set_employer = scope:challenger }
-					}
-					# Randomize deaths (only if the root is an adult)
-					if = {
-						limit = { root = { is_adult = yes } }
-						random_list = {
-							50 = {
-								death = {
-									death_reason = death_in_palace_coup
-									killer = scope:challenger
-								}
-							}
-							50 = { }
-						}
 					}
 				}
 			}
@@ -977,9 +941,17 @@ riseandfall_palace_coup_child_yields = {
 	if = {
 		limit = { exists = scope:challenger root = { is_adult = no } }
 		# If we created a temporary adventurer camp title for the challenger,
-		# destroy it now so the challenger is a normal courtier and not a landless holder.
+		# move their courtiers to the root and then destroy the title.
 		if = {
 			limit = { scope:event_root = { has_variable = challenger_camp_created } scope:challenger = { has_title = scope:palace_coup_challenger_camp_title } }
+			
+			# Move all courtiers from challenger to root
+			scope:challenger = {
+				every_courtier = {
+					set_employer = root
+				}
+			}
+			
 			scope:challenger = { destroy_title = scope:palace_coup_challenger_camp_title }
 		}
 
@@ -991,5 +963,76 @@ riseandfall_palace_coup_child_yields = {
 			set_diarchy_swing = 90
 		}
 		# Trigger the challenger's warlord path
+	}
+}
+
+
+# Rise and Fall - Calculate Total Side Prowess
+# Calculates the total prowess of the character and their knights
+# Stores the result in variable riseandfall_total_prowess
+riseandfall_calculate_total_side_prowess = {
+	# Start with the character's own prowess
+	set_variable = { name = riseandfall_total_prowess value = prowess }
+
+	# For challenger, use all courtiers (since knights might not be assigned yet)
+	if = {
+		limit = { exists = scope:challenger this = scope:challenger }
+		every_courtier = {
+			limit = { is_alive = yes is_imprisoned = no }
+			# add each courtier's prowess to the running total
+			change_variable = { name = riseandfall_total_prowess add = this.prowess }
+		}
+	}
+	# For others (root), use knights
+	else = {
+		every_knight = {
+			limit = { is_alive = yes is_imprisoned = no }
+			# add each knight's prowess to the running total
+			change_variable = { name = riseandfall_total_prowess add = this.prowess }
+		}
+	}
+
+	# After summing, store the result on the event root and on the appropriate character for localization
+	if = {
+		limit = { this = scope:challenger }
+		scope:event_root = { set_variable = { name = riseandfall_total_prowess_chall value = var:riseandfall_total_prowess } }
+		scope:challenger = { set_variable = { name = riseandfall_total_prowess_chall value = var:riseandfall_total_prowess } }
+	}
+	else = {
+		scope:event_root = { set_variable = { name = riseandfall_total_prowess_root value = var:riseandfall_total_prowess } }
+		root = { set_variable = { name = riseandfall_total_prowess_root value = var:riseandfall_total_prowess } }
+	}
+}
+
+
+##########################
+# Rise and Fall - Palace Coup Casualties
+# Apply random outcomes (death/wounded/maimed) to root knights and challenger courtiers
+##########################
+riseandfall_palace_coup_casualties = {
+	# Root side: every knight has a chance to live, die, be wounded, or be maimed
+	root = {
+		every_knight = {
+			limit = { is_alive = yes is_imprisoned = no }
+			random_list = {
+				50 = { }
+				20 = { death = { death_reason = death_in_palace_coup killer = scope:challenger } }
+				10 = { add_trait = wounded_1 }
+				10 = { add_trait = maimed }
+			}
+		}
+	}
+
+	# Challenger side: every courtier has a chance to live, die, be wounded, or be maimed
+	scope:challenger = {
+		every_courtier = {
+			limit = { is_alive = yes is_imprisoned = no is_adult = yes }
+			random_list = {
+				50 = { }
+				20 = { death = { death_reason = death_in_palace_coup killer = root } }
+				10 = { add_trait = wounded_1 }
+				10 = { add_trait = maimed }
+			}
+		}
 	}
 }

@@ -53,8 +53,8 @@ trait_retiredwarlord_desc:0 "Once a stirring force who sowed chaos across the re
 palace_coup.1001.t:0 "Palace Coup Attempt"
 palace_coup.1001.desc:0 "A disloyal knight in your court is staging a palace coup, moving to seize the throne by force. The corridors of your palace run thick with treachery. If you choose to fight, many in your court will perish in the fighting."
 
-palace_coup.1002.t:0 "The Coup Unfolds"
-palace_coup.1002.d:0 "The disloyal knight has launched the palace coup. Blood flows in the corridors as loyalists and traitors clash. You must decide: stand and fight in a duel, or attempt to flee and rally your forces later."
+palace_coup.1002.t:0 "The Challenge"
+palace_coup.1002.d:0 "[challenger.GetTitledFirstName] has stepped forward, surrounded by a band of loyal fighters.\n\n\"This ends now,\" [challenger.GetSheHe] declares. \"My champions against yours. Winner takes the throne.\"\n\nMy knights stand ready, hands on their hilts, awaiting my command."
 
 palace_coup.1003.t:0 "You Have Escaped — Raise the Banners"
 palace_coup.1003.d:0 "You stagger from the smoke-choked corridor into the cold night. Word spreads like wildfire: your life has been spared, but your throne was seized. Now is the hour to reclaim what is yours. Ride forth, call your vassals, and let every horn sound the summons to arms — raise the banners and reclaim the realm!"
@@ -65,7 +65,7 @@ palace_coup.1004.d:0 "You lost the duel. The palace coup has succeeded. You have
  # Option text (labels)
 palace_coup.1001.a:0 "Protect the palace"
 palace_coup.1001.b:0 "Flee the palace"
-palace_coup.1002.a:0 "Stand and Duel"
+palace_coup.1002.a:0 "My knights will crush you!"
 palace_coup.1002.b:0 "Attempt to Flee"
 palace_coup.1003.a:0 "Sound the horn — raise the banners"
 palace_coup.1004.a:0 "Accept Death"
@@ -76,11 +76,11 @@ palace_coup.1002.child_tooltip:0 "The ruler is a child — yield and accept the 
 
  # UI tooltips used by options/duel outcomes
 palace_coup.1001.tooltip:0 "Confront the challenger in a duel or attempt to flee."
-palace_coup.1002.tooltip:0 "Engage the challenger in a prowess duel. Winning kills the challenger; losing results in your death and loss of titles."
 palace_coup.1002.win.tooltip:0 "You win the duel and kill the challenger."
 palace_coup.1002.lose.tooltip:0 "The challenger will take all your lands and titles and you will perish."
 palace_coup.1002.flee_success.tooltip:0 "You successfully flee and start a rebellion."
 palace_coup.1002.fail.tooltip:0 "You get caught and assassinated."
+palace_coup.1002.flee_tooltip:0 "Attempt to flee — an intrigue duel between you and [challenger.GetTitledFirstName]."
 palace_coup.1003.tooltip:0 "Trigger the warlord event to raise banners against the challenger."
 palace_coup.1004.tooltip:0 "Accept your defeat and die."
 
@@ -91,3 +91,4 @@ death_in_palace_coup:0 "Died in the palace coup"
 death_in_palace_coup_killer:0 "$death_in_palace_coup$ by [TARGET_CHARACTER.GetUIName]"
 palace_coup.purge_toast:0 "A lot of people in your court will perish from this fighting."
 palace_coup.purge_toast_loss:0 "Your courtiers have been seized."
+riseandfall_total_prowess_name:0 "Total Side Prowess"
