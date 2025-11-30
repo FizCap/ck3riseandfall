@@ -92,3 +92,27 @@ death_in_palace_coup_killer:0 "$death_in_palace_coup$ by [TARGET_CHARACTER.GetUI
 palace_coup.purge_toast:0 "A lot of people in your court will perish from this fighting."
 palace_coup.purge_toast_loss:0 "Your courtiers have been seized."
 riseandfall_total_prowess_name:0 "Total Side Prowess"
+
+ # Realm Split localization
+realm_split.1001.t:0 "The Great Fracturing"
+realm_split.1001.d:0 "The bonds of vassalage have frayed beyond repair. Powerful lords throughout the realm whisper of independence, their ambitions no longer bound by oaths of fealty.\n\nFactions form in shadowed halls, armies muster in distant provinces, and the unity of your realm hangs by a thread. The realm teeters on the brink of dissolution — multiple successor states will emerge from the chaos, becoming your tributaries.\n\nYour most powerful vassals stand ready to carve their own realms from your empire. The split is inevitable."
+realm_split.1001.a:0 "Accept the inevitable — let them become tributaries"
+
+realm_split.1002.t:0 "Independence at Last!"
+realm_split.1002.d:0 "The realm has fractured, and from the chaos, you have emerged as an independent ruler! [scope:former_liege.GetTitledFirstName]'s grip on power has finally broken, and you now command your own destiny.\n\nYour realm stands tall among the successor states — may it endure where the old order could not."
+realm_split.1002.a:0 "Long live the new realm!"
+realm_split.1002.a.tt:0 "You are now an independent ruler with your own realm."
+
+ # Realm Split titles and modifiers
+ # Two naming variations for breakaway realms
+RISEANDFALL_BREAKAWAY_NAME_CAPITAL:0 "[rf_base_county.GetNameNoTooltip]"
+RISEANDFALL_BREAKAWAY_NAME_RULER:0 "[rf_breakaway_ruler.GetFirstNamePossessiveNoTooltip] Realm"
+RISEANDFALL_BREAKAWAY_TITLE_NAME:0 "[rf_breakaway_ruler.GetFirstNamePossessiveNoTooltip] Realm"
+RISEANDFALL_BREAKAWAY_FACTION:0 "Breakaway Faction"
+RISEANDFALL_REALM_SPLIT_TRUCE:0 "Realm Split Truce"
+
+riseandfall_former_liege_opinion:0 "Former Liege"
+riseandfall_former_liege_opinion_desc:0 "This ruler was once our liege before the great fracturing."
+
+riseandfall_negotiated_peace_opinion:0 "Negotiated Settlement"
+riseandfall_negotiated_peace_opinion_desc:0 "Our liege made concessions to keep the realm together."

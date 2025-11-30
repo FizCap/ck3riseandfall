@@ -1,0 +1,174 @@
+﻿namespace = realm_split
+
+##########################
+# Rise and Fall - Realm Split Events
+# Event chain for when a realm fractures into multiple independent realms
+
+# Main event: The Great Fracturing
+# Ruler faces the splitting of their realm into multiple parts
+realm_split.1001 = {
+    type = character_event
+    title = realm_split.1001.t
+    desc = realm_split.1001.d
+    theme = realm
+    
+    left_portrait = {
+        character = root
+        animation = stress
+    }
+    
+    trigger = {
+        riseandfall_can_realm_split_trigger = yes
+    }
+    
+    immediate = {
+        # Count vassals for description (use every_vassal for governments without powerful vassals)
+        # All governments use county tier or above
+        set_variable = { name = rf_display_vassal_count value = 0 }
+        if = {
+            limit = { riseandfall_no_powerful_vassals_trigger = yes }
+            # Administrative governments
+            every_vassal = {
+                limit = {
+                    is_ai = yes
+                    is_landed = yes
+                    primary_title.tier >= tier_county
+                }
+                root = { change_variable = { name = rf_display_vassal_count add = 1 } }
+            }
+        }
+        else = {
+            # Feudal/Clan - powerful vassals
+            every_powerful_vassal = {
+                limit = {
+                    is_ai = yes
+                    is_landed = yes
+                    primary_title.tier >= tier_county
+                }
+                root = { change_variable = { name = rf_display_vassal_count add = 1 } }
+            }
+        }
+        
+        # Save some vassals for the portrait display
+        if = {
+            limit = { riseandfall_no_powerful_vassals_trigger = yes }
+            # Administrative governments
+            random_vassal = {
+                limit = {
+                    is_ai = yes
+                    is_landed = yes
+                    primary_title.tier >= tier_county
+                }
+                weight = {
+                    base = 1
+                    modifier = {
+                        add = 10
+                        current_military_strength > root.current_military_strength
+                    }
+                }
+                save_scope_as = ambitious_vassal_1
+            }
+            random_vassal = {
+                limit = {
+                    is_ai = yes
+                    is_landed = yes
+                    primary_title.tier >= tier_county
+                    NOT = { this = scope:ambitious_vassal_1 }
+                }
+                weight = {
+                    base = 1
+                    modifier = {
+                        add = 10
+                        current_military_strength > root.current_military_strength
+                    }
+                }
+                save_scope_as = ambitious_vassal_2
+            }
+        }
+        else = {
+            # Feudal/Clan - powerful vassals
+            random_powerful_vassal = {
+                limit = {
+                    is_ai = yes
+                    is_landed = yes
+                    primary_title.tier >= tier_county
+                }
+                weight = {
+                    base = 1
+                    modifier = {
+                        add = 10
+                        current_military_strength > root.current_military_strength
+                    }
+                }
+                save_scope_as = ambitious_vassal_1
+            }
+            random_powerful_vassal = {
+                limit = {
+                    is_ai = yes
+                    is_landed = yes
+                    primary_title.tier >= tier_county
+                    NOT = { this = scope:ambitious_vassal_1 }
+                }
+                weight = {
+                    base = 1
+                    modifier = {
+                        add = 10
+                        current_military_strength > root.current_military_strength
+                    }
+                }
+                save_scope_as = ambitious_vassal_2
+            }
+        }
+    }
+    
+    # Only option: Accept the split - vassals break away and become tributaries
+    option = {
+        name = realm_split.1001.a
+        
+        # Execute the realm split
+        riseandfall_realm_split_se = yes
+        
+        # Stability improvement from reduced realm size
+        if = {
+            limit = { has_variable = riseandfall_realm_stability_score }
+            change_variable = { name = riseandfall_realm_stability_score add = 10 }
+        }
+        
+        # Set cooldown
+        set_variable = { name = low_stability_cooldown value = yes years = 5 }
+        
+        ai_chance = {
+            base = 100
+        }
+    }
+    
+    after = {
+        remove_variable = rf_display_vassal_count
+    }
+}
+
+# Notification event for vassals who become independent through the split
+realm_split.1002 = {
+    type = character_event
+    title = realm_split.1002.t
+    desc = realm_split.1002.d
+    theme = realm
+    
+    left_portrait = {
+        character = root
+        animation = personality_bold
+    }
+    right_portrait = {
+        character = scope:former_liege
+        animation = stress
+    }
+    
+    option = {
+        name = realm_split.1002.a
+        
+        # Celebration for gaining independence
+        add_prestige = 500
+        
+        custom_tooltip = realm_split.1002.a.tt
+    }
+}

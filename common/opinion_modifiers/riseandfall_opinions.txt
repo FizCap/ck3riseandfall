@@ -17,3 +17,16 @@ adventurer_invasion_opinion = {
 	years = 30
 	decaying = no
 }
+
+# Realm Split opinions
+riseandfall_former_liege_opinion = {
+	opinion = -30
+	years = 50
+	decaying = yes
+}
+
+riseandfall_negotiated_peace_opinion = {
+	opinion = 30
+	years = 20
+	decaying = yes
+}

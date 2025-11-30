@@ -1,0 +1,56 @@
+﻿##########################
+# Rise and Fall - Realm Split Triggers
+# Triggers for the realm split system
+
+##########################
+# Helper trigger to check if government lacks powerful vassals
+# Returns true if the government doesn't use powerful vassal system
+# Covers: Mandala (no_powerful_vassals flag), Administrative (administrative rule),
+#         Japanese Ritsuryo (deny_powerful_vassal), Celestial, Meritocratic, Steppe Admin
+
+riseandfall_no_powerful_vassals_trigger = {
+    OR = {
+        government_has_flag = no_powerful_vassals
+        government_allows = deny_powerful_vassal
+        government_allows = administrative
+    }
+}
+
+##########################
+# Trigger for Realm Split Eligibility
+# Returns true if the ruler can have their realm split
+
+riseandfall_can_realm_split_trigger = {
+    is_independent_ruler = yes
+    is_ai = yes
+    NOT = { has_variable = rf_realm_split_cooldown }
+    primary_title.tier >= tier_kingdom
+    # Must have at least 2 vassals (powerful vassals for feudal, regular vassals for administrative)
+    OR = {
+        # Normal governments with powerful vassals
+        AND = {
+            NOT = { riseandfall_no_powerful_vassals_trigger = yes }
+            any_powerful_vassal = {
+                count >= 2
+                is_ai = yes
+                is_landed = yes
+                primary_title.tier >= tier_county
+            }
+        }
+        # Governments without powerful vassals - use regular vassals
+        AND = {
+            riseandfall_no_powerful_vassals_trigger = yes
+            any_vassal = {
+                count >= 2
+                is_ai = yes
+                is_landed = yes
+                primary_title.tier >= tier_county
+            }
+        }
+    }
+    # Must have low stability
+    OR = {
+        NOT = { has_variable = riseandfall_realm_stability_score }
+        var:riseandfall_realm_stability_score <= 15
+    }
+}
