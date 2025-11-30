@@ -1,5 +1,5 @@
 ﻿admin_emperor = {
-	default_candidates = { holder_close_family landed_vassal }
+	default_candidates = { holder_close_family landed_vassal holder_councilor holder_court_position }
 
 	allow_children = yes
 
