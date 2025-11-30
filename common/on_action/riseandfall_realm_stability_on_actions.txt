@@ -185,6 +185,8 @@ riseandfall_yearly_realm_stability = {
             save_scope_as = independent_ruler
             scope:independent_ruler = {
                 riseandfall_calculate_realm_stability_se = yes
+                # Apply warlord legitimacy loss for rulers with warlord vassals
+                riseandfall_warlord_legitimacy_loss_se = yes
             }
         }
     }

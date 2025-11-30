@@ -31,3 +31,57 @@ riseandfall_warlord_imprisoned_se = {
         remove_trait = warlord
     }
 }
+
+# Warlord legitimacy loss effect — called from yearly on_action tick
+# Expected scope: character (liege with warlord vassals)
+# Calculates legitimacy loss as: -100 × (warlord_vassals / total_vassals)
+# Only applies to vassals at count tier or higher
+riseandfall_warlord_legitimacy_loss_se = {
+    # Guard: only applies to characters with legitimacy and warlord vassals
+    if = {
+        limit = {
+            has_legitimacy = yes
+            any_vassal = {
+                primary_title.tier >= tier_county
+                has_trait = warlord
+            }
+        }
+        # Count total vassals at count tier or higher
+        set_variable = { name = rf_total_vassals value = 0 }
+        set_variable = { name = rf_warlord_vassals value = 0 }
+        every_vassal = {
+            limit = { primary_title.tier >= tier_county }
+            prev = { change_variable = { name = rf_total_vassals add = 1 } }
+            if = {
+                limit = { has_trait = warlord }
+                prev = { change_variable = { name = rf_warlord_vassals add = 1 } }
+            }
+        }
+        # Calculate legitimacy loss: -100 × (warlord_vassals / total_vassals)
+        # First, compute the ratio and multiply by -100
+        if = {
+            limit = { var:rf_total_vassals > 0 }
+            set_variable = {
+                name = rf_legitimacy_loss
+                value = var:rf_warlord_vassals
+            }
+            change_variable = {
+                name = rf_legitimacy_loss
+                multiply = -100
+            }
+            change_variable = {
+                name = rf_legitimacy_loss
+                divide = var:rf_total_vassals
+            }
+            # Apply legitimacy loss (only if there's actually a loss)
+            if = {
+                limit = { var:rf_legitimacy_loss < 0 }
+                add_legitimacy = var:rf_legitimacy_loss
+            }
+            # Cleanup temporary variables
+            remove_variable = rf_legitimacy_loss
+        }
+        remove_variable = rf_total_vassals
+        remove_variable = rf_warlord_vassals
+    }
+}
