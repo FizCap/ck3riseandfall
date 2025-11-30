@@ -5,6 +5,22 @@ riseandfall_is_ally = {
 	}
 }
 
+riseandfall_is_friendly = {
+	scope = character
+	is_shown = {
+		scope:player = {
+			OR = {
+				is_allied_to = root
+				target_is_liege_or_above = root
+				target_is_vassal_or_below = root
+			}
+			NOT = {
+				is_at_war_with = root
+			}
+		}
+	}
+}
+
 riseandfall_is_enemy = {
 	scope = character
 	is_shown = {

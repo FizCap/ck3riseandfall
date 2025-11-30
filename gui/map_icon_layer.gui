@@ -41,7 +41,7 @@ widget = {
 	# Rise and Fall: Fort Map Mode Coloring
 	widget = {
 		name = "riseandfall_fort_coloring"
-		visible = "[And( Or( GetVariableSystem.Exists('riseandfall_fort_map_mode_active'), IsMapMode('fort_levels') ), GreaterThan_int32( ProvinceIcon.GetProvince.GetFortLevel, '(int32)0' ) )]"
+		visible = "[And( GetVariableSystem.Exists('riseandfall_fort_map_mode_active'), GreaterThan_int32( ProvinceIcon.GetProvince.GetFortLevel, '(int32)0' ) )]"
 		parentanchor = center
 		size = { 120 120 } # Large size to cover province
 		allow_outside = yes
@@ -54,7 +54,7 @@ widget = {
 			size = { 100% 100% }
 			texture = "gfx/interface/component_masks/mask_fade_circle.dds"
 			color = { 0.2 0.2 0.8 0.6 } # Blue
-			visible = "[And( Not( Or( Character.IsLocalPlayer, GetScriptedGui('riseandfall_is_friendly').IsShown( GuiScope.SetRoot( Character.MakeScope ).AddScope( 'player', GetPlayer.MakeScope ).End ) ) ), Not( GetScriptedGui('riseandfall_is_enemy').IsShown( GuiScope.SetRoot( Character.MakeScope ).AddScope( 'player', GetPlayer.MakeScope ).End ) ) )]"
+			visible = "[And( Not( Or( ProvinceIcon.GetOwner.IsLocalPlayer, GetScriptedGui('riseandfall_is_friendly').IsShown( GuiScope.SetRoot( ProvinceIcon.GetOwner.MakeScope ).AddScope( 'player', GetPlayer.MakeScope ).End ) ) ), Not( GetScriptedGui('riseandfall_is_enemy').IsShown( GuiScope.SetRoot( ProvinceIcon.GetOwner.MakeScope ).AddScope( 'player', GetPlayer.MakeScope ).End ) ) )]"
 		}
 
 		# Ally/Self (Green)
@@ -62,7 +62,7 @@ widget = {
 			size = { 100% 100% }
 			texture = "gfx/interface/component_masks/mask_fade_circle.dds"
 			color = { 0.2 0.8 0.2 0.6 } # Green
-			visible = "[Or( Character.IsLocalPlayer, GetScriptedGui('riseandfall_is_friendly').IsShown( GuiScope.SetRoot( Character.MakeScope ).AddScope( 'player', GetPlayer.MakeScope ).End ) )]"
+			visible = "[Or( ProvinceIcon.GetOwner.IsLocalPlayer, GetScriptedGui('riseandfall_is_friendly').IsShown( GuiScope.SetRoot( ProvinceIcon.GetOwner.MakeScope ).AddScope( 'player', GetPlayer.MakeScope ).End ) )]"
 		}
 
 		# Enemy (Red)
@@ -70,7 +70,7 @@ widget = {
 			size = { 100% 100% }
 			texture = "gfx/interface/component_masks/mask_fade_circle.dds"
 			color = { 0.8 0.2 0.2 0.6 } # Red
-			visible = "[GetScriptedGui('riseandfall_is_enemy').IsShown( GuiScope.SetRoot( Character.MakeScope ).AddScope( 'player', GetPlayer.MakeScope ).End )]"
+			visible = "[GetScriptedGui('riseandfall_is_enemy').IsShown( GuiScope.SetRoot( ProvinceIcon.GetOwner.MakeScope ).AddScope( 'player', GetPlayer.MakeScope ).End )]"
 		}
 		
 		# Fort Level Text
