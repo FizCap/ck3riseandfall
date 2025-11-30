@@ -1,11 +1,163 @@
 ﻿# Combined auto-create titles for AI counts (duchy), rulers (kingdom), and kings (empire)
 # This single effect consolidates duplication and can be called by the old entrypoint scripts
 # or directly by the on_action registration.
+
+# Helper effect: Destroy dynamic/titular titles of the same tier when creating a proper de jure title
+# Should be called on the ruler, with scope:target_title set to the newly created title
+riseandfall_destroy_same_tier_dynamic_titles_se = {
+    # Helper: destroy any titular (dynamic) titles of the same tier as the newly created title
+    # Save the root character to enforce proper scope when combining character and title checks
+    save_scope_as = destroy_helper_root
+    scope:destroy_helper_root = {
+        every_held_title = {
+            limit = {
+                tier = scope:target_title.tier
+                NOT = { this = scope:target_title }
+                is_titular = yes
+            }
+            save_scope_as = destroy_held_title
+            # Call destroy_title from the saved ruler scope using the saved title scope
+            scope:destroy_helper_root = {
+                if = {
+                    limit = { exists = scope:destroy_held_title }
+                    destroy_title = scope:destroy_held_title
+                }
+            }
+        }
+    }
+}
+
+# Standalone effect: Destroy titular titles if the ruler has a non-titular title of the same tier
+# Can be called independently (e.g., on yearly pulse) to clean up dynamic titles
+# Should be called on the ruler (character scope)
+riseandfall_cleanup_titular_titles_se = {
+    # Save the original scope so we can run character-scoped checks while iterating titles
+    save_scope_as = cleanup_ruler
+
+    # For every titular title held by the ruler, destroy it if the ruler holds
+    # any other non-titular title of the same or higher rank. This covers cases such as
+    # a titular duchy being left behind when the ruler gains a non-titular kingdom/empire, etc.
+    every_held_title = {
+        limit = { is_titular = yes }
+        save_scope_as = titular_held
+
+        # Run the checks in the character scope and keep scope isolation to avoid
+        # mixing `landed_title` and `character` scopes inside trigger/effect limits.
+        scope:cleanup_ruler = {
+                # County titular: destroy when any non-titular county OR higher (duchy/kingdom/empire/hegemony) is held
+                if = {
+                    limit = { scope:titular_held = { tier = tier_county } }
+                    scope:cleanup_ruler = {
+                        if = {
+                            limit = {
+                                any_held_title = {
+                                    NOT = { this = scope:titular_held }
+                                    is_titular = no
+                                    OR = {
+                                        tier = tier_county
+                                        tier = tier_duchy
+                                        tier = tier_kingdom
+                                        tier = tier_empire
+                                        tier = tier_hegemony
+                                    }
+                                }
+                            }
+                            destroy_title = scope:titular_held
+                        }
+                    }
+                }
+
+            # Duchy titular: destroy when any non-titular duchy OR higher (kingdom/empire/hegemony) is held
+            if = {
+                limit = { scope:titular_held = { tier = tier_duchy } }
+                scope:cleanup_ruler = {
+                    if = {
+                        limit = {
+                            any_held_title = {
+                                NOT = { this = scope:titular_held }
+                                is_titular = no
+                                OR = {
+                                    tier = tier_duchy
+                                    tier = tier_kingdom
+                                    tier = tier_empire
+                                    tier = tier_hegemony
+                                }
+                            }
+                        }
+                        destroy_title = scope:titular_held
+                    }
+                }
+            }
+
+            # Kingdom titular: destroy when any non-titular kingdom OR higher (empire/hegemony) is held
+            if = {
+                limit = { scope:titular_held = { tier = tier_kingdom } }
+                scope:cleanup_ruler = {
+                    if = {
+                        limit = {
+                            any_held_title = {
+                                NOT = { this = scope:titular_held }
+                                is_titular = no
+                                OR = {
+                                    tier = tier_kingdom
+                                    tier = tier_empire
+                                    tier = tier_hegemony
+                                }
+                            }
+                        }
+                        destroy_title = scope:titular_held
+                    }
+                }
+            }
+
+            # Empire titular: destroy when any non-titular empire OR higher (hegemony) is held
+            if = {
+                limit = { scope:titular_held = { tier = tier_empire } }
+                scope:cleanup_ruler = {
+                    if = {
+                        limit = {
+                            any_held_title = {
+                                NOT = { this = scope:titular_held }
+                                is_titular = no
+                                OR = {
+                                    tier = tier_empire
+                                    tier = tier_hegemony
+                                }
+                            }
+                        }
+                        destroy_title = scope:titular_held
+                    }
+                }
+            }
+
+            # Hegemony titular: destroy when a non-titular hegemony is held (same tier only, highest available)
+            if = {
+                limit = { scope:titular_held = { tier = tier_hegemony } }
+                scope:cleanup_ruler = {
+                    if = {
+                        limit = {
+                            any_held_title = {
+                                NOT = { this = scope:titular_held }
+                                is_titular = no
+                                tier = tier_hegemony
+                            }
+                        }
+                        destroy_title = scope:titular_held
+                    }
+                }
+            }
+        }
+    }
+}
+
 riseandfall_ai_create_titles_se = {
     # Iterate all rulers (player and AI will be further filtered per-tier)
     every_ruler = {
         limit = { is_landed = yes }
         save_scope_as = acting_ruler
+        
+        # First, cleanup any existing titular titles if they have non-titular equivalents
+        riseandfall_cleanup_titular_titles_se = yes
 
         # Duchies (AI rulers of at least kingdom tier can create duchies)
         ordered_alert_creatable_title = {
@@ -23,11 +175,14 @@ riseandfall_ai_create_titles_se = {
                     }
                     government_allows = administrative
                 }
-                # Prevent same-tier creation by default; single-heir realm law allows duplicating the tier
+                # Prevent same-tier creation unless:
+                # 1. Single-heir succession law allows it, OR
+                # 2. Primary title is titular (dynamic) - should replace it with proper title
                 NOT = {
                     AND = {
                         tier = scope:acting_ruler.primary_title.tier
                         NOT = { scope:acting_ruler = { has_realm_law = single_heir_succession_law } }
+                        NOT = { scope:acting_ruler.primary_title = { is_titular = yes } }
                     }
                 }
             }
@@ -51,6 +206,10 @@ riseandfall_ai_create_titles_se = {
                     }
                 }
                 resolve_title_and_vassal_change = scope:title_change
+                # Destroy any dynamic titles of the same tier
+                riseandfall_destroy_same_tier_dynamic_titles_se = yes
+                # Cleanup any titular titles if the ruler holds a non-titular same/higher tier
+                riseandfall_cleanup_titular_titles_se = yes
             }
         }
 
@@ -66,11 +225,14 @@ riseandfall_ai_create_titles_se = {
                     OR = { primary_title.tier = tier_empire primary_title.tier = tier_hegemony }
                     government_allows = administrative
                 }
-                # Prevent same-tier creation by default; single-heir realm law allows duplicating the tier
+                # Prevent same-tier creation unless:
+                # 1. Single-heir succession law allows it, OR
+                # 2. Primary title is titular (dynamic) - should replace it with proper title
                 NOT = {
                     AND = {
                         tier = scope:acting_ruler.primary_title.tier
                         NOT = { scope:acting_ruler = { has_realm_law = single_heir_succession_law } }
+                        NOT = { scope:acting_ruler.primary_title = { is_titular = yes } }
                     }
                 }
             }
@@ -94,10 +256,14 @@ riseandfall_ai_create_titles_se = {
                     }
                 }
                 resolve_title_and_vassal_change = scope:title_change
+                # Destroy any dynamic titles of the same tier
+                riseandfall_destroy_same_tier_dynamic_titles_se = yes
+                # Cleanup any titular titles if the ruler holds a non-titular same/higher tier
+                riseandfall_cleanup_titular_titles_se = yes
             }
         }
 
-        # Empires (AI kings promoting to empire)
+        # Empires (AI kings promoting to empire, or AI emperors with titular empire replacing it)
         ordered_alert_creatable_title = {
             order_by = tier
             check_range_bounds = no
@@ -106,14 +272,24 @@ riseandfall_ai_create_titles_se = {
                 tier = tier_empire
                 scope:acting_ruler = {
                     is_ai = yes
-                    primary_title.tier = tier_kingdom
+                    OR = {
+                        primary_title.tier = tier_kingdom
+                        # Also allow empire-tier rulers if their primary is titular
+                        AND = {
+                            primary_title.tier = tier_empire
+                            primary_title = { is_titular = yes }
+                        }
+                    }
                     government_allows = administrative
                 }
-                # Prevent same-tier creation by default; single-heir realm law allows duplicating the tier
+                # Prevent same-tier creation unless:
+                # 1. Single-heir succession law allows it, OR
+                # 2. Primary title is titular (dynamic) - should replace it with proper title
                 NOT = {
                     AND = {
                         tier = scope:acting_ruler.primary_title.tier
                         NOT = { scope:acting_ruler = { has_realm_law = single_heir_succession_law } }
+                        NOT = { scope:acting_ruler.primary_title = { is_titular = yes } }
                     }
                 }
                 # Hegemons must not create empires (extra guard)
@@ -139,6 +315,10 @@ riseandfall_ai_create_titles_se = {
                     }
                 }
                 resolve_title_and_vassal_change = scope:title_change
+                # Destroy any dynamic titles of the same tier
+                riseandfall_destroy_same_tier_dynamic_titles_se = yes
+                # Cleanup any titular titles if the ruler holds a non-titular same/higher tier
+                riseandfall_cleanup_titular_titles_se = yes
             }
         }
     }
@@ -236,6 +416,10 @@ riseandfall_ai_usurp_titles_se = {
                 }
 
                 resolve_title_and_vassal_change = scope:title_change
+                # Destroy any dynamic titles of the same tier
+                riseandfall_destroy_same_tier_dynamic_titles_se = yes
+                # Cleanup any titular titles if the ruler holds a non-titular same/higher tier
+                riseandfall_cleanup_titular_titles_se = yes
             }
         }
     }
