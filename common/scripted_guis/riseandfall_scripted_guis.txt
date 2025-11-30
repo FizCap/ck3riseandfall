@@ -1,0 +1,13 @@
+riseandfall_is_ally = {
+	scope = character
+	is_shown = {
+		is_allied_to = scope:player
+	}
+}
+
+riseandfall_is_enemy = {
+	scope = character
+	is_shown = {
+		is_at_war_with = scope:player
+	}
+}
