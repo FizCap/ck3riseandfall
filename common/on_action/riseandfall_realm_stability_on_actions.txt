@@ -5,6 +5,7 @@
 yearly_global_pulse = {
     on_actions = {
         riseandfall_yearly_realm_stability
+        riseandfall_clear_unlanded_realm_stability
     }
 }
 
@@ -12,6 +13,7 @@ on_game_start_after_lobby = {
     on_actions = {
         riseandfall_yearly_realm_stability
         riseandfall_low_stability_grace_period
+        riseandfall_clear_unlanded_realm_stability
     }
 }
 
@@ -216,5 +218,14 @@ riseandfall_war_won_defender = {
     # Apply loss to attacker. Apply victory effect to defender only for non-peasant wars
     scope:attacker = { riseandfall_war_loss_se = yes }
     if = { limit = { scope:war = { NOT = { using_cb = peasant_war } } } scope:defender = { riseandfall_war_victory_se = yes } }
+    }
+}
+
+riseandfall_clear_unlanded_realm_stability = {
+    trigger = { has_game_rule = riseandfall_realm_stability_enabled }
+    effect = {
+        # Clear realm stability variables & modifiers on unlanded characters yearly to
+        # fix stale state for characters who lost their lands.
+        riseandfall_clear_unlanded_stability_vars_se = yes
     }
 }

@@ -953,3 +953,135 @@ riseandfall_war_loss_se = {
     }
 }
 
+
+# Clear stability variables and modifiers on characters who are unlanded. This helps
+# remove stale data from characters who lost their lands and prevents stray modifiers
+# and variables from lingering on unlanded characters.
+riseandfall_clear_unlanded_stability_vars_se = {
+    every_living_character = {
+        limit = { is_landed = no }
+        # Remove recorded variables if present — removing a non-existent var is safe
+        remove_variable = riseandfall_realm_stability_score
+        remove_variable = riseandfall_realm_stability_target
+        remove_variable = riseandfall_rs_stats_component
+        remove_variable = riseandfall_rs_vassals_component
+        remove_variable = riseandfall_rs_legitimacy_component
+        remove_variable = riseandfall_rs_legitimacy_multiplier
+        remove_variable = riseandfall_rs_popular_opinion_component
+        remove_variable = riseandfall_rs_use_diarch_stats
+        remove_variable = riseandfall_puppet_regency_years
+        remove_variable = riseandfall_realm_stability_puppet_regency_multiplier
+        remove_variable = riseandfall_realm_stability_puppet_regency_years_tooltip
+        remove_variable = riseandfall_rs_civil_war_years
+        remove_variable = riseandfall_realm_stability_civil_war_penalty
+        remove_variable = riseandfall_realm_stability_war_multiplier
+        remove_variable = riseandfall_rs_difficulty_multiplier
+        remove_variable = riseandfall_rs_difficulty_multiplier_display
+        remove_variable = riseandfall_realm_stability_sex_law_penalty
+        remove_variable = riseandfall_rs_adjust_months
+        remove_variable = riseandfall_realm_stability_predicted_change
+        # Remove any fine-grained stability modifiers (0..100)
+        remove_character_modifier = riseandfall_stability_0
+        remove_character_modifier = riseandfall_stability_1
+        remove_character_modifier = riseandfall_stability_2
+        remove_character_modifier = riseandfall_stability_3
+        remove_character_modifier = riseandfall_stability_4
+        remove_character_modifier = riseandfall_stability_5
+        remove_character_modifier = riseandfall_stability_6
+        remove_character_modifier = riseandfall_stability_7
+        remove_character_modifier = riseandfall_stability_8
+        remove_character_modifier = riseandfall_stability_9
+        remove_character_modifier = riseandfall_stability_10
+        remove_character_modifier = riseandfall_stability_11
+        remove_character_modifier = riseandfall_stability_12
+        remove_character_modifier = riseandfall_stability_13
+        remove_character_modifier = riseandfall_stability_14
+        remove_character_modifier = riseandfall_stability_15
+        remove_character_modifier = riseandfall_stability_16
+        remove_character_modifier = riseandfall_stability_17
+        remove_character_modifier = riseandfall_stability_18
+        remove_character_modifier = riseandfall_stability_19
+        remove_character_modifier = riseandfall_stability_20
+        remove_character_modifier = riseandfall_stability_21
+        remove_character_modifier = riseandfall_stability_22
+        remove_character_modifier = riseandfall_stability_23
+        remove_character_modifier = riseandfall_stability_24
+        remove_character_modifier = riseandfall_stability_25
+        remove_character_modifier = riseandfall_stability_26
+        remove_character_modifier = riseandfall_stability_27
+        remove_character_modifier = riseandfall_stability_28
+        remove_character_modifier = riseandfall_stability_29
+        remove_character_modifier = riseandfall_stability_30
+        remove_character_modifier = riseandfall_stability_31
+        remove_character_modifier = riseandfall_stability_32
+        remove_character_modifier = riseandfall_stability_33
+        remove_character_modifier = riseandfall_stability_34
+        remove_character_modifier = riseandfall_stability_35
+        remove_character_modifier = riseandfall_stability_36
+        remove_character_modifier = riseandfall_stability_37
+        remove_character_modifier = riseandfall_stability_38
+        remove_character_modifier = riseandfall_stability_39
+        remove_character_modifier = riseandfall_stability_40
+        remove_character_modifier = riseandfall_stability_41
+        remove_character_modifier = riseandfall_stability_42
+        remove_character_modifier = riseandfall_stability_43
+        remove_character_modifier = riseandfall_stability_44
+        remove_character_modifier = riseandfall_stability_45
+        remove_character_modifier = riseandfall_stability_46
+        remove_character_modifier = riseandfall_stability_47
+        remove_character_modifier = riseandfall_stability_48
+        remove_character_modifier = riseandfall_stability_49
+        remove_character_modifier = riseandfall_stability_50
+        remove_character_modifier = riseandfall_stability_51
+        remove_character_modifier = riseandfall_stability_52
+        remove_character_modifier = riseandfall_stability_53
+        remove_character_modifier = riseandfall_stability_54
+        remove_character_modifier = riseandfall_stability_55
+        remove_character_modifier = riseandfall_stability_56
+        remove_character_modifier = riseandfall_stability_57
+        remove_character_modifier = riseandfall_stability_58
+        remove_character_modifier = riseandfall_stability_59
+        remove_character_modifier = riseandfall_stability_60
+        remove_character_modifier = riseandfall_stability_61
+        remove_character_modifier = riseandfall_stability_62
+        remove_character_modifier = riseandfall_stability_63
+        remove_character_modifier = riseandfall_stability_64
+        remove_character_modifier = riseandfall_stability_65
+        remove_character_modifier = riseandfall_stability_66
+        remove_character_modifier = riseandfall_stability_67
+        remove_character_modifier = riseandfall_stability_68
+        remove_character_modifier = riseandfall_stability_69
+        remove_character_modifier = riseandfall_stability_70
+        remove_character_modifier = riseandfall_stability_71
+        remove_character_modifier = riseandfall_stability_72
+        remove_character_modifier = riseandfall_stability_73
+        remove_character_modifier = riseandfall_stability_74
+        remove_character_modifier = riseandfall_stability_75
+        remove_character_modifier = riseandfall_stability_76
+        remove_character_modifier = riseandfall_stability_77
+        remove_character_modifier = riseandfall_stability_78
+        remove_character_modifier = riseandfall_stability_79
+        remove_character_modifier = riseandfall_stability_80
+        remove_character_modifier = riseandfall_stability_81
+        remove_character_modifier = riseandfall_stability_82
+        remove_character_modifier = riseandfall_stability_83
+        remove_character_modifier = riseandfall_stability_84
+        remove_character_modifier = riseandfall_stability_85
+        remove_character_modifier = riseandfall_stability_86
+        remove_character_modifier = riseandfall_stability_87
+        remove_character_modifier = riseandfall_stability_88
+        remove_character_modifier = riseandfall_stability_89
+        remove_character_modifier = riseandfall_stability_90
+        remove_character_modifier = riseandfall_stability_91
+        remove_character_modifier = riseandfall_stability_92
+        remove_character_modifier = riseandfall_stability_93
+        remove_character_modifier = riseandfall_stability_94
+        remove_character_modifier = riseandfall_stability_95
+        remove_character_modifier = riseandfall_stability_96
+        remove_character_modifier = riseandfall_stability_97
+        remove_character_modifier = riseandfall_stability_98
+        remove_character_modifier = riseandfall_stability_99
+        remove_character_modifier = riseandfall_stability_100
+    }
+}
+
