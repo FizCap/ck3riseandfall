@@ -185,8 +185,8 @@ riseandfall_ai_create_titles_se = {
                         primary_title.tier = tier_kingdom
                         primary_title.tier = tier_empire
                         primary_title.tier = tier_hegemony
+                        government_allows = administrative
                     }
-                    government_allows = administrative
                 }
                 # Prevent same-tier creation unless:
                 # 1. Single-heir succession law allows it, OR
@@ -235,8 +235,7 @@ riseandfall_ai_create_titles_se = {
                 tier = tier_kingdom
                 scope:acting_ruler = {
                     is_ai = yes
-                    OR = { primary_title.tier = tier_empire primary_title.tier = tier_hegemony }
-                    government_allows = administrative
+                    OR = { primary_title.tier = tier_empire primary_title.tier = tier_hegemony government_allows = administrative }
                 }
                 # Prevent same-tier creation unless:
                 # 1. Single-heir succession law allows it, OR
@@ -292,8 +291,8 @@ riseandfall_ai_create_titles_se = {
                             primary_title.tier = tier_empire
                             primary_title = { is_titular = yes }
                         }
+                        government_allows = administrative
                     }
-                    government_allows = administrative
                 }
                 # Prevent same-tier creation unless:
                 # 1. Single-heir succession law allows it, OR
