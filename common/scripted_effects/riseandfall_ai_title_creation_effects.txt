@@ -9,11 +9,16 @@ riseandfall_destroy_same_tier_dynamic_titles_se = {
     # Save the root character to enforce proper scope when combining character and title checks
     save_scope_as = destroy_helper_root
     scope:destroy_helper_root = {
-        every_held_title = {
+            every_held_title = {
+            # Do not touch special titular titles that should remain (head-of-faith / noble family titles)
             limit = {
                 tier = scope:target_title.tier
                 NOT = { this = scope:target_title }
                 is_titular = yes
+                NOT = { is_head_of_faith = yes }
+                NOT = { is_noble_family_title = yes }
+                NOT = { is_holy_order = yes }
+                NOT = { is_figurehead_title = yes }
             }
             save_scope_as = destroy_held_title
             # Call destroy_title from the saved ruler scope using the saved title scope
@@ -38,7 +43,15 @@ riseandfall_cleanup_titular_titles_se = {
     # any other non-titular title of the same or higher rank. This covers cases such as
     # a titular duchy being left behind when the ruler gains a non-titular kingdom/empire, etc.
     every_held_title = {
-        limit = { is_titular = yes }
+        # Only iterate titular titles that are not head of faith, noble family, holy order, or figurehead titles.
+        # Those are special and must not be destroyed by the AI creation/cleanup process.
+        limit = {
+            is_titular = yes
+            NOT = { is_head_of_faith = yes }
+            NOT = { is_noble_family_title = yes }
+            NOT = { is_holy_order = yes }
+            NOT = { is_figurehead_title = yes }
+        }
         save_scope_as = titular_held
 
         # Run the checks in the character scope and keep scope isolation to avoid
