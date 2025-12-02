@@ -12,7 +12,6 @@ riseandfall_create_adventurer_camp_interaction = {
         scope:actor = {
             is_ai = no
             is_landed = no
-            has_game_rule = riseandfall_adventurer_creator_enabled
         }
         scope:recipient = scope:actor # Self-targeting: actor == recipient
     }
@@ -21,7 +20,6 @@ riseandfall_create_adventurer_camp_interaction = {
         scope:actor = {
             is_ai = no
             is_landed = no
-            has_game_rule = riseandfall_adventurer_creator_enabled
         }
         scope:recipient = scope:actor
     }
