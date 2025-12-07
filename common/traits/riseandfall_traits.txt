@@ -22,3 +22,99 @@ retiredwarlord = {
 	shown_in_ruler_designer = no
 
 }
+
+
+
+#Dragonrider - Credit to agot, adding it here to prevent error log spam
+dragonrider = {
+	shown_in_ruler_designer = yes
+	ruler_designer_cost = 200
+	category = fame
+
+	martial = 1
+
+	monthly_prestige = 1.0
+	monthly_prestige_gain_mult = 0.5
+
+	legitimacy_gain_mult = 0.25
+
+	dread_baseline_add = 10
+	dread_gain_mult = 0.3
+
+	vassal_opinion = 10
+
+	birth = 0
+	random_creation = 0.0
+	random_creation_weight = 0
+	ai_boldness = 45
+
+	name = {
+		first_valid = {
+			triggered_desc = {
+				trigger = {
+					exists = this
+					exists = var:current_dragon
+					var:current_dragon ?= { is_alive = yes }
+				}
+				desc = trait_dragon_name_dragon_alive
+			}
+			desc = trait_dragonrider
+		}
+	}
+
+	desc = {
+		first_valid = {
+			triggered_desc = {
+				trigger = {
+					exists = this
+					has_character_flag = dragon_by_horn
+					exists = var:current_dragon
+					var:current_dragon ?= { is_alive = yes }
+				}
+				desc = trait_dragonbinder_desc
+			}
+			triggered_desc = {
+				trigger = {
+					exists = this
+					exists = var:current_dragon
+					var:current_dragon ?= { is_alive = yes }
+				}
+				desc = trait_dragonrider_desc
+			}
+			desc = trait_dragonrider_desc
+		}
+	}
+
+	tracks = {
+		dragon_training = {
+			30 = {
+				dread_baseline_add = 15
+			}
+
+			65 = {
+				dread_baseline_add = 15
+			}
+
+			100 = {
+				dread_baseline_add = 20
+			}
+		}
+		dragon_bond = {
+			30 = {
+				diplomacy = 1
+			}
+
+			65 = {
+				learning = 1
+				monthly_lifestyle_xp_gain_mult = 0.05
+				vassal_opinion = 15
+			}
+
+			100 = {
+				martial = 1
+				movement_speed = 0.1
+				monthly_lifestyle_xp_gain_mult = 0.10
+			}
+		}
+	}
+}
