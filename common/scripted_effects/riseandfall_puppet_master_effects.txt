@@ -137,15 +137,19 @@ riseandfall_force_abdicate_effect = {
 
 		# If we did not find an unlanded child, fallback to dynasty members in the recipient's court (pick the first valid adult member)
 		if = {
-			limit = { NOT = { exists = scope:chosen_successor } }
-			every_dynasty_member = {
-				# Save the current dynasty member as a temporary candidate
-				save_scope_as = candidate_for_score
-				# Ensure the candidate is an adult, not a ruler, and present in the recipient's court
-				if = {
-					limit = { is_adult = yes NOT = { is_ruler = yes } scope:recipient = { any_courtier = { this = scope:candidate_for_score } } }
-					# pick the first valid candidate
-					save_scope_as = chosen_successor
+			limit = { NOT = { exists = scope:chosen_successor } scope:recipient = { has_dynasty = yes } }
+			scope:recipient = {
+				dynasty = {
+					every_dynasty_member = {
+						# Save the current dynasty member as a temporary candidate
+						save_scope_as = candidate_for_score
+						# Ensure the candidate is an adult, not a ruler, and present in the recipient's court
+						if = {
+							limit = { is_adult = yes NOT = { is_ruler = yes } scope:recipient = { any_courtier = { this = scope:candidate_for_score } } }
+							# pick the first valid candidate
+							save_scope_as = chosen_successor
+						}
+					}
 				}
 			}
 		}
