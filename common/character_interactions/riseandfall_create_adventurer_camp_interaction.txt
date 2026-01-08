@@ -1,4 +1,4 @@
-riseandfall_create_adventurer_camp_interaction = {
+﻿riseandfall_create_adventurer_camp_interaction = {
     category = interaction_riseandfall
     common_interaction = yes
     interface_priority = 95
