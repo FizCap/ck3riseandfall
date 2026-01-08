@@ -7,6 +7,9 @@ riseandfall_steal_gold_effect = {
 	# actor = diarch, recipient = liege
 	# Based on palace coup gold transfer
 	scope:recipient = {
+		# Initialize the transfer amount so change_variable always operates on a value variable
+		set_variable = { name = rf_transfer_gold value = 0 }
+		# If the liege has gold, set the transfer amount to their gold first
 		if = { limit = { gold > 1 } set_variable = { name = rf_transfer_gold value = gold } }
 		change_variable = { name = rf_transfer_gold multiply = 0.5 }
 	}
@@ -14,7 +17,7 @@ riseandfall_steal_gold_effect = {
 	if = { limit = { scope:recipient = { has_variable = rf_transfer_gold } } scope:actor = { add_short_term_gold = scope:recipient.var:rf_transfer_gold } }
 	# Remove from liege
 	scope:recipient = {
-		if = { limit = { has_variable = rf_transfer_gold } remove_short_term_gold = var:rf_transfer_gold }
+		if = { limit = { var:rf_transfer_gold > 0 } remove_short_term_gold = var:rf_transfer_gold }
 		remove_variable = rf_transfer_gold
 	}
 	# Add cooldown
@@ -109,29 +112,175 @@ riseandfall_force_abdicate_effect = {
 	scope:recipient = {
 		# initialize a big age to find the youngest
 		set_variable = { name = rf_candidate_best_age value = 999 }
-		# iterate over close/extended family to find the youngest unlanded child
-		# allow children who are educated at other courts as long as their
-		# employer/liege/top_liege is the recipient
-		every_close_or_extended_family_member = {
-			limit = {
-				is_landed = no
-				NOT = { is_adult = yes }
-				OR = {
-					employer = scope:recipient
-					liege = scope:recipient
-					top_liege = scope:recipient
+		# Choose candidate depending on realm succession law: prefer males/females per law settings
+		if = {
+			limit = { scope:recipient = { has_realm_law = male_only_law } }
+			# Male-only: pick youngest unlanded male child
+			every_close_or_extended_family_member = {
+				limit = {
+					is_landed = no
+					NOT = { is_adult = yes }
+					is_male = yes
+					OR = {
+						employer = scope:recipient
+						liege = scope:recipient
+						top_liege = scope:recipient
+					}
+				}
+				set_variable = { name = candidate_age value = age }
+				save_scope_as = candidate_for_score
+				scope:recipient = { set_variable = { name = tmp_candidate_age value = scope:candidate_for_score.var:candidate_age } }
+				if = {
+					limit = { scope:recipient = { var:tmp_candidate_age < var:rf_candidate_best_age } }
+					save_scope_as = chosen_successor
+					scope:recipient = { set_variable = { name = rf_candidate_best_age value = scope:recipient.var:tmp_candidate_age } }
 				}
 			}
-			# store this family member's age into a variable on their scope
-			set_variable = { name = candidate_age value = age }
-			save_scope_as = candidate_for_score
-			# push the candidate age into recipient scope for comparison
-			scope:recipient = { set_variable = { name = tmp_candidate_age value = scope:candidate_for_score.var:candidate_age } }
-			# If the candidate's age is less than the current best (younger), choose them
+		}
+		else_if = {
+			limit = { scope:recipient = { has_realm_law = male_preference_law } }
+			# Male-preference: try youngest males first, then females if none found
+			# First pass: males
+			every_close_or_extended_family_member = {
+				limit = {
+					is_landed = no
+					NOT = { is_adult = yes }
+					is_male = yes
+					OR = {
+						employer = scope:recipient
+						liege = scope:recipient
+						top_liege = scope:recipient
+					}
+				}
+				set_variable = { name = candidate_age value = age }
+				save_scope_as = candidate_for_score
+				scope:recipient = { set_variable = { name = tmp_candidate_age value = scope:candidate_for_score.var:candidate_age } }
+				if = {
+					limit = { scope:recipient = { var:tmp_candidate_age < var:rf_candidate_best_age } }
+					save_scope_as = chosen_successor
+					scope:recipient = { set_variable = { name = rf_candidate_best_age value = scope:recipient.var:tmp_candidate_age } }
+				}
+			}
+			# If no male chosen, try females
 			if = {
-				limit = { scope:recipient = { var:tmp_candidate_age < var:rf_candidate_best_age } }
-				save_scope_as = chosen_successor
-				scope:recipient = { set_variable = { name = rf_candidate_best_age value = scope:recipient.var:tmp_candidate_age } }
+				limit = { NOT = { exists = scope:chosen_successor } }
+				scope:recipient = { set_variable = { name = rf_candidate_best_age value = 999 } }
+				every_close_or_extended_family_member = {
+					limit = {
+						is_landed = no
+						NOT = { is_adult = yes }
+						is_male = no
+						OR = {
+							employer = scope:recipient
+							liege = scope:recipient
+							top_liege = scope:recipient
+						}
+					}
+					set_variable = { name = candidate_age value = age }
+					save_scope_as = candidate_for_score
+					scope:recipient = { set_variable = { name = tmp_candidate_age value = scope:candidate_for_score.var:candidate_age } }
+					if = {
+						limit = { scope:recipient = { var:tmp_candidate_age < var:rf_candidate_best_age } }
+						save_scope_as = chosen_successor
+						scope:recipient = { set_variable = { name = rf_candidate_best_age value = scope:recipient.var:tmp_candidate_age } }
+					}
+				}
+			}
+		}
+		else_if = {
+			limit = { scope:recipient = { has_realm_law = female_preference_law } }
+			# Female-preference: try youngest females first, then males if none found
+			# First pass: females
+			every_close_or_extended_family_member = {
+				limit = {
+					is_landed = no
+					NOT = { is_adult = yes }
+					is_male = no
+					OR = {
+						employer = scope:recipient
+						liege = scope:recipient
+						top_liege = scope:recipient
+					}
+				}
+				set_variable = { name = candidate_age value = age }
+				save_scope_as = candidate_for_score
+				scope:recipient = { set_variable = { name = tmp_candidate_age value = scope:candidate_for_score.var:candidate_age } }
+				if = {
+					limit = { scope:recipient = { var:tmp_candidate_age < var:rf_candidate_best_age } }
+					save_scope_as = chosen_successor
+					scope:recipient = { set_variable = { name = rf_candidate_best_age value = scope:recipient.var:tmp_candidate_age } }
+				}
+			}
+			# If no female chosen, try males
+			if = {
+				limit = { NOT = { exists = scope:chosen_successor } }
+				scope:recipient = { set_variable = { name = rf_candidate_best_age value = 999 } }
+				every_close_or_extended_family_member = {
+					limit = {
+						is_landed = no
+						NOT = { is_adult = yes }
+						is_male = yes
+						OR = {
+							employer = scope:recipient
+							liege = scope:recipient
+							top_liege = scope:recipient
+						}
+					}
+					set_variable = { name = candidate_age value = age }
+					save_scope_as = candidate_for_score
+					scope:recipient = { set_variable = { name = tmp_candidate_age value = scope:candidate_for_score.var:candidate_age } }
+					if = {
+						limit = { scope:recipient = { var:tmp_candidate_age < var:rf_candidate_best_age } }
+						save_scope_as = chosen_successor
+						scope:recipient = { set_variable = { name = rf_candidate_best_age value = scope:recipient.var:tmp_candidate_age } }
+					}
+				}
+			}
+		}
+		else_if = {
+			limit = { scope:recipient = { has_realm_law = female_only_law } }
+			# Female-only: pick youngest unlanded female child
+			every_close_or_extended_family_member = {
+				limit = {
+					is_landed = no
+					NOT = { is_adult = yes }
+					is_male = no
+					OR = {
+						employer = scope:recipient
+						liege = scope:recipient
+						top_liege = scope:recipient
+					}
+				}
+				set_variable = { name = candidate_age value = age }
+				save_scope_as = candidate_for_score
+				scope:recipient = { set_variable = { name = tmp_candidate_age value = scope:candidate_for_score.var:candidate_age } }
+				if = {
+					limit = { scope:recipient = { var:tmp_candidate_age < var:rf_candidate_best_age } }
+					save_scope_as = chosen_successor
+					scope:recipient = { set_variable = { name = rf_candidate_best_age value = scope:recipient.var:tmp_candidate_age } }
+				}
+			}
+		}
+		else = {
+			# Default: any gender allowed (equal succession or unspecified)
+			every_close_or_extended_family_member = {
+				limit = {
+					is_landed = no
+					NOT = { is_adult = yes }
+					OR = {
+						employer = scope:recipient
+						liege = scope:recipient
+						top_liege = scope:recipient
+					}
+				}
+				set_variable = { name = candidate_age value = age }
+				save_scope_as = candidate_for_score
+				scope:recipient = { set_variable = { name = tmp_candidate_age value = scope:candidate_for_score.var:candidate_age } }
+				if = {
+					limit = { scope:recipient = { var:tmp_candidate_age < var:rf_candidate_best_age } }
+					save_scope_as = chosen_successor
+					scope:recipient = { set_variable = { name = rf_candidate_best_age value = scope:recipient.var:tmp_candidate_age } }
+				}
 			}
 		}
 
@@ -174,6 +323,10 @@ riseandfall_force_abdicate_effect = {
 			every_held_title = {
 				limit = {
 					holder = scope:recipient
+					# Avoid changing barony-level titles directly (engine requires changing the county instead)
+					NOT = { tier = tier_barony }
+					NOT = { is_head_of_faith = yes }
+					NOT = { is_noble_family_title = yes }
 				}
 				change_title_holder = {
 					holder = scope:chosen_successor
@@ -189,10 +342,19 @@ riseandfall_force_abdicate_effect = {
 			# (make the actor the diarch of the chosen_successor and set the puppet_regency type)
 			if = {
 				limit = { exists = scope:chosen_successor }
-				scope:chosen_successor = {
-					set_diarch = scope:actor
-					set_diarchy_type = puppet_regency
-					set_diarchy_swing = 90
+				# If no active diarchy exists yet on the chosen_successor, try to start one
+				if = {
+					limit = { NOT = { scope:chosen_successor = { has_active_diarchy = yes } } }
+					scope:chosen_successor = { try_start_diarchy = puppet_regency }
+				}
+				# Only set diarch/diarchy fields if an active diarchy now exists
+				if = {
+					limit = { scope:chosen_successor = { has_active_diarchy = yes } }
+					scope:chosen_successor = {
+						set_diarch = scope:actor
+						set_diarchy_type = puppet_regency
+						set_diarchy_swing = 90
+					}
 				}
 			}
 		}
