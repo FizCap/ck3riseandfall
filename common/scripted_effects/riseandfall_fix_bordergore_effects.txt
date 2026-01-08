@@ -12,7 +12,7 @@ riseandfall_fix_bordergore_se = {
     # Data shape: title holder changes via create_title_and_vassal_change / change_title_holder_include_vassals.
     # Error modes: Missing scopes (no action), no nonde jure counties (no message), invalid token (engine log error).
 
-    save_scope_as = liege
+    scope:actor = { save_scope_as = liege }
 
     # 1. Directly held counties by recipient that are outside ALL recipient de jure chains, but not already held by liege.
     scope:recipient = {
@@ -46,7 +46,7 @@ riseandfall_fix_bordergore_se = {
                         NOT = { de_jure_liege = { de_jure_liege = { holder = scope:recipient } } }
                         NOT = { de_jure_liege = { de_jure_liege = { de_jure_liege = { holder = scope:recipient } } } }
                         NOT = { de_jure_liege = { de_jure_liege = { de_jure_liege = { de_jure_liege = { holder = scope:recipient } } } } }
-                        NOT = { AND = { scope:recipient = { highest_held_title_tier = tier_county } de_jure_liege = { de_jure_liege = { this = scope:recipient_capital_dejure_kingdom } } } }
+                        NOT = { AND = { scope:recipient = { highest_held_title_tier = tier_county } exists = scope:recipient_capital_dejure_kingdom de_jure_liege = { de_jure_liege = { this = scope:recipient_capital_dejure_kingdom } } } }
                     }
                 }
 
@@ -83,7 +83,7 @@ riseandfall_fix_bordergore_se = {
                         scope:target_county = { NOT = { de_jure_liege = { de_jure_liege = { holder = scope:recipient } } } }
                         scope:target_county = { NOT = { de_jure_liege = { de_jure_liege = { de_jure_liege = { holder = scope:recipient } } } } }
                         scope:target_county = { NOT = { de_jure_liege = { de_jure_liege = { de_jure_liege = { de_jure_liege = { holder = scope:recipient } } } } } }
-                        NOT = { AND = { scope:recipient = { highest_held_title_tier = tier_county } scope:target_county = { de_jure_liege = { de_jure_liege = { this = scope:recipient_capital_dejure_kingdom } } } } }
+                        NOT = { AND = { scope:recipient = { highest_held_title_tier = tier_county } exists = scope:recipient_capital_dejure_kingdom scope:target_county = { de_jure_liege = { de_jure_liege = { this = scope:recipient_capital_dejure_kingdom } } } } }
                     }
                 }
                 if = {

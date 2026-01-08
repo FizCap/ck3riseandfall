@@ -56,13 +56,7 @@
                         NOT = { holder = { is_ai = no } }
                         NOT = { scope:recipient = { highest_held_title_tier = tier_county } }  # Do not transfer direct counties from counts
                         # Check if county's de jure kingdom is NOT the recipient's capital de jure kingdom
-                        NOT = {
-                            de_jure_liege = {
-                                de_jure_liege = {
-                                    this = scope:recipient.capital_province.county.de_jure_liege.de_jure_liege
-                                }
-                            }
-                        }
+                        NOT = { AND = { exists = scope:recipient.capital_province.county.de_jure_liege.de_jure_liege de_jure_liege = { de_jure_liege = { this = scope:recipient.capital_province.county.de_jure_liege.de_jure_liege } } } }
                     }
                 }
                 # Relaxed check: any directly held county whose de jure liege differs
@@ -73,9 +67,7 @@
                         tier = tier_county
                         exists = de_jure_liege
                         holder = scope:recipient
-                        NOT = {
-                            de_jure_liege = scope:recipient.capital_province.county.de_jure_liege
-                        }
+                        NOT = { AND = { exists = scope:recipient.capital_province.county.de_jure_liege de_jure_liege = scope:recipient.capital_province.county.de_jure_liege } }
                     }
                 }
                 # Subrealm counties (held by direct vassals) that would be transferred
@@ -108,10 +100,8 @@
     }
 
     on_accept = {
-        # Run the scripted effect under the actor scope; effect will reference scope:recipient
-        scope:actor = {
-            riseandfall_fix_bordergore_se = yes
-        }
+        # Call the scripted effect in the interaction context so both scope:actor and scope:recipient are available
+        riseandfall_fix_bordergore_se = yes
     }
 
     ai_frequency = 1
