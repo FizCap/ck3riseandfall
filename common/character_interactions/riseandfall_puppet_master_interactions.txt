@@ -24,10 +24,14 @@ riseandfall_steal_gold_interaction = {
 		}
 
 		scope:recipient = { has_diarchy_type = puppet_regency }
+		# Only the diarch of that recipient should see/send this interaction
+		scope:actor = { is_diarch_of_target = scope:recipient }
 	}
 
 	# Basic validity (no additional UI failures)
 	is_valid_showing_failures_only = {
+		# Only allow if the actor is the active diarch of the recipient
+		scope:actor = { is_diarch_of_target = scope:recipient }
 		riseandfall_liege_stability_below_50 = yes
 		scope:recipient = {
 			riseandfall_no_cooldown = yes
@@ -112,9 +116,13 @@ riseandfall_curry_favor_interaction = {
 		}
 
 		scope:recipient = { has_diarchy_type = puppet_regency }
+		# Actor must be the diarch of this recipient
+		scope:actor = { is_diarch_of_target = scope:recipient }
 	}
 
 	is_valid_showing_failures_only = { 
+		# Only the diarch of the recipient may use this
+		scope:actor = { is_diarch_of_target = scope:recipient }
 		scope:recipient = { 
 			riseandfall_no_cooldown = yes
 			riseandfall_no_existing_hook = yes
@@ -193,10 +201,14 @@ riseandfall_overthrow_liege_interaction = {
 		}
 
 		scope:recipient = { has_diarchy_type = puppet_regency }
+		# Restrict this to the recipient's active diarch
+		scope:actor = { is_diarch_of_target = scope:recipient }
 	}
 
 	# Gate on stability < 30
 	is_valid_showing_failures_only = {
+		# Only allow the active diarch to perform this
+		scope:actor = { is_diarch_of_target = scope:recipient }
 		riseandfall_liege_stability_below_30 = yes
 		riseandfall_puppet_regency_years_at_least_5 = yes
 		riseandfall_no_low_stability_cooldown = yes
@@ -276,10 +288,14 @@ riseandfall_force_abdicate_interaction = {
 			}
 		}
 		scope:recipient = { has_diarchy_type = puppet_regency }
+		# Only visible to the recipient's diarch
+		scope:actor = { is_diarch_of_target = scope:recipient }
 	}
 
 	# Show only when liege has poor health and no cooldown
 	is_valid_showing_failures_only = {
+		# Only the diarch should be allowed to do this
+		scope:actor = { is_diarch_of_target = scope:recipient }
 		scope:recipient = {
 			riseandfall_liege_has_poor_health = yes
 		}
