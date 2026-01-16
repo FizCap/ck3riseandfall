@@ -23,6 +23,12 @@ setting_riseandfall_adventurer_cleanup_desc:0 "Cleanup of mod-created adventurer
 setting_riseandfall_adventurer_cleanup_disabled:0 "Disabled"
 setting_riseandfall_adventurer_cleanup_disabled_desc:0 "Adventurer title cleanup is disabled; mod-created adventurer titles will persist and may affect performance in large worlds or long play sessions."
 
+# Adventurer Mega Wars rule
+rule_riseandfall_enable_adventurer_mega_wars:0 "Adventurer Mega Wars"
+setting_riseandfall_adventurer_mega_wars_enabled:0 "Enabled"
+setting_riseandfall_adventurer_mega_wars_enabled_desc:0 "When enabled, adventurers created by Rise and Fall (flagged with 'riseandfall_newadventurer') may trigger and participate in Mega Wars."
+setting_riseandfall_adventurer_mega_wars_disabled:0 "Disabled"
+setting_riseandfall_adventurer_mega_wars_disabled_desc:0 "Adventurers are excluded from Mega Wars."
 
 # Realm Stability rule
 rule_riseandfall_enable_realm_stability:0 "Realm Stability"
