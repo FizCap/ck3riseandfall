@@ -1,0 +1,17 @@
+﻿# Rise and Fall compatibility: Adventurer Mega War rule
+riseandfall_enable_adventurer_mega_wars = {
+
+	categories = {
+		riseandfall
+	}
+
+	# Default: disabled (adventurers do not participate in mega wars by default)
+	default = riseandfall_adventurer_mega_wars_disabled
+
+	riseandfall_adventurer_mega_wars_enabled = {
+	}
+
+	riseandfall_adventurer_mega_wars_disabled = {
+		flag = riseandfall_adventurer_mega_wars_disabled
+	}
+}
