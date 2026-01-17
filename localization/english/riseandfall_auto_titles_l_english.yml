@@ -25,3 +25,7 @@ riseandfall_grant_counties_confirm:0 "Grant Surplus Counties"
 
 riseandfall_grant_county_popup_title:0 "County granted"
 riseandfall_grant_county_popup_desc:0 "You granted the county: \n[SCOPE.sTitle('target_county').GetNameNoTierNoTooltip]"
+
+# Breakaway realm naming (avoid "Kingdom of the county of Paris")
+RISEANDFALL_BREAKAWAY_NAME_CAPITAL:0 "[SCOPE.sTitle('rf_base_county').GetNameNoTierNoTooltip]"
+RISEANDFALL_BREAKAWAY_NAME_RULER:0 "[SCOPE.sC('rf_breakaway_ruler').GetTitledFirstName]'s Realm"
