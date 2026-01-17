@@ -72,7 +72,7 @@ palace_coup.1002 = {
 
 			# Intrigue weight: compute from character intrigue only (root.intrigue - challenger.intrigue)
 			set_variable = { name = riseandfall_ai_intrigue_add value = intrigue }
-			change_variable = { name = riseandfall_ai_intrigue_add subtract = var:riseandfall_chall_intrigue }
+			change_variable = { name = riseandfall_ai_intrigue_add subtract = scope:challenger.intrigue }
 			clamp_variable = { name = riseandfall_ai_intrigue_add min = -50 max = 50 }
 		}
 	}

@@ -169,14 +169,14 @@ riseandfall_palace_coup_setup = {
 				limit = { 
 					NOT = { scope:event_root = { has_variable = installed_child_found } }
 					NOT = { is_adult = yes }
-					NOT = { exists = scope:installed_child }
+					NOT = { exists = scope:rf_installed_child }
 					OR = {
 						employer = root
 						liege = root
 						top_liege = root
 					}
 				}
-				save_scope_as = installed_child
+				save_scope_as = rf_installed_child
 				scope:event_root = { set_variable = { name = installed_child_found value = yes } }
 
 				if = {
@@ -201,7 +201,10 @@ riseandfall_palace_coup_setup = {
 						is_alive = yes
 						NOT = { this = root }
 						NOT = { this = scope:challenger }
-						NOT = { this = scope:installed_child }
+						OR = {
+							NOT = { exists = scope:rf_installed_child }
+							NOT = { this = scope:rf_installed_child }
+						}
 						employer != scope:challenger
 					}
 					random_list = {
@@ -224,8 +227,8 @@ riseandfall_palace_coup_setup = {
 	}
 
 	if = { 
-		limit = { exists = scope:installed_child } 
-		scope:installed_child = { set_variable = { name = low_stability_cooldown value = yes years = 5 } } 
+		limit = { exists = scope:rf_installed_child } 
+		scope:rf_installed_child = { set_variable = { name = low_stability_cooldown value = yes years = 5 } } 
 	}
 }
 
@@ -265,9 +268,9 @@ riseandfall_palace_coup_challenger_wins_prowess_duel = {
 			NOT = { is_noble_family_title = yes }
 		}
 		if = {
-			limit = { exists = scope:installed_child }
+			limit = { exists = scope:rf_installed_child }
 			change_title_holder = {
-				holder = scope:installed_child
+				holder = scope:rf_installed_child
 				change = scope:change
 				take_baronies = yes
 			}
@@ -286,8 +289,8 @@ riseandfall_palace_coup_challenger_wins_prowess_duel = {
 	root = {
 		every_vassal = {
 			if = {
-				limit = { exists = scope:installed_child }
-				change_liege = { liege = scope:installed_child change = scope:change }
+				limit = { exists = scope:rf_installed_child }
+				change_liege = { liege = scope:rf_installed_child change = scope:change }
 			}
 			else = {
 				change_liege = { liege = scope:challenger change = scope:change }
@@ -297,7 +300,14 @@ riseandfall_palace_coup_challenger_wins_prowess_duel = {
 	resolve_title_and_vassal_change = scope:change
 	scope:challenger = {
 		if = {
-			limit = { root = { has_legitimacy = yes } }
+			limit = {
+				root = { has_legitimacy = yes }
+				this = { has_legitimacy = yes }
+					OR = {
+					NOT = { exists = scope:rf_installed_child }
+					this = { is_ruler = yes }
+				}
+			}
 			add_legitimacy = -1200
 		}
 	}
@@ -312,13 +322,16 @@ riseandfall_palace_coup_challenger_wins_prowess_duel = {
 							is_alive = yes
 							this != root
 							this != scope:challenger
-							this != scope:installed_child
+							OR = {
+								NOT = { exists = scope:rf_installed_child }
+								this != scope:rf_installed_child
+							}
 						}
 
 							# Assign employer to challenger (or installed child if present)
 							if = {
 								limit = { employer != scope:challenger scope:event_root = { has_variable = challenger_camp_created } }
-								if = { limit = { exists = scope:installed_child scope:installed_child = { is_alive = yes NOT = { is_ruler = yes } is_landed = yes } } set_employer = scope:installed_child }
+								if = { limit = { exists = scope:rf_installed_child scope:rf_installed_child = { is_alive = yes NOT = { is_ruler = yes } is_landed = yes } } set_employer = scope:rf_installed_child }
 								else_if = { limit = { exists = scope:challenger scope:challenger = { is_alive = yes NOT = { is_ruler = yes } has_title = scope:palace_coup_challenger_camp_title } } set_employer = scope:challenger }
 							}
 				random = {
@@ -359,26 +372,26 @@ riseandfall_palace_coup_challenger_wins_prowess_duel = {
 
 	# Clean up: if we installed a child, make sure they are seated at their court
 	if = {
-		limit = { exists = scope:installed_child }
-		scope:installed_child = { set_location_to_default = yes }
+		limit = { exists = scope:rf_installed_child }
+		scope:rf_installed_child = { set_location_to_default = yes }
 	}
 
 	# (moved) Clean up: destroy the temporary adventurer camp title if it exists � moved after diarchy & transfers
 
 	# If we installed a child and challenger is alive, seat the child and prepare to make the challenger a puppet diarch (set after clean-up)
 	if = {
-		limit = { exists = scope:installed_child scope:challenger = { is_alive = yes } }
-		scope:installed_child = { set_location_to_default = yes }
+		limit = { exists = scope:rf_installed_child scope:challenger = { is_alive = yes } }
+		scope:rf_installed_child = { set_location_to_default = yes }
 	}
 
 	# Move challenger courtiers/followers to installed child's court when challenge becomes puppet master
 	if = {
-		limit = { exists = scope:installed_child scope:challenger = { is_alive = yes } }
+		limit = { exists = scope:rf_installed_child scope:challenger = { is_alive = yes } }
 				scope:challenger = {
 								scope:event_root = {
 								every_courtier_or_guest = {
-								limit = { NOT = { this = scope:installed_child } NOT = { this = scope:challenger } }
-								if = { limit = { exists = scope:installed_child scope:installed_child = { is_alive = yes NOT = { is_ruler = yes } is_landed = yes } } set_employer = scope:installed_child }
+								limit = { OR = { NOT = { exists = scope:rf_installed_child } NOT = { this = scope:rf_installed_child } } NOT = { this = scope:challenger } }
+								if = { limit = { exists = scope:rf_installed_child scope:rf_installed_child = { is_alive = yes NOT = { is_ruler = yes } is_landed = yes } } set_employer = scope:rf_installed_child }
 				if = {
 					limit = { not = { exists = involved_activity } }
 					set_location_to_default = yes
@@ -427,9 +440,9 @@ riseandfall_palace_coup_root_flees_success = {
 		root = {
 			capital_county = {
 				if = {
-					limit = { exists = scope:installed_child }
+					limit = { exists = scope:rf_installed_child }
 					change_title_holder = {
-						holder = scope:installed_child
+						holder = scope:rf_installed_child
 						change = scope:change
 						take_baronies = yes
 					}
@@ -461,9 +474,9 @@ riseandfall_palace_coup_root_flees_success = {
 				NOT = { is_noble_family_title = yes }
 			}
 				if = {
-					limit = { exists = scope:installed_child }
+					limit = { exists = scope:rf_installed_child }
 					change_title_holder = {
-						holder = scope:installed_child
+						holder = scope:rf_installed_child
 						change = scope:change
 						take_baronies = yes
 					}
@@ -494,9 +507,9 @@ riseandfall_palace_coup_root_flees_success = {
 				NOT = { is_noble_family_title = yes }
 			}
 			if = {
-				limit = { exists = scope:installed_child }
+				limit = { exists = scope:rf_installed_child }
 				change_title_holder = {
-					holder = scope:installed_child
+					holder = scope:rf_installed_child
 					change = scope:change
 					take_baronies = yes
 				}
@@ -516,9 +529,9 @@ riseandfall_palace_coup_root_flees_success = {
 	root = {
 		# If we installed a child, make root a vassal of the child; otherwise make root a vassal of the challenger
 		if = {
-			limit = { exists = scope:installed_child }
+			limit = { exists = scope:rf_installed_child }
 			change_liege = {
-				liege = scope:installed_child
+				liege = scope:rf_installed_child
 				change = scope:change
 			}
 		}
@@ -578,15 +591,22 @@ riseandfall_palace_coup_root_flees_success = {
 
 	# Clean up: if we installed a child, make sure they are seated at their court
 	if = {
-		limit = { exists = scope:installed_child }
-		scope:installed_child = { set_location_to_default = yes }
+		limit = { exists = scope:rf_installed_child }
+		scope:rf_installed_child = { set_location_to_default = yes }
 	}
 
-	# (moved) Clean up: destroy the temporary adventurer camp title if it still exists � moved after diarchy & transfers
+	# (moved) Clean up: destroy the temporary adventurer camp title if it still exists  moved after diarchy & transfers
 
 	scope:challenger = {
 		if = {
-			limit = { root = { has_legitimacy = yes } }
+			limit = {
+				root = { has_legitimacy = yes }
+				this = { has_legitimacy = yes }
+				OR = {
+					NOT = { exists = scope:installed_child }
+					this = { is_ruler = yes }
+				}
+			}
 			add_legitimacy = -1200
 		}
 	}
@@ -604,17 +624,17 @@ riseandfall_palace_coup_root_flees_success = {
 
 	# If installed child and challenger alive, ensure child is seated (diarchy set after cleanup)
 	if = {
-		limit = { exists = scope:installed_child scope:challenger = { is_alive = yes } }
-		scope:installed_child = { set_location_to_default = yes }
+		limit = { exists = scope:rf_installed_child scope:challenger = { is_alive = yes } }
+		scope:rf_installed_child = { set_location_to_default = yes }
 
 		# Move challenger courtiers/followers to installed child's court when challenge becomes puppet master
 		if = {
-			limit = { exists = scope:installed_child scope:challenger = { is_alive = yes } }
+			limit = { exists = scope:rf_installed_child scope:challenger = { is_alive = yes } }
 			scope:challenger = {
 				scope:event_root = {
 					every_courtier_or_guest = {
-						limit = { is_alive = yes NOT = { this = scope:installed_child } NOT = { this = scope:challenger } }
-						if = { limit = { exists = scope:installed_child scope:installed_child = { is_alive = yes NOT = { is_ruler = yes } is_landed = yes } } set_employer = scope:installed_child }
+						limit = { is_alive = yes OR = { NOT = { exists = scope:rf_installed_child } NOT = { this = scope:rf_installed_child } } NOT = { this = scope:challenger } }
+						if = { limit = { exists = scope:rf_installed_child scope:rf_installed_child = { is_alive = yes NOT = { is_ruler = yes } is_landed = yes } } set_employer = scope:rf_installed_child }
 						if = {
 							limit = { not = { exists = involved_activity } }
 							set_location_to_default = yes
@@ -626,11 +646,11 @@ riseandfall_palace_coup_root_flees_success = {
 
 		# Ensure challenger's own courtiers are employed by the installed child BEFORE destroying the temporary adventurer title
 		if = {
-			limit = { exists = scope:installed_child scope:challenger = { is_alive = yes } }
+			limit = { exists = scope:rf_installed_child scope:challenger = { is_alive = yes } }
 			scope:challenger = {
 				every_courtier_or_guest = {
-					limit = { is_alive = yes NOT = { this = scope:installed_child } NOT = { this = scope:challenger } }
-					set_employer = scope:installed_child
+					limit = { is_alive = yes NOT = { this = scope:rf_installed_child } NOT = { this = scope:challenger } }
+					set_employer = scope:rf_installed_child
 				}
 			}
 		}
@@ -638,11 +658,11 @@ riseandfall_palace_coup_root_flees_success = {
 
 		# Ensure challenger's own courtiers are employed by the installed child BEFORE destroying the temporary adventurer title
 		if = {
-			limit = { exists = scope:installed_child scope:challenger = { is_alive = yes } }
+			limit = { exists = scope:rf_installed_child scope:challenger = { is_alive = yes } }
 			scope:challenger = {
 				every_courtier_or_guest = {
-					limit = { is_alive = yes NOT = { this = scope:installed_child } NOT = { this = scope:challenger } }
-					set_employer = scope:installed_child
+					limit = { is_alive = yes NOT = { this = scope:rf_installed_child } NOT = { this = scope:challenger } }
+					set_employer = scope:rf_installed_child
 				}
 			}
 		}
@@ -659,9 +679,9 @@ riseandfall_palace_coup_root_flees_success = {
 
 		# If a child was installed, set the child as the employer of the challenger after their temporary title is destroyed and then set them as puppet master (diarch)
 		if = {
-			limit = { exists = scope:installed_child scope:challenger = { is_alive = yes } }
-			scope:challenger = { set_employer = scope:installed_child }
-			scope:installed_child = {
+			limit = { exists = scope:rf_installed_child scope:challenger = { is_alive = yes } }
+			scope:challenger = { set_employer = scope:rf_installed_child }
+			scope:rf_installed_child = {
 				set_diarch = scope:challenger
 				set_diarchy_type = puppet_regency
 				set_diarchy_swing = 90
@@ -683,13 +703,13 @@ riseandfall_palace_coup_root_flees_success = {
 			limit = {
 				this != root
 				this != scope:challenger
-				this != scope:installed_child
+				OR = { NOT = { exists = scope:rf_installed_child } this != scope:rf_installed_child }
 			}
 
 					# Assign employer to challenger when possible
 					if = {
 						limit = { employer != scope:challenger scope:event_root = { has_variable = challenger_camp_created } }
-							if = { limit = { exists = scope:installed_child scope:installed_child = { is_alive = yes NOT = { is_ruler = yes } } } set_employer = scope:installed_child }
+							if = { limit = { exists = scope:rf_installed_child scope:rf_installed_child = { is_alive = yes NOT = { is_ruler = yes } } } set_employer = scope:rf_installed_child }
 								else_if = { limit = { exists = scope:challenger scope:challenger = { is_alive = yes NOT = { is_ruler = yes } has_title = scope:palace_coup_challenger_camp_title } } set_employer = scope:challenger }
 					}
 				random = {
@@ -723,8 +743,8 @@ riseandfall_palace_coup_root_flees_failure = {
 	# Make the old ruler a vassal of the challenger, or of the installed child if present
 	root = {
 		if = {
-			limit = { exists = scope:installed_child }
-			change_liege = { liege = scope:installed_child change = scope:change }
+			limit = { exists = scope:rf_installed_child }
+			change_liege = { liege = scope:rf_installed_child change = scope:change }
 		}
 		else = {
 			change_liege = { liege = scope:challenger change = scope:change }
@@ -742,9 +762,9 @@ riseandfall_palace_coup_root_flees_failure = {
 			NOT = { is_noble_family_title = yes }
 		}
 		if = {
-			limit = { exists = scope:installed_child }
+			limit = { exists = scope:rf_installed_child }
 			change_title_holder = {
-				holder = scope:installed_child
+				holder = scope:rf_installed_child
 				change = scope:change
 				take_baronies = yes
 			}
@@ -762,8 +782,8 @@ riseandfall_palace_coup_root_flees_failure = {
 	root = {
 		every_vassal = {
 			if = {
-				limit = { exists = scope:installed_child }
-				change_liege = { liege = scope:installed_child change = scope:change }
+				limit = { exists = scope:rf_installed_child }
+				change_liege = { liege = scope:rf_installed_child change = scope:change }
 			}
 			else = {
 				change_liege = { liege = scope:challenger change = scope:change }
@@ -773,7 +793,14 @@ riseandfall_palace_coup_root_flees_failure = {
 	resolve_title_and_vassal_change = scope:change
 	scope:challenger = {
 		if = {
-			limit = { root = { has_legitimacy = yes } }
+			limit = {
+				root = { has_legitimacy = yes }
+				this = { has_legitimacy = yes }
+				OR = {
+					NOT = { exists = scope:installed_child }
+					this = { is_ruler = yes }
+				}
+			}
 			add_legitimacy = -1200
 		}
 	}
@@ -811,7 +838,7 @@ riseandfall_palace_coup_root_flees_failure = {
 					employer != scope:challenger
 					scope:event_root = { has_variable = challenger_camp_created }
 				}
-					if = { limit = { exists = scope:installed_child scope:installed_child = { is_alive = yes NOT = { is_ruler = yes } } } set_employer = scope:installed_child }
+					if = { limit = { exists = scope:rf_installed_child scope:rf_installed_child = { is_alive = yes NOT = { is_ruler = yes } } } set_employer = scope:rf_installed_child }
 					else_if = { limit = { exists = scope:challenger scope:challenger = { is_alive = yes NOT = { is_ruler = yes } has_title = scope:palace_coup_challenger_camp_title } } set_employer = scope:challenger }
 			}
 
@@ -850,18 +877,18 @@ riseandfall_palace_coup_root_flees_failure = {
 
 	# If we installed a child, seat the child as the nominal ruler (diarch will be set after cleanup)
 	if = {
-		limit = { exists = scope:installed_child scope:challenger = { is_alive = yes } }
-		scope:installed_child = { set_location_to_default = yes }
+		limit = { exists = scope:rf_installed_child scope:challenger = { is_alive = yes } }
+		scope:rf_installed_child = { set_location_to_default = yes }
 	}
 
 		# Move challenger courtiers/followers to installed child's court when challenge becomes puppet master
 		if = {
-			limit = { exists = scope:installed_child scope:challenger = { is_alive = yes } }
+			limit = { exists = scope:rf_installed_child scope:challenger = { is_alive = yes } }
 			scope:challenger = {
 						scope:event_root = {
 						every_courtier_or_guest = {
-							limit = { is_alive = yes NOT = { this = scope:installed_child } NOT = { this = scope:challenger } }
-									if = { limit = { exists = scope:installed_child scope:installed_child = { is_alive = yes NOT = { is_ruler = yes } } } set_employer = scope:installed_child }
+							limit = { is_alive = yes NOT = { this = scope:rf_installed_child } NOT = { this = scope:challenger } }
+									if = { limit = { exists = scope:rf_installed_child scope:rf_installed_child = { is_alive = yes NOT = { is_ruler = yes } } } set_employer = scope:rf_installed_child }
 					if = {
 						limit = { not = { exists = involved_activity } }
 						set_location_to_default = yes
@@ -873,11 +900,11 @@ riseandfall_palace_coup_root_flees_failure = {
 
 		# Ensure challenger's own courtiers are employed by the installed child BEFORE destroying the temporary adventurer title
 		if = {
-			limit = { exists = scope:installed_child scope:challenger = { is_alive = yes } }
+			limit = { exists = scope:rf_installed_child scope:challenger = { is_alive = yes } }
 			scope:challenger = {
 				every_courtier_or_guest = {
-					limit = { is_alive = yes NOT = { this = scope:installed_child } NOT = { this = scope:challenger } }
-					set_employer = scope:installed_child
+					limit = { is_alive = yes NOT = { this = scope:rf_installed_child } NOT = { this = scope:challenger } }
+					set_employer = scope:rf_installed_child
 				}
 			}
 		}
@@ -894,9 +921,9 @@ riseandfall_palace_coup_root_flees_failure = {
 
 	# If a child was installed, set the child as the employer of the challenger after their temporary title is destroyed and then set them as puppet master (diarch)
 	if = {
-		limit = { exists = scope:installed_child scope:challenger = { is_alive = yes } }
-		scope:challenger = { set_employer = scope:installed_child }
-		scope:installed_child = {
+		limit = { exists = scope:rf_installed_child scope:challenger = { is_alive = yes } }
+		scope:challenger = { set_employer = scope:rf_installed_child }
+		scope:rf_installed_child = {
 			set_diarch = scope:challenger
 			set_diarchy_type = puppet_regency
 			set_diarchy_swing = 90
@@ -912,8 +939,8 @@ riseandfall_palace_coup_root_flees_failure = {
 riseandfall_palace_coup_challenger_calls_banners = {
 	# If a child was installed, the child is the liege � trigger warlord event for the liege (child)
 	if = {
-		limit = { exists = scope:installed_child }
-		scope:installed_child = { trigger_event = { id = warlord.1001 } }
+		limit = { exists = scope:rf_installed_child }
+		scope:rf_installed_child = { trigger_event = { id = warlord.1001 } }
 	}
 	else = {
 		scope:challenger = { trigger_event = { id = warlord.1001 } }
@@ -972,6 +999,7 @@ riseandfall_palace_coup_child_yields = {
 # Stores the result in variable riseandfall_total_prowess
 riseandfall_calculate_total_side_prowess = {
 	# Start with the character's own prowess
+	save_scope_as = riseandfall_prowess_target
 	set_variable = { name = riseandfall_total_prowess value = prowess }
 
 	# For challenger, use all courtiers (since knights might not be assigned yet)
@@ -979,16 +1007,20 @@ riseandfall_calculate_total_side_prowess = {
 		limit = { exists = scope:challenger this = scope:challenger }
 		every_courtier = {
 			limit = { is_alive = yes is_imprisoned = no }
-			# add each courtier's prowess to the running total
-			change_variable = { name = riseandfall_total_prowess add = this.prowess }
+			save_scope_as = riseandfall_prowess_courtier
+			scope:riseandfall_prowess_target = {
+				change_variable = { name = riseandfall_total_prowess add = scope:riseandfall_prowess_courtier.prowess }
+			}
 		}
 	}
 	# For others (root), use knights
 	else = {
 		every_knight = {
 			limit = { is_alive = yes is_imprisoned = no }
-			# add each knight's prowess to the running total
-			change_variable = { name = riseandfall_total_prowess add = this.prowess }
+			save_scope_as = riseandfall_prowess_courtier
+			scope:riseandfall_prowess_target = {
+				change_variable = { name = riseandfall_total_prowess add = scope:riseandfall_prowess_courtier.prowess }
+			}
 		}
 	}
 
@@ -1004,9 +1036,6 @@ riseandfall_calculate_total_side_prowess = {
 	}
 }
 
-
-##########################
-# Rise and Fall - Palace Coup Casualties
 # Apply random outcomes (death/wounded/maimed) to root knights and challenger courtiers
 ##########################
 riseandfall_palace_coup_casualties = {
