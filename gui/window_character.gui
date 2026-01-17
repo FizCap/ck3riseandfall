@@ -1068,8 +1068,8 @@ window = {
 
 								text_single = {
 									name = "prowess_value"
-								text = "[CharacterWindow.GetCharacter.GetProwess|0]"
-								align = nobaseline
+									text = "[CharacterWindow.GetCharacter.GetProwess|0]"
+									align = nobaseline
 							}
 						}
 					}
@@ -1095,7 +1095,8 @@ window = {
 					vbox = {
 						visible = "[Or( Character.GetGovernment.HasRule( 'administrative' ), And( And( Not( Character.HasLandedTitles ), Not( Character.HasLiege ) ), GetPlayer.GetGovernment.HasRule( 'administrative' ) ) )]"
 						margin_right = 3
-						spacing = -3							using = Animation_Character_Window_Refresh
+						spacing = -3							
+						using = Animation_Character_Window_Refresh
 
 							tooltip = "ADMIN_WINDOW_THEME_GOVERNOR_EFFICIENCY_TT"
 							using = tooltip_ne
@@ -1506,9 +1507,9 @@ window = {
 								layoutpolicy_horizontal = expanding
 								margin = { 10 0 }
 								max_width = 280
-								 max_width = 50
+
 								text_single = {
-							size = { 33 8 }
+									name = "character_title"
 									layoutpolicy_horizontal = expanding
 									text = "CV_UNLANDED"
 									using = Font_Size_Medium
@@ -4302,7 +4303,7 @@ types CharacterWindow
 				name = "other_player_name"
 				visible = "[And( Character.IsPlayer, Not( Character.IsLocalPlayer ) )]"
 
-				raw_text = " � #L [Character.GetHumanName]#!"
+				raw_text = " • #L [Character.GetHumanName]#!"
 				tooltip = "AI_PERSONALITY_IS_PLAYER_TOOLTIP"
 				using = tooltip_se
 
@@ -4315,7 +4316,7 @@ types CharacterWindow
 				name = "ai_personality"
 				visible = "[Not( Character.IsPlayer )]"
 
-				raw_text = " � #L [Character.GetAIPersonalityNoTooltip]#!"
+				raw_text = " • #L [Character.GetAIPersonalityNoTooltip]#!"
 				tooltip = "AI_PERSONALITY_TT"
 				using = tooltip_se
 
