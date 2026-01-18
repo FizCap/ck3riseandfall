@@ -9,7 +9,7 @@
 	ai_energy = 100.00
 	ai_honor = -100.00
 	title_creation_cost_mult = -0.75
-    opinion_of_liege = -10
+    opinion_of_liege = -30
 	same_opinion = -30
 	vassal_limit = 1000
 	shown_in_ruler_designer = no
