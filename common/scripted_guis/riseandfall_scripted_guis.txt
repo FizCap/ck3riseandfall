@@ -1,4 +1,4 @@
-riseandfall_is_ally = {
+﻿riseandfall_is_ally = {
 	scope = character
 	is_shown = {
 		is_allied_to = scope:player
