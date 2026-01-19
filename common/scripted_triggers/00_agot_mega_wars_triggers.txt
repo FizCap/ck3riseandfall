@@ -143,7 +143,6 @@ agot_mw_start_lite_mw_trigger = {
 			}
 		}
 	}
-}
 
 # Check if any mega war type is valid to happen
 agot_mw_any_mw_allowed_trigger = {
