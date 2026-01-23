@@ -175,8 +175,8 @@ palace_coup.1002 = {
 		name = palace_coup.1002.c
 		custom_tooltip = palace_coup.1002.child_tooltip
 		trigger = { exists = scope:challenger root = { is_adult = no } }
-		# Challenger keeps the child on the throne as a puppet master
-		hidden_effect = { riseandfall_palace_coup_child_yields = yes }
+		# Challenger installs themselves as ruler
+		hidden_effect = { riseandfall_palace_coup_root_flees_failure = yes }
 		ai_chance = { base = 100 }
 	}
 }
@@ -214,7 +214,53 @@ palace_coup.1004 = {
 		name = palace_coup.1004.a
 		custom_tooltip = palace_coup.1004.tooltip
 		hidden_effect = {
-			riseandfall_palace_coup_root_death = yes
+			# Ensure puppet regency is active and challenger is set as diarch (defensive)
+			if = { limit = { NOT = { root = { has_active_diarchy = yes } } } root = { try_start_diarchy = puppet_regency } }
+			if = {
+				limit = { root = { has_active_diarchy = yes } }
+				root = {
+					set_diarch = scope:challenger
+					set_diarchy_type = puppet_regency
+					set_diarchy_swing = 90
+					set_variable = { name = puppet_master_cooldown value = yes days = 365 }
+					# Destroy temporary camp title (if present) so challenger can be moved into the root's court
+					if = { limit = { exists = scope:palace_coup_challenger_camp_title scope:challenger = { has_title = scope:palace_coup_challenger_camp_title } } scope:challenger = { destroy_title = scope:palace_coup_challenger_camp_title } }
+					# Ensure challenger and their courtiers are employed by the defeated ruler (root)
+					scope:challenger = {
+						# Only set employer if challenger is not a ruler
+						if = { limit = { NOT = { is_ruler = yes } } set_employer = root }
+						every_courtier = {
+							limit = { is_alive = yes }
+							set_employer = root
+						}
+					}
+				}
+			}
+			# Give challenger influence hook on the defeated ruler
+			scope:challenger = { add_hook = { target = root type = strong_favor_hook } }
+		}
+		ai_chance = { base = 100 }
+	}
+}
+
+palace_coup.1005 = {
+	type = character_event
+	title = palace_coup.1005.t
+	desc = palace_coup.1005.d
+	theme = court
+
+	left_portrait = { character = root }
+	right_portrait = { character = scope:challenger }
+
+	option = {
+		name = palace_coup.1005.a
+		custom_tooltip = palace_coup.1005.tooltip
+		hidden_effect = {
+			# Defensive: ensure puppet regency exists and challenger set as diarch
+			if = { limit = { NOT = { root = { has_active_diarchy = yes } } } root = { try_start_diarchy = puppet_regency } }
+			if = { limit = { root = { has_active_diarchy = yes } } root = { set_diarch = scope:challenger set_diarchy_type = puppet_regency set_diarchy_swing = 90 } }
+			# Give challenger a strong_favor_hook on the defeated ruler
+			scope:challenger = { add_hook = { target = root type = strong_favor_hook } }
 		}
 		ai_chance = { base = 100 }
 	}
