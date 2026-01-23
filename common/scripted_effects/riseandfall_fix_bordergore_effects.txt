@@ -43,10 +43,10 @@ riseandfall_fix_bordergore_se = {
                 limit = {
                     AND = {
                         NOT = { de_jure_liege = { holder = scope:recipient } }
-                        NOT = { de_jure_liege = { de_jure_liege = { holder = scope:recipient } } }
-                        NOT = { de_jure_liege = { de_jure_liege = { de_jure_liege = { holder = scope:recipient } } } }
-                        NOT = { de_jure_liege = { de_jure_liege = { de_jure_liege = { de_jure_liege = { holder = scope:recipient } } } } }
-                        NOT = { AND = { scope:recipient = { highest_held_title_tier = tier_county } exists = scope:recipient_capital_dejure_kingdom de_jure_liege = { de_jure_liege = { this = scope:recipient_capital_dejure_kingdom } } } }
+                        NOT = { de_jure_liege = { exists = de_jure_liege de_jure_liege = { holder = scope:recipient } } }
+                        NOT = { de_jure_liege = { exists = de_jure_liege de_jure_liege = { exists = de_jure_liege de_jure_liege = { holder = scope:recipient } } } }
+                        NOT = { de_jure_liege = { exists = de_jure_liege de_jure_liege = { exists = de_jure_liege de_jure_liege = { exists = de_jure_liege de_jure_liege = { holder = scope:recipient } } } } }
+                        NOT = { AND = { scope:recipient = { highest_held_title_tier = tier_county } exists = scope:recipient_capital_dejure_kingdom this = { de_jure_liege = { exists = de_jure_liege de_jure_liege = { this = scope:recipient_capital_dejure_kingdom } } } } }
                     }
                 }
 
@@ -80,10 +80,10 @@ riseandfall_fix_bordergore_se = {
                 limit = {
                     AND = {
                         scope:target_county = { NOT = { de_jure_liege = { holder = scope:recipient } } }
-                        scope:target_county = { NOT = { de_jure_liege = { de_jure_liege = { holder = scope:recipient } } } }
-                        scope:target_county = { NOT = { de_jure_liege = { de_jure_liege = { de_jure_liege = { holder = scope:recipient } } } } }
-                        scope:target_county = { NOT = { de_jure_liege = { de_jure_liege = { de_jure_liege = { de_jure_liege = { holder = scope:recipient } } } } } }
-                        NOT = { AND = { scope:recipient = { highest_held_title_tier = tier_county } exists = scope:recipient_capital_dejure_kingdom scope:target_county = { de_jure_liege = { de_jure_liege = { this = scope:recipient_capital_dejure_kingdom } } } } }
+                        scope:target_county = { NOT = { de_jure_liege = { exists = de_jure_liege de_jure_liege = { holder = scope:recipient } } } }
+                        scope:target_county = { NOT = { de_jure_liege = { exists = de_jure_liege de_jure_liege = { exists = de_jure_liege de_jure_liege = { holder = scope:recipient } } } } }
+                        scope:target_county = { NOT = { de_jure_liege = { exists = de_jure_liege de_jure_liege = { exists = de_jure_liege de_jure_liege = { exists = de_jure_liege de_jure_liege = { holder = scope:recipient } } } } } }
+                        NOT = { AND = { scope:recipient = { highest_held_title_tier = tier_county } exists = scope:recipient_capital_dejure_kingdom scope:target_county = { de_jure_liege = { exists = de_jure_liege de_jure_liege = { this = scope:recipient_capital_dejure_kingdom } } } } }
                     }
                 }
                 if = {
