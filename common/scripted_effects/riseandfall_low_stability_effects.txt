@@ -99,10 +99,9 @@ riseandfall_low_stability_random_event = {
         limit = { AND = { var:rf_realm_split_ok = 1 var:rf_puppet_ok = 1 var:rf_adventurer_ok = 1 } }
         # All options available including realm split (rare weight)
         random_list = {
-            2 = { trigger_event = { id = warlord.1001 } }
-            2 = { trigger_event = { id = puppet.1001 } }
-            2 = { trigger_event = { id = adventurer.1001 } }
-            2 = { trigger_event = { id = palace_coup.1001 } }
+            1 = { trigger_event = { id = warlord.1001 } }
+            1 = { trigger_event = { id = adventurer.1001 } }
+            1 = { trigger_event = { id = palace_coup.1001 } }
             1 = { trigger_event = { id = realm_split.1001 } }
         }
     }
@@ -110,9 +109,8 @@ riseandfall_low_stability_random_event = {
         limit = { AND = { var:rf_realm_split_ok = 1 var:rf_puppet_ok = 1 var:rf_adventurer_ok = 0 } }
         # Realm split + puppet allowed
         random_list = {
-            2 = { trigger_event = { id = warlord.1001 } }
-            2 = { trigger_event = { id = puppet.1001 } }
-            2 = { trigger_event = { id = palace_coup.1001 } }
+            1 = { trigger_event = { id = warlord.1001 } }
+            1 = { trigger_event = { id = palace_coup.1001 } }
             1 = { trigger_event = { id = realm_split.1001 } }
         }
     }
@@ -120,9 +118,9 @@ riseandfall_low_stability_random_event = {
         limit = { AND = { var:rf_realm_split_ok = 1 var:rf_puppet_ok = 0 var:rf_adventurer_ok = 1 } }
         # Realm split + adventurer allowed
         random_list = {
-            2 = { trigger_event = { id = warlord.1001 } }
-            2 = { trigger_event = { id = adventurer.1001 } }
-            2 = { trigger_event = { id = palace_coup.1001 } }
+            1 = { trigger_event = { id = warlord.1001 } }
+            1 = { trigger_event = { id = adventurer.1001 } }
+            1 = { trigger_event = { id = palace_coup.1001 } }
             1 = { trigger_event = { id = realm_split.1001 } }
         }
     }
@@ -130,8 +128,8 @@ riseandfall_low_stability_random_event = {
         limit = { AND = { var:rf_realm_split_ok = 1 var:rf_puppet_ok = 0 var:rf_adventurer_ok = 0 } }
         # Only realm split from special options
         random_list = {
-            2 = { trigger_event = { id = warlord.1001 } }
-            2 = { trigger_event = { id = palace_coup.1001 } }
+            1 = { trigger_event = { id = warlord.1001 } }
+            1 = { trigger_event = { id = palace_coup.1001 } }
             1 = { trigger_event = { id = realm_split.1001 } }
         }
     }
@@ -140,7 +138,6 @@ riseandfall_low_stability_random_event = {
         # Both puppet and adventurer available, no realm split
         random_list = {
             1 = { trigger_event = { id = warlord.1001 } }
-            1 = { trigger_event = { id = puppet.1001 } }
             1 = { trigger_event = { id = adventurer.1001 } }
             1 = { trigger_event = { id = palace_coup.1001 } }
         }
@@ -150,7 +147,6 @@ riseandfall_low_stability_random_event = {
         # Only puppet allowed
         random_list = {
             1 = { trigger_event = { id = warlord.1001 } }
-            1 = { trigger_event = { id = puppet.1001 } }
             1 = { trigger_event = { id = palace_coup.1001 } }
         }
     }
