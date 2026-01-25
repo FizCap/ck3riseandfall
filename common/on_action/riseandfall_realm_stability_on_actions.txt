@@ -6,6 +6,7 @@ yearly_global_pulse = {
     on_actions = {
         riseandfall_yearly_realm_stability
         riseandfall_clear_unlanded_realm_stability
+        riseandfall_dynamic_story_mode
     }
 }
 
@@ -229,5 +230,12 @@ riseandfall_clear_unlanded_realm_stability = {
         # Clear realm stability variables & modifiers on unlanded characters yearly to
         # fix stale state for characters who lost their lands.
         riseandfall_clear_unlanded_stability_vars_se = yes
+    }
+}
+
+riseandfall_dynamic_story_mode = {
+    trigger = { has_game_rule = riseandfall_dynamic_story_mode_enabled }
+    effect = {
+        riseandfall_dynamic_story_mode_se = yes
     }
 }

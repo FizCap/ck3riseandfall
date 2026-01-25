@@ -46,6 +46,15 @@ riseandfall_low_stability_roll_se = {
                     if = { limit = { AND = { var:tmp_diff > 0 var:tmp_chance < 1 } } set_variable = { name = tmp_chance value = 1 } }
                 }
 
+                # Dynamic Story Mode: Large realms (>=5% of world) have minimum 1% chance
+                if = {
+                    limit = { has_variable = riseandfall_large_realm }
+                    if = {
+                        limit = { var:tmp_chance < 1 }
+                        set_variable = { name = tmp_chance value = 1 }
+                    }
+                }
+
                 # Store the calculated chance on the character for tooltip display (persists until next yearly update)
                 set_variable = { name = riseandfall_low_stability_chance value = var:tmp_chance }
 

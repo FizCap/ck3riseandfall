@@ -16,6 +16,7 @@ riseandfall_low_stability_roll = {
         has_game_rule = riseandfall_low_stability_events_enabled
     }
     effect = {
+        riseandfall_dynamic_story_mode_se = yes
         every_independent_ruler = {
             limit = {
                 is_landed = yes
