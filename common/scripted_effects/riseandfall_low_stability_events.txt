@@ -257,8 +257,12 @@ riseandfall_palace_coup_challenger_wins_prowess_duel = {
 					
 					set_location_to_default = yes
 				}
-				else = {
+				else_if = {
+					limit = { is_courtier = yes }
 					return_to_court = yes
+				}
+				else = {
+					set_location_to_default = yes
 				}
 			}
 		}
@@ -282,24 +286,40 @@ riseandfall_palace_coup_challenger_wins_prowess_duel = {
 	}
 	# Notify the defeated ruler and attempt to make them a puppet (no death)
 	# Attempt to start puppet regency on the defeated ruler and assign challenger as diarch
-	if = { limit = { NOT = { root = { has_active_diarchy = yes } } } root = { try_start_diarchy = puppet_regency } }
+	if = {
+		limit = {
+			exists = scope:challenger
+			scope:challenger = { is_alive = yes }
+			NOT = { root = { has_active_diarchy = yes } }
+		}
+		root = { try_start_diarchy = puppet_regency }
+	}
 	if = {
 		limit = { root = { has_active_diarchy = yes } }
 		root = {
-			set_diarch = scope:challenger
-			set_diarchy_type = puppet_regency
-			set_diarchy_swing = 90
-			set_variable = { name = puppet_master_cooldown value = yes days = 365 }
-			# If the challenger still holds the temporary camp title, destroy it so they are not treated as a ruler
-			if = { limit = { exists = scope:palace_coup_challenger_camp_title scope:challenger = { has_title = scope:palace_coup_challenger_camp_title } } scope:challenger = { destroy_title = scope:palace_coup_challenger_camp_title } }
-			# Ensure challenger and their courtiers are employed by the defeated ruler (root)
-			scope:challenger = {
-				# Only set employer if challenger is not a ruler
-				if = { limit = { NOT = { is_ruler = yes } } set_employer = root }
-				every_courtier = {
-					limit = { is_alive = yes }
-					set_employer = root
+			# If the challenger still holds the temporary camp title, destroy it first so they are not treated as a ruler
+			if = {
+				limit = { exists = scope:palace_coup_challenger_camp_title scope:challenger = { has_title = scope:palace_coup_challenger_camp_title } }
+				scope:challenger = { destroy_title = scope:palace_coup_challenger_camp_title }
+			}
+
+			# Make sure the (new) diarch is not employed by the challenger; as puppet master they must be in root's court.
+			# Only proceed if the challenger is a valid courtier-type character (unrulered) after camp cleanup.
+			if = {
+				limit = { exists = scope:challenger scope:challenger = { is_alive = yes NOT = { is_ruler = yes } } }
+				scope:challenger = {
+					# Ensure challenger is employed by the defeated ruler before becoming diarch
+					if = { limit = { NOT = { employer = root } } set_employer = root }
+					every_courtier = {
+						limit = { is_alive = yes NOT = { employer = root } }
+						set_employer = root
+					}
 				}
+
+				set_diarch = scope:challenger
+				set_diarchy_type = puppet_regency
+				set_diarchy_swing = 90
+				set_variable = { name = puppet_master_cooldown value = yes days = 365 }
 			}
 		}
 	# Trigger notification event for the defeated ruler
@@ -510,26 +530,46 @@ riseandfall_palace_coup_root_flees_failure = {
 	scope:challenger = { if = { limit = { scope:event_root = { has_variable = duel_transfer_gold } } add_short_term_gold = scope:event_root.var:duel_transfer_gold } }
 	scope:event_root = { if = { limit = { scope:event_root = { has_variable = duel_transfer_gold } } remove_short_term_gold = scope:event_root.var:duel_transfer_gold } remove_variable = duel_transfer_gold }
 
-	# Do NOT transfer titles or vassals — instead establish puppet regency on the root
-	if = { limit = { NOT = { root = { has_active_diarchy = yes } } } root = { try_start_diarchy = puppet_regency } }
+	# Destroy temporary camp title (if present) early so challenger is not treated as a ruler.
 	if = {
-		limit = { root = { has_active_diarchy = yes } }
+		limit = {
+			exists = scope:palace_coup_challenger_camp_title
+			exists = scope:challenger
+			scope:challenger = { has_title = scope:palace_coup_challenger_camp_title }
+		}
+		scope:challenger = { destroy_title = scope:palace_coup_challenger_camp_title }
+	}
+
+	# Do NOT transfer titles or vassals — instead establish puppet regency on the root
+	if = {
+		limit = {
+			exists = scope:challenger
+			scope:challenger = { is_alive = yes NOT = { is_ruler = yes } }
+			NOT = { root = { has_active_diarchy = yes } }
+		}
+		root = { try_start_diarchy = puppet_regency }
+	}
+	if = {
+		limit = {
+			exists = scope:challenger
+			scope:challenger = { is_alive = yes NOT = { is_ruler = yes } }
+			root = { has_active_diarchy = yes }
+		}
 		root = {
+			# Ensure challenger and their courtiers are employed by the defeated ruler (root)
+			scope:challenger = {
+				# Only set employer if challenger is not a ruler
+				if = { limit = { NOT = { employer = root } } set_employer = root }
+				every_courtier = {
+					limit = { is_alive = yes NOT = { employer = root } }
+					set_employer = root
+				}
+			}
+
 			set_diarch = scope:challenger
 			set_diarchy_type = puppet_regency
 			set_diarchy_swing = 90
 			set_variable = { name = puppet_master_cooldown value = yes days = 365 }
-			# Destroy temporary camp title (if present) so challenger can be moved into the root's court
-			if = { limit = { exists = scope:palace_coup_challenger_camp_title scope:challenger = { has_title = scope:palace_coup_challenger_camp_title } } scope:challenger = { destroy_title = scope:palace_coup_challenger_camp_title } }
-			# Ensure challenger and their courtiers are employed by the defeated ruler (root)
-			scope:challenger = {
-				# Only set employer if challenger is not a ruler
-				if = { limit = { NOT = { is_ruler = yes } } set_employer = root }
-				every_courtier = {
-					limit = { is_alive = yes }
-					set_employer = root
-				}
-			}
 		}
 	}
 

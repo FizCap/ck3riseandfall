@@ -59,8 +59,6 @@ palace_coup.1002 = {
 		}
 
 		# For intrigue-based flee option, use individual character intrigue values (not a team total)
-		# Copy challenger's intrigue into a temporary var on the challenger for safe referencing
-		scope:challenger = { set_variable = { name = riseandfall_chall_intrigue value = intrigue } }
 		# compute AI add variables on root (clamped) for the duel and the intrigue flee choice
 		root = {
 			# Duel weight
@@ -219,25 +217,35 @@ palace_coup.1004 = {
 			if = {
 				limit = { root = { has_active_diarchy = yes } }
 				root = {
-					set_diarch = scope:challenger
-					set_diarchy_type = puppet_regency
-					set_diarchy_swing = 90
-					set_variable = { name = puppet_master_cooldown value = yes days = 365 }
-					# Destroy temporary camp title (if present) so challenger can be moved into the root's court
-					if = { limit = { exists = scope:palace_coup_challenger_camp_title scope:challenger = { has_title = scope:palace_coup_challenger_camp_title } } scope:challenger = { destroy_title = scope:palace_coup_challenger_camp_title } }
-					# Ensure challenger and their courtiers are employed by the defeated ruler (root)
-					scope:challenger = {
-						# Only set employer if challenger is not a ruler
-						if = { limit = { NOT = { is_ruler = yes } } set_employer = root }
-						every_courtier = {
-							limit = { is_alive = yes }
-							set_employer = root
+					# Destroy temporary camp title (if present) so challenger is not treated as a ruler
+					if = {
+						limit = { exists = scope:palace_coup_challenger_camp_title scope:challenger = { has_title = scope:palace_coup_challenger_camp_title } }
+						scope:challenger = { destroy_title = scope:palace_coup_challenger_camp_title }
+					}
+
+					# Only set diarch when challenger can be a valid puppet master courtier.
+					if = {
+						limit = { exists = scope:challenger scope:challenger = { is_alive = yes NOT = { is_ruler = yes } } }
+						scope:challenger = {
+							# Ensure the diarch is not employed by the challenger; as puppet master they must be in root's court.
+							if = { limit = { NOT = { employer = root } } set_employer = root }
+							every_courtier = {
+								limit = { is_alive = yes NOT = { employer = root } }
+								set_employer = root
+							}
 						}
+						set_diarch = scope:challenger
+						set_diarchy_type = puppet_regency
+						set_diarchy_swing = 90
+						set_variable = { name = puppet_master_cooldown value = yes days = 365 }
 					}
 				}
 			}
 			# Give challenger influence hook on the defeated ruler
-			scope:challenger = { add_hook = { target = root type = strong_favor_hook } }
+			if = {
+				limit = { scope:challenger = { is_alive = yes } root = { is_alive = yes } }
+				scope:challenger = { add_hook = { target = root type = strong_favor_hook } }
+			}
 		}
 		ai_chance = { base = 100 }
 	}

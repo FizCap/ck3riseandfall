@@ -7,6 +7,8 @@ riseandfall_low_stability_roll_se = {
     # For every independent ruler, compute chance once using the ruler's stability
         # Perform computations inside the saved scope so scope:independent_ruler variables resolve correctly
         scope:ruler_low_stability = {
+            # Ensure a default stability score exists so scripts don't error when it's missing
+            if = { limit = { NOT = { has_variable = riseandfall_realm_stability_score } } set_variable = { name = riseandfall_realm_stability_score value = 50 } }
             if = {
                 limit = { NOT = { has_variable = low_stability_cooldown } }
                 # Compute chance with a curved (approx power 1.5) formula based on highest held title tier.
@@ -295,7 +297,7 @@ riseandfall_create_adventurer_invasion_se = {
                 if = {
                     limit = { var:rf_disqualify == 0 }
                     # Select this claimant
-                    riseandfall_do_create_adventurer_se = yes
+                    if = { limit = { exists = scope:adventurer_candidate scope:adventurer_candidate = { is_alive = yes } } scope:adventurer_candidate = { riseandfall_do_create_adventurer_se = yes } }
                     scope:ruler_root = { change_variable = { name = remaining_to_select subtract = 1 } }
                     root = { change_variable = { name = remaining_to_select subtract = 1 } }
                 }
@@ -406,8 +408,8 @@ riseandfall_create_adventurer_invasion_se = {
                     limit = { var:rf_disqualify == 0 }
                     scope:adventurer_candidate = {
                         add_unpressed_claim = scope:ruler_root.primary_title
-                        riseandfall_do_create_adventurer_se = yes
                     }
+                    if = { limit = { exists = scope:adventurer_candidate scope:adventurer_candidate = { is_alive = yes } } scope:adventurer_candidate = { riseandfall_do_create_adventurer_se = yes } }
                     # consume a courtier slot for a successful conscription
                     scope:ruler_root = { change_variable = { name = remaining_courtier_slots subtract = 1 } }
                     root = { change_variable = { name = remaining_courtier_slots subtract = 1 } }
@@ -442,8 +444,8 @@ riseandfall_create_adventurer_invasion_se = {
         }
         scope:adventurer_candidate = {
             add_unpressed_claim = scope:ruler_root.primary_title
-            riseandfall_do_create_adventurer_se = yes
         }
+        if = { limit = { exists = scope:adventurer_candidate scope:adventurer_candidate = { is_alive = yes } } scope:adventurer_candidate = { riseandfall_do_create_adventurer_se = yes } }
         change_variable = { name = generated_to_create subtract = 1 }
     }
 

@@ -209,8 +209,17 @@ riseandfall_war_won_attacker = {
         # Root scope: none; event provides scope:attacker and scope:defender
     # Apply loss to defender. Apply victory effect to attacker only when the
     # war is NOT a peasant rebellion (peasant wars should not count as valid wins).
-    scope:defender = { riseandfall_war_loss_se = yes }
-    if = { limit = { scope:war = { NOT = { using_cb = peasant_war } } } scope:attacker = { riseandfall_war_victory_se = yes } }
+    # NOTE: war on_actions provide attacker/defender as weak scopes in some contexts.
+    # Save them to strong scopes before modifying variables to avoid runtime errors.
+    scope:defender = { save_scope_as = rf_defender }
+    if = { limit = { exists = scope:rf_defender } scope:rf_defender = { riseandfall_war_loss_se = yes } }
+    clear_saved_scope = rf_defender
+    if = {
+        limit = { scope:war = { NOT = { using_cb = peasant_war } } }
+        scope:attacker = { save_scope_as = rf_attacker }
+        if = { limit = { exists = scope:rf_attacker } scope:rf_attacker = { riseandfall_war_victory_se = yes } }
+        clear_saved_scope = rf_attacker
+    }
     }
 }
 
@@ -219,8 +228,15 @@ riseandfall_war_won_defender = {
     effect = {
         # Root scope: none; event provides scope:attacker and scope:defender
     # Apply loss to attacker. Apply victory effect to defender only for non-peasant wars
-    scope:attacker = { riseandfall_war_loss_se = yes }
-    if = { limit = { scope:war = { NOT = { using_cb = peasant_war } } } scope:defender = { riseandfall_war_victory_se = yes } }
+    scope:attacker = { save_scope_as = rf_attacker }
+    if = { limit = { exists = scope:rf_attacker } scope:rf_attacker = { riseandfall_war_loss_se = yes } }
+    clear_saved_scope = rf_attacker
+    if = {
+        limit = { scope:war = { NOT = { using_cb = peasant_war } } }
+        scope:defender = { save_scope_as = rf_defender }
+        if = { limit = { exists = scope:rf_defender } scope:rf_defender = { riseandfall_war_victory_se = yes } }
+        clear_saved_scope = rf_defender
+    }
     }
 }
 

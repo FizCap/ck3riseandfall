@@ -914,6 +914,8 @@ riseandfall_low_stability_grace_period_se = {
 
 # Called on the war winner scope (character) to reduce the war penalty by -10
 riseandfall_war_victory_se = {
+    # Defensive: only operate on living characters
+    if = { limit = { is_alive = yes }
     if = { limit = { NOT = { has_variable = riseandfall_war_penalty } } set_variable = { name = riseandfall_war_penalty value = 0 } }
     # Defensive: if a war scope exists and it's a peasant war, don't apply victory penalty reduction.
     if = {
@@ -926,19 +928,24 @@ riseandfall_war_victory_se = {
         # Clamp to minimum 0
         if = { limit = { var:riseandfall_war_penalty < 0 } set_variable = { name = riseandfall_war_penalty value = 0 } }
     }
+    }
 }
 
 # Called on the war loser scope (character) to increase the war penalty by +10
 riseandfall_war_loss_se = {
-    if = { limit = { NOT = { has_variable = riseandfall_war_penalty } } set_variable = { name = riseandfall_war_penalty value = 0 } }
-    # Defensive: if a war scope exists and it's a peasant war, don't apply loss penalty here
+    # Only operate on living characters; variables are stored on character scopes
     if = {
-        limit = { scope:war = { using_cb = peasant_war } }
-        # do nothing for peasant wars
-    }
-    else = {
-        # Increase penalty by +10
-        change_variable = { name = riseandfall_war_penalty add = 10 }
+        limit = { is_alive = yes }
+        if = { limit = { NOT = { has_variable = riseandfall_war_penalty } } set_variable = { name = riseandfall_war_penalty value = 0 } }
+        # Defensive: if a war scope exists and it's a peasant war, don't apply loss penalty here
+        if = {
+            limit = { scope:war = { using_cb = peasant_war } }
+            # do nothing for peasant wars
+        }
+        else = {
+            # Increase penalty by +10
+            change_variable = { name = riseandfall_war_penalty add = 10 }
+        }
     }
 }
 
