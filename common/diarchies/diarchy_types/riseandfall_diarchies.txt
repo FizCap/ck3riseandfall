@@ -7,8 +7,8 @@ puppet_regency = {
 	start = { always = yes }
 
 	# Handled via content - this is only for power sharing arrangements we want to end automatically.
-	# End the diarchy when the liege is not a landed ruler anymore.
-	end = { liege = { is_landed = no } }
+	# End the diarchy when the liege is not a landed ruler anymore or is not independent.
+	end = { OR = { is_landed = no is_independent_ruler = no } }
 
 	# Mandates
 	## Just the standard suite
