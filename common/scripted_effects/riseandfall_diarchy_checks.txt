@@ -2,12 +2,12 @@
     every_ruler = {
         limit = { has_diarchy_type = puppet_regency }
         if = {
-            limit = { OR = { is_independent_ruler = no is_landed = no } }
+            limit = { is_landed = no }
             end_diarchy = yes
         }
         else = {
-            # For independent landed rulers with puppet regency, ensure the diarch is employed in the court
-            diarch = { if = { limit = { employer != root } set_employer = root } }
+            # For landed rulers with puppet regency, ensure the diarch is employed in the court
+            diarch = { if = { limit = { employer != prev } set_employer = prev } }
         }
     }
 }
