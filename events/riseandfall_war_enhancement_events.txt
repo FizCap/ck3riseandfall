@@ -1,75 +1,34 @@
-﻿namespace = brb
+# This file contains events for the Rise and Fall mod's war enhancement mechanics.
+# These events handle post-rebellion succession, fallen rulers' fates, and family revolts triggered by character deaths.
 
-brb.1 = {
+namespace = riseandfall_war_enhancement
+
+# Event triggered after overthrowing a liege, allowing the attacker to decide the realm's fate.
+riseandfall_war_enhancement.1 = {
 	type = character_event
-	title = brb.1.t
-	desc = brb.1.desc
+	title = riseandfall_war_enhancement.1.t
+	desc = riseandfall_war_enhancement.1.desc
 	theme = realm
 	left_portrait = {
 		character = root
 		animation = dismissal
 	}
-	
 	immediate = {
-		scope:brb_prev_liege = {
-			every_close_or_extended_family_member = {
-				limit = {
-					is_independent_ruler = no
-					root = {
-						any_close_family_member = {
-							even_if_dead = yes
-							exists = killer
-							killer = prev
-						}
-					}
-				}
-				save_temporary_scope_as = brb_tbi
-				root = {
-					imprison = { target = scope:brb_tbi }
-				}
-			}
-		}
+		war_enhancement_imprison_family = yes
 	}
 	
+	# Option: Press claims on titles if the attacker has them.
 	option = { # press my claims
-		name = brb.1.a
+		name = riseandfall_war_enhancement.1.a
 		trigger = {
-			scope:brb_liege_primary_title = {
+			scope:riseandfall_war_enhancement_liege_primary_title = {
 				root = {
 					has_claim_on = prev
 				}
 			}
 		}
 		root = {
-			create_title_and_vassal_change = {
-				type = faction_demand
-				save_scope_as = change
-			}		
-		}
-		
-		scope:brb_liege_primary_title.holder = {
-			every_held_title = { 
-				limit = { 
-					OR = {
-						AND = {
-							previous_holder = scope:brb_prev_liege
-							title_held_years < 1
-						}
-						AND = {
-							has_claim = root
-							de_jure_liege = scope:brb_liege_primary_title
-						}
-					}
-				}
-				change_title_holder_include_vassals = {
-					holder = root
-					change = scope:change
-				}
-			}
-		}
-		
-		root = {
-			resolve_title_and_vassal_change = scope:change
+			hidden_effect = { war_enhancement_press_claims = yes }
 		}
 		ai_chance = {
 			base = 200
@@ -96,10 +55,11 @@ brb.1 = {
 		
 	}
 	
+	# Option: Elect a suitable ruler by setting up a diarchy (for non-liege case).
 	option = { # lets elect a suitable ruler (case: not liege)
-		name = brb.1.b
+		name = riseandfall_war_enhancement.1.b
 		trigger = {
-			scope:brb_liege_primary_title.holder = {
+			scope:riseandfall_war_enhancement_liege_primary_title.holder = {
 				AND = {
 					has_government = feudal_government
 					NOT = { is_liege_or_above_of = root }
@@ -107,29 +67,14 @@ brb.1 = {
 				}
 				root.liege.primary_title = {
 					AND = {
-						previous_holder = scope:brb_prev_liege
+						previous_holder = scope:riseandfall_war_enhancement_prev_liege
 						title_held_years < 1
 					}
 				}
 			}
 		}
 		
-		scope:brb_attacker.liege.primary_title.holder = { 
-			try_start_diarchy = regency
-			set_diarch = root
-			change_diarchy_swing = 100
-		}
-		
-		scope:brb_attacker.liege.primary_title = {
-			add_title_law = feudal_elective_succession_law
-		}
-		
-		scope:brb_attacker.liege.diarch = {
-			trigger_event = {
-				id = brb.6
-				days = 30
-			}
-		}
+		hidden_effect = { war_enhancement_elect_ruler_not_liege = yes }
 		ai_chance = {
 			base = -40
 			ai_value_modifier = {
@@ -155,31 +100,17 @@ brb.1 = {
 		}
 	}
 	
+	# Option: Elect a suitable ruler by setting up a diarchy (for still liege case).
 	option = { # lets elect a suitable ruler (case: still liege)
-		name = brb.1.c
+		name = riseandfall_war_enhancement.1.c
 		trigger = {
-			scope:brb_liege_primary_title.holder = {
+			scope:riseandfall_war_enhancement_liege_primary_title.holder = {
 				has_government = feudal_government
 				is_liege_or_above_of = root
 			}
 		}
 		
-		scope:brb_liege_primary_title.holder = { 
-			try_start_diarchy = regency
-			set_diarch = root
-			change_diarchy_swing = 100
-		}
-		
-		scope:brb_liege_primary_title = {
-			add_title_law = feudal_elective_succession_law
-		}
-		
-		scope:brb_liege_primary_title.holder.diarch = {
-			trigger_event = {
-				id = brb.6
-				days = 30
-			}
-		}
+		hidden_effect = { war_enhancement_elect_ruler_still_liege = yes }
 		ai_chance = {
 			base = -40
 			ai_value_modifier = {
@@ -204,13 +135,14 @@ brb.1 = {
 			}
 		}
 	}
-
+	
+	# Option: Declare independence if titles allow.
 	option = { #independence
-		name = brb.1.d
+		name = riseandfall_war_enhancement.1.d
 		trigger = {
 			OR = {
 				AND = {
-					scope:brb_liege = {
+					scope:riseandfall_war_enhancement_liege = {
 						highest_held_title_tier = tier_empire
 					}
 					root = {
@@ -218,7 +150,7 @@ brb.1 = {
 					}
 				}
 				AND = {
-					scope:brb_liege = {
+					scope:riseandfall_war_enhancement_liege = {
 						highest_held_title_tier = tier_kingdom
 					}
 					root = {
@@ -227,14 +159,7 @@ brb.1 = {
 				}
 			}
 		}
-		create_title_and_vassal_change = {
-			type = independency 
-			save_scope_as = change
-		}
-		becomes_independent = {
-			change = scope:change
-		}
-		resolve_title_and_vassal_change = scope:change
+		hidden_effect = { war_enhancement_declare_independence = yes }
 		ai_chance = {
 			base = 0
 			ai_value_modifier = {
@@ -259,8 +184,10 @@ brb.1 = {
 			}
 		}
 	}
+	
+	# Option: Decline to take action.
 	option = { # decline
-		name = brb.1.e
+		name = riseandfall_war_enhancement.1.e
 		ai_chance = {
 			base = 5
 			ai_value_modifier = {
@@ -290,11 +217,12 @@ brb.1 = {
 	
 }
 
-brb.2 = {
+# Event: Decide the fate of the previous liege after victory.
+riseandfall_war_enhancement.2 = {
 	type = character_event
 	
-	title = brb.2.t
-	desc = brb.2.d
+	title = riseandfall_war_enhancement.2.t
+	desc = riseandfall_war_enhancement.2.d
 
 	theme = intrigue
 	left_portrait = {
@@ -302,114 +230,95 @@ brb.2 = {
 		animation = admiration
 	}
 	right_portrait = {
-		character = scope:brb_prev_liege
+		character = scope:riseandfall_war_enhancement_prev_liege
 		animation = beg
 	}
 	
+	# Option: Execute the previous liege.
 	option = { #execute him (feudal variant)
-		name = brb.2.a
-		scope:brb_prev_liege = {
-			death = {
-				death_reason = death_execution
-				killer = root
-			}
-		}
-		if = {
-			limit = { 
-				scope:brb_attacker = { has_government = feudal_government }
-			}
-			scope:brb_attacker = {
-				trigger_event = {
-					id = brb.1
-				}
-			}		
-		} 
+		name = riseandfall_war_enhancement.2.a
+		hidden_effect = { war_enhancement_execute_liege = yes } 
 	}
 	
+	# Option: Do nothing (feudal government).
 	option = { #do nothing (feudal variant)
-		name = brb.2.c
+		name = riseandfall_war_enhancement.2.c
 		trigger = {
 			root = { has_government = feudal_government }
 		}
 		if = {
 			limit = { 
-				scope:brb_attacker = { has_government = feudal_government }
+				scope:riseandfall_war_enhancement_attacker = { has_government = feudal_government }
 			}
-			scope:brb_attacker = {
+			scope:riseandfall_war_enhancement_attacker = {
 				trigger_event = {
-					id = brb.1
+					id = riseandfall_war_enhancement.1
 				}
 			}		
 		} 
-		custom_tooltip = brb_do_nothing
+		custom_tooltip = riseandfall_war_enhancement_do_nothing
 	}
-
+	
+	# Option: Do nothing (tribal government).
 	option = { #do nothing (tribal variant)
-		name = brb.2.c1
+		name = riseandfall_war_enhancement.2.c1
 		trigger = {
 			root = { has_government = tribal_government }
 		}
 		if = {
 			limit = { 
-				scope:brb_attacker = { has_government = feudal_government }
+				scope:riseandfall_war_enhancement_attacker = { has_government = feudal_government }
 			}
-			scope:brb_attacker = {
+			scope:riseandfall_war_enhancement_attacker = {
 				trigger_event = {
-					id = brb.1
+					id = riseandfall_war_enhancement.1
 				}
 			}		
 		} 
-		custom_tooltip = brb_do_nothing
+		custom_tooltip = riseandfall_war_enhancement_do_nothing
 	}
 	
+	# Option: Imprison the previous liege.
 	option = { #imprison him
-		name = brb.2.d1
-		root = { imprison = { target = scope:brb_prev_liege } }
-		if = {
-			limit = { 
-				scope:brb_attacker = { has_government = feudal_government }
-			}
-			scope:brb_attacker = {
-				trigger_event = {
-					id = brb.1
-				}
-			}		
-		}
+		name = riseandfall_war_enhancement.2.d1
+		hidden_effect = { war_enhancement_imprison_liege = yes }
 	}
 }
 
-brb.21 = {
+# Event: The previous liege escaped, now deal with the realm.
+riseandfall_war_enhancement.21 = {
 	type = character_event
 	
-	title = brb.21.t
-	desc = brb.21.d
+	title = riseandfall_war_enhancement.21.t
+	desc = riseandfall_war_enhancement.21.d
 
 	theme = intrigue
 	left_portrait = {
-		character = scope:brb_prev_liege
+		character = scope:riseandfall_war_enhancement_prev_liege
 		animation = admiration
 	}
 	
 	option = { # escaped, time to deal with the realm (feudal)
-		name = brb.21.a
+		name = riseandfall_war_enhancement.21.a
 		if = {
 			limit = { 
-				scope:brb_attacker = { has_government = feudal_government } 
+				scope:riseandfall_war_enhancement_attacker = { has_government = feudal_government } 
 			}
-			scope:brb_attacker = {
+			scope:riseandfall_war_enhancement_attacker = {
 				trigger_event = {
-					id = brb.1
+					id = riseandfall_war_enhancement.1
 				}
 			}		
 		} 
 	}
 }
 
-brb.3 = {
+# Event: Family member considers starting a war against the liege who killed their relative.
+riseandfall_war_enhancement.3 = {
 	type = character_event
 	
-	title = brb.3.t
-	desc = brb.3.d
+	title = riseandfall_war_enhancement.3.t
+	desc = riseandfall_war_enhancement.3.d
 
 	theme = realm
 	left_portrait = {
@@ -437,11 +346,8 @@ brb.3 = {
 	}
 	
 	option = {
-		name = brb.3.a
-		start_war = {
-			casus_belli = refused_liege_demand_war
-			target = root.liege
-		}
+		name = riseandfall_war_enhancement.3.a
+		hidden_effect = { war_enhancement_start_war_against_liege = yes }
 		ai_chance = {
 			base = -50
 
@@ -526,19 +432,20 @@ brb.3 = {
 		}
 	}
 	option = {
-		name = brb.3.b
+		name = riseandfall_war_enhancement.3.b
 	}
 }
 
-brb.4 = {
+# Event: Family member joins a civil war against the liege.
+riseandfall_war_enhancement.4 = {
 	type = character_event
 	
-	title = brb.4.t
-	desc = brb.4.d
+	title = riseandfall_war_enhancement.4.t
+	desc = riseandfall_war_enhancement.4.d
 
 	theme = realm
 	left_portrait = {
-		character = scope:brb_highest_title_man
+		character = scope:riseandfall_war_enhancement_highest_title_man
 		animation = rage
 	}
 	lower_center_portrait = {
@@ -550,21 +457,14 @@ brb.4 = {
 	}
 	
 	trigger = {
-		scope:brb_highest_title_man = {
+		scope:riseandfall_war_enhancement_highest_title_man = {
 			is_at_war_with_liege = yes
 		}
 	}
 	
 	option = {
-		name = brb.4.a
-		scope:brb_highest_title_man = {
-			random_character_war = {
-				limit = {
-					is_civil_war = yes
-				}
-				add_attacker = root
-			}
-		}
+		name = riseandfall_war_enhancement.4.a
+		hidden_effect = { war_enhancement_join_civil_war = yes }
 		ai_chance = {
 			base = -50
 
@@ -590,7 +490,7 @@ brb.4 = {
 			}
 			
 			opinion_modifier = { # Opinion Factor
-				who = scope:brb_highest_title_man
+				who = scope:riseandfall_war_enhancement_highest_title_man
 				opinion_target = root
 				multiplier = 0.8
 			}
@@ -654,15 +554,16 @@ brb.4 = {
 		}
 	}
 	option = {
-		name = brb.4.b
+		name = riseandfall_war_enhancement.4.b
 	}
 }
 
-brb.5 = { #Everything is falling apart, try to escape or do nothing? (other options as well depending on personality)
+# Event: Fallen ruler's options when everything is falling apart.
+riseandfall_war_enhancement.5 = { #Everything is falling apart, try to escape or do nothing? (other options as well depending on personality)
 	type = character_event
 	
-	title = brb.5.t
-	desc = brb.5.d
+	title = riseandfall_war_enhancement.5.t
+	desc = riseandfall_war_enhancement.5.d
 
 	theme = intrigue
 	left_portrait = {
@@ -670,12 +571,13 @@ brb.5 = { #Everything is falling apart, try to escape or do nothing? (other opti
 		animation = beg
 	}
 	
+	# Option: Attempt to escape via intrigue duel.
 	option = { #attempt to escape (with options such as hide, rally allies, or use martial maybe) #intrigue/craven characters prefer, most common
-		name = brb.5.a
+		name = riseandfall_war_enhancement.5.a
 		
 		duel = {
 			skill = intrigue
-			target = scope:brb_attacker
+			target = scope:riseandfall_war_enhancement_attacker
 
 			# Success: root escapes
 			60 = {
@@ -687,9 +589,9 @@ brb.5 = { #Everything is falling apart, try to escape or do nothing? (other opti
 
 				hidden_effect = {
 					riseandfall_palace_coup_root_flees_success = yes
-					scope:brb_attacker = { 
+					scope:riseandfall_war_enhancement_attacker = { 
 						trigger_event = {
-							id = brb.21
+							id = riseandfall_war_enhancement.21
 						}
 					}
 				}
@@ -701,9 +603,9 @@ brb.5 = { #Everything is falling apart, try to escape or do nothing? (other opti
 					min = -49
 				}
 				hidden_effect = {
-					scope:brb_attacker = {
+					scope:riseandfall_war_enhancement_attacker = {
 						trigger_event = { 
-							id = brb.2
+							id = riseandfall_war_enhancement.2
 						}
 					}
 				}
@@ -720,10 +622,12 @@ brb.5 = { #Everything is falling apart, try to escape or do nothing? (other opti
 			}
 		}
 	}
+	
+	# Option: Surrender and give up.
 	option = { #do nothing/surrender/give up
-		name = brb.5.b
-		scope:brb_attacker = {
-			trigger_event = { id = brb.2 }
+		name = riseandfall_war_enhancement.5.b
+		scope:riseandfall_war_enhancement_attacker = {
+			trigger_event = { id = riseandfall_war_enhancement.2 }
 		}
 		ai_chance = {
 			base = 50
@@ -735,8 +639,10 @@ brb.5 = { #Everything is falling apart, try to escape or do nothing? (other opti
 			}
 		}
 	}
+	
+	# Option: Fight to the end (requires brave or lunatic trait).
 	option = { #Fight to the end (bravery required)
-		name = brb.5.c
+		name = riseandfall_war_enhancement.5.c
 		trigger = { 
 			OR = {
 				has_trait = brave
@@ -753,8 +659,10 @@ brb.5 = { #Everything is falling apart, try to escape or do nothing? (other opti
 		}
 
 	}
+	
+	# Option: Commit suicide (requires specific traits or flags).
 	option = { #commit suicide flavors
-		name = brb.5.d
+		name = riseandfall_war_enhancement.5.d
 		trigger = { 
 			OR = {
 				has_trait = depressed_1
@@ -806,114 +714,29 @@ brb.5 = { #Everything is falling apart, try to escape or do nothing? (other opti
 	}
 }
 
-brb.6 = {
-	title = brb.6.t
-	desc = brb.6.d
+# Event: Diarch abdication or power seizure.
+riseandfall_war_enhancement.6 = {
+	title = riseandfall_war_enhancement.6.t
+	desc = riseandfall_war_enhancement.6.d
 	type = character_event
 	theme = realm
 	
+	# Option: Abdicate as planned, passing titles to heir.
 	option = { #Abdicate as planned (x will become ruler) 
-		name = brb.6.a
-		root = {
-			create_title_and_vassal_change = {
-				type = faction_demand
-				save_scope_as = change
-			}		
-		}
-		scope:brb_attacker.liege.primary_title = {
-			change_title_holder_include_vassals = {
-				holder = scope:brb_attacker.liege.primary_title.current_heir
-				change = scope:change
-			}
-		}
-		scope:brb_attacker.liege = {
-			every_held_title = { 
-				limit = {
-					AND = {
-						OR = {
-							holder = scope:brb_attacker.liege
-							previous_holder = scope:brb_prev_liege
-						}
-						title_held_years < 1
-						OR = {
-							has_claim = brb_attacker.liege.primary_title.current_heir
-							de_jure_liege = scope:brb_attacker.liege.primary_title
-							de_facto_liege = scope:brb_attacker.liege.primary_title
-						}
-					}
-				}
-				change_title_holder_include_vassals = {
-					holder = scope:brb_attacker.liege.primary_title.current_heir
-					change = scope:change
-				}
-			}
-		}
-		
-		scope:brb_attacker.liege = {
-			change_liege = {
-				liege = scope:brb_attacker.liege.primary_title.current_heir
-				change = scope:change
-			}
-		}
-				
-		root = {
-			resolve_title_and_vassal_change = scope:change
-		}
-		scope:brb_liege_primary_title = { remove_title_law = feudal_elective_succession_law }
+		name = riseandfall_war_enhancement.6.a
+		hidden_effect = { war_enhancement_abdicate_to_heir = yes }
 	}
 	
+	# Option: Extend rule temporarily with some tyranny.
 	option = { #extend our rule for a time (less tyrannical)
-		name = brb.6.b
-		root = {
-			add_tyranny = 10
-			trigger_event = {
-				id = brb.6
-				days = 60
-			}
-		}
+		name = riseandfall_war_enhancement.6.b
+		hidden_effect = { war_enhancement_extend_rule = yes }
 	}
 	
+	# Option: Seize power tyrannically.
 	option = { #seize power (tyrannical)
-		name = brb.6.c
-		add_tyranny = 25
-		root = {
-			create_title_and_vassal_change = {
-				type = usurped
-				save_scope_as = change
-			}		
-		}
-		scope:brb_attacker.liege.primary_title = {
-			change_title_holder_include_vassals = {
-				holder = root
-				change = scope:change
-			}
-		}
-		scope:brb_attacker.liege = {
-			every_held_title = { 
-				limit = { 
-					OR = {
-						AND = {
-							previous_holder = scope:brb_prev_liege
-							title_held_years < 1
-							OR = {
-								has_claim = root
-								de_jure_liege = scope:brb_attacker.liege.primary_title
-								de_facto_liege = scope:brb_attacker.liege
-							}
-						}
-						this = title_capital_county
-					}
-				}
-				change_title_holder = {
-					holder = root
-					change = scope:change
-				}
-			}
-		}
-		root = {
-			resolve_title_and_vassal_change = scope:change
-		}
-		scope:brb_liege_primary_title = { remove_title_law = feudal_elective_succession_law }
+		name = riseandfall_war_enhancement.6.c
+		hidden_effect = { war_enhancement_seize_power = yes }
 	}
 }
 	
