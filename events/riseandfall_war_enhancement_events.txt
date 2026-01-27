@@ -1,0 +1,742 @@
+# This file contains events for the Rise and Fall mod's war enhancement mechanics.
+# These events handle post-rebellion succession, fallen rulers' fates, and family revolts triggered by character deaths.
+
+namespace = riseandfall_war_enhancement
+
+# Event triggered after overthrowing a liege, allowing the attacker to decide the realm's fate.
+riseandfall_war_enhancement.1 = {
+	type = character_event
+	title = riseandfall_war_enhancement.1.t
+	desc = riseandfall_war_enhancement.1.desc
+	theme = realm
+	left_portrait = {
+		character = root
+		animation = dismissal
+	}
+	immediate = {
+		war_enhancement_imprison_family = yes
+	}
+	
+	# Option: Press claims on titles if the attacker has them.
+	option = { # press my claims
+		name = riseandfall_war_enhancement.1.a
+		trigger = {
+			scope:riseandfall_war_enhancement_liege_primary_title = {
+				root = {
+					has_claim_on = prev
+				}
+			}
+		}
+		root = {
+			hidden_effect = { war_enhancement_press_claims = yes }
+		}
+		ai_chance = {
+			base = 200
+			ai_value_modifier = {
+				ai_greed = 0.5
+				ai_boldness = 0.3
+				ai_energy = 1
+				ai_rationality = 1
+			}
+			modifier = {
+				add = 100
+				root = {
+					has_trait = ambitious
+				}
+			}
+			
+			modifier = {
+				add = -15
+				root = {
+					has_trait = content
+				}
+			}
+		}
+		
+	}
+	
+	# Option: Elect a suitable ruler by setting up a diarchy (for non-liege case).
+	option = { # lets elect a suitable ruler (case: not liege)
+		name = riseandfall_war_enhancement.1.b
+		trigger = {
+			scope:riseandfall_war_enhancement_liege_primary_title.holder = {
+				AND = {
+					has_government = feudal_government
+					NOT = { is_liege_or_above_of = root }
+					NOT = { is_independent_ruler = root }
+				}
+				root.liege.primary_title = {
+					AND = {
+						previous_holder = scope:riseandfall_war_enhancement_prev_liege
+						title_held_years < 1
+					}
+				}
+			}
+		}
+		
+		hidden_effect = { war_enhancement_elect_ruler_not_liege = yes }
+		ai_chance = {
+			base = -40
+			ai_value_modifier = {
+				ai_greed = -0.3
+				ai_honor = 0.5
+				ai_energy = 0.4
+				ai_rationality = 0.75
+				ai_sociability = 0.5
+			}
+			modifier = {
+				add = 20
+				root = {
+					has_trait = content
+				}
+			}
+			
+			modifier = {
+				add = -50
+				root = {
+					has_trait = ambitious
+				}
+			}
+		}
+	}
+	
+	# Option: Elect a suitable ruler by setting up a diarchy (for still liege case).
+	option = { # lets elect a suitable ruler (case: still liege)
+		name = riseandfall_war_enhancement.1.c
+		trigger = {
+			scope:riseandfall_war_enhancement_liege_primary_title.holder = {
+				has_government = feudal_government
+				is_liege_or_above_of = root
+			}
+		}
+		
+		hidden_effect = { war_enhancement_elect_ruler_still_liege = yes }
+		ai_chance = {
+			base = -40
+			ai_value_modifier = {
+				ai_greed = -0.3
+				ai_honor = 0.5
+				ai_energy = 0.4
+				ai_rationality = 0.75
+				ai_sociability = 0.5
+			}
+			modifier = {
+				add = 20
+				root = {
+					has_trait = content
+				}
+			}
+			
+			modifier = {
+				add = -50
+				root = {
+					has_trait = ambitious
+				}
+			}
+		}
+	}
+	
+	# Option: Declare independence if titles allow.
+	option = { #independence
+		name = riseandfall_war_enhancement.1.d
+		trigger = {
+			OR = {
+				AND = {
+					scope:riseandfall_war_enhancement_liege = {
+						highest_held_title_tier = tier_empire
+					}
+					root = {
+						highest_held_title_tier = tier_kingdom
+					}
+				}
+				AND = {
+					scope:riseandfall_war_enhancement_liege = {
+						highest_held_title_tier = tier_kingdom
+					}
+					root = {
+						highest_held_title_tier = tier_duchy
+					}				
+				}
+			}
+		}
+		hidden_effect = { war_enhancement_declare_independence = yes }
+		ai_chance = {
+			base = 0
+			ai_value_modifier = {
+				ai_greed = 0.2
+				ai_boldness = 2
+				ai_energy = 0.8
+				ai_rationality = -0.75
+				ai_vengefulness = 0.2
+			}
+			modifier = {
+				add = 20
+				root = {
+					has_trait = ambitious
+				}
+			}
+			
+			modifier = {
+				add = -50
+				root = {
+					has_trait = content
+				}
+			}
+		}
+	}
+	
+	# Option: Decline to take action.
+	option = { # decline
+		name = riseandfall_war_enhancement.1.e
+		ai_chance = {
+			base = 5
+			ai_value_modifier = {
+				ai_greed = -0.75
+				ai_boldness = -0.3
+				ai_vengefulness = -1
+				ai_energy = -1
+				ai_honor = 0.3
+				ai_compassion = 0.3
+				ai_rationality = -1
+			}
+			modifier = {
+				add = 20
+				root = {
+					has_trait = content
+				}
+			}
+			
+			modifier = {
+				add = -50
+				root = {
+					has_trait = ambitious
+				}
+			}
+		}
+	}
+	
+}
+
+# Event: Decide the fate of the previous liege after victory.
+riseandfall_war_enhancement.2 = {
+	type = character_event
+	
+	title = riseandfall_war_enhancement.2.t
+	desc = riseandfall_war_enhancement.2.d
+
+	theme = intrigue
+	left_portrait = {
+		character = root
+		animation = admiration
+	}
+	right_portrait = {
+		character = scope:riseandfall_war_enhancement_prev_liege
+		animation = beg
+	}
+	
+	# Option: Execute the previous liege.
+	option = { #execute him (feudal variant)
+		name = riseandfall_war_enhancement.2.a
+		hidden_effect = { war_enhancement_execute_liege = yes } 
+	}
+	
+	# Option: Do nothing (feudal government).
+	option = { #do nothing (feudal variant)
+		name = riseandfall_war_enhancement.2.c
+		trigger = {
+			root = { has_government = feudal_government }
+		}
+		if = {
+			limit = { 
+				scope:riseandfall_war_enhancement_attacker = { has_government = feudal_government }
+			}
+			scope:riseandfall_war_enhancement_attacker = {
+				trigger_event = {
+					id = riseandfall_war_enhancement.1
+				}
+			}		
+		} 
+		custom_tooltip = riseandfall_war_enhancement_do_nothing
+	}
+	
+	# Option: Do nothing (tribal government).
+	option = { #do nothing (tribal variant)
+		name = riseandfall_war_enhancement.2.c1
+		trigger = {
+			root = { has_government = tribal_government }
+		}
+		if = {
+			limit = { 
+				scope:riseandfall_war_enhancement_attacker = { has_government = feudal_government }
+			}
+			scope:riseandfall_war_enhancement_attacker = {
+				trigger_event = {
+					id = riseandfall_war_enhancement.1
+				}
+			}		
+		} 
+		custom_tooltip = riseandfall_war_enhancement_do_nothing
+	}
+	
+	# Option: Imprison the previous liege.
+	option = { #imprison him
+		name = riseandfall_war_enhancement.2.d1
+		hidden_effect = { war_enhancement_imprison_liege = yes }
+	}
+}
+
+# Event: The previous liege escaped, now deal with the realm.
+riseandfall_war_enhancement.21 = {
+	type = character_event
+	
+	title = riseandfall_war_enhancement.21.t
+	desc = riseandfall_war_enhancement.21.d
+
+	theme = intrigue
+	left_portrait = {
+		character = scope:riseandfall_war_enhancement_prev_liege
+		animation = admiration
+	}
+	
+	option = { # escaped, time to deal with the realm (feudal)
+		name = riseandfall_war_enhancement.21.a
+		if = {
+			limit = { 
+				scope:riseandfall_war_enhancement_attacker = { has_government = feudal_government } 
+			}
+			scope:riseandfall_war_enhancement_attacker = {
+				trigger_event = {
+					id = riseandfall_war_enhancement.1
+				}
+			}		
+		} 
+	}
+}
+
+# Event: Family member considers starting a war against the liege who killed their relative.
+riseandfall_war_enhancement.3 = {
+	type = character_event
+	
+	title = riseandfall_war_enhancement.3.t
+	desc = riseandfall_war_enhancement.3.d
+
+	theme = realm
+	left_portrait = {
+		character = root
+		animation = rage
+	}
+	lower_center_portrait = {
+		character = scope:killed_man
+	}
+	right_portrait = {
+		character = root.liege
+		animation = marshal
+	}
+	
+	trigger = {
+		NOT = { root = root.liege }
+		scope:killed_man = {
+			NOT = {
+				OR = {
+					death_reason = death_disappearance
+					death_reason = death_mysterious
+				}
+			}
+		}
+	}
+	
+	option = {
+		name = riseandfall_war_enhancement.3.a
+		hidden_effect = { war_enhancement_start_war_against_liege = yes }
+		ai_chance = {
+			base = -50
+
+			modifier = {
+				add = 20
+				desc = cft_is_rival_accept_potential
+				liege = {
+					has_relation_potential_rival = root
+				}
+			}
+
+			modifier = {
+				add = 100
+				desc = cft_is_rival_accept
+				liege = {
+					has_relation_rival = root
+				}
+			}
+
+			opinion_modifier = { # Opinion Factor
+				who = root.liege
+				opinion_target = root
+				multiplier = -2
+			}
+			
+			modifier = {
+				add = 20
+				root = {
+					has_trait = vengeful
+				}
+			}
+			
+			modifier = {
+				add = -20
+				root.current_military_strength > root.liege.current_military_strength
+				root = {
+					has_trait = craven
+				}
+			}
+			
+			modifier = {
+				add = 20
+				ai_honor > 0
+			}
+			
+			modifier = {
+				add = 30
+				ai_vengefulness > medium_positive_ai_value
+			}
+
+			modifier = {
+				add = -15
+				liege = {
+					has_dread_level_towards = {
+						target = root
+						level = 1
+					}
+				}
+			}
+			
+			modifier = {
+				add = -15
+				liege = {
+					has_dread_level_towards = {
+						target = root
+						level = 2
+					}
+				}
+			}
+			
+			modifier = { #Comparative military strength.
+				add = {
+					value = 1
+					subtract = {
+						value = root.liege.current_military_strength
+						divide = { value = root.current_military_strength min = 1 }
+					}
+					multiply = 50
+					max = 20
+				}
+			}
+		}
+	}
+	option = {
+		name = riseandfall_war_enhancement.3.b
+	}
+}
+
+# Event: Family member joins a civil war against the liege.
+riseandfall_war_enhancement.4 = {
+	type = character_event
+	
+	title = riseandfall_war_enhancement.4.t
+	desc = riseandfall_war_enhancement.4.d
+
+	theme = realm
+	left_portrait = {
+		character = scope:riseandfall_war_enhancement_highest_title_man
+		animation = rage
+	}
+	lower_center_portrait = {
+		character = scope:killed_man
+	}
+	right_portrait = {
+		character = root.liege
+		animation = marshal
+	}
+	
+	trigger = {
+		scope:riseandfall_war_enhancement_highest_title_man = {
+			is_at_war_with_liege = yes
+		}
+	}
+	
+	option = {
+		name = riseandfall_war_enhancement.4.a
+		hidden_effect = { war_enhancement_join_civil_war = yes }
+		ai_chance = {
+			base = -50
+
+			modifier = {
+				add = 20
+				liege = {
+					has_relation_potential_rival = root
+				}
+			}
+
+			modifier = {
+				add = 100
+
+				liege = {
+					has_relation_rival = root
+				}
+			}
+
+			opinion_modifier = { # Opinion Factor
+				who = root.liege
+				opinion_target = root
+				multiplier = -0.8
+			}
+			
+			opinion_modifier = { # Opinion Factor
+				who = scope:riseandfall_war_enhancement_highest_title_man
+				opinion_target = root
+				multiplier = 0.8
+			}
+			
+			modifier = {
+				add = 20
+				root = {
+					has_trait = vengeful
+				}
+			}
+			
+			modifier = {
+				add = -20
+				root.current_military_strength > root.liege.current_military_strength
+				scope:recipient = {
+					has_trait = craven
+				}
+			}
+			
+			modifier = {
+				add = 20
+				ai_honor > 0
+			}
+			
+			modifier = {
+				add = 30
+				ai_vengefulness > medium_positive_ai_value
+			}
+
+			modifier = {
+				add = -15
+				liege = {
+					has_dread_level_towards = {
+						target = root
+						level = 1
+					}
+				}
+			}
+			
+			modifier = {
+				add = -15
+				liege = {
+					has_dread_level_towards = {
+						target = root
+						level = 2
+					}
+				}
+			}
+			
+			modifier = { #Comparative military strength.
+				add = {
+					value = 1
+					subtract = {
+						value = root.liege.current_military_strength
+						divide = { value = root.current_military_strength min = 1 }
+					}
+					multiply = 50
+					max = 20
+				}
+			}
+		}
+	}
+	option = {
+		name = riseandfall_war_enhancement.4.b
+	}
+}
+
+# Event: Fallen ruler's options when everything is falling apart.
+riseandfall_war_enhancement.5 = { #Everything is falling apart, try to escape or do nothing? (other options as well depending on personality)
+	type = character_event
+	
+	title = riseandfall_war_enhancement.5.t
+	desc = riseandfall_war_enhancement.5.d
+
+	theme = intrigue
+	left_portrait = {
+		character = root
+		animation = beg
+	}
+	
+	# Option: Attempt to escape via intrigue duel.
+	option = { #attempt to escape (with options such as hide, rally allies, or use martial maybe) #intrigue/craven characters prefer, most common
+		name = riseandfall_war_enhancement.5.a
+		
+		duel = {
+			skill = intrigue
+			target = scope:riseandfall_war_enhancement_attacker
+
+			# Success: root escapes
+			60 = {
+				compare_modifier = {
+					value = scope:duel_value
+					multiplier = 3.5
+					min = -49
+				}
+
+				hidden_effect = {
+					riseandfall_palace_coup_root_flees_success = yes
+					scope:riseandfall_war_enhancement_attacker = { 
+						trigger_event = {
+							id = riseandfall_war_enhancement.21
+						}
+					}
+				}
+			}			# Failure: challenger captures/seizes the ruler
+			40 = {
+				compare_modifier = {
+					value = scope:duel_value
+					multiplier = -3.5
+					min = -49
+				}
+				hidden_effect = {
+					scope:riseandfall_war_enhancement_attacker = {
+						trigger_event = { 
+							id = riseandfall_war_enhancement.2
+						}
+					}
+				}
+			}
+		}
+		
+		ai_chance = {
+			base = 50
+			ai_value_modifier = {
+				ai_boldness = -0.2
+				ai_energy = 0.4
+				ai_rationality = 0.2
+				ai_honor = -0.6
+			}
+		}
+	}
+	
+	# Option: Surrender and give up.
+	option = { #do nothing/surrender/give up
+		name = riseandfall_war_enhancement.5.b
+		scope:riseandfall_war_enhancement_attacker = {
+			trigger_event = { id = riseandfall_war_enhancement.2 }
+		}
+		ai_chance = {
+			base = 50
+			ai_value_modifier = {
+				ai_boldness = -1
+				ai_honor = 0.5
+				ai_energy = -0.8
+				ai_rationality = 0.2
+			}
+		}
+	}
+	
+	# Option: Fight to the end (requires brave or lunatic trait).
+	option = { #Fight to the end (bravery required)
+		name = riseandfall_war_enhancement.5.c
+		trigger = { 
+			OR = {
+				has_trait = brave
+				has_trait = lunatic
+			}
+		}
+		ai_chance = {
+			base = 0
+			ai_value_modifier = {
+				ai_boldness = 0.3
+				ai_zeal = 0.3
+				ai_rationality = -0.4
+			}
+		}
+
+	}
+	
+	# Option: Commit suicide (requires specific traits or flags).
+	option = { #commit suicide flavors
+		name = riseandfall_war_enhancement.5.d
+		trigger = { 
+			OR = {
+				has_trait = depressed_1
+				has_trait = depressed_genetic
+				has_trait = lunatic_1
+				has_trait = lunatic_genetic
+				has_character_flag = make_suicide_available
+				has_character_flag = mourning_soulmate
+				has_character_flag = extremely_high_stress
+			}
+		}
+		trigger_event = {
+			on_action = commit_suicide
+		}
+
+		show_as_tooltip = {
+			committed_suicide_effect = yes
+		}
+
+		ai_chance = {
+			base = 0
+			ai_value_modifier = {
+				ai_boldness = -0.2
+				ai_zeal = -0.2
+				ai_honor = -0.2
+				ai_greed = 0.2
+			}
+			modifier = {
+				add = 10
+				has_trait = lunatic_1
+			}
+			modifier = {
+				add = 10
+				has_trait = lunatic_genetic
+			}
+			modifier = {
+				add = 10
+				has_trait = extremely_high_stress
+			}
+			modifier = {
+				factor = 2
+				has_trait = depressed_1
+			}
+			modifier = {
+				factor = 2
+				has_trait = depressed_genetic
+			}
+		}
+	}
+}
+
+# Event: Diarch abdication or power seizure.
+riseandfall_war_enhancement.6 = {
+	title = riseandfall_war_enhancement.6.t
+	desc = riseandfall_war_enhancement.6.d
+	type = character_event
+	theme = realm
+	
+	# Option: Abdicate as planned, passing titles to heir.
+	option = { #Abdicate as planned (x will become ruler) 
+		name = riseandfall_war_enhancement.6.a
+		hidden_effect = { war_enhancement_abdicate_to_heir = yes }
+	}
+	
+	# Option: Extend rule temporarily with some tyranny.
+	option = { #extend our rule for a time (less tyrannical)
+		name = riseandfall_war_enhancement.6.b
+		hidden_effect = { war_enhancement_extend_rule = yes }
+	}
+	
+	# Option: Seize power tyrannically.
+	option = { #seize power (tyrannical)
+		name = riseandfall_war_enhancement.6.c
+		hidden_effect = { war_enhancement_seize_power = yes }
+	}
+}
+	
