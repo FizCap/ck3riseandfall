@@ -1,0 +1,919 @@
+﻿namespace = brb
+
+brb.1 = {
+	type = character_event
+	title = brb.1.t
+	desc = brb.1.desc
+	theme = realm
+	left_portrait = {
+		character = root
+		animation = dismissal
+	}
+	
+	immediate = {
+		scope:brb_prev_liege = {
+			every_close_or_extended_family_member = {
+				limit = {
+					is_independent_ruler = no
+					root = {
+						any_close_family_member = {
+							even_if_dead = yes
+							exists = killer
+							killer = prev
+						}
+					}
+				}
+				save_temporary_scope_as = brb_tbi
+				root = {
+					imprison = { target = scope:brb_tbi }
+				}
+			}
+		}
+	}
+	
+	option = { # press my claims
+		name = brb.1.a
+		trigger = {
+			scope:brb_liege_primary_title = {
+				root = {
+					has_claim_on = prev
+				}
+			}
+		}
+		root = {
+			create_title_and_vassal_change = {
+				type = faction_demand
+				save_scope_as = change
+			}		
+		}
+		
+		scope:brb_liege_primary_title.holder = {
+			every_held_title = { 
+				limit = { 
+					OR = {
+						AND = {
+							previous_holder = scope:brb_prev_liege
+							title_held_years < 1
+						}
+						AND = {
+							has_claim = root
+							de_jure_liege = scope:brb_liege_primary_title
+						}
+					}
+				}
+				change_title_holder_include_vassals = {
+					holder = root
+					change = scope:change
+				}
+			}
+		}
+		
+		root = {
+			resolve_title_and_vassal_change = scope:change
+		}
+		ai_chance = {
+			base = 200
+			ai_value_modifier = {
+				ai_greed = 0.5
+				ai_boldness = 0.3
+				ai_energy = 1
+				ai_rationality = 1
+			}
+			modifier = {
+				add = 100
+				root = {
+					has_trait = ambitious
+				}
+			}
+			
+			modifier = {
+				add = -15
+				root = {
+					has_trait = content
+				}
+			}
+		}
+		
+	}
+	
+	option = { # lets elect a suitable ruler (case: not liege)
+		name = brb.1.b
+		trigger = {
+			scope:brb_liege_primary_title.holder = {
+				AND = {
+					has_government = feudal_government
+					NOT = { is_liege_or_above_of = root }
+					NOT = { is_independent_ruler = root }
+				}
+				root.liege.primary_title = {
+					AND = {
+						previous_holder = scope:brb_prev_liege
+						title_held_years < 1
+					}
+				}
+			}
+		}
+		
+		scope:brb_attacker.liege.primary_title.holder = { 
+			try_start_diarchy = regency
+			set_diarch = root
+			change_diarchy_swing = 100
+		}
+		
+		scope:brb_attacker.liege.primary_title = {
+			add_title_law = feudal_elective_succession_law
+		}
+		
+		scope:brb_attacker.liege.diarch = {
+			trigger_event = {
+				id = brb.6
+				days = 30
+			}
+		}
+		ai_chance = {
+			base = -40
+			ai_value_modifier = {
+				ai_greed = -0.3
+				ai_honor = 0.5
+				ai_energy = 0.4
+				ai_rationality = 0.75
+				ai_sociability = 0.5
+			}
+			modifier = {
+				add = 20
+				root = {
+					has_trait = content
+				}
+			}
+			
+			modifier = {
+				add = -50
+				root = {
+					has_trait = ambitious
+				}
+			}
+		}
+	}
+	
+	option = { # lets elect a suitable ruler (case: still liege)
+		name = brb.1.c
+		trigger = {
+			scope:brb_liege_primary_title.holder = {
+				has_government = feudal_government
+				is_liege_or_above_of = root
+			}
+		}
+		
+		scope:brb_liege_primary_title.holder = { 
+			try_start_diarchy = regency
+			set_diarch = root
+			change_diarchy_swing = 100
+		}
+		
+		scope:brb_liege_primary_title = {
+			add_title_law = feudal_elective_succession_law
+		}
+		
+		scope:brb_liege_primary_title.holder.diarch = {
+			trigger_event = {
+				id = brb.6
+				days = 30
+			}
+		}
+		ai_chance = {
+			base = -40
+			ai_value_modifier = {
+				ai_greed = -0.3
+				ai_honor = 0.5
+				ai_energy = 0.4
+				ai_rationality = 0.75
+				ai_sociability = 0.5
+			}
+			modifier = {
+				add = 20
+				root = {
+					has_trait = content
+				}
+			}
+			
+			modifier = {
+				add = -50
+				root = {
+					has_trait = ambitious
+				}
+			}
+		}
+	}
+
+	option = { #independence
+		name = brb.1.d
+		trigger = {
+			OR = {
+				AND = {
+					scope:brb_liege = {
+						highest_held_title_tier = tier_empire
+					}
+					root = {
+						highest_held_title_tier = tier_kingdom
+					}
+				}
+				AND = {
+					scope:brb_liege = {
+						highest_held_title_tier = tier_kingdom
+					}
+					root = {
+						highest_held_title_tier = tier_duchy
+					}				
+				}
+			}
+		}
+		create_title_and_vassal_change = {
+			type = independency 
+			save_scope_as = change
+		}
+		becomes_independent = {
+			change = scope:change
+		}
+		resolve_title_and_vassal_change = scope:change
+		ai_chance = {
+			base = 0
+			ai_value_modifier = {
+				ai_greed = 0.2
+				ai_boldness = 2
+				ai_energy = 0.8
+				ai_rationality = -0.75
+				ai_vengefulness = 0.2
+			}
+			modifier = {
+				add = 20
+				root = {
+					has_trait = ambitious
+				}
+			}
+			
+			modifier = {
+				add = -50
+				root = {
+					has_trait = content
+				}
+			}
+		}
+	}
+	option = { # decline
+		name = brb.1.e
+		ai_chance = {
+			base = 5
+			ai_value_modifier = {
+				ai_greed = -0.75
+				ai_boldness = -0.3
+				ai_vengefulness = -1
+				ai_energy = -1
+				ai_honor = 0.3
+				ai_compassion = 0.3
+				ai_rationality = -1
+			}
+			modifier = {
+				add = 20
+				root = {
+					has_trait = content
+				}
+			}
+			
+			modifier = {
+				add = -50
+				root = {
+					has_trait = ambitious
+				}
+			}
+		}
+	}
+	
+}
+
+brb.2 = {
+	type = character_event
+	
+	title = brb.2.t
+	desc = brb.2.d
+
+	theme = intrigue
+	left_portrait = {
+		character = root
+		animation = admiration
+	}
+	right_portrait = {
+		character = scope:brb_prev_liege
+		animation = beg
+	}
+	
+	option = { #execute him (feudal variant)
+		name = brb.2.a
+		scope:brb_prev_liege = {
+			death = {
+				death_reason = death_execution
+				killer = root
+			}
+		}
+		if = {
+			limit = { 
+				scope:brb_attacker = { has_government = feudal_government }
+			}
+			scope:brb_attacker = {
+				trigger_event = {
+					id = brb.1
+				}
+			}		
+		} 
+	}
+	
+	option = { #do nothing (feudal variant)
+		name = brb.2.c
+		trigger = {
+			root = { has_government = feudal_government }
+		}
+		if = {
+			limit = { 
+				scope:brb_attacker = { has_government = feudal_government }
+			}
+			scope:brb_attacker = {
+				trigger_event = {
+					id = brb.1
+				}
+			}		
+		} 
+		custom_tooltip = brb_do_nothing
+	}
+
+	option = { #do nothing (tribal variant)
+		name = brb.2.c1
+		trigger = {
+			root = { has_government = tribal_government }
+		}
+		if = {
+			limit = { 
+				scope:brb_attacker = { has_government = feudal_government }
+			}
+			scope:brb_attacker = {
+				trigger_event = {
+					id = brb.1
+				}
+			}		
+		} 
+		custom_tooltip = brb_do_nothing
+	}
+	
+	option = { #imprison him
+		name = brb.2.d1
+		root = { imprison = { target = scope:brb_prev_liege } }
+		if = {
+			limit = { 
+				scope:brb_attacker = { has_government = feudal_government }
+			}
+			scope:brb_attacker = {
+				trigger_event = {
+					id = brb.1
+				}
+			}		
+		}
+	}
+}
+
+brb.21 = {
+	type = character_event
+	
+	title = brb.21.t
+	desc = brb.21.d
+
+	theme = intrigue
+	left_portrait = {
+		character = scope:brb_prev_liege
+		animation = admiration
+	}
+	
+	option = { # escaped, time to deal with the realm (feudal)
+		name = brb.21.a
+		if = {
+			limit = { 
+				scope:brb_attacker = { has_government = feudal_government } 
+			}
+			scope:brb_attacker = {
+				trigger_event = {
+					id = brb.1
+				}
+			}		
+		} 
+	}
+}
+
+brb.3 = {
+	type = character_event
+	
+	title = brb.3.t
+	desc = brb.3.d
+
+	theme = realm
+	left_portrait = {
+		character = root
+		animation = rage
+	}
+	lower_center_portrait = {
+		character = scope:killed_man
+	}
+	right_portrait = {
+		character = root.liege
+		animation = marshal
+	}
+	
+	trigger = {
+		NOT = { root = root.liege }
+		scope:killed_man = {
+			NOT = {
+				OR = {
+					death_reason = death_disappearance
+					death_reason = death_mysterious
+				}
+			}
+		}
+	}
+	
+	option = {
+		name = brb.3.a
+		start_war = {
+			casus_belli = refused_liege_demand_war
+			target = root.liege
+		}
+		ai_chance = {
+			base = -50
+
+			modifier = {
+				add = 20
+				desc = cft_is_rival_accept_potential
+				liege = {
+					has_relation_potential_rival = root
+				}
+			}
+
+			modifier = {
+				add = 100
+				desc = cft_is_rival_accept
+				liege = {
+					has_relation_rival = root
+				}
+			}
+
+			opinion_modifier = { # Opinion Factor
+				who = root.liege
+				opinion_target = root
+				multiplier = -2
+			}
+			
+			modifier = {
+				add = 20
+				root = {
+					has_trait = vengeful
+				}
+			}
+			
+			modifier = {
+				add = -20
+				root.current_military_strength > root.liege.current_military_strength
+				root = {
+					has_trait = craven
+				}
+			}
+			
+			modifier = {
+				add = 20
+				ai_honor > 0
+			}
+			
+			modifier = {
+				add = 30
+				ai_vengefulness > medium_positive_ai_value
+			}
+
+			modifier = {
+				add = -15
+				liege = {
+					has_dread_level_towards = {
+						target = root
+						level = 1
+					}
+				}
+			}
+			
+			modifier = {
+				add = -15
+				liege = {
+					has_dread_level_towards = {
+						target = root
+						level = 2
+					}
+				}
+			}
+			
+			modifier = { #Comparative military strength.
+				add = {
+					value = 1
+					subtract = {
+						value = root.liege.current_military_strength
+						divide = { value = root.current_military_strength min = 1 }
+					}
+					multiply = 50
+					max = 20
+				}
+			}
+		}
+	}
+	option = {
+		name = brb.3.b
+	}
+}
+
+brb.4 = {
+	type = character_event
+	
+	title = brb.4.t
+	desc = brb.4.d
+
+	theme = realm
+	left_portrait = {
+		character = scope:brb_highest_title_man
+		animation = rage
+	}
+	lower_center_portrait = {
+		character = scope:killed_man
+	}
+	right_portrait = {
+		character = root.liege
+		animation = marshal
+	}
+	
+	trigger = {
+		scope:brb_highest_title_man = {
+			is_at_war_with_liege = yes
+		}
+	}
+	
+	option = {
+		name = brb.4.a
+		scope:brb_highest_title_man = {
+			random_character_war = {
+				limit = {
+					is_civil_war = yes
+				}
+				add_attacker = root
+			}
+		}
+		ai_chance = {
+			base = -50
+
+			modifier = {
+				add = 20
+				liege = {
+					has_relation_potential_rival = root
+				}
+			}
+
+			modifier = {
+				add = 100
+
+				liege = {
+					has_relation_rival = root
+				}
+			}
+
+			opinion_modifier = { # Opinion Factor
+				who = root.liege
+				opinion_target = root
+				multiplier = -0.8
+			}
+			
+			opinion_modifier = { # Opinion Factor
+				who = scope:brb_highest_title_man
+				opinion_target = root
+				multiplier = 0.8
+			}
+			
+			modifier = {
+				add = 20
+				root = {
+					has_trait = vengeful
+				}
+			}
+			
+			modifier = {
+				add = -20
+				root.current_military_strength > root.liege.current_military_strength
+				scope:recipient = {
+					has_trait = craven
+				}
+			}
+			
+			modifier = {
+				add = 20
+				ai_honor > 0
+			}
+			
+			modifier = {
+				add = 30
+				ai_vengefulness > medium_positive_ai_value
+			}
+
+			modifier = {
+				add = -15
+				liege = {
+					has_dread_level_towards = {
+						target = root
+						level = 1
+					}
+				}
+			}
+			
+			modifier = {
+				add = -15
+				liege = {
+					has_dread_level_towards = {
+						target = root
+						level = 2
+					}
+				}
+			}
+			
+			modifier = { #Comparative military strength.
+				add = {
+					value = 1
+					subtract = {
+						value = root.liege.current_military_strength
+						divide = { value = root.current_military_strength min = 1 }
+					}
+					multiply = 50
+					max = 20
+				}
+			}
+		}
+	}
+	option = {
+		name = brb.4.b
+	}
+}
+
+brb.5 = { #Everything is falling apart, try to escape or do nothing? (other options as well depending on personality)
+	type = character_event
+	
+	title = brb.5.t
+	desc = brb.5.d
+
+	theme = intrigue
+	left_portrait = {
+		character = root
+		animation = beg
+	}
+	
+	option = { #attempt to escape (with options such as hide, rally allies, or use martial maybe) #intrigue/craven characters prefer, most common
+		name = brb.5.a
+		
+		duel = {
+			skill = intrigue
+			target = scope:brb_attacker
+
+			# Success: root escapes
+			60 = {
+				compare_modifier = {
+					value = scope:duel_value
+					multiplier = 3.5
+					min = -49
+				}
+
+				hidden_effect = {
+					riseandfall_palace_coup_root_flees_success = yes
+					scope:brb_attacker = { 
+						trigger_event = {
+							id = brb.21
+						}
+					}
+				}
+			}			# Failure: challenger captures/seizes the ruler
+			40 = {
+				compare_modifier = {
+					value = scope:duel_value
+					multiplier = -3.5
+					min = -49
+				}
+				hidden_effect = {
+					scope:brb_attacker = {
+						trigger_event = { 
+							id = brb.2
+						}
+					}
+				}
+			}
+		}
+		
+		ai_chance = {
+			base = 50
+			ai_value_modifier = {
+				ai_boldness = -0.2
+				ai_energy = 0.4
+				ai_rationality = 0.2
+				ai_honor = -0.6
+			}
+		}
+	}
+	option = { #do nothing/surrender/give up
+		name = brb.5.b
+		scope:brb_attacker = {
+			trigger_event = { id = brb.2 }
+		}
+		ai_chance = {
+			base = 50
+			ai_value_modifier = {
+				ai_boldness = -1
+				ai_honor = 0.5
+				ai_energy = -0.8
+				ai_rationality = 0.2
+			}
+		}
+	}
+	option = { #Fight to the end (bravery required)
+		name = brb.5.c
+		trigger = { 
+			OR = {
+				has_trait = brave
+				has_trait = lunatic
+			}
+		}
+		ai_chance = {
+			base = 0
+			ai_value_modifier = {
+				ai_boldness = 0.3
+				ai_zeal = 0.3
+				ai_rationality = -0.4
+			}
+		}
+
+	}
+	option = { #commit suicide flavors
+		name = brb.5.d
+		trigger = { 
+			OR = {
+				has_trait = depressed_1
+				has_trait = depressed_genetic
+				has_trait = lunatic_1
+				has_trait = lunatic_genetic
+				has_character_flag = make_suicide_available
+				has_character_flag = mourning_soulmate
+				has_character_flag = extremely_high_stress
+			}
+		}
+		trigger_event = {
+			on_action = commit_suicide
+		}
+
+		show_as_tooltip = {
+			committed_suicide_effect = yes
+		}
+
+		ai_chance = {
+			base = 0
+			ai_value_modifier = {
+				ai_boldness = -0.2
+				ai_zeal = -0.2
+				ai_honor = -0.2
+				ai_greed = 0.2
+			}
+			modifier = {
+				add = 10
+				has_trait = lunatic_1
+			}
+			modifier = {
+				add = 10
+				has_trait = lunatic_genetic
+			}
+			modifier = {
+				add = 10
+				has_trait = extremely_high_stress
+			}
+			modifier = {
+				factor = 2
+				has_trait = depressed_1
+			}
+			modifier = {
+				factor = 2
+				has_trait = depressed_genetic
+			}
+		}
+	}
+}
+
+brb.6 = {
+	title = brb.6.t
+	desc = brb.6.d
+	type = character_event
+	theme = realm
+	
+	option = { #Abdicate as planned (x will become ruler) 
+		name = brb.6.a
+		root = {
+			create_title_and_vassal_change = {
+				type = faction_demand
+				save_scope_as = change
+			}		
+		}
+		scope:brb_attacker.liege.primary_title = {
+			change_title_holder_include_vassals = {
+				holder = scope:brb_attacker.liege.primary_title.current_heir
+				change = scope:change
+			}
+		}
+		scope:brb_attacker.liege = {
+			every_held_title = { 
+				limit = {
+					AND = {
+						OR = {
+							holder = scope:brb_attacker.liege
+							previous_holder = scope:brb_prev_liege
+						}
+						title_held_years < 1
+						OR = {
+							has_claim = brb_attacker.liege.primary_title.current_heir
+							de_jure_liege = scope:brb_attacker.liege.primary_title
+							de_facto_liege = scope:brb_attacker.liege.primary_title
+						}
+					}
+				}
+				change_title_holder_include_vassals = {
+					holder = scope:brb_attacker.liege.primary_title.current_heir
+					change = scope:change
+				}
+			}
+		}
+		
+		scope:brb_attacker.liege = {
+			change_liege = {
+				liege = scope:brb_attacker.liege.primary_title.current_heir
+				change = scope:change
+			}
+		}
+				
+		root = {
+			resolve_title_and_vassal_change = scope:change
+		}
+		scope:brb_liege_primary_title = { remove_title_law = feudal_elective_succession_law }
+	}
+	
+	option = { #extend our rule for a time (less tyrannical)
+		name = brb.6.b
+		root = {
+			add_tyranny = 10
+			trigger_event = {
+				id = brb.6
+				days = 60
+			}
+		}
+	}
+	
+	option = { #seize power (tyrannical)
+		name = brb.6.c
+		add_tyranny = 25
+		root = {
+			create_title_and_vassal_change = {
+				type = usurped
+				save_scope_as = change
+			}		
+		}
+		scope:brb_attacker.liege.primary_title = {
+			change_title_holder_include_vassals = {
+				holder = root
+				change = scope:change
+			}
+		}
+		scope:brb_attacker.liege = {
+			every_held_title = { 
+				limit = { 
+					OR = {
+						AND = {
+							previous_holder = scope:brb_prev_liege
+							title_held_years < 1
+							OR = {
+								has_claim = root
+								de_jure_liege = scope:brb_attacker.liege.primary_title
+								de_facto_liege = scope:brb_attacker.liege
+							}
+						}
+						this = title_capital_county
+					}
+				}
+				change_title_holder = {
+					holder = root
+					change = scope:change
+				}
+			}
+		}
+		root = {
+			resolve_title_and_vassal_change = scope:change
+		}
+		scope:brb_liege_primary_title = { remove_title_law = feudal_elective_succession_law }
+	}
+}
+	
