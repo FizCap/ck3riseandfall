@@ -1,0 +1,55 @@
+﻿##########################
+# Rise and Fall - Dynamic Story Mode
+# Calculates total world realm size, identifies rulers controlling >=5% of the world,
+# and flags them for minimum 1% low stability event chance.
+
+riseandfall_dynamic_story_mode_se = {
+    # For each independent ruler, compute the world total inside their scope
+    # (avoids undefined global scopes in on_actions). This repeats the total
+    # computation per ruler but is safe and deterministic.
+
+    # Compute world total once per playthrough and cache it as a global variable
+    if = {
+        limit = { NOT = { exists = global_var:riseandfall_world_total } }
+        set_global_variable = { name = riseandfall_world_total value = 0 }
+        every_independent_ruler = {
+            change_global_variable = { name = riseandfall_world_total add = realm_size }
+        }
+    }
+
+    # Clear any existing large realm flags first
+    every_independent_ruler = {
+        remove_variable = riseandfall_large_realm
+    }
+
+    # Evaluate each ruler and flag if they control >=5% of world counties
+    every_independent_ruler = {
+        # Save this ruler so inner loops can write back into their scope
+        save_scope_as = outer_ruler
+
+        # Copy cached global world total into the saved outer ruler scope for per-ruler computations
+        scope:outer_ruler = { set_variable = { name = tmp_world_total value = global_var:riseandfall_world_total } }
+
+        # Save the full world total for inspection
+        scope:outer_ruler = { set_variable = { name = tmp_world_total_full value = var:tmp_world_total } }
+
+        # Compute 5% threshold on the saved outer scope (integer math: *5/100)
+        scope:outer_ruler = { change_variable = { name = tmp_world_total multiply = 5 } }
+        scope:outer_ruler = { change_variable = { name = tmp_world_total divide = 100 } }
+
+        # Save the ruler's realm size for inspection
+        scope:outer_ruler = { set_variable = { name = tmp_realm_size value = realm_size } }
+
+        # If this ruler meets or exceeds the threshold, flag them
+        if = {
+            limit = { realm_size >= scope:outer_ruler.var:tmp_world_total }
+            set_variable = { name = riseandfall_large_realm value = 1 }
+        }
+
+        # Clean up temporary var from the saved scope and clear saved scope
+        scope:outer_ruler = { remove_variable = tmp_world_total }
+        scope:outer_ruler = { remove_variable = tmp_world_total_full }
+        scope:outer_ruler = { remove_variable = tmp_realm_size }
+        clear_saved_scope = outer_ruler
+    }
+}
