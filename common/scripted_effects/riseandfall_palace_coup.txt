@@ -703,7 +703,8 @@ riseandfall_palace_coup_casualties = {
 			random_list = {
 				50 = { }
 				20 = { death = { death_reason = death_in_palace_coup } }
-ge_variable = { name = riseandfall_total_prowess add = scope:riseandfall_prowess_courtier.prowess }
+				10 = { add_trait = wounded_1 }
+				10 = { add_trait = maimed }
 			}
 		}
 	}
