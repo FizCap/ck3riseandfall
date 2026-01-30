@@ -472,12 +472,6 @@ riseandfall_execute_realm_split_se = {
         name = RISEANDFALL_REALM_SPLIT_TRUCE
     }
     
-    # Give starting gold
-    if = {
-        limit = { gold < 200 }
-        add_gold = 300
-    }
-    
     # Add claim on original primary title
     add_unpressed_claim = scope:original_primary
     
