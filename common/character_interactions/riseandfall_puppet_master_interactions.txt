@@ -213,7 +213,6 @@ riseandfall_overthrow_liege_interaction = {
 		scope:actor = { is_diarch_of_target = scope:recipient }
 		riseandfall_liege_stability_below_30 = yes
 		riseandfall_puppet_regency_years_at_least_5 = yes
-		riseandfall_no_low_stability_cooldown = yes
 	}
 
 	auto_accept = yes
