@@ -482,8 +482,8 @@ riseandfall_execute_realm_split_se = {
         limit = { exists = scope:breakaway_1 }
 
         # Rival with original ruler
-        scope:breakaway_1 = { set_relation_rival = { target = scope:original_ruler reason = riseandfall_realmsplit_became_rival } }
-        scope:original_ruler = { set_relation_rival = { target = scope:breakaway_1 reason = riseandfall_realmsplit_became_rival } }
+        if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:original_ruler } NOT = { has_relation_rival = scope:original_ruler } } scope:breakaway_1 = { set_relation_rival = { target = scope:original_ruler reason = riseandfall_realmsplit_became_rival } } }
+        if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:breakaway_1 } NOT = { has_relation_rival = scope:breakaway_1 } } scope:original_ruler = { set_relation_rival = { target = scope:breakaway_1 reason = riseandfall_realmsplit_became_rival } } }
 
         # Original gets claim on breakaway's primary title
         scope:original_ruler = { add_unpressed_claim = scope:breakaway_1.primary_title }
@@ -494,11 +494,11 @@ riseandfall_execute_realm_split_se = {
         if = {
             limit = { exists = scope:breakaway_2 }
             # Rivalry between the two breakaways
-            scope:breakaway_1 = { set_relation_rival = { target = scope:breakaway_2 reason = riseandfall_realmsplit_became_rival } }
-            scope:breakaway_2 = { set_relation_rival = { target = scope:breakaway_1 reason = riseandfall_realmsplit_became_rival } }
+            if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:breakaway_2 } NOT = { has_relation_rival = scope:breakaway_2 } } scope:breakaway_1 = { set_relation_rival = { target = scope:breakaway_2 reason = riseandfall_realmsplit_became_rival } } }
+            if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:breakaway_1 } NOT = { has_relation_rival = scope:breakaway_1 } } scope:breakaway_2 = { set_relation_rival = { target = scope:breakaway_1 reason = riseandfall_realmsplit_became_rival } } }
             # Rivalry with original
-            scope:original_ruler = { set_relation_rival = { target = scope:breakaway_2 reason = riseandfall_realmsplit_became_rival } }
-            scope:breakaway_2 = { set_relation_rival = { target = scope:original_ruler reason = riseandfall_realmsplit_became_rival } }
+            if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:breakaway_2 } NOT = { has_relation_rival = scope:breakaway_2 } } scope:original_ruler = { set_relation_rival = { target = scope:breakaway_2 reason = riseandfall_realmsplit_became_rival } } }
+            if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:original_ruler } NOT = { has_relation_rival = scope:original_ruler } } scope:breakaway_2 = { set_relation_rival = { target = scope:original_ruler reason = riseandfall_realmsplit_became_rival } } }
             # Cross claims
             scope:breakaway_1 = { add_unpressed_claim = scope:breakaway_2.primary_title }
             scope:breakaway_2 = { add_unpressed_claim = scope:breakaway_1.primary_title }
@@ -509,11 +509,11 @@ riseandfall_execute_realm_split_se = {
         if = {
             limit = { exists = scope:breakaway_3 }
             # Rivalries
-            scope:breakaway_1 = { set_relation_rival = { target = scope:breakaway_3 reason = riseandfall_realmsplit_became_rival } }
-            scope:breakaway_3 = { set_relation_rival = { target = scope:breakaway_1 reason = riseandfall_realmsplit_became_rival } }
+            if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:breakaway_3 } NOT = { has_relation_rival = scope:breakaway_3 } } scope:breakaway_1 = { set_relation_rival = { target = scope:breakaway_3 reason = riseandfall_realmsplit_became_rival } } }
+            if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:breakaway_1 } NOT = { has_relation_rival = scope:breakaway_1 } } scope:breakaway_3 = { set_relation_rival = { target = scope:breakaway_1 reason = riseandfall_realmsplit_became_rival } } }
             # Rivalry with original
-            scope:original_ruler = { set_relation_rival = { target = scope:breakaway_3 reason = riseandfall_realmsplit_became_rival } }
-            scope:breakaway_3 = { set_relation_rival = { target = scope:original_ruler reason = riseandfall_realmsplit_became_rival } }
+            if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:breakaway_3 } NOT = { has_relation_rival = scope:breakaway_3 } } scope:original_ruler = { set_relation_rival = { target = scope:breakaway_3 reason = riseandfall_realmsplit_became_rival } } }
+            if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:original_ruler } NOT = { has_relation_rival = scope:original_ruler } } scope:breakaway_3 = { set_relation_rival = { target = scope:original_ruler reason = riseandfall_realmsplit_became_rival } } }
             # Cross claims
             scope:breakaway_1 = { add_unpressed_claim = scope:breakaway_3.primary_title }
             scope:breakaway_3 = { add_unpressed_claim = scope:breakaway_1.primary_title }
@@ -523,8 +523,8 @@ riseandfall_execute_realm_split_se = {
             if = {
                 limit = { exists = scope:breakaway_2 }
                 # also ensure breakaway_2 and breakaway_3 are rivals and claim each other
-                scope:breakaway_2 = { set_relation_rival = { target = scope:breakaway_3 reason = riseandfall_realmsplit_became_rival } }
-                scope:breakaway_3 = { set_relation_rival = { target = scope:breakaway_2 reason = riseandfall_realmsplit_became_rival } }
+                if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:breakaway_3 } NOT = { has_relation_rival = scope:breakaway_3 } } scope:breakaway_2 = { set_relation_rival = { target = scope:breakaway_3 reason = riseandfall_realmsplit_became_rival } } }
+                if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:breakaway_2 } NOT = { has_relation_rival = scope:breakaway_2 } } scope:breakaway_3 = { set_relation_rival = { target = scope:breakaway_2 reason = riseandfall_realmsplit_became_rival } } }
                 scope:breakaway_2 = { add_unpressed_claim = scope:breakaway_3.primary_title }
                 scope:breakaway_3 = { add_unpressed_claim = scope:breakaway_2.primary_title }
             }
@@ -533,11 +533,11 @@ riseandfall_execute_realm_split_se = {
         if = {
             limit = { exists = scope:breakaway_4 }
             # Rivalries
-            scope:breakaway_1 = { set_relation_rival = { target = scope:breakaway_4 reason = riseandfall_realmsplit_became_rival } }
-            scope:breakaway_4 = { set_relation_rival = { target = scope:breakaway_1 reason = riseandfall_realmsplit_became_rival } }
+            if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:breakaway_4 } NOT = { has_relation_rival = scope:breakaway_4 } } scope:breakaway_1 = { set_relation_rival = { target = scope:breakaway_4 reason = riseandfall_realmsplit_became_rival } } }
+            if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:breakaway_1 } NOT = { has_relation_rival = scope:breakaway_1 } } scope:breakaway_4 = { set_relation_rival = { target = scope:breakaway_1 reason = riseandfall_realmsplit_became_rival } } }
             # Rivalry with original
-            scope:original_ruler = { set_relation_rival = { target = scope:breakaway_4 reason = riseandfall_realmsplit_became_rival } }
-            scope:breakaway_4 = { set_relation_rival = { target = scope:original_ruler reason = riseandfall_realmsplit_became_rival } }
+            if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:breakaway_4 } NOT = { has_relation_rival = scope:breakaway_4 } } scope:original_ruler = { set_relation_rival = { target = scope:breakaway_4 reason = riseandfall_realmsplit_became_rival } } }
+            if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:original_ruler } NOT = { has_relation_rival = scope:original_ruler } } scope:breakaway_4 = { set_relation_rival = { target = scope:original_ruler reason = riseandfall_realmsplit_became_rival } } }
             # Cross claims
             scope:breakaway_1 = { add_unpressed_claim = scope:breakaway_4.primary_title }
             scope:breakaway_4 = { add_unpressed_claim = scope:breakaway_1.primary_title }
@@ -546,16 +546,16 @@ riseandfall_execute_realm_split_se = {
 
             if = {
                 limit = { exists = scope:breakaway_2 }
-                scope:breakaway_2 = { set_relation_rival = { target = scope:breakaway_4 reason = riseandfall_realmsplit_became_rival } }
-                scope:breakaway_4 = { set_relation_rival = { target = scope:breakaway_2 reason = riseandfall_realmsplit_became_rival } }
+                if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:breakaway_4 } NOT = { has_relation_rival = scope:breakaway_4 } } scope:breakaway_2 = { set_relation_rival = { target = scope:breakaway_4 reason = riseandfall_realmsplit_became_rival } } }
+                if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:breakaway_2 } NOT = { has_relation_rival = scope:breakaway_2 } } scope:breakaway_4 = { set_relation_rival = { target = scope:breakaway_2 reason = riseandfall_realmsplit_became_rival } } }
                 scope:breakaway_2 = { add_unpressed_claim = scope:breakaway_4.primary_title }
                 scope:breakaway_4 = { add_unpressed_claim = scope:breakaway_2.primary_title }
             }
 
             if = {
                 limit = { exists = scope:breakaway_3 }
-                scope:breakaway_3 = { set_relation_rival = { target = scope:breakaway_4 reason = riseandfall_realmsplit_became_rival } }
-                scope:breakaway_4 = { set_relation_rival = { target = scope:breakaway_3 reason = riseandfall_realmsplit_became_rival } }
+                if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:breakaway_4 } NOT = { has_relation_rival = scope:breakaway_4 } } scope:breakaway_3 = { set_relation_rival = { target = scope:breakaway_4 reason = riseandfall_realmsplit_became_rival } } }
+                if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:breakaway_3 } NOT = { has_relation_rival = scope:breakaway_3 } } scope:breakaway_4 = { set_relation_rival = { target = scope:breakaway_3 reason = riseandfall_realmsplit_became_rival } } }
                 scope:breakaway_3 = { add_unpressed_claim = scope:breakaway_4.primary_title }
                 scope:breakaway_4 = { add_unpressed_claim = scope:breakaway_3.primary_title }
             }
