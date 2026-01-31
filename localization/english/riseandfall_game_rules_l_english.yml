@@ -115,3 +115,10 @@ setting_riseandfall_admin_score_nerf_enabled:0 "Enabled"
 setting_riseandfall_admin_score_nerf_enabled_desc:0 "When enabled, admin succession scoring receives a randomized nerf to make administrative appointments more chaotic and unpredictable."
 setting_riseandfall_admin_score_nerf_disabled:0 "Disabled"
 setting_riseandfall_admin_score_nerf_disabled_desc:0 "Admin succession scoring is not modified by Rise and Fall."
+
+# Dynamic Story Mode rule
+rule_riseandfall_enable_dynamic_story_mode:0 "Dynamic Story Mode (BETA)"
+setting_riseandfall_dynamic_story_mode_enabled:0 "Enabled"
+setting_riseandfall_dynamic_story_mode_enabled_desc:0 "The mod will try to make the world dynamic with large countries facing challenges of staying together."
+setting_riseandfall_dynamic_story_mode_disabled:0 "Disabled"
+setting_riseandfall_dynamic_story_mode_disabled_desc:0 "Will use vanilla mod behavior for low stability events."

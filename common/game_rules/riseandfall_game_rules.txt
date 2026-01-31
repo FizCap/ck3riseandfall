@@ -222,6 +222,23 @@ riseandfall_enable_bordergore_fix = {
     }
 }
 
+riseandfall_enable_dynamic_story_mode = {
+
+    categories = {
+        riseandfall
+    }
+
+    # Default: disabled
+    default = riseandfall_dynamic_story_mode_enabled
+
+    riseandfall_dynamic_story_mode_enabled = {
+    }
+
+    riseandfall_dynamic_story_mode_disabled = {
+        flag = riseandfall_dynamic_story_mode_disabled
+    }
+}
+
 riseandfall_enable_interaction_stability = {
 
     categories = {

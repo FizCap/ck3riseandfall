@@ -1,6 +1,7 @@
 ﻿yearly_global_pulse = {
     on_actions = {
         riseandfall_low_stability_roll
+        riseandfall_check_puppet_regency
         riseandfall_warlord
     }
 }
@@ -16,6 +17,7 @@ riseandfall_low_stability_roll = {
         has_game_rule = riseandfall_low_stability_events_enabled
     }
     effect = {
+        riseandfall_dynamic_story_mode_se = yes
         every_independent_ruler = {
             limit = {
                 is_landed = yes
@@ -25,6 +27,15 @@ riseandfall_low_stability_roll = {
             save_scope_as = ruler_low_stability
             riseandfall_low_stability_roll_se = yes
         }
+    }
+}
+
+riseandfall_check_puppet_regency = {
+    trigger = {
+        has_game_rule = riseandfall_low_stability_events_enabled
+    }
+    effect = {
+        riseandfall_check_puppet_regency_end = yes
     }
 }
 

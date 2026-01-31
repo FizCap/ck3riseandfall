@@ -59,30 +59,34 @@ palace_coup.1002.d:0 "[challenger.GetTitledFirstName] has stepped forward, surro
 palace_coup.1003.t:0 "You Have Escaped — Raise the Banners"
 palace_coup.1003.d:0 "You stagger from the smoke-choked corridor into the cold night. Word spreads like wildfire: your life has been spared, but your throne was seized. Now is the hour to reclaim what is yours. Ride forth, call your vassals, and let every horn sound the summons to arms — raise the banners and reclaim the realm!"
 
-palace_coup.1004.t:0 "Your Reign Ends"
-palace_coup.1004.d:0 "You lost the duel. The palace coup has succeeded. You have been defeated and your life is forfeit. Accept your death."
+palace_coup.1004.t:0 "Puppeted: Your Reign Continues in Name"
+palace_coup.1004.d:0 "You lost the duel. The palace coup has succeeded. Your life has been spared, but [challenger.GetTitledFirstName] now controls your realm as your puppet master. You remain the nominal ruler, but important decisions will be made by your puppet master."
 
+palace_coup.1005.t:0 "Failed Escape — You Are Puppeted"
+palace_coup.1005.d:0 "Your attempt to flee was thwarted. [challenger.GetTitledFirstName] caught you and has placed you under a puppet regency. You remain the figurehead ruler, but the puppet master will pull the strings."
+palace_coup.1005.a:0 "Accept your fate"
+palace_coup.1005.tooltip:0 "You failed to flee — you will remain in name only, while [challenger.GetTitledFirstName] governs behind the curtain."
  # Option text (labels)
 palace_coup.1001.a:0 "Protect the palace"
 palace_coup.1001.b:0 "Flee the palace"
 palace_coup.1002.a:0 "My knights will crush you!"
 palace_coup.1002.b:0 "Attempt to Flee"
 palace_coup.1003.a:0 "Sound the horn — raise the banners"
-palace_coup.1004.a:0 "Accept Death"
+palace_coup.1004.a:0 "Accept your fate"
 
 # Child-specific option when ruler is a child
-palace_coup.1002.c:0 "Yield to the challenger"
-palace_coup.1002.child_tooltip:0 "The ruler is a child — yield and accept the challenger as puppet master."
+palace_coup.1002.c:0 "I yield the throne."
+palace_coup.1002.child_tooltip:0 "The ruler is a child — you are forced to yield the throne to [challenger.GetTitledFirstName]."
 
  # UI tooltips used by options/duel outcomes
 palace_coup.1001.tooltip:0 "Confront the challenger in a duel or attempt to flee."
 palace_coup.1002.win.tooltip:0 "You win the duel and kill the challenger."
-palace_coup.1002.lose.tooltip:0 "The challenger will take all your lands and titles and you will perish."
+palace_coup.1002.lose.tooltip:0 "You will be spared but reduced to a puppet under [challenger.GetTitledFirstName]."
 palace_coup.1002.flee_success.tooltip:0 "You successfully flee and start a rebellion."
 palace_coup.1002.fail.tooltip:0 "You get caught and assassinated."
 palace_coup.1002.flee_tooltip:0 "Attempt to flee — an intrigue duel between you and [challenger.GetTitledFirstName]."
 palace_coup.1003.tooltip:0 "Trigger the warlord event to raise banners against the challenger."
-palace_coup.1004.tooltip:0 "Accept your defeat and die."
+palace_coup.1004.tooltip:0 "Accept your defeat and the puppet master who will rule behind the throne."
 
  # Misc / gameplay keys
 palace_coup_adventurer_camp_name:0 "Palace Coup War Camp"
@@ -105,7 +109,7 @@ realm_split.1002.a.tt:0 "You are now an independent ruler with your own realm."
 
  # Realm Split titles and modifiers
  # Two naming variations for breakaway realms
-RISEANDFALL_BREAKAWAY_NAME_CAPITAL:0 "[rf_base_county.GetNameNoTooltip]"
+RISEANDFALL_BREAKAWAY_NAME_CAPITAL:0 "[rf_base_province.GetNameNoTooltip]"
 RISEANDFALL_BREAKAWAY_NAME_RULER:0 "[rf_breakaway_ruler.GetFirstNamePossessiveNoTooltip] Realm"
 RISEANDFALL_BREAKAWAY_TITLE_NAME:0 "[rf_breakaway_ruler.GetFirstNamePossessiveNoTooltip] Realm"
 RISEANDFALL_BREAKAWAY_FACTION:0 "Breakaway Faction"

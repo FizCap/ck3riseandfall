@@ -123,6 +123,8 @@ riseandfall_curry_favor_interaction = {
 	is_valid_showing_failures_only = { 
 		# Only the diarch of the recipient may use this
 		scope:actor = { is_diarch_of_target = scope:recipient }
+		# Disallow curry favor if actor already has a strong favor hook on the recipient
+		scope:actor = { NOT = { has_hook_of_type = { target = scope:recipient type = strong_favor_hook } } }
 		scope:recipient = { 
 			riseandfall_no_cooldown = yes
 			riseandfall_no_existing_hook = yes

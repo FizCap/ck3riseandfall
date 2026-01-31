@@ -298,6 +298,7 @@ riseandfall_execute_realm_split_se = {
                 scope:new_realm_ruler = {
                     save_scope_as = rf_breakaway_ruler
                     capital_county = { save_scope_as = rf_base_county }
+                    capital_province = { save_scope_as = rf_base_province }
                     if = {
                         limit = {
                             has_variable = rf_title_style
@@ -333,6 +334,7 @@ riseandfall_execute_realm_split_se = {
                 scope:new_realm_ruler = {
                     save_scope_as = rf_breakaway_ruler
                     capital_county = { save_scope_as = rf_base_county }
+                    capital_province = { save_scope_as = rf_base_province }
                     if = {
                         limit = {
                             has_variable = rf_title_style
@@ -367,6 +369,7 @@ riseandfall_execute_realm_split_se = {
                 scope:new_realm_ruler = {
                     save_scope_as = rf_breakaway_ruler
                     capital_county = { save_scope_as = rf_base_county }
+                    capital_province = { save_scope_as = rf_base_province }
                     if = {
                         limit = {
                             has_variable = rf_title_style
@@ -467,12 +470,6 @@ riseandfall_execute_realm_split_se = {
         character = scope:original_ruler
         years = 10
         name = RISEANDFALL_REALM_SPLIT_TRUCE
-    }
-    
-    # Give starting gold
-    if = {
-        limit = { gold < 200 }
-        add_gold = 300
     }
     
     # Add claim on original primary title

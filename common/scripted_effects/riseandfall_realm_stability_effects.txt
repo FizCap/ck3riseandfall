@@ -3,10 +3,10 @@
 # Computes a 0..100 realm stability score and stores it on the ruler as
 # riseandfall_realm_stability_score
 # Weighting (user spec):
-#  - Ruler stats: total contribution clamped to -20..+20 (five stats combined)
+#  - Ruler stats: total contribution clamped to -30..+30 (five stats combined)
 #    Contributions still computed per-stat but overall clamped to the range above.
 #  - Legitimacy: multiplicative multiplier applied to the base (50%..100%)
-#  - Vassal relations: mapped to -30..+30 (average direct vassal opinion -100..100)
+#  - Vassal relations: mapped to -20..+20 (average direct vassal opinion -100..100)
 
 riseandfall_calculate_realm_stability_se = {
     # Root scope: called from an every_ruler on_action, so root is the ruler
@@ -223,8 +223,8 @@ riseandfall_calculate_realm_stability_se = {
         change_variable = { name = riseandfall_rs_stats_component add = var:tmp_stat_contrib }
     }
 
-    # Clamp stats component to -20..+20 (sum of five per-stat ranges centered at 0)
-    clamp_variable = { name = riseandfall_rs_stats_component min = -20 max = 20 }
+    # Clamp stats component to -30..+30 (sum of five per-stat ranges centered at 0)
+    clamp_variable = { name = riseandfall_rs_stats_component min = -30 max = 30 }
 
 
 
@@ -366,16 +366,16 @@ riseandfall_calculate_realm_stability_se = {
         set_variable = { name = tmp_avg_opinion value = 0 }
     }
 
-    # Map -100..+100 to -30..+30 by scaling: value * 30 / 100 (implemented as *30 / 100)
-    # This makes an average opinion of -68 -> approx -20, +80 -> approx +24
+    # Map -100..+100 to -20..+20 by scaling: value * 20 / 100 (implemented as *20 / 100)
+    # This makes an average opinion of -68 -> approx -14, +80 -> approx +16
     # Use integer math: multiply first then divide to preserve precision.
-    change_variable = { name = tmp_avg_opinion multiply = 30 }
+    change_variable = { name = tmp_avg_opinion multiply = 20 }
     change_variable = { name = tmp_avg_opinion divide = 100 }
     # Round the scaled value to keep the component integer
     round_variable = { name = tmp_avg_opinion nearest = 1 }
     set_variable = { name = riseandfall_rs_vassals_component value = var:tmp_avg_opinion }
 
-    clamp_variable = { name = riseandfall_rs_vassals_component min = -30 max = 30 }
+    clamp_variable = { name = riseandfall_rs_vassals_component min = -20 max = 20 }
 
     ########################################
     # 3.6) PUPPET REGENCY TRACKING
@@ -494,13 +494,10 @@ riseandfall_calculate_realm_stability_se = {
 
     }
 
-    # WAR MULTIPLIER (wins/losses change a persistent multiplier)
-    # We maintain a per-character multiplier (percent) that modifies the computed
-    # TARGET score multiplicatively. Winning a war multiplies by 110/100 (+10%),
-    # losing a war multiplies by 90/100 (-10%). This multiplier is persistent and
-    # applied to the tmp_target_score here. By default it is 100 (no change).
-    if = { limit = { NOT = { has_variable = riseandfall_realm_stability_war_multiplier } } set_variable = { name = riseandfall_realm_stability_war_multiplier value = 100 } }
-    if = { limit = { NOT = { has_variable = riseandfall_realm_stability_puppet_regency_multiplier } } set_variable = { name = riseandfall_realm_stability_puppet_regency_multiplier value = 100 } }
+    # WAR PENALTY (wins/losses change a persistent penalty)
+    # We maintain a per-character penalty that subtracts from the computed
+    # TARGET score. Losing a war adds +10 penalty, winning reduces by -10 (min 0).
+    if = { limit = { NOT = { has_variable = riseandfall_war_penalty } } set_variable = { name = riseandfall_war_penalty value = 0 } }
     # DIFFICULTY MULTIPLIER (configured via game rule)
     if = { limit = { NOT = { has_variable = riseandfall_rs_difficulty_multiplier } } set_variable = { name = riseandfall_rs_difficulty_multiplier value = 100 } }
     if = { limit = { NOT = { has_variable = riseandfall_rs_difficulty_multiplier_display } } set_variable = { name = riseandfall_rs_difficulty_multiplier_display value = 1.0 } }
@@ -525,11 +522,10 @@ riseandfall_calculate_realm_stability_se = {
         set_variable = { name = riseandfall_rs_difficulty_multiplier value = 120 }
         set_variable = { name = riseandfall_rs_difficulty_multiplier_display value = 1.2 }
     }
-    # Apply the multiplier to the target score (percent math)
-    change_variable = { name = tmp_target_score multiply = var:riseandfall_realm_stability_war_multiplier }
-    change_variable = { name = tmp_target_score divide = 100 }
-    # Store the multiplier back to itself to expose for the tooltip (no-op assignment)
-    set_variable = { name = riseandfall_realm_stability_war_multiplier value = var:riseandfall_realm_stability_war_multiplier }
+    # Apply the war penalty to the target score (use a negated temp var — `-var:` is not valid in scripts)
+    set_variable = { name = tmp_war_penalty value = var:riseandfall_war_penalty }
+    change_variable = { name = tmp_war_penalty multiply = -1 }
+    change_variable = { name = tmp_target_score add = var:tmp_war_penalty }
     # Apply difficulty game rule multiplier
     change_variable = { name = tmp_target_score multiply = var:riseandfall_rs_difficulty_multiplier }
     change_variable = { name = tmp_target_score divide = 100 }
@@ -916,40 +912,40 @@ riseandfall_low_stability_grace_period_se = {
 }
 
 
-# Called on the war winner scope (character) to increase the war multiplier by +10%
+# Called on the war winner scope (character) to reduce the war penalty by -10
 riseandfall_war_victory_se = {
-    if = { limit = { NOT = { has_variable = riseandfall_realm_stability_war_multiplier } } set_variable = { name = riseandfall_realm_stability_war_multiplier value = 100 } }
-    # Defensive: if a war scope exists and it's a peasant war, don't apply victory multiplier.
+    # Defensive: only operate on living characters
+    if = { limit = { is_alive = yes }
+    if = { limit = { NOT = { has_variable = riseandfall_war_penalty } } set_variable = { name = riseandfall_war_penalty value = 0 } }
+    # Defensive: if a war scope exists and it's a peasant war, don't apply victory penalty reduction.
     if = {
         limit = { scope:war = { using_cb = peasant_war } }
         # do nothing for peasant wars
     }
     else = {
-        # Increase by +10 percentage points (additive)
-        change_variable = { name = riseandfall_realm_stability_war_multiplier add = 10 }
-        # Clamp bounds so the multiplier cannot exceed 100% and can drop to 0% (0..100)
-        if = { limit = { var:riseandfall_realm_stability_war_multiplier < 0 } set_variable = { name = riseandfall_realm_stability_war_multiplier value = 0 } }
-        if = { limit = { var:riseandfall_realm_stability_war_multiplier > 100 } set_variable = { name = riseandfall_realm_stability_war_multiplier value = 100 } }
-        # Expose for tooltip
-        set_variable = { name = riseandfall_realm_stability_war_multiplier value = var:riseandfall_realm_stability_war_multiplier }
+        # Reduce penalty by -10
+        change_variable = { name = riseandfall_war_penalty add = -10 }
+        # Clamp to minimum 0
+        if = { limit = { var:riseandfall_war_penalty < 0 } set_variable = { name = riseandfall_war_penalty value = 0 } }
+    }
     }
 }
 
-# Called on the war loser scope (character) to decrease the war multiplier by -10%
+# Called on the war loser scope (character) to increase the war penalty by +10
 riseandfall_war_loss_se = {
-    if = { limit = { NOT = { has_variable = riseandfall_realm_stability_war_multiplier } } set_variable = { name = riseandfall_realm_stability_war_multiplier value = 100 } }
-    # Defensive: if a war scope exists and it's a peasant war, don't apply loss multiplier here
+    # Only operate on living characters; variables are stored on character scopes
     if = {
-        limit = { scope:war = { using_cb = peasant_war } }
-        # do nothing for peasant wars
-    }
-    else = {
-        # Decrease by -10 percentage points (additive)
-        change_variable = { name = riseandfall_realm_stability_war_multiplier add = -10 }
-        # Clamp bounds so the multiplier cannot exceed 100% and can drop to 0% (0..100)
-        if = { limit = { var:riseandfall_realm_stability_war_multiplier < 0 } set_variable = { name = riseandfall_realm_stability_war_multiplier value = 0 } }
-        if = { limit = { var:riseandfall_realm_stability_war_multiplier > 100 } set_variable = { name = riseandfall_realm_stability_war_multiplier value = 100 } }
-        set_variable = { name = riseandfall_realm_stability_war_multiplier value = var:riseandfall_realm_stability_war_multiplier }
+        limit = { is_alive = yes }
+        if = { limit = { NOT = { has_variable = riseandfall_war_penalty } } set_variable = { name = riseandfall_war_penalty value = 0 } }
+        # Defensive: if a war scope exists and it's a peasant war, don't apply loss penalty here
+        if = {
+            limit = { scope:war = { using_cb = peasant_war } }
+            # do nothing for peasant wars
+        }
+        else = {
+            # Increase penalty by +10
+            change_variable = { name = riseandfall_war_penalty add = 10 }
+        }
     }
 }
 
@@ -1084,4 +1080,3 @@ riseandfall_clear_unlanded_stability_vars_se = {
         remove_character_modifier = riseandfall_stability_100
     }
 }
-

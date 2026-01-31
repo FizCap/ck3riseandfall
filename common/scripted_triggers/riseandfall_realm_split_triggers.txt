@@ -22,7 +22,6 @@ riseandfall_no_powerful_vassals_trigger = {
 
 riseandfall_can_realm_split_trigger = {
     is_independent_ruler = yes
-    is_ai = yes
     NOT = { has_variable = rf_realm_split_cooldown }
     primary_title.tier >= tier_kingdom
     # Must have at least 2 vassals (powerful vassals for feudal, regular vassals for administrative)
@@ -32,7 +31,6 @@ riseandfall_can_realm_split_trigger = {
             NOT = { riseandfall_no_powerful_vassals_trigger = yes }
             any_powerful_vassal = {
                 count >= 2
-                is_ai = yes
                 is_landed = yes
                 primary_title.tier >= tier_county
             }
@@ -42,7 +40,6 @@ riseandfall_can_realm_split_trigger = {
             riseandfall_no_powerful_vassals_trigger = yes
             any_vassal = {
                 count >= 2
-                is_ai = yes
                 is_landed = yes
                 primary_title.tier >= tier_county
             }

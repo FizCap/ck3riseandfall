@@ -11,10 +11,11 @@ riseandfall_steal_gold_effect = {
 		set_variable = { name = rf_transfer_gold value = 0 }
 		# If the liege has gold, set the transfer amount to their gold first
 		if = { limit = { gold > 1 } set_variable = { name = rf_transfer_gold value = gold } }
-		change_variable = { name = rf_transfer_gold multiply = 0.5 }
+		# Use integer math: divide by 2 to transfer roughly 50%
+		if = { limit = { var:rf_transfer_gold > 0 } change_variable = { name = rf_transfer_gold divide = 2 } }
 	}
 	# Give to diarch
-	if = { limit = { scope:recipient = { has_variable = rf_transfer_gold } } scope:actor = { add_short_term_gold = scope:recipient.var:rf_transfer_gold } }
+	if = { limit = { scope:recipient = { has_variable = rf_transfer_gold } scope:recipient = { var:rf_transfer_gold > 0 } } scope:actor = { add_short_term_gold = scope:recipient.var:rf_transfer_gold } }
 	# Remove from liege
 	scope:recipient = {
 		if = { limit = { var:rf_transfer_gold > 0 } remove_short_term_gold = var:rf_transfer_gold }
@@ -131,7 +132,7 @@ riseandfall_force_abdicate_effect = {
 				save_scope_as = candidate_for_score
 				scope:recipient = { set_variable = { name = tmp_candidate_age value = scope:candidate_for_score.var:candidate_age } }
 				if = {
-					limit = { scope:recipient = { var:tmp_candidate_age < var:rf_candidate_best_age } }
+					limit = { scope:recipient = { has_variable = tmp_candidate_age has_variable = rf_candidate_best_age var:tmp_candidate_age < var:rf_candidate_best_age } }
 					save_scope_as = chosen_successor
 					scope:recipient = { set_variable = { name = rf_candidate_best_age value = scope:recipient.var:tmp_candidate_age } }
 				}
@@ -156,7 +157,7 @@ riseandfall_force_abdicate_effect = {
 				save_scope_as = candidate_for_score
 				scope:recipient = { set_variable = { name = tmp_candidate_age value = scope:candidate_for_score.var:candidate_age } }
 				if = {
-					limit = { scope:recipient = { var:tmp_candidate_age < var:rf_candidate_best_age } }
+					limit = { scope:recipient = { has_variable = tmp_candidate_age has_variable = rf_candidate_best_age var:tmp_candidate_age < var:rf_candidate_best_age } }
 					save_scope_as = chosen_successor
 					scope:recipient = { set_variable = { name = rf_candidate_best_age value = scope:recipient.var:tmp_candidate_age } }
 				}
@@ -180,7 +181,7 @@ riseandfall_force_abdicate_effect = {
 					save_scope_as = candidate_for_score
 					scope:recipient = { set_variable = { name = tmp_candidate_age value = scope:candidate_for_score.var:candidate_age } }
 					if = {
-						limit = { scope:recipient = { var:tmp_candidate_age < var:rf_candidate_best_age } }
+						limit = { scope:recipient = { has_variable = tmp_candidate_age has_variable = rf_candidate_best_age var:tmp_candidate_age < var:rf_candidate_best_age } }
 						save_scope_as = chosen_successor
 						scope:recipient = { set_variable = { name = rf_candidate_best_age value = scope:recipient.var:tmp_candidate_age } }
 					}
@@ -206,7 +207,7 @@ riseandfall_force_abdicate_effect = {
 				save_scope_as = candidate_for_score
 				scope:recipient = { set_variable = { name = tmp_candidate_age value = scope:candidate_for_score.var:candidate_age } }
 				if = {
-					limit = { scope:recipient = { var:tmp_candidate_age < var:rf_candidate_best_age } }
+					limit = { scope:recipient = { has_variable = tmp_candidate_age has_variable = rf_candidate_best_age var:tmp_candidate_age < var:rf_candidate_best_age } }
 					save_scope_as = chosen_successor
 					scope:recipient = { set_variable = { name = rf_candidate_best_age value = scope:recipient.var:tmp_candidate_age } }
 				}
@@ -230,7 +231,7 @@ riseandfall_force_abdicate_effect = {
 					save_scope_as = candidate_for_score
 					scope:recipient = { set_variable = { name = tmp_candidate_age value = scope:candidate_for_score.var:candidate_age } }
 					if = {
-						limit = { scope:recipient = { var:tmp_candidate_age < var:rf_candidate_best_age } }
+						limit = { scope:recipient = { has_variable = tmp_candidate_age has_variable = rf_candidate_best_age var:tmp_candidate_age < var:rf_candidate_best_age } }
 						save_scope_as = chosen_successor
 						scope:recipient = { set_variable = { name = rf_candidate_best_age value = scope:recipient.var:tmp_candidate_age } }
 					}
@@ -255,7 +256,7 @@ riseandfall_force_abdicate_effect = {
 				save_scope_as = candidate_for_score
 				scope:recipient = { set_variable = { name = tmp_candidate_age value = scope:candidate_for_score.var:candidate_age } }
 				if = {
-					limit = { scope:recipient = { var:tmp_candidate_age < var:rf_candidate_best_age } }
+					limit = { scope:recipient = { has_variable = tmp_candidate_age has_variable = rf_candidate_best_age var:tmp_candidate_age < var:rf_candidate_best_age } }
 					save_scope_as = chosen_successor
 					scope:recipient = { set_variable = { name = rf_candidate_best_age value = scope:recipient.var:tmp_candidate_age } }
 				}
@@ -277,7 +278,7 @@ riseandfall_force_abdicate_effect = {
 				save_scope_as = candidate_for_score
 				scope:recipient = { set_variable = { name = tmp_candidate_age value = scope:candidate_for_score.var:candidate_age } }
 				if = {
-					limit = { scope:recipient = { var:tmp_candidate_age < var:rf_candidate_best_age } }
+					limit = { scope:recipient = { has_variable = tmp_candidate_age has_variable = rf_candidate_best_age var:tmp_candidate_age < var:rf_candidate_best_age } }
 					save_scope_as = chosen_successor
 					scope:recipient = { set_variable = { name = rf_candidate_best_age value = scope:recipient.var:tmp_candidate_age } }
 				}
@@ -307,19 +308,6 @@ riseandfall_force_abdicate_effect = {
 		if = {
 			limit = { exists = scope:chosen_successor }
 			# proceed to transfer all held titles from recipient to chosen_successor
-			# Transfer the county capital first if present
-			if = {
-				limit = { scope:recipient = { capital_county = { exists = yes } } }
-				scope:recipient = {
-					capital_county = {
-						change_title_holder = {
-							holder = scope:chosen_successor
-							change = scope:change
-							take_baronies = yes
-						}
-					}
-				}
-			}
 			every_held_title = {
 				limit = {
 					holder = scope:recipient
@@ -331,7 +319,7 @@ riseandfall_force_abdicate_effect = {
 				change_title_holder = {
 					holder = scope:chosen_successor
 					change = scope:change
-					take_baronies = yes
+					take_baronies = no
 				}
 			}
 			resolve_title_and_vassal_change = scope:change
@@ -341,7 +329,13 @@ riseandfall_force_abdicate_effect = {
 			# Re-establish puppet regency on the new liege so the puppet master stays in power
 			# (make the actor the diarch of the chosen_successor and set the puppet_regency type)
 			if = {
-				limit = { exists = scope:chosen_successor }
+				limit = {
+					exists = scope:chosen_successor
+					scope:chosen_successor = { is_alive = yes }
+					exists = scope:actor
+					# Puppet-master diarch must be a valid courtier-type character (not a ruler)
+					scope:actor = { is_alive = yes NOT = { is_ruler = yes } }
+				}
 				# If no active diarchy exists yet on the chosen_successor, try to start one
 				if = {
 					limit = { NOT = { scope:chosen_successor = { has_active_diarchy = yes } } }
@@ -350,6 +344,10 @@ riseandfall_force_abdicate_effect = {
 				# Only set diarch/diarchy fields if an active diarchy now exists
 				if = {
 					limit = { scope:chosen_successor = { has_active_diarchy = yes } }
+					# Ensure the diarch is in the new liege's court before setting them as diarch
+					scope:actor = {
+						if = { limit = { NOT = { employer = scope:chosen_successor } } set_employer = scope:chosen_successor }
+					}
 					scope:chosen_successor = {
 						set_diarch = scope:actor
 						set_diarchy_type = puppet_regency

@@ -1,0 +1,18 @@
+﻿riseandfall_check_puppet_regency_end = {
+    every_ruler = {
+        limit = { has_diarchy_type = puppet_regency }
+        if = {
+            limit = { is_landed = no }
+            end_diarchy = yes
+        }
+        else = {
+            # For landed rulers with puppet regency, ensure the diarch is employed in the court
+            diarch = {
+                if = {
+                    limit = { NOT = { is_ruler = yes } employer != prev }
+                    set_employer = prev
+                }
+            }
+        }
+    }
+}

@@ -4,8 +4,6 @@
 puppet_regency:0 "Puppet Regency"
 
 # Modifiers (mod-unique)
-from_diarch_domain_limit_bonus:0 "Domain Limit Bonus"
-from_diarch_domain_limit_bonus_desc:0 "Increases the domain limit."
 
 to_diarch_stress_gain:0 "Stress Gain"
 to_diarch_stress_gain_desc:0 "Increases stress gain."
@@ -13,7 +11,7 @@ to_diarch_stress_gain_desc:0 "Increases stress gain."
 # Diarchy succession score
 diarch_succession_score.category.realm_politics:0 "Realm Influence"
 diarch_succession_score.category.stats:0 "Stats"
-diarch_succession_score.personal_ties.your_powerful_vassal:0 "Powerful vassal"
+riseandfall_diarch_succession_score.personal_ties.your_powerful_vassal:0 "Powerful vassal"
 diarch_succession_score.is_councillor:0 "Councillor"
 diarch_succession_score.disqualifiers.not_landed:0 "Not landed"
 

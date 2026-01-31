@@ -59,8 +59,6 @@ palace_coup.1002 = {
 		}
 
 		# For intrigue-based flee option, use individual character intrigue values (not a team total)
-		# Copy challenger's intrigue into a temporary var on the challenger for safe referencing
-		scope:challenger = { set_variable = { name = riseandfall_chall_intrigue value = intrigue } }
 		# compute AI add variables on root (clamped) for the duel and the intrigue flee choice
 		root = {
 			# Duel weight
@@ -72,7 +70,7 @@ palace_coup.1002 = {
 
 			# Intrigue weight: compute from character intrigue only (root.intrigue - challenger.intrigue)
 			set_variable = { name = riseandfall_ai_intrigue_add value = intrigue }
-			change_variable = { name = riseandfall_ai_intrigue_add subtract = var:riseandfall_chall_intrigue }
+			change_variable = { name = riseandfall_ai_intrigue_add subtract = scope:challenger.intrigue }
 			clamp_variable = { name = riseandfall_ai_intrigue_add min = -50 max = 50 }
 		}
 	}
@@ -175,8 +173,8 @@ palace_coup.1002 = {
 		name = palace_coup.1002.c
 		custom_tooltip = palace_coup.1002.child_tooltip
 		trigger = { exists = scope:challenger root = { is_adult = no } }
-		# Challenger keeps the child on the throne as a puppet master
-		hidden_effect = { riseandfall_palace_coup_child_yields = yes }
+		# Challenger installs themselves as ruler
+		hidden_effect = { riseandfall_palace_coup_root_flees_failure = yes }
 		ai_chance = { base = 100 }
 	}
 }
@@ -214,7 +212,63 @@ palace_coup.1004 = {
 		name = palace_coup.1004.a
 		custom_tooltip = palace_coup.1004.tooltip
 		hidden_effect = {
-			riseandfall_palace_coup_root_death = yes
+			# Ensure puppet regency is active and challenger is set as diarch (defensive)
+			if = { limit = { NOT = { root = { has_active_diarchy = yes } } } root = { try_start_diarchy = puppet_regency } }
+			if = {
+				limit = { root = { has_active_diarchy = yes } }
+				root = {
+					# Destroy temporary camp title (if present) so challenger is not treated as a ruler
+					if = {
+						limit = { exists = scope:palace_coup_challenger_camp_title scope:challenger = { has_title = scope:palace_coup_challenger_camp_title } }
+						scope:challenger = { destroy_title = scope:palace_coup_challenger_camp_title }
+					}
+
+					# Only set diarch when challenger can be a valid puppet master courtier.
+					if = {
+						limit = { exists = scope:challenger scope:challenger = { is_alive = yes NOT = { is_ruler = yes } } }
+						scope:challenger = {
+							# Ensure the diarch is not employed by the challenger; as puppet master they must be in root's court.
+							if = { limit = { NOT = { employer = root } } set_employer = root }
+							every_courtier = {
+								limit = { is_alive = yes NOT = { employer = root } }
+								set_employer = root
+							}
+						}
+						set_diarch = scope:challenger
+						set_diarchy_type = puppet_regency
+						set_diarchy_swing = 90
+						set_variable = { name = puppet_master_cooldown value = yes days = 365 }
+					}
+				}
+			}
+			# Give challenger influence hook on the defeated ruler
+			if = {
+				limit = { scope:challenger = { is_alive = yes } root = { is_alive = yes } }
+				scope:challenger = { add_hook = { target = root type = strong_favor_hook } }
+			}
+		}
+		ai_chance = { base = 100 }
+	}
+}
+
+palace_coup.1005 = {
+	type = character_event
+	title = palace_coup.1005.t
+	desc = palace_coup.1005.d
+	theme = court
+
+	left_portrait = { character = root }
+	right_portrait = { character = scope:challenger }
+
+	option = {
+		name = palace_coup.1005.a
+		custom_tooltip = palace_coup.1005.tooltip
+		hidden_effect = {
+			# Defensive: ensure puppet regency exists and challenger set as diarch
+			if = { limit = { NOT = { root = { has_active_diarchy = yes } } } root = { try_start_diarchy = puppet_regency } }
+			if = { limit = { root = { has_active_diarchy = yes } } root = { set_diarch = scope:challenger set_diarchy_type = puppet_regency set_diarchy_swing = 90 } }
+			# Give challenger a strong_favor_hook on the defeated ruler
+			scope:challenger = { add_hook = { target = root type = strong_favor_hook } }
 		}
 		ai_chance = { base = 100 }
 	}

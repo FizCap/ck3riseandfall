@@ -6,6 +6,7 @@ yearly_global_pulse = {
     on_actions = {
         riseandfall_yearly_realm_stability
         riseandfall_clear_unlanded_realm_stability
+        riseandfall_dynamic_story_mode
     }
 }
 
@@ -69,17 +70,17 @@ riseandfall_on_death_stability_inheritance = {
                 primary_heir = { is_alive = yes }
             }
             # Only transfer stability to the primary heir if the heir is strictly LOWER
-            # ranked than the predecessor (we disallow same-tier inheritance as well).
+            # or EQUAL ranked than the predecessor.
             # The game's tier constants map higher numbers -> higher ranks
             # (see common/script_values/00_title_tiers_values.txt: tier_county=2 ... tier_empire=5).
-            # Prevent inheritance when the heir's highest_held_title_tier is greater-or-equal
-            # to the predecessor's highest_held_title_tier. Allow only when heir < predecessor.
+            # Prevent inheritance when the heir's highest_held_title_tier is greater
+            # to the predecessor's highest_held_title_tier.
             primary_heir = {
                 if = {
                     limit = {
                         OR = {
                             scope:predecessor = { is_landed = no }
-                            highest_held_title_tier < scope:predecessor.highest_held_title_tier
+                            highest_held_title_tier <= scope:predecessor.highest_held_title_tier
                         }
                     }
                     riseandfall_inherit_stability_score_se = yes
@@ -100,7 +101,7 @@ riseandfall_on_death_stability_inheritance = {
                     limit = {
                         OR = {
                             scope:predecessor = { is_landed = no }
-                            highest_held_title_tier < scope:predecessor.highest_held_title_tier
+                            highest_held_title_tier <= scope:predecessor.highest_held_title_tier
                         }
                     }
                     riseandfall_inherit_stability_score_se = yes
@@ -130,15 +131,15 @@ riseandfall_on_title_gain_inheritance = {
                 holds_landed_title = yes
                 exists = scope:previous_holder
                 scope:previous_holder = { has_variable = riseandfall_realm_stability_score }
-                # Only inherit when the previous holder is strictly higher-ranked than
-                # the inheritor. We disallow same-tier inheritance as well.
+                # Only inherit when the previous holder is strictly higher-ranked OR EQUAL ranked than
+                # the inheritor.
                 # Note: game tier constants map higher numbers -> higher ranks
                 # (see common/script_values/00_title_tiers_values.txt: tier_county=2 ... tier_empire=5).
-                # Condition: inheritor.highest_held_title_tier < previous_holder.highest_held_title_tier
+                # Condition: inheritor.highest_held_title_tier <= previous_holder.highest_held_title_tier
                 # OR previous holder is unlanded (no primary title to compare)
                 OR = {
                     scope:previous_holder = { is_landed = no }
-                    highest_held_title_tier < scope:previous_holder.highest_held_title_tier
+                    highest_held_title_tier <= scope:previous_holder.highest_held_title_tier
                 }
             }
             # Inherit from the previous holder of this specific title
@@ -154,7 +155,7 @@ riseandfall_on_title_gain_inheritance = {
                 scope:previous_holder = { has_variable = riseandfall_realm_stability_score }
                 OR = {
                     scope:previous_holder = { is_landed = no }
-                    highest_held_title_tier < scope:previous_holder.highest_held_title_tier
+                    highest_held_title_tier <= scope:previous_holder.highest_held_title_tier
                 }
             }
             # He already has a stability score; only inherit secondary history variables
@@ -208,8 +209,17 @@ riseandfall_war_won_attacker = {
         # Root scope: none; event provides scope:attacker and scope:defender
     # Apply loss to defender. Apply victory effect to attacker only when the
     # war is NOT a peasant rebellion (peasant wars should not count as valid wins).
-    scope:defender = { riseandfall_war_loss_se = yes }
-    if = { limit = { scope:war = { NOT = { using_cb = peasant_war } } } scope:attacker = { riseandfall_war_victory_se = yes } }
+    # NOTE: war on_actions provide attacker/defender as weak scopes in some contexts.
+    # Save them to strong scopes before modifying variables to avoid runtime errors.
+    scope:defender = { save_scope_as = rf_defender }
+    if = { limit = { exists = scope:rf_defender } scope:rf_defender = { riseandfall_war_loss_se = yes } }
+    clear_saved_scope = rf_defender
+    if = {
+        limit = { scope:war = { NOT = { using_cb = peasant_war } } }
+        scope:attacker = { save_scope_as = rf_attacker }
+        if = { limit = { exists = scope:rf_attacker } scope:rf_attacker = { riseandfall_war_victory_se = yes } }
+        clear_saved_scope = rf_attacker
+    }
     }
 }
 
@@ -218,8 +228,15 @@ riseandfall_war_won_defender = {
     effect = {
         # Root scope: none; event provides scope:attacker and scope:defender
     # Apply loss to attacker. Apply victory effect to defender only for non-peasant wars
-    scope:attacker = { riseandfall_war_loss_se = yes }
-    if = { limit = { scope:war = { NOT = { using_cb = peasant_war } } } scope:defender = { riseandfall_war_victory_se = yes } }
+    scope:attacker = { save_scope_as = rf_attacker }
+    if = { limit = { exists = scope:rf_attacker } scope:rf_attacker = { riseandfall_war_loss_se = yes } }
+    clear_saved_scope = rf_attacker
+    if = {
+        limit = { scope:war = { NOT = { using_cb = peasant_war } } }
+        scope:defender = { save_scope_as = rf_defender }
+        if = { limit = { exists = scope:rf_defender } scope:rf_defender = { riseandfall_war_victory_se = yes } }
+        clear_saved_scope = rf_defender
+    }
     }
 }
 
@@ -229,5 +246,12 @@ riseandfall_clear_unlanded_realm_stability = {
         # Clear realm stability variables & modifiers on unlanded characters yearly to
         # fix stale state for characters who lost their lands.
         riseandfall_clear_unlanded_stability_vars_se = yes
+    }
+}
+
+riseandfall_dynamic_story_mode = {
+    trigger = { has_game_rule = riseandfall_dynamic_story_mode_enabled }
+    effect = {
+        riseandfall_dynamic_story_mode_se = yes
     }
 }

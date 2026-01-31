@@ -7,35 +7,58 @@ riseandfall_low_stability_roll_se = {
     # For every independent ruler, compute chance once using the ruler's stability
         # Perform computations inside the saved scope so scope:independent_ruler variables resolve correctly
         scope:ruler_low_stability = {
+            # Ensure a default stability score exists so scripts don't error when it's missing
+            if = { limit = { NOT = { has_variable = riseandfall_realm_stability_score } } set_variable = { name = riseandfall_realm_stability_score value = 50 } }
             if = {
                 limit = { NOT = { has_variable = low_stability_cooldown } }
-                # Ensure the stability variable exists for this ruler; default to 30 (neutral)
-                if = {
-                    limit = { NOT = { has_variable = riseandfall_realm_stability_score } }
-                    set_variable = { name = riseandfall_realm_stability_score value = 30 }
-                }
-                # Compute chance scaled to stability: stability 30 -> 1%, stability 0 -> 100%.
-                # Formula: tmp_diff = clamp(30 - stability, 0, 30)
-                # tmp_chance = floor((tmp_diff * 99) / 30) + 1  -> yields 1..100
-                # tmp_diff = 30 - stability_score
+                # Compute chance with a curved (approx power 1.5) formula based on highest held title tier.
+                # Thresholds: county = 30, duchy = 35, kingdom = 40, empire = 45, hegemony = 50.
+                # Approach: tmp_diff = max(0, threshold - stability_score)
+                # Chance ~= floor( (tmp_diff^2 * 100) / (threshold^2) ); minimum 1% when tmp_diff > 0.
+                set_variable = { name = stability_threshold value = 30 }
+                if = { limit = { highest_held_title_tier >= tier_duchy } set_variable = { name = stability_threshold value = 35 } }
+                if = { limit = { highest_held_title_tier >= tier_kingdom } set_variable = { name = stability_threshold value = 40 } }
+                if = { limit = { highest_held_title_tier >= tier_empire } set_variable = { name = stability_threshold value = 45 } }
+                if = { limit = { highest_held_title_tier >= tier_hegemony } set_variable = { name = stability_threshold value = 50 } }
+
                 set_variable = { name = tmp_diff value = 0 }
                 change_variable = { name = tmp_diff add = var:riseandfall_realm_stability_score }
                 change_variable = { name = tmp_diff multiply = -1 }
-                change_variable = { name = tmp_diff add = 30 }
-                clamp_variable = { name = tmp_diff min = 0 max = 30 }
+                change_variable = { name = tmp_diff add = var:stability_threshold }
+                clamp_variable = { name = tmp_diff min = 0 max = 50 }
 
                 set_variable = { name = tmp_chance value = 0 }
-                # If stability >= 31, chance should be 0%
+                # If stability > threshold, chance should be 0%
                 if = {
-                    limit = { var:riseandfall_realm_stability_score >= 31 }
+                    limit = { var:riseandfall_realm_stability_score > var:stability_threshold }
                     set_variable = { name = tmp_chance value = 0 }
                 }
                 else = {
-                    change_variable = { name = tmp_chance add = var:tmp_diff }
-                    change_variable = { name = tmp_chance multiply = 99 }
-                    change_variable = { name = tmp_chance divide = 30 }
-                    change_variable = { name = tmp_chance add = 1 }
+                    # tmp_sq = tmp_diff^2
+                    set_variable = { name = tmp_sq value = var:tmp_diff }
+                    change_variable = { name = tmp_sq multiply = var:tmp_diff }
+
+                    # Scale to percentage: (tmp_sq * 100) / (threshold^2)
+                    set_variable = { name = tmp_chance value = var:tmp_sq }
+                    change_variable = { name = tmp_chance multiply = 100 }
+                    change_variable = { name = tmp_chance divide = var:stability_threshold }
+                    change_variable = { name = tmp_chance divide = var:stability_threshold }
+
+                    # Ensure at least 1% when tmp_diff > 0
+                    if = { limit = { AND = { var:tmp_diff > 0 var:tmp_chance < 1 } } set_variable = { name = tmp_chance value = 1 } }
                 }
+
+                # Dynamic Story Mode: Large realms (>=5% of world) have minimum 1% chance
+                if = {
+                    limit = { has_variable = riseandfall_large_realm }
+                    if = {
+                        limit = { var:tmp_chance < 1 }
+                        set_variable = { name = tmp_chance value = 1 }
+                    }
+                }
+
+                # Store the calculated chance on the character for tooltip display (persists until next yearly update)
+                set_variable = { name = riseandfall_low_stability_chance value = var:tmp_chance }
 
                 # Roll once for the independent ruler. If it succeeds, notify the liege and add stability
                 random = {
@@ -43,6 +66,10 @@ riseandfall_low_stability_roll_se = {
                     # Trigger a random low stability event
                     riseandfall_low_stability_random_event = yes
                 }
+            }
+            else = {
+                # If on cooldown, chance is 0
+                set_variable = { name = riseandfall_low_stability_chance value = 0 }
             }
         }
     }
@@ -60,78 +87,109 @@ riseandfall_low_stability_random_event = {
     if = { limit = { has_diarchy_type = puppet_regency } set_variable = { name = rf_puppet_ok value = 0 days = 14 } }
 
     set_variable = { name = rf_adventurer_ok value = 0 days = 14 }
-    # Allow adventurer invasion for kingdom-tier rulers or higher (kingdom, empire)
-    if = { limit = { primary_title = { tier >= tier_kingdom } } set_variable = { name = rf_adventurer_ok value = 1 days = 14 } }
+    # Allow adventurer invasion for kingdom-tier rulers or higher (requires highest-held title >= kingdom)
+    if = { limit = { highest_held_title_tier >= tier_kingdom } set_variable = { name = rf_adventurer_ok value = 1 days = 14 } }
 
-    # Realm split eligibility: kingdom+ tier, 2+ powerful vassals, very low stability
+    # Realm split eligibility: use shared trigger for consistent rules (kingdom+ and 2+ vassals, low stability)
     set_variable = { name = rf_realm_split_ok value = 0 days = 14 }
     if = {
-        limit = {
-            primary_title = { tier >= tier_kingdom }
-            NOT = { has_variable = rf_realm_split_cooldown }
-            any_powerful_vassal = {
-                count >= 2
-                is_ai = yes
-                is_landed = yes
-                primary_title.tier >= tier_duchy
-            }
-            OR = {
-                NOT = { has_variable = riseandfall_realm_stability_score }
-                var:riseandfall_realm_stability_score <= 15
-            }
-        }
+        limit = { riseandfall_can_realm_split_trigger = yes }
         set_variable = { name = rf_realm_split_ok value = 1 days = 14 }
     }
+
+    # Palace coup not possible for theocracies or republics
+    set_variable = { name = rf_palace_coup_ok value = 1 days = 14 }
+    if = { limit = { government_has_flag = government_is_theocracy } set_variable = { name = rf_palace_coup_ok value = 0 days = 14 } }
+    if = { limit = { government_has_flag = government_is_republic } set_variable = { name = rf_palace_coup_ok value = 0 days = 14 } }
 
     # Handle all eligibility combinations with realm split as a rare but impactful option
     if = {
         limit = { AND = { var:rf_realm_split_ok = 1 var:rf_puppet_ok = 1 var:rf_adventurer_ok = 1 } }
         # All options available including realm split (rare weight)
-        random_list = {
-            2 = { trigger_event = { id = warlord.1001 } }
-            2 = { trigger_event = { id = puppet.1001 } }
-            2 = { trigger_event = { id = adventurer.1001 } }
-            2 = { trigger_event = { id = palace_coup.1001 } }
-            1 = { trigger_event = { id = realm_split.1001 } }
+        if = { limit = { var:rf_palace_coup_ok = 1 }
+            random_list = {
+                1 = { trigger_event = { id = warlord.1001 } }
+                1 = { trigger_event = { id = adventurer.1001 } }
+                1 = { trigger_event = { id = palace_coup.1001 } }
+                1 = { trigger_event = { id = realm_split.1001 } }
+            }
+        }
+        else = {
+            random_list = {
+                1 = { trigger_event = { id = warlord.1001 } }
+                1 = { trigger_event = { id = adventurer.1001 } }
+                1 = { trigger_event = { id = realm_split.1001 } }
+            }
         }
     }
     else_if = {
         limit = { AND = { var:rf_realm_split_ok = 1 var:rf_puppet_ok = 1 var:rf_adventurer_ok = 0 } }
         # Realm split + puppet allowed
-        random_list = {
-            2 = { trigger_event = { id = warlord.1001 } }
-            2 = { trigger_event = { id = puppet.1001 } }
-            2 = { trigger_event = { id = palace_coup.1001 } }
-            1 = { trigger_event = { id = realm_split.1001 } }
+        if = { limit = { var:rf_palace_coup_ok = 1 }
+            random_list = {
+                1 = { trigger_event = { id = warlord.1001 } }
+                1 = { trigger_event = { id = palace_coup.1001 } }
+                1 = { trigger_event = { id = realm_split.1001 } }
+            }
+        }
+        else = {
+            random_list = {
+                1 = { trigger_event = { id = warlord.1001 } }
+                1 = { trigger_event = { id = realm_split.1001 } }
+            }
         }
     }
     else_if = {
         limit = { AND = { var:rf_realm_split_ok = 1 var:rf_puppet_ok = 0 var:rf_adventurer_ok = 1 } }
         # Realm split + adventurer allowed
-        random_list = {
-            2 = { trigger_event = { id = warlord.1001 } }
-            2 = { trigger_event = { id = adventurer.1001 } }
-            2 = { trigger_event = { id = palace_coup.1001 } }
-            1 = { trigger_event = { id = realm_split.1001 } }
+        if = { limit = { var:rf_palace_coup_ok = 1 }
+            random_list = {
+                1 = { trigger_event = { id = warlord.1001 } }
+                1 = { trigger_event = { id = adventurer.1001 } }
+                1 = { trigger_event = { id = palace_coup.1001 } }
+                1 = { trigger_event = { id = realm_split.1001 } }
+            }
+        }
+        else = {
+            random_list = {
+                1 = { trigger_event = { id = warlord.1001 } }
+                1 = { trigger_event = { id = adventurer.1001 } }
+                1 = { trigger_event = { id = realm_split.1001 } }
+            }
         }
     }
     else_if = {
         limit = { AND = { var:rf_realm_split_ok = 1 var:rf_puppet_ok = 0 var:rf_adventurer_ok = 0 } }
         # Only realm split from special options
-        random_list = {
-            2 = { trigger_event = { id = warlord.1001 } }
-            2 = { trigger_event = { id = palace_coup.1001 } }
-            1 = { trigger_event = { id = realm_split.1001 } }
+        if = { limit = { var:rf_palace_coup_ok = 1 }
+            random_list = {
+                1 = { trigger_event = { id = warlord.1001 } }
+                1 = { trigger_event = { id = palace_coup.1001 } }
+                1 = { trigger_event = { id = realm_split.1001 } }
+            }
+        }
+        else = {
+            random_list = {
+                1 = { trigger_event = { id = warlord.1001 } }
+                1 = { trigger_event = { id = realm_split.1001 } }
+            }
         }
     }
     else_if = {
         limit = { AND = { var:rf_puppet_ok = 1 var:rf_adventurer_ok = 1 } }
         # Both puppet and adventurer available, no realm split
-        random_list = {
-            1 = { trigger_event = { id = warlord.1001 } }
-            1 = { trigger_event = { id = puppet.1001 } }
-            1 = { trigger_event = { id = adventurer.1001 } }
-            1 = { trigger_event = { id = palace_coup.1001 } }
+        if = { limit = { var:rf_palace_coup_ok = 1 }
+            random_list = {
+                1 = { trigger_event = { id = warlord.1001 } }
+                1 = { trigger_event = { id = adventurer.1001 } }
+                1 = { trigger_event = { id = palace_coup.1001 } }
+            }
+        }
+        else = {
+            random_list = {
+                1 = { trigger_event = { id = warlord.1001 } }
+                1 = { trigger_event = { id = adventurer.1001 } }
+            }
         }
     }
     else_if = {
@@ -139,24 +197,38 @@ riseandfall_low_stability_random_event = {
         # Only puppet allowed
         random_list = {
             1 = { trigger_event = { id = warlord.1001 } }
-            1 = { trigger_event = { id = puppet.1001 } }
             1 = { trigger_event = { id = palace_coup.1001 } }
         }
     }
     else_if = {
         limit = { AND = { var:rf_puppet_ok = 0 var:rf_adventurer_ok = 1 } }
         # Only adventurer allowed
-        random_list = {
-            1 = { trigger_event = { id = warlord.1001 } }
-            1 = { trigger_event = { id = adventurer.1001 } }
-            1 = { trigger_event = { id = palace_coup.1001 } }
+        if = { limit = { var:rf_palace_coup_ok = 1 }
+            random_list = {
+                1 = { trigger_event = { id = warlord.1001 } }
+                1 = { trigger_event = { id = adventurer.1001 } }
+                1 = { trigger_event = { id = palace_coup.1001 } }
+            }
+        }
+        else = {
+            random_list = {
+                1 = { trigger_event = { id = warlord.1001 } }
+                1 = { trigger_event = { id = adventurer.1001 } }
+            }
         }
     }
     else = {
         # Neither allowed: fallback to warlord / palace coup
-        random_list = {
-            1 = { trigger_event = { id = warlord.1001 } }
-            1 = { trigger_event = { id = palace_coup.1001 } }
+        if = { limit = { var:rf_palace_coup_ok = 1 }
+            random_list = {
+                1 = { trigger_event = { id = warlord.1001 } }
+                1 = { trigger_event = { id = palace_coup.1001 } }
+            }
+        }
+        else = {
+            random_list = {
+                1 = { trigger_event = { id = warlord.1001 } }
+            }
         }
     }
 }
@@ -279,7 +351,7 @@ riseandfall_create_adventurer_invasion_se = {
                 if = {
                     limit = { var:rf_disqualify == 0 }
                     # Select this claimant
-                    riseandfall_do_create_adventurer_se = yes
+                    if = { limit = { exists = scope:adventurer_candidate scope:adventurer_candidate = { is_alive = yes } } scope:adventurer_candidate = { riseandfall_do_create_adventurer_se = yes } }
                     scope:ruler_root = { change_variable = { name = remaining_to_select subtract = 1 } }
                     root = { change_variable = { name = remaining_to_select subtract = 1 } }
                 }
@@ -390,8 +462,8 @@ riseandfall_create_adventurer_invasion_se = {
                     limit = { var:rf_disqualify == 0 }
                     scope:adventurer_candidate = {
                         add_unpressed_claim = scope:ruler_root.primary_title
-                        riseandfall_do_create_adventurer_se = yes
                     }
+                    if = { limit = { exists = scope:adventurer_candidate scope:adventurer_candidate = { is_alive = yes } } scope:adventurer_candidate = { riseandfall_do_create_adventurer_se = yes } }
                     # consume a courtier slot for a successful conscription
                     scope:ruler_root = { change_variable = { name = remaining_courtier_slots subtract = 1 } }
                     root = { change_variable = { name = remaining_courtier_slots subtract = 1 } }
@@ -426,8 +498,8 @@ riseandfall_create_adventurer_invasion_se = {
         }
         scope:adventurer_candidate = {
             add_unpressed_claim = scope:ruler_root.primary_title
-            riseandfall_do_create_adventurer_se = yes
         }
+        if = { limit = { exists = scope:adventurer_candidate scope:adventurer_candidate = { is_alive = yes } } scope:adventurer_candidate = { riseandfall_do_create_adventurer_se = yes } }
         change_variable = { name = generated_to_create subtract = 1 }
     }
 
