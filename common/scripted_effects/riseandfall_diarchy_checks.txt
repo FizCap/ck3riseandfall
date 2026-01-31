@@ -7,7 +7,12 @@
         }
         else = {
             # For landed rulers with puppet regency, ensure the diarch is employed in the court
-            diarch = { if = { limit = { employer != prev } set_employer = prev } }
+            diarch = {
+                if = {
+                    limit = { NOT = { is_ruler = yes } employer != prev }
+                    set_employer = prev
+                }
+            }
         }
     }
 }
