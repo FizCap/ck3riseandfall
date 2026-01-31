@@ -251,22 +251,24 @@ riseandfall_overthrow_liege_interaction = {
 
 	# Rare/conditional
 	ai_will_do = {
-		# Overthrow: major action — usually rare but strong when conditions are favorable (ambitious actors, weak liege)
-		base = -1000
+		# Overthrow: major action — rare but achievable when conditions are strongly in favor of the actor (ambitious/vengeful actors, weak or disliked liege)
+		base = -400
 
-		modifier = { scope:actor = { has_trait = ambitious } add = 300 }
-		modifier = { scope:actor = { has_trait = greedy } add = 200 }
-		modifier = { scope:actor = { has_trait = vengeful } add = 150 }
-		modifier = { scope:actor = { has_trait = deceitful } add = 80 }
-		modifier = { scope:actor = { has_trait = honest } add = -200 }
+		modifier = { scope:actor = { has_trait = ambitious } add = 500 }
+		modifier = { scope:actor = { has_trait = greedy } add = 300 }
+		modifier = { scope:actor = { has_trait = vengeful } add = 250 }
+		modifier = { scope:actor = { has_trait = deceitful } add = 150 }
+		modifier = { scope:actor = { has_trait = honest } add = -300 }
 
 		# If liege dislikes the diarch, more impetus to overthrow
-		modifier = { scope:recipient = { opinion = { target = scope:actor value < 0 } } add = 200 }
+		modifier = { scope:recipient = { opinion = { target = scope:actor value < 0 } } add = 300 }
+		# Substantially favor overthrow when liege stability is very low
+		modifier = { scope:recipient = { riseandfall_liege_stability_below_30 = yes } add = 400 }
 
 		# Military strength comparisons removed: Puppetmaster operates politically rather than through direct force
 
 		# Penalize if actor is at war (avoid opening the realm to internal conflict)
-		modifier = { scope:actor = { is_at_war = yes } add = -200 }
+		modifier = { scope:actor = { is_at_war = yes } add = -300 }
 	}
 }
 
