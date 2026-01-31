@@ -36,7 +36,10 @@ war_enhancement_press_claims = {
 			limit = { 
 				OR = {
 					AND = {
-						previous_holder = scope:riseandfall_war_enhancement_prev_liege
+						OR = {
+							previous_holder = scope:riseandfall_war_enhancement_prev_liege
+							holder = scope:riseandfall_war_enhancement_attacker.liege
+						}
 						title_held_years < 1
 					}
 					AND = {
@@ -55,20 +58,33 @@ war_enhancement_press_claims = {
 	root = {
 		resolve_title_and_vassal_change = scope:change
 	}
+	if = {
+		limit = {
+			scope:riseandfall_war_enhancement_liege_primary_title.holder != root
+		}
+		hidden_effect = {
+			root = {
+				trigger_event = {
+					id = riseandfall_war_enhancement.1
+				}
+			}
+		}
+	}
 }
 
-# Event .1.b effect: Elect ruler (not liege)
-war_enhancement_elect_ruler_not_liege = {
-	scope:riseandfall_war_enhancement_attacker.liege.primary_title.holder = { 
+# Event .1.b effect: Elect ruler
+war_enhancement_elect_ruler = {
+	scope:riseandfall_war_enhancement_attacker.liege = { 
 		try_start_diarchy = regency
 		set_diarch = root
 		change_diarchy_swing = 100
 	}
-	
 	scope:riseandfall_war_enhancement_attacker.liege.primary_title = {
-		add_title_law = feudal_elective_succession_law
+		clear_title_laws = yes
+		save_scope_as = riseandfall_liege_elective_title
+		add_title_law = feudal_elective_succession_law 
 	}
-	
+
 	scope:riseandfall_war_enhancement_attacker.liege.diarch = {
 		trigger_event = {
 			id = riseandfall_war_enhancement.6
@@ -77,23 +93,112 @@ war_enhancement_elect_ruler_not_liege = {
 	}
 }
 
-# Event .1.c effect: Elect ruler (still liege)
-war_enhancement_elect_ruler_still_liege = {
-	scope:riseandfall_war_enhancement_liege_primary_title.holder = { 
-		try_start_diarchy = regency
-		set_diarch = root
-		change_diarchy_swing = 100
-	}
-	
-	scope:riseandfall_war_enhancement_liege_primary_title = {
-		add_title_law = feudal_elective_succession_law
-	}
-	
-	scope:riseandfall_war_enhancement_liege_primary_title.holder.diarch = {
-		trigger_event = {
-			id = riseandfall_war_enhancement.6
-			days = 30
+# Event .1.c effect: Tyrannically overthrow electoral system
+war_enhancement_overthrow_electoral_system = {
+	add_tyranny = 25
+	if = { 
+		limit = {
+			scope:riseandfall_war_enhancement_attacker.liege = {
+				any_held_title = {
+					is_de_facto_liege_or_above_target = scope:riseandfall_war_enhancement_attacker.capital_county.de_jure_liege.de_jure_liege
+				}
+			}
 		}
+		scope:riseandfall_war_enhancement_attacker.capital_county.de_jure_liege = {
+		
+		}
+		hidden_effect = {
+			scope:riseandfall_liege_elective_title = {
+				clear_title_laws = yes
+			}
+		}
+	}
+	else = {
+		hidden_effect = {
+			scope:riseandfall_war_enhancement_attacker.liege.primary_title = {
+				save_scope_as = riseandfall_liege_elective_title
+				clear_title_laws = yes
+			}
+		}
+	}
+	root = {
+		create_title_and_vassal_change = {
+			type = conquest
+			save_scope_as = change
+		}		
+	}
+	scope:riseandfall_liege_elective_title = {
+		change_title_holder_include_vassals = {
+			holder = root
+			change = scope:change
+		}
+	}
+	scope:riseandfall_war_enhancement_attacker.liege = {
+		every_held_title = { 
+			limit = { 
+				OR = {
+					AND = {
+						OR = {
+							holder = scope:riseandfall_war_enhancement_attacker.liege
+							previous_holder = scope:riseandfall_war_enhancement_prev_liege
+						}
+						title_held_years < 1
+						OR = {
+							has_claim = root
+							de_jure_liege = scope:riseandfall_liege_elective_title
+						}
+					}
+					this = title_capital_county
+				}
+			}
+			change_title_holder_include_vassals = {
+				holder = root
+				change = scope:change
+			}
+		}
+	}
+	
+	scope:riseandfall_war_enhancement_attacker.liege = {
+		change_liege = {
+			liege = root
+			change = scope:change
+		}
+	}
+
+	root = {
+		resolve_title_and_vassal_change = scope:change
+	}
+	if = {
+		limit = { 
+			scope:riseandfall_liege_elective_title = { 
+				tier = tier_duchy	
+			}
+		}
+		add_legitimacy = -300
+	}
+	if = {
+		limit = { 
+			scope:riseandfall_liege_elective_title = { 
+				tier = tier_kingdom	
+			}
+		}
+		add_legitimacy = -600
+	}
+	if = {
+		limit = { 
+			scope:riseandfall_liege_elective_title = { 
+				tier = tier_empire	
+			}
+		}
+		add_legitimacy = -750
+	}
+	if = {
+		limit = { 
+			scope:riseandfall_liege_elective_title = { 
+				tier = tier_hegemony
+			}
+		}
+		add_legitimacy = -1000
 	}
 }
 
@@ -120,6 +225,7 @@ war_enhancement_execute_liege = {
 	if = {
 		limit = { 
 			scope:riseandfall_war_enhancement_attacker = { has_government = feudal_government }
+			#scope:riseandfall_war_enhancement_liege_primary_title.holder != root
 		}
 		scope:riseandfall_war_enhancement_attacker = {
 			trigger_event = {
@@ -135,6 +241,7 @@ war_enhancement_imprison_liege = {
 	if = {
 		limit = { 
 			scope:riseandfall_war_enhancement_attacker = { has_government = feudal_government }
+			#scope:riseandfall_war_enhancement_liege_primary_title.holder != root
 		}
 		scope:riseandfall_war_enhancement_attacker = {
 			trigger_event = {
@@ -172,9 +279,9 @@ war_enhancement_abdicate_to_heir = {
 			save_scope_as = change
 		}		
 	}
-	scope:riseandfall_war_enhancement_attacker.liege.primary_title = {
+	scope:riseandfall_liege_elective_title = {
 		change_title_holder_include_vassals = {
-			holder = scope:riseandfall_war_enhancement_attacker.liege.primary_title.current_heir
+			holder = scope:riseandfall_liege_elective_title.current_heir
 			change = scope:change
 		}
 	}
@@ -188,14 +295,14 @@ war_enhancement_abdicate_to_heir = {
 					}
 					title_held_years < 1
 					OR = {
-						has_claim = riseandfall_war_enhancement_attacker.liege.primary_title.current_heir
-						de_jure_liege = scope:riseandfall_war_enhancement_attacker.liege.primary_title
-						de_facto_liege = scope:riseandfall_war_enhancement_attacker.liege.primary_title
+						has_claim = scope:riseandfall_liege_elective_title.current_heir
+						de_jure_liege = scope:riseandfall_liege_elective_title
+						de_facto_liege = scope:riseandfall_war_enhancement_attacker.liege
 					}
 				}
 			}
 			change_title_holder_include_vassals = {
-				holder = scope:riseandfall_war_enhancement_attacker.liege.primary_title.current_heir
+				holder = scope:riseandfall_liege_elective_title.current_heir
 				change = scope:change
 			}
 		}
@@ -203,7 +310,7 @@ war_enhancement_abdicate_to_heir = {
 	
 	scope:riseandfall_war_enhancement_attacker.liege = {
 		change_liege = {
-			liege = scope:riseandfall_war_enhancement_attacker.liege.primary_title.current_heir
+			liege = scope:riseandfall_liege_elective_title.current_heir
 			change = scope:change
 		}
 	}
@@ -211,16 +318,16 @@ war_enhancement_abdicate_to_heir = {
 	root = {
 		resolve_title_and_vassal_change = scope:change
 	}
-	scope:riseandfall_war_enhancement_liege_primary_title = { remove_title_law = feudal_elective_succession_law }
+	scope:riseandfall_liege_elective_title = { remove_title_law = feudal_elective_succession_law }
 }
 
 # Event .6.b effect: Extend rule temporarily
 war_enhancement_extend_rule = {
-	root = {
-		add_tyranny = 10
+	scope:riseandfall_liege_elective_title.holder.diarch = {
+		change_strife_opinion = 10
 		trigger_event = {
 			id = riseandfall_war_enhancement.6
-			days = 60
+			days = 90
 		}
 	}
 }
@@ -230,11 +337,11 @@ war_enhancement_seize_power = {
 	add_tyranny = 25
 	root = {
 		create_title_and_vassal_change = {
-			type = usurped
+			type = conquest
 			save_scope_as = change
 		}		
 	}
-	scope:riseandfall_war_enhancement_attacker.liege.primary_title = {
+	scope:riseandfall_liege_elective_title = {
 		change_title_holder_include_vassals = {
 			holder = root
 			change = scope:change
@@ -245,25 +352,69 @@ war_enhancement_seize_power = {
 			limit = { 
 				OR = {
 					AND = {
-						previous_holder = scope:riseandfall_war_enhancement_prev_liege
+						OR = {
+							holder = scope:riseandfall_war_enhancement_attacker.liege
+							previous_holder = scope:riseandfall_war_enhancement_prev_liege
+						}
 						title_held_years < 1
 						OR = {
 							has_claim = root
-							de_jure_liege = scope:riseandfall_war_enhancement_attacker.liege.primary_title
+							de_jure_liege = scope:riseandfall_liege_elective_title
 							de_facto_liege = scope:riseandfall_war_enhancement_attacker.liege
 						}
 					}
 					this = title_capital_county
 				}
 			}
-			change_title_holder = {
+			change_title_holder_include_vassals = {
 				holder = root
 				change = scope:change
 			}
 		}
 	}
+	
+	scope:riseandfall_war_enhancement_attacker.liege = {
+		change_liege = {
+			liege = root
+			change = scope:change
+		}
+	}
+
 	root = {
 		resolve_title_and_vassal_change = scope:change
 	}
-	scope:riseandfall_war_enhancement_liege_primary_title = { remove_title_law = feudal_elective_succession_law }
+	if = {
+		limit = { 
+			scope:riseandfall_liege_elective_title = { 
+				tier = tier_duchy	
+			}
+		}
+		add_legitimacy = -300
+	}
+	if = {
+		limit = { 
+			scope:riseandfall_liege_elective_title = { 
+				tier = tier_kingdom	
+			}
+		}
+		add_legitimacy = -600
+	}
+	if = {
+		limit = { 
+			scope:riseandfall_liege_elective_title = { 
+				tier = tier_empire	
+			}
+		}
+		add_legitimacy = -750
+	}
+	if = {
+		limit = { 
+			scope:riseandfall_liege_elective_title = { 
+				tier = tier_hegemony
+			}
+		}
+		add_legitimacy = -1000
+	}
+	
+	scope:riseandfall_liege_elective_title = { remove_title_law = feudal_elective_succession_law }
 }

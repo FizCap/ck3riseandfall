@@ -21,17 +21,19 @@ riseandfall_war_enhancement.1 = {
 	option = { # press my claims
 		name = riseandfall_war_enhancement.1.a
 		trigger = {
-			scope:riseandfall_war_enhancement_liege_primary_title = {
-				root = {
-					has_claim_on = prev
+			scope:riseandfall_liege_elective_title.holder = {
+				any_held_title = {
+					root = {
+						has_claim_on = prev
+					}
 				}
 			}
 		}
 		root = {
-			hidden_effect = { war_enhancement_press_claims = yes }
+			war_enhancement_press_claims = yes
 		}
 		ai_chance = {
-			base = 200
+			base = 800
 			ai_value_modifier = {
 				ai_greed = 0.5
 				ai_boldness = 0.3
@@ -55,28 +57,25 @@ riseandfall_war_enhancement.1 = {
 		
 	}
 	
-	# Option: Elect a suitable ruler by setting up a diarchy (for non-liege case).
-	option = { # lets elect a suitable ruler (case: not liege)
+	# Option: Elect a suitable ruler by setting up a diarchy.
+	option = { # lets elect a suitable ruler
 		name = riseandfall_war_enhancement.1.b
 		trigger = {
-			scope:riseandfall_war_enhancement_liege_primary_title.holder = {
-				AND = {
-					has_government = feudal_government
-					NOT = { is_liege_or_above_of = root }
-					NOT = { is_independent_ruler = root }
-				}
-				root.liege.primary_title = {
-					AND = {
-						previous_holder = scope:riseandfall_war_enhancement_prev_liege
-						title_held_years < 1
-					}
-				}
+			scope:riseandfall_war_enhancement_attacker.liege = {
+				has_government = feudal_government
+				has_realm_law_flag = partition_succession_law
+			}
+			scope:riseandfall_war_enhancement_attacker.liege.primary_title = {
+				NOT = { has_title_law_flag = elective_succession_law }
+			}
+			root = {
+				is_independent_ruler = no
 			}
 		}
 		
-		hidden_effect = { war_enhancement_elect_ruler_not_liege = yes }
+		war_enhancement_elect_ruler = yes
 		ai_chance = {
-			base = -40
+			base = -75
 			ai_value_modifier = {
 				ai_greed = -0.3
 				ai_honor = 0.5
@@ -87,12 +86,16 @@ riseandfall_war_enhancement.1 = {
 			modifier = {
 				add = 20
 				root = {
-					has_trait = content
+					has_trait = just
 				}
 			}
-			
+			opinion_modifier = { # Opinion Factor
+				who = root
+				opinion_target = scope:riseandfall_war_enhancement_attacker.liege
+				multiplier = -5
+			}
 			modifier = {
-				add = -50
+				add = 30
 				root = {
 					has_trait = ambitious
 				}
@@ -100,35 +103,46 @@ riseandfall_war_enhancement.1 = {
 		}
 	}
 	
-	# Option: Elect a suitable ruler by setting up a diarchy (for still liege case).
-	option = { # lets elect a suitable ruler (case: still liege)
+	# Option: Seize power tyrannically from an elective system.
+	option = { # lets get rid of this silly elective system.
 		name = riseandfall_war_enhancement.1.c
 		trigger = {
-			scope:riseandfall_war_enhancement_liege_primary_title.holder = {
+			scope:riseandfall_war_enhancement_attacker.liege = {
 				has_government = feudal_government
-				is_liege_or_above_of = root
+			}
+			scope:riseandfall_war_enhancement_attacker.liege.primary_title = {
+				has_title_law_flag = elective_succession_law
+			}
+			root = {
+				is_independent_ruler = no
 			}
 		}
 		
-		hidden_effect = { war_enhancement_elect_ruler_still_liege = yes }
+		war_enhancement_overthrow_electoral_system = yes
 		ai_chance = {
-			base = -40
+			base = -200
 			ai_value_modifier = {
-				ai_greed = -0.3
-				ai_honor = 0.5
-				ai_energy = 0.4
-				ai_rationality = 0.75
+				ai_greed = 2
+				ai_honor = -1.5
+				ai_energy = 2.5
+				ai_compassion = -2
+				ai_boldness = 2.5
 				ai_sociability = 0.5
+				ai_vengefulness = 0.3
 			}
 			modifier = {
 				add = 20
 				root = {
-					has_trait = content
+					has_trait = ambitious
 				}
 			}
-			
+			opinion_modifier = { # Opinion Factor
+				who = root
+				opinion_target = scope:riseandfall_war_enhancement_attacker.liege
+				multiplier = -5
+			}
 			modifier = {
-				add = -50
+				add = 30
 				root = {
 					has_trait = ambitious
 				}
@@ -159,7 +173,7 @@ riseandfall_war_enhancement.1 = {
 				}
 			}
 		}
-		hidden_effect = { war_enhancement_declare_independence = yes }
+		war_enhancement_declare_independence = yes
 		ai_chance = {
 			base = 0
 			ai_value_modifier = {
@@ -189,18 +203,18 @@ riseandfall_war_enhancement.1 = {
 	option = { # decline
 		name = riseandfall_war_enhancement.1.e
 		ai_chance = {
-			base = 5
+			base = 100
 			ai_value_modifier = {
 				ai_greed = -0.75
-				ai_boldness = -0.3
+				ai_boldness = -2.5
 				ai_vengefulness = -1
-				ai_energy = -1
 				ai_honor = 0.3
 				ai_compassion = 0.3
-				ai_rationality = -1
+				ai_rationality = -0.2
+				ai_sociability = -1
 			}
 			modifier = {
-				add = 20
+				add = 50
 				root = {
 					has_trait = content
 				}
@@ -211,6 +225,11 @@ riseandfall_war_enhancement.1 = {
 				root = {
 					has_trait = ambitious
 				}
+			}
+			opinion_modifier = { # Opinion Factor
+				who = root
+				opinion_target = scope:riseandfall_war_enhancement_attacker.liege
+				multiplier = 2
 			}
 		}
 	}
@@ -237,7 +256,7 @@ riseandfall_war_enhancement.2 = {
 	# Option: Execute the previous liege.
 	option = { #execute him (feudal variant)
 		name = riseandfall_war_enhancement.2.a
-		hidden_effect = { war_enhancement_execute_liege = yes } 
+		war_enhancement_execute_liege = yes
 	}
 	
 	# Option: Do nothing (feudal government).
@@ -256,7 +275,7 @@ riseandfall_war_enhancement.2 = {
 				}
 			}		
 		} 
-		custom_tooltip = riseandfall_war_enhancement_do_nothing
+		#custom_tooltip = riseandfall_war_enhancement_do_nothing
 	}
 	
 	# Option: Do nothing (tribal government).
@@ -281,7 +300,7 @@ riseandfall_war_enhancement.2 = {
 	# Option: Imprison the previous liege.
 	option = { #imprison him
 		name = riseandfall_war_enhancement.2.d1
-		hidden_effect = { war_enhancement_imprison_liege = yes }
+		war_enhancement_imprison_liege = yes
 	}
 }
 
@@ -347,7 +366,7 @@ riseandfall_war_enhancement.3 = {
 	
 	option = {
 		name = riseandfall_war_enhancement.3.a
-		hidden_effect = { war_enhancement_start_war_against_liege = yes }
+		war_enhancement_start_war_against_liege = yes
 		ai_chance = {
 			base = -50
 
@@ -464,7 +483,7 @@ riseandfall_war_enhancement.4 = {
 	
 	option = {
 		name = riseandfall_war_enhancement.4.a
-		hidden_effect = { war_enhancement_join_civil_war = yes }
+		war_enhancement_join_civil_war = yes
 		ai_chance = {
 			base = -50
 
@@ -724,19 +743,75 @@ riseandfall_war_enhancement.6 = {
 	# Option: Abdicate as planned, passing titles to heir.
 	option = { #Abdicate as planned (x will become ruler) 
 		name = riseandfall_war_enhancement.6.a
-		hidden_effect = { war_enhancement_abdicate_to_heir = yes }
+		war_enhancement_abdicate_to_heir = yes 
+		ai_chance = {
+			base = 100
+			ai_value_modifier = {
+			ai_honor = 2
+			ai_compassion = 2
+			ai_vengefulness = -0.6
+			}
+			
+			opinion_modifier = { # Opinion Factor
+				who = root
+				opinion_target = scope:riseandfall_liege_elective_title.current_heir
+				multiplier = 2
+			}
+
+			modifier = { #I am the heir.
+				add = 100
+				scope:riseandfall_liege_elective_title.current_heir = root
+			}
+			
+		}
 	}
 	
-	# Option: Extend rule temporarily with some tyranny.
+	# Option: Extend rule temporarily with some strife.
 	option = { #extend our rule for a time (less tyrannical)
 		name = riseandfall_war_enhancement.6.b
-		hidden_effect = { war_enhancement_extend_rule = yes }
+		war_enhancement_extend_rule = yes
+		ai_chance = {
+			base = 100 
+			ai_value_modifier = {
+			ai_honor = -1
+			ai_energy = -1
+			ai_compassion = -0.3
+			}
+			
+			opinion_modifier = { # Opinion Factor
+				who = root
+				opinion_target = scope:riseandfall_liege_elective_title.current_heir
+				multiplier = -2
+			}
+		}
 	}
 	
 	# Option: Seize power tyrannically.
 	option = { #seize power (tyrannical)
 		name = riseandfall_war_enhancement.6.c
-		hidden_effect = { war_enhancement_seize_power = yes }
+		war_enhancement_seize_power = yes
+		ai_chance = {
+			base = -100 
+			ai_value_modifier = {
+			ai_honor = -2
+			ai_compassion = -0.3
+			ai_greed = 2
+			ai_vengefulness = 0.5
+			ai_energy = 1
+			ai_boldness = 0.8
+			}
+			
+			modifier = { #I am already the heir, there is no reason to seize the realm.
+				add = -300
+				scope:riseandfall_liege_elective_title.current_heir = root
+			}
+			
+			opinion_modifier = { # Opinion Factor
+				who = root
+				opinion_target = scope:riseandfall_liege_elective_title.current_heir
+				multiplier = -3
+			}
+		}
 	}
 }
 	

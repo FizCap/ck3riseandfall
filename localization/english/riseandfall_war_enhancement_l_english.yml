@@ -1,11 +1,12 @@
-l_english:
+﻿l_english:
  riseandfall_war_enhancement_rebellion_war_victory_desc_defender:0 "The rebels will decide the fate of the realm"
  riseandfall_war_enhancement_rebellion_desc:1 "The rebels will decide the fate of the realm"
  riseandfall_war_enhancement.1.t:0 "For the Good of the Realm"
  riseandfall_war_enhancement.1.desc:0 "Now that we have overthrown the [riseandfall_war_enhancement_liege_primary_title.GetBaseName] and have wrested control from [riseandfall_war_enhancement_prev_liege.GetName], now it is time to decide what is to be done with the realm."
  riseandfall_war_enhancement.1.a:0 "Of course, [riseandfall_war_enhancement_prev_liege.GetHerHis] titles are rightfully mine."
  riseandfall_war_enhancement.1.b:0 "We must elect a suitable ruler."
- riseandfall_war_enhancement.1.c:0 "We must elect a suitable ruler."
+ riseandfall_war_enhancement.1.c:0 "Let us overthrow this worthless elective system."
+ riseandfall_war_enhancement.1.d:0 "My own realm will inevitably overtake them."
  riseandfall_war_enhancement.1.e:0 "They have learned their lesson."
  riseandfall_war_enhancement_ruler_fate:0 "You will decide the fate of [riseandfall_war_enhancement_prev_liege.GetName]"
  
@@ -13,7 +14,7 @@ l_english:
  riseandfall_war_enhancement.2.d:0 "I, as the leader of the rebellion, now get to decide what happens to [riseandfall_war_enhancement_prev_liege.GetFirstNameBase]."
  riseandfall_war_enhancement.2.a:0 "Bring me [riseandfall_war_enhancement_prev_liege.GetHerHis] head!"
  riseandfall_war_enhancement.2.b:0 "[riseandfall_war_enhancement_prev_liege.GetHerHis] has forfeited [riseandfall_war_enhancement_prev_liege.GetHerHis] titles"
- riseandfall_war_enhancement.2.c:0 "He is nothing to fear now."
+ riseandfall_war_enhancement.2.c:0 "[riseandfall_war_enhancement_prev_liege.GetName] is nothing to fear now."
  riseandfall_war_enhancement_do_nothing:0 "[riseandfall_war_enhancement_prev_liege.GetName] walks free."
  riseandfall_war_enhancement.2.d1:0 "Put [riseandfall_war_enhancement_liege.GetHerHim] in the dungeon where he belongs."
  riseandfall_war_enhancement.2.e:0 "Depose and imprison [riseandfall_war_enhancement_prev_liege.GetHerHim]"
