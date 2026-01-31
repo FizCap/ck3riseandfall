@@ -20,6 +20,8 @@ riseandfall_dynamic_story_mode_se = {
     # Clear any existing large realm flags first
     every_independent_ruler = {
         remove_variable = riseandfall_large_realm
+        remove_variable = riseandfall_very_large_realm
+        remove_variable = riseandfall_massive_realm
     }
 
     # Evaluate each ruler and flag if they control >=5% of world counties
@@ -33,22 +35,41 @@ riseandfall_dynamic_story_mode_se = {
         # Save the full world total for inspection
         scope:outer_ruler = { set_variable = { name = tmp_world_total_full value = var:tmp_world_total } }
 
-        # Compute 5% threshold on the saved outer scope (integer math: *5/100)
+        # Compute percentage thresholds on the saved outer scope (integer math)
+        # 5% threshold
         scope:outer_ruler = { change_variable = { name = tmp_world_total multiply = 5 } }
         scope:outer_ruler = { change_variable = { name = tmp_world_total divide = 100 } }
+        # 10% threshold
+        scope:outer_ruler = { set_variable = { name = tmp_world_total_10 value = scope:outer_ruler.var:tmp_world_total_full } }
+        scope:outer_ruler = { change_variable = { name = tmp_world_total_10 multiply = 10 } }
+        scope:outer_ruler = { change_variable = { name = tmp_world_total_10 divide = 100 } }
+        # 15% threshold
+        scope:outer_ruler = { set_variable = { name = tmp_world_total_15 value = scope:outer_ruler.var:tmp_world_total_full } }
+        scope:outer_ruler = { change_variable = { name = tmp_world_total_15 multiply = 15 } }
+        scope:outer_ruler = { change_variable = { name = tmp_world_total_15 divide = 100 } }
 
         # Save the ruler's realm size for inspection
         scope:outer_ruler = { set_variable = { name = tmp_realm_size value = realm_size } }
 
-        # If this ruler meets or exceeds the threshold, flag them
+        # Flag massive (>=15%), very large (>=10%), or large (>=5%) in that order
         if = {
+            limit = { realm_size >= scope:outer_ruler.var:tmp_world_total_15 }
+            set_variable = { name = riseandfall_massive_realm value = 1 }
+        }
+        else_if = {
+            limit = { realm_size >= scope:outer_ruler.var:tmp_world_total_10 }
+            set_variable = { name = riseandfall_very_large_realm value = 1 }
+        }
+        else_if = {
             limit = { realm_size >= scope:outer_ruler.var:tmp_world_total }
             set_variable = { name = riseandfall_large_realm value = 1 }
         }
 
-        # Clean up temporary var from the saved scope and clear saved scope
+        # Clean up temporary vars from the saved scope and clear saved scope
         scope:outer_ruler = { remove_variable = tmp_world_total }
         scope:outer_ruler = { remove_variable = tmp_world_total_full }
+        scope:outer_ruler = { remove_variable = tmp_world_total_10 }
+        scope:outer_ruler = { remove_variable = tmp_world_total_15 }
         scope:outer_ruler = { remove_variable = tmp_realm_size }
         clear_saved_scope = outer_ruler
     }
