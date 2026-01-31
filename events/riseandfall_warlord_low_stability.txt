@@ -58,9 +58,19 @@ warlord.1002 = {
                 }
             }
         }
-        # If not a powerful vassal, remove any existing claims on liege's titles
+        # If not a powerful vassal (or not a member of a powerful family), remove any existing claims on liege's titles
         if = {
-            limit = { NOT = { is_powerful_vassal = yes } }
+            limit = {
+                NOT = {
+                    OR = {
+                        is_powerful_vassal = yes
+                        AND = {
+                            is_landed = yes
+                            house = { is_powerful_family = yes }
+                        }
+                    }
+                }
+            }
             if = {
                 limit = { exists = liege }
                 liege = {
@@ -79,9 +89,17 @@ warlord.1002 = {
             opinion = { target = liege value < 50 }
         }
     }
-    # Immediately run the warlord action event for this new warlord (only for powerful vassals)
+    # Immediately run the warlord action event for this new warlord (powerful vassals, or landed members of a powerful family)
     if = {
-        limit = { is_powerful_vassal = yes }
+        limit = {
+            OR = {
+                is_powerful_vassal = yes
+                AND = {
+                    is_landed = yes
+                    house = { is_powerful_family = yes }
+                }
+            }
+        }
         trigger_event = { id = warlord.1003 }
     }
     }
