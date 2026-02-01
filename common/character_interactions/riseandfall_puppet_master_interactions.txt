@@ -240,7 +240,7 @@ riseandfall_overthrow_liege_interaction = {
 		}
 	}
 	# How often AI considers this by top-title tier (months)
-	ai_frequency = 12
+	ai_frequency = 6
 	# Allow AI to consider this interaction
 	ai_potential = { always = yes }
 
@@ -249,19 +249,33 @@ riseandfall_overthrow_liege_interaction = {
 		max = 1
 	}
 
-	# Rare/conditional
+	# Rare/conditional — rebalanced to make overthrow achievable under clear conditions
 	ai_will_do = {
-		# Overthrow: major action — rare but achievable when conditions are strongly in favor of the actor (ambitious/vengeful actors, weak or disliked liege)
-		base = -400
+		# Overthrow: major action — still rare, but more likely when stability, tenure, opinion or wartime conditions favor the actor
+		base = -200
 
-		modifier = { scope:actor = { has_trait = ambitious } add = 500 }
-		modifier = { scope:actor = { has_trait = greedy } add = 300 }
-		modifier = { scope:actor = { has_trait = vengeful } add = 250 }
+		# Traits
+		modifier = { scope:actor = { has_trait = ambitious } add = 400 }
+		modifier = { scope:actor = { has_trait = greedy } add = 250 }
+		modifier = { scope:actor = { has_trait = vengeful } add = 200 }
 		modifier = { scope:actor = { has_trait = deceitful } add = 150 }
 		modifier = { scope:actor = { has_trait = honest } add = -300 }
 
-		# If liege dislikes the diarch, more impetus to overthrow
+		# Opinion tiers — stronger penalty for deeply negative relations
 		modifier = { scope:recipient = { opinion = { target = scope:actor value < 0 } } add = 300 }
+		modifier = { scope:recipient = { opinion = { target = scope:actor value <= -50 } } add = 200 }
+
+		# Stability & tenure make overthrow easier
+		modifier = { scope:recipient = { riseandfall_liege_stability_below_30 = yes } add = 200 }
+		modifier = { scope:recipient = { has_variable = riseandfall_puppet_regency_years var:riseandfall_puppet_regency_years >= 10 } add = 200 }
+		modifier = { scope:recipient = { riseandfall_puppet_regency_years_at_least_5 = yes } add = 100 }
+
+		# Liege distracted / vulnerable
+		modifier = { scope:recipient = { is_at_war = yes } add = 150 }
+
+		# Actor advantages
+		modifier = { scope:actor = { has_hook_of_type = { target = scope:recipient type = strong_favor_hook } } add = 100 }
+		modifier = { scope:actor = { is_at_war = yes } add = -150 }
 	}
 }
 
