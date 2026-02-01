@@ -1,0 +1,279 @@
+﻿##########################
+# Rise and Fall - Create Adventurer Invasion
+# Creates a random number (3-10) of adventurers with claims on the ruler's primary title
+
+riseandfall_create_adventurer_invasion_se = {
+    # Called on the ruler (root)
+    save_scope_as = ruler_root  # Save the ruler for use in iterators
+    scope:ruler_root = { save_scope_as = independent_ruler }
+
+    # Initialize variables for tooltip safety
+    set_variable = { name = selected value = 0 }
+    scope:ruler_root = { set_variable = { name = selected value = 0 } }
+    # Also initialize key variables on root (the original scope) so tooltip evaluation can access them
+    root = {
+        set_variable = { name = selected value = 0 }
+        set_variable = { name = claimant_count value = 0 }
+        set_variable = { name = to_select value = 0 }
+        set_variable = { name = remaining_to_select value = 0 }
+        set_variable = { name = num_existing value = 1 }
+        set_variable = { name = num_generated value = 1 }
+        set_variable = { name = remaining_courtier_slots value = 0 }
+        set_variable = { name = generated_to_create value = 0 }
+        set_variable = { name = no_more_courtiers value = 0 }
+    }
+    # Mirror same initial variables on the saved ruler scope so change_variable in that scope
+    # operates on value-typed variables (prevents 'Variable not of the value scope type' errors)
+    scope:ruler_root = {
+        set_variable = { name = claimant_count value = 0 }
+        set_variable = { name = to_select value = 0 }
+        set_variable = { name = remaining_to_select value = 0 }
+        set_variable = { name = num_existing value = 1 }
+        set_variable = { name = num_generated value = 1 }
+        set_variable = { name = remaining_courtier_slots value = 0 }
+        set_variable = { name = generated_to_create value = 0 }
+        set_variable = { name = no_more_courtiers value = 0 }
+    }
+    set_variable = { name = claimant_count value = 0 }
+    set_variable = { name = to_select value = 0 }
+    set_variable = { name = remaining_to_select value = 0 }
+    set_variable = { name = num_existing value = 1 }
+    set_variable = { name = num_generated value = 1 }
+    set_variable = { name = remaining_courtier_slots value = 0 }
+    set_variable = { name = generated_to_create value = 0 }
+    set_variable = { name = no_more_courtiers value = 0 }
+    # Determine number of adventurers from existing claimants: random 1-5
+    set_variable = { name = num_existing value = 1 }
+    random_list = {
+        20 = { set_variable = { name = num_existing value = 1 } }
+        20 = { set_variable = { name = num_existing value = 2 } }
+        20 = { set_variable = { name = num_existing value = 3 } }
+        20 = { set_variable = { name = num_existing value = 4 } }
+        20 = { set_variable = { name = num_existing value = 5 } }
+    }
+    # Determine number of adventurers from generated characters: random 1-5
+    set_variable = { name = num_generated value = 1 }
+    random_list = {
+        20 = { set_variable = { name = num_generated value = 1 } }
+        20 = { set_variable = { name = num_generated value = 2 } }
+        20 = { set_variable = { name = num_generated value = 3 } }
+        20 = { set_variable = { name = num_generated value = 4 } }
+        20 = { set_variable = { name = num_generated value = 5 } }
+    }
+
+    # Handle existing claimants
+    # Count existing claimants (store on saved ruler scope)
+    set_variable = { name = claimant_count value = 0 }
+    every_living_character = {
+        limit = { has_claim_on = root.primary_title }
+        root = { change_variable = { name = claimant_count add = 1 } }
+    }
+    # Mirror selection count to saved scope and track remaining slots
+    set_variable = { name = to_select value = var:num_existing }
+    root = { set_variable = { name = to_select value = var:num_existing } }
+    set_variable = { name = remaining_to_select value = var:to_select }
+    root = { set_variable = { name = remaining_to_select value = var:to_select } }
+
+    # Pick claimants one-by-one using random_character to avoid iterator-time var comparisons
+    while = {
+        limit = { var:remaining_to_select > 0 }
+        # clear any previous saved candidate
+        scope:ruler_root = { clear_saved_scope = adventurer_candidate }
+
+        # Attempt to pick a random eligible claimant
+        scope:ruler_root = {
+            every_living_character = {
+                limit = {
+                    has_claim_on = scope:ruler_root.primary_title
+                    is_landed = no
+                    NOT = { has_government = landless_adventurer_government }
+                    age >= 16
+                    NOT = { has_character_flag = riseandfall_newadventurer }
+                    NOT = { has_trait_with_flag = can_not_marry }
+                }
+                save_scope_as = adventurer_candidate
+            }
+        }
+
+        if = {
+            limit = { exists = scope:adventurer_candidate }
+            scope:adventurer_candidate = {
+                # Disqualify if too close to the ruler (allies/spouse/heir)
+                set_variable = { name = rf_disqualify value = 0 }
+                if = {
+                    limit = {
+                        OR = {
+                            is_allied_to = root
+                            is_spouse_of = root
+                            is_heir_of = root
+                            is_primary_heir_of = root
+                            is_player_heir_of = root
+                        }
+                    }
+                    set_variable = { name = rf_disqualify value = 1 }
+                }
+
+                if = {
+                    limit = { var:rf_disqualify == 0 }
+                    # Select this claimant
+                    if = { limit = { exists = scope:adventurer_candidate scope:adventurer_candidate = { is_alive = yes } } scope:adventurer_candidate = { riseandfall_do_create_adventurer_se = yes } }
+                    scope:ruler_root = { change_variable = { name = remaining_to_select subtract = 1 } }
+                    root = { change_variable = { name = remaining_to_select subtract = 1 } }
+                }
+                else = {
+                    # Found claimant but disqualified (ally/heir/etc.) -> consume one attempt to avoid infinite loop
+                    scope:ruler_root = { change_variable = { name = remaining_to_select subtract = 1 } }
+                    root = { change_variable = { name = remaining_to_select subtract = 1 } }
+                }
+                remove_variable = rf_disqualify
+            }
+        }
+        else = {
+            # No eligible claimants found -> stop attempting
+            set_variable = { name = remaining_to_select value = 0 }
+            root = { set_variable = { name = remaining_to_select value = 0 } }
+        }
+    }
+
+    # Clean up mirrored variables used for tooltip-safety
+    remove_variable = to_select
+    scope:ruler_root = { remove_variable = to_select }
+    remove_variable = remaining_to_select
+    scope:ruler_root = { remove_variable = remaining_to_select }
+
+    # Try to conscript existing courtiers before generating new adventurers
+    set_variable = { name = remaining_courtier_slots value = var:num_generated }
+    set_variable = { name = no_more_courtiers value = 0 }
+    # Setup a best-score tracker on the saved ruler scope so we can pick the "best" courtier
+    scope:ruler_root = { set_variable = { name = tmp_best_adventurer_score value = -9999 } }
+    while = {
+        limit = {
+            var:remaining_courtier_slots > 0
+            var:no_more_courtiers == 0
+        }
+        clear_saved_scope = adventurer_candidate
+        root = {
+            # Select the best courtier by aggregated stats rather than a single random pick
+            every_courtier = {
+                limit = {
+                    age >= 16
+                    is_landed = no
+                    NOT = { has_government = landless_adventurer_government }
+                    NOT = { has_character_flag = riseandfall_newadventurer }
+                    NOT = { has_trait_with_flag = can_not_marry }
+                    NOT = {
+                        OR = {
+                            is_allied_to = root
+                            is_spouse_of = root
+                            is_heir_of = root
+                            is_primary_heir_of = root
+                            is_player_heir_of = root
+                        }
+                    }
+                }
+                # Compute a weighted-stat 'candidate_total' to choose the best candidate
+                set_variable = { name = candidate_total value = diplomacy }
+                change_variable = { name = candidate_total add = martial }
+                change_variable = { name = candidate_total add = stewardship }
+                change_variable = { name = candidate_total add = intrigue }
+                change_variable = { name = candidate_total add = learning }
+
+                # Save candidate score into the ruler scope for safe comparison
+                save_scope_as = candidate_for_score
+                scope:ruler_root = { set_variable = { name = tmp_candidate value = scope:candidate_for_score.var:candidate_total } }
+
+                # If this candidate is better than the saved best, select them
+                if = {
+                    limit = { scope:ruler_root = { has_variable = tmp_candidate } }
+                    if = {
+                        limit = { scope:ruler_root.var:tmp_candidate > scope:ruler_root.var:tmp_best_adventurer_score }
+                        save_scope_as = adventurer_candidate
+                        scope:ruler_root = { set_variable = { name = tmp_best_adventurer_score value = scope:ruler_root.var:tmp_candidate } }
+                    }
+                }
+            }
+        }
+        if = {
+            limit = { exists = scope:adventurer_candidate }
+            scope:adventurer_candidate = {
+                # Disqualify courtiers who are close to the ruler (ally/spouse/heir) or who
+                # already hold claims on the ruler_root's kingdom+ titles.
+                set_variable = { name = rf_disqualify value = 0 }
+                # Close-relation checks (same as claimant checks)
+                if = {
+                    limit = {
+                        OR = {
+                            is_allied_to = root
+                            is_spouse_of = root
+                            is_heir_of = root
+                            is_primary_heir_of = root
+                            is_player_heir_of = root
+                        }
+                    }
+                    set_variable = { name = rf_disqualify value = 1 }
+                }
+
+                # Check for claims on ruler_root's kingdom+ titles
+                scope:ruler_root = {
+                    every_held_title = {
+                        limit = { tier >= tier_kingdom }
+                        scope:adventurer_candidate = {
+                            if = { limit = { has_claim_on = prev } set_variable = { name = rf_disqualify value = 1 } }
+                        }
+                    }
+                }
+
+                if = {
+                    limit = { var:rf_disqualify == 0 }
+                    scope:adventurer_candidate = {
+                        add_unpressed_claim = scope:ruler_root.primary_title
+                    }
+                    if = { limit = { exists = scope:adventurer_candidate scope:adventurer_candidate = { is_alive = yes } } scope:adventurer_candidate = { riseandfall_do_create_adventurer_se = yes } }
+                    # consume a courtier slot for a successful conscription
+                    scope:ruler_root = { change_variable = { name = remaining_courtier_slots subtract = 1 } }
+                    root = { change_variable = { name = remaining_courtier_slots subtract = 1 } }
+                }
+                else = {
+                    # Disqualified courtiers still consume an attempt to avoid infinite loops
+                    scope:ruler_root = { change_variable = { name = remaining_courtier_slots subtract = 1 } }
+                    root = { change_variable = { name = remaining_courtier_slots subtract = 1 } }
+                }
+                remove_variable = rf_disqualify
+            }
+        }
+        else = {
+            set_variable = { name = no_more_courtiers value = 1 }
+        }
+    }
+    clear_saved_scope = adventurer_candidate
+
+    set_variable = { name = generated_to_create value = var:remaining_courtier_slots }
+    set_variable = { name = no_more_courtiers value = 0 }
+
+    # Handle generated characters if we still have open slots
+    while = {
+        limit = { var:generated_to_create > 0 }
+        create_character = {
+            location = root.capital_province
+            culture = root.culture
+            faith = root.faith
+            age = { 16 40 }
+            gender_female_chance = 50
+            save_scope_as = adventurer_candidate
+        }
+        scope:adventurer_candidate = {
+            add_unpressed_claim = scope:ruler_root.primary_title
+        }
+        if = { limit = { exists = scope:adventurer_candidate scope:adventurer_candidate = { is_alive = yes } } scope:adventurer_candidate = { riseandfall_do_create_adventurer_se = yes } }
+        change_variable = { name = generated_to_create subtract = 1 }
+    }
+
+    clear_saved_scope = adventurer_candidate
+
+    remove_variable = remaining_courtier_slots
+    remove_variable = generated_to_create
+    remove_variable = no_more_courtiers
+    remove_variable = num_existing
+    remove_variable = num_generated
+    remove_variable = claimant_count
+}
