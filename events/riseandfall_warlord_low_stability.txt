@@ -18,13 +18,7 @@ warlord.1001 = {
             add_realm_law = crown_authority_0
         }
         hidden_effect = {
-            every_vassal = {
-                limit = {
-                    NOT = { has_trait = warlord }
-                    NOT = { has_trait = loyal }
-                }
-                trigger_event = { id = warlord.1002 }
-            }
+            riseandfall_warlord_notify_vassals = yes
             # Set low stability cooldown on the liege when this event fires
             set_variable = { name = low_stability_cooldown value = yes years = 5 }
         }
@@ -48,74 +42,21 @@ warlord.1002 = {
     option = {
         name = warlord.1002.a
         # Become a warlord: gain the 'warlord' trait and create a decision to raise faction/claim
-        add_trait = warlord
-                if = {
-            limit = { is_independent_ruler = no }
-            liege = {
-                add_opinion = {
-                    target = root
-                    modifier = warlord_rebellion_opinion
-                }
+        riseandfall_warlord_become_warlord = yes
+        ai_chance = {
+            base = 0
+            modifier = {
+                add = 100
+                is_independent_ruler = no
+                opinion = { target = liege value < 50 }
             }
         }
-        # If not a powerful vassal (or not a member of a powerful family), remove any existing claims on liege's titles
-        if = {
-            limit = {
-                NOT = {
-                    OR = {
-                        is_powerful_vassal = yes
-                        AND = {
-                            is_landed = yes
-                            house = { is_powerful_family = yes }
-                        }
-                    }
-                }
-            }
-            if = {
-                limit = { exists = liege }
-                liege = {
-                    every_held_title = {
-                        limit = { root = { has_claim_on = prev } }
-                        root = { remove_claim = prev }
-                    }
-                }
-            }
-        }
-    ai_chance = {
-        base = 0
-        modifier = {
-            add = 100
-            is_independent_ruler = no
-            opinion = { target = liege value < 50 }
-        }
-    }
-    # Immediately run the warlord action event for this new warlord (powerful vassals, or landed members of a powerful family)
-    if = {
-        limit = {
-            OR = {
-                is_powerful_vassal = yes
-                AND = {
-                    is_landed = yes
-                    house = { is_powerful_family = yes }
-                }
-            }
-        }
-        trigger_event = { id = warlord.1003 }
-    }
     }
 
     option = {
         name = warlord.1002.b
         # Remain loyal: boost relationzs with liege instead of adding trait
-        if = {
-            limit = { is_independent_ruler = no }
-            liege = {
-                add_opinion = {
-                    target = root
-                    modifier = warlord_loyalty_opinion
-                }
-            }
-        }
+        riseandfall_warlord_remain_loyal = yes
         # small positive opinion or stability bonus could be added by scripted effects
         ai_chance = {
             base = 0
@@ -159,76 +100,12 @@ warlord.1003 = {
             }
         }
         # Give claims on the liege's own titles to the warlord (only for powerful vassals)
-        if = {
-            limit = { exists = liege }
-            if = {
-                # Only proceed for powerful vassals. Avoid scope:root context switches in tooltip
-                # validation by using a single character-scoped token that is safe to evaluate.
-                limit = { is_powerful_vassal = yes }
-                liege = {
-                    # Give claims only on the highest tier titles the liege holds
-                    if = {
-                        limit = { any_held_title = { tier = tier_hegemony } }
-                        every_held_title = {
-                            limit = {
-                                tier = tier_hegemony
-                                NOT = { root = { has_claim_on = prev } }
-                            }
-                            root = { add_unpressed_claim = prev }
-                        }
-                    }
-                    else_if = {
-                        limit = { any_held_title = { tier = tier_empire } }
-                        every_held_title = {
-                            limit = {
-                                tier = tier_empire
-                                NOT = { root = { has_claim_on = prev } }
-                            }
-                            root = { add_unpressed_claim = prev }
-                        }
-                    }
-                    else_if = {
-                        limit = { any_held_title = { tier = tier_kingdom } }
-                        every_held_title = {
-                            limit = {
-                                tier = tier_kingdom
-                                NOT = { root = { has_claim_on = prev } }
-                            }
-                            root = { add_unpressed_claim = prev }
-                        }
-                    }
-                    else_if = {
-                        limit = { any_held_title = { tier = tier_duchy } }
-                        every_held_title = {
-                            limit = {
-                                tier = tier_duchy
-                                NOT = { root = { has_claim_on = prev } }
-                            }
-                            root = { add_unpressed_claim = prev }
-                        }
-                    }
-                    else = {
-                        every_held_title = {
-                            limit = {
-                                tier = tier_county
-                                NOT = { root = { has_claim_on = prev } }
-                            }
-                            root = { add_unpressed_claim = prev }
-                        }
-                    }
-                        
-                    add_opinion = {
-                        target = root
-                        modifier = warlord_rebellion_opinion
-                    }
-                }
-            }
-        }
+        riseandfall_warlord_claim_liege_titles = yes
     }
     option = {
         name = warlord.1003.b
         # Remove the warlord trait and abandon the path
-        remove_trait = warlord
+        riseandfall_warlord_abandon_path = yes
         ai_chance = {
             base = 0
             modifier = {
@@ -240,16 +117,6 @@ warlord.1003 = {
                 liege = {
                     has_variable = riseandfall_realm_stability_score
                     var:riseandfall_realm_stability_score > 60
-                }
-            }
-        }
-        # If this character had claims on their liege's titles, remove them
-        if = {
-            limit = { exists = liege }
-            liege = {
-                every_held_title = {
-                    limit = { root = { has_claim_on = prev } }
-                    root = { remove_claim = prev }
                 }
             }
         }

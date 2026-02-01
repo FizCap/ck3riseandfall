@@ -1,0 +1,156 @@
+﻿# Rise and Fall - Warlord Scripted Effects
+# Contains scripted effects related to warlord events
+
+# Notify vassals to choose warlord path or remain loyal
+riseandfall_warlord_notify_vassals = {
+    every_vassal = {
+        limit = {
+            NOT = { has_trait = warlord }
+            NOT = { has_trait = loyal }
+        }
+        trigger_event = { id = warlord.1002 }
+    }
+}
+
+# Become a warlord: add trait, opinions, remove claims if not powerful, trigger next event if powerful
+riseandfall_warlord_become_warlord = {
+    add_trait = warlord
+    if = {
+        limit = { is_independent_ruler = no }
+        liege = {
+            add_opinion = {
+                target = root
+                modifier = warlord_rebellion_opinion
+            }
+        }
+    }
+    # If not a powerful vassal (or not a member of a powerful family), remove any existing claims on liege's titles
+    if = {
+        limit = {
+            NOT = {
+                OR = {
+                    is_powerful_vassal = yes
+                    AND = {
+                        is_landed = yes
+                        house = { is_powerful_family = yes }
+                    }
+                }
+            }
+        }
+        if = {
+            limit = { exists = liege }
+            liege = {
+                every_held_title = {
+                    limit = { root = { has_claim_on = prev } }
+                    root = { remove_claim = prev }
+                }
+            }
+        }
+    }
+    # Immediately run the warlord action event for this new warlord if the liege has no powerful vassals
+    if = {
+        limit = { liege = { riseandfall_no_powerful_vassals_trigger = yes } }
+        trigger_event = { id = warlord.1003 }
+    }
+}
+
+# Remain loyal: add loyalty opinion
+riseandfall_warlord_remain_loyal = {
+    if = {
+        limit = { is_independent_ruler = no }
+        liege = {
+            add_opinion = {
+                target = root
+                modifier = warlord_loyalty_opinion
+            }
+        }
+    }
+}
+
+# Claim liege's titles (for powerful vassals or when liege has no powerful vassals)
+riseandfall_warlord_claim_liege_titles = {
+    if = {
+        limit = { exists = liege }
+        if = {
+            # Proceed for powerful vassals or when liege has no powerful vassals
+            limit = {
+                OR = {
+                    is_powerful_vassal = yes
+                    liege = { riseandfall_no_powerful_vassals_trigger = yes }
+                }
+            }
+            liege = {
+                # Give claims only on the highest tier titles the liege holds
+                if = {
+                    limit = { any_held_title = { tier = tier_hegemony } }
+                    every_held_title = {
+                        limit = {
+                            tier = tier_hegemony
+                            NOT = { root = { has_claim_on = prev } }
+                        }
+                        root = { add_unpressed_claim = prev }
+                    }
+                }
+                else_if = {
+                    limit = { any_held_title = { tier = tier_empire } }
+                    every_held_title = {
+                        limit = {
+                            tier = tier_empire
+                            NOT = { root = { has_claim_on = prev } }
+                        }
+                        root = { add_unpressed_claim = prev }
+                    }
+                }
+                else_if = {
+                    limit = { any_held_title = { tier = tier_kingdom } }
+                    every_held_title = {
+                        limit = {
+                            tier = tier_kingdom
+                            NOT = { root = { has_claim_on = prev } }
+                        }
+                        root = { add_unpressed_claim = prev }
+                    }
+                }
+                else_if = {
+                    limit = { any_held_title = { tier = tier_duchy } }
+                    every_held_title = {
+                        limit = {
+                            tier = tier_duchy
+                            NOT = { root = { has_claim_on = prev } }
+                        }
+                        root = { add_unpressed_claim = prev }
+                    }
+                }
+                else = {
+                    every_held_title = {
+                        limit = {
+                            tier = tier_county
+                            NOT = { root = { has_claim_on = prev } }
+                        }
+                        root = { add_unpressed_claim = prev }
+                    }
+                }
+                        
+                add_opinion = {
+                    target = root
+                    modifier = warlord_rebellion_opinion
+                }
+            }
+        }
+    }
+}
+
+# Abandon warlord path: remove trait and claims
+riseandfall_warlord_abandon_path = {
+    remove_trait = warlord
+    # If this character had claims on their liege's titles, remove them
+    if = {
+        limit = { exists = liege }
+        liege = {
+            every_held_title = {
+                limit = { root = { has_claim_on = prev } }
+                root = { remove_claim = prev }
+            }
+        }
+    }
+}
