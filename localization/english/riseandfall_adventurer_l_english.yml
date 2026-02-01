@@ -27,6 +27,8 @@ riseandfall_vassal_limit_bonus_desc: "A small permanent increase to vassal limit
 
 # Reason key for becoming a rival
 riseandfall_adventurer_became_rival: "Became rival due to adventurer uprising"
+# Reason key for becoming a rival due to realm split
+riseandfall_realmsplit_became_rival: "Became rival due to realm split"
 
 # Adventurer Camp Created Message
 riseandfall_adventurer_camp_created_title: "Legitimist Revolt Brewing"

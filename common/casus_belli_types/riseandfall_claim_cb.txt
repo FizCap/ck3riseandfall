@@ -636,13 +636,19 @@
     should_show_war_goal_subview = yes
 
     attacker_wargoal_percentage = 0.8
+    attacker_ticking_warscore_delay = { months = 3 }    # Shorten delay before ticking War Score starts
+    defender_ticking_warscore_delay = { months = 3 }
+    attacker_ticking_warscore = 0.2                     # Increase daily ticking War Score
+    defender_ticking_warscore = 0.2
+    attacker_score_from_battles_scale = 40
+    defender_score_from_battles_scale = 50
     max_attacker_score_from_battles = 100
-    max_attacker_score_from_occupation = 150
     max_defender_score_from_battles = 100
+    max_attacker_score_from_occupation = 150
     max_defender_score_from_occupation = 150
     max_ai_diplo_distance_to_title = 1000
-    attacker_score_from_occupation_scale = 20			# War Score from occupation by the Attacker is modified by this value
-	defender_score_from_occupation_scale = 20			# War Score from occupation by the defender is modified by this value
+    attacker_score_from_occupation_scale = 100         # Restore occupation scale to vanilla
+    defender_score_from_occupation_scale = 100         # Restore occupation scale to vanilla
     landless_attacker_needs_armies = yes 				# If set to no, being landless and having no armies doesn't automatically give the other side 100% warscore
 
     white_peace_possible = no # If set to "no", white peaces can't happen; only victory, defeat, or invalidation

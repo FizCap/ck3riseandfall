@@ -45,9 +45,4 @@ riseandfall_can_realm_split_trigger = {
             }
         }
     }
-    # Must have low stability
-    OR = {
-        NOT = { has_variable = riseandfall_realm_stability_score }
-        var:riseandfall_realm_stability_score <= 15
-    }
 }

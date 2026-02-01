@@ -48,13 +48,18 @@ riseandfall_low_stability_roll_se = {
                     if = { limit = { AND = { var:tmp_diff > 0 var:tmp_chance < 1 } } set_variable = { name = tmp_chance value = 1 } }
                 }
 
-                # Dynamic Story Mode: Large realms (>=5% of world) have minimum 1% chance
+                # Dynamic Story Mode: Very large and massive realms get stronger minimum chances
                 if = {
+                    limit = { has_variable = riseandfall_massive_realm }
+                    if = { limit = { var:tmp_chance < 3 } set_variable = { name = tmp_chance value = 3 } }
+                }
+                else_if = {
+                    limit = { has_variable = riseandfall_very_large_realm }
+                    if = { limit = { var:tmp_chance < 2 } set_variable = { name = tmp_chance value = 2 } }
+                }
+                else_if = {
                     limit = { has_variable = riseandfall_large_realm }
-                    if = {
-                        limit = { var:tmp_chance < 1 }
-                        set_variable = { name = tmp_chance value = 1 }
-                    }
+                    if = { limit = { var:tmp_chance < 1 } set_variable = { name = tmp_chance value = 1 } }
                 }
 
                 # Store the calculated chance on the character for tooltip display (persists until next yearly update)
@@ -88,7 +93,8 @@ riseandfall_low_stability_random_event = {
 
     set_variable = { name = rf_adventurer_ok value = 0 days = 14 }
     # Allow adventurer invasion for kingdom-tier rulers or higher (requires highest-held title >= kingdom)
-    if = { limit = { highest_held_title_tier >= tier_kingdom } set_variable = { name = rf_adventurer_ok value = 1 days = 14 } }
+    # Also ensure the current ruler is not themselves an adventurer (avoid self-spawning adventurer events)
+    if = { limit = { AND = { highest_held_title_tier >= tier_kingdom NOT = { has_trait = adventurer } } } set_variable = { name = rf_adventurer_ok value = 1 days = 14 } }
 
     # Realm split eligibility: use shared trigger for consistent rules (kingdom+ and 2+ vassals, low stability)
     set_variable = { name = rf_realm_split_ok value = 0 days = 14 }

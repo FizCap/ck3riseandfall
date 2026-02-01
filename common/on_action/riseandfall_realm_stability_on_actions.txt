@@ -99,10 +99,8 @@ riseandfall_on_death_stability_inheritance = {
             player_heir = {
                 if = {
                     limit = {
-                        OR = {
-                            scope:predecessor = { is_landed = no }
-                            highest_held_title_tier <= scope:predecessor.highest_held_title_tier
-                        }
+                        # Only inherit stability from a strictly higher-ranked predecessor.
+                        highest_held_title_tier < scope:predecessor.highest_held_title_tier
                     }
                     riseandfall_inherit_stability_score_se = yes
                 }
@@ -131,16 +129,10 @@ riseandfall_on_title_gain_inheritance = {
                 holds_landed_title = yes
                 exists = scope:previous_holder
                 scope:previous_holder = { has_variable = riseandfall_realm_stability_score }
-                # Only inherit when the previous holder is strictly higher-ranked OR EQUAL ranked than
-                # the inheritor.
+                # Only inherit when the previous holder is strictly higher-ranked than the inheritor.
                 # Note: game tier constants map higher numbers -> higher ranks
                 # (see common/script_values/00_title_tiers_values.txt: tier_county=2 ... tier_empire=5).
-                # Condition: inheritor.highest_held_title_tier <= previous_holder.highest_held_title_tier
-                # OR previous holder is unlanded (no primary title to compare)
-                OR = {
-                    scope:previous_holder = { is_landed = no }
-                    highest_held_title_tier <= scope:previous_holder.highest_held_title_tier
-                }
+                highest_held_title_tier < scope:previous_holder.highest_held_title_tier
             }
             # Inherit from the previous holder of this specific title
             scope:previous_holder = { save_scope_as = predecessor }
@@ -153,10 +145,12 @@ riseandfall_on_title_gain_inheritance = {
                 holds_landed_title = yes
                 exists = scope:previous_holder
                 scope:previous_holder = { has_variable = riseandfall_realm_stability_score }
-                OR = {
-                    scope:previous_holder = { is_landed = no }
-                    highest_held_title_tier <= scope:previous_holder.highest_held_title_tier
-                }
+                # Only inherit "realm history" (civil war years / puppet regency years / war multiplier)
+                # when the gained title is the character's primary title. Otherwise, inheriting a random
+                # secondary title (e.g., a barony) can overwrite these counters and make them look like
+                # they "randomly reset".
+                has_primary_title = scope:title
+                highest_held_title_tier < scope:previous_holder.highest_held_title_tier
             }
             # He already has a stability score; only inherit secondary history variables
             scope:previous_holder = { save_scope_as = predecessor }
