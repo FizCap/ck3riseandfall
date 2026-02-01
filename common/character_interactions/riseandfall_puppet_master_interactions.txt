@@ -262,13 +262,6 @@ riseandfall_overthrow_liege_interaction = {
 
 		# If liege dislikes the diarch, more impetus to overthrow
 		modifier = { scope:recipient = { opinion = { target = scope:actor value < 0 } } add = 300 }
-		# Substantially favor overthrow when liege stability is very low
-		modifier = { scope:recipient = { riseandfall_liege_stability_below_30 = yes } add = 400 }
-
-		# Military strength comparisons removed: Puppetmaster operates politically rather than through direct force
-
-		# Penalize if actor is at war (avoid opening the realm to internal conflict)
-		modifier = { scope:actor = { is_at_war = yes } add = -300 }
 	}
 }
 
