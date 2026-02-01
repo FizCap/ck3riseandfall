@@ -93,7 +93,8 @@ riseandfall_low_stability_random_event = {
 
     set_variable = { name = rf_adventurer_ok value = 0 days = 14 }
     # Allow adventurer invasion for kingdom-tier rulers or higher (requires highest-held title >= kingdom)
-    if = { limit = { highest_held_title_tier >= tier_kingdom } set_variable = { name = rf_adventurer_ok value = 1 days = 14 } }
+    # Also ensure the current ruler is not themselves an adventurer (avoid self-spawning adventurer events)
+    if = { limit = { AND = { highest_held_title_tier >= tier_kingdom NOT = { has_trait = adventurer } } } set_variable = { name = rf_adventurer_ok value = 1 days = 14 } }
 
     # Realm split eligibility: use shared trigger for consistent rules (kingdom+ and 2+ vassals, low stability)
     set_variable = { name = rf_realm_split_ok value = 0 days = 14 }
