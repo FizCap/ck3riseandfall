@@ -120,3 +120,13 @@ riseandfall_former_liege_opinion_desc:0 "This ruler was once our liege before th
 
 riseandfall_negotiated_peace_opinion:0 "Negotiated Settlement"
 riseandfall_negotiated_peace_opinion_desc:0 "Our liege made concessions to keep the realm together."
+
+ # Authority Collapse localization
+authority_collapse.1001.t:0 "Total Collapse of Central Authority"
+authority_collapse.1001.d:0 "The very foundations of your realm tremble as central authority crumbles. Bandits roam freely across the lands, unchecked by any semblance of order. Roads are unsafe, taxes go uncollected, and the people suffer under the weight of anarchy. The collapse is complete — your realm has descended into chaos."
+authority_collapse.1001.a:0 "Acknowledge the disaster"
+authority_collapse.1001.tooltip:0 "Bandits now run rampant across your entire realm. All provinces suffer declining county control, development, and popular opinion for 5 years."
+
+# Modifier localization
+riseandfall_authority_collapse:0 "Authority Collapse"
+riseandfall_authority_collapse_desc:0 "Local order has broken down: county control and development decline, and popular opinion collapses while this modifier is active."

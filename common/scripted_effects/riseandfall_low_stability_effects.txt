@@ -86,15 +86,11 @@ riseandfall_low_stability_roll_se = {
 riseandfall_low_stability_random_event = {
     # Prefilter eligibility into simple flags to guarantee a fallback without chained logic.
     # rf_puppet_ok = 1 if puppet event is allowed (no existing puppet_regency)
-    # rf_adventurer_ok = 1 if adventurer event is allowed (empire-tier ruler)
     # rf_realm_split_ok = 1 if realm split is allowed (kingdom+ ruler with 2+ powerful vassals)
     set_variable = { name = rf_puppet_ok value = 1 days = 14 }
     if = { limit = { has_diarchy_type = puppet_regency } set_variable = { name = rf_puppet_ok value = 0 days = 14 } }
 
     # Adventurer event retired
-    # Allow adventurer invasion for kingdom-tier rulers or higher (requires highest-held title >= kingdom)
-    # Also ensure the current ruler is not themselves an adventurer (avoid self-spawning adventurer events)
-    # if = { limit = { AND = { highest_held_title_tier >= tier_kingdom NOT = { has_trait = adventurer } } } set_variable = { name = rf_adventurer_ok value = 1 days = 14 } }
 
     # Realm split eligibility: use shared trigger for consistent rules (kingdom+ and 2+ vassals, low stability)
     set_variable = { name = rf_realm_split_ok value = 0 days = 14 }
@@ -117,29 +113,14 @@ riseandfall_low_stability_random_event = {
                 1 = { trigger_event = { id = warlord.1001 } }
                 1 = { trigger_event = { id = palace_coup.1001 } }
                 1 = { trigger_event = { id = realm_split.1001 } }
+                1 = { trigger_event = { id = authority_collapse.1001 } }
             }
         }
         else = {
             random_list = {
                 1 = { trigger_event = { id = warlord.1001 } }
                 1 = { trigger_event = { id = realm_split.1001 } }
-            }
-        }
-    }
-    else_if = {
-        limit = { AND = { var:rf_realm_split_ok = 1 var:rf_puppet_ok = 0 var:rf_adventurer_ok = 1 } }
-        # Realm split + adventurer allowed
-        if = { limit = { var:rf_palace_coup_ok = 1 }
-            random_list = {
-                1 = { trigger_event = { id = warlord.1001 } }
-                1 = { trigger_event = { id = palace_coup.1001 } }
-                1 = { trigger_event = { id = realm_split.1001 } }
-            }
-        }
-        else = {
-            random_list = {
-                1 = { trigger_event = { id = warlord.1001 } }
-                1 = { trigger_event = { id = realm_split.1001 } }
+                1 = { trigger_event = { id = authority_collapse.1001 } }
             }
         }
     }
@@ -151,12 +132,14 @@ riseandfall_low_stability_random_event = {
                 1 = { trigger_event = { id = warlord.1001 } }
                 1 = { trigger_event = { id = palace_coup.1001 } }
                 1 = { trigger_event = { id = realm_split.1001 } }
+                1 = { trigger_event = { id = authority_collapse.1001 } }
             }
         }
         else = {
             random_list = {
                 1 = { trigger_event = { id = warlord.1001 } }
                 1 = { trigger_event = { id = realm_split.1001 } }
+                1 = { trigger_event = { id = authority_collapse.1001 } }
             }
         }
     }
@@ -166,19 +149,22 @@ riseandfall_low_stability_random_event = {
         random_list = {
             1 = { trigger_event = { id = warlord.1001 } }
             1 = { trigger_event = { id = palace_coup.1001 } }
+            1 = { trigger_event = { id = authority_collapse.1001 } }
         }
     }
     else = {
-        # Neither allowed: fallback to warlord / palace coup
+        # Neither allowed: fallback to warlord / palace coup / authority collapse
         if = { limit = { var:rf_palace_coup_ok = 1 }
             random_list = {
                 1 = { trigger_event = { id = warlord.1001 } }
                 1 = { trigger_event = { id = palace_coup.1001 } }
+                1 = { trigger_event = { id = authority_collapse.1001 } }
             }
         }
         else = {
             random_list = {
                 1 = { trigger_event = { id = warlord.1001 } }
+                1 = { trigger_event = { id = authority_collapse.1001 } }
             }
         }
     }
