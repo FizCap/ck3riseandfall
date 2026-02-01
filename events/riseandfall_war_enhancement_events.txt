@@ -1,4 +1,4 @@
-# This file contains events for the Rise and Fall mod's war enhancement mechanics.
+﻿# This file contains events for the Rise and Fall mod's war enhancement mechanics.
 # These events handle post-rebellion succession, fallen rulers' fates, and family revolts triggered by character deaths.
 
 namespace = riseandfall_war_enhancement
@@ -72,7 +72,7 @@ riseandfall_war_enhancement.1 = {
 				is_independent_ruler = no
 			}
 		}
-		
+		war_enhancement_council_formation = yes
 		war_enhancement_elect_ruler = yes
 		ai_chance = {
 			base = -75
@@ -117,7 +117,7 @@ riseandfall_war_enhancement.1 = {
 				is_independent_ruler = no
 			}
 		}
-		
+		war_enhancement_hereditary_succession_enforced = yes
 		war_enhancement_overthrow_electoral_system = yes
 		ai_chance = {
 			base = -200
@@ -127,6 +127,55 @@ riseandfall_war_enhancement.1 = {
 				ai_energy = 2.5
 				ai_compassion = -2
 				ai_boldness = 2.5
+				ai_sociability = 0.5
+				ai_vengefulness = 0.3
+			}
+			modifier = {
+				add = 20
+				root = {
+					has_trait = ambitious
+				}
+			}
+			opinion_modifier = { # Opinion Factor
+				who = root
+				opinion_target = scope:riseandfall_war_enhancement_attacker.liege
+				multiplier = -5
+			}
+			modifier = {
+				add = 30
+				root = {
+					has_trait = ambitious
+				}
+			}
+		}
+	}
+	
+	# Option: We should restore the Princely Elective system.
+	option = { # 
+		name = riseandfall_war_enhancement.1.f
+		trigger = {
+			scope:riseandfall_war_enhancement_attacker.liege = {
+				has_government = feudal_government
+			}
+			scope:riseandfall_war_enhancement_attacker.liege.primary_title = {
+					NOT = { has_title_law = princely_elective_succession_law }
+					this = title:e_hre
+			}
+			root = {
+				is_independent_ruler = no
+			}
+		}
+		war_enhancement_princely_restoration = yes
+		war_enhancement_restore_hre_electoral_system = yes
+
+		ai_chance = {
+			base = -50
+			ai_value_modifier = {
+				ai_greed = 2
+				ai_honor = 1.5
+				ai_energy = 0.5
+				ai_compassion = 0.2
+				ai_boldness = 0.2
 				ai_sociability = 0.5
 				ai_vengefulness = 0.3
 			}
@@ -173,6 +222,7 @@ riseandfall_war_enhancement.1 = {
 				}
 			}
 		}
+		war_enhancement_independence_affirmed = yes
 		war_enhancement_declare_independence = yes
 		ai_chance = {
 			base = 0
@@ -202,6 +252,7 @@ riseandfall_war_enhancement.1 = {
 	# Option: Decline to take action.
 	option = { # decline
 		name = riseandfall_war_enhancement.1.e
+		war_enhancement_enthroned_heir = yes
 		ai_chance = {
 			base = 100
 			ai_value_modifier = {
@@ -743,7 +794,11 @@ riseandfall_war_enhancement.6 = {
 	# Option: Abdicate as planned, passing titles to heir.
 	option = { #Abdicate as planned (x will become ruler) 
 		name = riseandfall_war_enhancement.6.a
-		war_enhancement_abdicate_to_heir = yes 
+		root = {
+			save_scope_as = riseandfall_council_regent
+		}
+		war_enhancement_abdicate_to_heir = yes
+		war_enhancement_smooth_election = yes
 		ai_chance = {
 			base = 100
 			ai_value_modifier = {
@@ -769,7 +824,11 @@ riseandfall_war_enhancement.6 = {
 	# Option: Extend rule temporarily with some strife.
 	option = { #extend our rule for a time (less tyrannical)
 		name = riseandfall_war_enhancement.6.b
+		root = {
+			save_scope_as = riseandfall_council_regent
+		}
 		war_enhancement_extend_rule = yes
+		war_enhancement_delay_council = yes
 		ai_chance = {
 			base = 100 
 			ai_value_modifier = {
@@ -788,8 +847,12 @@ riseandfall_war_enhancement.6 = {
 	
 	# Option: Seize power tyrannically.
 	option = { #seize power (tyrannical)
+		root = {
+			save_scope_as = riseandfall_council_regent
+		}
 		name = riseandfall_war_enhancement.6.c
 		war_enhancement_seize_power = yes
+		war_enhancement_council_overthrow = yes
 		ai_chance = {
 			base = -100 
 			ai_value_modifier = {
@@ -814,4 +877,102 @@ riseandfall_war_enhancement.6 = {
 		}
 	}
 }
+
+# Event: Liege overthrown! The rebel has left our liege alone. (the liege's heir takes the throne)
+riseandfall_war_enhancement.7 = {
+	title = riseandfall_war_enhancement.7.t
+	desc = riseandfall_war_enhancement.7.d
+	type = character_event
+	theme = realm
+	
+	option = { #how shocking
+		name = riseandfall_war_enhancement.7.a
+	}
+}
+
+# Event: Liege overthrown! The rebel is forming a council to select a new suitable liege and I should vote.
+riseandfall_war_enhancement.8 = {
+	title = riseandfall_war_enhancement.8.t
+	desc = riseandfall_war_enhancement.8.d
+	type = character_event
+	theme = realm
+	
+	option = { #how shocking, I better vote
+		name = riseandfall_war_enhancement.8.a
+	}
+}
+
+# Event: Liege overthrown! The rebel has restored princely elective succession.
+riseandfall_war_enhancement.9 = {
+	title = riseandfall_war_enhancement.9.t
+	desc = riseandfall_war_enhancement.9.d
+	type = character_event
+	theme = realm
+	
+	option = { # well that's nice
+		name = riseandfall_war_enhancement.9.a
+	}
+}
+
+# Event: Liege overthrown! The rebel has affirmed their independence from the realm.
+riseandfall_war_enhancement.10 = {
+	title = riseandfall_war_enhancement.10.t
+	desc = riseandfall_war_enhancement.10.d
+	type = character_event
+	theme = realm
+	
+	option = { #Suicidal!
+		name = riseandfall_war_enhancement.10.a
+	}
+}
+
+# Event: Liege overthrown! The rebel has removed our elective system.
+riseandfall_war_enhancement.11 = {
+	title = riseandfall_war_enhancement.11.t
+	desc = riseandfall_war_enhancement.11.d
+	type = character_event
+	theme = realm
+	
+	option = { #That wasn't very nice
+		name = riseandfall_war_enhancement.11.a
+	}
+}
+
+# Event: The regent has delayed the council meeting to choose a new liege.
+riseandfall_war_enhancement.12 = {
+	title = riseandfall_war_enhancement.12.t
+	desc = riseandfall_war_enhancement.12.d
+	type = character_event
+	theme = realm
+	
+	option = { #What's he up to?
+		name = riseandfall_war_enhancement.12.a
+	}
+}
+
+# Event: The regent has overthrown the council and crowned themselves ruler!
+riseandfall_war_enhancement.13 = {
+	title = riseandfall_war_enhancement.13.t
+	desc = riseandfall_war_enhancement.13.d
+	type = character_event
+	theme = realm
+	
+	option = { #That is not very feudal of them
+		name = riseandfall_war_enhancement.13.a
+	}
+}
+
+# Event: The council has elected a liege and the regent has given up power.
+riseandfall_war_enhancement.14 = {
+	title = riseandfall_war_enhancement.14.t
+	desc = riseandfall_war_enhancement.14.d
+	type = character_event
+	theme = realm
+	
+	option = { #So, everything went well.
+		name = riseandfall_war_enhancement.14.a
+	}
+}
+
+
 	

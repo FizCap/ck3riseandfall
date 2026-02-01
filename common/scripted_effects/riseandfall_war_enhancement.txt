@@ -92,33 +92,34 @@ war_enhancement_elect_ruler = {
 		}
 	}
 }
+# Event .1.f 
+war_enhancement_restore_hre_electoral_system = {
+	scope:riseandfall_war_enhancement_attacker.liege = { 
+		try_start_diarchy = regency
+		set_diarch = root
+		change_diarchy_swing = 100
+	}
+	scope:riseandfall_war_enhancement_attacker.liege.primary_title = {
+		clear_title_laws = yes
+		save_scope_as = riseandfall_liege_elective_title
+		add_title_law = princely_elective_succession_law 
+	}
+
+	scope:riseandfall_war_enhancement_attacker.liege.diarch = {
+		trigger_event = {
+			id = riseandfall_war_enhancement.6
+			days = 30
+		}
+	}
+}
 
 # Event .1.c effect: Tyrannically overthrow electoral system
 war_enhancement_overthrow_electoral_system = {
 	add_tyranny = 25
-	if = { 
-		limit = {
-			scope:riseandfall_war_enhancement_attacker.liege = {
-				any_held_title = {
-					is_de_facto_liege_or_above_target = scope:riseandfall_war_enhancement_attacker.capital_county.de_jure_liege.de_jure_liege
-				}
-			}
-		}
-		scope:riseandfall_war_enhancement_attacker.capital_county.de_jure_liege = {
-		
-		}
-		hidden_effect = {
-			scope:riseandfall_liege_elective_title = {
-				clear_title_laws = yes
-			}
-		}
-	}
-	else = {
-		hidden_effect = {
-			scope:riseandfall_war_enhancement_attacker.liege.primary_title = {
+	hidden_effect = {
+		scope:riseandfall_war_enhancement_attacker.liege.primary_title = {
 				save_scope_as = riseandfall_liege_elective_title
 				clear_title_laws = yes
-			}
 		}
 	}
 	root = {
@@ -318,16 +319,25 @@ war_enhancement_abdicate_to_heir = {
 	root = {
 		resolve_title_and_vassal_change = scope:change
 	}
-	scope:riseandfall_liege_elective_title = { remove_title_law = feudal_elective_succession_law }
+	if = {
+		limit = {
+				NOT = { 
+					scope:riseandfall_liege_elective_title = { has_title_law = princely_elective_succession_law }
+				}
+		}
+		scope:riseandfall_liege_elective_title = {
+			clear_title_laws = yes
+		}
+	}
 }
 
 # Event .6.b effect: Extend rule temporarily
 war_enhancement_extend_rule = {
 	scope:riseandfall_liege_elective_title.holder.diarch = {
-		change_strife_opinion = 10
+		change_strife_opinion = 5
 		trigger_event = {
 			id = riseandfall_war_enhancement.6
-			days = 90
+			days = 150
 		}
 	}
 }
@@ -415,6 +425,100 @@ war_enhancement_seize_power = {
 		}
 		add_legitimacy = -1000
 	}
-	
-	scope:riseandfall_liege_elective_title = { remove_title_law = feudal_elective_succession_law }
+	if = {
+		limit = {
+				NOT = { 
+					scope:riseandfall_liege_elective_title = { has_title_law = princely_elective_succession_law }
+				}
+		}
+		remove_title_law = feudal_elective_succession_law 
+	}
+}
+
+war_enhancement_enthroned_heir = { #rebel merely overthrew liege and nothing else. 
+	scope:riseandfall_war_enhancement_attacker.liege = {
+		every_vassal = {
+			limit = { NOT = { this = scope:riseandfall_war_enhancement_attacker } }
+			trigger_event = {
+				id = riseandfall_war_enhancement.7 
+			}
+		}
+	}
+}
+
+war_enhancement_council_formation = { #rebel is forming a council to elect a new liege. 
+	scope:riseandfall_war_enhancement_attacker.liege = {
+		every_vassal = {
+			limit = { NOT = { this = scope:riseandfall_war_enhancement_attacker } }
+			trigger_event = {
+				id = riseandfall_war_enhancement.8
+			}
+		}
+	}
+}
+
+war_enhancement_princely_restoration = { #rebel has restored princely elective to the hre. 
+	scope:riseandfall_war_enhancement_attacker.liege = {
+		every_vassal = {
+			limit = { NOT = { this = scope:riseandfall_war_enhancement_attacker } }
+			trigger_event = {
+				id = riseandfall_war_enhancement.9
+			}
+		}
+	}
+}
+
+war_enhancement_independence_affirmed = { #rebel has restored princely elective to the hre. 
+	scope:riseandfall_war_enhancement_attacker.liege = {
+		every_vassal = {
+			limit = { NOT = { this = scope:riseandfall_war_enhancement_attacker } }
+			trigger_event = {
+				id = riseandfall_war_enhancement.10
+			}
+		}
+	}
+}
+
+war_enhancement_hereditary_succession_enforced = {
+	scope:riseandfall_war_enhancement_attacker.liege = {
+		every_vassal = {
+			limit = { NOT = { this = scope:riseandfall_war_enhancement_attacker } }
+			trigger_event = {
+				id = riseandfall_war_enhancement.11
+			}
+		}
+	}
+}
+
+war_enhancement_delay_council = { #Regent has delayed the council meeting to vote.
+	scope:riseandfall_war_enhancement_attacker.liege = {
+		every_vassal = {
+			limit = { NOT = { this = scope:riseandfall_war_enhancement_attacker } }
+			trigger_event = {
+				id = riseandfall_war_enhancement.12
+			}
+		}
+	}
+}
+
+war_enhancement_council_overthrow = { #Regent has used their influence to overthrow the realm
+	scope:riseandfall_war_enhancement_attacker.liege = {
+		every_vassal = {
+			limit = { NOT = { this = scope:riseandfall_war_enhancement_attacker } }
+			trigger_event = {
+				id = riseandfall_war_enhancement.13
+			}
+		}
+	}
+}
+
+war_enhancement_smooth_election = {
+	scope:riseandfall_war_enhancement_attacker.liege = {
+		every_vassal = {
+			limit = { NOT = { this = scope:riseandfall_war_enhancement_attacker } }
+			trigger_event = {
+				id = riseandfall_war_enhancement.14
+			}
+		}
+	}
 }
