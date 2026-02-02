@@ -102,6 +102,13 @@ setting_riseandfall_bordergore_fix_enabled_desc:0 "When enabled, AI rulers will 
 setting_riseandfall_bordergore_fix_disabled:0 "Disabled"
 setting_riseandfall_bordergore_fix_disabled_desc:0 "AI will not automatically fix bordergore and the player will not see the manual 'Fix Bordergore' interaction."
 
+# War Enhancement rule
+rule_riseandfall_enable_war_enhancement:0 "War Enhancement (BETA)"
+setting_riseandfall_war_enhancement_enabled:0 "Enabled"
+setting_riseandfall_war_enhancement_enabled_desc:0 "War enhancement mechanics are active, including post-war succession and rebellion dynamics for specific casus belli."
+setting_riseandfall_war_enhancement_disabled:0 "Disabled"
+setting_riseandfall_war_enhancement_disabled_desc:0 "War enhancement mechanics are disabled; wars will follow vanilla behavior."
+
 # Lite Mode rule (lighter experience)
 rule_riseandfall_lite_mode:0 "Lite Mode"
 setting_riseandfall_lite_mode_enabled:0 "Enabled"

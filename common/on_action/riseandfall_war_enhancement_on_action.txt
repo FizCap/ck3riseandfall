@@ -10,6 +10,9 @@ on_war_won_attacker = {
 # Scripted effect triggered when the attacker wins a war.
 # Handles post-war succession and rebellion mechanics for specific casus belli.
 riseandfall_war_enhancement_war_won = {
+	trigger = {
+		has_game_rule = riseandfall_war_enhancement_enabled
+	}
 	effect = {
 		if = {
 			limit = {
@@ -124,9 +127,6 @@ riseandfall_war_enhancement_war_won = {
 				}
 			}
 		}
-	}
-}
-	effect = {
 		if = {
 			limit = {
 				exists = scope:killer
@@ -196,115 +196,6 @@ riseandfall_war_enhancement_war_won = {
 					days = 4
 				}
 				remove_from_list = riseandfall_war_enhancement_members
-			}
-		}
-	}
-}
-
-riseandfall_war_enhancement_war_won = {
-	effect = {
-		if = {
-			limit = {
-				scope:war = {
-					OR = {
-						using_cb = liberty_faction_war
-						using_cb = refused_liege_demand_war
-						#using_cb = depose_war
-					}
-				}
-			}
-			scope:defender = {
-				save_scope_as = riseandfall_war_enhancement_prev_liege
-			}
-			scope:defender.primary_title = {
-				save_scope_as = riseandfall_war_enhancement_liege_primary_title
-			}
-			
-			scope:attacker.liege = {
-				save_scope_as = riseandfall_war_enhancement_liege
-			}
-			scope:attacker = {
-				save_scope_as = riseandfall_war_enhancement_rebellion_leader
-			}
-			scope:war = {
-				ordered_war_attacker = {
-					limit = {
-						is_vassal_of = scope:riseandfall_war_enhancement_liege 
-					}
-					order_by = { 
-						add = current_military_strength
-						add = {
-							value = diplomacy
-							multiply = 35
-						}
-						add = {
-							value = martial
-							multiply = 50
-						}
-						add = {
-							value = stewardship
-							multiply = 20
-						}
-						add = {
-							value = intrigue
-							multiply = 20
-						}
-						add = {
-							value = learning
-							multiply = 20
-						}
-					}
-					save_scope_as = riseandfall_war_enhancement_contender
-				}
-			}
-			
-			if = {
-				limit = {
-					OR = {
-						#strongest military contender
-						AND = {
-							scope:riseandfall_war_enhancement_contender = { 
-								current_military_strength > scope:riseandfall_war_enhancement_rebellion_leader.current_military_strength
-							}
-							scope:war = { 
-								war_contribution = {
-									target = scope:riseandfall_war_enhancement_contender 
-									value > 40%
-								}
-							}
-						}
-						#diplomatic option
-						AND = {
-							scope:riseandfall_war_enhancement_contender = { 
-								diplomacy > scope:riseandfall_war_enhancement_rebellion_leader.diplomacy
-								martial > scope:riseandfall_war_enhancement_rebellion_leader.martial
-								current_military_strength > scope:riseandfall_war_enhancement_rebellion_leader.current_military_strength
-							}
-							scope:war = { 
-								war_contribution = {
-									target = scope:riseandfall_war_enhancement_contender 
-									value > 25%
-								}
-							}
-						}
-					}
-				}
-				scope:riseandfall_war_enhancement_contender = {
-					clear_saved_scope = riseandfall_war_enhancement_contender
-					save_scope_as = riseandfall_war_enhancement_attacker
-				}
-			}
-			else = {
-				scope:riseandfall_war_enhancement_rebellion_leader = {
-					clear_saved_scope = riseandfall_war_enhancement_rebellion_leader
-					save_scope_as = riseandfall_war_enhancement_attacker
-				}
-			}
-
-			scope:defender = {
-				trigger_event = {
-					id = riseandfall_war_enhancement.5 #everything is falling apart!
-				}
 			}
 		}
 	}
