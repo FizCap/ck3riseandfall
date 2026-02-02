@@ -88,15 +88,8 @@ warlord.1003 = {
         ai_chance = {
             base = 0
             modifier = {
-                add = -100
-                is_independent_ruler = yes
-            }
-            modifier = {
                 add = 100
-                liege = {
-                    has_variable = riseandfall_realm_stability_score
-                    var:riseandfall_realm_stability_score < 49
-                }
+                NOT = { is_independent_ruler = yes }
             }
         }
         # Give claims on the liege's own titles to the warlord (only for powerful vassals)
@@ -110,14 +103,7 @@ warlord.1003 = {
             base = 0
             modifier = {
                 add = 100
-                opinion = { target = liege value >= 50 }
-            }
-            modifier = {
-                add = 100
-                liege = {
-                    has_variable = riseandfall_realm_stability_score
-                    var:riseandfall_realm_stability_score > 60
-                }
+                is_independent_ruler = yes
             }
         }
     }
