@@ -12,6 +12,27 @@
 riseandfall_realm_split_se = {
     save_scope_as = original_ruler
     primary_title = { save_scope_as = original_primary }
+
+    # Hegemony special case: make all empire-tier vassals break away automatically
+    if = {
+        limit = { primary_title.tier = tier_hegemony }
+        scope:original_ruler = {
+            every_vassal = {
+                limit = {
+                    is_landed = yes
+                    primary_title.tier >= tier_empire
+                }
+                add_character_flag = { flag = rf_breakaway_ruler days = 30 }
+                # Rivalry and cross-claims with original ruler
+                scope:original_ruler = { add_unpressed_claim = this.primary_title }
+                this = { add_unpressed_claim = scope:original_primary }
+                if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:original_ruler } NOT = { has_relation_rival = scope:original_ruler } } this = { set_relation_rival = { target = scope:original_ruler reason = riseandfall_realmsplit_became_rival } } }
+                if = { limit = { can_set_relation_rival_trigger = { CHARACTER = this } NOT = { has_relation_rival = this } } scope:original_ruler = { set_relation_rival = { target = this reason = riseandfall_realmsplit_became_rival } } }
+                # Execute realm split for the empire vassal immediately
+                this = { riseandfall_execute_realm_split_se = yes }
+            }
+        }
+    }
     
     # Pick 2-4 vassals to become breakaway rulers
     # Use ordered_vassal for governments without powerful vassals, ordered_powerful_vassal otherwise
@@ -24,6 +45,7 @@ riseandfall_realm_split_se = {
             limit = {
                 is_landed = yes
                 primary_title.tier >= tier_county
+                NOT = { primary_title.tier >= tier_empire }
             }
             order_by = current_military_strength
             max = 1
@@ -38,6 +60,7 @@ riseandfall_realm_split_se = {
             limit = {
                 is_landed = yes
                 primary_title.tier >= tier_county
+                NOT = { primary_title.tier >= tier_empire }
             }
             order_by = current_military_strength
             max = 1
@@ -56,6 +79,7 @@ riseandfall_realm_split_se = {
                 limit = {
                     is_landed = yes
                     primary_title.tier >= tier_county
+                    NOT = { primary_title.tier >= tier_empire }
                     NOT = { this = scope:breakaway_1 }
                 }
                 order_by = current_military_strength
@@ -70,6 +94,7 @@ riseandfall_realm_split_se = {
                 limit = {
                     is_landed = yes
                     primary_title.tier >= tier_county
+                    NOT = { primary_title.tier >= tier_empire }
                     NOT = { this = scope:breakaway_1 }
                 }
                 order_by = current_military_strength
@@ -92,6 +117,7 @@ riseandfall_realm_split_se = {
                     limit = {
                         is_landed = yes
                         primary_title.tier >= tier_county
+                        NOT = { primary_title.tier >= tier_empire }
                         NOT = { this = scope:breakaway_1 }
                         NOT = { this = scope:breakaway_2 }
                     }
@@ -107,6 +133,7 @@ riseandfall_realm_split_se = {
                     limit = {
                         is_landed = yes
                         primary_title.tier >= tier_county
+                        NOT = { primary_title.tier >= tier_empire }
                         NOT = { this = scope:breakaway_1 }
                         NOT = { this = scope:breakaway_2 }
                     }
@@ -131,6 +158,7 @@ riseandfall_realm_split_se = {
                     limit = {
                         is_landed = yes
                         primary_title.tier >= tier_county
+                        NOT = { primary_title.tier >= tier_empire }
                         NOT = { this = scope:breakaway_1 }
                         NOT = { this = scope:breakaway_2 }
                         NOT = { this = scope:breakaway_3 }
@@ -147,6 +175,7 @@ riseandfall_realm_split_se = {
                     limit = {
                         is_landed = yes
                         primary_title.tier >= tier_county
+                        NOT = { primary_title.tier >= tier_empire }
                         NOT = { this = scope:breakaway_1 }
                         NOT = { this = scope:breakaway_2 }
                         NOT = { this = scope:breakaway_3 }
@@ -168,6 +197,7 @@ riseandfall_realm_split_se = {
             is_landed = yes
             NOT = { has_character_flag = rf_breakaway_ruler }
             primary_title.tier >= tier_county
+            NOT = { primary_title.tier >= tier_empire }
         }
         
         # Use weighted random - higher weight for same de_jure territory
@@ -299,31 +329,49 @@ riseandfall_execute_realm_split_se = {
                     save_scope_as = rf_breakaway_ruler
                     capital_county = { save_scope_as = rf_base_county }
                     capital_province = { save_scope_as = rf_base_province }
+
+                    # If the breakaway already holds an empire-tier primary title, use it
                     if = {
-                        limit = {
-                            has_variable = rf_title_style
-                            var:rf_title_style = 1
-                        }
-                        create_dynamic_title = {
-                            tier = empire
-                            name = RISEANDFALL_BREAKAWAY_NAME_CAPITAL
+                        limit = { scope:rf_breakaway_ruler.primary_title.tier >= tier_empire }
+                        scope:rf_breakaway_ruler = {
+                            primary_title = {
+                                save_scope_as = rf_new_title
+                                set_color_from_title = scope:rf_base_county
+                                # Set coat of arms from dynasty if ruler has one
+                                if = {
+                                    limit = { scope:rf_breakaway_ruler = { has_dynasty = yes } }
+                                    set_coa = scope:rf_breakaway_ruler.dynasty
+                                }
+                            }
                         }
                     }
                     else = {
-                        create_dynamic_title = {
-                            tier = empire
-                            name = RISEANDFALL_BREAKAWAY_NAME_RULER
+                        if = {
+                            limit = {
+                                has_variable = rf_title_style
+                                var:rf_title_style = 1
+                            }
+                            create_dynamic_title = {
+                                tier = empire
+                                name = RISEANDFALL_BREAKAWAY_NAME_CAPITAL
+                            }
                         }
-                    }
-                    if = {
-                        limit = { exists = scope:new_title }
-                        scope:new_title = {
-                            save_scope_as = rf_new_title
-                            set_color_from_title = scope:rf_base_county
-                            # Set coat of arms from dynasty if ruler has one
-                            if = {
-                                limit = { scope:rf_breakaway_ruler = { has_dynasty = yes } }
-                                set_coa = scope:rf_breakaway_ruler.dynasty
+                        else = {
+                            create_dynamic_title = {
+                                tier = empire
+                                name = RISEANDFALL_BREAKAWAY_NAME_RULER
+                            }
+                        }
+                        if = {
+                            limit = { exists = scope:new_title }
+                            scope:new_title = {
+                                save_scope_as = rf_new_title
+                                set_color_from_title = scope:rf_base_county
+                                # Set coat of arms from dynasty if ruler has one
+                                if = {
+                                    limit = { scope:rf_breakaway_ruler = { has_dynasty = yes } }
+                                    set_coa = scope:rf_breakaway_ruler.dynasty
+                                }
                             }
                         }
                     }
