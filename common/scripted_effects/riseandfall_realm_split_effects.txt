@@ -521,6 +521,15 @@ riseandfall_execute_realm_split_se = {
     }
     
     # Add claim on original primary title
+    # If the original primary was a hegemon, ensure the original ruler
+    # gets an unpressed claim on the breakaway's (possibly newly-created)
+    # empire title so the hegemon can press for it later.
+    if = {
+        limit = { scope:original_primary.tier = tier_hegemony }
+        if = { limit = { exists = scope:rf_new_title } scope:original_ruler = { add_unpressed_claim = scope:rf_new_title } }
+        else = { if = { limit = { exists = scope:new_realm_ruler.primary_title } scope:original_ruler = { add_unpressed_claim = scope:new_realm_ruler.primary_title } } }
+    }
+
     add_unpressed_claim = scope:original_primary
 
     # --- New: make breakaways rivals and give cross-claims ---
