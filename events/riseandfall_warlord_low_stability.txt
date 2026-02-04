@@ -97,14 +97,21 @@ warlord.1003 = {
     }
     option = {
         name = warlord.1003.b
-        # Remove the warlord trait and abandon the path
-        riseandfall_warlord_abandon_path = yes
+        # Remove the warlord trait and abandon the path if opinion >= 50
         ai_chance = {
             base = 0
             modifier = {
                 add = 100
                 is_independent_ruler = yes
             }
+            modifier = {
+                add = 100
+                opinion = { target = liege value >= 50 }
+            }
+        }
+        if = {
+            limit = { opinion = { target = liege value >= 50 } }
+            riseandfall_warlord_abandon_path = yes
         }
     }
 }
