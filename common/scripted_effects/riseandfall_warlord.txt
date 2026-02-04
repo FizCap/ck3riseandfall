@@ -24,18 +24,10 @@ riseandfall_warlord_become_warlord = {
             }
         }
     }
-    # If not a powerful vassal (or not a member of a powerful family), remove any existing claims on liege's titles
+    # If not a powerful vassal, remove any existing claims on liege's titles
     if = {
         limit = {
-            NOT = {
-                OR = {
-                    is_powerful_vassal = yes
-                    AND = {
-                        is_landed = yes
-                        house = { is_powerful_family = yes }
-                    }
-                }
-            }
+            NOT = { is_powerful_vassal = yes }
         }
         if = {
             limit = { exists = liege }
