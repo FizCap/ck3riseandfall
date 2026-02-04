@@ -88,6 +88,34 @@ palace_coup.1002.flee_tooltip:0 "Attempt to flee — an intrigue duel between yo
 palace_coup.1003.tooltip:0 "Trigger the warlord event to raise banners against the challenger."
 palace_coup.1004.tooltip:0 "Accept your defeat and the puppet master who will rule behind the throne."
 
+palace_coup.1001.1.t:0 "Palace Coup Confirmation"
+palace_coup.1001.1.d:0 "You have been selected to lead the palace coup against [root.GetTitledFirstName]. Do you wish to proceed with this dangerous endeavor?"
+palace_coup.1001.1.a:0 "Yes, I will seize the throne!"
+palace_coup.1001.1.b:0 "No, I decline."
+palace_coup.1001.1.tooltip:0 "Proceed with the palace coup."
+palace_coup.1001.1.tooltip_no:0 "Decline the palace coup; another challenger will be found."
+
+# Challenger notification events
+palace_coup.2001.t:0 "Defeat in the Duel"
+palace_coup.2001.d:0 "The duel has ended in disaster. [root.GetTitledFirstName] proved victorious, and your challenge has failed. Your life ends here in the palace corridors."
+palace_coup.2001.a:0 "Accept your fate"
+palace_coup.2001.tooltip:0 "You lost the duel and will perish."
+
+palace_coup.2002.t:0 "Victory in the Duel"
+palace_coup.2002.d:0 "The duel is won! [root.GetTitledFirstName] lies defeated at your feet. You have seized control of the realm and established yourself as puppet master, ruling through a regency diarchy."
+palace_coup.2002.a:0 "Long live the new order"
+palace_coup.2002.tooltip:0 "You have won the duel and become puppet master of the realm."
+
+palace_coup.2003.t:0 "The Ruler Escapes"
+palace_coup.2003.d:0 "[root.GetTitledFirstName] has successfully fled the palace! Though defeated in the duel, [root.GetSheHe] lives to fight another day. Word has it that [root.GetSheHe] is already calling [root.GetHerHis] banners and rallying vassals to reclaim the throne."
+palace_coup.2003.a:0 "Prepare for war"
+palace_coup.2003.tooltip:0 "The deposed ruler has escaped and is raising an army to reclaim the throne."
+
+palace_coup.2004.t:0 "Escape Thwarted"
+palace_coup.2004.d:0 "[root.GetTitledFirstName] attempted to flee but was caught! You have successfully thwarted [root.GetHerHis] escape and established yourself as puppet master, ruling through a regency diarchy."
+palace_coup.2004.a:0 "Secure your victory"
+palace_coup.2004.tooltip:0 "You caught the fleeing ruler and have become puppet master of the realm."
+
  # Misc / gameplay keys
 palace_coup_adventurer_camp_name:0 "Palace Coup War Camp"
 palace_coup_adventurer_camp_adj:0 "Palace Coup"

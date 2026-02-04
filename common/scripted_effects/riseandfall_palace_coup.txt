@@ -78,6 +78,60 @@ riseandfall_palace_coup_setup = {
 				}
 			}
 		}
+		# Include vassals who are councilors
+		every_vassal = {
+			limit = {
+				is_councillor = yes
+				is_alive = yes
+				age > 16
+			}
+			# Initialize candidate score from stats
+			set_variable = { name = candidate_total value = diplomacy }
+			change_variable = { name = candidate_total add = martial }
+			change_variable = { name = candidate_total add = stewardship }
+			change_variable = { name = candidate_total add = intrigue }
+			change_variable = { name = candidate_total add = learning }
+			
+			# Apply realm succession law penalties
+			if = {
+				limit = { root = { has_realm_law = female_preference_law } }
+				if = { limit = { NOT = { is_female = yes } } change_variable = { name = candidate_total add = -1000 } }
+			}
+			if = {
+				limit = { root = { has_realm_law = male_only_law } }
+				if = { limit = { NOT = { is_male = yes } } set_variable = { name = candidate_total value = -9999 } }
+			}
+			if = {
+				limit = { root = { has_realm_law = male_preference_law } }
+				if = { limit = { NOT = { is_male = yes } } change_variable = { name = candidate_total add = -1000 } }
+			}
+			if = {
+				limit = { root = { has_realm_law = female_only_law } }
+				if = { limit = { NOT = { is_female = yes } } set_variable = { name = candidate_total value = -9999 } }
+			}
+			
+			# Multiplier for claims
+			if = {
+				limit = { scope:tmp_primary_title = { exists = yes } }
+				if = { limit = { has_claim_on = scope:tmp_primary_title } change_variable = { name = candidate_total multiply = 1.5 } }
+			}
+			
+			# Knights get a 1.5x multiplier (though vassals might not be knights, but keep for consistency)
+			if = { limit = { is_knight = yes } change_variable = { name = candidate_total multiply = 1.5 } }
+			
+			# Save candidate score to event_root and update best challenger if applicable
+			save_scope_as = candidate_for_score
+			scope:event_root = { set_variable = { name = tmp_candidate value = scope:candidate_for_score.var:candidate_total } }
+			
+			if = {
+				limit = { scope:event_root = { has_variable = tmp_candidate } }
+				if = {
+					limit = { scope:event_root.var:tmp_candidate > scope:event_root.var:tmp_best_challenger_score }
+					save_scope_as = challenger
+					scope:event_root = { set_variable = { name = tmp_best_challenger_score value = scope:event_root.var:tmp_candidate } }
+				}
+			}
+		}
 	}
 	
 	# ---------------------------------------------------------
@@ -91,9 +145,8 @@ riseandfall_palace_coup_setup = {
 				limit = {
 					is_landed = no
 					is_alive = yes
-					NOT = { is_close_family_of = root }
 					age > 16
-					is_male = yes
+					is_male = yes 
 				}
 				save_scope_as = challenger
 			}
@@ -135,6 +188,194 @@ riseandfall_palace_coup_setup = {
 		}
 	}
 	
+	# Handle player challenger: save as potential and find backup challenger
+	if = {
+		limit = { exists = scope:challenger scope:challenger = { is_ai = no } }
+		scope:challenger = { save_scope_as = potential_challenger }
+		
+		# Reset score for backup selection
+		scope:event_root = { set_variable = { name = tmp_best_challenger_score value = -9999 } }
+		
+		# Re-run selection excluding potential
+		root = {
+			every_courtier_or_guest = {
+				limit = {
+					is_alive = yes
+					NOT = { is_close_family_of = root }
+					age > 16
+					NOT = { this = scope:potential_challenger }
+					is_ai = yes  # Only select AI characters for backup
+				}
+				# Initialize candidate score from stats
+				set_variable = { name = candidate_total value = diplomacy }
+				change_variable = { name = candidate_total add = martial }
+				change_variable = { name = candidate_total add = stewardship }
+				change_variable = { name = candidate_total add = intrigue }
+				change_variable = { name = candidate_total add = learning }
+				
+				# Apply realm succession law penalties
+				if = {
+					limit = { root = { has_realm_law = female_preference_law } }
+					if = { limit = { NOT = { is_female = yes } } change_variable = { name = candidate_total add = -1000 } }
+				}
+				if = {
+					limit = { root = { has_realm_law = male_only_law } }
+					if = { limit = { NOT = { is_male = yes } } set_variable = { name = candidate_total value = -9999 } }
+				}
+				if = {
+					limit = { root = { has_realm_law = male_preference_law } }
+					if = { limit = { NOT = { is_male = yes } } change_variable = { name = candidate_total add = -1000 } }
+				}
+				if = {
+					limit = { root = { has_realm_law = female_only_law } }
+					if = { limit = { NOT = { is_female = yes } } set_variable = { name = candidate_total value = -9999 } }
+				}
+				
+				# Multiplier for claims
+				if = {
+					limit = { scope:tmp_primary_title = { exists = yes } }
+					if = { limit = { has_claim_on = scope:tmp_primary_title } change_variable = { name = candidate_total multiply = 1.5 } }
+				}
+				
+				# Knights get a 1.5x multiplier
+				if = { limit = { is_knight = yes } change_variable = { name = candidate_total multiply = 1.5 } }
+				
+				# Save candidate score to event_root and update best challenger if applicable
+				save_scope_as = candidate_for_score
+				scope:event_root = { set_variable = { name = tmp_candidate value = scope:candidate_for_score.var:candidate_total } }
+				
+				if = {
+					limit = { scope:event_root = { has_variable = tmp_candidate } }
+					if = {
+						limit = { scope:event_root.var:tmp_candidate > scope:event_root.var:tmp_best_challenger_score }
+						save_scope_as = challenger
+						scope:event_root = { set_variable = { name = tmp_best_challenger_score value = scope:event_root.var:tmp_candidate } }
+					}
+				}
+			}
+			# Include vassals who are councilors
+			every_vassal = {
+				limit = {
+					is_councillor = yes
+					is_alive = yes
+					NOT = { is_close_family_of = root }
+					age > 16
+					NOT = { this = scope:potential_challenger }
+					is_ai = yes  # Only select AI characters for backup
+				}
+				# Initialize candidate score from stats
+				set_variable = { name = candidate_total value = diplomacy }
+				change_variable = { name = candidate_total add = martial }
+				change_variable = { name = candidate_total add = stewardship }
+				change_variable = { name = candidate_total add = intrigue }
+				change_variable = { name = candidate_total add = learning }
+				
+				# Apply realm succession law penalties
+				if = {
+					limit = { root = { has_realm_law = female_preference_law } }
+					if = { limit = { NOT = { is_female = yes } } change_variable = { name = candidate_total add = -1000 } }
+				}
+				if = {
+					limit = { root = { has_realm_law = male_only_law } }
+					if = { limit = { NOT = { is_male = yes } } set_variable = { name = candidate_total value = -9999 } }
+				}
+				if = {
+					limit = { root = { has_realm_law = male_preference_law } }
+					if = { limit = { NOT = { is_male = yes } } change_variable = { name = candidate_total add = -1000 } }
+				}
+				if = {
+					limit = { root = { has_realm_law = female_only_law } }
+					if = { limit = { NOT = { is_female = yes } } set_variable = { name = candidate_total value = -9999 } }
+				}
+				
+				# Multiplier for claims
+				if = {
+					limit = { scope:tmp_primary_title = { exists = yes } }
+					if = { limit = { has_claim_on = scope:tmp_primary_title } change_variable = { name = candidate_total multiply = 1.5 } }
+				}
+				
+				# Knights get a 1.5x multiplier
+				if = { limit = { is_knight = yes } change_variable = { name = candidate_total multiply = 1.5 } }
+				
+				# Save candidate score to event_root and update best challenger if applicable
+				save_scope_as = candidate_for_score
+				scope:event_root = { set_variable = { name = tmp_candidate value = scope:candidate_for_score.var:candidate_total } }
+				
+				if = {
+					limit = { scope:event_root = { has_variable = tmp_candidate } }
+					if = {
+						limit = { scope:event_root.var:tmp_candidate > scope:event_root.var:tmp_best_challenger_score }
+						save_scope_as = challenger
+						scope:event_root = { set_variable = { name = tmp_best_challenger_score value = scope:event_root.var:tmp_candidate } }
+					}
+				}
+			}
+		}
+		
+		# Fallbacks for backup challenger, excluding potential, only AI
+		if = {
+			limit = { NOT = { exists = scope:challenger } }
+			if = {
+				limit = { root = { OR = { has_realm_law = male_only_law has_realm_law = male_preference_law } } }
+				random_courtier = {
+					limit = {
+						is_landed = no
+						is_alive = yes
+						NOT = { is_close_family_of = root }
+						age > 16
+						is_male = yes
+						NOT = { this = scope:potential_challenger }
+						is_ai = yes
+					}
+					save_scope_as = challenger
+				}
+			}
+			else_if = {
+				limit = { root = { OR = { has_realm_law = female_only_law has_realm_law = female_preference_law } } }
+				random_courtier = {
+					limit = {
+						is_landed = no
+						is_alive = yes
+						NOT = { is_close_family_of = root }
+						age > 16
+						is_female = yes
+						NOT = { this = scope:potential_challenger }
+						is_ai = yes
+					}
+					save_scope_as = challenger
+				}
+			}
+			else = {
+				random_courtier = {
+					limit = {
+						is_landed = no
+						is_alive = yes
+						NOT = { is_close_family_of = root }
+						age > 16
+						NOT = { this = scope:potential_challenger }
+						is_ai = yes
+					}
+					save_scope_as = challenger
+				}
+			}
+		}
+		
+		# Last-resort for backup: if no challenger found yet, pick any alive AI courtier (including landed), excluding potential
+		if = {
+			limit = { NOT = { exists = scope:challenger } }
+			root = {
+				random_courtier = {
+					limit = { 
+						is_adult = yes 
+						NOT = { this = scope:potential_challenger }
+						is_ai = yes
+					}
+					save_scope_as = challenger
+				}
+			}
+		}
+	}
+	
 	# ---------------------------------------------------------
 	# EXECUTION PHASE
 	# ---------------------------------------------------------
@@ -144,7 +385,7 @@ riseandfall_palace_coup_setup = {
 		# Create a temporary landless adventurer camp
 		scope:challenger = {
 			if = {
-				limit = { is_alive = yes }
+				limit = { is_alive = yes NOT = { is_landed = yes } }
 				create_adventurer_title = {
 					name = palace_coup_adventurer_camp_name
 					holder = scope:challenger
@@ -204,6 +445,12 @@ riseandfall_palace_coup_root_wins_prowess_duel = {
 				killer = scope:event_root
 			}
 		}
+	}
+
+	# Notify challenger of defeat
+	if = {
+		limit = { exists = scope:challenger }
+		scope:challenger = { trigger_event = { id = palace_coup.2001 } }
 	}
 
 	# Clean up: ensure the temporary palace coup camp title is destroyed
@@ -324,6 +571,12 @@ riseandfall_palace_coup_challenger_wins_prowess_duel = {
 		}
 	# Trigger notification event for the defeated ruler
 	root = { trigger_event = { id = palace_coup.1004 } }
+	
+	# Notify challenger of victory
+	if = {
+		limit = { exists = scope:challenger }
+		scope:challenger = { trigger_event = { id = palace_coup.2002 } }
+	}
 	
 	# Clean up: ensure the temporary palace coup camp title is destroyed
 	hidden_effect = { riseandfall_palace_coup_cleanup_camp = yes }
@@ -477,6 +730,9 @@ riseandfall_palace_coup_root_flees_success = {
 		}
 	}
 	
+	# Notify challenger of successful escape
+	scope:challenger = { trigger_event = { id = palace_coup.2003 } }
+	
 	# Clean up: ensure the temporary palace coup camp title is destroyed
 	hidden_effect = { riseandfall_palace_coup_cleanup_camp = yes }
 	
@@ -575,6 +831,9 @@ riseandfall_palace_coup_root_flees_failure = {
 
 	# Notify root of their new status (failed escape specific notification)
 	root = { trigger_event = { id = palace_coup.1005 } }
+
+	# Notify challenger of failed escape
+	scope:challenger = { trigger_event = { id = palace_coup.2004 } }
 
 	# Clean up temporary palace coup camp title
 	hidden_effect = { riseandfall_palace_coup_cleanup_camp = yes }
