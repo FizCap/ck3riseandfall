@@ -13,6 +13,35 @@ riseandfall_realm_split_se = {
     save_scope_as = original_ruler
     primary_title = { save_scope_as = original_primary }
 
+    # Determine dynamic number of breakaways based on direct vassal count
+    scope:original_ruler = {
+        set_variable = { name = rf_direct_vassals value = 0 }
+        every_vassal = {
+            limit = {
+                is_landed = yes
+                primary_title.tier >= tier_county
+                NOT = { primary_title.tier >= tier_empire }
+            }
+            scope:original_ruler = { change_variable = { name = rf_direct_vassals add = 1 } }
+        }
+
+        # Heuristics: base minimum 1; +1 max per 10 vassals, capped at 10
+        if = {
+            limit = { has_variable = rf_direct_vassals }
+            if = { limit = { var:rf_direct_vassals >= 90 } set_variable = { name = rf_breakaway_count value = 10 } }
+            else_if = { limit = { var:rf_direct_vassals >= 80 } set_variable = { name = rf_breakaway_count value = 9 } }
+            else_if = { limit = { var:rf_direct_vassals >= 70 } set_variable = { name = rf_breakaway_count value = 8 } }
+            else_if = { limit = { var:rf_direct_vassals >= 60 } set_variable = { name = rf_breakaway_count value = 7 } }
+            else_if = { limit = { var:rf_direct_vassals >= 50 } set_variable = { name = rf_breakaway_count value = 6 } }
+            else_if = { limit = { var:rf_direct_vassals >= 40 } set_variable = { name = rf_breakaway_count value = 5 } }
+            else_if = { limit = { var:rf_direct_vassals >= 30 } set_variable = { name = rf_breakaway_count value = 4 } }
+            else_if = { limit = { var:rf_direct_vassals >= 20 } set_variable = { name = rf_breakaway_count value = 3 } }
+            else_if = { limit = { var:rf_direct_vassals >= 10 } set_variable = { name = rf_breakaway_count value = 2 } }
+            else = { set_variable = { name = rf_breakaway_count value = 1 } }
+        }
+        else = { set_variable = { name = rf_breakaway_count value = 1 } }
+    }
+
     # Hegemony special case: make all empire-tier vassals break away automatically
     if = {
         limit = { primary_title.tier = tier_hegemony }
@@ -35,156 +64,134 @@ riseandfall_realm_split_se = {
     }
     
     # Pick 2-4 vassals to become breakaway rulers
-    # Use ordered_vassal for governments without powerful vassals, ordered_powerful_vassal otherwise
-    
-    # First breakaway ruler - strongest vassal
-    if = {
-        limit = { riseandfall_no_powerful_vassals_trigger = yes }
-        # Administrative governments - use ordered_vassal
-        ordered_vassal = {
-            limit = {
-                is_landed = yes
-                primary_title.tier >= tier_county
-                NOT = { primary_title.tier >= tier_empire }
-            }
-            order_by = current_military_strength
-            max = 1
-            
-            save_scope_as = breakaway_1
-            add_character_flag = { flag = rf_breakaway_ruler days = 30 }
+
+    # First breakaway ruler - strongest vassal (simplified)
+    ordered_vassal = {
+        limit = {
+            is_landed = yes
+            primary_title.tier >= tier_county
+            NOT = { primary_title.tier >= tier_empire }
         }
-    }
-    else = {
-        # Feudal/Clan - use powerful vassals
-        ordered_powerful_vassal = {
-            limit = {
-                is_landed = yes
-                primary_title.tier >= tier_county
-                NOT = { primary_title.tier >= tier_empire }
-            }
-            order_by = current_military_strength
-            max = 1
-            
-            save_scope_as = breakaway_1
-            add_character_flag = { flag = rf_breakaway_ruler days = 30 }
-        }
+        order_by = current_military_strength
+        max = 1
+
+        save_scope_as = breakaway_1
+        add_character_flag = { flag = rf_breakaway_ruler days = 30 }
     }
     
     # Second breakaway ruler
     if = {
         limit = { exists = scope:breakaway_1 }
         if = {
-            limit = { riseandfall_no_powerful_vassals_trigger = yes }
-            ordered_vassal = {
-                limit = {
-                    is_landed = yes
-                    primary_title.tier >= tier_county
-                    NOT = { primary_title.tier >= tier_empire }
-                    NOT = { this = scope:breakaway_1 }
+            limit = { has_variable = rf_breakaway_count }
+            if = {
+                limit = { var:rf_breakaway_count >= 2 }
+                ordered_vassal = {
+                    limit = {
+                        is_landed = yes
+                        primary_title.tier >= tier_county
+                        NOT = { primary_title.tier >= tier_empire }
+                        NOT = { this = scope:breakaway_1 }
+                    }
+                    order_by = current_military_strength
+                    max = 1
+
+                    save_scope_as = breakaway_2
+                    add_character_flag = { flag = rf_breakaway_ruler days = 30 }
                 }
-                order_by = current_military_strength
-                max = 1
-                
-                save_scope_as = breakaway_2
-                add_character_flag = { flag = rf_breakaway_ruler days = 30 }
-            }
-        }
-        else = {
-            ordered_powerful_vassal = {
-                limit = {
-                    is_landed = yes
-                    primary_title.tier >= tier_county
-                    NOT = { primary_title.tier >= tier_empire }
-                    NOT = { this = scope:breakaway_1 }
-                }
-                order_by = current_military_strength
-                max = 1
-                
-                save_scope_as = breakaway_2
-                add_character_flag = { flag = rf_breakaway_ruler days = 30 }
             }
         }
     }
-    
+
     # Third breakaway ruler (50% chance)
     if = {
         limit = { exists = scope:breakaway_2 }
-        random = {
-            chance = 50
+        if = {
+            limit = { has_variable = rf_breakaway_count }
             if = {
-                limit = { riseandfall_no_powerful_vassals_trigger = yes }
-                ordered_vassal = {
-                    limit = {
-                        is_landed = yes
-                        primary_title.tier >= tier_county
-                        NOT = { primary_title.tier >= tier_empire }
-                        NOT = { this = scope:breakaway_1 }
-                        NOT = { this = scope:breakaway_2 }
+                limit = { var:rf_breakaway_count >= 3 }
+                random = {
+                    chance = 50
+                    if = {
+                        ordered_vassal = {
+                            limit = {
+                                is_landed = yes
+                                primary_title.tier >= tier_county
+                                NOT = { primary_title.tier >= tier_empire }
+                                NOT = { this = scope:breakaway_1 }
+                                NOT = { this = scope:breakaway_2 }
+                            }
+                            order_by = current_military_strength
+                            max = 1
+
+                            save_scope_as = breakaway_3
+                            add_character_flag = { flag = rf_breakaway_ruler days = 30 }
+                        }
                     }
-                    order_by = current_military_strength
-                    max = 1
-                    
-                    save_scope_as = breakaway_3
-                    add_character_flag = { flag = rf_breakaway_ruler days = 30 }
-                }
-            }
-            else = {
-                ordered_powerful_vassal = {
-                    limit = {
-                        is_landed = yes
-                        primary_title.tier >= tier_county
-                        NOT = { primary_title.tier >= tier_empire }
-                        NOT = { this = scope:breakaway_1 }
-                        NOT = { this = scope:breakaway_2 }
+                    else = {
+                        ordered_vassal = {
+                            limit = {
+                                is_landed = yes
+                                primary_title.tier >= tier_county
+                                NOT = { primary_title.tier >= tier_empire }
+                                NOT = { this = scope:breakaway_1 }
+                                NOT = { this = scope:breakaway_2 }
+                            }
+                            order_by = current_military_strength
+                            max = 1
+
+                            save_scope_as = breakaway_3
+                            add_character_flag = { flag = rf_breakaway_ruler days = 30 }
+                        }
                     }
-                    order_by = current_military_strength
-                    max = 1
-                    
-                    save_scope_as = breakaway_3
-                    add_character_flag = { flag = rf_breakaway_ruler days = 30 }
                 }
             }
         }
     }
-    
+
     # Fourth breakaway ruler (25% chance, only if third exists)
     if = {
         limit = { exists = scope:breakaway_3 }
-        random = {
-            chance = 25
+        if = {
+            limit = { has_variable = rf_breakaway_count }
             if = {
-                limit = { riseandfall_no_powerful_vassals_trigger = yes }
-                ordered_vassal = {
-                    limit = {
-                        is_landed = yes
-                        primary_title.tier >= tier_county
-                        NOT = { primary_title.tier >= tier_empire }
-                        NOT = { this = scope:breakaway_1 }
-                        NOT = { this = scope:breakaway_2 }
-                        NOT = { this = scope:breakaway_3 }
+                limit = { var:rf_breakaway_count >= 4 }
+                random = {
+                    chance = 25
+                    if = {
+                        ordered_vassal = {
+                            limit = {
+                                is_landed = yes
+                                primary_title.tier >= tier_county
+                                NOT = { primary_title.tier >= tier_empire }
+                                NOT = { this = scope:breakaway_1 }
+                                NOT = { this = scope:breakaway_2 }
+                                NOT = { this = scope:breakaway_3 }
+                            }
+                            order_by = current_military_strength
+                            max = 1
+
+                            save_scope_as = breakaway_4
+                            add_character_flag = { flag = rf_breakaway_ruler days = 30 }
+                        }
                     }
-                    order_by = current_military_strength
-                    max = 1
-                    
-                    save_scope_as = breakaway_4
-                    add_character_flag = { flag = rf_breakaway_ruler days = 30 }
-                }
-            }
-            else = {
-                ordered_powerful_vassal = {
-                    limit = {
-                        is_landed = yes
-                        primary_title.tier >= tier_county
-                        NOT = { primary_title.tier >= tier_empire }
-                        NOT = { this = scope:breakaway_1 }
-                        NOT = { this = scope:breakaway_2 }
-                        NOT = { this = scope:breakaway_3 }
+                    else = {
+                        ordered_vassal = {
+                            limit = {
+                                is_landed = yes
+                                primary_title.tier >= tier_county
+                                NOT = { primary_title.tier >= tier_empire }
+                                NOT = { this = scope:breakaway_1 }
+                                NOT = { this = scope:breakaway_2 }
+                                NOT = { this = scope:breakaway_3 }
+                            }
+                            order_by = current_military_strength
+                            max = 1
+
+                            save_scope_as = breakaway_4
+                            add_character_flag = { flag = rf_breakaway_ruler days = 30 }
+                        }
                     }
-                    order_by = current_military_strength
-                    max = 1
-                    
-                    save_scope_as = breakaway_4
-                    add_character_flag = { flag = rf_breakaway_ruler days = 30 }
                 }
             }
         }
@@ -201,10 +208,11 @@ riseandfall_realm_split_se = {
         }
         
         # Use weighted random - higher weight for same de_jure territory
-        # Base weight 10, bonus 100 if same de_jure kingdom
+        # Base weight adjusted so single-breakaway doesn't take everything
+        # Root base weight 50, breakaway base weight 50; de_jure bonuses still apply
         random_list = {
-            # Stay with root (low base chance)
-            10 = {
+            # Stay with root (higher base chance)
+            50 = {
                 modifier = {
                     add = 50
                     capital_county = {
@@ -219,7 +227,7 @@ riseandfall_realm_split_se = {
                 }
             }
             # Join breakaway_1
-            100 = {
+            50 = {
                 trigger = { exists = scope:breakaway_1 }
                 modifier = {
                     add = 200
@@ -232,7 +240,7 @@ riseandfall_realm_split_se = {
                 set_variable = { name = rf_my_breakaway value = scope:breakaway_1 }
             }
             # Join breakaway_2
-            100 = {
+            50 = {
                 trigger = { exists = scope:breakaway_2 }
                 modifier = {
                     add = 200
@@ -245,7 +253,7 @@ riseandfall_realm_split_se = {
                 set_variable = { name = rf_my_breakaway value = scope:breakaway_2 }
             }
             # Join breakaway_3
-            100 = {
+            50 = {
                 trigger = { exists = scope:breakaway_3 }
                 modifier = {
                     add = 200
@@ -258,7 +266,7 @@ riseandfall_realm_split_se = {
                 set_variable = { name = rf_my_breakaway value = scope:breakaway_3 }
             }
             # Join breakaway_4
-            100 = {
+            50 = {
                 trigger = { exists = scope:breakaway_4 }
                 modifier = {
                     add = 200
@@ -271,6 +279,110 @@ riseandfall_realm_split_se = {
                 set_variable = { name = rf_my_breakaway value = scope:breakaway_4 }
             }
         }
+    }
+    
+    # Set rivalries and claims between breakaways and original ruler
+    if = {
+        limit = { exists = scope:breakaway_1 }
+        # Rivalry and claims with original
+        scope:breakaway_1 = {
+            if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:original_ruler } NOT = { has_relation_rival = scope:original_ruler } } set_relation_rival = { target = scope:original_ruler reason = riseandfall_realmsplit_became_rival } }
+        }
+        scope:original_ruler = {
+            if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:breakaway_1 } NOT = { has_relation_rival = scope:breakaway_1 } } set_relation_rival = { target = scope:breakaway_1 reason = riseandfall_realmsplit_became_rival } }
+        }
+        scope:original_ruler = { add_unpressed_claim = scope:breakaway_1.primary_title }
+        scope:breakaway_1 = { add_unpressed_claim = scope:original_primary }
+    }
+    if = {
+        limit = { exists = scope:breakaway_2 }
+        # Rivalry and claims with original
+        scope:breakaway_2 = {
+            if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:original_ruler } NOT = { has_relation_rival = scope:original_ruler } } set_relation_rival = { target = scope:original_ruler reason = riseandfall_realmsplit_became_rival } }
+        }
+        scope:original_ruler = {
+            if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:breakaway_2 } NOT = { has_relation_rival = scope:breakaway_2 } } set_relation_rival = { target = scope:breakaway_2 reason = riseandfall_realmsplit_became_rival } }
+        }
+        scope:original_ruler = { add_unpressed_claim = scope:breakaway_2.primary_title }
+        scope:breakaway_2 = { add_unpressed_claim = scope:original_primary }
+        # Rivalry and claims with breakaway_1
+        scope:breakaway_2 = {
+            if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:breakaway_1 } NOT = { has_relation_rival = scope:breakaway_1 } } set_relation_rival = { target = scope:breakaway_1 reason = riseandfall_realmsplit_became_rival } }
+        }
+        scope:breakaway_1 = {
+            if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:breakaway_2 } NOT = { has_relation_rival = scope:breakaway_2 } } set_relation_rival = { target = scope:breakaway_2 reason = riseandfall_realmsplit_became_rival } }
+        }
+        scope:breakaway_1 = { add_unpressed_claim = scope:breakaway_2.primary_title }
+        scope:breakaway_2 = { add_unpressed_claim = scope:breakaway_1.primary_title }
+    }
+    if = {
+        limit = { exists = scope:breakaway_3 }
+        # Rivalry and claims with original
+        scope:breakaway_3 = {
+            if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:original_ruler } NOT = { has_relation_rival = scope:original_ruler } } set_relation_rival = { target = scope:original_ruler reason = riseandfall_realmsplit_became_rival } }
+        }
+        scope:original_ruler = {
+            if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:breakaway_3 } NOT = { has_relation_rival = scope:breakaway_3 } } set_relation_rival = { target = scope:breakaway_3 reason = riseandfall_realmsplit_became_rival } }
+        }
+        scope:original_ruler = { add_unpressed_claim = scope:breakaway_3.primary_title }
+        scope:breakaway_3 = { add_unpressed_claim = scope:original_primary }
+        # Rivalry and claims with breakaway_1
+        scope:breakaway_3 = {
+            if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:breakaway_1 } NOT = { has_relation_rival = scope:breakaway_1 } } set_relation_rival = { target = scope:breakaway_1 reason = riseandfall_realmsplit_became_rival } }
+        }
+        scope:breakaway_1 = {
+            if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:breakaway_3 } NOT = { has_relation_rival = scope:breakaway_3 } } set_relation_rival = { target = scope:breakaway_3 reason = riseandfall_realmsplit_became_rival } }
+        }
+        scope:breakaway_1 = { add_unpressed_claim = scope:breakaway_3.primary_title }
+        scope:breakaway_3 = { add_unpressed_claim = scope:breakaway_1.primary_title }
+        # Rivalry and claims with breakaway_2
+        scope:breakaway_3 = {
+            if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:breakaway_2 } NOT = { has_relation_rival = scope:breakaway_2 } } set_relation_rival = { target = scope:breakaway_2 reason = riseandfall_realmsplit_became_rival } }
+        }
+        scope:breakaway_2 = {
+            if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:breakaway_3 } NOT = { has_relation_rival = scope:breakaway_3 } } set_relation_rival = { target = scope:breakaway_3 reason = riseandfall_realmsplit_became_rival } }
+        }
+        scope:breakaway_2 = { add_unpressed_claim = scope:breakaway_3.primary_title }
+        scope:breakaway_3 = { add_unpressed_claim = scope:breakaway_2.primary_title }
+    }
+    if = {
+        limit = { exists = scope:breakaway_4 }
+        # Rivalry and claims with original
+        scope:breakaway_4 = {
+            if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:original_ruler } NOT = { has_relation_rival = scope:original_ruler } } set_relation_rival = { target = scope:original_ruler reason = riseandfall_realmsplit_became_rival } }
+        }
+        scope:original_ruler = {
+            if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:breakaway_4 } NOT = { has_relation_rival = scope:breakaway_4 } } set_relation_rival = { target = scope:breakaway_4 reason = riseandfall_realmsplit_became_rival } }
+        }
+        scope:original_ruler = { add_unpressed_claim = scope:breakaway_4.primary_title }
+        scope:breakaway_4 = { add_unpressed_claim = scope:original_primary }
+        # Rivalry and claims with breakaway_1
+        scope:breakaway_4 = {
+            if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:breakaway_1 } NOT = { has_relation_rival = scope:breakaway_1 } } set_relation_rival = { target = scope:breakaway_1 reason = riseandfall_realmsplit_became_rival } }
+        }
+        scope:breakaway_1 = {
+            if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:breakaway_4 } NOT = { has_relation_rival = scope:breakaway_4 } } set_relation_rival = { target = scope:breakaway_4 reason = riseandfall_realmsplit_became_rival } }
+        }
+        scope:breakaway_1 = { add_unpressed_claim = scope:breakaway_4.primary_title }
+        scope:breakaway_4 = { add_unpressed_claim = scope:breakaway_1.primary_title }
+        # Rivalry and claims with breakaway_2
+        scope:breakaway_4 = {
+            if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:breakaway_2 } NOT = { has_relation_rival = scope:breakaway_2 } } set_relation_rival = { target = scope:breakaway_2 reason = riseandfall_realmsplit_became_rival } }
+        }
+        scope:breakaway_2 = {
+            if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:breakaway_4 } NOT = { has_relation_rival = scope:breakaway_4 } } set_relation_rival = { target = scope:breakaway_4 reason = riseandfall_realmsplit_became_rival } }
+        }
+        scope:breakaway_2 = { add_unpressed_claim = scope:breakaway_4.primary_title }
+        scope:breakaway_4 = { add_unpressed_claim = scope:breakaway_2.primary_title }
+        # Rivalry and claims with breakaway_3
+        scope:breakaway_4 = {
+            if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:breakaway_3 } NOT = { has_relation_rival = scope:breakaway_3 } } set_relation_rival = { target = scope:breakaway_3 reason = riseandfall_realmsplit_became_rival } }
+        }
+        scope:breakaway_3 = {
+            if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:breakaway_4 } NOT = { has_relation_rival = scope:breakaway_4 } } set_relation_rival = { target = scope:breakaway_4 reason = riseandfall_realmsplit_became_rival } }
+        }
+        scope:breakaway_3 = { add_unpressed_claim = scope:breakaway_4.primary_title }
+        scope:breakaway_4 = { add_unpressed_claim = scope:breakaway_3.primary_title }
     }
     
     # Execute the splits for each breakaway ruler
@@ -296,8 +408,12 @@ riseandfall_realm_split_se = {
         limit = { has_character_flag = rf_breakaway_ruler }
         remove_character_flag = rf_breakaway_ruler
     }
-    
-    # Add cooldown
+
+    # Cleanup temporary variables and add cooldown
+    scope:original_ruler = {
+        remove_variable = rf_direct_vassals
+        remove_variable = rf_breakaway_count
+    }
     set_variable = { name = rf_realm_split_cooldown value = 1 years = 5 }
 }
 
@@ -512,14 +628,7 @@ riseandfall_execute_realm_split_se = {
         contract_group = tributary_settled
         suzerain = scope:original_ruler
     }
-    
-    # Add truce
-    add_truce_both_ways = {
-        character = scope:original_ruler
-        years = 10
-        name = RISEANDFALL_REALM_SPLIT_TRUCE
-    }
-    
+
     # Add claim on original primary title
     # If the original primary was a hegemon, ensure the original ruler
     # gets an unpressed claim on the breakaway's (possibly newly-created)
@@ -532,92 +641,7 @@ riseandfall_execute_realm_split_se = {
 
     add_unpressed_claim = scope:original_primary
 
-    # --- New: make breakaways rivals and give cross-claims ---
-    # Each breakaway becomes rivals with the original ruler and with each other,
-    # and cross-unpressed claims are added so each side can press claims on top titles.
-    if = {
-        limit = { exists = scope:breakaway_1 }
 
-        # Rival with original ruler
-        if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:original_ruler } NOT = { has_relation_rival = scope:original_ruler } } scope:breakaway_1 = { set_relation_rival = { target = scope:original_ruler reason = riseandfall_realmsplit_became_rival } } }
-        if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:breakaway_1 } NOT = { has_relation_rival = scope:breakaway_1 } } scope:original_ruler = { set_relation_rival = { target = scope:breakaway_1 reason = riseandfall_realmsplit_became_rival } } }
-
-        # Original gets claim on breakaway's primary title
-        scope:original_ruler = { add_unpressed_claim = scope:breakaway_1.primary_title }
-
-        # Breakaway claims on original primary (defensive - ensures breakaway has claim)
-        scope:breakaway_1 = { add_unpressed_claim = scope:original_primary }
-
-        if = {
-            limit = { exists = scope:breakaway_2 }
-            # Rivalry between the two breakaways
-            if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:breakaway_2 } NOT = { has_relation_rival = scope:breakaway_2 } } scope:breakaway_1 = { set_relation_rival = { target = scope:breakaway_2 reason = riseandfall_realmsplit_became_rival } } }
-            if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:breakaway_1 } NOT = { has_relation_rival = scope:breakaway_1 } } scope:breakaway_2 = { set_relation_rival = { target = scope:breakaway_1 reason = riseandfall_realmsplit_became_rival } } }
-            # Rivalry with original
-            if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:breakaway_2 } NOT = { has_relation_rival = scope:breakaway_2 } } scope:original_ruler = { set_relation_rival = { target = scope:breakaway_2 reason = riseandfall_realmsplit_became_rival } } }
-            if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:original_ruler } NOT = { has_relation_rival = scope:original_ruler } } scope:breakaway_2 = { set_relation_rival = { target = scope:original_ruler reason = riseandfall_realmsplit_became_rival } } }
-            # Cross claims
-            scope:breakaway_1 = { add_unpressed_claim = scope:breakaway_2.primary_title }
-            scope:breakaway_2 = { add_unpressed_claim = scope:breakaway_1.primary_title }
-            scope:original_ruler = { add_unpressed_claim = scope:breakaway_2.primary_title }
-            scope:breakaway_2 = { add_unpressed_claim = scope:original_primary }
-        }
-
-        if = {
-            limit = { exists = scope:breakaway_3 }
-            # Rivalries
-            if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:breakaway_3 } NOT = { has_relation_rival = scope:breakaway_3 } } scope:breakaway_1 = { set_relation_rival = { target = scope:breakaway_3 reason = riseandfall_realmsplit_became_rival } } }
-            if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:breakaway_1 } NOT = { has_relation_rival = scope:breakaway_1 } } scope:breakaway_3 = { set_relation_rival = { target = scope:breakaway_1 reason = riseandfall_realmsplit_became_rival } } }
-            # Rivalry with original
-            if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:breakaway_3 } NOT = { has_relation_rival = scope:breakaway_3 } } scope:original_ruler = { set_relation_rival = { target = scope:breakaway_3 reason = riseandfall_realmsplit_became_rival } } }
-            if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:original_ruler } NOT = { has_relation_rival = scope:original_ruler } } scope:breakaway_3 = { set_relation_rival = { target = scope:original_ruler reason = riseandfall_realmsplit_became_rival } } }
-            # Cross claims
-            scope:breakaway_1 = { add_unpressed_claim = scope:breakaway_3.primary_title }
-            scope:breakaway_3 = { add_unpressed_claim = scope:breakaway_1.primary_title }
-            scope:original_ruler = { add_unpressed_claim = scope:breakaway_3.primary_title }
-            scope:breakaway_3 = { add_unpressed_claim = scope:original_primary }
-
-            if = {
-                limit = { exists = scope:breakaway_2 }
-                # also ensure breakaway_2 and breakaway_3 are rivals and claim each other
-                if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:breakaway_3 } NOT = { has_relation_rival = scope:breakaway_3 } } scope:breakaway_2 = { set_relation_rival = { target = scope:breakaway_3 reason = riseandfall_realmsplit_became_rival } } }
-                if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:breakaway_2 } NOT = { has_relation_rival = scope:breakaway_2 } } scope:breakaway_3 = { set_relation_rival = { target = scope:breakaway_2 reason = riseandfall_realmsplit_became_rival } } }
-                scope:breakaway_2 = { add_unpressed_claim = scope:breakaway_3.primary_title }
-                scope:breakaway_3 = { add_unpressed_claim = scope:breakaway_2.primary_title }
-            }
-        }
-
-        if = {
-            limit = { exists = scope:breakaway_4 }
-            # Rivalries
-            if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:breakaway_4 } NOT = { has_relation_rival = scope:breakaway_4 } } scope:breakaway_1 = { set_relation_rival = { target = scope:breakaway_4 reason = riseandfall_realmsplit_became_rival } } }
-            if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:breakaway_1 } NOT = { has_relation_rival = scope:breakaway_1 } } scope:breakaway_4 = { set_relation_rival = { target = scope:breakaway_1 reason = riseandfall_realmsplit_became_rival } } }
-            # Rivalry with original
-            if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:breakaway_4 } NOT = { has_relation_rival = scope:breakaway_4 } } scope:original_ruler = { set_relation_rival = { target = scope:breakaway_4 reason = riseandfall_realmsplit_became_rival } } }
-            if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:original_ruler } NOT = { has_relation_rival = scope:original_ruler } } scope:breakaway_4 = { set_relation_rival = { target = scope:original_ruler reason = riseandfall_realmsplit_became_rival } } }
-            # Cross claims
-            scope:breakaway_1 = { add_unpressed_claim = scope:breakaway_4.primary_title }
-            scope:breakaway_4 = { add_unpressed_claim = scope:breakaway_1.primary_title }
-            scope:original_ruler = { add_unpressed_claim = scope:breakaway_4.primary_title }
-            scope:breakaway_4 = { add_unpressed_claim = scope:original_primary }
-
-            if = {
-                limit = { exists = scope:breakaway_2 }
-                if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:breakaway_4 } NOT = { has_relation_rival = scope:breakaway_4 } } scope:breakaway_2 = { set_relation_rival = { target = scope:breakaway_4 reason = riseandfall_realmsplit_became_rival } } }
-                if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:breakaway_2 } NOT = { has_relation_rival = scope:breakaway_2 } } scope:breakaway_4 = { set_relation_rival = { target = scope:breakaway_2 reason = riseandfall_realmsplit_became_rival } } }
-                scope:breakaway_2 = { add_unpressed_claim = scope:breakaway_4.primary_title }
-                scope:breakaway_4 = { add_unpressed_claim = scope:breakaway_2.primary_title }
-            }
-
-            if = {
-                limit = { exists = scope:breakaway_3 }
-                if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:breakaway_4 } NOT = { has_relation_rival = scope:breakaway_4 } } scope:breakaway_3 = { set_relation_rival = { target = scope:breakaway_4 reason = riseandfall_realmsplit_became_rival } } }
-                if = { limit = { can_set_relation_rival_trigger = { CHARACTER = scope:breakaway_3 } NOT = { has_relation_rival = scope:breakaway_3 } } scope:breakaway_4 = { set_relation_rival = { target = scope:breakaway_3 reason = riseandfall_realmsplit_became_rival } } }
-                scope:breakaway_3 = { add_unpressed_claim = scope:breakaway_4.primary_title }
-                scope:breakaway_4 = { add_unpressed_claim = scope:breakaway_3.primary_title }
-            }
-        }
-    }
     # --- End new rivalry & cross-claims block ---
 
     # Remove flag
