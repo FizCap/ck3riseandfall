@@ -1,0 +1,131 @@
+﻿##################################################
+# Rise and Fall — Puppet Master (diarch) marriage scripted effects
+# Creates a spouse for AI, unlanded, non-ruler diarchs and places the spouse in the liege's court (diarchs cannot have courtiers)
+
+# Male diarch -> create female spouse
+riseandfall_marry_puppet_master_male_se = {
+    # Expecting character scope (root) — the diarch character. The outer on_action should have saved the liege as scope:liege.
+    if = {
+        # Prefer the liege's capital province for a valid create_character location
+        limit = { exists = scope:liege.capital_province }
+        create_character = {
+            location = scope:liege.capital_province
+            culture = scope:liege.culture
+            faith = scope:liege.faith
+            age = { 16 20 }
+            gender = female
+            save_scope_as = created_spouse
+        }
+    }
+    else_if = {
+        limit = { exists = scope:liege.capital_county }
+        create_character = {
+            location = scope:liege.capital_county.title_province
+            culture = scope:liege.culture
+            faith = scope:liege.faith
+            age = { 16 20 }
+            gender = female
+            save_scope_as = created_spouse
+        }
+    }
+    else = {
+        # Fallback: prefer setting employer if liege is a character, else create without location
+        if = {
+            limit = { exists = scope:liege.capital_province }
+            create_character = {
+                employer = scope:liege
+                culture = scope:liege.culture
+                faith = scope:liege.faith
+                age = { 16 20 }
+                gender = female
+                save_scope_as = created_spouse
+            }
+        }
+        else = {
+            create_character = {
+                culture = scope:root.culture
+                faith = scope:root.faith
+                age = { 16 20 }
+                gender = female
+                save_scope_as = created_spouse
+            }
+        }
+    }
+
+    # Ensure the created spouse becomes a courtier of the liege (diarchs can't employ courtiers)
+    if = {
+        limit = { exists = scope:created_spouse scope:liege = { exists = yes } }
+        scope:created_spouse = { set_employer = scope:liege }
+    }
+
+    marry = scope:created_spouse
+
+    # Clean up the created spouse if the marriage didn't occur (avoid orphan characters)
+    if = {
+        limit = { exists = scope:created_spouse scope:created_spouse = { NOT = { is_married = yes } } }
+        scope:created_spouse = { death = natural }
+    }
+}
+
+# Female diarch -> create male spouse (matrilineal)
+riseandfall_marry_puppet_master_female_se = {
+    # Expecting character scope (root) — the diarch character. The outer on_action should have saved the liege as scope:liege.
+    if = {
+        limit = { exists = scope:liege.capital_province }
+        create_character = {
+            location = scope:liege.capital_province
+            culture = scope:liege.culture
+            faith = scope:liege.faith
+            age = { 16 20 }
+            gender = male
+            save_scope_as = created_spouse
+        }
+    }
+    else_if = {
+        limit = { exists = scope:liege.capital_county }
+        create_character = {
+            location = scope:liege.capital_county.title_province
+            culture = scope:liege.culture
+            faith = scope:liege.faith
+            age = { 16 20 }
+            gender = male
+            save_scope_as = created_spouse
+        }
+    }
+    else = {
+        if = {
+            limit = { exists = scope:liege.capital_province }
+            create_character = {
+                employer = scope:liege
+                culture = scope:liege.culture
+                faith = scope:liege.faith
+                age = { 16 20 }
+                gender = male
+                save_scope_as = created_spouse
+            }
+        }
+        else = {
+            create_character = {
+                culture = scope:root.culture
+                faith = scope:root.faith
+                age = { 16 20 }
+                gender = male
+                save_scope_as = created_spouse
+            }
+        }
+    }
+
+    # Ensure the created spouse becomes a courtier of the liege (diarchs can't employ courtiers)
+    if = {
+        limit = { exists = scope:created_spouse scope:liege = { exists = yes } }
+        scope:created_spouse = { set_employer = scope:liege }
+    }
+
+    marry_matrilineal = scope:created_spouse
+
+    # Clean up the created spouse if the marriage didn't occur
+    if = {
+        limit = { exists = scope:created_spouse scope:created_spouse = { NOT = { is_married = yes } } }
+        scope:created_spouse = { death = natural }
+    }
+}

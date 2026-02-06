@@ -1,5 +1,6 @@
 ﻿namespace = palace_coup
 
+# Initial palace coup event: Sets up the challenger selection and confronts the ruler with the coup attempt
 palace_coup.1001 = {
 	type = character_event
 	title = palace_coup.1001.t
@@ -22,13 +23,55 @@ palace_coup.1001 = {
 		name = palace_coup.1001.a
 		custom_tooltip = palace_coup.1001.tooltip
 		trigger = { exists = scope:challenger }
-		# Trigger the choice event
-		trigger_event = { id = palace_coup.1002 }
+		# Trigger the confirmation or choice event
+		trigger_event = { id = palace_coup.1001.1 }
 		ai_chance = { base = 100 }
 	}
 
 }
 
+# Player confirmation event: Asks the player challenger if they want to proceed with the palace coup
+palace_coup.1001.1 = {
+	type = character_event
+	title = palace_coup.1001.1.t
+	desc = palace_coup.1001.1.d
+	theme = court
+
+	left_portrait = {
+		character = root
+	}
+	right_portrait = {
+		character = scope:potential_challenger
+	}
+
+	immediate = {
+		if = {
+			limit = { NOT = { exists = scope:potential_challenger } }
+			trigger_event = { id = palace_coup.1002 }
+		}
+	}
+
+	option = {
+		name = palace_coup.1001.1.a
+		custom_tooltip = palace_coup.1001.1.tooltip
+		trigger = { exists = scope:potential_challenger }
+		# Accept the palace coup
+		scope:potential_challenger = { save_scope_as = challenger }
+		trigger_event = { id = palace_coup.1002 }
+		ai_chance = { base = 0 }  # Players only
+	}
+
+	option = {
+		name = palace_coup.1001.1.b
+		custom_tooltip = palace_coup.1001.1.tooltip_no
+		trigger = { exists = scope:potential_challenger }
+		# Decline, use backup challenger
+		trigger_event = { id = palace_coup.1002 }
+		ai_chance = { base = 100 }
+	}
+}
+
+# Main confrontation event: Ruler chooses to duel the challenger or attempt to flee
 palace_coup.1002 = {
 	type = character_event
 	title = palace_coup.1002.t
@@ -179,6 +222,7 @@ palace_coup.1002 = {
 	}
 }
 
+# Escape success event: Ruler successfully flees and calls banners to reclaim the throne
 palace_coup.1003 = {
 	type = character_event
 	title = palace_coup.1003.t
@@ -199,6 +243,7 @@ palace_coup.1003 = {
 	}
 }
 
+# Puppeted after duel loss: Notification that the ruler is now a puppet under the challenger
 palace_coup.1004 = {
 	type = character_event
 	title = palace_coup.1004.t
@@ -251,6 +296,7 @@ palace_coup.1004 = {
 	}
 }
 
+# Puppeted after failed escape: Notification that the ruler's escape failed and they are now puppeted
 palace_coup.1005 = {
 	type = character_event
 	title = palace_coup.1005.t
@@ -273,4 +319,72 @@ palace_coup.1005 = {
 		ai_chance = { base = 100 }
 	}
 
+}
+
+# Challenger loses duel: Notification to challenger that they lost the duel and will die
+palace_coup.2001 = {
+	type = character_event
+	title = palace_coup.2001.t
+	desc = palace_coup.2001.d
+	theme = court
+
+	left_portrait = { character = scope:event_root }
+	right_portrait = { character = root }
+
+	option = {
+		name = palace_coup.2001.a
+		custom_tooltip = palace_coup.2001.tooltip
+		ai_chance = { base = 100 }
+	}
+}
+
+# Challenger wins duel: Notification to challenger that they won and puppeted the ruler
+palace_coup.2002 = {
+	type = character_event
+	title = palace_coup.2002.t
+	desc = palace_coup.2002.d
+	theme = court
+
+	left_portrait = { character = scope:event_root }
+	right_portrait = { character = root }
+
+	option = {
+		name = palace_coup.2002.a
+		custom_tooltip = palace_coup.2002.tooltip
+		ai_chance = { base = 100 }
+	}
+}
+
+# Root escapes successfully: Notification to challenger that the ruler escaped and is calling banners
+palace_coup.2003 = {
+	type = character_event
+	title = palace_coup.2003.t
+	desc = palace_coup.2003.d
+	theme = court
+
+	left_portrait = { character = scope:event_root }
+	right_portrait = { character = root }
+
+	option = {
+		name = palace_coup.2003.a
+		custom_tooltip = palace_coup.2003.tooltip
+		ai_chance = { base = 100 }
+	}
+}
+
+# Root's escape fails: Notification to challenger that they caught the ruler and puppeted them
+palace_coup.2004 = {
+	type = character_event
+	title = palace_coup.2004.t
+	desc = palace_coup.2004.d
+	theme = court
+
+	left_portrait = { character = scope:event_root }
+	right_portrait = { character = root }
+
+	option = {
+		name = palace_coup.2004.a
+		custom_tooltip = palace_coup.2004.tooltip
+		ai_chance = { base = 100 }
+	}
 }

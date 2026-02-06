@@ -1,0 +1,7 @@
+﻿# Rise and Fall Province Modifiers
+
+riseandfall_authority_collapse = {
+    development_decline = -1
+    county_opinion_add = -200
+    icon = byzantine_crown_negative
+}

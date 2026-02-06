@@ -25,3 +25,22 @@ riseandfall_grant_counties_confirm:0 "Grant Surplus Counties"
 
 riseandfall_grant_county_popup_title:0 "County granted"
 riseandfall_grant_county_popup_desc:0 "You granted the county: \n[SCOPE.sTitle('target_county').GetNameNoTierNoTooltip]"
+
+riseandfall_enable_hide_mod_decisions:0 "Hide Rise and Fall decisions"
+riseandfall_enable_hide_mod_decisions_desc:0 "Hide all Rise and Fall mod decisions from the decisions panel until you toggle this off. Useful for decluttering the UI when you don't want to see the mod's decisions."
+riseandfall_enable_hide_mod_decisions_tooltip:0 "Hide Rise and Fall decisions"
+riseandfall_enable_hide_mod_decisions_confirm:0 "Hide Rise and Fall decisions"
+
+riseandfall_disable_hide_mod_decisions:0 "Show Rise and Fall decisions"
+riseandfall_disable_hide_mod_decisions_desc:0 "Show all Rise and Fall mod decisions in the decisions panel."
+riseandfall_disable_hide_mod_decisions_tooltip:0 "Show Rise and Fall decisions"
+riseandfall_disable_hide_mod_decisions_confirm:0 "Show Rise and Fall decisions"
+
+riseandfall_hide_mod_decision_menu:0 "Hide/Show Rise and Fall decisions"
+riseandfall_hide_mod_decision_menu_desc:0 "Open a small selection menu allowing you to hide or show all Rise and Fall decisions. Choose the option you want to perform."
+riseandfall_hide_mod_decision_menu_tooltip:0 "Open Hide/Show Rise and Fall decisions menu."
+
+riseandfall_hide_mod_decision_menu_tt:0 "Select a valid option"
+riseandfall_hide_mod_decision_menu_tooltip_tt:0 "This will hide or show Rise and Fall decisions immediately when you confirm."
+
+riseandfall_hide_mod_decision_menu_confirm:0 "Apply"

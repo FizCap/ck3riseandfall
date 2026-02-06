@@ -1,0 +1,36 @@
+namespace = authority_collapse
+
+authority_collapse.1001 = {
+    type = character_event
+    title = authority_collapse.1001.t
+    desc = authority_collapse.1001.d
+    theme = realm
+
+    left_portrait = root
+
+    option = {
+        name = authority_collapse.1001.a
+        custom_tooltip = authority_collapse.1001.tooltip
+        ai_chance = { base = 100 }
+        hidden_effect = {
+            # Run effects in the root character's scope to target their realm
+            root = {
+                # Apply authority collapse modifier to all provinces in the realm
+                every_realm_province = {
+                    add_province_modifier = {
+                        modifier = riseandfall_authority_collapse
+                        years = 5
+                    }
+                    # Force county control to 0 by subtracting the current control value
+                    county = {
+                        change_county_control = {
+                            value = -100
+                        }
+                    }
+                }
+                # Set low stability cooldown on the ruler
+                set_variable = { name = low_stability_cooldown value = yes years = 5 }
+            }
+        }
+    }
+}

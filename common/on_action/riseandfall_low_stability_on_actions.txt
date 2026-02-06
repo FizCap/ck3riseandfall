@@ -3,6 +3,8 @@
         riseandfall_low_stability_roll
         riseandfall_check_puppet_regency
         riseandfall_warlord
+        riseandfall_marry_male_puppet_master_target
+        riseandfall_marry_female_puppet_master_target
     }
 }
 
@@ -73,5 +75,56 @@ riseandfall_warlord_imprisoned = {
         # root = prisoner, scope:imprisoner = the character who imprisoned them
         # Call the scripted effect which handles warlord trait removal when a liege imprisons a vassal
         riseandfall_warlord_imprisoned_se = yes
+    }
+}
+
+
+# On_actions for puppet masters (diarchs): AI-only unlanded diarchs should be given spouses by their liege's court.
+# We iterate each ruler with a puppet_regency diarchy and pick any courtier who is that ruler's diarch, then call the marriage scripted effects.
+riseandfall_marry_male_puppet_master_target = {
+    effect = {
+        every_ruler = {
+            limit = { has_diarchy_type = puppet_regency }
+            save_scope_as = liege
+            every_courtier = {
+                limit = {
+                    is_diarch_of_target = scope:liege
+                    is_ai = yes
+                    is_landed = no
+                    is_ruler = no
+                    is_male = yes
+                    is_adult = yes
+                    is_married = no
+                    is_betrothed = no
+                }
+                save_scope_as = diarch_candidate
+                # call the scripted effect on the diarch character (root)
+                riseandfall_marry_puppet_master_male_se = yes
+            }
+        }
+    }
+}
+
+riseandfall_marry_female_puppet_master_target = {
+    effect = {
+        every_independent_ruler = {
+            limit = { has_diarchy_type = puppet_regency }
+            save_scope_as = liege
+            every_courtier = {
+                limit = {
+                    is_diarch_of_target = scope:liege
+                    is_ai = yes
+                    is_landed = no
+                    is_ruler = no
+                    is_female = yes
+                    is_adult = yes
+                    is_married = no
+                    is_betrothed = no
+                }
+                save_scope_as = diarch_candidate
+                # call the scripted effect on the diarch character (root)
+                riseandfall_marry_puppet_master_female_se = yes
+            }
+        }
     }
 }
