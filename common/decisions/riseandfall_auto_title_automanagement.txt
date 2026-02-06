@@ -12,7 +12,7 @@ riseandfall_enable_auto_create_duchies = {
     selection_tooltip = riseandfall_enable_auto_create_duchies_tooltip
     decision_group_type = riseandfall
 
-    is_shown = { always = yes }
+    is_shown = { always = yes NOT = { exists = global_var:riseandfall_hide_other_decisions } }
 
     is_valid = { is_landed = yes }
 
@@ -31,7 +31,7 @@ riseandfall_enable_auto_create_kingdoms = {
     selection_tooltip = riseandfall_enable_auto_create_kingdoms_tooltip
     decision_group_type = riseandfall
 
-    is_shown = { always = yes }
+    is_shown = { always = yes NOT = { exists = global_var:riseandfall_hide_other_decisions } }
 
     is_valid = { is_landed = yes }
 
@@ -50,7 +50,7 @@ riseandfall_grant_duchies = {
     selection_tooltip = riseandfall_grant_duchies_tooltip
     decision_group_type = riseandfall
 
-    is_shown = { is_landed = yes }
+    is_shown = { is_landed = yes NOT = { exists = global_var:riseandfall_hide_other_decisions } }
 
     is_valid = { is_landed = yes }
 
@@ -70,7 +70,7 @@ riseandfall_grant_kingdoms = {
     selection_tooltip = riseandfall_grant_kingdoms_tooltip
     decision_group_type = riseandfall
 
-    is_shown = { is_landed = yes }
+    is_shown = { is_landed = yes NOT = { exists = global_var:riseandfall_hide_other_decisions } }
 
     is_valid = { is_landed = yes }
 
@@ -91,7 +91,7 @@ riseandfall_grant_counties = {
     selection_tooltip = riseandfall_grant_counties_desc
     decision_group_type = riseandfall
 
-    is_shown = { is_landed = yes }
+    is_shown = { is_landed = yes NOT = { exists = global_var:riseandfall_hide_other_decisions } }
 
     is_valid = { is_landed = yes }
 
@@ -104,4 +104,99 @@ riseandfall_grant_counties = {
 
     # Make AI very likely to pick this when ai_potential is true
     ai_will_do = { base = 100 }
+}
+
+
+riseandfall_enable_hide_mod_decisions = {
+    picture = { reference = "gfx/interface/illustrations/decisions/decision_misc.dds" }
+    sort_order = 8
+    ai_check_interval = 0
+    desc = riseandfall_enable_hide_mod_decisions_desc
+    selection_tooltip = riseandfall_enable_hide_mod_decisions_tooltip
+    decision_group_type = riseandfall
+
+    is_shown = { always = no }
+
+    is_valid = { is_landed = yes }
+
+    effect = { set_global_variable = { name = riseandfall_hide_other_decisions value = yes } }
+
+    ai_potential = {}
+    ai_will_do = { base = 0 }
+} 
+
+
+riseandfall_disable_hide_mod_decisions = {
+    picture = { reference = "gfx/interface/illustrations/decisions/decision_misc.dds" }
+    sort_order = 9
+    ai_check_interval = 0
+    desc = riseandfall_disable_hide_mod_decisions_desc
+    selection_tooltip = riseandfall_disable_hide_mod_decisions_tooltip
+    decision_group_type = riseandfall
+
+    is_shown = { always = no }
+
+    is_valid = { is_landed = yes }
+
+    effect = { remove_global_variable = riseandfall_hide_other_decisions }
+
+    ai_potential = {}
+    ai_will_do = { base = 0 }
+}
+
+
+# Menu: show a popup with Hide / Show options (widget-based)
+riseandfall_hide_mod_decision_menu = {
+    picture = { reference = "gfx/interface/illustrations/decisions/decision_misc.dds" }
+    sort_order = 7
+    ai_check_interval = 0
+    desc = riseandfall_hide_mod_decision_menu_desc
+    selection_tooltip = riseandfall_hide_mod_decision_menu_tooltip
+    decision_group_type = riseandfall
+
+    is_shown = { always = yes }
+
+    is_valid = { is_landed = yes }
+
+    widget = {
+        gui = "decision_view_widget_option_list_generic"
+        controller = decision_option_list_controller
+        decision_to_second_step_button = "CHOOSE_CHARACTER_ROLE_DECISION_NEXT_STEP_BUTTON"
+        show_from_start = yes
+
+        item = {
+            value = riseandfall_enable_hide_mod_decisions
+            is_shown = { NOT = { exists = global_var:riseandfall_hide_other_decisions } }
+            is_valid = { is_landed = yes }
+            current_description = riseandfall_enable_hide_mod_decisions_desc
+            localization = riseandfall_enable_hide_mod_decisions
+            icon = "gfx/interface/illustrations/decisions/decision_misc.dds"
+            ai_chance = { base = 0 }
+        }
+
+        item = {
+            value = riseandfall_disable_hide_mod_decisions
+            is_shown = { exists = global_var:riseandfall_hide_other_decisions }
+            is_valid = { is_landed = yes }
+            current_description = riseandfall_disable_hide_mod_decisions_desc
+            localization = riseandfall_disable_hide_mod_decisions
+            icon = "gfx/interface/illustrations/decisions/decision_misc.dds"
+            ai_chance = { base = 0 }
+        }
+    }
+
+    effect = {
+        custom_tooltip = riseandfall_hide_mod_decision_menu_tt
+        hidden_effect = {
+            custom_tooltip = riseandfall_hide_mod_decision_menu_tooltip_tt
+            if = {
+                limit = { scope:riseandfall_enable_hide_mod_decisions = yes }
+                set_global_variable = { name = riseandfall_hide_other_decisions value = yes }
+            }
+            else_if = {
+                limit = { scope:riseandfall_disable_hide_mod_decisions = yes }
+                remove_global_variable = riseandfall_hide_other_decisions
+            }
+        }
+    }
 }
