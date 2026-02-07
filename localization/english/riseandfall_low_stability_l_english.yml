@@ -138,8 +138,8 @@ realm_split.1002.a.tt:0 "You are now an independent ruler with your own realm."
  # Realm Split titles and modifiers
  # Two naming variations for breakaway realms
 RISEANDFALL_BREAKAWAY_NAME_CAPITAL:0 "[rf_base_province.GetNameNoTooltip]"
-RISEANDFALL_BREAKAWAY_NAME_RULER:0 "[rf_breakaway_ruler.GetFirstNamePossessiveNoTooltip] Realm"
-RISEANDFALL_BREAKAWAY_TITLE_NAME:0 "[rf_breakaway_ruler.GetFirstNamePossessiveNoTooltip] Realm"
+RISEANDFALL_BREAKAWAY_NAME_RULER:0 "[rf_breakaway_ruler.GetFirstNamePossessive] Realm"
+RISEANDFALL_BREAKAWAY_TITLE_NAME:0 "[rf_breakaway_ruler.GetFirstNamePossessive] Realm"
 RISEANDFALL_BREAKAWAY_FACTION:0 "Breakaway Faction"
 RISEANDFALL_REALM_SPLIT_TRUCE:0 "Realm Split Truce"
 
