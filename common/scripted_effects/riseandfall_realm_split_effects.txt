@@ -210,6 +210,7 @@ riseandfall_realm_split_se = {
         # Use weighted random - higher weight for same de_jure territory
         # Base weight adjusted so single-breakaway doesn't take everything
         # Root base weight 50, breakaway base weight 50; de_jure bonuses still apply
+        # Added adjacency bonuses to promote contiguous breakaway realms
         random_list = {
             # Stay with root (higher base chance)
             50 = {
@@ -225,6 +226,10 @@ riseandfall_realm_split_se = {
                     add = 100
                     capital_county.kingdom = scope:original_ruler.capital_county.kingdom
                 }
+                modifier = {
+                    add = 150
+                    primary_title = { is_neighbor_to_realm = scope:original_ruler }
+                }
             }
             # Join breakaway_1
             50 = {
@@ -236,6 +241,10 @@ riseandfall_realm_split_se = {
                 modifier = {
                     add = 100
                     capital_county.duchy = scope:breakaway_1.capital_county.duchy
+                }
+                modifier = {
+                    add = 150
+                    primary_title = { is_neighbor_to_realm = scope:breakaway_1 }
                 }
                 set_variable = { name = rf_my_breakaway value = scope:breakaway_1 }
             }
@@ -250,6 +259,10 @@ riseandfall_realm_split_se = {
                     add = 100
                     capital_county.duchy = scope:breakaway_2.capital_county.duchy
                 }
+                modifier = {
+                    add = 150
+                    primary_title = { is_neighbor_to_realm = scope:breakaway_2 }
+                }
                 set_variable = { name = rf_my_breakaway value = scope:breakaway_2 }
             }
             # Join breakaway_3
@@ -263,6 +276,10 @@ riseandfall_realm_split_se = {
                     add = 100
                     capital_county.duchy = scope:breakaway_3.capital_county.duchy
                 }
+                modifier = {
+                    add = 150
+                    primary_title = { is_neighbor_to_realm = scope:breakaway_3 }
+                }
                 set_variable = { name = rf_my_breakaway value = scope:breakaway_3 }
             }
             # Join breakaway_4
@@ -275,6 +292,10 @@ riseandfall_realm_split_se = {
                 modifier = {
                     add = 100
                     capital_county.duchy = scope:breakaway_4.capital_county.duchy
+                }
+                modifier = {
+                    add = 150
+                    primary_title = { is_neighbor_to_realm = scope:breakaway_4 }
                 }
                 set_variable = { name = rf_my_breakaway value = scope:breakaway_4 }
             }
