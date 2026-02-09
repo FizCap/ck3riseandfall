@@ -1,5 +1,0 @@
-﻿Checking Rise and Fall mod files...
-BRACE MISMATCH in riseandfall_adventurer_effects.txt: 345 open, 344 close
-POTENTIAL MISSING LOC KEY: riseandfall.1001 in 0
-POTENTIAL MISSING LOC KEY: riseandfall.1001 in 0
-Errors found - please review above.
