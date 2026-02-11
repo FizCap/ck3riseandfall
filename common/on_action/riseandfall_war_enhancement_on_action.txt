@@ -10,9 +10,6 @@ on_war_won_attacker = {
 # Scripted effect triggered when the attacker wins a war.
 # Handles post-war succession and rebellion mechanics for specific casus belli.
 riseandfall_war_enhancement_war_won = {
-	trigger = {
-		has_game_rule = riseandfall_war_enhancement_enabled
-	}
 	effect = {
 		if = {
 			limit = {

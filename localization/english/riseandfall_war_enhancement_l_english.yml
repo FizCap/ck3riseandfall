@@ -16,6 +16,7 @@
  riseandfall_war_enhancement.2.a:0 "Bring me [riseandfall_war_enhancement_prev_liege.GetHerHis] head!"
  riseandfall_war_enhancement.2.b:0 "[riseandfall_war_enhancement_prev_liege.GetHerHis] has forfeited [riseandfall_war_enhancement_prev_liege.GetHerHis] titles"
  riseandfall_war_enhancement.2.c:0 "[riseandfall_war_enhancement_prev_liege.GetName] is nothing to fear now."
+ riseandfall_war_enhancement.2.d:0 "Put [riseandfall_war_enhancement_prev_liege.GetName] in the dungeon where he belongs."
 
  riseandfall_war_enhancement.21.t:0 "Flight from the [riseandfall_war_enhancement_liege_primary_title.GetBaseName]"
  riseandfall_war_enhancement.21.d:0 "Despite our best efforts, [riseandfall_war_enhancement_prev_liege.GetName] has successfully evaded capture by our forces, his current whereabouts are unknown."
