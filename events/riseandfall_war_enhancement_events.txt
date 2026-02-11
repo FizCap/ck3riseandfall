@@ -13,15 +13,12 @@ riseandfall_war_enhancement.1 = {
 		character = root
 		animation = dismissal
 	}
-	immediate = {
-		war_enhancement_imprison_family = yes
-	}
 	
 	# Option: Press claims on titles if the attacker has them.
 	option = { # press my claims
 		name = riseandfall_war_enhancement.1.a
 		trigger = {
-			scope:riseandfall_liege_elective_title.holder = {
+			scope:riseandfall_war_enhancement_attacker.liege = {
 				any_held_title = {
 					root = {
 						has_claim_on = prev
@@ -29,9 +26,8 @@ riseandfall_war_enhancement.1 = {
 				}
 			}
 		}
-		root = {
-			war_enhancement_press_claims = yes
-		}
+		war_enhancement_press_claims = yes
+		
 		ai_chance = {
 			base = 800
 			ai_value_modifier = {
@@ -308,50 +304,108 @@ riseandfall_war_enhancement.2 = {
 	option = { #execute him (feudal variant)
 		name = riseandfall_war_enhancement.2.a
 		war_enhancement_execute_liege = yes
+		ai_chance = {
+			base = 10
+			ai_value_modifier = {
+				ai_vengefulness = 0.2
+				ai_boldness = 0.2
+				ai_energy = 0.2
+				ai_compassion = -0.2
+			}
+			modifier = {
+				add = 15
+				root = {
+					has_trait = sadistic
+				}
+			}
+			modifier = { #general uneasiness from executing kids (based on age) 
+				subtract = 20
+				scope:riseandfall_war_enhancement_prev_liege = {
+					age < 20
+				}
+			}
+			modifier = { 
+				subtract = 20
+				scope:riseandfall_war_enhancement_prev_liege = {
+					age <= 12
+				}
+			}
+			modifier = { 
+				subtract = 20
+				scope:riseandfall_war_enhancement_prev_liege = {
+					age <= 6
+				}
+			}
+			opinion_modifier = { # Opinion Factor
+				who = root
+				opinion_target = scope:riseandfall_war_enhancement_prev_liege
+				multiplier = -0.2
+			}
+		}
+			
+	}
+
+	# Option: Imprison the previous liege.
+	option = { #imprison him
+		name = riseandfall_war_enhancement.2.d
+		war_enhancement_imprison_liege = yes
+		ai_chance = {
+			base = 20
+			ai_value_modifier = {
+				ai_vengefulness = 0.2
+				ai_energy = -0.5
+				ai_compassion = 0.2
+				ai_greed = -0.2
+			}
+			modifier = {
+				add = 15
+				root = {
+					has_trait = sadistic
+				}
+			}
+			opinion_modifier = { # Opinion Factor
+				who = root
+				opinion_target = scope:riseandfall_war_enhancement_prev_liege
+				multiplier = -0.1
+			}
+		}
 	}
 	
 	# Option: Do nothing (feudal government).
 	option = { #do nothing (feudal variant)
 		name = riseandfall_war_enhancement.2.c
-		trigger = {
-			root = { has_government = feudal_government }
-		}
-		if = {
-			limit = { 
-				scope:riseandfall_war_enhancement_attacker = { has_government = feudal_government }
+		ai_chance = {
+			base = 10
+			ai_value_modifier = {
+				ai_vengefulness = -0.2
+				ai_energy = -0.5
+				ai_compassion = 0.2
+				ai_greed = -0.2
 			}
-			scope:riseandfall_war_enhancement_attacker = {
-				trigger_event = {
-					id = riseandfall_war_enhancement.1
+			modifier = { #general uneasiness from harshly punishing kids (based on age) 
+				add = 10
+				scope:riseandfall_war_enhancement_prev_liege = {
+					age < 20
 				}
-			}		
-		} 
-		#custom_tooltip = riseandfall_war_enhancement_do_nothing
-	}
-	
-	# Option: Do nothing (tribal government).
-	option = { #do nothing (tribal variant)
-		name = riseandfall_war_enhancement.2.c1
-		trigger = {
-			root = { has_government = tribal_government }
-		}
-		if = {
-			limit = { 
-				scope:riseandfall_war_enhancement_attacker = { has_government = feudal_government }
 			}
-			scope:riseandfall_war_enhancement_attacker = {
-				trigger_event = {
-					id = riseandfall_war_enhancement.1
+			modifier = { 
+				add = 10
+				scope:riseandfall_war_enhancement_prev_liege = {
+					age <= 12
 				}
-			}		
-		} 
-		custom_tooltip = riseandfall_war_enhancement_do_nothing
-	}
-	
-	# Option: Imprison the previous liege.
-	option = { #imprison him
-		name = riseandfall_war_enhancement.2.d1
-		war_enhancement_imprison_liege = yes
+			}
+			add = { 
+				subtract = 10
+				scope:riseandfall_war_enhancement_prev_liege = {
+					age <= 6
+				}
+			}
+			opinion_modifier = { # Opinion Factor
+				who = root
+				opinion_target = scope:riseandfall_war_enhancement_prev_liege
+				multiplier = 0.3
+			}
+		}
 	}
 }
 
@@ -658,7 +712,7 @@ riseandfall_war_enhancement.5 = { #Everything is falling apart, try to escape or
 				}
 
 				hidden_effect = {
-					riseandfall_palace_coup_root_flees_success = yes
+					#riseandfall_palace_coup_root_flees_success = yes
 					scope:riseandfall_war_enhancement_attacker = { 
 						trigger_event = {
 							id = riseandfall_war_enhancement.21
@@ -719,6 +773,9 @@ riseandfall_war_enhancement.5 = { #Everything is falling apart, try to escape or
 				has_trait = lunatic
 			}
 		}
+		scope:riseandfall_war_enhancement_attacker = {
+			trigger_event = { id = riseandfall_war_enhancement.21 }
+		}
 		ai_chance = {
 			base = 0
 			ai_value_modifier = {
@@ -750,6 +807,9 @@ riseandfall_war_enhancement.5 = { #Everything is falling apart, try to escape or
 
 		show_as_tooltip = {
 			committed_suicide_effect = yes
+		}
+		scope:riseandfall_war_enhancement_attacker = {
+			trigger_event = { id = riseandfall_war_enhancement.21 } #escaped
 		}
 
 		ai_chance = {

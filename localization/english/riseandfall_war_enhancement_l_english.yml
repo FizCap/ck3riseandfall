@@ -16,9 +16,6 @@
  riseandfall_war_enhancement.2.a:0 "Bring me [riseandfall_war_enhancement_prev_liege.GetHerHis] head!"
  riseandfall_war_enhancement.2.b:0 "[riseandfall_war_enhancement_prev_liege.GetHerHis] has forfeited [riseandfall_war_enhancement_prev_liege.GetHerHis] titles"
  riseandfall_war_enhancement.2.c:0 "[riseandfall_war_enhancement_prev_liege.GetName] is nothing to fear now."
- riseandfall_war_enhancement_do_nothing:0 "[riseandfall_war_enhancement_prev_liege.GetName] walks free."
- riseandfall_war_enhancement.2.d1:0 "Put [riseandfall_war_enhancement_liege.GetHerHim] in the dungeon where he belongs."
- riseandfall_war_enhancement.2.e:0 "Depose and imprison [riseandfall_war_enhancement_prev_liege.GetHerHim]"
 
  riseandfall_war_enhancement.21.t:0 "Flight from the [riseandfall_war_enhancement_liege_primary_title.GetBaseName]"
  riseandfall_war_enhancement.21.d:0 "Despite our best efforts, [riseandfall_war_enhancement_prev_liege.GetName] has successfully evaded capture by our forces, his current whereabouts are unknown."
@@ -51,7 +48,7 @@
  riseandfall_war_enhancement.7.a:0 "That's the end of that, then."
  
  riseandfall_war_enhancement.8.t:0 "Liege overthrown!"
- riseandfall_war_enhancement.8.d:0 "Succession overthrown! [riseandfall_war_enhancement_prev_liege.GetFirstName] has just been overthrown by a rebellion! The leader of the rebellion, [riseandfall_war_enhancement_attacker.GetName], is forming a council of vassals to vote for our next liege to take the throne, to be held in soon."
+ riseandfall_war_enhancement.8.d:0 "Succession overthrown! [riseandfall_war_enhancement_prev_liege.GetFirstName] has just been overthrown by a rebellion! The leader of the rebellion, [riseandfall_war_enhancement_attacker.GetName], is forming a council of vassals to vote for our next liege to take the throne, to be held soon."
  riseandfall_war_enhancement.8.a:0 "I better vote."
  
  riseandfall_war_enhancement.9.t:0 "Liege overthrown!"
