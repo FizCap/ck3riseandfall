@@ -67,7 +67,7 @@ warlord.1002 = {
             modifier = {
                 add = 100
                 is_independent_ruler = no
-                opinion = { target = liege value >= 50 }
+                opinion = { target = liege value >= 75 }
             }
         }
     }
@@ -106,11 +106,11 @@ warlord.1003 = {
             }
             modifier = {
                 add = 100
-                opinion = { target = liege value >= 50 }
+                opinion = { target = liege value >= 75 }
             }
         }
         if = {
-            limit = { opinion = { target = liege value >= 50 } }
+            limit = { opinion = { target = liege value >= 75 } }
             riseandfall_warlord_abandon_path = yes
         }
     }
