@@ -31,9 +31,9 @@ war_enhancement_press_claims = {
 		}		
 	}
 	
-	scope:riseandfall_war_enhancement_liege_primary_title.holder = {
-		every_held_title = { 
-			limit = { 
+	scope:riseandfall_war_enhancement_attacker.liege = {
+		every_held_title = {
+			limit = {
 				OR = {
 					AND = {
 						OR = {
@@ -42,10 +42,7 @@ war_enhancement_press_claims = {
 						}
 						title_held_years < 1
 					}
-					AND = {
-						has_claim = root
-						de_jure_liege = scope:riseandfall_war_enhancement_liege_primary_title
-					}
+					has_claim = root
 				}
 			}
 			change_title_holder_include_vassals = {
@@ -54,6 +51,7 @@ war_enhancement_press_claims = {
 			}
 		}
 	}
+
 	
 	root = {
 		resolve_title_and_vassal_change = scope:change
@@ -143,11 +141,7 @@ war_enhancement_overthrow_electoral_system = {
 							holder = scope:riseandfall_war_enhancement_attacker.liege
 							previous_holder = scope:riseandfall_war_enhancement_prev_liege
 						}
-						title_held_years < 1
-						OR = {
-							has_claim = root
-							de_jure_liege = scope:riseandfall_liege_elective_title
-						}
+						has_claim = root
 					}
 					this = title_capital_county
 				}
@@ -158,7 +152,7 @@ war_enhancement_overthrow_electoral_system = {
 			}
 		}
 	}
-	
+		
 	scope:riseandfall_war_enhancement_attacker.liege = {
 		change_liege = {
 			liege = root
@@ -344,7 +338,6 @@ war_enhancement_extend_rule = {
 
 # Event .6.c effect: Seize power tyrannically
 war_enhancement_seize_power = {
-	add_tyranny = 25
 	root = {
 		create_title_and_vassal_change = {
 			type = conquest
@@ -357,6 +350,7 @@ war_enhancement_seize_power = {
 			change = scope:change
 		}
 	}
+	add_tyranny = 25
 	scope:riseandfall_war_enhancement_attacker.liege = {
 		every_held_title = { 
 			limit = { 

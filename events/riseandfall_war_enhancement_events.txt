@@ -394,8 +394,8 @@ riseandfall_war_enhancement.2 = {
 					age <= 12
 				}
 			}
-			add = { 
-				subtract = 10
+			modifier = { 
+				add = 10
 				scope:riseandfall_war_enhancement_prev_liege = {
 					age <= 6
 				}
@@ -771,11 +771,96 @@ riseandfall_war_enhancement.5 = { #Everything is falling apart, try to escape or
 			OR = {
 				has_trait = brave
 				has_trait = lunatic
+				ai_boldness >= 90
 			}
 		}
 		scope:riseandfall_war_enhancement_attacker = {
 			trigger_event = { id = riseandfall_war_enhancement.21 }
 		}
+		hidden_effect = {
+		if = {
+			limit = {
+				root = {
+					martial >= 25
+				}
+			}
+			root = {
+				every_knight = {
+					limit = { is alive = yes is_imprisoned = no }
+					random_list = {
+						60 = { death = { death_reason = death_battle } }
+						20 = { add_trait = wounded_1 }
+						10 = { add_trait = maimed }
+						10 = { }
+					}
+				}
+				death = { death_reason = death_battle } 
+			}
+		}
+		else_if = {
+			limit = {
+				root = {
+					martial >= 20
+				}
+			}
+			root = {
+				every_knight = {
+					limit = { is alive = yes is_imprisoned = no }
+					random_list = {
+						30 = { death = { death_reason = death_battle } }
+						20 = { add_trait = wounded_1 }
+						10 = { add_trait = maimed }
+						30 = { }
+					}
+				}
+				death = { death_reason = death_battle } 
+			}
+		}
+		else_if = {
+			limit = {
+				root = {
+					martial >= 10
+				}
+			}
+			root = {
+				every_knight = {
+					limit = { is alive = yes is_imprisoned = no }
+					random_list = {
+						20 = { death = { death_reason = death_battle } }
+						10 = { add_trait = wounded_1 }
+						10 = { add_trait = maimed }
+						60 = { }
+					}
+				}
+				death = { death_reason = death_battle } 
+			}
+		}
+		else_if = {
+			limit = {
+				root = {
+					martial > 6
+				}
+			}
+			root = {
+				every_knight = {
+					limit = { is alive = yes is_imprisoned = no }
+					random_list = {
+						10 = { death = { death_reason = death_battle } }
+						10 = { add_trait = wounded_1 }
+						10 = { add_trait = maimed }
+						70 = { }
+					}
+				}
+			death = { death_reason = death_battle } 
+			}
+		}
+		else = { #Your knights refused to fight and you were handed over and captured
+			scope:riseandfall_war_enhancement_attacker = {
+				trigger_event = { id = riseandfall_war_enhancement.2 }
+			}
+		}
+		}
+		
 		ai_chance = {
 			base = 0
 			ai_value_modifier = {
@@ -801,10 +886,12 @@ riseandfall_war_enhancement.5 = { #Everything is falling apart, try to escape or
 				has_character_flag = extremely_high_stress
 			}
 		}
-		trigger_event = {
-			on_action = commit_suicide
+	
+		
+		root = {
+			death = { death_reason = death_suicide }
 		}
-
+		
 		show_as_tooltip = {
 			committed_suicide_effect = yes
 		}
