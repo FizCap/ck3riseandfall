@@ -130,36 +130,36 @@ palace_coup.1002 = {
 			target = scope:challenger
 
 			# Root wins duel
-			40 = {
-				compare_modifier = {
-					value = scope:duel_value
-					multiplier = 1
-					min = -999
-				}
-
-				custom_tooltip = palace_coup.1002.win.tooltip
-
-				# Root wins duel: do not transfer the challenger's gold; just kill the challenger
-
-				hidden_effect = {
-					riseandfall_palace_coup_root_wins_prowess_duel = yes
-				}
+		30 = {
+			compare_modifier = {
+				value = scope:duel_value
+				multiplier = 0.5
+				min = 0
 			}
 
-			# Challenger wins duel
-			60 = {
-				compare_modifier = {
-					value = scope:duel_value
-					multiplier = -1
-					min = -999
-				}
+			custom_tooltip = palace_coup.1002.win.tooltip
 
-				custom_tooltip = palace_coup.1002.lose.tooltip
+			# Root wins duel: do not transfer the challenger's gold; just kill the challenger
 
-				hidden_effect = {
-					riseandfall_palace_coup_challenger_wins_prowess_duel = yes
-				}
+			hidden_effect = {
+				riseandfall_palace_coup_root_wins_prowess_duel = yes
 			}
+		}
+
+		# Challenger wins duel
+		70 = {
+			compare_modifier = {
+				value = scope:duel_value
+				multiplier = -0.5
+				min = 60
+			}
+
+			custom_tooltip = palace_coup.1002.lose.tooltip
+
+			hidden_effect = {
+				riseandfall_palace_coup_challenger_wins_prowess_duel = yes
+			}
+		}
 		}
 
 		ai_chance = {
@@ -216,7 +216,6 @@ palace_coup.1002 = {
 		name = palace_coup.1002.c
 		custom_tooltip = palace_coup.1002.child_tooltip
 		trigger = { exists = scope:challenger root = { is_adult = no } }
-		# Challenger installs themselves as ruler
 		hidden_effect = { riseandfall_palace_coup_root_flees_failure = yes }
 		ai_chance = { base = 100 }
 	}
