@@ -300,6 +300,38 @@ riseandfall_war_enhancement.2 = {
 		animation = beg
 	}
 	
+	# Option: Kill every member of their house you can find!
+	option = { 	
+		name = riseandfall_war_enhancement.2.e
+		trigger = { 
+			OR = { 
+				has_trait = sadistic
+				has_trait = lunatic
+				has_trait = possessed
+				ai_vengefulness >= 95
+				ai_compassion <= -90
+				ai_honor <= 90
+			}
+		}
+		war_enhancement_execute_liege_family = yes
+		ai_chance = {
+			base = -50
+			ai_value_modifier = {
+				ai_vengefulness = 0.5
+				ai_boldness = 0.3
+				ai_energy = 0.4
+				ai_compassion = -0.6
+				ai_honor = -0.4
+			}
+			opinion_modifier = { # Opinion Factor
+				who = root
+				opinion_target = scope:riseandfall_war_enhancement_prev_liege
+				multiplier = -0.3
+			}
+		}
+			
+	}
+	
 	# Option: Execute the previous liege.
 	option = { #execute him (feudal variant)
 		name = riseandfall_war_enhancement.2.a
@@ -347,7 +379,7 @@ riseandfall_war_enhancement.2 = {
 
 	# Option: Imprison the previous liege.
 	option = { #imprison him
-		name = riseandfall_war_enhancement.2.d
+		name = riseandfall_war_enhancement.2.f
 		war_enhancement_imprison_liege = yes
 		ai_chance = {
 			base = 20

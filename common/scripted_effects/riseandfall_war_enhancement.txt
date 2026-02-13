@@ -31,7 +31,7 @@ war_enhancement_press_claims = {
 	
 	root = {
 		create_title_and_vassal_change = {
-			type = faction_demand
+			type = conquest
 			save_scope_as = change
 		}		
 	}
@@ -239,6 +239,62 @@ war_enhancement_declare_independence = {
 		change = scope:change
 	}
 	resolve_title_and_vassal_change = scope:change
+}
+
+war_enhancement_execute_liege_family = { #Massacre their house!
+	scope:riseandfall_war_enhancement_liege_primary_title.holder = {
+		every_courtier = {
+			limit = { house = scope:riseandfall_war_enhancement_prev_liege.house }
+			death = { death_reason = death_siege killer = root }
+			if = {
+				limit = { 
+					primary_spouse = {
+						is_at_same_location = scope:riseandfall_war_enhancement_prev_liege
+					}
+				}
+				primary_spouse = {
+					death = { death_reason = death_siege killer = root }
+				}
+			}
+		}
+		every_guest = {
+			limit = { house = scope:riseandfall_war_enhancement_prev_liege.house }
+			death = { death_reason = death_siege killer = root }
+			if = {
+				limit = { 
+					primary_spouse = {
+						is_at_same_location = scope:riseandfall_war_enhancement_prev_liege
+					}
+				}
+				primary_spouse = {
+					death = { death_reason = death_siege killer = root }
+				}
+			}
+		}
+	}
+	if = {
+		limit = {
+			scope:riseandfall_war_enhancement_prev_liege.house = scope:riseandfall_war_enhancement_liege_primary_title.holder.house
+		}
+		scope:riseandfall_war_enhancement_liege_primary_title.holder = {
+			death = { death_reason = death_siege killer = root }
+			if = {
+				limit = { 
+					primary_spouse = {
+						is_at_same_location = scope:riseandfall_war_enhancement_liege_primary_title.holder.house
+					}
+				}
+				primary_spouse = {
+					death = { death_reason = death_siege killer = root }
+				}
+			}
+		}
+	}
+	root = {
+		trigger_event = {
+				id = riseandfall_war_enhancement.1
+		}
+	}
 }
 
 # Event .2.a effect: Execute previous liege
