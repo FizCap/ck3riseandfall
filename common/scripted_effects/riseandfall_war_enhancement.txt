@@ -24,9 +24,14 @@ war_enhancement_imprison_family = {
 
 # Event .1.a effect: Press claims
 war_enhancement_press_claims = {
+
+	scope:riseandfall_war_enhancement_attacker.liege = {
+		save_scope_as = riseandfall_war_enhancement_prev_liege_successor
+	}
+	
 	root = {
 		create_title_and_vassal_change = {
-			type = conquest
+			type = faction_demand
 			save_scope_as = change
 		}		
 	}
@@ -50,12 +55,38 @@ war_enhancement_press_claims = {
 				change = scope:change
 			}
 		}
+		every_vassal = {
+			limit = { this != scope:riseandfall_war_enhancement_attacker  }
+			add_to_list = riseandfall_war_enhancement_vassal_list
+		}
 	}
-
+	
+	hidden_effect = {
+	if = {
+		limit = {
+			scope:riseandfall_war_enhancement_prev_liege_successor.primary_title = scope:riseandfall_war_enhancement_liege_primary_title
+		}
+		every_in_list = {
+			list = riseandfall_war_enhancement_vassal_list
+			change_liege = {
+				liege = root
+				change = scope:change
+			}
+		}
+		scope:riseandfall_war_enhancement_prev_liege_successor = {
+			change_liege = {
+				liege = root
+				change = scope:change
+			}
+		}
+	}
+	}
 	
 	root = {
 		resolve_title_and_vassal_change = scope:change
 	}
+
+	
 	if = {
 		limit = {
 			scope:riseandfall_war_enhancement_liege_primary_title.holder != root
@@ -68,6 +99,7 @@ war_enhancement_press_claims = {
 			}
 		}
 	}
+	
 }
 
 # Event .1.b effect: Elect ruler
