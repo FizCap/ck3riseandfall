@@ -9,6 +9,8 @@
  riseandfall_war_enhancement.1.d:0 "My own realm will inevitably overtake them."
  riseandfall_war_enhancement.1.f:0 "We should reinstate the Princely Elective system."
  riseandfall_war_enhancement.1.e:0 "They have learned their lesson."
+ riseandfall_war_enhancement.1.g:0 "[ROOT.Char.GetFaith.HighGodName] has deemed it fit to transfer power to those who will act with justice."
+ riseandfall_war_enhancement.1.h:0 "This is just the natural way of things."
  riseandfall_war_enhancement_ruler_fate:0 "You will decide the fate of [riseandfall_war_enhancement_prev_liege.GetName]"
  
  riseandfall_war_enhancement.2.t:0 "The fate of [riseandfall_war_enhancement_prev_liege.GetName]"
@@ -17,7 +19,8 @@
  riseandfall_war_enhancement.2.b:0 "[riseandfall_war_enhancement_prev_liege.GetHerHis] has forfeited [riseandfall_war_enhancement_prev_liege.GetHerHis] titles"
  riseandfall_war_enhancement.2.c:0 "[riseandfall_war_enhancement_prev_liege.GetName] is nothing to fear now."
  riseandfall_war_enhancement.2.f:0 "Put [riseandfall_war_enhancement_prev_liege.GetName] in the dungeon where [riseandfall_war_enhancement_prev_liege.GetHerHis] belongs."
- riseandfall_war_enhancement.2.e:0 "Send the order to kill as many members of their house our forces can find."
+ riseandfall_war_enhancement.2.e:0 "Order our forces to kill all the members of their house we can find."
+ riseandfall_war_enhancement.2.g:0 "Send orders to capture the members of this house alive."
 
  riseandfall_war_enhancement.21.t:0 "Flight from the [riseandfall_war_enhancement_liege_primary_title.GetBaseName]"
  riseandfall_war_enhancement.21.d:0 "Despite our best efforts, [riseandfall_war_enhancement_prev_liege.GetName] has successfully evaded capture by our forces, his current whereabouts are unknown."
@@ -76,3 +79,11 @@
  riseandfall_war_enhancement.14.t:0 "Liege elected!"
  riseandfall_war_enhancement.14.d:0 "[ROOT.Char.GetLiege.GetName] has been successfully elected as our new liege, and the old regent, [riseandfall_council_regent.GetName], has stepped down."
  riseandfall_war_enhancement.14.a:0 "An expected result."
+ 
+ riseandfall_war_enhancement.15.t:0 "House overthrown!"
+ riseandfall_war_enhancement.15.d:0 "[ROOT.Char.GetLiege.GetName] has taken control of the realm after their victory against the house of [riseandfall_war_enhancement_prev_liege.GetName]."
+ riseandfall_war_enhancement.15.a:0 "Their house has shown their strength."
+ 
+ riseandfall_war_enhancement.16.t:0 "New Rulers"
+ riseandfall_war_enhancement.16.d:0 "Fortune has led [ROOT.Char.GetLiege.GetName] to victory against [riseandfall_war_enhancement_prev_liege.GetName], and now controls the realm."
+ riseandfall_war_enhancement.16.a:0 "These things happen."

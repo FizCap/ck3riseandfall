@@ -53,13 +53,141 @@ riseandfall_war_enhancement.1 = {
 		
 	}
 	
-	# Option: Elect a suitable ruler by setting up a diarchy.
+	# Option: Clans have a more dynamic political system, and can seize control from other houses with much less trouble here compared to feudal.
+	option = { # 
+		name = riseandfall_war_enhancement.1.g
+		trigger = {
+			AND = {
+				scope:riseandfall_war_enhancement_attacker = {
+					has_government = clan_government
+				}
+				scope:riseandfall_war_enhancement_attacker.liege = {
+					has_government = clan_government
+				}
+				scope:riseandfall_war_enhancement_attacker = {
+					NOT = { house = scope:riseandfall_war_enhancement_attacker.liege.house }
+				}
+			}
+		}
+		war_enhancement_clan_overthrow = yes 
+		war_enhancement_clan_seize = yes
+		
+		ai_chance = {
+			base = -200
+			ai_value_modifier = {
+				ai_greed = 0.3
+				ai_boldness = 0.5
+				ai_energy = 0.2
+				ai_rationality = 0.6
+			}
+			opinion_modifier = { # Opinion Factor
+				who = root
+				opinion_target = scope:riseandfall_war_enhancement_attacker.liege
+				multiplier = -2
+			}
+			modifier = {
+				add = 100
+				root = {
+					has_trait = ambitious
+				}
+			}
+			modifier = {
+				add = -60
+				root = {
+					house = scope:riseandfall_war_enhancement_attacker.liege.house 
+				}
+			}
+			modifier = {
+				add = -30
+				root = {
+					dynasty = scope:riseandfall_war_enhancement_attacker.liege.dynasty 
+				}
+			}
+			
+			modifier = {
+				add = -15
+				root = {
+					has_trait = content
+				}
+			}
+		}
+		
+	}
+	
+	# Option: Nomads/Tribes have a more dynamic political system, and can seize control from other houses with much less trouble here compared to feudal.
+	option = { # 
+		name = riseandfall_war_enhancement.1.h
+		trigger = {
+			AND = {
+				scope:riseandfall_war_enhancement_attacker = {
+					OR = {
+						has_government = nomad_government
+						has_government = tribal_government
+					}
+				}
+				scope:riseandfall_war_enhancement_attacker.liege = {
+					OR = {
+						has_government = nomad_government
+						has_government = tribal_government
+					}
+				}
+			}
+		}
+		war_enhancement_primitive_overthrow = yes
+		war_enhancement_primitive_seize = yes
+		
+		ai_chance = {
+			base = -200
+			ai_value_modifier = {
+				ai_greed = 0.3
+				ai_boldness = 0.5
+				ai_energy = 0.2
+				ai_rationality = 0.6
+			}
+			opinion_modifier = { # Opinion Factor
+				who = root
+				opinion_target = scope:riseandfall_war_enhancement_prev_liege
+				multiplier = -1.5
+			}
+			modifier = {
+				add = 100
+				root = {
+					has_trait = ambitious
+				}
+			}
+			modifier = {
+				add = -60
+				root = {
+					house = scope:riseandfall_war_enhancement_attacker.liege.house 
+				}
+			}
+			modifier = {
+				add = -30
+				root = {
+					dynasty = scope:riseandfall_war_enhancement_attacker.liege.dynasty 
+				}
+			}
+			
+			modifier = {
+				add = -15
+				root = {
+					has_trait = content
+				}
+			}
+		}
+		
+	}
+	
+	# Option: Elect a suitable ruler by setting up a diarchy. (Feudal behavior)
 	option = { # lets elect a suitable ruler
 		name = riseandfall_war_enhancement.1.b
 		trigger = {
 			scope:riseandfall_war_enhancement_attacker.liege = {
 				has_government = feudal_government
-				has_realm_law_flag = partition_succession_law
+				OR = {
+					has_realm_law_flag = partition_succession_law
+					has_realm_law_flag = advanced_succession_law
+				}
 			}
 			scope:riseandfall_war_enhancement_attacker.liege.primary_title = {
 				NOT = { has_title_law_flag = elective_succession_law }
@@ -104,7 +232,10 @@ riseandfall_war_enhancement.1 = {
 		name = riseandfall_war_enhancement.1.c
 		trigger = {
 			scope:riseandfall_war_enhancement_attacker.liege = {
-				has_government = feudal_government
+				OR = {
+					has_government = feudal_government
+					has_government = tribal_government
+				}
 			}
 			scope:riseandfall_war_enhancement_attacker.liege.primary_title = {
 				has_title_law_flag = elective_succession_law
@@ -300,7 +431,7 @@ riseandfall_war_enhancement.2 = {
 		animation = beg
 	}
 	
-	# Option: Kill every member of their house you can find!
+	# Option: Kill every member of their house you can find! Their house must learn.
 	option = { 	
 		name = riseandfall_war_enhancement.2.e
 		trigger = { 
@@ -310,7 +441,12 @@ riseandfall_war_enhancement.2 = {
 				has_trait = possessed
 				ai_vengefulness >= 95
 				ai_compassion <= -90
-				ai_honor <= 90
+				ai_honor <= -90
+				has_government = tribal_government
+				has_government = nomad_government
+				has_government = celestial_government
+				has_government = meritocratic_government
+				has_government = steppe_admin_government
 			}
 		}
 		war_enhancement_execute_liege_family = yes
@@ -328,12 +464,72 @@ riseandfall_war_enhancement.2 = {
 				opinion_target = scope:riseandfall_war_enhancement_prev_liege
 				multiplier = -0.3
 			}
-		}
-			
+			opinion_modifier = { # Opinion Factor
+				who = root
+				opinion_target = scope:riseandfall_war_enhancement_attacker.liege
+				multiplier = -0.3
+			}
+			modifier = { #  we have a more savage form of government
+				add = 125
+				root = {
+					OR = {
+						has_government = nomad_government
+					}
+				}
+			}
+			modifier = { #  we have a more savage form of government
+				add = 25
+				root = {
+					OR = {
+						has_government = tribal_government
+					}
+				}
+			}
+			modifier = { #  human resources are plentiful
+				add = 25
+				root = {
+					OR = {
+						has_government = celestial_government
+						has_government = meritocratic_government
+						has_government = steppe_admin_government
+						has_government = japan_administrative_government
+						has_government = japan_fuedal_government
+					}
+				}
+			}
+		}		
 	}
 	
-	# Option: Execute the previous liege.
-	option = { #execute him (feudal variant)
+	# Option: Imprison every member of their house you can find!
+	option = { 	
+		name = riseandfall_war_enhancement.2.g
+		trigger = { 
+			OR = { 
+				ai_vengefulness >= 50
+				ai_honor <= -50
+				ai_rationality >= 30
+				has_government = tribal_government
+				has_government = nomad_government
+				has_government = celestial_government
+				has_government = meritocratic_government
+				has_government = steppe_admin_government
+			}
+		}
+		war_enhancement_imprison_liege_family = yes
+		ai_chance = {
+			base = 60
+			ai_value_modifier = {
+				ai_vengefulness = -0.1
+				ai_energy = 0.3
+				ai_boldness > -0.3
+				ai_honor = -0.3
+				ai_rationality = 0.6
+			}
+		}		
+	}
+	
+	# Option: Execute just the previous liege.
+	option = { 
 		name = riseandfall_war_enhancement.2.a
 		war_enhancement_execute_liege = yes
 		ai_chance = {
@@ -377,7 +573,7 @@ riseandfall_war_enhancement.2 = {
 			
 	}
 
-	# Option: Imprison the previous liege.
+	# Option: Imprison just the previous liege.
 	option = { #imprison him
 		name = riseandfall_war_enhancement.2.f
 		war_enhancement_imprison_liege = yes
@@ -403,8 +599,8 @@ riseandfall_war_enhancement.2 = {
 		}
 	}
 	
-	# Option: Do nothing (feudal government).
-	option = { #do nothing (feudal variant)
+	# Option: Do nothing (no punishment for previous liege).
+	option = { #do nothing
 		name = riseandfall_war_enhancement.2.c
 		ai_chance = {
 			base = 10
@@ -454,18 +650,13 @@ riseandfall_war_enhancement.21 = {
 		animation = admiration
 	}
 	
-	option = { # escaped, time to deal with the realm (feudal)
+	option = { # escaped, time to deal with the realm
 		name = riseandfall_war_enhancement.21.a
-		if = {
-			limit = { 
-				scope:riseandfall_war_enhancement_attacker = { has_government = feudal_government } 
-			}
 			scope:riseandfall_war_enhancement_attacker = {
 				trigger_event = {
 					id = riseandfall_war_enhancement.1
-				}
-			}		
-		} 
+				}			
+			}
 	}
 }
 
@@ -1150,6 +1341,30 @@ riseandfall_war_enhancement.14 = {
 	
 	option = { #So, everything went well.
 		name = riseandfall_war_enhancement.14.a
+	}
+}
+
+# Event: Liege clan house overthrown!
+riseandfall_war_enhancement.15 = {
+	title = riseandfall_war_enhancement.15.t
+	desc = riseandfall_war_enhancement.15.d
+	type = character_event
+	theme = realm
+	
+	option = { #Their house has shown their strength. Is this the will of the one?
+		name = riseandfall_war_enhancement.15.a
+	}
+}
+
+# Event: Liege overthrown in a primitive system.
+riseandfall_war_enhancement.16 = {
+	title = riseandfall_war_enhancement.16.t
+	desc = riseandfall_war_enhancement.16.d
+	type = character_event
+	theme = realm
+	
+	option = { # These things happen.
+		name = riseandfall_war_enhancement.16.a
 	}
 }
 
