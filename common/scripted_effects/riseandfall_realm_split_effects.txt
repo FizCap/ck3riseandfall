@@ -398,13 +398,8 @@ riseandfall_realm_split_se = {
         }
         
         # Use weighted random - higher weight for same de_jure territory
-        # Base weight adjusted so single-breakaway doesn't take everything
-<<<<<<< Updated upstream
-        # Root base weight 50, breakaway base weight 50; de_jure bonuses still apply
-        # Added adjacency bonuses to promote contiguous breakaway realms
-=======
-        # Root base weight 30, breakaway base weight 50; de_jure bonuses still apply
->>>>>>> Stashed changes
+        # Geography-first assignment: duchy (+400) > kingdom (+250) > adjacency (+200) > empire (+75)
+        # Culture match (+50) promotes cohesive realms; penalty for distant assignments (-30)
         random_list = {
             # Stay with root (base weight reduced to prefer breakaways)
             30 = {
@@ -417,28 +412,44 @@ riseandfall_realm_split_se = {
                     }
                 }
                 modifier = {
-                    add = 100
+                    add = 150
                     capital_county.kingdom = scope:original_ruler.capital_county.kingdom
                 }
                 modifier = {
-                    add = 150
+                    add = 200
                     primary_title = { is_neighbor_to_realm = scope:original_ruler }
+                }
+                modifier = {
+                    add = 50
+                    culture = scope:original_ruler.culture
                 }
             }
             # Join breakaway_1
             50 = {
                 trigger = { exists = scope:breakaway_1 }
                 modifier = {
-                    add = 200
-                    capital_county.kingdom = scope:breakaway_1.capital_county.kingdom
-                }
-                modifier = {
-                    add = 100
+                    add = 400
                     capital_county.duchy = scope:breakaway_1.capital_county.duchy
                 }
                 modifier = {
-                    add = 150
+                    add = 250
+                    capital_county.kingdom = scope:breakaway_1.capital_county.kingdom
+                }
+                modifier = {
+                    add = 200
                     primary_title = { is_neighbor_to_realm = scope:breakaway_1 }
+                }
+                modifier = {
+                    add = 75
+                    capital_county.empire = scope:breakaway_1.capital_county.empire
+                }
+                modifier = {
+                    add = 50
+                    culture = scope:breakaway_1.culture
+                }
+                modifier = {
+                    add = -30
+                    NOT = { capital_county.empire = scope:breakaway_1.capital_county.empire }
                 }
                 set_variable = { name = rf_my_breakaway value = scope:breakaway_1 }
             }
@@ -446,16 +457,28 @@ riseandfall_realm_split_se = {
             50 = {
                 trigger = { exists = scope:breakaway_2 }
                 modifier = {
-                    add = 200
-                    capital_county.kingdom = scope:breakaway_2.capital_county.kingdom
-                }
-                modifier = {
-                    add = 100
+                    add = 400
                     capital_county.duchy = scope:breakaway_2.capital_county.duchy
                 }
                 modifier = {
-                    add = 150
+                    add = 250
+                    capital_county.kingdom = scope:breakaway_2.capital_county.kingdom
+                }
+                modifier = {
+                    add = 200
                     primary_title = { is_neighbor_to_realm = scope:breakaway_2 }
+                }
+                modifier = {
+                    add = 75
+                    capital_county.empire = scope:breakaway_2.capital_county.empire
+                }
+                modifier = {
+                    add = 50
+                    culture = scope:breakaway_2.culture
+                }
+                modifier = {
+                    add = -30
+                    NOT = { capital_county.empire = scope:breakaway_2.capital_county.empire }
                 }
                 set_variable = { name = rf_my_breakaway value = scope:breakaway_2 }
             }
@@ -463,16 +486,28 @@ riseandfall_realm_split_se = {
             50 = {
                 trigger = { exists = scope:breakaway_3 }
                 modifier = {
-                    add = 200
-                    capital_county.kingdom = scope:breakaway_3.capital_county.kingdom
-                }
-                modifier = {
-                    add = 100
+                    add = 400
                     capital_county.duchy = scope:breakaway_3.capital_county.duchy
                 }
                 modifier = {
-                    add = 150
+                    add = 250
+                    capital_county.kingdom = scope:breakaway_3.capital_county.kingdom
+                }
+                modifier = {
+                    add = 200
                     primary_title = { is_neighbor_to_realm = scope:breakaway_3 }
+                }
+                modifier = {
+                    add = 75
+                    capital_county.empire = scope:breakaway_3.capital_county.empire
+                }
+                modifier = {
+                    add = 50
+                    culture = scope:breakaway_3.culture
+                }
+                modifier = {
+                    add = -30
+                    NOT = { capital_county.empire = scope:breakaway_3.capital_county.empire }
                 }
                 set_variable = { name = rf_my_breakaway value = scope:breakaway_3 }
             }
@@ -480,16 +515,28 @@ riseandfall_realm_split_se = {
             50 = {
                 trigger = { exists = scope:breakaway_4 }
                 modifier = {
-                    add = 200
-                    capital_county.kingdom = scope:breakaway_4.capital_county.kingdom
-                }
-                modifier = {
-                    add = 100
+                    add = 400
                     capital_county.duchy = scope:breakaway_4.capital_county.duchy
                 }
                 modifier = {
-                    add = 150
+                    add = 250
+                    capital_county.kingdom = scope:breakaway_4.capital_county.kingdom
+                }
+                modifier = {
+                    add = 200
                     primary_title = { is_neighbor_to_realm = scope:breakaway_4 }
+                }
+                modifier = {
+                    add = 75
+                    capital_county.empire = scope:breakaway_4.capital_county.empire
+                }
+                modifier = {
+                    add = 50
+                    culture = scope:breakaway_4.culture
+                }
+                modifier = {
+                    add = -30
+                    NOT = { capital_county.empire = scope:breakaway_4.capital_county.empire }
                 }
                 set_variable = { name = rf_my_breakaway value = scope:breakaway_4 }
             }
@@ -497,12 +544,28 @@ riseandfall_realm_split_se = {
             50 = {
                 trigger = { exists = scope:breakaway_5 }
                 modifier = {
-                    add = 200
+                    add = 400
+                    capital_county.duchy = scope:breakaway_5.capital_county.duchy
+                }
+                modifier = {
+                    add = 250
                     capital_county.kingdom = scope:breakaway_5.capital_county.kingdom
                 }
                 modifier = {
-                    add = 100
-                    capital_county.duchy = scope:breakaway_5.capital_county.duchy
+                    add = 200
+                    primary_title = { is_neighbor_to_realm = scope:breakaway_5 }
+                }
+                modifier = {
+                    add = 75
+                    capital_county.empire = scope:breakaway_5.capital_county.empire
+                }
+                modifier = {
+                    add = 50
+                    culture = scope:breakaway_5.culture
+                }
+                modifier = {
+                    add = -30
+                    NOT = { capital_county.empire = scope:breakaway_5.capital_county.empire }
                 }
                 set_variable = { name = rf_my_breakaway value = scope:breakaway_5 }
             }
@@ -510,12 +573,28 @@ riseandfall_realm_split_se = {
             50 = {
                 trigger = { exists = scope:breakaway_6 }
                 modifier = {
-                    add = 200
+                    add = 400
+                    capital_county.duchy = scope:breakaway_6.capital_county.duchy
+                }
+                modifier = {
+                    add = 250
                     capital_county.kingdom = scope:breakaway_6.capital_county.kingdom
                 }
                 modifier = {
-                    add = 100
-                    capital_county.duchy = scope:breakaway_6.capital_county.duchy
+                    add = 200
+                    primary_title = { is_neighbor_to_realm = scope:breakaway_6 }
+                }
+                modifier = {
+                    add = 75
+                    capital_county.empire = scope:breakaway_6.capital_county.empire
+                }
+                modifier = {
+                    add = 50
+                    culture = scope:breakaway_6.culture
+                }
+                modifier = {
+                    add = -30
+                    NOT = { capital_county.empire = scope:breakaway_6.capital_county.empire }
                 }
                 set_variable = { name = rf_my_breakaway value = scope:breakaway_6 }
             }
@@ -523,12 +602,28 @@ riseandfall_realm_split_se = {
             50 = {
                 trigger = { exists = scope:breakaway_7 }
                 modifier = {
-                    add = 200
+                    add = 400
+                    capital_county.duchy = scope:breakaway_7.capital_county.duchy
+                }
+                modifier = {
+                    add = 250
                     capital_county.kingdom = scope:breakaway_7.capital_county.kingdom
                 }
                 modifier = {
-                    add = 100
-                    capital_county.duchy = scope:breakaway_7.capital_county.duchy
+                    add = 200
+                    primary_title = { is_neighbor_to_realm = scope:breakaway_7 }
+                }
+                modifier = {
+                    add = 75
+                    capital_county.empire = scope:breakaway_7.capital_county.empire
+                }
+                modifier = {
+                    add = 50
+                    culture = scope:breakaway_7.culture
+                }
+                modifier = {
+                    add = -30
+                    NOT = { capital_county.empire = scope:breakaway_7.capital_county.empire }
                 }
                 set_variable = { name = rf_my_breakaway value = scope:breakaway_7 }
             }
@@ -536,12 +631,28 @@ riseandfall_realm_split_se = {
             50 = {
                 trigger = { exists = scope:breakaway_8 }
                 modifier = {
-                    add = 200
+                    add = 400
+                    capital_county.duchy = scope:breakaway_8.capital_county.duchy
+                }
+                modifier = {
+                    add = 250
                     capital_county.kingdom = scope:breakaway_8.capital_county.kingdom
                 }
                 modifier = {
-                    add = 100
-                    capital_county.duchy = scope:breakaway_8.capital_county.duchy
+                    add = 200
+                    primary_title = { is_neighbor_to_realm = scope:breakaway_8 }
+                }
+                modifier = {
+                    add = 75
+                    capital_county.empire = scope:breakaway_8.capital_county.empire
+                }
+                modifier = {
+                    add = 50
+                    culture = scope:breakaway_8.culture
+                }
+                modifier = {
+                    add = -30
+                    NOT = { capital_county.empire = scope:breakaway_8.capital_county.empire }
                 }
                 set_variable = { name = rf_my_breakaway value = scope:breakaway_8 }
             }
@@ -549,12 +660,28 @@ riseandfall_realm_split_se = {
             50 = {
                 trigger = { exists = scope:breakaway_9 }
                 modifier = {
-                    add = 200
+                    add = 400
+                    capital_county.duchy = scope:breakaway_9.capital_county.duchy
+                }
+                modifier = {
+                    add = 250
                     capital_county.kingdom = scope:breakaway_9.capital_county.kingdom
                 }
                 modifier = {
-                    add = 100
-                    capital_county.duchy = scope:breakaway_9.capital_county.duchy
+                    add = 200
+                    primary_title = { is_neighbor_to_realm = scope:breakaway_9 }
+                }
+                modifier = {
+                    add = 75
+                    capital_county.empire = scope:breakaway_9.capital_county.empire
+                }
+                modifier = {
+                    add = 50
+                    culture = scope:breakaway_9.culture
+                }
+                modifier = {
+                    add = -30
+                    NOT = { capital_county.empire = scope:breakaway_9.capital_county.empire }
                 }
                 set_variable = { name = rf_my_breakaway value = scope:breakaway_9 }
             }
@@ -562,12 +689,28 @@ riseandfall_realm_split_se = {
             50 = {
                 trigger = { exists = scope:breakaway_10 }
                 modifier = {
-                    add = 200
+                    add = 400
+                    capital_county.duchy = scope:breakaway_10.capital_county.duchy
+                }
+                modifier = {
+                    add = 250
                     capital_county.kingdom = scope:breakaway_10.capital_county.kingdom
                 }
                 modifier = {
-                    add = 100
-                    capital_county.duchy = scope:breakaway_10.capital_county.duchy
+                    add = 200
+                    primary_title = { is_neighbor_to_realm = scope:breakaway_10 }
+                }
+                modifier = {
+                    add = 75
+                    capital_county.empire = scope:breakaway_10.capital_county.empire
+                }
+                modifier = {
+                    add = 50
+                    culture = scope:breakaway_10.culture
+                }
+                modifier = {
+                    add = -30
+                    NOT = { capital_county.empire = scope:breakaway_10.capital_county.empire }
                 }
                 set_variable = { name = rf_my_breakaway value = scope:breakaway_10 }
             }
