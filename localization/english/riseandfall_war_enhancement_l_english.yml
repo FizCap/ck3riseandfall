@@ -1,0 +1,89 @@
+﻿l_english:
+ riseandfall_war_enhancement_rebellion_war_victory_desc_defender:0 "The rebels will decide the fate of the realm"
+ riseandfall_war_enhancement_rebellion_desc:1 "The rebels will decide the fate of the realm"
+ riseandfall_war_enhancement.1.t:0 "For the Good of the Realm"
+ riseandfall_war_enhancement.1.desc:0 "Now that we have overthrown the [riseandfall_war_enhancement_liege_primary_title.GetBaseName] and have wrested control from [riseandfall_war_enhancement_prev_liege.GetName], now it is time to decide what is to be done with the realm."
+ riseandfall_war_enhancement.1.a:0 "Of course, [riseandfall_war_enhancement_prev_liege.GetHerHis] titles are rightfully mine."
+ riseandfall_war_enhancement.1.b:0 "We must elect a suitable ruler."
+ riseandfall_war_enhancement.1.c:0 "Let us overthrow this worthless elective system."
+ riseandfall_war_enhancement.1.d:0 "My own realm will inevitably overtake them."
+ riseandfall_war_enhancement.1.f:0 "We should reinstate the Princely Elective system."
+ riseandfall_war_enhancement.1.e:0 "They have learned their lesson."
+ riseandfall_war_enhancement.1.g:0 "[ROOT.Char.GetFaith.HighGodName] has deemed it fit to transfer power to those who will act with justice."
+ riseandfall_war_enhancement.1.h:0 "This is just the natural way of things."
+ riseandfall_war_enhancement_ruler_fate:0 "You will decide the fate of [riseandfall_war_enhancement_prev_liege.GetName]"
+ 
+ riseandfall_war_enhancement.2.t:0 "The fate of [riseandfall_war_enhancement_prev_liege.GetName]"
+ riseandfall_war_enhancement.2.d:0 "I, as the leader of the rebellion, now get to decide what happens to [riseandfall_war_enhancement_prev_liege.GetFirstNameBase]."
+ riseandfall_war_enhancement.2.a:0 "Bring me [riseandfall_war_enhancement_prev_liege.GetHerHis] head!"
+ riseandfall_war_enhancement.2.b:0 "[riseandfall_war_enhancement_prev_liege.GetHerHis] has forfeited [riseandfall_war_enhancement_prev_liege.GetHerHis] titles"
+ riseandfall_war_enhancement.2.c:0 "[riseandfall_war_enhancement_prev_liege.GetName] is nothing to fear now."
+ riseandfall_war_enhancement.2.f:0 "Put [riseandfall_war_enhancement_prev_liege.GetName] in the dungeon where [riseandfall_war_enhancement_prev_liege.GetHerHis] belongs."
+ riseandfall_war_enhancement.2.e:0 "Order our forces to kill all the members of their house we can find."
+ riseandfall_war_enhancement.2.g:0 "Send orders to capture the members of this house alive."
+
+ riseandfall_war_enhancement.21.t:0 "Flight from the [riseandfall_war_enhancement_liege_primary_title.GetBaseName]"
+ riseandfall_war_enhancement.21.d:0 "Despite our best efforts, [riseandfall_war_enhancement_prev_liege.GetName] has successfully evaded capture by our forces, his current whereabouts are unknown."
+ riseandfall_war_enhancement.21.a:0 "Outrageous!"
+ 
+ riseandfall_war_enhancement.3.t:0 "Execution of [killed_man.GetName]"
+ riseandfall_war_enhancement.3.d:0 "This is an outrage. [ROOT.Char.GetLiege.GetName] has unlawfully killed [killed_man.GetName]. I can call upon my loyal vassals and bannermen to rebel against the tyrant lord."
+ riseandfall_war_enhancement.3.a:0 "Ready the horses, we're marching to [ROOT.Char.GetLiege.GetCapitalLocation.GetNameNoTooltip]"
+ riseandfall_war_enhancement.3.b:0 "We dare not anger our liege"
+ 
+ riseandfall_war_enhancement.4.t:0 "Execution of [killed_man.GetName]"
+ riseandfall_war_enhancement.4.d:0 "This is an outrage. [ROOT.Char.GetLiege.GetName] has unlawfully killed [killed_man.GetName]. [riseandfall_war_enhancement_highest_title_man.GetName] has already risen up arms and attacked [ROOT.Char.GetLiege.GetName]. Shall we join [riseandfall_war_enhancement_highest_title_man.GetHerHim]?"
+ riseandfall_war_enhancement.4.a:0 "We shall avenge [killed_man.GetName]!"
+ riseandfall_war_enhancement.4.b:0 "It is not wise..."
+ 
+ riseandfall_war_enhancement.5.t:0 "Chaos in the capital!"
+ riseandfall_war_enhancement.5.d:0 "With the rebels closing in, my person is at risk of capture."
+ riseandfall_war_enhancement.5.a:0 "These ruffians shall not capture me!"
+ riseandfall_war_enhancement.5.b:0 "There is no point in trying to escape."
+ riseandfall_war_enhancement.5.c:0 "I won't give up a single title, resist to the end!"
+ 
+ riseandfall_war_enhancement.6.t:0 "Selecting a Successor"
+ riseandfall_war_enhancement.6.d:0 "The time has come for the vassals of the realm to form a council to choose a successor for the [ROOT.Char.GetLiege.GetPrimaryTitle.GetTierAsName] of [ROOT.Char.GetLiege.GetPrimaryTitle.GetBaseNameNoTier]."
+ riseandfall_war_enhancement.6.a:0 "Let us take the vote."
+ riseandfall_war_enhancement.6.b:0 "The time is not yet right."
+ riseandfall_war_enhancement.6.c:0 "By [ROOT.Char.GetFaith.HighGodName], I will crown myself!"
+ 
+ riseandfall_war_enhancement.7.t:0 "Liege overthrown!"
+ riseandfall_war_enhancement.7.d:0 "[riseandfall_war_enhancement_prev_liege.GetFirstName] has just been overthrown by a rebellion! The leader of the rebellion, [riseandfall_war_enhancement_attacker.GetName], has allowed the heir, [riseandfall_war_enhancement_attacker.GetLiege.GetFirstName], to take the throne."
+ riseandfall_war_enhancement.7.a:0 "That's the end of that, then."
+ 
+ riseandfall_war_enhancement.8.t:0 "Liege overthrown!"
+ riseandfall_war_enhancement.8.d:0 "Succession overthrown! [riseandfall_war_enhancement_prev_liege.GetFirstName] has just been overthrown by a rebellion! The leader of the rebellion, [riseandfall_war_enhancement_attacker.GetName], is forming a council of vassals to vote for our next liege to take the throne, to be held soon."
+ riseandfall_war_enhancement.8.a:0 "I better vote."
+ 
+ riseandfall_war_enhancement.9.t:0 "Liege overthrown!"
+ riseandfall_war_enhancement.9.d:0 "Princely Elective restored! [riseandfall_war_enhancement_prev_liege.GetFirstName] has just been overthrown by a rebellion! The leader of the rebellion, [riseandfall_war_enhancement_attacker.GetName], is reforming the Elective Princes to vote for our next liege to take the throne."
+ riseandfall_war_enhancement.9.a:0 "More princes?"
+ 
+ riseandfall_war_enhancement.10.t:0 "Liege overthrown!"
+ riseandfall_war_enhancement.10.d:0 "Independence declared! [riseandfall_war_enhancement_prev_liege.GetFirstName] has just been overthrown by a rebellion! The leader of the rebellion, [riseandfall_war_enhancement_attacker.GetName], has used this opportunity to declare independence."
+ riseandfall_war_enhancement.10.a:0 "Suicidal!"
+ 
+ riseandfall_war_enhancement.11.t:0 "Liege overthrown!"
+ riseandfall_war_enhancement.11.d:0 "Elective succession overthrown! [riseandfall_war_enhancement_prev_liege.GetFirstName] has just been overthrown by a rebellion! The leader of the rebellion, [riseandfall_war_enhancement_attacker.GetName], has used this opportunity to enthrone themselves as ruler."
+ riseandfall_war_enhancement.11.a:0 "Shocking!"
+
+ riseandfall_war_enhancement.12.t:0 "Regent delays council vote!"
+ riseandfall_war_enhancement.12.d:0 "The council's regent, [riseandfall_council_regent.GetName] has delayed the vote of the council."
+ riseandfall_war_enhancement.12.a:0 "What is [riseandfall_council_regent.GetCharacterViewName] up to?"
+ 
+ riseandfall_war_enhancement.13.t:0 "Liege overthrown!"
+ riseandfall_war_enhancement.13.d:0 "The council's regent, [riseandfall_council_regent.GetName] has overthrown the council and installed themselves onto the throne!"
+ riseandfall_war_enhancement.13.a:0 "They have no authority!"
+ 
+ riseandfall_war_enhancement.14.t:0 "Liege elected!"
+ riseandfall_war_enhancement.14.d:0 "[ROOT.Char.GetLiege.GetName] has been successfully elected as our new liege, and the old regent, [riseandfall_council_regent.GetName], has stepped down."
+ riseandfall_war_enhancement.14.a:0 "An expected result."
+ 
+ riseandfall_war_enhancement.15.t:0 "House overthrown!"
+ riseandfall_war_enhancement.15.d:0 "[ROOT.Char.GetLiege.GetName] has taken control of the realm after their victory against the house of [riseandfall_war_enhancement_prev_liege.GetName]."
+ riseandfall_war_enhancement.15.a:0 "Their house has shown their strength."
+ 
+ riseandfall_war_enhancement.16.t:0 "New Rulers"
+ riseandfall_war_enhancement.16.d:0 "Fortune has led [ROOT.Char.GetLiege.GetName] to victory against [riseandfall_war_enhancement_prev_liege.GetName], and now controls the realm."
+ riseandfall_war_enhancement.16.a:0 "These things happen."

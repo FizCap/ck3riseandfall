@@ -256,6 +256,23 @@ riseandfall_enable_interaction_stability = {
     }
 }
 
+riseandfall_enable_war_enhancement = {
+
+    categories = {
+        riseandfall
+    }
+
+    # Default: enabled (war enhancement mechanics active)
+    default = riseandfall_war_enhancement_disabled
+
+    riseandfall_war_enhancement_enabled = {
+    }
+
+    riseandfall_war_enhancement_disabled = {
+        flag = riseandfall_war_enhancement_disabled
+    }
+}
+
 riseandfall_lite_mode = {
 
     categories = {

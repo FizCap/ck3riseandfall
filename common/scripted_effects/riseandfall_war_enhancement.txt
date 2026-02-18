@@ -1,0 +1,866 @@
+﻿# Scripted effects for Rise and Fall war enhancement events
+
+# Event .1 immediate: Imprison family members related to the killer
+war_enhancement_imprison_family = {
+	scope:riseandfall_war_enhancement_prev_liege = {
+		every_close_or_extended_family_member = {
+			limit = {
+				is_independent_ruler = no
+				root = {
+					any_close_family_member = {
+						even_if_dead = yes
+						exists = killer
+						killer = prev
+					}
+				}
+			}
+			save_temporary_scope_as = riseandfall_war_enhancement_tbi
+			root = {
+				imprison = { target = scope:riseandfall_war_enhancement_tbi }
+			}
+		}
+	}
+}
+
+# Event .1.a effect: Press claims
+war_enhancement_press_claims = {
+
+	scope:riseandfall_war_enhancement_attacker.liege = {
+		save_scope_as = riseandfall_war_enhancement_prev_liege_successor
+	}
+	
+	root = {
+		create_title_and_vassal_change = {
+			type = conquest
+			save_scope_as = change
+		}		
+	}
+	
+	scope:riseandfall_war_enhancement_attacker.liege = {
+		every_held_title = {
+			limit = {
+				OR = {
+					AND = {
+						OR = {
+							previous_holder = scope:riseandfall_war_enhancement_prev_liege
+							holder = scope:riseandfall_war_enhancement_attacker.liege
+						}
+						title_held_years < 1
+					}
+					has_claim = root
+				}
+			}
+			change_title_holder_include_vassals = {
+				holder = root
+				change = scope:change
+			}
+		}
+		every_vassal = {
+			limit = { this != scope:riseandfall_war_enhancement_attacker  }
+			add_to_list = riseandfall_war_enhancement_vassal_list
+		}
+	}
+	
+	hidden_effect = {
+	if = {
+		limit = {
+			scope:riseandfall_war_enhancement_prev_liege_successor.primary_title = scope:riseandfall_war_enhancement_liege_primary_title
+		}
+		every_in_list = {
+			list = riseandfall_war_enhancement_vassal_list
+			change_liege = {
+				liege = root
+				change = scope:change
+			}
+		}
+		scope:riseandfall_war_enhancement_prev_liege_successor = {
+			change_liege = {
+				liege = root
+				change = scope:change
+			}
+		}
+	}
+	}
+	
+	root = {
+		resolve_title_and_vassal_change = scope:change
+	}
+
+	
+	if = {
+		limit = {
+			scope:riseandfall_war_enhancement_liege_primary_title.holder != root
+		}
+		hidden_effect = {
+			root = {
+				trigger_event = {
+					id = riseandfall_war_enhancement.1
+				}
+			}
+		}
+	}
+	
+}
+
+# Event .1.b effect: Elect ruler
+war_enhancement_elect_ruler = {
+	scope:riseandfall_war_enhancement_attacker.liege = { 
+		try_start_diarchy = regency
+		set_diarch = root
+		change_diarchy_swing = 100
+	}
+	scope:riseandfall_war_enhancement_attacker.liege.primary_title = {
+		clear_title_laws = yes
+		save_scope_as = riseandfall_liege_elective_title
+		add_title_law = feudal_elective_succession_law 
+	}
+
+	scope:riseandfall_war_enhancement_attacker.liege.diarch = {
+		trigger_event = {
+			id = riseandfall_war_enhancement.6
+			days = 30
+		}
+	}
+}
+# Event .1.f 
+war_enhancement_restore_hre_electoral_system = {
+	scope:riseandfall_war_enhancement_attacker.liege = { 
+		try_start_diarchy = regency
+		set_diarch = root
+		change_diarchy_swing = 100
+	}
+	scope:riseandfall_war_enhancement_attacker.liege.primary_title = {
+		clear_title_laws = yes
+		save_scope_as = riseandfall_liege_elective_title
+		add_title_law = princely_elective_succession_law 
+	}
+
+	scope:riseandfall_war_enhancement_attacker.liege.diarch = {
+		trigger_event = {
+			id = riseandfall_war_enhancement.6
+			days = 30
+		}
+	}
+}
+
+# Event .1.c effect: Tyrannically overthrow electoral system
+war_enhancement_overthrow_electoral_system = {
+	add_tyranny = 25
+	hidden_effect = {
+		scope:riseandfall_war_enhancement_attacker.liege.primary_title = {
+				save_scope_as = riseandfall_liege_elective_title
+				clear_title_laws = yes
+		}
+	}
+	root = {
+		create_title_and_vassal_change = {
+			type = conquest
+			save_scope_as = change
+		}		
+	}
+	scope:riseandfall_war_enhancement_attacker.liege = {
+		every_held_title = { 
+			limit = { 
+				OR = {
+					AND = {
+						OR = {
+							holder = scope:riseandfall_war_enhancement_attacker.liege
+							previous_holder = scope:riseandfall_war_enhancement_prev_liege
+						}
+						has_claim = root
+					}
+					this = title_capital_county
+				}
+			}
+			change_title_holder_include_vassals = {
+				holder = root
+				change = scope:change
+			}
+		}
+	}
+		
+	scope:riseandfall_war_enhancement_attacker.liege = {
+		change_liege = {
+			liege = root
+			change = scope:change
+		}
+	}
+
+	root = {
+		resolve_title_and_vassal_change = scope:change
+	}
+	if = {
+		limit = { 
+			scope:riseandfall_liege_elective_title = { 
+				tier = tier_duchy	
+			}
+		}
+		add_legitimacy = -300
+	}
+	if = {
+		limit = { 
+			scope:riseandfall_liege_elective_title = { 
+				tier = tier_kingdom	
+			}
+		}
+		add_legitimacy = -600
+	}
+	if = {
+		limit = { 
+			scope:riseandfall_liege_elective_title = { 
+				tier = tier_empire	
+			}
+		}
+		add_legitimacy = -750
+	}
+	if = {
+		limit = { 
+			scope:riseandfall_liege_elective_title = { 
+				tier = tier_hegemony
+			}
+		}
+		add_legitimacy = -1000
+	}
+}
+
+# Event .1.d effect: Independence
+war_enhancement_declare_independence = {
+	create_title_and_vassal_change = {
+		type = independency 
+		save_scope_as = change
+	}
+	becomes_independent = {
+		change = scope:change
+	}
+	resolve_title_and_vassal_change = scope:change
+}
+
+war_enhancement_execute_liege_family = { #Massacre their house!
+	scope:riseandfall_war_enhancement_liege_primary_title.holder = {
+		every_close_or_extended_family_member = {
+			limit = {
+				house = scope:riseandfall_war_enhancement_prev_liege.house
+				is_at_same_location = scope:riseandfall_war_enhancement_prev_liege
+			}
+			if = {
+				limit = { 
+					primary_spouse = {
+						is_at_same_location = scope:riseandfall_war_enhancement_prev_liege
+						NOT = { house = scope:riseandfall_war_enhancement_attacker.house }
+					}
+				}
+				primary_spouse = {
+					death = { death_reason = death_siege killer = root }
+				}
+			}
+			death = { death_reason = death_siege killer = root }
+		}	
+		hidden_effect = {
+		every_courtier = {
+			limit = {
+				house = scope:riseandfall_war_enhancement_prev_liege.house
+				is_at_same_location = scope:riseandfall_war_enhancement_prev_liege
+			}
+			if = {
+				limit = { 
+					primary_spouse = {
+						is_at_same_location = scope:riseandfall_war_enhancement_prev_liege
+						NOT = { house = scope:riseandfall_war_enhancement_attacker.house }
+					}
+				}
+				primary_spouse = {
+					death = { death_reason = death_siege killer = root }
+				}
+			}
+			death = { death_reason = death_siege killer = root }
+		}
+		}
+	}
+	if = {
+		limit = {
+			scope:riseandfall_war_enhancement_prev_liege.house = scope:riseandfall_war_enhancement_liege_primary_title.holder.house
+		}
+		scope:riseandfall_war_enhancement_liege_primary_title.holder = {
+			death = { death_reason = death_siege killer = root }
+			if = {
+				limit = { 
+					primary_spouse = {
+						is_at_same_location = scope:riseandfall_war_enhancement_liege_primary_title.holder.house
+						NOT = { house = scope:riseandfall_war_enhancement_attacker.house }
+						NOT = { has_relation = scope:riseandfall_war_enhancement_attacker }
+					}
+				}
+				primary_spouse = {
+					death = { death_reason = death_siege killer = root }
+
+				}
+			}
+		}
+	}
+	scope:riseandfall_war_enhancement_prev_liege = {
+		if = {
+			limit = { 
+				primary_spouse = {
+					is_at_same_location = scope:riseandfall_war_enhancement_prev_liege
+					NOT = { house = scope:riseandfall_war_enhancement_attacker.house }
+					NOT = { has_relation = scope:riseandfall_war_enhancement_attacker }
+				}
+			}
+			primary_spouse = {
+				death = { death_reason = death_siege killer = root }
+			}
+		}
+	}
+	hidden_effect = {
+	scope:riseandfall_war_enhancement_liege_primary_title.holder = {
+		every_close_or_extended_family_member = {
+			limit = {
+				house = scope:riseandfall_war_enhancement_prev_liege.house
+				is_at_same_location = scope:riseandfall_war_enhancement_prev_liege
+				NOT = { has_relation = scope:riseandfall_war_enhancement_attacker }
+			}
+			if = {
+				limit = { 
+					primary_spouse = {
+						is_at_same_location = scope:riseandfall_war_enhancement_prev_liege
+						NOT = { house = scope:riseandfall_war_enhancement_attacker.house }
+						NOT = { has_relation = scope:riseandfall_war_enhancement_attacker }
+					}
+				}
+				primary_spouse = {
+					death = { death_reason = death_siege killer = root }
+				}
+			}
+			death = { death_reason = death_siege killer = root }
+		}	
+	}
+	}
+	root = {
+		add_dread = 20
+		add_trait = murderer
+		add_tyranny = 10
+		hidden_effect = { add_strife = 10 }
+		trigger_event = {
+				id = riseandfall_war_enhancement.1
+		}
+	}
+}
+
+war_enhancement_imprison_liege_family = { #Imprison their house!
+	scope:riseandfall_war_enhancement_liege_primary_title.holder = {
+		every_close_or_extended_family_member = {
+			limit = {
+				house = scope:riseandfall_war_enhancement_prev_liege.house
+				is_at_same_location = scope:riseandfall_war_enhancement_prev_liege
+			}
+			if = {
+				limit = { 
+					primary_spouse = {
+						is_at_same_location = scope:riseandfall_war_enhancement_prev_liege
+						NOT = { house = scope:riseandfall_war_enhancement_attacker.house }
+					}
+				}
+				primary_spouse = {
+					root = { imprison = { target = prev } }
+				}
+			}
+			root = { imprison = { target = prev } }
+		}	
+		hidden_effect = {
+		every_courtier = {
+			limit = {
+				house = scope:riseandfall_war_enhancement_prev_liege.house
+				is_at_same_location = scope:riseandfall_war_enhancement_prev_liege
+			}
+			if = {
+				limit = { 
+					primary_spouse = {
+						is_at_same_location = scope:riseandfall_war_enhancement_prev_liege
+						NOT = { house = scope:riseandfall_war_enhancement_attacker.house }
+					}
+				}
+				primary_spouse = {
+					root = { imprison = { target = prev } }
+				}
+			}
+			root = { imprison = { target = prev } }
+		}
+		}
+	}
+	if = {
+		limit = {
+			scope:riseandfall_war_enhancement_prev_liege.house = scope:riseandfall_war_enhancement_liege_primary_title.holder.house
+		}
+		scope:riseandfall_war_enhancement_liege_primary_title.holder = {
+			root = { imprison = { target = prev } }
+			if = {
+				limit = { 
+					primary_spouse = {
+						is_at_same_location = scope:riseandfall_war_enhancement_liege_primary_title.holder.house
+						NOT = { house = scope:riseandfall_war_enhancement_attacker.house }
+						NOT = { has_relation = scope:riseandfall_war_enhancement_attacker }
+					}
+				}
+				primary_spouse = {
+					root = { imprison = { target = prev } }
+
+				}
+			}
+		}
+	}
+	scope:riseandfall_war_enhancement_prev_liege = {
+		if = {
+			limit = { 
+				primary_spouse = {
+					is_at_same_location = scope:riseandfall_war_enhancement_prev_liege
+					NOT = { house = scope:riseandfall_war_enhancement_attacker.house }
+					NOT = { has_relation = scope:riseandfall_war_enhancement_attacker }
+				}
+			}
+			primary_spouse = {
+				root = { imprison = { target = prev } }
+			}
+		}
+	}
+	root = {
+		add_dread = 10
+		add_tyranny = 5
+		hidden_effect = { add_strife = 5 }
+		trigger_event = {
+				id = riseandfall_war_enhancement.1
+		}
+	}
+}
+
+# Event .2.a effect: Execute previous liege
+war_enhancement_execute_liege = {
+	scope:riseandfall_war_enhancement_prev_liege = {
+		death = {
+			death_reason = death_execution
+			killer = root
+		}
+	}
+	scope:riseandfall_war_enhancement_attacker = {
+		trigger_event = {
+			id = riseandfall_war_enhancement.1
+		}		
+	}
+}
+
+# Event .2.d1 effect: Imprison previous liege
+war_enhancement_imprison_liege = {
+	root = { imprison = { target = scope:riseandfall_war_enhancement_prev_liege } }
+	scope:riseandfall_war_enhancement_attacker = {
+		trigger_event = {
+			id = riseandfall_war_enhancement.1
+		}		
+	}
+}
+
+# Event .3.a effect: Start war against liege
+war_enhancement_start_war_against_liege = {
+	start_war = {
+		casus_belli = refused_liege_demand_war
+		target = root.liege
+	}
+}
+
+# Event .4.a effect: Join civil war
+war_enhancement_join_civil_war = {
+	scope:riseandfall_war_enhancement_highest_title_man = {
+		random_character_war = {
+			limit = {
+				is_civil_war = yes
+			}
+			add_attacker = root
+		}
+	}
+}
+
+# Event .6.a effect: Abdicate to heir
+war_enhancement_abdicate_to_heir = {
+	root = {
+		create_title_and_vassal_change = {
+			type = faction_demand
+			save_scope_as = change
+		}		
+	}
+	scope:riseandfall_liege_elective_title = {
+		change_title_holder_include_vassals = {
+			holder = scope:riseandfall_liege_elective_title.current_heir
+			change = scope:change
+		}
+	}
+	scope:riseandfall_war_enhancement_attacker.liege = {
+		every_held_title = { 
+			limit = {
+				AND = {
+					OR = {
+						holder = scope:riseandfall_war_enhancement_attacker.liege
+						previous_holder = scope:riseandfall_war_enhancement_prev_liege
+					}
+					title_held_years < 1
+					OR = {
+						has_claim = scope:riseandfall_liege_elective_title.current_heir
+						de_jure_liege = scope:riseandfall_liege_elective_title
+						de_facto_liege = scope:riseandfall_war_enhancement_attacker.liege
+					}
+				}
+			}
+			change_title_holder_include_vassals = {
+				holder = scope:riseandfall_liege_elective_title.current_heir
+				change = scope:change
+			}
+		}
+	}
+	
+	scope:riseandfall_war_enhancement_attacker.liege = {
+		change_liege = {
+			liege = scope:riseandfall_liege_elective_title.current_heir
+			change = scope:change
+		}
+	}
+			
+	root = {
+		resolve_title_and_vassal_change = scope:change
+	}
+	if = {
+		limit = {
+				NOT = { 
+					scope:riseandfall_liege_elective_title = { has_title_law = princely_elective_succession_law }
+				}
+		}
+		scope:riseandfall_liege_elective_title = {
+			clear_title_laws = yes
+		}
+	}
+}
+
+# Event .6.b effect: Extend rule temporarily
+war_enhancement_extend_rule = {
+	scope:riseandfall_liege_elective_title.holder.diarch = {
+		change_strife_opinion = 5
+		trigger_event = {
+			id = riseandfall_war_enhancement.6
+			days = 150
+		}
+	}
+}
+
+# Event .6.c effect: Seize power tyrannically
+war_enhancement_seize_power = {
+	root = {
+		create_title_and_vassal_change = {
+			type = conquest
+			save_scope_as = change
+		}		
+	}
+	scope:riseandfall_liege_elective_title = {
+		change_title_holder_include_vassals = {
+			holder = root
+			change = scope:change
+		}
+	}
+	add_tyranny = 25
+	scope:riseandfall_war_enhancement_attacker.liege = {
+		every_held_title = { 
+			limit = { 
+				OR = {
+					AND = {
+						OR = {
+							holder = scope:riseandfall_war_enhancement_attacker.liege
+							previous_holder = scope:riseandfall_war_enhancement_prev_liege
+						}
+						title_held_years < 1
+						OR = {
+							has_claim = root
+							de_jure_liege = scope:riseandfall_liege_elective_title
+							de_facto_liege = scope:riseandfall_war_enhancement_attacker.liege
+						}
+					}
+					this = title_capital_county
+				}
+			}
+			change_title_holder_include_vassals = {
+				holder = root
+				change = scope:change
+			}
+		}
+	}
+	
+	scope:riseandfall_war_enhancement_attacker.liege = {
+		change_liege = {
+			liege = root
+			change = scope:change
+		}
+	}
+
+	root = {
+		resolve_title_and_vassal_change = scope:change
+	}
+	if = {
+		limit = { 
+			scope:riseandfall_liege_elective_title = { 
+				tier = tier_duchy	
+			}
+		}
+		add_legitimacy = -300
+	}
+	if = {
+		limit = { 
+			scope:riseandfall_liege_elective_title = { 
+				tier = tier_kingdom	
+			}
+		}
+		add_legitimacy = -600
+	}
+	if = {
+		limit = { 
+			scope:riseandfall_liege_elective_title = { 
+				tier = tier_empire	
+			}
+		}
+		add_legitimacy = -750
+	}
+	if = {
+		limit = { 
+			scope:riseandfall_liege_elective_title = { 
+				tier = tier_hegemony
+			}
+		}
+		add_legitimacy = -1000
+	}
+	if = {
+		limit = {
+				NOT = { 
+					scope:riseandfall_liege_elective_title = { has_title_law = princely_elective_succession_law }
+				}
+		}
+		remove_title_law = feudal_elective_succession_law 
+	}
+}
+
+war_enhancement_enthroned_heir = { #rebel merely overthrew liege and nothing else. 
+	scope:riseandfall_war_enhancement_attacker.liege = {
+		every_vassal = {
+			limit = { NOT = { this = scope:riseandfall_war_enhancement_attacker } }
+			trigger_event = {
+				id = riseandfall_war_enhancement.7 
+			}
+		}
+	}
+}
+
+war_enhancement_council_formation = { #rebel is forming a council to elect a new liege. 
+	scope:riseandfall_war_enhancement_attacker.liege = {
+		every_vassal = {
+			limit = { NOT = { this = scope:riseandfall_war_enhancement_attacker } }
+			trigger_event = {
+				id = riseandfall_war_enhancement.8
+			}
+		}
+	}
+}
+
+war_enhancement_princely_restoration = { #rebel has restored princely elective to the hre. 
+	scope:riseandfall_war_enhancement_attacker.liege = {
+		every_vassal = {
+			limit = { NOT = { this = scope:riseandfall_war_enhancement_attacker } }
+			trigger_event = {
+				id = riseandfall_war_enhancement.9
+			}
+		}
+	}
+}
+
+war_enhancement_independence_affirmed = { #rebel has declared independence. 
+	scope:riseandfall_war_enhancement_attacker.liege = {
+		every_vassal = {
+			limit = { NOT = { this = scope:riseandfall_war_enhancement_attacker } }
+			trigger_event = {
+				id = riseandfall_war_enhancement.10
+			}
+		}
+	}
+}
+
+war_enhancement_hereditary_succession_enforced = {
+	scope:riseandfall_war_enhancement_attacker.liege = {
+		every_vassal = {
+			limit = { NOT = { this = scope:riseandfall_war_enhancement_attacker } }
+			trigger_event = {
+				id = riseandfall_war_enhancement.11
+			}
+		}
+	}
+}
+
+war_enhancement_delay_council = { #Regent has delayed the council meeting to vote.
+	scope:riseandfall_war_enhancement_attacker.liege = {
+		every_vassal = {
+			limit = { NOT = { this = scope:riseandfall_war_enhancement_attacker } }
+			trigger_event = {
+				id = riseandfall_war_enhancement.12
+			}
+		}
+	}
+}
+
+war_enhancement_council_overthrow = { #Regent has used their influence to overthrow the realm
+	scope:riseandfall_war_enhancement_attacker.liege = {
+		every_vassal = {
+			limit = { NOT = { this = scope:riseandfall_war_enhancement_attacker } }
+			trigger_event = {
+				id = riseandfall_war_enhancement.13
+			}
+		}
+	}
+}
+
+war_enhancement_smooth_election = {
+	scope:riseandfall_war_enhancement_attacker.liege = {
+		every_vassal = {
+			limit = { NOT = { this = scope:riseandfall_war_enhancement_attacker } }
+			trigger_event = {
+				id = riseandfall_war_enhancement.14
+			}
+		}
+	}
+}
+
+war_enhancement_clan_seize = {
+	root = {
+		create_title_and_vassal_change = {
+			type = conquest
+			save_scope_as = change
+		}		
+	}
+	scope:riseandfall_war_enhancement_liege_primary_title = {
+		change_title_holder_include_vassals = {
+			holder = root
+			change = scope:change
+		}
+	}
+	add_tyranny = 10
+	scope:riseandfall_war_enhancement_attacker.liege = {
+		every_held_title = { 
+			limit = { 
+				root = {
+				NOT = { is_independent_ruler = yes }
+				}
+				OR = {
+					AND = {
+						OR = {
+							holder = scope:riseandfall_war_enhancement_attacker.liege
+							previous_holder = scope:riseandfall_war_enhancement_prev_liege
+						}
+						title_held_years < 1
+						OR = {
+							has_claim = root
+							de_jure_liege = scope:riseandfall_liege_elective_title
+							de_facto_liege = scope:riseandfall_war_enhancement_attacker.liege
+						}
+					}
+					this = title_capital_county
+				}
+			}
+			change_title_holder_include_vassals = {
+				holder = root
+				change = scope:change
+			}
+		}
+	}
+	
+	if = {
+		limit = { root = { NOT = { is_independent_ruler = yes } } }
+	scope:riseandfall_war_enhancement_attacker.liege = {
+		change_liege = {
+			liege = root
+			change = scope:change
+		}
+	}
+	}
+	root = {
+		resolve_title_and_vassal_change = scope:change
+	}
+}
+
+war_enhancement_clan_overthrow = {
+	scope:riseandfall_war_enhancement_attacker.liege = {
+		every_vassal = {
+			limit = { NOT = { this = scope:riseandfall_war_enhancement_attacker } }
+			trigger_event = {
+				id = riseandfall_war_enhancement.15
+			}
+		}
+	}
+}
+
+war_enhancement_primitive_overthrow = {
+	scope:riseandfall_war_enhancement_attacker.liege = {
+		every_vassal = {
+			limit = { NOT = { this = scope:riseandfall_war_enhancement_attacker } }
+			trigger_event = {
+				id = riseandfall_war_enhancement.16
+			}
+		}
+	}
+}
+
+war_enhancement_primitive_seize = {
+	root = {
+		create_title_and_vassal_change = {
+			type = conquest
+			save_scope_as = change
+		}		
+	}
+	scope:riseandfall_war_enhancement_liege_primary_title = {
+		change_title_holder_include_vassals = {
+			holder = root
+			change = scope:change
+		}
+	}
+	add_tyranny = 5
+	add_prestige = 200
+	scope:riseandfall_war_enhancement_attacker.liege = {
+		every_held_title = { 
+			limit = { 
+				root = {
+				NOT = { is_independent_ruler = yes }
+				}
+				OR = {
+					AND = {
+						OR = {
+							holder = scope:riseandfall_war_enhancement_attacker.liege
+							previous_holder = scope:riseandfall_war_enhancement_prev_liege
+						}
+						title_held_years < 1
+						OR = {
+							has_claim = root
+							de_jure_liege = scope:riseandfall_liege_elective_title
+							de_facto_liege = scope:riseandfall_war_enhancement_attacker.liege
+						}
+					}
+					this = title_capital_county
+				}
+			}
+			change_title_holder_include_vassals = {
+				holder = root
+				change = scope:change
+			}
+		}
+	}
+	
+	if = {
+		limit = { root = { NOT = { is_independent_ruler = yes } } }
+	scope:riseandfall_war_enhancement_attacker.liege = {
+		change_liege = {
+			liege = root
+			change = scope:change
+		}
+	}
+	}
+	root = {
+		resolve_title_and_vassal_change = scope:change
+	}
+}
