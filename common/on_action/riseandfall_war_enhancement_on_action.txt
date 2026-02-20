@@ -199,7 +199,6 @@ riseandfall_war_enhancement_war_won = {
 			}
 		}
 	}
-}
 
 riseandfall_war_enhancement_war_won = {
 	effect = {
