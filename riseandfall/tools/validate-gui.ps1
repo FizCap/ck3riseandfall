@@ -43,7 +43,7 @@ $keys = @{}
 foreach ($f in $repoGuiFiles) {
     $text = Get-Content -Raw -Path $f.FullName -ErrorAction SilentlyContinue
     if ($text -match $pattern) {
-        foreach ($m in ([regex]::Matches($text, ${pattern}[A-Za-z0-9_\-\.]+))) {
+        foreach ($m in ([regex]::Matches($text, "$pattern[A-Za-z0-9_\-\.]+"))) {
             $id = $m.Value
             if ($keys.ContainsKey($id)) { $keys[$id]++ } else { $keys[$id] = 1 }
         }
@@ -60,7 +60,7 @@ if ($dupes) {
 
 # Check localization files for tokens
 $locFiles = Get-ChildItem -Path (Join-Path $Root 'localization\english') -Filter *.yml -Recurse -File -ErrorAction SilentlyContinue
-$locText = ($locFiles | ForEach-Object { Get-Content -Raw $_ } ) -join "`n"
+$locText = ($locFiles | ForEach-Object { Get-Content -Raw -Path $_.FullName } ) -join "`n"
 $missing = @()
 foreach ($k in $keys.Keys) {
     # Remove trailing punctuation
