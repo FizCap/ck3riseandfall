@@ -2,7 +2,17 @@
     vassal_limit = 1000
     icon = intrigue_positive
 }
-
+# Temporary debuff applied to lieges when authority collapses
+riseandfall_authority_collapse_liege_debuff = {
+    levy_size = -0.5
+    vassal_levy_contribution_mult = -0.5
+    vassal_tax_mult = -0.5
+    army_maintenance_mult = 5.0
+    mercenary_hire_cost_mult = 10.0
+    domain_tax_mult = -0.5
+    vassal_opinion = -200
+    icon = intrigue_negative
+}
 riseandfall_vassal_limit_bonus_temp = {
     vassal_limit = 1000
     icon = intrigue_positive

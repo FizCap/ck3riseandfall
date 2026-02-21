@@ -19,7 +19,7 @@ authority_collapse.1001 = {
                 every_realm_province = {
                     add_province_modifier = {
                         modifier = riseandfall_authority_collapse
-                        years = 5
+                        years = 10
                     }
                     # Force county control to 0 by subtracting the current control value
                     county = {
@@ -29,7 +29,12 @@ authority_collapse.1001 = {
                     }
                 }
                 # Set low stability cooldown on the ruler
-                set_variable = { name = low_stability_cooldown value = yes years = 5 }
+                set_variable = { name = low_stability_cooldown value = yes years = 10 }
+                # Apply personal debuffs to the liege for the duration of the collapse
+                add_character_modifier = { modifier = riseandfall_authority_collapse_liege_debuff years = 5 }
+                    # If the liege has a treasury, remove it; also remove any short-term gold
+                    if = { limit = { treasury > 0 } remove_treasury = { value = treasury } }
+                    if = { limit = { gold > 1 } remove_short_term_gold = gold }
             }
         }
     }

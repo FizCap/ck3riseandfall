@@ -30,3 +30,5 @@ riseandfall_negotiated_peace_opinion = {
 	years = 20
 	decaying = yes
 }
+
+# Opinion penalty applied to each direct vassal when their liege suffers an authority collapse

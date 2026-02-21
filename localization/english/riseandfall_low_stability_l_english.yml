@@ -158,3 +158,5 @@ authority_collapse.1001.tooltip:0 "Bandits now run rampant across your entire re
 # Modifier localization
 riseandfall_authority_collapse:0 "Authority Collapse"
 riseandfall_authority_collapse_desc:0 "Local order has broken down: county control and development decline, and popular opinion collapses while this modifier is active."
+riseandfall_authority_collapse_liege_debuff:0 "Authority Collapse"
+riseandfall_authority_collapse_liege_debuff_desc:0 "Your personal authority has crumbled  levies and vassal contributions are halved, taxes falter, armies cost far more, and mercenaries are prohibitively expensive for the duration of the collapse."
