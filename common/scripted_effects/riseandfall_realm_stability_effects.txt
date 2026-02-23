@@ -15,11 +15,101 @@ riseandfall_calculate_realm_stability_se = {
     remove_variable = riseandfall_rs_vassals_component
 
     ########################################
+    # GLOBAL STAT AVERAGE CACHE (recomputed every 10 calendar years)
+    # We keep track of the last year the calculation ran plus a decade counter.
+    # The routine below only executes once per ingame year (using current_year)
+    # and when ten years have passed we walk every_ruler and recompute averages.
+    # Initialize tracking globals if missing.
+    if = { limit = { NOT = { exists = global_var:riseandfall_stat_avg_last_year } } set_global_variable = { name = riseandfall_stat_avg_last_year value = 0 } }
+    if = { limit = { NOT = { exists = global_var:riseandfall_stat_avg_years } } set_global_variable = { name = riseandfall_stat_avg_years value = 0 } }
+    if = { limit = { NOT = { exists = global_var:riseandfall_avg_diplomacy } } set_global_variable = { name = riseandfall_avg_diplomacy value = 10 } }
+    if = { limit = { NOT = { exists = global_var:riseandfall_avg_martial } } set_global_variable = { name = riseandfall_avg_martial value = 10 } }
+    if = { limit = { NOT = { exists = global_var:riseandfall_avg_stewardship } } set_global_variable = { name = riseandfall_avg_stewardship value = 10 } }
+    if = { limit = { NOT = { exists = global_var:riseandfall_avg_intrigue } } set_global_variable = { name = riseandfall_avg_intrigue value = 10 } }
+    if = { limit = { NOT = { exists = global_var:riseandfall_avg_learning } } set_global_variable = { name = riseandfall_avg_learning value = 10 } }
+    if = { limit = { NOT = { exists = global_var:riseandfall_ruler_count } } set_global_variable = { name = riseandfall_ruler_count value = 0 } }
+    if = { limit = { NOT = { exists = global_var:riseandfall_avg_total } } set_global_variable = { name = riseandfall_avg_total value = 10 } }
+
+    # run once per year (and run an initial calculation on first call)
+    if = {
+        limit = { NOT = { current_year = global_var:riseandfall_stat_avg_last_year } }
+        # if this is the very first time we've ever executed, recompute now
+        if = { limit = { global_var:riseandfall_stat_avg_last_year = 0 }
+            set_global_variable = { name = riseandfall_avg_diplomacy value = 0 }
+            set_global_variable = { name = riseandfall_avg_martial value = 0 }
+            set_global_variable = { name = riseandfall_avg_stewardship value = 0 }
+            set_global_variable = { name = riseandfall_avg_intrigue value = 0 }
+            set_global_variable = { name = riseandfall_avg_learning value = 0 }
+            set_global_variable = { name = riseandfall_avg_total value = 0 }
+            set_global_variable = { name = riseandfall_ruler_count value = 0 }
+            every_ruler = {
+                change_global_variable = { name = riseandfall_ruler_count add = 1 }
+                change_global_variable = { name = riseandfall_avg_diplomacy add = diplomacy }
+                change_global_variable = { name = riseandfall_avg_martial add = martial }
+                change_global_variable = { name = riseandfall_avg_stewardship add = stewardship }
+                change_global_variable = { name = riseandfall_avg_intrigue add = intrigue }
+                change_global_variable = { name = riseandfall_avg_learning add = learning }
+                change_global_variable = { name = riseandfall_avg_total add = diplomacy }
+                change_global_variable = { name = riseandfall_avg_total add = martial }
+                change_global_variable = { name = riseandfall_avg_total add = stewardship }
+                change_global_variable = { name = riseandfall_avg_total add = intrigue }
+                change_global_variable = { name = riseandfall_avg_total add = learning }
+            }
+            if = { limit = { global_var:riseandfall_ruler_count > 0 }
+                change_global_variable = { name = riseandfall_avg_diplomacy divide = global_var:riseandfall_ruler_count }
+                change_global_variable = { name = riseandfall_avg_martial divide = global_var:riseandfall_ruler_count }
+                change_global_variable = { name = riseandfall_avg_stewardship divide = global_var:riseandfall_ruler_count }
+                change_global_variable = { name = riseandfall_avg_intrigue divide = global_var:riseandfall_ruler_count }
+                change_global_variable = { name = riseandfall_avg_learning divide = global_var:riseandfall_ruler_count }
+                change_global_variable = { name = riseandfall_avg_total divide = global_var:riseandfall_ruler_count }
+                change_global_variable = { name = riseandfall_avg_total divide = 5 }
+            }
+        }
+        change_global_variable = { name = riseandfall_stat_avg_years add = 1 }
+        set_global_variable = { name = riseandfall_stat_avg_last_year value = current_year }
+        # perform decadal recompute
+        if = { limit = { global_var:riseandfall_stat_avg_years >= 10 }
+            set_global_variable = { name = riseandfall_stat_avg_years value = 0 }
+            set_global_variable = { name = riseandfall_avg_diplomacy value = 0 }
+            set_global_variable = { name = riseandfall_avg_martial value = 0 }
+            set_global_variable = { name = riseandfall_avg_stewardship value = 0 }
+            set_global_variable = { name = riseandfall_avg_intrigue value = 0 }
+            set_global_variable = { name = riseandfall_avg_learning value = 0 }
+            set_global_variable = { name = riseandfall_ruler_count value = 0 }
+            every_ruler = {
+                change_global_variable = { name = riseandfall_ruler_count add = 1 }
+                change_global_variable = { name = riseandfall_avg_diplomacy add = diplomacy }
+                change_global_variable = { name = riseandfall_avg_martial add = martial }
+                change_global_variable = { name = riseandfall_avg_stewardship add = stewardship }
+                change_global_variable = { name = riseandfall_avg_intrigue add = intrigue }
+                change_global_variable = { name = riseandfall_avg_learning add = learning }
+                change_global_variable = { name = riseandfall_avg_total add = diplomacy }
+                change_global_variable = { name = riseandfall_avg_total add = martial }
+                change_global_variable = { name = riseandfall_avg_total add = stewardship }
+                change_global_variable = { name = riseandfall_avg_total add = intrigue }
+                change_global_variable = { name = riseandfall_avg_total add = learning }
+            }
+            if = { limit = { global_var:riseandfall_ruler_count > 0 }
+                change_global_variable = { name = riseandfall_avg_diplomacy divide = global_var:riseandfall_ruler_count }
+                change_global_variable = { name = riseandfall_avg_martial divide = global_var:riseandfall_ruler_count }
+                change_global_variable = { name = riseandfall_avg_stewardship divide = global_var:riseandfall_ruler_count }
+                change_global_variable = { name = riseandfall_avg_intrigue divide = global_var:riseandfall_ruler_count }
+                change_global_variable = { name = riseandfall_avg_learning divide = global_var:riseandfall_ruler_count }
+                # average of five stats = total / (count*5)
+                change_global_variable = { name = riseandfall_avg_total divide = global_var:riseandfall_ruler_count }
+                change_global_variable = { name = riseandfall_avg_total divide = 5 }
+            }
+        }
+    }
+
+    ########################################
     # 1) RULER STATS (per-stat -10..+10, total -50..+50)
-    # New rule: for each stat, contribution = stat - 10, clamped to [-10,10].
-    #   - stat < 10 => negative contribution of -1 per point below 10 (cap -10)
-    #   - stat > 10 => positive contribution of +1 per point above 10 (cap +10)
+    # New rule: for each stat, contribution = stat - world_average, clamped to [-10,10].
+    #   - stat below global average => negative contribution (cap -10)
+    #   - stat above global average => positive contribution (cap +10)
     # Total stats component is the sum of Diplomacy/Martial/Stewardship/Intrigue/Learning
+    #   - stat below the global average => negative contribution of -1 per point below (cap -10)
+    #   - stat above the global average => positive contribution of +1 per point above (cap +10)
     set_variable = { name = riseandfall_rs_stats_component value = 0 }
 
     # If ruler is under regency/puppet_regency, save the active diarch scope so we can read their stats.
@@ -30,8 +120,8 @@ riseandfall_calculate_realm_stability_se = {
     }
     else = { set_variable = { name = riseandfall_rs_use_diarch_stats value = 0 } }
 
-    # Helper macro-like repeated block for each stat: compute tmp_add = source_stat - 10 and apply
-    # More aggressive negative scaling: lower stats (far below 10) penalize much more.
+    # Helper macro-like repeated block for each stat: compute tmp_add = source_stat - global average and apply
+    # More aggressive negative scaling: stats far below the world average penalize much more.
     # Positive scaling increased so good stats help more.
     # Diplomacy
     if = { limit = { var:riseandfall_rs_use_diarch_stats = 1 }
@@ -45,7 +135,10 @@ riseandfall_calculate_realm_stability_se = {
         }
     }
     else = { set_variable = { name = tmp_add value = diplomacy } }
-    change_variable = { name = tmp_add add = -10 }
+    # subtract global average using a temporary negative value
+    set_variable = { name = tmp_baseline value = global_var:riseandfall_avg_diplomacy }
+    change_variable = { name = tmp_baseline multiply = -1 }
+    change_variable = { name = tmp_add add = var:tmp_baseline }
     # Positive contributions (tmp_add > 1): apply curved scaling mirroring the negative side
     # Use piecewise thresholds so high stats get diminishing returns instead of a linear x2
     if = {
@@ -59,7 +152,7 @@ riseandfall_calculate_realm_stability_se = {
     }
     else_if = {
         limit = { var:tmp_add < -1 }
-        # Convert to positive distance below 10
+        # Convert to positive distance below baseline (world average)
         set_variable = { name = tmp_neg value = var:tmp_add }
         change_variable = { name = tmp_neg multiply = -1 }
         # Piecewise stronger penalties for lower stats (store in tmp_stat_contrib)
@@ -77,7 +170,7 @@ riseandfall_calculate_realm_stability_se = {
 
     # Martial
     if = { limit = { var:riseandfall_rs_use_diarch_stats = 1 }
-        # Use diarch stats (same weighting for regency and puppet regency)
+        # Use diarch stats (same weighting for regency and puppet_regency)
         if = { limit = { has_diarchy_type = puppet_regency }
             set_variable = { name = tmp_add value = scope:diarch.martial }
         }
@@ -87,7 +180,9 @@ riseandfall_calculate_realm_stability_se = {
         }
     }
     else = { set_variable = { name = tmp_add value = martial } }
-    change_variable = { name = tmp_add add = -10 }
+    set_variable = { name = tmp_baseline value = global_var:riseandfall_avg_martial }
+    change_variable = { name = tmp_baseline multiply = -1 }
+    change_variable = { name = tmp_add add = var:tmp_baseline }
     if = {
         limit = { var:tmp_add > 1 }
         set_variable = { name = tmp_pos value = var:tmp_add }
@@ -114,7 +209,7 @@ riseandfall_calculate_realm_stability_se = {
 
     # Stewardship
     if = { limit = { var:riseandfall_rs_use_diarch_stats = 1 }
-        # Use diarch stats (same weighting for regency and puppet regency)
+        # Use diarch stats (same weighting for regency and puppet_regency)
         if = { limit = { has_diarchy_type = puppet_regency }
             set_variable = { name = tmp_add value = scope:diarch.stewardship }
         }
@@ -124,7 +219,9 @@ riseandfall_calculate_realm_stability_se = {
         }
     }
     else = { set_variable = { name = tmp_add value = stewardship } }
-    change_variable = { name = tmp_add add = -10 }
+    set_variable = { name = tmp_baseline value = global_var:riseandfall_avg_stewardship }
+    change_variable = { name = tmp_baseline multiply = -1 }
+    change_variable = { name = tmp_add add = var:tmp_baseline }
     if = {
         limit = { var:tmp_add > 1 }
         set_variable = { name = tmp_pos value = var:tmp_add }
@@ -151,7 +248,7 @@ riseandfall_calculate_realm_stability_se = {
 
     # Intrigue
     if = { limit = { var:riseandfall_rs_use_diarch_stats = 1 }
-        # Use diarch stats (same weighting for regency and puppet regency)
+        # Use diarch stats (same weighting for regency and puppet_regency)
         if = { limit = { has_diarchy_type = puppet_regency }
             set_variable = { name = tmp_add value = scope:diarch.intrigue }
         }
@@ -161,7 +258,9 @@ riseandfall_calculate_realm_stability_se = {
         }
     }
     else = { set_variable = { name = tmp_add value = intrigue } }
-    change_variable = { name = tmp_add add = -10 }
+    set_variable = { name = tmp_baseline value = global_var:riseandfall_avg_intrigue }
+    change_variable = { name = tmp_baseline multiply = -1 }
+    change_variable = { name = tmp_add add = var:tmp_baseline }
     if = {
         limit = { var:tmp_add > 1 }
         set_variable = { name = tmp_pos value = var:tmp_add }
@@ -188,7 +287,7 @@ riseandfall_calculate_realm_stability_se = {
 
     # Learning
     if = { limit = { var:riseandfall_rs_use_diarch_stats = 1 }
-        # Use diarch stats (same weighting for regency and puppet regency)
+        # Use diarch stats (same weighting for regency and puppet_regency)
         if = { limit = { has_diarchy_type = puppet_regency }
             set_variable = { name = tmp_add value = scope:diarch.learning }
         }
@@ -198,7 +297,9 @@ riseandfall_calculate_realm_stability_se = {
         }
     }
     else = { set_variable = { name = tmp_add value = learning } }
-    change_variable = { name = tmp_add add = -10 }
+    set_variable = { name = tmp_baseline value = global_var:riseandfall_avg_learning }
+    change_variable = { name = tmp_baseline multiply = -1 }
+    change_variable = { name = tmp_add add = var:tmp_baseline }
     if = {
         limit = { var:tmp_add > 1 }
         set_variable = { name = tmp_pos value = var:tmp_add }
