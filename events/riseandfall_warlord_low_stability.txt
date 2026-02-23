@@ -46,9 +46,16 @@ warlord.1002 = {
         ai_chance = {
             base = 0
             modifier = {
+                # only landed vassals consider rebellion
                 add = 100
                 is_independent_ruler = no
-                opinion = { target = liege value < 50 }
+            }
+            modifier = {
+                # low crown authority makes vassals emboldened
+                add = 100
+                liege = {
+                    has_realm_law = crown_authority_0
+                }
             }
         }
     }
@@ -68,6 +75,13 @@ warlord.1002 = {
                 add = 100
                 is_independent_ruler = no
                 opinion = { target = liege value >= 75 }
+            }
+            modifier = {
+                # high crown authority encourages loyalty
+                add = 100
+                liege = {
+                    has_realm_law = crown_authority_2
+                }
             }
         }
     }
