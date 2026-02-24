@@ -171,7 +171,6 @@ riseandfall_hide_mod_decision_menu = {
             current_description = riseandfall_enable_hide_mod_decisions_desc
             localization = riseandfall_enable_hide_mod_decisions
             icon = "gfx/interface/illustrations/decisions/decision_misc.dds"
-            ai_chance = { base = 0 }
         }
 
         item = {
@@ -181,7 +180,6 @@ riseandfall_hide_mod_decision_menu = {
             current_description = riseandfall_disable_hide_mod_decisions_desc
             localization = riseandfall_disable_hide_mod_decisions
             icon = "gfx/interface/illustrations/decisions/decision_misc.dds"
-            ai_chance = { base = 0 }
         }
     }
 
