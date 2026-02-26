@@ -1,202 +1,202 @@
-﻿riseandfall_stability_0 = {
+riseandfall_stability_0 = {
     independent_ruler_opinion = -50
-    vassal_opinion = -25
+    vassal_opinion = -50
     courtier_opinion = -25
     icon = realm_stability_negative
 }
 
 riseandfall_stability_1 = {
     independent_ruler_opinion = -50
-    vassal_opinion = -25
+    vassal_opinion = -48
     courtier_opinion = -25
     icon = realm_stability_negative
 }
 
 riseandfall_stability_2 = {
     independent_ruler_opinion = -49
-    vassal_opinion = -24
+    vassal_opinion = -46
     courtier_opinion = -24
     icon = realm_stability_negative
 }
 
 riseandfall_stability_3 = {
     independent_ruler_opinion = -48
-    vassal_opinion = -24
+    vassal_opinion = -44
     courtier_opinion = -24
     icon = realm_stability_negative
 }
 
 riseandfall_stability_4 = {
     independent_ruler_opinion = -47
-    vassal_opinion = -23
+    vassal_opinion = -42
     courtier_opinion = -23
     icon = realm_stability_negative
 }
 
 riseandfall_stability_5 = {
     independent_ruler_opinion = -46
-    vassal_opinion = -23
+    vassal_opinion = -40
     courtier_opinion = -23
     icon = realm_stability_negative
 }
 
 riseandfall_stability_6 = {
     independent_ruler_opinion = -45
-    vassal_opinion = -22
+    vassal_opinion = -39
     courtier_opinion = -22
     icon = realm_stability_negative
 }
 
 riseandfall_stability_7 = {
     independent_ruler_opinion = -44
-    vassal_opinion = -21
+    vassal_opinion = -37
     courtier_opinion = -21
     icon = realm_stability_negative
 }
 
 riseandfall_stability_8 = {
     independent_ruler_opinion = -43
-    vassal_opinion = -21
+    vassal_opinion = -35
     courtier_opinion = -21
     icon = realm_stability_negative
 }
 
 riseandfall_stability_9 = {
     independent_ruler_opinion = -42
-    vassal_opinion = -20
+    vassal_opinion = -34
     courtier_opinion = -20
     icon = realm_stability_negative
 }
 
 riseandfall_stability_10 = {
     independent_ruler_opinion = -41
-    vassal_opinion = -20
+    vassal_opinion = -32
     courtier_opinion = -20
     icon = realm_stability_negative
 }
 
 riseandfall_stability_11 = {
     independent_ruler_opinion = -40
-    vassal_opinion = -19
+    vassal_opinion = -30
     courtier_opinion = -19
     icon = realm_stability_negative
 }
 
 riseandfall_stability_12 = {
     independent_ruler_opinion = -39
-    vassal_opinion = -18
+    vassal_opinion = -29
     courtier_opinion = -18
     icon = realm_stability_negative
 }
 
 riseandfall_stability_13 = {
     independent_ruler_opinion = -38
-    vassal_opinion = -18
+    vassal_opinion = -27
     courtier_opinion = -18
     icon = realm_stability_negative
 }
 
 riseandfall_stability_14 = {
     independent_ruler_opinion = -37
-    vassal_opinion = -17
+    vassal_opinion = -26
     courtier_opinion = -17
     icon = realm_stability_negative
 }
 
 riseandfall_stability_15 = {
     independent_ruler_opinion = -36
-    vassal_opinion = -17
+    vassal_opinion = -24
     courtier_opinion = -17
     icon = realm_stability_negative
 }
 
 riseandfall_stability_16 = {
     independent_ruler_opinion = -35
-    vassal_opinion = -16
+    vassal_opinion = -23
     courtier_opinion = -16
     icon = realm_stability_negative
 }
 
 riseandfall_stability_17 = {
     independent_ruler_opinion = -34
-    vassal_opinion = -15
+    vassal_opinion = -22
     courtier_opinion = -15
     icon = realm_stability_negative
 }
 
 riseandfall_stability_18 = {
     independent_ruler_opinion = -33
-    vassal_opinion = -15
+    vassal_opinion = -20
     courtier_opinion = -15
     icon = realm_stability_negative
 }
 
 riseandfall_stability_19 = {
     independent_ruler_opinion = -32
-    vassal_opinion = -14
+    vassal_opinion = -19
     courtier_opinion = -14
     icon = realm_stability_negative
 }
 
 riseandfall_stability_20 = {
     independent_ruler_opinion = -31
-    vassal_opinion = -13
+    vassal_opinion = -18
     courtier_opinion = -13
     icon = realm_stability_negative
 }
 
 riseandfall_stability_21 = {
     independent_ruler_opinion = -30
-    vassal_opinion = -13
+    vassal_opinion = -17
     courtier_opinion = -13
     icon = realm_stability_negative
 }
 
 riseandfall_stability_22 = {
     independent_ruler_opinion = -29
-    vassal_opinion = -12
+    vassal_opinion = -16
     courtier_opinion = -12
     icon = realm_stability_negative
 }
 
 riseandfall_stability_23 = {
     independent_ruler_opinion = -28
-    vassal_opinion = -12
+    vassal_opinion = -15
     courtier_opinion = -12
     icon = realm_stability_negative
 }
 
 riseandfall_stability_24 = {
     independent_ruler_opinion = -27
-    vassal_opinion = -11
+    vassal_opinion = -14
     courtier_opinion = -11
     icon = realm_stability_negative
 }
 
 riseandfall_stability_25 = {
     independent_ruler_opinion = -26
-    vassal_opinion = -10
+    vassal_opinion = -12
     courtier_opinion = -10
     icon = realm_stability_negative
 }
 
 riseandfall_stability_26 = {
     independent_ruler_opinion = -25
-    vassal_opinion = -10
+    vassal_opinion = -12
     courtier_opinion = -10
     icon = realm_stability_negative
 }
 
 riseandfall_stability_27 = {
     independent_ruler_opinion = -24
-    vassal_opinion = -9
+    vassal_opinion = -11
     courtier_opinion = -9
     icon = realm_stability_negative
 }
 
 riseandfall_stability_28 = {
     independent_ruler_opinion = -23
-    vassal_opinion = -9
+    vassal_opinion = -10
     courtier_opinion = -9
     icon = realm_stability_negative
 }
@@ -217,133 +217,133 @@ riseandfall_stability_30 = {
 
 riseandfall_stability_31 = {
     independent_ruler_opinion = -20
-    vassal_opinion = -8
+    vassal_opinion = -7
     courtier_opinion = -8
     icon = realm_stability_negative
 }
 
 riseandfall_stability_32 = {
     independent_ruler_opinion = -19
-    vassal_opinion = -7
+    vassal_opinion = -6
     courtier_opinion = -7
     icon = realm_stability_negative
 }
 
 riseandfall_stability_33 = {
     independent_ruler_opinion = -18
-    vassal_opinion = -7
+    vassal_opinion = -6
     courtier_opinion = -7
     icon = realm_stability_negative
 }
 
 riseandfall_stability_34 = {
     independent_ruler_opinion = -17
-    vassal_opinion = -7
+    vassal_opinion = -5
     courtier_opinion = -7
     icon = realm_stability_negative
 }
 
 riseandfall_stability_35 = {
     independent_ruler_opinion = -16
-    vassal_opinion = -6
+    vassal_opinion = -4
     courtier_opinion = -6
     icon = realm_stability_negative
 }
 
 riseandfall_stability_36 = {
     independent_ruler_opinion = -15
-    vassal_opinion = -6
+    vassal_opinion = -4
     courtier_opinion = -6
     icon = realm_stability_negative
 }
 
 riseandfall_stability_37 = {
     independent_ruler_opinion = -14
-    vassal_opinion = -5
+    vassal_opinion = -3
     courtier_opinion = -5
     icon = realm_stability_negative
 }
 
 riseandfall_stability_38 = {
     independent_ruler_opinion = -13
-    vassal_opinion = -5
+    vassal_opinion = -3
     courtier_opinion = -5
     icon = realm_stability_negative
 }
 
 riseandfall_stability_39 = {
     independent_ruler_opinion = -12
-    vassal_opinion = -5
+    vassal_opinion = -2
     courtier_opinion = -5
     icon = realm_stability_negative
 }
 
 riseandfall_stability_40 = {
     independent_ruler_opinion = -11
-    vassal_opinion = -4
+    vassal_opinion = -2
     courtier_opinion = -4
     icon = realm_stability_negative
 }
 
 riseandfall_stability_41 = {
     independent_ruler_opinion = -10
-    vassal_opinion = -4
+    vassal_opinion = -2
     courtier_opinion = -4
     icon = realm_stability_negative
 }
 
 riseandfall_stability_42 = {
     independent_ruler_opinion = -9
-    vassal_opinion = -3
+    vassal_opinion = -1
     courtier_opinion = -3
     icon = realm_stability_negative
 }
 
 riseandfall_stability_43 = {
     independent_ruler_opinion = -8
-    vassal_opinion = -3
+    vassal_opinion = -1
     courtier_opinion = -3
     icon = realm_stability_negative
 }
 
 riseandfall_stability_44 = {
     independent_ruler_opinion = -7
-    vassal_opinion = -3
+    vassal_opinion = -1
     courtier_opinion = -3
     icon = realm_stability_negative
 }
 
 riseandfall_stability_45 = {
     independent_ruler_opinion = -6
-    vassal_opinion = -2
+    vassal_opinion = -1
     courtier_opinion = -2
     icon = realm_stability_negative
 }
 
 riseandfall_stability_46 = {
     independent_ruler_opinion = -5
-    vassal_opinion = -2
+    vassal_opinion = 0
     courtier_opinion = -2
     icon = realm_stability_negative
 }
 
 riseandfall_stability_47 = {
     independent_ruler_opinion = -4
-    vassal_opinion = -1
+    vassal_opinion = 0
     courtier_opinion = -1
     icon = realm_stability_negative
 }
 
 riseandfall_stability_48 = {
     independent_ruler_opinion = -3
-    vassal_opinion = -1
+    vassal_opinion = 0
     courtier_opinion = -1
     icon = realm_stability_negative
 }
 
 riseandfall_stability_49 = {
     independent_ruler_opinion = -2
-    vassal_opinion = -1
+    vassal_opinion = 0
     courtier_opinion = -1
     icon = realm_stability_negative
 }
@@ -704,4 +704,3 @@ riseandfall_stability_100 = {
     courtier_opinion = 10
     icon = realm_stability_positive
 }
-
