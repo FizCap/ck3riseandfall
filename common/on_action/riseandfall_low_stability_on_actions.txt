@@ -92,6 +92,7 @@ riseandfall_marry_male_puppet_master_target = {
                     is_ai = yes
                     is_landed = no
                     is_ruler = no
+                    NOT = { has_trait_with_flag = can_not_marry }
                     is_male = yes
                     is_adult = yes
                     is_married = no
@@ -116,6 +117,7 @@ riseandfall_marry_female_puppet_master_target = {
                     is_ai = yes
                     is_landed = no
                     is_ruler = no
+                    NOT = { has_trait_with_flag = can_not_marry }
                     is_female = yes
                     is_adult = yes
                     is_married = no
