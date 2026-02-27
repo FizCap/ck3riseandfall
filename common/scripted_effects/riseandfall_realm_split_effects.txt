@@ -1099,6 +1099,11 @@ riseandfall_execute_realm_split_se = {
             }
         }
         resolve_title_and_vassal_change = scope:rf_title_change
+
+        # original ruler should get an unpressed claim on the brand new breakaway title
+        scope:original_ruler = {
+            add_unpressed_claim = scope:rf_new_title
+        }
     }
     
     # Transfer assigned vassals
