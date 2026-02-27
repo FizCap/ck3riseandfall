@@ -5602,8 +5602,6 @@ types CharacterWindow
 			#AGOT Added; Displays relevant dragons in faux military breakdown
 
 				hbox = {
-					tooltip = CHARACTER_WINDOW_MILITARY_STRENGTH_TOOLTIP
-					using = tooltip_es
 					spacing = 6
 
 					# Keep the stability control visible even if the scripted dragon military
@@ -5618,6 +5616,8 @@ types CharacterWindow
 					expand = {}
 
 					container = {
+						tooltip = CHARACTER_WINDOW_MILITARY_STRENGTH_TOOLTIP
+						using = tooltip_es
 						visible = "[Not(GetScriptedGui('agot_can_see_dragon_military_view').IsShown(GuiScope.SetRoot(CharacterWindow.GetCharacter.MakeScope).End))]"
 						layoutpolicy_horizontal = expanding
 
