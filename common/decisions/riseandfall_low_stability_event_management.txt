@@ -1,0 +1,257 @@
+##############################################
+# Player decision: Low Stability Event Management
+# Lets the player enable/disable individual low stability events.
+##############################################
+
+riseandfall_low_stability_event_manager = {
+    picture = { reference = "gfx/interface/illustrations/decisions/decision_misc.dds" }
+    sort_order = 30
+    ai_check_interval = 0
+    desc = riseandfall_low_stability_event_manager_desc
+    selection_tooltip = riseandfall_low_stability_event_manager_tooltip
+    decision_group_type = riseandfall
+
+    is_shown = {
+        is_landed = yes
+        has_game_rule = riseandfall_low_stability_events_enabled
+        NOT = { exists = global_var:riseandfall_hide_other_decisions }
+    }
+
+    is_valid = { is_landed = yes }
+
+    widget = {
+        gui = "decision_view_widget_option_list_generic"
+        controller = decision_option_list_controller
+        decision_to_second_step_button = "CHOOSE_CHARACTER_ROLE_DECISION_NEXT_STEP_BUTTON"
+        show_from_start = yes
+
+        # Warlord uprising
+        item = {
+            value = riseandfall_enable_low_stability_warlord
+            is_shown = { exists = global_var:riseandfall_low_stability_event_warlord_disabled }
+            is_valid = { always = yes }
+            current_description = riseandfall_low_stability_warlord_currently_disabled
+            localization = riseandfall_enable_low_stability_warlord
+            icon = "gfx/interface/illustrations/decisions/decision_misc.dds"
+        }
+        item = {
+            value = riseandfall_disable_low_stability_warlord
+            is_shown = { NOT = { exists = global_var:riseandfall_low_stability_event_warlord_disabled } }
+            is_valid = { always = yes }
+            current_description = riseandfall_low_stability_warlord_currently_enabled
+            localization = riseandfall_disable_low_stability_warlord
+            icon = "gfx/interface/illustrations/decisions/decision_misc.dds"
+        }
+
+        # Palace coup
+        item = {
+            value = riseandfall_enable_low_stability_palace_coup
+            is_shown = { exists = global_var:riseandfall_low_stability_event_palace_coup_disabled }
+            is_valid = { always = yes }
+            current_description = riseandfall_low_stability_palace_coup_currently_disabled
+            localization = riseandfall_enable_low_stability_palace_coup
+            icon = "gfx/interface/illustrations/decisions/decision_misc.dds"
+        }
+        item = {
+            value = riseandfall_disable_low_stability_palace_coup
+            is_shown = { NOT = { exists = global_var:riseandfall_low_stability_event_palace_coup_disabled } }
+            is_valid = { always = yes }
+            current_description = riseandfall_low_stability_palace_coup_currently_enabled
+            localization = riseandfall_disable_low_stability_palace_coup
+            icon = "gfx/interface/illustrations/decisions/decision_misc.dds"
+        }
+
+        # Realm split
+        item = {
+            value = riseandfall_enable_low_stability_realm_split
+            is_shown = { exists = global_var:riseandfall_low_stability_event_realm_split_disabled }
+            is_valid = { always = yes }
+            current_description = riseandfall_low_stability_realm_split_currently_disabled
+            localization = riseandfall_enable_low_stability_realm_split
+            icon = "gfx/interface/illustrations/decisions/decision_misc.dds"
+        }
+        item = {
+            value = riseandfall_disable_low_stability_realm_split
+            is_shown = { NOT = { exists = global_var:riseandfall_low_stability_event_realm_split_disabled } }
+            is_valid = { always = yes }
+            current_description = riseandfall_low_stability_realm_split_currently_enabled
+            localization = riseandfall_disable_low_stability_realm_split
+            icon = "gfx/interface/illustrations/decisions/decision_misc.dds"
+        }
+
+        # Authority collapse
+        item = {
+            value = riseandfall_enable_low_stability_authority_collapse
+            is_shown = { exists = global_var:riseandfall_low_stability_event_authority_collapse_disabled }
+            is_valid = { always = yes }
+            current_description = riseandfall_low_stability_authority_collapse_currently_disabled
+            localization = riseandfall_enable_low_stability_authority_collapse
+            icon = "gfx/interface/illustrations/decisions/decision_misc.dds"
+        }
+        item = {
+            value = riseandfall_disable_low_stability_authority_collapse
+            is_shown = { NOT = { exists = global_var:riseandfall_low_stability_event_authority_collapse_disabled } }
+            is_valid = { always = yes }
+            current_description = riseandfall_low_stability_authority_collapse_currently_enabled
+            localization = riseandfall_disable_low_stability_authority_collapse
+            icon = "gfx/interface/illustrations/decisions/decision_misc.dds"
+        }
+    }
+
+    effect = {
+        custom_tooltip = riseandfall_low_stability_event_manager_tt
+        hidden_effect = {
+            custom_tooltip = riseandfall_low_stability_event_manager_tooltip_tt
+
+            if = {
+                limit = { scope:riseandfall_enable_low_stability_warlord = yes }
+                remove_global_variable = riseandfall_low_stability_event_warlord_disabled
+            }
+            else_if = {
+                limit = { scope:riseandfall_disable_low_stability_warlord = yes }
+                set_global_variable = { name = riseandfall_low_stability_event_warlord_disabled value = yes }
+            }
+            else_if = {
+                limit = { scope:riseandfall_enable_low_stability_palace_coup = yes }
+                remove_global_variable = riseandfall_low_stability_event_palace_coup_disabled
+            }
+            else_if = {
+                limit = { scope:riseandfall_disable_low_stability_palace_coup = yes }
+                set_global_variable = { name = riseandfall_low_stability_event_palace_coup_disabled value = yes }
+            }
+            else_if = {
+                limit = { scope:riseandfall_enable_low_stability_realm_split = yes }
+                remove_global_variable = riseandfall_low_stability_event_realm_split_disabled
+            }
+            else_if = {
+                limit = { scope:riseandfall_disable_low_stability_realm_split = yes }
+                set_global_variable = { name = riseandfall_low_stability_event_realm_split_disabled value = yes }
+            }
+            else_if = {
+                limit = { scope:riseandfall_enable_low_stability_authority_collapse = yes }
+                remove_global_variable = riseandfall_low_stability_event_authority_collapse_disabled
+            }
+            else_if = {
+                limit = { scope:riseandfall_disable_low_stability_authority_collapse = yes }
+                set_global_variable = { name = riseandfall_low_stability_event_authority_collapse_disabled value = yes }
+            }
+        }
+    }
+
+    ai_potential = {}
+    ai_will_do = { base = 0 }
+}
+
+
+# Hidden option entries used by the widget list above
+riseandfall_enable_low_stability_warlord = {
+    picture = { reference = "gfx/interface/illustrations/decisions/decision_misc.dds" }
+    sort_order = 31
+    ai_check_interval = 0
+    desc = riseandfall_enable_low_stability_warlord_desc
+    selection_tooltip = riseandfall_enable_low_stability_warlord_tooltip
+    decision_group_type = riseandfall
+    is_shown = { always = no }
+    is_valid = { always = yes }
+    effect = {}
+    ai_potential = {}
+    ai_will_do = { base = 0 }
+}
+
+riseandfall_disable_low_stability_warlord = {
+    picture = { reference = "gfx/interface/illustrations/decisions/decision_misc.dds" }
+    sort_order = 32
+    ai_check_interval = 0
+    desc = riseandfall_disable_low_stability_warlord_desc
+    selection_tooltip = riseandfall_disable_low_stability_warlord_tooltip
+    decision_group_type = riseandfall
+    is_shown = { always = no }
+    is_valid = { always = yes }
+    effect = {}
+    ai_potential = {}
+    ai_will_do = { base = 0 }
+}
+
+riseandfall_enable_low_stability_palace_coup = {
+    picture = { reference = "gfx/interface/illustrations/decisions/decision_misc.dds" }
+    sort_order = 33
+    ai_check_interval = 0
+    desc = riseandfall_enable_low_stability_palace_coup_desc
+    selection_tooltip = riseandfall_enable_low_stability_palace_coup_tooltip
+    decision_group_type = riseandfall
+    is_shown = { always = no }
+    is_valid = { always = yes }
+    effect = {}
+    ai_potential = {}
+    ai_will_do = { base = 0 }
+}
+
+riseandfall_disable_low_stability_palace_coup = {
+    picture = { reference = "gfx/interface/illustrations/decisions/decision_misc.dds" }
+    sort_order = 34
+    ai_check_interval = 0
+    desc = riseandfall_disable_low_stability_palace_coup_desc
+    selection_tooltip = riseandfall_disable_low_stability_palace_coup_tooltip
+    decision_group_type = riseandfall
+    is_shown = { always = no }
+    is_valid = { always = yes }
+    effect = {}
+    ai_potential = {}
+    ai_will_do = { base = 0 }
+}
+
+riseandfall_enable_low_stability_realm_split = {
+    picture = { reference = "gfx/interface/illustrations/decisions/decision_misc.dds" }
+    sort_order = 35
+    ai_check_interval = 0
+    desc = riseandfall_enable_low_stability_realm_split_desc
+    selection_tooltip = riseandfall_enable_low_stability_realm_split_tooltip
+    decision_group_type = riseandfall
+    is_shown = { always = no }
+    is_valid = { always = yes }
+    effect = {}
+    ai_potential = {}
+    ai_will_do = { base = 0 }
+}
+
+riseandfall_disable_low_stability_realm_split = {
+    picture = { reference = "gfx/interface/illustrations/decisions/decision_misc.dds" }
+    sort_order = 36
+    ai_check_interval = 0
+    desc = riseandfall_disable_low_stability_realm_split_desc
+    selection_tooltip = riseandfall_disable_low_stability_realm_split_tooltip
+    decision_group_type = riseandfall
+    is_shown = { always = no }
+    is_valid = { always = yes }
+    effect = {}
+    ai_potential = {}
+    ai_will_do = { base = 0 }
+}
+
+riseandfall_enable_low_stability_authority_collapse = {
+    picture = { reference = "gfx/interface/illustrations/decisions/decision_misc.dds" }
+    sort_order = 37
+    ai_check_interval = 0
+    desc = riseandfall_enable_low_stability_authority_collapse_desc
+    selection_tooltip = riseandfall_enable_low_stability_authority_collapse_tooltip
+    decision_group_type = riseandfall
+    is_shown = { always = no }
+    is_valid = { always = yes }
+    effect = {}
+    ai_potential = {}
+    ai_will_do = { base = 0 }
+}
+
+riseandfall_disable_low_stability_authority_collapse = {
+    picture = { reference = "gfx/interface/illustrations/decisions/decision_misc.dds" }
+    sort_order = 38
+    ai_check_interval = 0
+    desc = riseandfall_disable_low_stability_authority_collapse_desc
+    selection_tooltip = riseandfall_disable_low_stability_authority_collapse_tooltip
+    decision_group_type = riseandfall
+    is_shown = { always = no }
+    is_valid = { always = yes }
+    effect = {}
+    ai_potential = {}
+    ai_will_do = { base = 0 }
+}

@@ -1,0 +1,23 @@
+﻿##########################
+# Rise and Fall - Low Stability Event Availability Triggers
+# Keep per-event eligibility logic here so the selector stays simple.
+
+riseandfall_low_stability_warlord_available_trigger = {
+    NOT = { exists = global_var:riseandfall_low_stability_event_warlord_disabled }
+}
+
+riseandfall_low_stability_palace_coup_available_trigger = {
+    NOT = { exists = global_var:riseandfall_low_stability_event_palace_coup_disabled }
+    NOT = { government_has_flag = government_is_theocracy }
+    NOT = { government_has_flag = government_is_republic }
+    NOT = { has_diarchy_type = puppet_regency }
+}
+
+riseandfall_low_stability_realm_split_available_trigger = {
+    riseandfall_can_realm_split_trigger = yes
+    NOT = { exists = global_var:riseandfall_low_stability_event_realm_split_disabled }
+}
+
+riseandfall_low_stability_authority_collapse_available_trigger = {
+    NOT = { exists = global_var:riseandfall_low_stability_event_authority_collapse_disabled }
+}

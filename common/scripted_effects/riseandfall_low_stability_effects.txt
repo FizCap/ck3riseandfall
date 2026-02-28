@@ -84,87 +84,33 @@ riseandfall_low_stability_roll_se = {
 # Randomly selects between warlord uprising, peasant unrest, and puppet master offer
 
 riseandfall_low_stability_random_event = {
-    # Prefilter eligibility into simple flags to guarantee a fallback without chained logic.
-    # rf_puppet_ok = 1 if puppet event is allowed (no existing puppet_regency)
-    # rf_realm_split_ok = 1 if realm split is allowed (kingdom+ ruler with 2+ powerful vassals)
-    set_variable = { name = rf_puppet_ok value = 1 days = 14 }
-    if = { limit = { has_diarchy_type = puppet_regency } set_variable = { name = rf_puppet_ok value = 0 days = 14 } }
-
-    # Adventurer event retired
-
-    # Realm split eligibility: use shared trigger for consistent rules (kingdom+ and 2+ vassals, low stability)
-    set_variable = { name = rf_realm_split_ok value = 0 days = 14 }
+    # Keep selector simple: each entry has its own availability trigger.
+    # random_list excludes entries whose trigger fails, so valid entries are rerolled automatically.
     if = {
-        limit = { riseandfall_can_realm_split_trigger = yes }
-        set_variable = { name = rf_realm_split_ok value = 1 days = 14 }
-    }
-
-    # Palace coup not possible for theocracies or republics
-    set_variable = { name = rf_palace_coup_ok value = 1 days = 14 }
-    if = { limit = { government_has_flag = government_is_theocracy } set_variable = { name = rf_palace_coup_ok value = 0 days = 14 } }
-    if = { limit = { government_has_flag = government_is_republic } set_variable = { name = rf_palace_coup_ok value = 0 days = 14 } }
-
-    # Handle all eligibility combinations with realm split as a rare but impactful option
-    if = {
-        limit = { AND = { var:rf_realm_split_ok = 1 var:rf_puppet_ok = 1 } }
-        # All options available including realm split (rare weight)
-        if = { limit = { var:rf_palace_coup_ok = 1 }
-            random_list = {
-                1 = { trigger_event = { id = warlord.1001 } }
-                1 = { trigger_event = { id = palace_coup.1001 } }
-                1 = { trigger_event = { id = realm_split.1001 } }
-                1 = { trigger_event = { id = authority_collapse.1001 } }
+        limit = {
+            OR = {
+                riseandfall_low_stability_warlord_available_trigger = yes
+                riseandfall_low_stability_palace_coup_available_trigger = yes
+                riseandfall_low_stability_realm_split_available_trigger = yes
+                riseandfall_low_stability_authority_collapse_available_trigger = yes
             }
         }
-        else = {
-            random_list = {
-                1 = { trigger_event = { id = warlord.1001 } }
-                1 = { trigger_event = { id = realm_split.1001 } }
-                1 = { trigger_event = { id = authority_collapse.1001 } }
-            }
-        }
-    }
-    else_if = {
-        limit = { AND = { var:rf_realm_split_ok = 1 var:rf_puppet_ok = 0 } }
-        # Only realm split from special options
-        if = { limit = { var:rf_palace_coup_ok = 1 }
-            random_list = {
-                1 = { trigger_event = { id = warlord.1001 } }
-                1 = { trigger_event = { id = palace_coup.1001 } }
-                1 = { trigger_event = { id = realm_split.1001 } }
-                1 = { trigger_event = { id = authority_collapse.1001 } }
-            }
-        }
-        else = {
-            random_list = {
-                1 = { trigger_event = { id = warlord.1001 } }
-                1 = { trigger_event = { id = realm_split.1001 } }
-                1 = { trigger_event = { id = authority_collapse.1001 } }
-            }
-        }
-    }
-    else_if = {
-        limit = { var:rf_puppet_ok = 1 }
-        # Only puppet allowed
         random_list = {
-            1 = { trigger_event = { id = warlord.1001 } }
-            1 = { trigger_event = { id = palace_coup.1001 } }
-            1 = { trigger_event = { id = authority_collapse.1001 } }
-        }
-    }
-    else = {
-        # Neither allowed: fallback to warlord / palace coup / authority collapse
-        if = { limit = { var:rf_palace_coup_ok = 1 }
-            random_list = {
-                1 = { trigger_event = { id = warlord.1001 } }
-                1 = { trigger_event = { id = palace_coup.1001 } }
-                1 = { trigger_event = { id = authority_collapse.1001 } }
+            1 = {
+                trigger = { riseandfall_low_stability_warlord_available_trigger = yes }
+                trigger_event = { id = warlord.1001 }
             }
-        }
-        else = {
-            random_list = {
-                1 = { trigger_event = { id = warlord.1001 } }
-                1 = { trigger_event = { id = authority_collapse.1001 } }
+            1 = {
+                trigger = { riseandfall_low_stability_palace_coup_available_trigger = yes }
+                trigger_event = { id = palace_coup.1001 }
+            }
+            1 = {
+                trigger = { riseandfall_low_stability_realm_split_available_trigger = yes }
+                trigger_event = { id = realm_split.1001 }
+            }
+            1 = {
+                trigger = { riseandfall_low_stability_authority_collapse_available_trigger = yes }
+                trigger_event = { id = authority_collapse.1001 }
             }
         }
     }
