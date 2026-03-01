@@ -5,3 +5,6 @@
  WARLORD_CONQUEST_WAR_NAME: "Warlord Conquest of [ATTACKER.GetPrimaryTitle.GetAdjective]"
  WARLORD_CONQUEST_WAR_NAME_BASE: "[ATTACKER.GetPrimaryTitle.GetAdjective][DEFENDER.GetPrimaryTitle.GetName]"
  WARLORD_CONQUEST_CB_NAME: "Warlord Conquest"
+ RISEANDFALL_DIADOCHI_CB_NAME: "Successor State War"
+ RISEANDFALL_DIADOCHI_WAR_NAME: "[ATTACKER.GetPrimaryTitle.GetAdjective] Successor State War"
+ RISEANDFALL_DIADOCHI_WAR_NAME_BASE: "[ATTACKER.GetPrimaryTitle.GetAdjective][DEFENDER.GetPrimaryTitle.GetName]"

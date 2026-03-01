@@ -1,0 +1,276 @@
+riseandfall_diadochi_cb = {
+    icon = invasion_cb
+    group = conquest
+
+    combine_into_one = yes
+    should_show_war_goal_subview = yes
+    mutually_exclusive_titles = { always = yes }
+
+    allowed_for_character = {
+        # Allow independent rulers to open this CB. Defender gating is handled
+        # by `allowed_against_character` / `riseandfall_is_diadochi_target_trigger`.
+        is_independent_ruler = yes
+        NOR = {
+            government_has_flag = government_is_landless_adventurer
+        }
+    }
+
+    allowed_against_character = {
+        NOT = { this = scope:attacker }
+        is_independent_ruler = yes
+        riseandfall_is_diadochi_target_trigger = yes
+    }
+
+    target_titles = all
+    target_title_tier = all
+    target_de_jure_regions_above = yes
+    ignore_effect = change_title_holder
+
+    valid_to_start = { always = yes }
+
+    should_invalidate = {
+        NOT = {
+            scope:defender = {
+                riseandfall_is_diadochi_target_trigger = yes
+            }
+        }
+    }
+
+    on_invalidated_desc = msg_county_conquest_war_invalidated_message
+    on_invalidated = { }
+
+    cost = {
+        piety = { value = 0 }
+        prestige = { value = 0 }
+    }
+
+    on_declaration = {
+        on_declared_war = yes
+    }
+
+    on_victory = {
+        scope:attacker = { show_pow_release_message_effect = yes }
+
+        add_legitimacy_attacker_victory_effect = yes
+        scope:attacker = { accolade_attacker_war_end_glory_gain_low_effect = yes }
+
+        create_title_and_vassal_change = {
+            type = conquest
+            save_scope_as = change
+            add_claim_on_loss = yes
+        }
+
+        scope:defender = {
+            every_held_title = {
+                limit = { tier = scope:defender.primary_title.tier holder = scope:defender }
+                change_title_holder = {
+                    holder = scope:attacker
+                    change = scope:change
+                    take_baronies = yes
+                }
+            }
+            change_liege = {
+                liege = scope:attacker
+                change = scope:change
+            }
+            every_vassal = {
+                change_liege = {
+                    liege = scope:attacker
+                    change = scope:change
+                }
+            }
+        }
+
+        every_in_list = {
+            list = target_titles
+            limit = { tier = scope:defender.primary_title.tier }
+            custom_tooltip = CONQUEST_CB_TITLE
+
+            conquest_cb_title_transfer = {
+                RELIGIOUS_WAR = no
+            }
+        }
+
+        every_in_list = {
+            list = titles_taken
+            if = {
+                limit = { tier >= scope:attacker.primary_title.tier holder = scope:defender }
+                change_title_holder = {
+                    holder = scope:attacker
+                    change = scope:change
+                    take_baronies = yes
+                }
+            }
+        }
+
+        every_in_list = {
+            list = vassals_taken
+            change_liege = {
+                liege = scope:attacker
+                change = scope:change
+            }
+        }
+
+        resolve_title_and_vassal_change = scope:change
+
+        scope:defender = { ep3_war_loss_adventurer_tt_effect = yes }
+
+        if = {
+            limit = { scope:attacker.primary_title.tier > scope:defender.primary_title.tier }
+            scope:attacker = {
+                add_prestige_experience = {
+                    value = medium_prestige_value
+                }
+            }
+        }
+        else = {
+            every_in_list = {
+                list = target_titles
+                scope:attacker = {
+                    add_prestige_experience = minor_prestige_value
+                }
+            }
+        }
+
+        modify_allies_of_participants_fame_values = {
+            WINNER = scope:attacker
+            FAME_BASE = minor_prestige_value
+            IS_RELIGIOUS_WAR = no
+            WINNER_ALLY_FAME_SCALE = 1
+            LOSER_ALLY_FAME_SCALE = 1
+        }
+
+        add_truce_attacker_victory_effect = yes
+
+        scope:attacker = { fp1_remember_recent_conquest_victory_effect = yes }
+        laamp_as_mercenary_payout_tooltip_effect = yes
+    }
+
+    on_white_peace = {
+        scope:attacker = { show_pow_release_message_effect = yes }
+        scope:defender = { accolade_defender_war_end_glory_gain_low_effect = yes }
+
+        scope:attacker = {
+            add_prestige = {
+                value = minor_prestige_value
+                multiply = -1.0
+            }
+        }
+
+        modify_allies_of_participants_fame_values = {
+            WINNER = scope:attacker
+            FAME_BASE = medium_prestige_value
+            IS_RELIGIOUS_WAR = no
+            WINNER_ALLY_FAME_SCALE = 1
+            LOSER_ALLY_FAME_SCALE = 1
+        }
+
+        add_truce_white_peace_effect = yes
+        laamp_as_mercenary_payout_tooltip_effect = yes
+    }
+
+    on_defeat = {
+        scope:attacker = { show_pow_release_message_effect = yes }
+
+        add_legitimacy_attacker_defeat_effect = yes
+        scope:defender = { accolade_defender_war_end_glory_gain_low_effect = yes }
+
+        scope:attacker = {
+            pay_short_term_gold_reparations_effect = {
+                GOLD_VALUE = 2
+            }
+            add_prestige = {
+                value = medium_prestige_value
+                multiply = -1.0
+            }
+        }
+
+        scope:defender = {
+            add_prestige_war_defender_effect = {
+                PRESTIGE_VALUE = medium_prestige_value
+            }
+        }
+
+        modify_allies_of_participants_fame_values = {
+            WINNER = scope:defender
+            FAME_BASE = minor_prestige_value
+            IS_RELIGIOUS_WAR = no
+            WINNER_ALLY_FAME_SCALE = 1
+            LOSER_ALLY_FAME_SCALE = 1
+        }
+
+        add_truce_attacker_defeat_effect = yes
+
+        scope:attacker = {
+            save_temporary_scope_as = loser
+        }
+        on_lost_aggression_war_discontent_loss = yes
+
+        laamp_as_mercenary_payout_tooltip_effect = yes
+    }
+
+    transfer_behavior = transfer
+
+    on_primary_attacker_death = inherit
+    on_primary_defender_death = inherit
+
+    attacker_allies_inherit = yes
+    defender_allies_inherit = yes
+
+    war_name = "RISEANDFALL_DIADOCHI_WAR_NAME"
+    war_name_base = "RISEANDFALL_DIADOCHI_WAR_NAME_BASE"
+    cb_name = "RISEANDFALL_DIADOCHI_CB_NAME"
+
+    interface_priority = 80
+
+    attacker_wargoal_percentage = 0.8
+
+    attacker_ticking_warscore_delay = { months = 12 }
+    defender_ticking_warscore_delay = { months = 12 }
+    attacker_ticking_warscore = 0.1
+    defender_ticking_warscore = 0.1
+
+    attacker_score_from_occupation_scale = 25
+    defender_score_from_occupation_scale = 25
+    attacker_score_from_battles_scale = 100
+    defender_score_from_battles_scale = 100
+
+    max_attacker_score_from_battles = 90
+    max_defender_score_from_battles = 90
+    max_attacker_score_from_occupation = 100
+    max_defender_score_from_occupation = 100
+
+    full_occupation_by_defender_gives_victory = no
+    full_occupation_by_attacker_gives_victory = no
+    landless_attacker_needs_armies = no
+    allow_hostages = yes
+
+    max_ai_diplo_distance_to_title = 1200
+
+    ai_score_mult = {
+        value = 1
+        add = house_relation_ai_score_value
+
+        # Encourage aggression against successor/split realms.
+        add = {
+            if = {
+                limit = {
+                    scope:defender = { riseandfall_has_successor_primary_title_trigger = yes }
+                }
+                add = 80
+            }
+        }
+
+        # Strong preference for wars between successor states of the same origin.
+        add = {
+            if = {
+                limit = {
+                    scope:attacker = { riseandfall_has_successor_primary_title_trigger = yes }
+                    scope:defender = { riseandfall_has_successor_primary_title_trigger = yes }
+                    scope:attacker.primary_title.var:rf_successor_origin_title = scope:defender.primary_title.var:rf_successor_origin_title
+                }
+                add = 220
+            }
+        }
+    }
+}

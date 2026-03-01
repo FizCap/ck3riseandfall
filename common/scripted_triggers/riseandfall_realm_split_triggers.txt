@@ -45,3 +45,48 @@ riseandfall_can_realm_split_trigger = {
         }
     }
 }
+
+##########################
+# Successor-state helper triggers (Diadochi wars)
+
+riseandfall_has_successor_primary_title_trigger = {
+    is_independent_ruler = yes
+    primary_title = {
+        has_variable = rf_is_successor_split_title
+        has_variable = rf_successor_origin_title
+    }
+}
+
+riseandfall_can_use_diadochi_cb_trigger = {
+    riseandfall_has_successor_primary_title_trigger = yes
+}
+
+riseandfall_is_diadochi_target_trigger = {
+    # Root scope is defender (called from allowed_against_character).
+    # Keep this simple:
+    # 1) successor vs successor, same origin title
+    # 2) origin ruler vs successor
+    # 3) successor vs origin
+    OR = {
+        # Successor attacks another successor from the same origin title.
+        AND = {
+            riseandfall_has_successor_primary_title_trigger = yes
+            scope:attacker = { riseandfall_has_successor_primary_title_trigger = yes }
+            scope:attacker.primary_title.var:rf_successor_origin_title = scope:defender.primary_title.var:rf_successor_origin_title
+        }
+        # Origin ruler attacks one of its successor states.
+        AND = {
+            riseandfall_has_successor_primary_title_trigger = yes
+            scope:attacker = {
+                has_title = scope:defender.primary_title.var:rf_successor_origin_title
+            }
+        }
+        # Successor attacks its origin ruler.
+        AND = {
+            scope:attacker = { riseandfall_has_successor_primary_title_trigger = yes }
+            scope:defender = {
+                has_title = scope:attacker.primary_title.var:rf_successor_origin_title
+            }
+        }
+    }
+}

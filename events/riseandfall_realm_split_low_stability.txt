@@ -166,9 +166,6 @@ realm_split.1002 = {
     option = {
         name = realm_split.1002.a
         
-        # Celebration for gaining independence
-        add_prestige = 500
-        
         custom_tooltip = realm_split.1002.a.tt
     }
 }

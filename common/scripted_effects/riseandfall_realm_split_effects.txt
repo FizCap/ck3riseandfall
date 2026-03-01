@@ -1160,6 +1160,49 @@ riseandfall_execute_realm_split_se = {
 
     add_unpressed_claim = scope:original_primary
 
+    # Mark this realm as a successor state and link it to its split origin title.
+    # Stored both on the ruler and the successor primary title for future mechanics.
+    set_variable = { name = rf_successor_origin_title value = scope:original_primary }
+    add_character_flag = rf_successor_state_ruler
+    if = {
+        limit = { exists = scope:new_realm_ruler.primary_title }
+        # Capture the initial realm size on the new realm ruler so we can store
+        # a permanent snapshot on the title for future shrink checks.
+        scope:rf_breakaway_ruler = { set_variable = { name = tmp_successor_realm_size value = realm_size } }
+        scope:new_realm_ruler.primary_title = {
+            set_variable = { name = rf_successor_origin_title value = scope:original_primary years = 50 }
+            set_variable = { name = rf_is_successor_split_title value = 1 years = 50 }
+            # Permanent marker for this title indicating it's a split realm successor
+            set_variable = { name = rf_is_permanent_successor_split value = 1 }
+            # Store the baseline realm size (number of counties) on the title permanently
+            # Only set if the title doesn't already have a snapshot to avoid accidental overwrite
+            if = {
+                limit = { NOT = { has_variable = rf_successor_permanent_realm_size } }
+                set_variable = { name = rf_successor_permanent_realm_size value = scope:rf_breakaway_ruler.var:tmp_successor_realm_size }
+            }
+        }
+        # Clear the temporary holder variable from the ruler scope
+        scope:rf_breakaway_ruler = { remove_variable = tmp_successor_realm_size }
+    }
+
+    # Ensure all successor rulers from this same split origin have mutual claims
+    # on each other's primary titles (including the newly-created breakaway).
+    every_independent_ruler = {
+        limit = {
+            NOT = { this = scope:new_realm_ruler }
+            is_landed = yes
+            exists = primary_title
+            primary_title = {
+                has_variable = rf_is_successor_split_title
+                has_variable = rf_successor_origin_title
+            }
+            has_weak_claim_on = scope:original_primary
+        }
+        save_scope_as = rf_peer_successor
+        scope:new_realm_ruler = { add_unpressed_claim = scope:rf_peer_successor.primary_title }
+        scope:rf_peer_successor = { add_unpressed_claim = scope:new_realm_ruler.primary_title }
+    }
+
 
     # --- End new rivalry & cross-claims block ---
 
