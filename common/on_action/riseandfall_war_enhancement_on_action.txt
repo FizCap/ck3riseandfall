@@ -1,4 +1,4 @@
-# This file contains on_actions that trigger scripted effects for war enhancement mechanics in the Rise and Fall mod.
+﻿# This file contains on_actions that trigger scripted effects for war enhancement mechanics in the Rise and Fall mod.
 # It handles events related to character deaths and war victories to simulate rebellion and succession dynamics.
 
 on_war_won_attacker = {

@@ -1,4 +1,4 @@
-riseandfall_stability_0 = {
+﻿riseandfall_stability_0 = {
     independent_ruler_opinion = -50
     vassal_opinion = -50
     courtier_opinion = -25
