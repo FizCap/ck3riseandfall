@@ -1,0 +1,214 @@
+﻿# Rise and Fall — Adventurer Chance Hover Tooltip
+# Mirrors the stability_hud_tooltip / legitimacy_hud_tooltip pattern.
+# Loaded from gui/shared/ so it is available globally.
+#
+# Shows the chance that a character will launch an adventurer uprising,
+# broken down by component so the player can understand what drives risk.
+
+types RiseAndFallAdventurerTooltipTypes
+{
+	type adventurer_chance_tooltip = object_tooltip_pop_out
+	{
+		visible = "[Character.MakeScope.Var('rf_adventurer_final_chance').IsSet]"
+
+		# ── Header title ─────────────────────────────────────────────────────────
+		blockoverride "title_text"
+		{
+			margin = { 0 8 }
+			text = "ADVENTURER_CHANCE_TT_TITLE"
+			default_format = "#T"
+		}
+
+		# ── Hide top-right concept link ───────────────────────────────────────────
+		blockoverride "concept_link"
+		{
+			raw_text = ""
+		}
+
+		# ── Risk level subtitle (coloured) ────────────────────────────────────────
+		blockoverride "subheading"
+		{
+			text_single = {
+				layoutpolicy_horizontal = expanding
+				autoresize = yes
+				fontsize_min = 14
+				using = Font_Size_Small
+				text = "ADVENTURER_CHANCE_TT_RISK_STATUS"
+				fonttintcolor = "[TooltipInfo.GetTintColor]"
+				max_width = 400
+				margin_top = -4
+			}
+		}
+
+		# ── Decorative header image ───────────────────────────────────────────────
+		blockoverride "header_additions"
+		{
+			widget = {
+				size = { 120 74 }
+
+				# High risk (>= 40%) — rebellion imagery
+				widget = {
+					size = { 240 74 }
+					position = { -16 0 }
+					visible = "[GreaterThanOrEqualTo_CFixedPoint( Character.MakeScope.Var('rf_adventurer_final_chance').GetValue, '(CFixedPoint)40' )]"
+
+					proportional_icon = {
+						size = { 100% 100% }
+						texture = "gfx/interface/window_legend_chronicle/under_expected_legitimacy_decoration.dds"
+						using = Mask_Rough_Edges
+						modify_texture = {
+							texture = "gfx/interface/component_masks/mask_fade_horizontal_right.dds"
+							blend_mode = alphaMultiply
+						}
+					}
+				}
+
+				# Moderate risk (15–39%) — knight imagery
+				widget = {
+					size = { 240 74 }
+					position = { -16 0 }
+					visible = "[And( GreaterThanOrEqualTo_CFixedPoint( Character.MakeScope.Var('rf_adventurer_final_chance').GetValue, '(CFixedPoint)15' ), LessThan_CFixedPoint( Character.MakeScope.Var('rf_adventurer_final_chance').GetValue, '(CFixedPoint)40' ) )]"
+
+					proportional_icon = {
+						size = { 100% 100% }
+						texture = "gfx/interface/illustrations/decisions/decision_knight_kneeling.dds"
+						using = Mask_Rough_Edges
+						modify_texture = {
+							texture = "gfx/interface/component_masks/mask_fade_horizontal_right.dds"
+							blend_mode = alphaMultiply
+						}
+					}
+				}
+
+				# Low risk (< 15%) — loyal/stable imagery
+				widget = {
+					size = { 240 74 }
+					position = { -16 0 }
+					visible = "[LessThan_CFixedPoint( Character.MakeScope.Var('rf_adventurer_final_chance').GetValue, '(CFixedPoint)15' )]"
+
+					proportional_icon = {
+						size = { 100% 100% }
+						texture = "gfx/interface/window_legend_chronicle/expected_legitimacy_decoration.dds"
+						using = Mask_Rough_Edges
+						modify_texture = {
+							texture = "gfx/interface/component_masks/mask_fade_horizontal_right.dds"
+							blend_mode = alphaMultiply
+						}
+					}
+				}
+			}
+		}
+
+		# ── Main body ─────────────────────────────────────────────────────────────
+		blockoverride "main_description"
+		{
+			vbox = {
+				layoutpolicy_horizontal = expanding
+				margin_right = 10
+
+				# ── Chance track header ───────────────────────────────────────────
+				hbox = {
+					name = "adventurer_track_header"
+					layoutpolicy_horizontal = expanding
+					spacing = 5
+					margin_left = -10
+					min_height = 40
+
+					background = {
+						using = Background_Area
+						margin = { -5 -5 }
+						modify_texture = {
+							texture = "gfx/interface/component_masks/mask_fade_horizontal_right.dds"
+							blend_mode = alphaMultiply
+						}
+					}
+
+					icon = {
+						size = { 22 22 }
+						texture = "gfx/interface/icons/dynasty/legitimist_revolt.dds"
+					}
+
+					text_single = {
+						text = "ADVENTURER_CHANCE_TT_TRACK_TITLE"
+						layoutpolicy_horizontal = expanding
+						align = nobaseline
+					}
+				}
+
+				# ── Chance progress bar (fills red as risk increases) ─────────────
+				margin_widget = {
+					size = { 500 20 }
+					margin = { 10 0 }
+
+					progressbar_standard = {
+						layoutpolicy_horizontal = expanding
+						size = { 480 16 }
+						min = 0
+						max = 100
+						value = "[FixedPointToProgressbarValue( Divide_CFixedPoint( Character.MakeScope.Var('rf_adventurer_final_chance').GetValue, '(CFixedPoint)100' ) )]"
+
+						# Red tint for high risk
+						modify_texture = {
+							name = "tint_high"
+							texture = "gfx/interface/colors/red.dds"
+							blend_mode = colordodge
+							alpha = 0.38
+							visible = "[GreaterThanOrEqualTo_CFixedPoint( Character.MakeScope.Var('rf_adventurer_final_chance').GetValue, '(CFixedPoint)40' )]"
+						}
+						# Orange tint for moderate risk
+						modify_texture = {
+							name = "tint_mid"
+							texture = "gfx/interface/colors/orange.dds"
+							blend_mode = colordodge
+							alpha = 0.3
+							visible = "[And( GreaterThanOrEqualTo_CFixedPoint( Character.MakeScope.Var('rf_adventurer_final_chance').GetValue, '(CFixedPoint)15' ), LessThan_CFixedPoint( Character.MakeScope.Var('rf_adventurer_final_chance').GetValue, '(CFixedPoint)40' ) )]"
+						}
+						# Gold tint for low risk
+						modify_texture = {
+							name = "tint_low"
+							texture = "gfx/interface/colors/gold.dds"
+							blend_mode = colordodge
+							alpha = 0.32
+							visible = "[LessThan_CFixedPoint( Character.MakeScope.Var('rf_adventurer_final_chance').GetValue, '(CFixedPoint)15' )]"
+						}
+					}
+				}
+
+				spacer = { size = { 0 8 } }
+
+				# ── Final Chance ──────────────────────────────────────────────────
+				cooltip_paragraph = {
+					text = "ADVENTURER_CHANCE_TT_FINAL"
+				}
+
+				spacer = { size = { 0 12 } }
+
+				# ── Base Components ───────────────────────────────────────────────
+				cooltip_paragraph = {
+					text = "ADVENTURER_CHANCE_TT_BASE"
+				}
+
+				spacer = { size = { 0 12 } }
+
+				# ── Opinion Factors ───────────────────────────────────────────────
+				cooltip_paragraph = {
+					text = "ADVENTURER_CHANCE_TT_OPINION"
+				}
+
+				spacer = { size = { 0 12 } }
+
+				# ── Sex-based Penalty ─────────────────────────────────────────────
+				cooltip_paragraph = {
+					text = "ADVENTURER_CHANCE_TT_SEX_PENALTY"
+				}
+
+				spacer = { size = { 0 12 } }
+
+				# ── Stability Modifier ────────────────────────────────────────────
+				cooltip_paragraph = {
+					text = "ADVENTURER_CHANCE_TT_STABILITY"
+				}
+			}
+		}
+	}
+}

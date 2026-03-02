@@ -5525,7 +5525,9 @@ types CharacterWindow
 				name = "stability_vbox"
 				size = { 86 32 }
 				datacontext = "[AccessGameRules.AccessNamedGameRule( 'riseandfall_enable_realm_stability' ).GetSetting]"
-				tooltip = "REALM_STABILITY_TOOLTIP"
+				tooltipwidget = {
+					stability_hud_tooltip = {}
+				}
 				using = tooltip_es
 				# Show stability HUD for landed rulers while the feature is enabled.
 				# Also require the stability variable to be set so this control doesn't
@@ -5537,7 +5539,7 @@ types CharacterWindow
 
 				# Left: small circular icon (consistent with other stat boxes but modernized)
 				container = {
-					margin = { 2 0 }
+					margin_left = 2
 
 					background = {
 						using = Background_Area_Dark

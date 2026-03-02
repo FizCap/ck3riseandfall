@@ -44,6 +44,16 @@ riseandfall_create_adventurer_camp_interaction:0 "Create Adventurer Camp"
 riseandfall_create_adventurer_camp_interaction_desc:0 "Gather your followers and raise a landless adventurer camp: you will become an adventurer leading a small host. This will mark you as an adventurer and allow adventurer mechanics to trigger."
 
 # Adventurer Chance Tooltip
-ADVENTURER_CHANCE_TOOLTIP:0 "#bold Adventurer Chance#!\nFinal Chance: [Character.MakeScope.Var('rf_adventurer_final_chance').GetValue|1]%\n\n#bold Base Components#!\nBase Chance: [Character.MakeScope.Var('rf_adventurer_base_chance').GetValue|1]%\nTrait Bonuses: [Character.MakeScope.Var('rf_adventurer_trait_chance').GetValue|1]%\nIntrigue Bonus: [Character.MakeScope.Var('intrigue_bonus').GetValue|1]%\n\n#bold Opinion Factors#!\nOpinion: [Character.MakeScope.Var('rf_opinion_adjust').GetValue|2]%\n\n#bold Sex-based Penalty#!\nSex Penalty: [Character.MakeScope.Var('rf_sex_penalty').GetValue|1]%\n\n#bold Realm Stability Modifier#!\nStability Modifier: [Character.MakeScope.Var('rf_stability_modifier').GetValue|2]% (50 stability = 0%)"
+ADVENTURER_CHANCE_TOOLTIP:0 "#bold Adventurer Chance#!\nFinal Chance: [Character.MakeScope.Var('rf_adventurer_final_chance').GetValue|1]%\n\n#bold Base Components#!\nBase Chance: [Character.MakeScope.Var('rf_adventurer_base_chance').GetValue|1]%\nTrait Bonuses: [Character.MakeScope.Var('rf_adventurer_trait_chance').GetValue|1]%\nIntrigue Bonus: [Character.MakeScope.Var('intrigue_bonus').GetValue|1]%\n\n#bold Opinion Factors#!\nOpinion: [Character.MakeScope.Var('rf_opinion_adjust').GetValue|2]%\n\n#bold Sex-based Penalty#!\nSex Penalty: [Character.MakeScope.Var('rf_sex_penalty').GetValue|1]%\n\n#bold Realm Stability Modifier#!\nStability Modifier: [Character.MakeScope.Var('rf_stability_modifier').GetValue|2]%"
+
+ # ── Adventurer Chance widget keys (rf_adventurer_tooltip.gui) ───────────────
+ ADVENTURER_CHANCE_TT_TITLE:0 "Adventurer Uprising Chance"
+ ADVENTURER_CHANCE_TT_RISK_STATUS:0 "Current chance: [Character.MakeScope.Var('rf_adventurer_final_chance').GetValue|1]%"
+ ADVENTURER_CHANCE_TT_TRACK_TITLE:0 "Uprising Risk"
+ ADVENTURER_CHANCE_TT_FINAL:0 "#bold Final Chance#!\nCombined chance this character will launch an adventurer uprising:\n[Character.MakeScope.Var('rf_adventurer_final_chance').GetValue|1]%"
+ ADVENTURER_CHANCE_TT_BASE:0 "#bold Base Components#!\nBase Chance: [Character.MakeScope.Var('rf_adventurer_base_chance').GetValue|1]%\nTrait Bonuses: +[Character.MakeScope.Var('rf_adventurer_trait_chance').GetValue|1]%\nIntrigue Bonus: +[Character.MakeScope.Var('intrigue_bonus').GetValue|1]%"
+ ADVENTURER_CHANCE_TT_OPINION:0 "#bold Opinion Factor#!\nOpinion adjustment: [Character.MakeScope.Var('rf_opinion_adjust').GetValue|2]%\n#S Low opinion of the liege increases the chance of revolt.#!"
+ ADVENTURER_CHANCE_TT_SEX_PENALTY:0 "#bold Sex-based Penalty#!\nSex Penalty: [Character.MakeScope.Var('rf_sex_penalty').GetValue|1]%\n#S Certain gender roles in this culture reduce uprising likelihood.#!"
+ADVENTURER_CHANCE_TT_STABILITY:0 "#bold Realm Stability Modifier#!\nStability Modifier: [Character.MakeScope.Var('rf_stability_modifier').GetValue|2]%\n#S Low realm stability increases the risk of adventurer uprisings.#!"
 
     
