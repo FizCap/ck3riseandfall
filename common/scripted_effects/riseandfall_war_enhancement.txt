@@ -42,10 +42,7 @@ war_enhancement_press_claims = {
 								OR = {
 									AND = {
 										previous_holder = { exists = yes }
-										AND = {
-											previous_holder = { exists = yes }
-											previous_holder = scope:riseandfall_war_enhancement_prev_liege
-										}
+										previous_holder = scope:riseandfall_war_enhancement_prev_liege
 									}
 									holder = scope:riseandfall_war_enhancement_attacker.liege
 								}
