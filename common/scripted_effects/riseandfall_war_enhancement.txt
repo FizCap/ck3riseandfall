@@ -343,10 +343,10 @@ war_enhancement_execute_liege_family = { #Massacre their house!
 	}
 	}
 	root = {
-	add_dread = 20
-	add_trait = murderer
-	add_tyranny = 10
-	hidden_effect = { change_strife_opinion = 10 }
+		add_dread = 20
+		add_trait = murderer
+		add_tyranny = 10
+		hidden_effect = { change_strife_opinion = 10 }
 		trigger_event = {
 				id = riseandfall_war_enhancement.1
 		}
