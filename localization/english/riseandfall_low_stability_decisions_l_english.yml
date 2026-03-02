@@ -42,3 +42,24 @@
  riseandfall_low_stability_realm_split_currently_disabled:0 "Current status: Disabled"
  riseandfall_low_stability_authority_collapse_currently_enabled:0 "Current status: Enabled"
  riseandfall_low_stability_authority_collapse_currently_disabled:0 "Current status: Disabled"
+
+ # debug utilities
+ riseandfall_debug_reduce_stability_10:0 "Debug: zero stability"
+ riseandfall_debug_reduce_stability_10_desc:0 "Set realm stability to 0 for testing purposes."
+ riseandfall_debug_reduce_stability_10_tooltip:0 "For debugging only."
+ riseandfall_debug_reduce_stability_10_confirm:0 "Execute"
+
+ riseandfall_debug_fire_low_stability_event:0 "Debug: fire low stability event"
+ riseandfall_debug_fire_low_stability_event_desc:0 "Trigger a low stability random event immediately."
+ riseandfall_debug_fire_low_stability_event_tooltip:0 "For debugging only."
+ riseandfall_debug_fire_low_stability_event_confirm:0 "Execute"
+
+ # confirm strings for toggles
+ riseandfall_enable_low_stability_warlord_confirm:0 "Enable"
+ riseandfall_disable_low_stability_warlord_confirm:0 "Disable"
+ riseandfall_enable_low_stability_palace_coup_confirm:0 "Enable"
+ riseandfall_disable_low_stability_palace_coup_confirm:0 "Disable"
+ riseandfall_enable_low_stability_realm_split_confirm:0 "Enable"
+ riseandfall_disable_low_stability_realm_split_confirm:0 "Disable"
+ riseandfall_enable_low_stability_authority_collapse_confirm:0 "Enable"
+ riseandfall_disable_low_stability_authority_collapse_confirm:0 "Disable"

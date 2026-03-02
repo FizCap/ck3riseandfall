@@ -1,4 +1,4 @@
-riseandfall_diadochi_cb = {
+﻿riseandfall_diadochi_cb = {
     icon = invasion_cb
     group = conquest
 
@@ -47,6 +47,10 @@ riseandfall_diadochi_cb = {
     on_declaration = {
         on_declared_war = yes
     }
+
+    on_victory_desc = { desc = RISEANDFALL_DIADOCHI_ON_VICTORY_DESC }
+    on_white_peace_desc = { desc = RISEANDFALL_DIADOCHI_ON_WHITE_PEACE_DESC }
+    on_defeat_desc = { desc = RISEANDFALL_DIADOCHI_ON_DEFEAT_DESC }
 
     on_victory = {
         scope:attacker = { show_pow_release_message_effect = yes }

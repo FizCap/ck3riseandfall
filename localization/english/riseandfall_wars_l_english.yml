@@ -8,3 +8,6 @@
  RISEANDFALL_DIADOCHI_CB_NAME: "Successor State War"
  RISEANDFALL_DIADOCHI_WAR_NAME: "[ATTACKER.GetPrimaryTitle.GetAdjective] Successor State War"
  RISEANDFALL_DIADOCHI_WAR_NAME_BASE: "[ATTACKER.GetPrimaryTitle.GetAdjective][DEFENDER.GetPrimaryTitle.GetName]"
+ RISEANDFALL_DIADOCHI_ON_VICTORY_DESC: "The war has concluded in your favor; the defender's realm is broken and titles have been transferred."
+ RISEANDFALL_DIADOCHI_ON_DEFEAT_DESC: "You have been defeated in the Successor State War and suffered losses and concessions."
+ RISEANDFALL_DIADOCHI_ON_WHITE_PEACE_DESC: "The war ended in a white peace; no territorial changes occurred, but reputations were affected."
