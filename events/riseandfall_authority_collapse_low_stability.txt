@@ -1,4 +1,4 @@
-namespace = authority_collapse
+﻿namespace = authority_collapse
 
 authority_collapse.1001 = {
     type = character_event
