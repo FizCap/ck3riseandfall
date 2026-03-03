@@ -29,6 +29,7 @@ riseandfall_diadochi_wars_se = {
                         primary_title = scope:rf_ruler.primary_title.var:rf_successor_origin_title
                     }
                     NOT = { is_at_war_with = scope:rf_ruler }
+                    NOT = { has_truce = scope:rf_ruler }
                     NOT = { is_in_debt = yes }
                     # Do not target realms the attacker has high opinion of
                     scope:rf_ruler = { opinion = { target = this value <= 50 } }
@@ -64,8 +65,10 @@ riseandfall_diadochi_wars_se = {
                     }
                     if = {
                         limit = { var:rf_required_power <= scope:rf_ruler.military_power }
+                        # Do not attempt to declare if there's a truce between attacker and target
                         if = {
-                            limit = { scope:rf_ruler = { can_declare_war = { defender = scope:rf_target casus_belli = riseandfall_diadochi_cb target_titles = { scope:rf_target.primary_title } } } }
+                            limit = { NOT = { scope:rf_ruler = { has_truce = scope:rf_target } } }
+                            if = { limit = { scope:rf_ruler = { can_declare_war = { defender = scope:rf_target casus_belli = riseandfall_diadochi_cb target_titles = { scope:rf_target.primary_title } } } } }
                             scope:rf_ruler = {
                                 random = {
                                     chance = 20
