@@ -205,20 +205,22 @@ types RiseAndFallStabilityTooltipTypes
 					text = "REALM_STABILITY_TT_LEGITIMACY_MULT"
 				}
 
-				# ── Civil War & War History (hidden when both = 0) ───────────────
+				# ── Civil War & War History (show when either penalty > 0) ────────────────
 				vbox = {
-						visible = "[Or( LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_realm_stability_civil_war_penalty').GetValue, '(CFixedPoint)0' ), LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_war_penalty').GetValue, '(CFixedPoint)0' ) )]"
-						layoutpolicy_horizontal = expanding
-						spacer = { size = { 0 12 } }
-						cooltip_paragraph = {
-							text = "REALM_STABILITY_TT_WAR_HEADER"
-						}
-						cooltip_paragraph = {
-							visible = "[LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_realm_stability_civil_war_penalty').GetValue, '(CFixedPoint)0' )]"
-							text = "REALM_STABILITY_TT_CIVIL_WAR_PENALTY"
-						}
-						cooltip_paragraph = {
-							visible = "[LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_war_penalty').GetValue, '(CFixedPoint)0' )]"
+					visible = "[Or( GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_realm_stability_civil_war_penalty').GetValue, '(CFixedPoint)0' ), GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_war_penalty').GetValue, '(CFixedPoint)0' ) )]"
+					layoutpolicy_horizontal = expanding
+					spacer = { size = { 0 12 } }
+					cooltip_paragraph = {
+						text = "REALM_STABILITY_TT_WAR_HEADER"
+					}
+					cooltip_paragraph = {
+						visible = "[GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_realm_stability_civil_war_penalty').GetValue, '(CFixedPoint)0' )]"
+						text = "REALM_STABILITY_TT_CIVIL_WAR_PENALTY"
+					}
+					cooltip_paragraph = {
+						visible = "[GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_war_penalty').GetValue, '(CFixedPoint)0' )]"
+						text = "REALM_STABILITY_TT_WAR_PENALTY"
+					}
 				}
 
 				# ── Puppet Regency (hidden at 100%) ──────────────────────────────
@@ -233,7 +235,7 @@ types RiseAndFallStabilityTooltipTypes
 
 				# ── Ruler Gender & Succession (hidden when penalty = 0) ───────────
 				vbox = {
-						visible = "[LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_realm_stability_sex_law_penalty').GetValue, '(CFixedPoint)0' )]"
+					visible = "[GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_realm_stability_sex_law_penalty').GetValue, '(CFixedPoint)0' )]"
 					layoutpolicy_horizontal = expanding
 					spacer = { size = { 0 12 } }
 					cooltip_paragraph = {
@@ -241,11 +243,14 @@ types RiseAndFallStabilityTooltipTypes
 					}
 				}
 
-				spacer = { size = { 0 12 } }
-
-				# ── Difficulty Multiplier ─────────────────────────────────────────
-				cooltip_paragraph = {
-					text = "REALM_STABILITY_TT_DIFFICULTY"
+				# ── Difficulty Multiplier (hidden when exactly 100%) ──────────────
+				vbox = {
+					visible = "[Or( GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_difficulty_multiplier').GetValue, '(CFixedPoint)100' ), LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_difficulty_multiplier').GetValue, '(CFixedPoint)100' ) )]"
+					layoutpolicy_horizontal = expanding
+					spacer = { size = { 0 12 } }
+					cooltip_paragraph = {
+						text = "REALM_STABILITY_TT_DIFFICULTY"
+					}
 				}
 			}
 		}
