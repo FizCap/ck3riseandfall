@@ -50,6 +50,15 @@ setting_riseandfall_realm_stability_stable_desc:0 "Generally easier to keep high
 setting_riseandfall_realm_stability_very_stable:0 "Very Stable"
 setting_riseandfall_realm_stability_very_stable_desc:0 "Realm stability is easier to maintain."
 
+# Realm Stability multiplier target (who the difficulty multiplier applies to)
+rule_riseandfall_realm_stability_difficulty_target:0 "Realm Stability Difficulty Target"
+setting_riseandfall_realm_stability_difficulty_both:0 "Both"
+setting_riseandfall_realm_stability_difficulty_both_desc:0 "Apply the realm stability difficulty multiplier to both player-controlled and AI-controlled characters."
+setting_riseandfall_realm_stability_difficulty_player_only:0 "Player Only"
+setting_riseandfall_realm_stability_difficulty_player_only_desc:0 "Apply the realm stability difficulty multiplier only to player-controlled characters."
+setting_riseandfall_realm_stability_difficulty_ai_only:0 "AI Only"
+setting_riseandfall_realm_stability_difficulty_ai_only_desc:0 "Apply the realm stability difficulty multiplier only to AI-controlled characters."
+
 # Men-at-arms cap increase rule (administrative governments)
 rule_riseandfall_enable_mma_limit_modifier:0 "Men-at-Arms Cap Increase (Administrative Titles)"
 setting_riseandfall_mma_limit_modifier_enabled:0 "Enabled"

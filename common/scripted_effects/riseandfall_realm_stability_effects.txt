@@ -627,9 +627,25 @@ riseandfall_calculate_realm_stability_se = {
     set_variable = { name = tmp_war_penalty value = var:riseandfall_war_penalty }
     change_variable = { name = tmp_war_penalty multiply = -1 }
     change_variable = { name = tmp_target_score add = var:tmp_war_penalty }
-    # Apply difficulty game rule multiplier
-    change_variable = { name = tmp_target_score multiply = var:riseandfall_rs_difficulty_multiplier }
-    change_variable = { name = tmp_target_score divide = 100 }
+    # Apply difficulty game rule multiplier according to the new target setting
+    # If the game rule is Player Only, apply only to player-controlled characters (is_ai = no).
+    # If the game rule is AI Only, apply only to AI-controlled characters (is_ai = yes).
+    # Otherwise apply to all characters (Both).
+    if = {
+        limit = { has_game_rule = riseandfall_realm_stability_difficulty_player_only is_ai = no }
+        change_variable = { name = tmp_target_score multiply = var:riseandfall_rs_difficulty_multiplier }
+        change_variable = { name = tmp_target_score divide = 100 }
+    }
+    else_if = {
+        limit = { has_game_rule = riseandfall_realm_stability_difficulty_ai_only is_ai = yes }
+        change_variable = { name = tmp_target_score multiply = var:riseandfall_rs_difficulty_multiplier }
+        change_variable = { name = tmp_target_score divide = 100 }
+    }
+    else = {
+        # Both (default) — apply to all characters
+        change_variable = { name = tmp_target_score multiply = var:riseandfall_rs_difficulty_multiplier }
+        change_variable = { name = tmp_target_score divide = 100 }
+    }
     # Ensure we expose the difficulty multiplier for tooltip/use
     set_variable = { name = riseandfall_rs_difficulty_multiplier value = var:riseandfall_rs_difficulty_multiplier }
     set_variable = { name = riseandfall_rs_difficulty_multiplier_display value = var:riseandfall_rs_difficulty_multiplier_display }

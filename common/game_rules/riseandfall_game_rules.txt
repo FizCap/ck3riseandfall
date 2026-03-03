@@ -108,6 +108,30 @@ riseandfall_enable_realm_stability = {
     }
 }
 
+riseandfall_realm_stability_difficulty_target = {
+
+    categories = {
+        riseandfall
+    }
+
+    # Default: Both players and AI use the difficulty multiplier
+    default = riseandfall_realm_stability_difficulty_both
+
+    # Both: no flag needed; multiplier applies to everyone
+    riseandfall_realm_stability_difficulty_both = {
+    }
+
+    # Player Only: apply multiplier only to player-controlled characters
+    riseandfall_realm_stability_difficulty_player_only = {
+        flag = riseandfall_realm_stability_difficulty_player_only
+    }
+
+    # AI Only: apply multiplier only to AI-controlled characters
+    riseandfall_realm_stability_difficulty_ai_only = {
+        flag = riseandfall_realm_stability_difficulty_ai_only
+    }
+}
+
 riseandfall_realm_stability_difficulty = {
 
     categories = {
