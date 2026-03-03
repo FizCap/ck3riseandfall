@@ -21,14 +21,6 @@ riseandfall_low_stability_roll = {
         has_game_rule = riseandfall_low_stability_events_enabled
     }
     effect = {
-        # dynamic story mode has its own game rule; only run the calculation
-        # if that rule is active.  The separate on_action `riseandfall_dynamic_story_mode`
-        # already handles the general yearly update, so this is only needed when
-        # low stability events are running in a game without the story mode rule.
-        if = {
-            limit = { has_game_rule = riseandfall_dynamic_story_mode_enabled }
-            riseandfall_dynamic_story_mode_se = yes
-        }
         every_independent_ruler = {
             limit = {
                 is_landed = yes
