@@ -1,6 +1,6 @@
 ﻿l_english:
  riseandfall_low_stability_event_manager:0 "Manage Low Stability Events"
- riseandfall_low_stability_event_manager_desc:0 "Here you can disable or enable individual Rise and Fall low stability events such as warlord uprisings, palace coups, realm splits, and central authority collapse."
+ riseandfall_low_stability_event_manager_desc:0 "Here you can disable or enable individual Rise and Fall low stability events such as warlord uprisings, palace coups, realm splits, and central authority collapse. Disabling an event will prevent it from firing for Players and the AI."
  riseandfall_low_stability_event_manager_tooltip:0 "Open the low stability event manager."
  riseandfall_low_stability_event_manager_confirm:0 "Apply"
  riseandfall_low_stability_event_manager_tt:0 "Select a valid option"
