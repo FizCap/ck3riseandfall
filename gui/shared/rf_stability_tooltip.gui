@@ -207,20 +207,18 @@ types RiseAndFallStabilityTooltipTypes
 
 				# ── Civil War & War History (hidden when both = 0) ───────────────
 				vbox = {
-					visible = "[Or( GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_realm_stability_civil_war_penalty').GetValue, '(CFixedPoint)0' ), GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_war_penalty').GetValue, '(CFixedPoint)0' ) )]"
-					layoutpolicy_horizontal = expanding
-					spacer = { size = { 0 12 } }
-					cooltip_paragraph = {
-						text = "REALM_STABILITY_TT_WAR_HEADER"
-					}
-					cooltip_paragraph = {
-						visible = "[GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_realm_stability_civil_war_penalty').GetValue, '(CFixedPoint)0' )]"
-						text = "REALM_STABILITY_TT_CIVIL_WAR_PENALTY"
-					}
-					cooltip_paragraph = {
-						visible = "[GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_war_penalty').GetValue, '(CFixedPoint)0' )]"
-						text = "REALM_STABILITY_TT_WAR_PENALTY"
-					}
+						visible = "[Or( LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_realm_stability_civil_war_penalty').GetValue, '(CFixedPoint)0' ), LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_war_penalty').GetValue, '(CFixedPoint)0' ) )]"
+						layoutpolicy_horizontal = expanding
+						spacer = { size = { 0 12 } }
+						cooltip_paragraph = {
+							text = "REALM_STABILITY_TT_WAR_HEADER"
+						}
+						cooltip_paragraph = {
+							visible = "[LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_realm_stability_civil_war_penalty').GetValue, '(CFixedPoint)0' )]"
+							text = "REALM_STABILITY_TT_CIVIL_WAR_PENALTY"
+						}
+						cooltip_paragraph = {
+							visible = "[LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_war_penalty').GetValue, '(CFixedPoint)0' )]"
 				}
 
 				# ── Puppet Regency (hidden at 100%) ──────────────────────────────
@@ -235,7 +233,7 @@ types RiseAndFallStabilityTooltipTypes
 
 				# ── Ruler Gender & Succession (hidden when penalty = 0) ───────────
 				vbox = {
-					visible = "[GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_realm_stability_sex_law_penalty').GetValue, '(CFixedPoint)0' )]"
+						visible = "[LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_realm_stability_sex_law_penalty').GetValue, '(CFixedPoint)0' )]"
 					layoutpolicy_horizontal = expanding
 					spacer = { size = { 0 12 } }
 					cooltip_paragraph = {
