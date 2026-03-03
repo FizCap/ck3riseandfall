@@ -1,0 +1,88 @@
+﻿# Rise and Fall: scripted effect to force Diadochi wars among same-origin realms
+# Moved from on_action to keep on_action concise.
+riseandfall_diadochi_wars_se = {
+    # Only force AI attackers (do not force human players)
+    every_independent_ruler = {
+        limit = {
+            is_ai = yes
+            # Require an existing stability score and minimum stability
+            has_variable = riseandfall_realm_stability_score
+            # Only act when stability is healthy
+            var:riseandfall_realm_stability_score >= 40
+            NOT = { is_at_war = yes }
+            NOT = { is_in_debt = yes }
+        }
+        save_scope_as = rf_ruler
+        scope:rf_ruler = {
+            # Build a list of potential targets sharing the same split origin
+            every_independent_ruler = {
+                limit = {
+                    is_landed = yes
+                    is_independent_ruler = yes
+                    NOT = { this = scope:rf_ruler }
+                    # Only allow candidates who neighbour the attacker realm
+                    primary_title = { is_neighbor_to_realm = scope:rf_ruler }
+                    # Relationship checks (successor vs successor, origin vs successor, successor vs origin)
+                    OR = {
+                        primary_title.var:rf_successor_origin_title = scope:rf_ruler.primary_title.var:rf_successor_origin_title
+                        primary_title.var:rf_successor_origin_title = scope:rf_ruler.primary_title
+                        primary_title = scope:rf_ruler.primary_title.var:rf_successor_origin_title
+                    }
+                    NOT = { is_at_war_with = scope:rf_ruler }
+                    NOT = { is_in_debt = yes }
+                    # Do not target realms the attacker has high opinion of
+                    scope:rf_ruler = { opinion = { target = this value <= 50 } }
+                    # Ensure attacker can actually declare this CB on the candidate
+                    scope:rf_ruler = { can_declare_war = { defender = this casus_belli = riseandfall_diadochi_cb target_titles = { this.primary_title } } }
+                    has_variable = riseandfall_realm_stability_score
+                    var:riseandfall_realm_stability_score >= 40
+                }
+                add_to_list = rf_diadochi_targets
+            }
+
+            # Randomly pick one target (if any) to avoid mass simultaneous wars
+            random_in_list = {
+                list = rf_diadochi_targets*
+                save_scope_as = rf_target
+            }
+
+            # If we selected a valid target, check can_declare_war then force the declaration
+            if = {
+                limit = { exists = scope:rf_target }
+                # Respect engine rules such as truces/alliances/factions via can_declare_war
+                # Ensure attacker is sufficiently stronger: 1.5x normally, 1.0x if target is already at war
+                scope:rf_ruler = {
+                    set_variable = { name = rf_required_power value = scope:rf_target.military_power }
+                    if = {
+                        limit = { scope:rf_target = { is_at_war = yes } }
+                        # target already engaged: require at least equal power
+                        change_variable = { name = rf_required_power multiply = 1.0 }
+                    }
+                    else = {
+                        # normal requirement: attacker must be >= 1.5x target
+                        change_variable = { name = rf_required_power multiply = 1.5 }
+                    }
+                    if = {
+                        limit = { var:rf_required_power <= scope:rf_ruler.military_power }
+                        if = {
+                            limit = { scope:rf_ruler = { can_declare_war = { defender = scope:rf_target casus_belli = riseandfall_diadochi_cb target_titles = { scope:rf_target.primary_title } } } }
+                            scope:rf_ruler = {
+                                random = {
+                                    chance = 20
+                                    start_war = {
+                                        casus_belli = riseandfall_diadochi_cb
+                                        target = scope:rf_target
+                                        target_title = scope:rf_target.primary_title
+                                        claimant = scope:rf_ruler
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    remove_variable = rf_required_power
+                }
+                clear_saved_scope = rf_target
+            }
+        }
+    }
+}

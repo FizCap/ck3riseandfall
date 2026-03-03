@@ -6,6 +6,7 @@
         riseandfall_marry_male_puppet_master_target
         riseandfall_marry_female_puppet_master_target
         riseandfall_split_title_monitor
+        riseandfall_force_diadochi_wars
     }
 }
 
@@ -20,7 +21,14 @@ riseandfall_low_stability_roll = {
         has_game_rule = riseandfall_low_stability_events_enabled
     }
     effect = {
-        riseandfall_dynamic_story_mode_se = yes
+        # dynamic story mode has its own game rule; only run the calculation
+        # if that rule is active.  The separate on_action `riseandfall_dynamic_story_mode`
+        # already handles the general yearly update, so this is only needed when
+        # low stability events are running in a game without the story mode rule.
+        if = {
+            limit = { has_game_rule = riseandfall_dynamic_story_mode_enabled }
+            riseandfall_dynamic_story_mode_se = yes
+        }
         every_independent_ruler = {
             limit = {
                 is_landed = yes
@@ -171,5 +179,15 @@ riseandfall_split_title_monitor = {
                 }
             }
         }
+    }
+}
+
+riseandfall_force_diadochi_wars = {
+    trigger = { 
+        has_game_rule = riseandfall_dynamic_story_mode_enabled 
+    }
+    effect = {
+        # Delegated to scripted effect to keep on_action concise
+        riseandfall_diadochi_wars_se = yes
     }
 }
