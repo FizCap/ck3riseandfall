@@ -277,9 +277,12 @@ riseandfall_split_title_monitor = {
                     change_variable = { name = rf_snapshot multiply = 0.25 }
                     if = {
                         limit = { var:rf_current_realm_size <= var:rf_snapshot }
-                        # Save the split title and call engine-supported destroy_title on it
+                        # Save the split title and only destroy it if it's a titular title
                         primary_title = { save_scope_as = rf_split_title }
-                        destroy_title = scope:rf_split_title
+                        if = {
+                            limit = { scope:rf_split_title = { is_titular = yes } }
+                            destroy_title = scope:rf_split_title
+                        }
                     }
                     # Cleanup
                     remove_variable = rf_current_realm_size
