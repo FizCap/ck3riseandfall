@@ -5,6 +5,7 @@
         riseandfall_warlord
         riseandfall_marry_male_puppet_master_target
         riseandfall_marry_female_puppet_master_target
+        riseandfall_split_title_monitor
     }
 }
 
@@ -126,6 +127,48 @@ riseandfall_marry_female_puppet_master_target = {
                 save_scope_as = diarch_candidate
                 # call the scripted effect on the diarch character (root)
                 riseandfall_marry_puppet_master_female_se = yes
+            }
+        }
+    }
+}
+
+riseandfall_split_title_monitor = {
+    trigger = {
+        has_game_rule = riseandfall_low_stability_events_enabled
+    }
+    effect = {
+        every_ruler = {
+            limit = {
+                is_landed = yes
+                exists = primary_title
+            }
+            save_scope_as = rf_ruler
+            scope:rf_ruler = {
+                # Only operate on primary titles that were flagged as permanent split successors
+                if = {
+                    limit = {
+                        primary_title = {
+                            has_variable = rf_is_permanent_successor_split
+                            has_variable = rf_successor_permanent_realm_size
+                        }
+                    }
+                    # Compute current realm size and compare to the stored snapshot on the title
+                    set_variable = { name = rf_current_realm_size value = realm_size }
+                    set_variable = { name = rf_snapshot value = primary_title.var:rf_successor_permanent_realm_size }
+                    change_variable = { name = rf_snapshot multiply = 0.25 }
+                    if = {
+                        limit = { var:rf_current_realm_size <= var:rf_snapshot }
+                        # Save the split title and only destroy it if it's a titular title
+                        primary_title = { save_scope_as = rf_split_title }
+                        if = {
+                            limit = { scope:rf_split_title = { is_titular = yes } }
+                            destroy_title = scope:rf_split_title
+                        }
+                    }
+                    # Cleanup
+                    remove_variable = rf_current_realm_size
+                    remove_variable = rf_snapshot
+                }
             }
         }
     }
