@@ -205,16 +205,16 @@ types RiseAndFallStabilityTooltipTypes
 					text = "REALM_STABILITY_TT_LEGITIMACY_MULT"
 				}
 
-				# ── Civil War & War History (show when either penalty > 0) ────────────────
+				# ── Civil War & War History (show when civil war penalty < 0 or war penalty > 0) ───
 				vbox = {
-					visible = "[Or( GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_realm_stability_civil_war_penalty').GetValue, '(CFixedPoint)0' ), GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_war_penalty').GetValue, '(CFixedPoint)0' ) )]"
+					visible = "[Or( LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_realm_stability_civil_war_penalty').GetValue, '(CFixedPoint)0' ), GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_war_penalty').GetValue, '(CFixedPoint)0' ) )]"
 					layoutpolicy_horizontal = expanding
 					spacer = { size = { 0 12 } }
 					cooltip_paragraph = {
 						text = "REALM_STABILITY_TT_WAR_HEADER"
 					}
 					cooltip_paragraph = {
-						visible = "[GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_realm_stability_civil_war_penalty').GetValue, '(CFixedPoint)0' )]"
+						visible = "[LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_realm_stability_civil_war_penalty').GetValue, '(CFixedPoint)0' )]"
 						text = "REALM_STABILITY_TT_CIVIL_WAR_PENALTY"
 					}
 					cooltip_paragraph = {
