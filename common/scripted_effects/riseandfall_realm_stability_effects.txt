@@ -1009,6 +1009,13 @@ riseandfall_inherit_stability_score_se = {
             else = { set_variable = { name = riseandfall_rs_difficulty_multiplier value = 100 } }
             if = { limit = { scope:predecessor = { has_variable = riseandfall_rs_difficulty_multiplier_display } } set_variable = { name = riseandfall_rs_difficulty_multiplier_display value = scope:predecessor.var:riseandfall_rs_difficulty_multiplier_display } }
             else = { set_variable = { name = riseandfall_rs_difficulty_multiplier_display value = 1.0 } }
+            # Initialize tooltip multiplier vars so they show correctly before the first yearly tick
+            if = { limit = { scope:predecessor = { has_variable = riseandfall_realm_stability_puppet_regency_multiplier } } set_variable = { name = riseandfall_realm_stability_puppet_regency_multiplier value = scope:predecessor.var:riseandfall_realm_stability_puppet_regency_multiplier } }
+            else = { set_variable = { name = riseandfall_realm_stability_puppet_regency_multiplier value = 100 } }
+            if = { limit = { scope:predecessor = { has_variable = riseandfall_realm_stability_puppet_regency_years_tooltip } } set_variable = { name = riseandfall_realm_stability_puppet_regency_years_tooltip value = scope:predecessor.var:riseandfall_realm_stability_puppet_regency_years_tooltip } }
+            else = { set_variable = { name = riseandfall_realm_stability_puppet_regency_years_tooltip value = 0 } }
+            # Legitimacy multiplier: new ruler starts fresh at 100%
+            set_variable = { name = riseandfall_rs_legitimacy_multiplier value = 100 }
         }
         else = {
             # Predecessor had no stability score; initialize heir to baseline
@@ -1016,6 +1023,9 @@ riseandfall_inherit_stability_score_se = {
             set_variable = { name = riseandfall_rs_civil_war_years value = 0 }
             set_variable = { name = riseandfall_puppet_regency_years value = 0 }
             set_variable = { name = riseandfall_realm_stability_war_multiplier value = 100 }
+            set_variable = { name = riseandfall_realm_stability_puppet_regency_multiplier value = 100 }
+            set_variable = { name = riseandfall_realm_stability_puppet_regency_years_tooltip value = 0 }
+            set_variable = { name = riseandfall_rs_legitimacy_multiplier value = 100 }
         }
     }
 }

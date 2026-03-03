@@ -235,7 +235,7 @@ types RiseAndFallStabilityTooltipTypes
 
 				# ── Ruler Gender & Succession (hidden when penalty = 0) ───────────
 				vbox = {
-					visible = "[GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_realm_stability_sex_law_penalty').GetValue, '(CFixedPoint)0' )]"
+					visible = "[LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_realm_stability_sex_law_penalty').GetValue, '(CFixedPoint)0' )]"
 					layoutpolicy_horizontal = expanding
 					spacer = { size = { 0 12 } }
 					cooltip_paragraph = {
