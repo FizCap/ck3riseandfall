@@ -1,4 +1,4 @@
-ï»¿######################################################
+######################################################
 ################# CHARACTER WINDOW ###################
 ######################################################
 
@@ -4426,7 +4426,7 @@ types CharacterWindow
 				name = "other_player_name"
 				visible = "[And( Character.IsPlayer, Not( Character.IsLocalPlayer ) )]"
 
-				raw_text = " â€¢ #L [Character.GetHumanName]#!"
+				raw_text = " • #L [Character.GetHumanName]#!"
 				tooltip = "AI_PERSONALITY_IS_PLAYER_TOOLTIP"
 				using = tooltip_se
 
@@ -4439,7 +4439,7 @@ types CharacterWindow
 				name = "ai_personality"
 				visible = "[Not( Character.IsPlayer )]"
 
-				raw_text = " â€¢ #L [Character.GetAIPersonalityNoTooltip]#!"
+				raw_text = " • #L [Character.GetAIPersonalityNoTooltip]#!"
 				tooltip = "AI_PERSONALITY_TT"
 				using = tooltip_se
 
@@ -5606,7 +5606,7 @@ types CharacterWindow
 
 					# Keep the stability control visible even if the scripted dragon military
 					# view is shown. Only hide the normal military details when dragons are
-					# visible â€” do this by wrapping the normal icon + number in a
+					# visible — do this by wrapping the normal icon + number in a
 					# container with the scriptedGui visibility guard. To ensure the
 					# military widget keeps its original centered layout we place
 					# expand blocks around the container (not inside it) so the
@@ -5672,7 +5672,9 @@ types CharacterWindow
 					name = "stability_vbox"
 					size = { 86 32 }
 					datacontext = "[AccessGameRules.AccessNamedGameRule( 'riseandfall_enable_realm_stability' ).GetSetting]"
-					tooltip = "REALM_STABILITY_TOOLTIP"
+					tooltipwidget = {
+					    stability_hud_tooltip = {}
+					}
 					using = tooltip_es
 					visible = "[And( And( And( Character.HasLandedTitles, NotEqualTo_int32( Character.GetPrimaryTitle.GetTierFrame, '(int32)2' ) ), And( Not( Character.GetGovernment.IsType( 'landless_adventurer_government' ) ), Not( GameRuleSetting.HasFlag( 'riseandfall_realm_stability_disabled' ) ) ) ), Character.MakeScope.Var('riseandfall_realm_stability_score').IsSet )]"
 					spacing = 0
