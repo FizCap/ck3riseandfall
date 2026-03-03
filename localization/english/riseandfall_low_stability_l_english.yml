@@ -151,12 +151,12 @@ riseandfall_negotiated_peace_opinion_desc:0 "Our liege made concessions to keep 
 
  # Authority Collapse localization
 authority_collapse.1001.t:0 "Total Collapse of Central Authority"
-authority_collapse.1001.d:0 "The very foundations of your realm tremble as central authority crumbles. Bandits roam freely across the lands, unchecked by any semblance of order. Roads are unsafe, taxes go uncollected, and the people suffer under the weight of anarchy. The collapse is complete — your realm has descended into chaos."
+authority_collapse.1001.d:0 "The very foundations of your realm tremble as central authority crumbles. Bandits roam freely across the lands, unchecked by any semblance of order. Roads are unsafe, taxes go uncollected, and the people suffer under the weight of anarchy. Armies desert en masse, corruption empties the treasury, and your vassals abandon their oaths and loyalty, leaving governance in ruins. The collapse is complete — your realm has descended into chaos."
 authority_collapse.1001.a:0 "Acknowledge the disaster"
-authority_collapse.1001.tooltip:0 "Bandits now run rampant across your entire realm. All provinces suffer declining county control, development, and popular opinion for 5 years."
+authority_collapse.1001.tooltip:0 "Bandits now run rampant across your entire realm. All provinces suffer declining county control, development, and popular opinion for 5 years. Armies may desert, corruption drains the treasury, and vassal loyalty collapses."
 
 # Modifier localization
 riseandfall_authority_collapse:0 "Authority Collapse"
-riseandfall_authority_collapse_desc:0 "Local order has broken down: county control and development decline, and popular opinion collapses while this modifier is active."
+riseandfall_authority_collapse_desc:0 "Local order has broken down: county control and development decline, popular opinion collapses, armies desert, taxes fail, and vassal loyalty collapses while this modifier is active."
 riseandfall_authority_collapse_liege_debuff:0 "Authority Collapse"
-riseandfall_authority_collapse_liege_debuff_desc:0 "Your personal authority has crumbled  levies and vassal contributions are halved, taxes falter, armies cost far more, and mercenaries are prohibitively expensive for the duration of the collapse."
+riseandfall_authority_collapse_liege_debuff_desc:0 "Your personal authority has crumbled: levies and vassal contributions are halved, armies may partially desert, taxes falter as corruption empties the treasury, and mercenaries become prohibitively expensive for the duration of the collapse."
