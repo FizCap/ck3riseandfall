@@ -59,7 +59,7 @@ riseandfall_cleanup_titular_titles_se = {
         # Run the checks in the character scope and keep scope isolation to avoid
         # mixing `landed_title` and `character` scopes inside trigger/effect limits.
         scope:cleanup_ruler = {
-                # County titular: destroy when any non-titular county OR higher (duchy/kingdom/empire/hegemony) is held
+                # County titular: destroy when any proper lower/same tier OR any higher tier title is held
                 if = {
                     limit = { scope:titular_held = { tier = tier_county } }
                     scope:cleanup_ruler = {
@@ -67,9 +67,14 @@ riseandfall_cleanup_titular_titles_se = {
                             limit = {
                                 any_held_title = {
                                     NOT = { this = scope:titular_held }
-                                    is_titular = no
                                     OR = {
-                                        tier = tier_county
+                                        AND = {
+                                            tier = tier_county
+                                            OR = {
+                                                is_titular = no
+                                                this = scope:cleanup_ruler.primary_title
+                                            }
+                                        }
                                         tier = tier_duchy
                                         tier = tier_kingdom
                                         tier = tier_empire
@@ -82,7 +87,7 @@ riseandfall_cleanup_titular_titles_se = {
                     }
                 }
 
-            # Duchy titular: destroy when any non-titular duchy OR higher (kingdom/empire/hegemony) is held
+            # Duchy titular: destroy when any proper lower/same tier OR any higher tier title is held
             if = {
                 limit = { scope:titular_held = { tier = tier_duchy } }
                 scope:cleanup_ruler = {
@@ -90,9 +95,14 @@ riseandfall_cleanup_titular_titles_se = {
                         limit = {
                             any_held_title = {
                                 NOT = { this = scope:titular_held }
-                                is_titular = no
                                 OR = {
-                                    tier = tier_duchy
+                                    AND = {
+                                        tier = tier_duchy
+                                        OR = {
+                                            is_titular = no
+                                            this = scope:cleanup_ruler.primary_title
+                                        }
+                                    }
                                     tier = tier_kingdom
                                     tier = tier_empire
                                     tier = tier_hegemony
@@ -104,7 +114,7 @@ riseandfall_cleanup_titular_titles_se = {
                 }
             }
 
-            # Kingdom titular: destroy when any non-titular kingdom OR higher (empire/hegemony) is held
+            # Kingdom titular: destroy when any proper lower/same tier OR any higher tier title is held
             if = {
                 limit = { scope:titular_held = { tier = tier_kingdom } }
                 scope:cleanup_ruler = {
@@ -112,9 +122,14 @@ riseandfall_cleanup_titular_titles_se = {
                         limit = {
                             any_held_title = {
                                 NOT = { this = scope:titular_held }
-                                is_titular = no
                                 OR = {
-                                    tier = tier_kingdom
+                                    AND = {
+                                        tier = tier_kingdom
+                                        OR = {
+                                            is_titular = no
+                                            this = scope:cleanup_ruler.primary_title
+                                        }
+                                    }
                                     tier = tier_empire
                                     tier = tier_hegemony
                                 }
@@ -125,7 +140,7 @@ riseandfall_cleanup_titular_titles_se = {
                 }
             }
 
-            # Empire titular: destroy when any non-titular empire OR higher (hegemony) is held
+            # Empire titular: destroy when any proper lower/same tier OR any higher tier title is held
             if = {
                 limit = { scope:titular_held = { tier = tier_empire } }
                 scope:cleanup_ruler = {
@@ -133,9 +148,14 @@ riseandfall_cleanup_titular_titles_se = {
                         limit = {
                             any_held_title = {
                                 NOT = { this = scope:titular_held }
-                                is_titular = no
                                 OR = {
-                                    tier = tier_empire
+                                    AND = {
+                                        tier = tier_empire
+                                        OR = {
+                                            is_titular = no
+                                            this = scope:cleanup_ruler.primary_title
+                                        }
+                                    }
                                     tier = tier_hegemony
                                 }
                             }
@@ -145,7 +165,7 @@ riseandfall_cleanup_titular_titles_se = {
                 }
             }
 
-            # Hegemony titular: destroy when a non-titular hegemony is held (same tier only, highest available)
+            # Hegemony titular: destroy when a proper same tier is held
             if = {
                 limit = { scope:titular_held = { tier = tier_hegemony } }
                 scope:cleanup_ruler = {
@@ -153,8 +173,13 @@ riseandfall_cleanup_titular_titles_se = {
                         limit = {
                             any_held_title = {
                                 NOT = { this = scope:titular_held }
-                                is_titular = no
-                                tier = tier_hegemony
+                                AND = {
+                                        tier = tier_hegemony
+                                        OR = {
+                                            is_titular = no
+                                            this = scope:cleanup_ruler.primary_title
+                                        }
+                                    }
                             }
                         }
                         destroy_title = scope:titular_held
