@@ -1160,6 +1160,13 @@ riseandfall_execute_realm_split_se = {
 
     add_unpressed_claim = scope:original_primary
 
+    if = {
+        limit = { exists = scope:new_realm_ruler }
+        scope:new_realm_ruler = {
+            set_variable = { name = low_stability_cooldown value = yes years = 5 }
+        }
+    }
+
     # Mark this realm as a successor state and link it to its split origin title.
     # Stored both on the ruler and the successor primary title for future mechanics.
     set_variable = { name = rf_successor_origin_title value = scope:original_primary }
