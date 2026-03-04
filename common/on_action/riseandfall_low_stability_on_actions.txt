@@ -16,6 +16,16 @@ on_imprison = {
     }
 }
 
+riseandfall_force_diadochi_wars = {
+    trigger = {
+        has_game_rule = riseandfall_dynamic_story_mode_enabled
+    }
+    effect = {
+        riseandfall_diadochi_wars_se = yes
+    }
+}
+
+
 riseandfall_low_stability_roll = {
     trigger = {
         has_game_rule = riseandfall_low_stability_events_enabled
@@ -171,15 +181,5 @@ riseandfall_split_title_monitor = {
                 }
             }
         }
-    }
-}
-
-riseandfall_force_diadochi_wars = {
-    trigger = { 
-        has_game_rule = riseandfall_dynamic_story_mode_enabled 
-    }
-    effect = {
-        # Delegated to scripted effect to keep on_action concise
-        riseandfall_diadochi_wars_se = yes
     }
 }

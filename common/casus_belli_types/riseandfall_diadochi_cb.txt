@@ -23,20 +23,38 @@
 
     target_titles = all
     target_title_tier = all
-    target_de_jure_regions_above = yes
     ignore_effect = change_title_holder
 
-    valid_to_start = { always = yes }
-
-    should_invalidate = {
-        NOT = {
-            scope:defender = {
-                riseandfall_is_diadochi_target_trigger = yes
+    valid_to_start = {
+        # Allow targeting the designated successor state title OR the unifying origin title
+        scope:target = {
+            OR = {
+                # Target is an active successor state title
+                has_variable = rf_is_successor_split_title
+                
+                # Target is the origin title of the attacking successor state
+                AND = {
+                    scope:attacker.primary_title = { has_variable = rf_successor_origin_title }
+                    this = scope:attacker.primary_title.var:rf_successor_origin_title
+                }
+                
+                # Target is the origin title of the defending successor state (if origin attacks successor)
+                AND = {
+                    scope:defender.primary_title = { has_variable = rf_successor_origin_title }
+                    this = scope:defender.primary_title.var:rf_successor_origin_title
+                }
             }
         }
     }
 
-    on_invalidated_desc = msg_county_conquest_war_invalidated_message
+    # Do not auto-invalidate: this CB is often started via scripted `start_war`
+    # during pulses, and any transient scope/target evaluation can immediately
+    # end the war. Declaration legality is already ensured by
+    # allowed_for_character / allowed_against_character and by `can_declare_war`
+    # checks in the forcing scripted effect.
+    should_invalidate = { always = no }
+
+    on_invalidated_desc = msg_invalidate_war_title
     on_invalidated = { }
 
     cost = {
@@ -244,8 +262,8 @@
     max_attacker_score_from_occupation = 100
     max_defender_score_from_occupation = 100
 
-    full_occupation_by_defender_gives_victory = no
-    full_occupation_by_attacker_gives_victory = no
+    full_occupation_by_defender_gives_victory = yes
+    full_occupation_by_attacker_gives_victory = yes
     landless_attacker_needs_armies = no
     allow_hostages = yes
 
