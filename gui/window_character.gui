@@ -1120,51 +1120,29 @@ window = {
 											name = "prowess_value"
 											text = "[CharacterWindow.GetCharacter.GetProwess|0]"
 											align = nobaseline
+										}
+									}
+								}
+
+								vbox = {
+							tooltip = "ADVENTURER_CHANCE_TOOLTIP"
+							using = Animation_Character_Window_Refresh
+							spacing = -3
+							visible = "[And( Character.MakeScope.Var('rf_disqualify').IsSet, Not(EqualTo_CFixedPoint(Character.MakeScope.Var('rf_disqualify').GetValue, '(CFixedPoint)1')) ) ]"
+
+							icon = {
+								size = { 32 32 }
+								texture = "gfx/interface/icons/dynasty/legitimist_revolt.dds"
+							}
+
+							text_single = {
+								text = "[Character.MakeScope.Var('rf_adventurer_final_chance').GetValue|1]"
+								default_format = "#high"
+								align = nobaseline
 							}
 						}
-					}
 
-					vbox = {
-						tooltip = "ADVENTURER_CHANCE_TOOLTIP"
-						using = Animation_Character_Window_Refresh
-						spacing = -3
-						visible = "[And( Character.MakeScope.Var('rf_disqualify').IsSet, Not(EqualTo_CFixedPoint(Character.MakeScope.Var('rf_disqualify').GetValue, '(CFixedPoint)1')) ) ]"
-
-						icon = {
-							size = { 32 32 }
-							texture = "gfx/interface/icons/dynasty/legitimist_revolt.dds"
-						}
-
-						text_single = {
-							text = "[Character.MakeScope.Var('rf_adventurer_final_chance').GetValue|1]"
-							default_format = "#high"
-							align = nobaseline
-						}
-					}
-
-					vbox = {
-						visible = "[Or( Character.GetGovernment.HasRule( 'administrative' ), And( And( Not( Character.HasLandedTitles ), Not( Character.HasLiege ) ), GetPlayer.GetGovernment.HasRule( 'administrative' ) ) )]"
-						margin_right = 3
-						spacing = -3
-
-						using = Animation_Character_Window_Refresh
-
-						tooltip = "ADMIN_WINDOW_THEME_GOVERNOR_EFFICIENCY_TT"
-						using = tooltip_ne
-
-						icon = {
-							name = "char_governor_efficiency_icon"
-							size = { 32 32 }
-							texture = "gfx/interface/icons/icon_skill_governor_efficiency.dds"
-						}
-
-						text_single = {
-							name = "char_governor_efficiency_value"
-							text = "ADMIN_WINDOW_THEME_GOVERNOR_EFFICIENCY_VALUE"
-							align = nobaseline
-						}
-					}								vbox = {
-									visible = "[Character.HasLandedTitles]"
+						vbox = {
 									margin_right = 3
 									spacing = -3
 
@@ -4051,28 +4029,30 @@ types CharacterWindow
 			layoutpolicy_vertical = expanding
 		}
 
-		# Stability (modernized: icon + compact progress bar + ratio) — moved into its own vbox
+		# Stability (modernized: icon + compact progress bar + ratio)
 		# Put the box next to military strength in its own vbox and show it only
 		# for characters that actually have a stability score set (like we show
 		# military strength only for landed characters). This avoids showing the
 		# stability HUD for characters without stability data.
-		    vbox = {
-				name = "stability_vbox"
-				size = { 86 32 }
-				datacontext = "[AccessGameRules.AccessNamedGameRule( 'riseandfall_enable_realm_stability' ).GetSetting]"
-				tooltip = "REALM_STABILITY_TOOLTIP"
-				using = tooltip_es
-				# Show stability HUD for landed rulers while the feature is enabled.
-				# Also require the stability variable to be set so this control doesn't
-				# show for characters who don't have realm stability.
-					visible = "[And( And( And( Character.HasLandedTitles, NotEqualTo_int32( Character.GetPrimaryTitle.GetTierFrame, '(int32)2' ) ), And( Not( Character.GetGovernment.IsType( 'landless_adventurer_government' ) ), Not( GameRuleSetting.HasFlag( 'riseandfall_realm_stability_disabled' ) ) ) ), Character.MakeScope.Var('riseandfall_realm_stability_score').IsSet )]"
+		vbox = {
+			name = "stability_vbox"
+			size = { 86 32 }
+			datacontext = "[AccessGameRules.AccessNamedGameRule( 'riseandfall_enable_realm_stability' ).GetSetting]"
+			tooltipwidget = {
+				stability_hud_tooltip = {}
+			}
+			using = tooltip_es
+			# Show stability HUD for landed rulers while the feature is enabled.
+			# Also require the stability variable to be set so this control doesn't
+			# show for characters who don't have realm stability.
+			visible = "[And( And( And( Character.HasLandedTitles, NotEqualTo_int32( Character.GetPrimaryTitle.GetTierFrame, '(int32)2' ) ), And( Not( Character.GetGovernment.IsType( 'landless_adventurer_government' ) ), Not( GameRuleSetting.HasFlag( 'riseandfall_realm_stability_disabled' ) ) ) ), Character.MakeScope.Var('riseandfall_realm_stability_score').IsSet )]"
 
 			hbox = {
 				spacing = 6
 
 				# Left: small circular icon (consistent with other stat boxes but modernized)
 				container = {
-					margin = { 2 0 }
+					margin_left = 2
 
 					background = {
 						using = Background_Area_Dark
@@ -4119,7 +4099,7 @@ types CharacterWindow
 					layoutpolicy_vertical = expanding
 					spacing = 2
 
-						text_single = {
+					text_single = {
 						name = "stability_score"
 						text = "[Character.MakeScope.Var('riseandfall_realm_stability_score').GetValue|0]"
 						default_format = "#high"
