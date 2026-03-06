@@ -4,6 +4,12 @@
 
 riseandfall_low_stability_warlord_available_trigger = {
     NOT = { exists = global_var:riseandfall_low_stability_event_warlord_disabled }
+    # must have at least one landed vassals of county tier or higher
+    any_vassal = {
+        count >= 1
+        is_landed = yes
+        primary_title.tier >= tier_county
+    }
 }
 
 riseandfall_low_stability_palace_coup_available_trigger = {
