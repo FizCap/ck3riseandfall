@@ -6,6 +6,11 @@
         riseandfall_marry_male_puppet_master_target
         riseandfall_marry_female_puppet_master_target
         riseandfall_split_title_monitor
+    }
+}
+
+random_yearly_everyone_pulse = {
+    on_actions = {
         riseandfall_force_diadochi_wars
     }
 }
@@ -19,6 +24,7 @@ on_imprison = {
 riseandfall_force_diadochi_wars = {
     trigger = {
         has_game_rule = riseandfall_dynamic_story_mode_enabled
+        is_ai = yes
     }
     effect = {
         riseandfall_diadochi_wars_se = yes
