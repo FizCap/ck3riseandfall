@@ -55,27 +55,40 @@ riseandfall_diadochi_wars_se = {
 
 			# Successors should still pressure their origin realm sometimes, but peers remain
 			# the default target so they do not ignore each other.
+			# Prioritize neighboring successor states first for more realistic conquest patterns.
 			if = {
 				limit = { var:rf_diadochi_is_successor = 1 }
 				random_list = {
 					35 = {
-						riseandfall_diadochi_try_origin_target_se = yes
+						riseandfall_diadochi_try_neighbor_peer_target_se = yes
 						if = {
 							limit = { NOT = { exists = scope:rf_diadochi_target_ruler } }
 							riseandfall_diadochi_try_peer_target_se = yes
 						}
-					}
-					65 = {
-						riseandfall_diadochi_try_peer_target_se = yes
 						if = {
 							limit = { NOT = { exists = scope:rf_diadochi_target_ruler } }
 							riseandfall_diadochi_try_origin_target_se = yes
 						}
 					}
+					65 = {
+						riseandfall_diadochi_try_origin_target_se = yes
+						if = {
+							limit = { NOT = { exists = scope:rf_diadochi_target_ruler } }
+							riseandfall_diadochi_try_neighbor_peer_target_se = yes
+						}
+						if = {
+							limit = { NOT = { exists = scope:rf_diadochi_target_ruler } }
+							riseandfall_diadochi_try_peer_target_se = yes
+						}
+					}
 				}
 			}
 			else = {
-				riseandfall_diadochi_try_peer_target_se = yes
+				riseandfall_diadochi_try_neighbor_peer_target_se = yes
+				if = {
+					limit = { NOT = { exists = scope:rf_diadochi_target_ruler } }
+					riseandfall_diadochi_try_peer_target_se = yes
+				}
 			}
 
 			if = {
@@ -130,6 +143,57 @@ riseandfall_diadochi_try_peer_target_se = {
 		}
 		save_scope_as = rf_diadochi_target_ruler
 		primary_title = { save_scope_as = rf_diadochi_target_title }
+	}
+}
+
+riseandfall_diadochi_try_neighbor_peer_target_se = {
+	clear_saved_scope = rf_diadochi_target_ruler
+	clear_saved_scope = rf_diadochi_target_title
+
+	# First, try to find a neighboring successor state from the same origin
+	any_neighboring_realm_owner = {
+		limit = {
+			NOT = { this = root }
+			is_landed = yes
+			is_independent_ruler = yes
+			exists = primary_title
+			is_imprisoned = no
+			is_at_war = no
+			riseandfall_has_successor_primary_title_trigger = yes
+			primary_title.var:rf_successor_origin_title = scope:rf_diadochi_origin_title
+			root.military_power > military_power
+		}
+	}
+
+	if = {
+		limit = {
+			any_neighboring_realm_owner = {
+				NOT = { this = root }
+				is_landed = yes
+				is_independent_ruler = yes
+				exists = primary_title
+				is_imprisoned = no
+				is_at_war = no
+				riseandfall_has_successor_primary_title_trigger = yes
+				primary_title.var:rf_successor_origin_title = scope:rf_diadochi_origin_title
+				root.military_power > military_power
+			}
+		}
+		random_neighboring_realm_owner = {
+			limit = {
+				NOT = { this = root }
+				is_landed = yes
+				is_independent_ruler = yes
+				exists = primary_title
+				is_imprisoned = no
+				is_at_war = no
+				riseandfall_has_successor_primary_title_trigger = yes
+				primary_title.var:rf_successor_origin_title = scope:rf_diadochi_origin_title
+				root.military_power > military_power
+			}
+			save_scope_as = rf_diadochi_target_ruler
+			primary_title = { save_scope_as = rf_diadochi_target_title }
+		}
 	}
 }
 
