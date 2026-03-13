@@ -82,11 +82,16 @@
             add_claim_on_loss = yes
         }
         scope:defender = {
-            # If the defender's primary title is a successor split title, destroy
-            # that title first so the defender does not retain the split realm title
-            # after being vassalized (prevents duplicate split-realm titles).
+            # If the defender's primary title is a titular successor split title,
+            # destroy that title first so the defender does not retain the split
+            # realm title after being vassalized (prevents duplicate split-realm titles).
             if = {
-                limit = { primary_title = { has_variable = rf_is_successor_split_title } }
+                limit = {
+                    primary_title = {
+                        has_variable = rf_is_successor_split_title
+                        is_titular = yes
+                    }
+                }
                 primary_title = { save_scope_as = rf_defender_split_title }
                 destroy_title = scope:rf_defender_split_title
             }
