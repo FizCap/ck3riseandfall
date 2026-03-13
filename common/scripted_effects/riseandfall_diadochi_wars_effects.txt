@@ -393,7 +393,7 @@ riseandfall_diadochi_try_peer_target_se = {
 			is_at_war = no
 			riseandfall_has_successor_primary_title_trigger = yes
 			primary_title.var:rf_successor_origin_title = scope:rf_diadochi_origin_title
-			root.military_power > military_power
+			root.riseandfall_military_power_with_allies > this.riseandfall_military_power_with_allies
 		}
 		save_scope_as = rf_diadochi_target_ruler
 		primary_title = { save_scope_as = rf_diadochi_target_title }
@@ -415,7 +415,7 @@ riseandfall_diadochi_try_neighbor_peer_target_se = {
 				is_at_war = no
 				riseandfall_has_successor_primary_title_trigger = yes
 				primary_title.var:rf_successor_origin_title = scope:rf_diadochi_origin_title
-				root.military_power > military_power
+				root.riseandfall_military_power_with_allies > this.riseandfall_military_power_with_allies
 			}
 		}
 		random_neighboring_realm_owner = {
@@ -428,7 +428,7 @@ riseandfall_diadochi_try_neighbor_peer_target_se = {
 				is_at_war = no
 				riseandfall_has_successor_primary_title_trigger = yes
 				primary_title.var:rf_successor_origin_title = scope:rf_diadochi_origin_title
-				root.military_power > military_power
+				root.riseandfall_military_power_with_allies > this.riseandfall_military_power_with_allies
 			}
 			save_scope_as = rf_diadochi_target_ruler
 			primary_title = { save_scope_as = rf_diadochi_target_title }
@@ -450,7 +450,7 @@ riseandfall_diadochi_try_origin_target_se = {
 				is_imprisoned = no
 				is_at_war = no
 			}
-			military_power > scope:rf_diadochi_origin_title.holder.military_power
+			riseandfall_military_power_with_allies > scope:rf_diadochi_origin_title.holder.riseandfall_military_power_with_allies
 		}
 		scope:rf_diadochi_origin_title.holder = { save_scope_as = rf_diadochi_target_ruler }
 		scope:rf_diadochi_origin_title = { save_scope_as = rf_diadochi_target_title }

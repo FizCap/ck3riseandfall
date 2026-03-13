@@ -1,0 +1,9 @@
+# Rise and Fall - Military power helper values
+# Provides a script value that includes the current character's allies when comparing strength.
+
+riseandfall_military_power_with_allies = {
+    value = military_power
+    every_ally = {
+        add = military_power
+    }
+}
