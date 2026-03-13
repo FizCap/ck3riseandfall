@@ -1,0 +1,114 @@
+﻿namespace = riseandfall_diadochi_browser
+
+riseandfall_diadochi_browser.0001 = {
+	type = character_event
+	title = riseandfall_diadochi_browser.0001.t
+	desc = riseandfall_diadochi_browser.0001.desc
+	theme = war
+
+	left_portrait = {
+		character = root
+		animation = personality_bold
+	}
+
+	immediate = {
+		riseandfall_diadochi_prepare_browser_targets_se = yes
+	}
+
+	option = {
+		name = riseandfall_diadochi_browser.0001.a_1
+		trigger = { exists = scope:rf_diadochi_browser_target_ruler_1 }
+		custom_tooltip = riseandfall_diadochi_browser.0001.a_1.tt
+		start_war = {
+			casus_belli = riseandfall_diadochi_cb
+			target = scope:rf_diadochi_browser_target_ruler_1
+			target_title = scope:rf_diadochi_browser_target_title_1
+		}
+	}
+
+	option = {
+		name = riseandfall_diadochi_browser.0001.a_2
+		trigger = { exists = scope:rf_diadochi_browser_target_ruler_2 }
+		custom_tooltip = riseandfall_diadochi_browser.0001.a_2.tt
+		start_war = {
+			casus_belli = riseandfall_diadochi_cb
+			target = scope:rf_diadochi_browser_target_ruler_2
+			target_title = scope:rf_diadochi_browser_target_title_2
+		}
+	}
+
+	option = {
+		name = riseandfall_diadochi_browser.0001.a_3
+		trigger = { exists = scope:rf_diadochi_browser_target_ruler_3 }
+		custom_tooltip = riseandfall_diadochi_browser.0001.a_3.tt
+		start_war = {
+			casus_belli = riseandfall_diadochi_cb
+			target = scope:rf_diadochi_browser_target_ruler_3
+			target_title = scope:rf_diadochi_browser_target_title_3
+		}
+	}
+
+	option = {
+		name = riseandfall_diadochi_browser.0001.a_4
+		trigger = { exists = scope:rf_diadochi_browser_target_ruler_4 }
+		custom_tooltip = riseandfall_diadochi_browser.0001.a_4.tt
+		start_war = {
+			casus_belli = riseandfall_diadochi_cb
+			target = scope:rf_diadochi_browser_target_ruler_4
+			target_title = scope:rf_diadochi_browser_target_title_4
+		}
+	}
+
+	option = {
+		name = riseandfall_diadochi_browser.0001.a_5
+		trigger = { exists = scope:rf_diadochi_browser_target_ruler_5 }
+		custom_tooltip = riseandfall_diadochi_browser.0001.a_5.tt
+		start_war = {
+			casus_belli = riseandfall_diadochi_cb
+			target = scope:rf_diadochi_browser_target_ruler_5
+			target_title = scope:rf_diadochi_browser_target_title_5
+		}
+	}
+
+	option = {
+		name = riseandfall_diadochi_browser.0001.a_6
+		trigger = { exists = scope:rf_diadochi_browser_target_ruler_6 }
+		custom_tooltip = riseandfall_diadochi_browser.0001.a_6.tt
+		start_war = {
+			casus_belli = riseandfall_diadochi_cb
+			target = scope:rf_diadochi_browser_target_ruler_6
+			target_title = scope:rf_diadochi_browser_target_title_6
+		}
+	}
+
+	option = {
+		name = riseandfall_diadochi_browser.0001.a_7
+		trigger = { exists = scope:rf_diadochi_browser_target_ruler_7 }
+		custom_tooltip = riseandfall_diadochi_browser.0001.a_7.tt
+		start_war = {
+			casus_belli = riseandfall_diadochi_cb
+			target = scope:rf_diadochi_browser_target_ruler_7
+			target_title = scope:rf_diadochi_browser_target_title_7
+		}
+	}
+
+	option = {
+		name = riseandfall_diadochi_browser.0001.a_8
+		trigger = { exists = scope:rf_diadochi_browser_target_ruler_8 }
+		custom_tooltip = riseandfall_diadochi_browser.0001.a_8.tt
+		start_war = {
+			casus_belli = riseandfall_diadochi_cb
+			target = scope:rf_diadochi_browser_target_ruler_8
+			target_title = scope:rf_diadochi_browser_target_title_8
+		}
+	}
+
+	option = {
+		name = riseandfall_diadochi_browser.0001.b
+		trigger = { always = yes }
+	}
+
+	after = {
+		riseandfall_diadochi_clear_browser_targets_se = yes
+	}
+}

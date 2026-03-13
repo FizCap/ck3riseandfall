@@ -107,6 +107,10 @@ Common pitfalls (short)
 - Using wrong saved scope types (saving a barony then using it as a province) — verify scopes with `docs/event_scopes.log`.
 - Missing loc keys — game shows raw keys.
 - Editing vanilla templates directly — prefer `blockoverride` to remain compatible with other mods.
+- Freeform custom windows do not get arbitrary list data just because they exist; most `datamodel` collections are fed by hardcoded controllers (`DeclareWarInteractionWindow`, `ActivityGuestListWindow`, `CharacterSelectionList`, etc.).
+- `common/scripted_guis/` entries are wrappers for `is_shown`, `is_valid`, tooltips, and `effect`; they are good for launching/filling UI state but not for inventing new data providers.
+- Variable lists (`clear_variable_list`, `add_to_variable_list`, `has_variable_list`, `is_target_in_variable_list`) are engine-supported, but in vanilla they are usually consumed through existing planner/selection contexts rather than directly exposed by a generic custom `.gui` window.
+- When you need a custom browser but the final action is already handled by vanilla UI, prefer `open_interaction_window` or `open_view` as the handoff instead of duplicating the interaction in script.
 
 Vanilla idioms worth copying (high-signal)
 - Header + close pattern: `header_pattern` + `blockoverride "header_text"` + `blockoverride "button_close"`.
@@ -153,6 +157,23 @@ Notes for LLM usage
 - Prefer vanilla tokens and patterns. When in doubt, copy the smallest vanilla pattern and `blockoverride` it.
 - Always include an engineering contract and QA gates for each generated change.
 - When suggesting exact promote/function names (e.g., `GetPlayer`, `Character.GetID`), prefer verifying with `dump_data_types` before committing code.
+- Distinguish between three layers before designing a GUI solution:
+  - A script layer that can compute legality (`can_declare_war`, scripted triggers/effects).
+  - A wrapper layer that can launch or validate UI actions (`GetScriptedGui(...).Execute(...)`, `open_interaction_window`).
+  - A controller/datamodel layer that must already exist in the engine if you want a dynamic scrollable list.
+- If the controller/datamodel layer does not exist for your custom collection, a decision or event browser that hands off into a vanilla interaction is usually more robust than forcing a bespoke window.
+
+## Delta: Decision/event browser pattern for interaction handoff
+- Problem: Wanted a non-intrusive way to show all currently legal scripted-war targets without hardcoding a new controller-backed list window.
+- Fix: Use a player decision or compact button to trigger a scripted effect that caches legal targets into numbered scopes, then open a small event browser. Each option uses `open_interaction_window` to hand off into the vanilla interaction (`declare_war_interaction`) with the correct `recipient` and optional `target_title`.
+- Why this works:
+  - The legality computation stays in script and can reuse `can_declare_war` with the exact CB/title tuple.
+  - The player still gets the normal interaction confirmation UI.
+  - No dependency on an unavailable custom list controller.
+- Vanilla references worth copying:
+  - `game/common/important_actions/00_war_actions.txt` for `open_interaction_window = { interaction = declare_war_interaction actor = ... recipient = ... }`
+  - `game/common/scripted_guis/ce1_funeral_scripted_guis.txt` for scripted-GUI effects that fill variable lists before toggling a selection window
+  - `game/gui/window_activity_guest_list.gui` and `game/gui/interaction_create_claimant_faction.gui` for how hardcoded `CharacterSelectionList` controllers drive scrollable lists
 
 ## Delta: Title view giveaway toggle (window_title.gui)
 - Problem: Needed a per-title toggle in the Title window to flip the scripted variable `Riseandfall_giveaway_blocked` while showing the current state. Direct inline GUI expressions like ternaries, `SelectString`, or `Title.HasVariable` failed to parse.

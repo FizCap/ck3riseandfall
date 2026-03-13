@@ -64,6 +64,71 @@ riseandfall_can_use_diadochi_cb_trigger = {
     riseandfall_has_successor_primary_title_trigger = yes
 }
 
+riseandfall_can_browse_diadochi_targets_trigger = {
+    is_landed = yes
+    is_independent_ruler = yes
+    exists = primary_title
+    NOR = {
+        government_has_flag = government_is_landless_adventurer
+    }
+    OR = {
+        any_neighboring_realm_owner = {
+            NOT = { this = root }
+            is_landed = yes
+            is_independent_ruler = yes
+            exists = primary_title
+            NOT = { has_truce = root }
+            NOT = { is_allied_to = root }
+            NOT = { is_at_war_with = root }
+            root = {
+                can_declare_war = {
+                    defender = prev
+                    casus_belli = riseandfall_diadochi_cb
+                    target_titles = { prev.primary_title }
+                }
+            }
+        }
+        any_independent_ruler = {
+            NOT = { this = root }
+            is_landed = yes
+            is_independent_ruler = yes
+            exists = primary_title
+            NOT = { has_truce = root }
+            NOT = { is_allied_to = root }
+            NOT = { is_at_war_with = root }
+            root = {
+                can_declare_war = {
+                    defender = prev
+                    casus_belli = riseandfall_diadochi_cb
+                    target_titles = { prev.primary_title }
+                }
+            }
+        }
+        AND = {
+            riseandfall_has_successor_primary_title_trigger = yes
+            primary_title.var:rf_successor_origin_title = {
+                exists = holder
+                holder = {
+                    NOT = { this = root }
+                    is_landed = yes
+                    is_independent_ruler = yes
+                    exists = primary_title
+                    NOT = { has_truce = root }
+                    NOT = { is_allied_to = root }
+                    NOT = { is_at_war_with = root }
+                    root = {
+                        can_declare_war = {
+                            defender = prev
+                            casus_belli = riseandfall_diadochi_cb
+                            target_titles = { root.primary_title.var:rf_successor_origin_title }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 riseandfall_is_diadochi_target_trigger = {
     # Root scope is defender (called from allowed_against_character).
     # Keep this simple:

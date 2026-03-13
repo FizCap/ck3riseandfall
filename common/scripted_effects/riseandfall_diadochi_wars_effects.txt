@@ -27,11 +27,9 @@ riseandfall_diadochi_wars_se = {
 			OR = {
 				riseandfall_has_successor_primary_title_trigger = yes
 				any_independent_ruler = {
-					limit = {
-						NOT = { this = root }
-						riseandfall_has_successor_primary_title_trigger = yes
-						primary_title.var:rf_successor_origin_title = root.primary_title
-					}
+					NOT = { this = root }
+					riseandfall_has_successor_primary_title_trigger = yes
+					primary_title.var:rf_successor_origin_title = root.primary_title
 				}
 			}
 		}
@@ -125,6 +123,262 @@ riseandfall_diadochi_wars_se = {
 	clear_saved_scope = rf_diadochi_attacker
 }
 
+riseandfall_diadochi_clear_browser_targets_se = {
+	# Inputs: root is the ruler browsing Diadochi war targets.
+	# Outputs: clears all temporary browser scopes and flags.
+	# Data shape: numbered ruler/title saved scopes plus the shared origin/pending title scopes.
+	# Error modes: none; safe to call before opening or after closing the browser event.
+	clear_saved_scope = rf_diadochi_origin_title
+	clear_saved_scope = rf_diadochi_browser_pending_title
+	clear_saved_scope = rf_diadochi_browser_target_ruler_1
+	clear_saved_scope = rf_diadochi_browser_target_title_1
+	clear_saved_scope = rf_diadochi_browser_target_ruler_2
+	clear_saved_scope = rf_diadochi_browser_target_title_2
+	clear_saved_scope = rf_diadochi_browser_target_ruler_3
+	clear_saved_scope = rf_diadochi_browser_target_title_3
+	clear_saved_scope = rf_diadochi_browser_target_ruler_4
+	clear_saved_scope = rf_diadochi_browser_target_title_4
+	clear_saved_scope = rf_diadochi_browser_target_ruler_5
+	clear_saved_scope = rf_diadochi_browser_target_title_5
+	clear_saved_scope = rf_diadochi_browser_target_ruler_6
+	clear_saved_scope = rf_diadochi_browser_target_title_6
+	clear_saved_scope = rf_diadochi_browser_target_ruler_7
+	clear_saved_scope = rf_diadochi_browser_target_title_7
+	clear_saved_scope = rf_diadochi_browser_target_ruler_8
+	clear_saved_scope = rf_diadochi_browser_target_title_8
+	remove_variable = rf_diadochi_browser_has_overflow
+}
+
+riseandfall_diadochi_store_browser_target_se = {
+	# Inputs: root is the attacker, current scope is the defender, and
+	# scope:rf_diadochi_browser_pending_title is the legal CB target title.
+	# Outputs: stores the defender/title pair in the next free browser slot.
+	# Data shape: up to eight numbered saved scopes.
+	# Error modes: duplicate defenders are ignored; overflow is tracked with a flag.
+	if = {
+		limit = {
+			OR = {
+				AND = {
+					exists = scope:rf_diadochi_browser_target_ruler_1
+					this = scope:rf_diadochi_browser_target_ruler_1
+				}
+				AND = {
+					exists = scope:rf_diadochi_browser_target_ruler_2
+					this = scope:rf_diadochi_browser_target_ruler_2
+				}
+				AND = {
+					exists = scope:rf_diadochi_browser_target_ruler_3
+					this = scope:rf_diadochi_browser_target_ruler_3
+				}
+				AND = {
+					exists = scope:rf_diadochi_browser_target_ruler_4
+					this = scope:rf_diadochi_browser_target_ruler_4
+				}
+				AND = {
+					exists = scope:rf_diadochi_browser_target_ruler_5
+					this = scope:rf_diadochi_browser_target_ruler_5
+				}
+				AND = {
+					exists = scope:rf_diadochi_browser_target_ruler_6
+					this = scope:rf_diadochi_browser_target_ruler_6
+				}
+				AND = {
+					exists = scope:rf_diadochi_browser_target_ruler_7
+					this = scope:rf_diadochi_browser_target_ruler_7
+				}
+				AND = {
+					exists = scope:rf_diadochi_browser_target_ruler_8
+					this = scope:rf_diadochi_browser_target_ruler_8
+				}
+			}
+		}
+	}
+	else_if = {
+		limit = { NOT = { exists = scope:rf_diadochi_browser_target_ruler_1 } }
+		save_scope_as = rf_diadochi_browser_target_ruler_1
+		scope:rf_diadochi_browser_pending_title = { save_scope_as = rf_diadochi_browser_target_title_1 }
+	}
+	else_if = {
+		limit = { NOT = { exists = scope:rf_diadochi_browser_target_ruler_2 } }
+		save_scope_as = rf_diadochi_browser_target_ruler_2
+		scope:rf_diadochi_browser_pending_title = { save_scope_as = rf_diadochi_browser_target_title_2 }
+	}
+	else_if = {
+		limit = { NOT = { exists = scope:rf_diadochi_browser_target_ruler_3 } }
+		save_scope_as = rf_diadochi_browser_target_ruler_3
+		scope:rf_diadochi_browser_pending_title = { save_scope_as = rf_diadochi_browser_target_title_3 }
+	}
+	else_if = {
+		limit = { NOT = { exists = scope:rf_diadochi_browser_target_ruler_4 } }
+		save_scope_as = rf_diadochi_browser_target_ruler_4
+		scope:rf_diadochi_browser_pending_title = { save_scope_as = rf_diadochi_browser_target_title_4 }
+	}
+	else_if = {
+		limit = { NOT = { exists = scope:rf_diadochi_browser_target_ruler_5 } }
+		save_scope_as = rf_diadochi_browser_target_ruler_5
+		scope:rf_diadochi_browser_pending_title = { save_scope_as = rf_diadochi_browser_target_title_5 }
+	}
+	else_if = {
+		limit = { NOT = { exists = scope:rf_diadochi_browser_target_ruler_6 } }
+		save_scope_as = rf_diadochi_browser_target_ruler_6
+		scope:rf_diadochi_browser_pending_title = { save_scope_as = rf_diadochi_browser_target_title_6 }
+	}
+	else_if = {
+		limit = { NOT = { exists = scope:rf_diadochi_browser_target_ruler_7 } }
+		save_scope_as = rf_diadochi_browser_target_ruler_7
+		scope:rf_diadochi_browser_pending_title = { save_scope_as = rf_diadochi_browser_target_title_7 }
+	}
+	else_if = {
+		limit = { NOT = { exists = scope:rf_diadochi_browser_target_ruler_8 } }
+		save_scope_as = rf_diadochi_browser_target_ruler_8
+		scope:rf_diadochi_browser_pending_title = { save_scope_as = rf_diadochi_browser_target_title_8 }
+	}
+	else = {
+		set_variable = { name = rf_diadochi_browser_has_overflow value = 1 }
+	}
+}
+
+riseandfall_diadochi_prepare_browser_targets_se = {
+	# Inputs: root is the player ruler opening the Diadochi target browser.
+	# Outputs: stores up to eight legal defender/title pairs for the browser event.
+	# Data shape: numbered saved scopes plus an overflow flag when more targets exist.
+	# Error modes: no legal targets available because of truces, alliances, ongoing wars, or CB/title rules.
+	riseandfall_diadochi_clear_browser_targets_se = yes
+
+	if = {
+		limit = {
+			is_landed = yes
+			is_independent_ruler = yes
+			exists = primary_title
+			NOR = {
+				government_has_flag = government_is_landless_adventurer
+			}
+		}
+
+		if = {
+			limit = { riseandfall_has_successor_primary_title_trigger = yes }
+			primary_title.var:rf_successor_origin_title = { save_scope_as = rf_diadochi_origin_title }
+
+			every_neighboring_realm_owner = {
+				limit = {
+					NOT = { this = root }
+					is_landed = yes
+					is_independent_ruler = yes
+					exists = primary_title
+					NOT = { has_truce = root }
+					NOT = { is_allied_to = root }
+					NOT = { is_at_war_with = root }
+					root = {
+						can_declare_war = {
+							defender = prev
+							casus_belli = riseandfall_diadochi_cb
+							target_titles = { prev.primary_title }
+						}
+					}
+				}
+				primary_title = { save_scope_as = rf_diadochi_browser_pending_title }
+				riseandfall_diadochi_store_browser_target_se = yes
+			}
+
+			every_independent_ruler = {
+				limit = {
+					NOT = { this = root }
+					is_landed = yes
+					is_independent_ruler = yes
+					exists = primary_title
+					NOT = { has_truce = root }
+					NOT = { is_allied_to = root }
+					NOT = { is_at_war_with = root }
+					root = {
+						can_declare_war = {
+							defender = prev
+							casus_belli = riseandfall_diadochi_cb
+							target_titles = { prev.primary_title }
+						}
+					}
+				}
+				primary_title = { save_scope_as = rf_diadochi_browser_pending_title }
+				riseandfall_diadochi_store_browser_target_se = yes
+			}
+
+			if = {
+				limit = {
+					exists = scope:rf_diadochi_origin_title
+					scope:rf_diadochi_origin_title = { exists = holder }
+					scope:rf_diadochi_origin_title.holder = {
+						NOT = { this = root }
+						is_landed = yes
+						is_independent_ruler = yes
+						exists = primary_title
+						NOT = { has_truce = root }
+						NOT = { is_allied_to = root }
+						NOT = { is_at_war_with = root }
+						root = {
+							can_declare_war = {
+								defender = prev
+								casus_belli = riseandfall_diadochi_cb
+								target_titles = { scope:rf_diadochi_origin_title }
+							}
+						}
+					}
+				}
+				scope:rf_diadochi_origin_title.holder = {
+					scope:rf_diadochi_origin_title = { save_scope_as = rf_diadochi_browser_pending_title }
+					riseandfall_diadochi_store_browser_target_se = yes
+				}
+			}
+		}
+		else = {
+			primary_title = { save_scope_as = rf_diadochi_origin_title }
+
+			every_neighboring_realm_owner = {
+				limit = {
+					NOT = { this = root }
+					is_landed = yes
+					is_independent_ruler = yes
+					exists = primary_title
+					NOT = { has_truce = root }
+					NOT = { is_allied_to = root }
+					NOT = { is_at_war_with = root }
+					root = {
+						can_declare_war = {
+							defender = prev
+							casus_belli = riseandfall_diadochi_cb
+							target_titles = { prev.primary_title }
+						}
+					}
+				}
+				primary_title = { save_scope_as = rf_diadochi_browser_pending_title }
+				riseandfall_diadochi_store_browser_target_se = yes
+			}
+
+			every_independent_ruler = {
+				limit = {
+					NOT = { this = root }
+					is_landed = yes
+					is_independent_ruler = yes
+					exists = primary_title
+					NOT = { has_truce = root }
+					NOT = { is_allied_to = root }
+					NOT = { is_at_war_with = root }
+					root = {
+						can_declare_war = {
+							defender = prev
+							casus_belli = riseandfall_diadochi_cb
+							target_titles = { prev.primary_title }
+						}
+					}
+				}
+				primary_title = { save_scope_as = rf_diadochi_browser_pending_title }
+				riseandfall_diadochi_store_browser_target_se = yes
+			}
+		}
+	}
+
+	clear_saved_scope = rf_diadochi_browser_pending_title
+	clear_saved_scope = rf_diadochi_origin_title
+}
+
 riseandfall_diadochi_try_peer_target_se = {
 	clear_saved_scope = rf_diadochi_target_ruler
 	clear_saved_scope = rf_diadochi_target_title
@@ -149,21 +403,6 @@ riseandfall_diadochi_try_peer_target_se = {
 riseandfall_diadochi_try_neighbor_peer_target_se = {
 	clear_saved_scope = rf_diadochi_target_ruler
 	clear_saved_scope = rf_diadochi_target_title
-
-	# First, try to find a neighboring successor state from the same origin
-	any_neighboring_realm_owner = {
-		limit = {
-			NOT = { this = root }
-			is_landed = yes
-			is_independent_ruler = yes
-			exists = primary_title
-			is_imprisoned = no
-			is_at_war = no
-			riseandfall_has_successor_primary_title_trigger = yes
-			primary_title.var:rf_successor_origin_title = scope:rf_diadochi_origin_title
-			root.military_power > military_power
-		}
-	}
 
 	if = {
 		limit = {

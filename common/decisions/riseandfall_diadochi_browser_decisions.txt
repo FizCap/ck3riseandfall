@@ -1,0 +1,30 @@
+﻿riseandfall_browse_diadochi_targets = {
+	picture = { reference = "gfx/interface/illustrations/event_scenes/mpo_warrior_steppe_camp.dds" }
+	sort_order = 37
+	ai_check_interval = 0
+	desc = riseandfall_browse_diadochi_targets_desc
+	selection_tooltip = riseandfall_browse_diadochi_targets_tooltip
+	decision_group_type = riseandfall
+
+	is_shown = {
+		riseandfall_can_browse_diadochi_targets_trigger = yes
+	}
+
+	is_valid = {
+		riseandfall_can_browse_diadochi_targets_trigger = yes
+	}
+
+	effect = {
+		riseandfall_diadochi_prepare_browser_targets_se = yes
+		if = {
+			limit = { exists = scope:rf_diadochi_browser_target_ruler_1 }
+			trigger_event = riseandfall_diadochi_browser.0001
+		}
+		else = {
+			riseandfall_diadochi_clear_browser_targets_se = yes
+		}
+	}
+
+	ai_potential = {}
+	ai_will_do = { base = 0 }
+}
