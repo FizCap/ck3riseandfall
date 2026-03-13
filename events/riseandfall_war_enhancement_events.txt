@@ -521,7 +521,7 @@ riseandfall_war_enhancement.2 = {
 			ai_value_modifier = {
 				ai_vengefulness = -0.1
 				ai_energy = 0.3
-				ai_boldness > -0.3
+				ai_boldness = -0.3
 				ai_honor = -0.3
 				ai_rationality = 0.6
 			}
@@ -547,19 +547,19 @@ riseandfall_war_enhancement.2 = {
 				}
 			}
 			modifier = { #general uneasiness from executing kids (based on age) 
-				subtract = 20
+				add = -20
 				scope:riseandfall_war_enhancement_prev_liege = {
 					age < 20
 				}
 			}
 			modifier = { 
-				subtract = 20
+				add = -20
 				scope:riseandfall_war_enhancement_prev_liege = {
 					age <= 12
 				}
 			}
 			modifier = { 
-				subtract = 20
+				add = -20
 				scope:riseandfall_war_enhancement_prev_liege = {
 					age <= 6
 				}
@@ -1185,7 +1185,9 @@ riseandfall_war_enhancement.6 = {
 
 			modifier = { #I am the heir.
 				add = 100
-				scope:riseandfall_liege_elective_title.current_heir = root
+				scope:riseandfall_liege_elective_title.current_heir = {
+					this = root
+				}
 			}
 			
 		}
@@ -1236,7 +1238,9 @@ riseandfall_war_enhancement.6 = {
 			
 			modifier = { #I am already the heir, there is no reason to seize the realm.
 				add = -300
-				scope:riseandfall_liege_elective_title.current_heir = root
+				scope:riseandfall_liege_elective_title.current_heir = {
+					this = root
+				}
 			}
 			
 			opinion_modifier = { # Opinion Factor
