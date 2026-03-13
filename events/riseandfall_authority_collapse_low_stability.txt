@@ -15,26 +15,38 @@ authority_collapse.1001 = {
         hidden_effect = {
             # Run effects in the root character's scope to target their realm
             root = {
-                # Apply authority collapse modifier to all provinces in the realm
-                every_realm_province = {
-                    add_province_modifier = {
+                # Apply authority collapse modifier to all counties in the realm
+                every_realm_county = {
+                    add_county_modifier = {
                         modifier = riseandfall_authority_collapse
                         years = 10
                     }
                     # Force county control to 0 by subtracting the current control value
-                    county = {
-                        change_county_control = {
-                            value = -100
-                        }
+                    change_county_control = {
+                        value = -100
                     }
                 }
                 # Set low stability cooldown on the ruler
-                set_variable = { name = low_stability_cooldown value = yes years = 10 }
+                set_variable = { name = low_stability_cooldown value = yes years = 5 }
                 # Apply personal debuffs to the liege for the duration of the collapse
                 add_character_modifier = { modifier = riseandfall_authority_collapse_liege_debuff years = 5 }
-                    # If the liege has a treasury, remove it; also remove any short-term gold
-                    if = { limit = { treasury > 0 } remove_treasury = { value = treasury } }
-                    if = { limit = { gold > 1 } remove_short_term_gold = gold }
+                # If the liege has a treasury, remove 95% of it; also remove 95% of their short-term gold
+                if = {
+                    limit = { treasury > 0 }
+                    set_variable = { name = authority_collapse_treasury_loss value = treasury }
+                    change_variable = { name = authority_collapse_treasury_loss multiply = 0.95 }
+                    round_variable = { name = authority_collapse_treasury_loss nearest = 1 }
+                    remove_treasury = { value = authority_collapse_treasury_loss }
+                    remove_variable = authority_collapse_treasury_loss
+                }
+                if = {
+                    limit = { gold > 1 }
+                    set_variable = { name = authority_collapse_gold_loss value = gold }
+                    change_variable = { name = authority_collapse_gold_loss multiply = 0.95 }
+                    round_variable = { name = authority_collapse_gold_loss nearest = 1 }
+                    remove_short_term_gold = authority_collapse_gold_loss
+                    remove_variable = authority_collapse_gold_loss
+                }
             }
         }
     }
