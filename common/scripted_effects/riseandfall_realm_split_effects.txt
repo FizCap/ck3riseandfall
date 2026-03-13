@@ -865,8 +865,8 @@ riseandfall_execute_realm_split_se = {
         # a permanent snapshot on the title for future shrink checks.
         scope:rf_breakaway_ruler = { set_variable = { name = tmp_successor_realm_size value = realm_size } }
         scope:new_realm_ruler.primary_title = {
-            set_variable = { name = rf_successor_origin_title value = scope:original_primary years = 50 }
-            set_variable = { name = rf_is_successor_split_title value = 1 years = 50 }
+            set_variable = { name = rf_successor_origin_title value = scope:original_primary years = 30 }
+            set_variable = { name = rf_is_successor_split_title value = 1 years = 30 }
             # Permanent marker for this title indicating it's a split realm successor
             set_variable = { name = rf_is_permanent_successor_split value = 1 }
             # Store the baseline realm size (number of counties) on the title permanently
