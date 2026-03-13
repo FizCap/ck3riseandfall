@@ -368,8 +368,8 @@
     max_defender_score_from_occupation = 100
 
     # Keep the vanilla/intent behavior flags
-    full_occupation_by_defender_gives_victory = no
-    full_occupation_by_attacker_gives_victory = no
+    full_occupation_by_defender_gives_victory = yes
+    full_occupation_by_attacker_gives_victory = yes
     landless_attacker_needs_armies = no
     allow_hostages = yes
 
