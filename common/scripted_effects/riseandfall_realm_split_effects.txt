@@ -829,26 +829,6 @@ riseandfall_execute_realm_split_se = {
     add_unpressed_claim = scope:original_primary
 
     if = {
-        limit = { exists = scope:original_ruler }
-        if = {
-            limit = {
-                can_set_relation_rival_trigger = { CHARACTER = scope:original_ruler }
-                NOT = { has_relation_rival = scope:original_ruler }
-            }
-            set_relation_rival = { target = scope:original_ruler reason = riseandfall_realmsplit_became_rival }
-        }
-        scope:original_ruler = {
-            if = {
-                limit = {
-                    can_set_relation_rival_trigger = { CHARACTER = scope:new_realm_ruler }
-                    NOT = { has_relation_rival = scope:new_realm_ruler }
-                }
-                set_relation_rival = { target = scope:new_realm_ruler reason = riseandfall_realmsplit_became_rival }
-            }
-        }
-    }
-
-    if = {
         limit = { exists = scope:new_realm_ruler }
         scope:new_realm_ruler = {
             set_variable = { name = low_stability_cooldown value = yes years = 5 }
