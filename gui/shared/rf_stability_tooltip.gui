@@ -17,9 +17,7 @@ types RiseAndFallStabilityTooltipTypes
 		# ── Header title ─────────────────────────────────────────────────────────
 		blockoverride "title_text"
 		{
-			margin = { 0 8 }
-			text = "REALM_STABILITY_TT_TITLE"
-			default_format = "#T"
+			raw_text = ""
 		}
 
 		# ── Hide the top-right concept link (score shown in the HUD bar already) ──
@@ -31,72 +29,48 @@ types RiseAndFallStabilityTooltipTypes
 		# ── Coloured status subtitle ──────────────────────────────────────────────
 		blockoverride "subheading"
 		{
-			text_single = {
-				layoutpolicy_horizontal = expanding
-				autoresize = yes
-				fontsize_min = 14
-				using = Font_Size_Small
-				text = "REALM_STABILITY_TT_STATUS"
-				fonttintcolor = "[TooltipInfo.GetTintColor]"
-				max_width = 400
-				margin_top = -4
-			}
+			raw_text = ""
 		}
 
 		# ── Decorative header image — swaps based on stability level ──────────────
 		blockoverride "header_additions"
 		{
 			widget = {
-				size = { 120 74 }
+				size = { 500 92 }
 
 				# High stability (≥ 70)
 				widget = {
-					size = { 240 74 }
-					position = { -16 0 }
+					size = { 500 92 }
 					visible = "[GreaterThanOrEqualTo_CFixedPoint( Character.MakeScope.Var('riseandfall_realm_stability_score').GetValue, '(CFixedPoint)70' )]"
 
 					proportional_icon = {
 						size = { 100% 100% }
 						texture = "gfx/interface/illustrations/event_story/High Stability.dds"
 						using = Mask_Rough_Edges
-						modify_texture = {
-							texture = "gfx/interface/component_masks/mask_fade_horizontal_right.dds"
-							blend_mode = alphaMultiply
-						}
 					}
 				}
 
 				# Medium stability (31–69)
 				widget = {
-					size = { 240 74 }
-					position = { -16 0 }
+					size = { 500 92 }
 					visible = "[And( GreaterThanOrEqualTo_CFixedPoint( Character.MakeScope.Var('riseandfall_realm_stability_score').GetValue, '(CFixedPoint)31' ), LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_realm_stability_score').GetValue, '(CFixedPoint)70' ) )]"
 
 					proportional_icon = {
 						size = { 100% 100% }
 						texture = "gfx/interface/illustrations/event_story/Medium Stability.dds"
 						using = Mask_Rough_Edges
-						modify_texture = {
-							texture = "gfx/interface/component_masks/mask_fade_horizontal_right.dds"
-							blend_mode = alphaMultiply
-						}
 					}
 				}
 
 				# Low stability (≤ 30)
 				widget = {
-					size = { 240 74 }
-					position = { -16 0 }
+					size = { 500 92 }
 					visible = "[LessThanOrEqualTo_CFixedPoint( Character.MakeScope.Var('riseandfall_realm_stability_score').GetValue, '(CFixedPoint)30' )]"
 
 					proportional_icon = {
 						size = { 100% 100% }
 						texture = "gfx/interface/illustrations/event_story/Low Stability.dds"
 						using = Mask_Rough_Edges
-						modify_texture = {
-							texture = "gfx/interface/component_masks/mask_fade_horizontal_right.dds"
-							blend_mode = alphaMultiply
-						}
 					}
 				}
 			}
@@ -108,34 +82,14 @@ types RiseAndFallStabilityTooltipTypes
 			vbox = {
 				layoutpolicy_horizontal = expanding
 				margin_right = 10
+				margin_top = 4
 
-				# ── Stability Track section header (icon + label + darkened bg) ──
-				hbox = {
-					name = "stability_track_header"
+				text_single = {
+					text = "REALM_STABILITY_TT_TITLE"
+					default_format = "#T"
 					layoutpolicy_horizontal = expanding
-					spacing = 5
-					margin_left = -10
-					min_height = 40
-
-					background = {
-						using = Background_Area
-						margin = { -5 -5 }
-						modify_texture = {
-							texture = "gfx/interface/component_masks/mask_fade_horizontal_right.dds"
-							blend_mode = alphaMultiply
-						}
-					}
-
-					icon = {
-						size = { 22 22 }
-						texture = "gfx/interface/icons/scale_of_power.dds"
-					}
-
-					text_single = {
-						text = "REALM_STABILITY_TT_TRACK_TITLE"
-						layoutpolicy_horizontal = expanding
-						align = nobaseline
-					}
+					align = hcenter|nobaseline
+					margin_bottom = 4
 				}
 
 				# ── Wide colour-coded progress bar ───────────────────────────────
