@@ -63,6 +63,12 @@ riseandfall_calculate_realm_stability_se = {
                 change_global_variable = { name = riseandfall_avg_learning divide = global_var:riseandfall_ruler_count }
                 change_global_variable = { name = riseandfall_avg_total divide = global_var:riseandfall_ruler_count }
                 change_global_variable = { name = riseandfall_avg_total divide = 5 }
+
+                clamp_global_variable = { name = riseandfall_avg_diplomacy min = 10 }
+                clamp_global_variable = { name = riseandfall_avg_martial min = 10 }
+                clamp_global_variable = { name = riseandfall_avg_stewardship min = 10 }
+                clamp_global_variable = { name = riseandfall_avg_intrigue min = 10 }
+                clamp_global_variable = { name = riseandfall_avg_learning min = 10 }
             }
         }
         change_global_variable = { name = riseandfall_stat_avg_years add = 1 }
@@ -98,6 +104,12 @@ riseandfall_calculate_realm_stability_se = {
                 # average of five stats = total / (count*5)
                 change_global_variable = { name = riseandfall_avg_total divide = global_var:riseandfall_ruler_count }
                 change_global_variable = { name = riseandfall_avg_total divide = 5 }
+
+                clamp_global_variable = { name = riseandfall_avg_diplomacy min = 10 }
+                clamp_global_variable = { name = riseandfall_avg_martial min = 10 }
+                clamp_global_variable = { name = riseandfall_avg_stewardship min = 10 }
+                clamp_global_variable = { name = riseandfall_avg_intrigue min = 10 }
+                clamp_global_variable = { name = riseandfall_avg_learning min = 10 }
             }
         }
     }
