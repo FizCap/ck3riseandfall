@@ -45,6 +45,10 @@
                 save_scope_as = riseandfall_created_adventurer_title
             }
 
+            scope:riseandfall_created_adventurer_title = {
+                set_variable = { name = riseandfall_created_adventurer_title value = yes }
+            }
+
             # Send immediate UI confirmation to the player
             hidden_effect = {
                 send_interface_toast = {

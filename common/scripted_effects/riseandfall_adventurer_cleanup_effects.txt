@@ -3,12 +3,12 @@
         # Save the current ruler as a character scope so we can call character-only
         # effects (like destroy_title and gold removal) from inside title loops.
         save_scope_as = rf_ruler
-        # Destroy any titles created by this mod for AI rulers without the adventurer flag
+        # Destroy any mod-created adventurer titles held by AI rulers once their
+        # new-adventurer grace flag is gone, even if the original adventurer died.
         if = {
             limit = {
                 is_ai = yes
                 is_landed = no
-                has_character_flag = riseandfall_adventurer
                 NOT = { has_character_flag = riseandfall_newadventurer }
             }
             save_scope_as = rf_ruler

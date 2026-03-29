@@ -395,9 +395,9 @@ riseandfall_palace_coup_setup = {
 				scope:palace_coup_challenger_camp_title = {
 					set_variable = { name = riseandfall_created_adventurer_title value = yes }
 				}
+				scope:event_root = { set_variable = { name = challenger_camp_created value = yes } }
 			}
 		}
-		scope:event_root = { set_variable = { name = challenger_camp_created value = yes } }
 		
 		# -----------------------------------------------------
 		# MOVE ENTOURAGE
@@ -850,11 +850,18 @@ riseandfall_palace_coup_challenger_calls_banners = {
 # Centralized cleanup for palace coup temporary camp title
 riseandfall_palace_coup_cleanup_camp = {
 	if = {
-		limit = { scope:event_root = { is_alive = yes has_variable = challenger_camp_created } scope:challenger = { is_alive = yes has_title = scope:palace_coup_challenger_camp_title } }
+		limit = {
+			scope:event_root = { is_alive = yes has_variable = challenger_camp_created }
+			exists = scope:palace_coup_challenger_camp_title
+			scope:challenger = { is_alive = yes has_title = scope:palace_coup_challenger_camp_title }
+		}
 		scope:challenger = { destroy_title = scope:palace_coup_challenger_camp_title }
 	}
 	else_if = {
-		limit = { scope:event_root = { is_alive = yes has_variable = challenger_camp_created } }
+		limit = {
+			scope:event_root = { is_alive = yes has_variable = challenger_camp_created }
+			exists = scope:palace_coup_challenger_camp_title
+		}
 		root = { destroy_title = scope:palace_coup_challenger_camp_title }
 	}
 	# Remove marker variable from event_root
