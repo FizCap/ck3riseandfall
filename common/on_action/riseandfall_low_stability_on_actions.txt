@@ -21,6 +21,24 @@ on_imprison = {
     }
 }
 
+on_title_gain = {
+    on_actions = {
+        riseandfall_warlord
+    }
+}
+
+on_title_gain_inheritance = {
+    on_actions = {
+        riseandfall_warlord
+    }
+}
+
+on_title_lost = {
+    on_actions = {
+        riseandfall_warlord
+    }
+}
+
 riseandfall_force_diadochi_wars = {
     trigger = {
         has_game_rule = riseandfall_dynamic_story_mode_enabled
