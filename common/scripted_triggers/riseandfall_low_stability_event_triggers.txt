@@ -26,4 +26,9 @@ riseandfall_low_stability_realm_split_available_trigger = {
 
 riseandfall_low_stability_authority_collapse_available_trigger = {
     NOT = { exists = global_var:riseandfall_low_stability_event_authority_collapse_disabled }
+    NOT = {
+        any_realm_county = {
+            has_county_modifier = riseandfall_authority_collapse
+        }
+    }
 }
