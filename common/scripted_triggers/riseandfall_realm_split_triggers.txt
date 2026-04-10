@@ -26,26 +26,11 @@ riseandfall_can_realm_split_trigger = {
     # Do not split again if this realm was recently created by a split.
     # These variables live on the title for 50 years.
     NOT = { primary_title = { has_variable = rf_successor_origin_title } }
-    # Must have at least 2 vassals (powerful vassals for feudal, regular vassals for administrative)
-    OR = {
-        # Normal governments with powerful vassals
-        AND = {
-            NOT = { riseandfall_no_powerful_vassals_trigger = yes }
-            any_powerful_vassal = {
-                count >= 2
-                is_landed = yes
-                primary_title.tier >= tier_county
-            }
-        }
-        # Governments without powerful vassals - use regular vassals
-        AND = {
-            riseandfall_no_powerful_vassals_trigger = yes
-            any_vassal = {
-                count >= 2
-                is_landed = yes
-                primary_title.tier >= tier_county
-            }
-        }
+    # Must have at least 2 landed vassals
+    any_vassal = {
+        count >= 2
+        is_landed = yes
+        primary_title.tier >= tier_county
     }
 }
 
