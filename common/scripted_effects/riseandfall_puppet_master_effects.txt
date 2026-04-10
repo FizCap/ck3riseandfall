@@ -87,7 +87,6 @@ riseandfall_overthrow_liege_effect = {
 				holder = scope:recipient
 				# Avoid changing barony-level titles directly (engine requires changing the county instead)
 				NOT = { tier = tier_barony }
-				NOT = { is_head_of_faith = yes }
 				NOT = { is_noble_family_title = yes }
 			}
 			change_title_holder = {
@@ -95,6 +94,17 @@ riseandfall_overthrow_liege_effect = {
 				change = scope:change
 				take_baronies = yes
 			}
+		}
+		every_vassal = {
+			limit = { NOT = { this = scope:actor } }
+			change_liege = {
+				liege = scope:actor
+				change = scope:change
+			}
+		}
+		change_liege = {
+			liege = scope:actor
+			change = scope:change
 		}
 	}
 	resolve_title_and_vassal_change = scope:change
