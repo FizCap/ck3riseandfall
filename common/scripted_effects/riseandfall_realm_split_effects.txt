@@ -1,7 +1,7 @@
 ﻿##########################
 # Rise and Fall - Realm Split System
-# Dynamic realm split: seeds breakaways by kingdom first, then allows extra duchy-level fractures in large realms.
-# Breakaways become independent tributaries while the original ruler keeps their capital core and the unassigned remainder.
+# Empire and hegemony splits seed by kingdom, while kingdom-tier splits seed by duchy.
+# The original ruler keeps their capital core and any territory outside the seeded regions.
 # Supports governments without powerful vassals (Celestial, Japanese, Administrative, Meritocratic, etc.)
 # All governments use county-tier or above
 
@@ -20,6 +20,40 @@ riseandfall_mark_secondary_breakaway_seed_se = {
     scope:original_ruler = { change_variable = { name = rf_breakaway_seed_count add = 1 } }
 }
 
+riseandfall_assign_saved_kingdom_to_seed_se = {
+    scope:original_ruler = {
+        every_vassal = {
+            limit = {
+                is_landed = yes
+                NOT = { has_character_flag = rf_breakaway_ruler }
+                NOT = { has_variable = rf_my_breakaway }
+                primary_title.tier >= tier_county
+                NOT = { primary_title.tier >= tier_empire }
+                NOT = { capital_county.duchy = scope:original_ruler.capital_county.duchy }
+                capital_county.kingdom = scope:rf_assign_kingdom
+            }
+            set_variable = { name = rf_my_breakaway value = scope:rf_active_seed }
+        }
+    }
+}
+
+riseandfall_assign_saved_duchy_to_seed_se = {
+    scope:original_ruler = {
+        every_vassal = {
+            limit = {
+                is_landed = yes
+                NOT = { has_character_flag = rf_breakaway_ruler }
+                NOT = { has_variable = rf_my_breakaway }
+                primary_title.tier >= tier_county
+                NOT = { primary_title.tier >= tier_empire }
+                NOT = { capital_county.duchy = scope:rf_capital_duchy }
+                capital_county.duchy = scope:rf_assign_duchy
+            }
+            set_variable = { name = rf_my_breakaway value = scope:rf_active_seed }
+        }
+    }
+}
+
 ##########################
 # Main Realm Split Effect
 # Called on the ruler who is being split
@@ -31,6 +65,7 @@ riseandfall_realm_split_se = {
     scope:original_ruler = {
         set_variable = { name = rf_breakaway_seed_count value = 0 }
         capital_county.kingdom = { save_scope_as = rf_capital_kingdom }
+        capital_county.duchy = { save_scope_as = rf_capital_duchy }
         remove_character_flag = rf_split_small
         remove_character_flag = rf_split_medium
         remove_character_flag = rf_split_large
@@ -43,6 +78,8 @@ riseandfall_realm_split_se = {
         every_vassal = {
             limit = { is_landed = yes }
             remove_character_flag = rf_breakaway_ruler
+            remove_character_flag = rf_major_breakaway_seed
+            remove_character_flag = rf_secondary_breakaway_seed
             remove_variable = rf_my_breakaway
             remove_variable = rf_seeded_kingdom
             remove_variable = rf_seeded_duchy
@@ -99,104 +136,231 @@ riseandfall_realm_split_se = {
         }
     }
 
-    # Phase 1: one primary seed per non-capital kingdom, with the odds scaling by realm size.
-    scope:original_ruler = {
-        every_realm_de_jure_kingdom = {
-            limit = { NOT = { this = scope:rf_capital_kingdom } }
-            save_scope_as = rf_seed_kingdom
+    # Phase 1: seed the split at kingdom scale for empire/hegemony realms and
+    # at duchy scale for kingdom-tier realms.
+    if = {
+        limit = {
+            scope:original_primary = {
+                OR = {
+                    tier = tier_empire
+                    tier = tier_hegemony
+                }
+            }
+        }
+        scope:original_ruler = {
+            every_realm_de_jure_kingdom = {
+                limit = { NOT = { this = scope:rf_capital_kingdom } }
+                save_scope_as = rf_seed_kingdom
 
-            if = {
-                limit = { scope:original_ruler = { has_character_flag = rf_split_extreme } }
-                scope:original_ruler = {
-                    ordered_vassal = {
-                        limit = {
-                            is_landed = yes
-                            primary_title.tier >= tier_county
-                            NOT = { primary_title.tier >= tier_empire }
-                            NOT = { has_character_flag = rf_breakaway_ruler }
-                            capital_county.kingdom = scope:rf_seed_kingdom
-                        }
-                        order_by = current_military_strength
-                        max = 1
-                        riseandfall_mark_primary_breakaway_seed_se = yes
-                    }
-                }
-            }
-            else_if = {
-                limit = { scope:original_ruler = { has_character_flag = rf_split_large } }
-                random = {
-                    chance = 90
-                    scope:original_ruler = {
-                        ordered_vassal = {
-                            limit = {
-                                is_landed = yes
-                                primary_title.tier >= tier_county
-                                NOT = { primary_title.tier >= tier_empire }
-                                NOT = { has_character_flag = rf_breakaway_ruler }
-                                capital_county.kingdom = scope:rf_seed_kingdom
+                if = {
+                    limit = { scope:original_ruler = { has_character_flag = rf_split_extreme } }
+                    random = {
+                        chance = 60
+                        scope:original_ruler = {
+                            ordered_vassal = {
+                                limit = {
+                                    is_landed = yes
+                                    primary_title.tier >= tier_county
+                                    NOT = { primary_title.tier >= tier_empire }
+                                    NOT = { has_character_flag = rf_breakaway_ruler }
+                                    capital_county.kingdom = scope:rf_seed_kingdom
+                                }
+                                order_by = current_military_strength
+                                max = 1
+                                riseandfall_mark_primary_breakaway_seed_se = yes
                             }
-                            order_by = current_military_strength
-                            max = 1
-                            riseandfall_mark_primary_breakaway_seed_se = yes
                         }
                     }
                 }
-            }
-            else_if = {
-                limit = { scope:original_ruler = { has_character_flag = rf_split_medium } }
-                random = {
-                    chance = 70
-                    scope:original_ruler = {
-                        ordered_vassal = {
-                            limit = {
-                                is_landed = yes
-                                primary_title.tier >= tier_county
-                                NOT = { primary_title.tier >= tier_empire }
-                                NOT = { has_character_flag = rf_breakaway_ruler }
-                                capital_county.kingdom = scope:rf_seed_kingdom
+                else_if = {
+                    limit = { scope:original_ruler = { has_character_flag = rf_split_large } }
+                    random = {
+                        chance = 50
+                        scope:original_ruler = {
+                            ordered_vassal = {
+                                limit = {
+                                    is_landed = yes
+                                    primary_title.tier >= tier_county
+                                    NOT = { primary_title.tier >= tier_empire }
+                                    NOT = { has_character_flag = rf_breakaway_ruler }
+                                    capital_county.kingdom = scope:rf_seed_kingdom
+                                }
+                                order_by = current_military_strength
+                                max = 1
+                                riseandfall_mark_primary_breakaway_seed_se = yes
                             }
-                            order_by = current_military_strength
-                            max = 1
-                            riseandfall_mark_primary_breakaway_seed_se = yes
+                        }
+                    }
+                }
+                else_if = {
+                    limit = { scope:original_ruler = { has_character_flag = rf_split_medium } }
+                    random = {
+                        chance = 40
+                        scope:original_ruler = {
+                            ordered_vassal = {
+                                limit = {
+                                    is_landed = yes
+                                    primary_title.tier >= tier_county
+                                    NOT = { primary_title.tier >= tier_empire }
+                                    NOT = { has_character_flag = rf_breakaway_ruler }
+                                    capital_county.kingdom = scope:rf_seed_kingdom
+                                }
+                                order_by = current_military_strength
+                                max = 1
+                                riseandfall_mark_primary_breakaway_seed_se = yes
+                            }
+                        }
+                    }
+                }
+                else_if = {
+                    limit = { scope:original_ruler = { has_character_flag = rf_split_small } }
+                    random = {
+                        chance = 30
+                        scope:original_ruler = {
+                            ordered_vassal = {
+                                limit = {
+                                    is_landed = yes
+                                    primary_title.tier >= tier_county
+                                    NOT = { primary_title.tier >= tier_empire }
+                                    NOT = { has_character_flag = rf_breakaway_ruler }
+                                    capital_county.kingdom = scope:rf_seed_kingdom
+                                }
+                                order_by = current_military_strength
+                                max = 1
+                                riseandfall_mark_primary_breakaway_seed_se = yes
+                            }
+                        }
+                    }
+                }
+                else = {
+                    random = {
+                        chance = 20
+                        scope:original_ruler = {
+                            ordered_vassal = {
+                                limit = {
+                                    is_landed = yes
+                                    primary_title.tier >= tier_county
+                                    NOT = { primary_title.tier >= tier_empire }
+                                    NOT = { has_character_flag = rf_breakaway_ruler }
+                                    capital_county.kingdom = scope:rf_seed_kingdom
+                                }
+                                order_by = current_military_strength
+                                max = 1
+                                riseandfall_mark_primary_breakaway_seed_se = yes
+                            }
                         }
                     }
                 }
             }
-            else_if = {
-                limit = { scope:original_ruler = { has_character_flag = rf_split_small } }
-                random = {
-                    chance = 45
-                    scope:original_ruler = {
-                        ordered_vassal = {
-                            limit = {
-                                is_landed = yes
-                                primary_title.tier >= tier_county
-                                NOT = { primary_title.tier >= tier_empire }
-                                NOT = { has_character_flag = rf_breakaway_ruler }
-                                capital_county.kingdom = scope:rf_seed_kingdom
+        }
+    }
+    else = {
+        scope:original_ruler = {
+            every_realm_de_jure_duchy = {
+                limit = { NOT = { this = scope:rf_capital_duchy } }
+                save_scope_as = rf_seed_duchy
+
+                if = {
+                    limit = { scope:original_ruler = { has_character_flag = rf_split_extreme } }
+                    random = {
+                        chance = 45
+                        scope:original_ruler = {
+                            ordered_vassal = {
+                                limit = {
+                                    is_landed = yes
+                                    primary_title.tier >= tier_county
+                                    NOT = { primary_title.tier >= tier_empire }
+                                    NOT = { has_character_flag = rf_breakaway_ruler }
+                                    capital_county.duchy = scope:rf_seed_duchy
+                                }
+                                order_by = current_military_strength
+                                max = 1
+                                capital_county.kingdom = { save_scope_as = rf_seed_kingdom }
+                                riseandfall_mark_primary_breakaway_seed_se = yes
                             }
-                            order_by = current_military_strength
-                            max = 1
-                            riseandfall_mark_primary_breakaway_seed_se = yes
                         }
                     }
                 }
-            }
-            else = {
-                random = {
-                    chance = 20
-                    scope:original_ruler = {
-                        ordered_vassal = {
-                            limit = {
-                                is_landed = yes
-                                primary_title.tier >= tier_county
-                                NOT = { primary_title.tier >= tier_empire }
-                                NOT = { has_character_flag = rf_breakaway_ruler }
-                                capital_county.kingdom = scope:rf_seed_kingdom
+                else_if = {
+                    limit = { scope:original_ruler = { has_character_flag = rf_split_large } }
+                    random = {
+                        chance = 35
+                        scope:original_ruler = {
+                            ordered_vassal = {
+                                limit = {
+                                    is_landed = yes
+                                    primary_title.tier >= tier_county
+                                    NOT = { primary_title.tier >= tier_empire }
+                                    NOT = { has_character_flag = rf_breakaway_ruler }
+                                    capital_county.duchy = scope:rf_seed_duchy
+                                }
+                                order_by = current_military_strength
+                                max = 1
+                                capital_county.kingdom = { save_scope_as = rf_seed_kingdom }
+                                riseandfall_mark_primary_breakaway_seed_se = yes
                             }
-                            order_by = current_military_strength
-                            max = 1
-                            riseandfall_mark_primary_breakaway_seed_se = yes
+                        }
+                    }
+                }
+                else_if = {
+                    limit = { scope:original_ruler = { has_character_flag = rf_split_medium } }
+                    random = {
+                        chance = 28
+                        scope:original_ruler = {
+                            ordered_vassal = {
+                                limit = {
+                                    is_landed = yes
+                                    primary_title.tier >= tier_county
+                                    NOT = { primary_title.tier >= tier_empire }
+                                    NOT = { has_character_flag = rf_breakaway_ruler }
+                                    capital_county.duchy = scope:rf_seed_duchy
+                                }
+                                order_by = current_military_strength
+                                max = 1
+                                capital_county.kingdom = { save_scope_as = rf_seed_kingdom }
+                                riseandfall_mark_primary_breakaway_seed_se = yes
+                            }
+                        }
+                    }
+                }
+                else_if = {
+                    limit = { scope:original_ruler = { has_character_flag = rf_split_small } }
+                    random = {
+                        chance = 20
+                        scope:original_ruler = {
+                            ordered_vassal = {
+                                limit = {
+                                    is_landed = yes
+                                    primary_title.tier >= tier_county
+                                    NOT = { primary_title.tier >= tier_empire }
+                                    NOT = { has_character_flag = rf_breakaway_ruler }
+                                    capital_county.duchy = scope:rf_seed_duchy
+                                }
+                                order_by = current_military_strength
+                                max = 1
+                                capital_county.kingdom = { save_scope_as = rf_seed_kingdom }
+                                riseandfall_mark_primary_breakaway_seed_se = yes
+                            }
+                        }
+                    }
+                }
+                else = {
+                    random = {
+                        chance = 12
+                        scope:original_ruler = {
+                            ordered_vassal = {
+                                limit = {
+                                    is_landed = yes
+                                    primary_title.tier >= tier_county
+                                    NOT = { primary_title.tier >= tier_empire }
+                                    NOT = { has_character_flag = rf_breakaway_ruler }
+                                    capital_county.duchy = scope:rf_seed_duchy
+                                }
+                                order_by = current_military_strength
+                                max = 1
+                                capital_county.kingdom = { save_scope_as = rf_seed_kingdom }
+                                riseandfall_mark_primary_breakaway_seed_se = yes
+                            }
                         }
                     }
                 }
@@ -243,299 +407,412 @@ riseandfall_realm_split_se = {
         }
     }
 
-    # Phase 2: large realms can splinter further at duchy scale, including the
-    # capital kingdom as long as the ruler keeps the capital duchy.
+    # The strongest seeds become the likely large successor states.
+    if = {
+        limit = {
+            has_variable = rf_breakaway_seed_count
+            var:rf_breakaway_seed_count >= 1
+        }
+        scope:original_ruler = {
+            ordered_vassal = {
+                limit = { has_character_flag = rf_breakaway_ruler }
+                order_by = current_military_strength
+                max = 1
+                add_character_flag = { flag = rf_major_breakaway_seed days = 30 }
+            }
+        }
+    }
+    if = {
+        limit = {
+            has_variable = rf_breakaway_seed_count
+            var:rf_breakaway_seed_count >= 2
+        }
+        scope:original_ruler = {
+            ordered_vassal = {
+                limit = {
+                    has_character_flag = rf_breakaway_ruler
+                    NOT = { has_character_flag = rf_major_breakaway_seed }
+                }
+                order_by = current_military_strength
+                max = 1
+                add_character_flag = { flag = rf_secondary_breakaway_seed days = 30 }
+            }
+        }
+    }
+
+    # Phase 2: seeded rulers keep their home region first.
+    if = {
+        limit = {
+            scope:original_primary = {
+                OR = {
+                    tier = tier_empire
+                    tier = tier_hegemony
+                }
+            }
+        }
+        scope:original_ruler = {
+            every_vassal = {
+                limit = {
+                    has_character_flag = rf_breakaway_ruler
+                    has_variable = rf_seeded_kingdom
+                }
+                save_scope_as = rf_active_seed
+
+                scope:original_ruler = {
+                    every_vassal = {
+                        limit = {
+                            is_landed = yes
+                            NOT = { has_character_flag = rf_breakaway_ruler }
+                            NOT = { has_variable = rf_my_breakaway }
+                            primary_title.tier >= tier_county
+                            NOT = { primary_title.tier >= tier_empire }
+                            NOT = { capital_county.duchy = scope:rf_capital_duchy }
+                            capital_county.kingdom = scope:rf_active_seed.var:rf_seeded_kingdom
+                        }
+                        set_variable = { name = rf_my_breakaway value = scope:rf_active_seed }
+                    }
+                }
+            }
+        }
+    }
+    else = {
+        scope:original_ruler = {
+            every_vassal = {
+                limit = {
+                    has_character_flag = rf_breakaway_ruler
+                    has_variable = rf_seeded_duchy
+                }
+                save_scope_as = rf_active_seed
+
+                scope:original_ruler = {
+                    every_vassal = {
+                        limit = {
+                            is_landed = yes
+                            NOT = { has_character_flag = rf_breakaway_ruler }
+                            NOT = { has_variable = rf_my_breakaway }
+                            primary_title.tier >= tier_county
+                            NOT = { primary_title.tier >= tier_empire }
+                            NOT = { capital_county.duchy = scope:rf_capital_duchy }
+                            capital_county.duchy = scope:rf_active_seed.var:rf_seeded_duchy
+                        }
+                        set_variable = { name = rf_my_breakaway value = scope:rf_active_seed }
+                    }
+                }
+            }
+        }
+    }
+
+    # Phase 3: unseeded regions are claimed by nearby strong seeds so the
+    # successor map keeps de jure borders but varies in size.
+    if = {
+        limit = {
+            scope:original_primary = {
+                OR = {
+                    tier = tier_empire
+                    tier = tier_hegemony
+                }
+            }
+        }
+        scope:original_ruler = {
+            every_realm_de_jure_kingdom = {
+                limit = { NOT = { this = scope:rf_capital_kingdom } }
+                save_scope_as = rf_assign_kingdom
+
+                if = {
+                    limit = {
+                        scope:original_ruler = {
+                            any_vassal = {
+                                is_landed = yes
+                                NOT = { has_character_flag = rf_breakaway_ruler }
+                                NOT = { has_variable = rf_my_breakaway }
+                                primary_title.tier >= tier_county
+                                NOT = { primary_title.tier >= tier_empire }
+                                capital_county.kingdom = scope:rf_assign_kingdom
+                            }
+                        }
+                    }
+
+                    if = {
+                        limit = {
+                            scope:original_ruler = {
+                                any_vassal = {
+                                    has_character_flag = rf_major_breakaway_seed
+                                    scope:rf_assign_kingdom = { is_neighbor_to_realm = prev }
+                                }
+                            }
+                        }
+                        scope:original_ruler = {
+                            ordered_vassal = {
+                                limit = {
+                                    has_character_flag = rf_major_breakaway_seed
+                                    scope:rf_assign_kingdom = { is_neighbor_to_realm = prev }
+                                }
+                                order_by = current_military_strength
+                                max = 1
+                                save_scope_as = rf_active_seed
+                                riseandfall_assign_saved_kingdom_to_seed_se = yes
+                            }
+                        }
+                    }
+                    else_if = {
+                        limit = {
+                            scope:original_ruler = {
+                                any_vassal = {
+                                    has_character_flag = rf_secondary_breakaway_seed
+                                    scope:rf_assign_kingdom = { is_neighbor_to_realm = prev }
+                                }
+                            }
+                        }
+                        scope:original_ruler = {
+                            ordered_vassal = {
+                                limit = {
+                                    has_character_flag = rf_secondary_breakaway_seed
+                                    scope:rf_assign_kingdom = { is_neighbor_to_realm = prev }
+                                }
+                                order_by = current_military_strength
+                                max = 1
+                                save_scope_as = rf_active_seed
+                                riseandfall_assign_saved_kingdom_to_seed_se = yes
+                            }
+                        }
+                    }
+                    else_if = {
+                        limit = {
+                            scope:original_ruler = {
+                                any_vassal = {
+                                    has_character_flag = rf_breakaway_ruler
+                                    scope:rf_assign_kingdom = { is_neighbor_to_realm = prev }
+                                }
+                            }
+                        }
+                        scope:original_ruler = {
+                            ordered_vassal = {
+                                limit = {
+                                    has_character_flag = rf_breakaway_ruler
+                                    scope:rf_assign_kingdom = { is_neighbor_to_realm = prev }
+                                }
+                                order_by = current_military_strength
+                                max = 1
+                                save_scope_as = rf_active_seed
+                                riseandfall_assign_saved_kingdom_to_seed_se = yes
+                            }
+                        }
+                    }
+                    else_if = {
+                        limit = {
+                            scope:original_ruler = {
+                                any_vassal = { has_character_flag = rf_secondary_breakaway_seed }
+                            }
+                        }
+                        scope:original_ruler = {
+                            ordered_vassal = {
+                                limit = { has_character_flag = rf_secondary_breakaway_seed }
+                                order_by = current_military_strength
+                                max = 1
+                                save_scope_as = rf_active_seed
+                                riseandfall_assign_saved_kingdom_to_seed_se = yes
+                            }
+                        }
+                    }
+                    else_if = {
+                        limit = {
+                            scope:original_ruler = {
+                                any_vassal = { has_character_flag = rf_major_breakaway_seed }
+                            }
+                        }
+                        scope:original_ruler = {
+                            ordered_vassal = {
+                                limit = { has_character_flag = rf_major_breakaway_seed }
+                                order_by = current_military_strength
+                                max = 1
+                                save_scope_as = rf_active_seed
+                                riseandfall_assign_saved_kingdom_to_seed_se = yes
+                            }
+                        }
+                    }
+                    else = {
+                        scope:original_ruler = {
+                            ordered_vassal = {
+                                limit = { has_character_flag = rf_breakaway_ruler }
+                                order_by = current_military_strength
+                                max = 1
+                                save_scope_as = rf_active_seed
+                                riseandfall_assign_saved_kingdom_to_seed_se = yes
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    else = {
+        scope:original_ruler = {
+            every_realm_de_jure_duchy = {
+                limit = { NOT = { this = scope:rf_capital_duchy } }
+                save_scope_as = rf_assign_duchy
+
+                if = {
+                    limit = {
+                        scope:original_ruler = {
+                            any_vassal = {
+                                is_landed = yes
+                                NOT = { has_character_flag = rf_breakaway_ruler }
+                                NOT = { has_variable = rf_my_breakaway }
+                                primary_title.tier >= tier_county
+                                NOT = { primary_title.tier >= tier_empire }
+                                capital_county.duchy = scope:rf_assign_duchy
+                            }
+                        }
+                    }
+
+                    if = {
+                        limit = {
+                            scope:original_ruler = {
+                                any_vassal = {
+                                    has_character_flag = rf_major_breakaway_seed
+                                    scope:rf_assign_duchy = { is_neighbor_to_realm = prev }
+                                }
+                            }
+                        }
+                        scope:original_ruler = {
+                            ordered_vassal = {
+                                limit = {
+                                    has_character_flag = rf_major_breakaway_seed
+                                    scope:rf_assign_duchy = { is_neighbor_to_realm = prev }
+                                }
+                                order_by = current_military_strength
+                                max = 1
+                                save_scope_as = rf_active_seed
+                                riseandfall_assign_saved_duchy_to_seed_se = yes
+                            }
+                        }
+                    }
+                    else_if = {
+                        limit = {
+                            scope:original_ruler = {
+                                any_vassal = {
+                                    has_character_flag = rf_secondary_breakaway_seed
+                                    scope:rf_assign_duchy = { is_neighbor_to_realm = prev }
+                                }
+                            }
+                        }
+                        scope:original_ruler = {
+                            ordered_vassal = {
+                                limit = {
+                                    has_character_flag = rf_secondary_breakaway_seed
+                                    scope:rf_assign_duchy = { is_neighbor_to_realm = prev }
+                                }
+                                order_by = current_military_strength
+                                max = 1
+                                save_scope_as = rf_active_seed
+                                riseandfall_assign_saved_duchy_to_seed_se = yes
+                            }
+                        }
+                    }
+                    else_if = {
+                        limit = {
+                            scope:original_ruler = {
+                                any_vassal = {
+                                    has_character_flag = rf_breakaway_ruler
+                                    scope:rf_assign_duchy = { is_neighbor_to_realm = prev }
+                                }
+                            }
+                        }
+                        scope:original_ruler = {
+                            ordered_vassal = {
+                                limit = {
+                                    has_character_flag = rf_breakaway_ruler
+                                    scope:rf_assign_duchy = { is_neighbor_to_realm = prev }
+                                }
+                                order_by = current_military_strength
+                                max = 1
+                                save_scope_as = rf_active_seed
+                                riseandfall_assign_saved_duchy_to_seed_se = yes
+                            }
+                        }
+                    }
+                    else_if = {
+                        limit = {
+                            scope:original_ruler = {
+                                any_vassal = { has_character_flag = rf_secondary_breakaway_seed }
+                            }
+                        }
+                        scope:original_ruler = {
+                            ordered_vassal = {
+                                limit = { has_character_flag = rf_secondary_breakaway_seed }
+                                order_by = current_military_strength
+                                max = 1
+                                save_scope_as = rf_active_seed
+                                riseandfall_assign_saved_duchy_to_seed_se = yes
+                            }
+                        }
+                    }
+                    else_if = {
+                        limit = {
+                            scope:original_ruler = {
+                                any_vassal = { has_character_flag = rf_major_breakaway_seed }
+                            }
+                        }
+                        scope:original_ruler = {
+                            ordered_vassal = {
+                                limit = { has_character_flag = rf_major_breakaway_seed }
+                                order_by = current_military_strength
+                                max = 1
+                                save_scope_as = rf_active_seed
+                                riseandfall_assign_saved_duchy_to_seed_se = yes
+                            }
+                        }
+                    }
+                    else = {
+                        scope:original_ruler = {
+                            ordered_vassal = {
+                                limit = { has_character_flag = rf_breakaway_ruler }
+                                order_by = current_military_strength
+                                max = 1
+                                save_scope_as = rf_active_seed
+                                riseandfall_assign_saved_duchy_to_seed_se = yes
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    # Phase 4: any leftover border marches outside clean kingdom blocks join the
+    # nearest breakaway so the map does not leave many stray leftovers.
     scope:original_ruler = {
         every_vassal = {
             limit = {
                 is_landed = yes
-                OR = {
-                    primary_title.tier >= tier_duchy
-                    AND = {
-                        scope:original_ruler = { has_character_flag = rf_split_lower_tier }
-                        primary_title.tier >= tier_county
-                    }
-                }
-                NOT = { primary_title.tier >= tier_empire }
                 NOT = { has_character_flag = rf_breakaway_ruler }
+                NOT = { has_variable = rf_my_breakaway }
+                primary_title.tier >= tier_county
+                NOT = { primary_title.tier >= tier_empire }
                 NOT = { capital_county.duchy = scope:original_ruler.capital_county.duchy }
             }
-            capital_county.kingdom = { save_scope_as = rf_seed_kingdom }
+            save_scope_as = rf_unassigned_vassal
 
             if = {
                 limit = {
-                    scope:original_ruler = { has_character_flag = rf_split_lower_tier }
-                    scope:original_ruler = { has_character_flag = rf_split_major_fracture }
-                }
-                random = {
-                    chance = 85
-                    riseandfall_mark_secondary_breakaway_seed_se = yes
-                }
-            }
-            else_if = {
-                limit = {
-                    scope:original_ruler = { has_character_flag = rf_split_lower_tier }
-                    scope:original_ruler = { has_character_flag = rf_split_fracture }
-                }
-                random = {
-                    chance = 60
-                    riseandfall_mark_secondary_breakaway_seed_se = yes
-                }
-            }
-            else_if = {
-                limit = { scope:original_ruler = { has_character_flag = rf_split_lower_tier } }
-                random = {
-                    chance = 35
-                    riseandfall_mark_secondary_breakaway_seed_se = yes
-                }
-            }
-            else_if = {
-                limit = { scope:original_ruler = { has_character_flag = rf_split_total_collapse } }
-                random = {
-                    chance = 40
-                    riseandfall_mark_secondary_breakaway_seed_se = yes
-                }
-            }
-            else_if = {
-                limit = { scope:original_ruler = { has_character_flag = rf_split_major_fracture } }
-                random = {
-                    chance = 24
-                    riseandfall_mark_secondary_breakaway_seed_se = yes
-                }
-            }
-            else_if = {
-                limit = { scope:original_ruler = { has_character_flag = rf_split_fracture } }
-                random = {
-                    chance = 14
-                    riseandfall_mark_secondary_breakaway_seed_se = yes
-                }
-            }
-        }
-    }
-
-    # Phase 3: seed cores always pull their own duchy first.
-    scope:original_ruler = {
-        every_vassal = {
-            limit = {
-                has_character_flag = rf_breakaway_ruler
-                has_variable = rf_seeded_duchy
-            }
-            save_scope_as = rf_active_seed
-
-            scope:original_ruler = {
-                every_vassal = {
-                    limit = {
-                        is_landed = yes
-                        NOT = { has_character_flag = rf_breakaway_ruler }
-                        NOT = { has_variable = rf_my_breakaway }
-                        primary_title.tier >= tier_county
-                        NOT = { primary_title.tier >= tier_empire }
-                        NOT = { capital_county.duchy = scope:original_ruler.capital_county.duchy }
-                        capital_county.duchy = scope:rf_active_seed.var:rf_seeded_duchy
-                    }
-                    set_variable = { name = rf_my_breakaway value = scope:rf_active_seed }
-                }
-            }
-        }
-    }
-
-    # Phase 4: secondary seeds can peel off adjacent pockets inside their kingdom.
-    scope:original_ruler = {
-        every_vassal = {
-            limit = {
-                has_character_flag = rf_breakaway_ruler
-                has_variable = rf_seeded_kingdom
-                NOT = { has_variable = rf_primary_kingdom_seed }
-            }
-            save_scope_as = rf_active_seed
-
-            scope:original_ruler = {
-                every_vassal = {
-                    limit = {
-                        is_landed = yes
-                        NOT = { has_character_flag = rf_breakaway_ruler }
-                        NOT = { has_variable = rf_my_breakaway }
-                        primary_title.tier >= tier_county
-                        NOT = { primary_title.tier >= tier_empire }
-                        NOT = { capital_county.duchy = scope:original_ruler.capital_county.duchy }
-                        capital_county.kingdom = scope:rf_active_seed.var:rf_seeded_kingdom
-                        primary_title = { is_neighbor_to_realm = scope:rf_active_seed }
-                    }
-
-                    if = {
-                        limit = {
-                            scope:original_ruler = { has_character_flag = rf_split_lower_tier }
-                            scope:original_ruler = { has_character_flag = rf_split_major_fracture }
-                        }
-                        random = {
-                            chance = 75
-                            set_variable = { name = rf_my_breakaway value = scope:rf_active_seed }
-                        }
-                    }
-                    else_if = {
-                        limit = {
-                            scope:original_ruler = { has_character_flag = rf_split_lower_tier }
-                            scope:original_ruler = { has_character_flag = rf_split_fracture }
-                        }
-                        random = {
-                            chance = 55
-                            set_variable = { name = rf_my_breakaway value = scope:rf_active_seed }
-                        }
-                    }
-                    else_if = {
-                        limit = { scope:original_ruler = { has_character_flag = rf_split_lower_tier } }
-                        random = {
-                            chance = 35
-                            set_variable = { name = rf_my_breakaway value = scope:rf_active_seed }
-                        }
-                    }
-                    else_if = {
-                        limit = { scope:original_ruler = { has_character_flag = rf_split_total_collapse } }
-                        random = {
-                            chance = 55
-                            set_variable = { name = rf_my_breakaway value = scope:rf_active_seed }
-                        }
-                    }
-                    else_if = {
-                        limit = { scope:original_ruler = { has_character_flag = rf_split_major_fracture } }
-                        random = {
-                            chance = 38
-                            set_variable = { name = rf_my_breakaway value = scope:rf_active_seed }
-                        }
-                    }
-                    else_if = {
-                        limit = { scope:original_ruler = { has_character_flag = rf_split_fracture } }
-                        random = {
-                            chance = 24
-                            set_variable = { name = rf_my_breakaway value = scope:rf_active_seed }
+                    scope:original_ruler = {
+                        any_vassal = {
+                            has_character_flag = rf_breakaway_ruler
+                            primary_title = { is_neighbor_to_realm = scope:rf_unassigned_vassal }
                         }
                     }
                 }
-            }
-        }
-    }
-
-    # Phase 5: primary kingdom seeds absorb the rest of their kingdom, keeping borders readable.
-    scope:original_ruler = {
-        every_vassal = {
-            limit = {
-                has_character_flag = rf_breakaway_ruler
-                has_variable = rf_seeded_kingdom
-                has_variable = rf_primary_kingdom_seed
-                scope:original_primary = {
-                    OR = {
-                        tier = tier_empire
-                        tier = tier_hegemony
-                    }
-                }
-            }
-            save_scope_as = rf_active_seed
-
-            scope:original_ruler = {
-                every_vassal = {
-                    limit = {
-                        is_landed = yes
-                        NOT = { has_character_flag = rf_breakaway_ruler }
-                        NOT = { has_variable = rf_my_breakaway }
-                        primary_title.tier >= tier_county
-                        NOT = { primary_title.tier >= tier_empire }
-                        NOT = { capital_county.duchy = scope:original_ruler.capital_county.duchy }
-                        capital_county.kingdom = scope:rf_active_seed.var:rf_seeded_kingdom
-                    }
-                    set_variable = { name = rf_my_breakaway value = scope:rf_active_seed }
-                }
-            }
-        }
-    }
-
-    # Phase 6: let adjacent seeds occasionally pull border marches for a less tidy finish,
-    # including inside the capital kingdom outside the capital duchy.
-    scope:original_ruler = {
-        every_vassal = {
-            limit = { has_character_flag = rf_breakaway_ruler }
-            save_scope_as = rf_active_seed
-
-            scope:original_ruler = {
-                every_vassal = {
-                    limit = {
-                        is_landed = yes
-                        NOT = { has_character_flag = rf_breakaway_ruler }
-                        NOT = { has_variable = rf_my_breakaway }
-                        primary_title.tier >= tier_county
-                        NOT = { primary_title.tier >= tier_empire }
-                        NOT = { capital_county.duchy = scope:original_ruler.capital_county.duchy }
-                        primary_title = { is_neighbor_to_realm = scope:rf_active_seed }
-                    }
-                    if = {
-                        limit = { scope:original_ruler = { has_character_flag = rf_split_lower_tier } }
-                        random = {
-                            chance = 60
-                            set_variable = { name = rf_my_breakaway value = scope:rf_active_seed }
-                        }
-                    }
-                    else = {
-                        random = {
-                            chance = 35
-                            set_variable = { name = rf_my_breakaway value = scope:rf_active_seed }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    # Phase 7: tiny breakaways are absorbed into stronger nearby successors so
-    # the result is messier and less full of one-county shards.
-    scope:original_ruler = {
-        every_vassal = {
-            limit = {
-                has_character_flag = rf_breakaway_ruler
-                NOT = { primary_title.tier >= tier_kingdom }
-                realm_size < 5
-            }
-            save_scope_as = rf_small_seed
-
-            scope:original_ruler = {
-                ordered_vassal = {
-                    limit = {
-                        has_character_flag = rf_breakaway_ruler
-                        NOT = { this = scope:rf_small_seed }
-                        capital_county.kingdom = scope:rf_small_seed.capital_county.kingdom
-                    }
-                    order_by = current_military_strength
-                    max = 1
-                    scope:rf_small_seed = {
-                        set_variable = { name = rf_my_breakaway value = prev }
-                        remove_character_flag = rf_breakaway_ruler
-                        remove_variable = rf_seeded_kingdom
-                        remove_variable = rf_seeded_duchy
-                        remove_variable = rf_primary_kingdom_seed
-                    }
-                }
-            }
-
-            if = {
-                limit = {
-                    NOT = { has_character_flag = rf_breakaway_ruler }
-                    has_variable = rf_my_breakaway
-                }
-            }
-            else = {
                 scope:original_ruler = {
                     ordered_vassal = {
                         limit = {
                             has_character_flag = rf_breakaway_ruler
-                            NOT = { this = scope:rf_small_seed }
-                            primary_title = { is_neighbor_to_realm = scope:rf_small_seed }
+                            primary_title = { is_neighbor_to_realm = scope:rf_unassigned_vassal }
                         }
                         order_by = current_military_strength
                         max = 1
-                        scope:rf_small_seed = {
-                            set_variable = { name = rf_my_breakaway value = prev }
-                            remove_character_flag = rf_breakaway_ruler
-                            remove_variable = rf_seeded_kingdom
-                            remove_variable = rf_seeded_duchy
-                            remove_variable = rf_primary_kingdom_seed
+                        save_scope_as = rf_active_seed
+                        scope:rf_unassigned_vassal = {
+                            set_variable = { name = rf_my_breakaway value = scope:rf_active_seed }
                         }
                     }
                 }
@@ -878,62 +1155,14 @@ riseandfall_execute_realm_split_se = {
         scope:rf_peer_successor = { add_unpressed_claim = scope:new_realm_ruler.primary_title }
     }
 
-    # If an empire-tier split throws off a very large kingdom successor, allow one
-    # follow-up fracture inside that kingdom so it does not leave fully intact.
-    if = {
-        limit = {
-            scope:original_primary = {
-                OR = {
-                    tier = tier_empire
-                    tier = tier_hegemony
-                }
-            }
-            primary_title.tier = tier_kingdom
-            realm_size >= 18
-            any_vassal = {
-                is_landed = yes
-                primary_title.tier >= tier_county
-                NOT = { primary_title.tier >= tier_kingdom }
-                NOT = { capital_county.duchy = scope:new_realm_ruler.capital_county.duchy }
-            }
-        }
-        if = {
-            limit = {
-                realm_size >= 45
-                any_vassal = {
-                    is_landed = yes
-                    primary_title.tier >= tier_duchy
-                    NOT = { primary_title.tier >= tier_kingdom }
-                    NOT = { capital_county.duchy = scope:new_realm_ruler.capital_county.duchy }
-                }
-            }
-            random = {
-                chance = 85
-                riseandfall_realm_split_se = yes
-            }
-        }
-        else_if = {
-            limit = { realm_size >= 30 }
-            random = {
-                chance = 65
-                riseandfall_realm_split_se = yes
-            }
-        }
-        else = {
-            random = {
-                chance = 40
-                riseandfall_realm_split_se = yes
-            }
-        }
-    }
-
-
     # --- End new rivalry & cross-claims block ---
 
     remove_variable = rf_seeded_kingdom
     remove_variable = rf_seeded_duchy
     remove_variable = rf_primary_kingdom_seed
     remove_variable = rf_execute_breakaway
+    remove_character_flag = rf_major_breakaway_seed
+    remove_character_flag = rf_secondary_breakaway_seed
 
     # Remove flag
     remove_character_flag = rf_breakaway_ruler
