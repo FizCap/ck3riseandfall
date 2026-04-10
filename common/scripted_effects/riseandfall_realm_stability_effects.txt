@@ -564,18 +564,54 @@ riseandfall_calculate_realm_stability_se = {
 
     if = {
         limit = { is_independent_ruler = yes }
-        # Increment or decay the consecutive-years counter depending on whether the ruler
-        # is in a civil war this tick. This ensures the TARGET reflects the new year state.
-        if = { limit = { is_in_civil_war = yes } change_variable = { name = riseandfall_rs_civil_war_years add = 1 } }
-        else = { if = { limit = { var:riseandfall_rs_civil_war_years > 0 } change_variable = { name = riseandfall_rs_civil_war_years add = -1 } } }
+        # Dynamic civil war severity based on how much of the realm is in revolt.
+        # We estimate revolt share as:
+        #   sum(sub_realm_size of direct vassals at war with liege) / ruler realm_size
+        # Tier mapping (percent rebel share):
+        #   5-20 => +1 pressure/year, 21-40 => +2, 41-60 => +3, 61-80 => +4, 81-100 => +5
+        # Pressure decays by 1/year while not in civil war. Final penalty is -pressure, capped at -50.
+        save_scope_as = ruler
+        set_variable = { name = tmp_cw_realm_counties value = 1 }
+        set_variable = { name = tmp_cw_rebel_counties value = 0 }
+        set_variable = { name = tmp_cw_rebel_percent value = 0 }
+        set_variable = { name = tmp_cw_yearly_step value = 0 }
 
-    # Compute cumulative penalty (years * -5), cap it at a minimum of -25, and subtract from tmp_target_score
+        if = {
+            limit = { is_in_civil_war = yes }
+            set_variable = { name = tmp_cw_realm_counties value = realm_size }
+            if = { limit = { var:tmp_cw_realm_counties < 1 } set_variable = { name = tmp_cw_realm_counties value = 1 } }
+
+            every_vassal = {
+                limit = { is_at_war_with_liege = yes }
+                save_scope_value_as = { name = tmp_cw_vassal_sub_realm value = sub_realm_size }
+                scope:ruler = { change_variable = { name = tmp_cw_rebel_counties add = scope:tmp_cw_vassal_sub_realm } }
+            }
+
+            set_variable = { name = tmp_cw_rebel_percent value = var:tmp_cw_rebel_counties }
+            change_variable = { name = tmp_cw_rebel_percent multiply = 100 }
+            change_variable = { name = tmp_cw_rebel_percent divide = var:tmp_cw_realm_counties }
+            clamp_variable = { name = tmp_cw_rebel_percent min = 0 max = 100 }
+
+            if = { limit = { var:tmp_cw_rebel_percent >= 80 } set_variable = { name = tmp_cw_yearly_step value = 5 } }
+            else_if = { limit = { var:tmp_cw_rebel_percent >= 61 } set_variable = { name = tmp_cw_yearly_step value = 4 } }
+            else_if = { limit = { var:tmp_cw_rebel_percent >= 41 } set_variable = { name = tmp_cw_yearly_step value = 3 } }
+            else_if = { limit = { var:tmp_cw_rebel_percent >= 21 } set_variable = { name = tmp_cw_yearly_step value = 2 } }
+            else_if = { limit = { var:tmp_cw_rebel_percent >= 5 } set_variable = { name = tmp_cw_yearly_step value = 1 } }
+            else = { set_variable = { name = tmp_cw_yearly_step value = 0 } }
+
+            change_variable = { name = riseandfall_rs_civil_war_years add = var:tmp_cw_yearly_step }
+        }
+        else = {
+            if = { limit = { var:riseandfall_rs_civil_war_years > 0 } change_variable = { name = riseandfall_rs_civil_war_years add = -1 } }
+        }
+
+    # Compute cumulative penalty from weighted pressure and subtract from target score
     set_variable = { name = tmp_cw_total value = var:riseandfall_rs_civil_war_years }
-    change_variable = { name = tmp_cw_total multiply = -3 }
+    change_variable = { name = tmp_cw_total multiply = -1 }
     # Cap the civil war penalty so it never goes below -50
     clamp_variable = { name = tmp_cw_total min = -50 max = 0 }
     change_variable = { name = tmp_target_score add = var:tmp_cw_total }
-    # store the displayed cumulative penalty for the tooltip
+    # Store the displayed cumulative penalty for the tooltip
     set_variable = { name = riseandfall_realm_stability_civil_war_penalty value = var:tmp_cw_total }
 
         # Sex vs realm-law penalty: if the ruler's sex conflicts with realm succession laws,
