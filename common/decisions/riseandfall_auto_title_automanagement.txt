@@ -107,6 +107,25 @@ riseandfall_grant_counties = {
 }
 
 
+riseandfall_transfer_rightful_vassals = {
+    picture = { reference = "gfx/interface/illustrations/decisions/decision_misc.dds" }
+    sort_order = 20
+    ai_check_interval = 0
+    desc = riseandfall_transfer_rightful_vassals_desc
+    selection_tooltip = riseandfall_transfer_rightful_vassals_tooltip
+    decision_group_type = riseandfall
+
+    is_shown = { is_landed = yes NOT = { exists = global_var:riseandfall_hide_other_decisions } }
+
+    is_valid = { is_landed = yes }
+
+    effect = { riseandfall_player_transfer_rightful_vassals_se = yes }
+
+    ai_potential = {}
+    ai_will_do = { base = 0 }
+}
+
+
 riseandfall_enable_hide_mod_decisions = {
     picture = { reference = "gfx/interface/illustrations/decisions/decision_misc.dds" }
     sort_order = 8

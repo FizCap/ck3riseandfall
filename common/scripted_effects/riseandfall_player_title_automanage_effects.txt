@@ -56,6 +56,129 @@ riseandfall_player_create_kingdoms_se = {
     }
 }
 
+# Player: transfer eligible direct vassals to their rightful de jure liege.
+riseandfall_player_transfer_rightful_vassals_se = {
+    # CONTRACT
+    # Inputs: current ruler scope with direct landed vassals.
+    # Outputs: eligible direct vassals are reassigned to their de jure holder or that holder's direct liege.
+    # Data shape: character liege changes via create_title_and_vassal_change / change_liege / resolve_title_and_vassal_change.
+    # Error modes: missing de jure holders, wars, rank mismatches, or government edge cases skip the transfer.
+
+    save_scope_as = actor
+
+    if = {
+        limit = { is_landed = yes }
+
+        every_vassal = {
+            limit = {
+                liege = scope:actor
+                highest_held_title_tier >= tier_county
+                exists = primary_title
+                exists = primary_title.de_jure_liege
+                primary_title.de_jure_liege.holder != liege
+                NOT = { is_at_war_with = scope:actor }
+                NOT = {
+                    any_vassal_or_below = {
+                        is_at_war_with = scope:actor
+                    }
+                }
+                NAND = {
+                    is_house_head = yes
+                    house.house_confederation.leading_house = house
+                }
+            }
+
+            save_temporary_scope_as = vassal_to_transfer
+
+            if = {
+                limit = {
+                    exists = primary_title.de_jure_liege.holder
+                    primary_title.de_jure_liege.holder = {
+                        liege = scope:actor
+                        highest_held_title_tier > scope:vassal_to_transfer.highest_held_title_tier
+                        NOR = {
+                            is_at_war_with = scope:actor
+                            is_at_war_with = scope:vassal_to_transfer
+                        }
+                    }
+                    NAND = {
+                        primary_title.de_jure_liege.holder.liege ?= { has_government = japan_administrative_government }
+                        primary_title.de_jure_liege.holder ?= { has_government = japan_administrative_government }
+                        has_government = japan_feudal_government
+                    }
+                }
+
+                primary_title.de_jure_liege.holder = { save_temporary_scope_as = transfer_recipient }
+
+                scope:actor = {
+                    create_title_and_vassal_change = {
+                        type = granted
+                        save_scope_as = change
+                        add_claim_on_loss = no
+                    }
+                }
+
+                change_liege = {
+                    liege = scope:transfer_recipient
+                    change = scope:change
+                }
+
+                scope:actor = { resolve_title_and_vassal_change = scope:change }
+
+                scope:transfer_recipient = {
+                    add_opinion = {
+                        target = scope:actor
+                        modifier = granted_vassal
+                    }
+                }
+            }
+            else_if = {
+                limit = {
+                    exists = primary_title.de_jure_liege.holder.liege
+                    primary_title.de_jure_liege.holder.liege = {
+                        this != scope:actor
+                        liege = scope:actor
+                        highest_held_title_tier > scope:vassal_to_transfer.highest_held_title_tier
+                        NOR = {
+                            is_at_war_with = scope:actor
+                            is_at_war_with = scope:vassal_to_transfer
+                        }
+                    }
+                    NAND = {
+                        primary_title.de_jure_liege.holder.liege ?= { has_government = japan_administrative_government }
+                        primary_title.de_jure_liege.holder ?= { has_government = japan_administrative_government }
+                        has_government = japan_feudal_government
+                    }
+                }
+
+                primary_title.de_jure_liege.holder.liege = { save_temporary_scope_as = transfer_recipient }
+
+                scope:actor = {
+                    create_title_and_vassal_change = {
+                        type = granted
+                        save_scope_as = change
+                        add_claim_on_loss = no
+                    }
+                }
+
+                change_liege = {
+                    liege = scope:transfer_recipient
+                    change = scope:change
+                }
+
+                scope:actor = { resolve_title_and_vassal_change = scope:change }
+
+                scope:transfer_recipient = {
+                    add_opinion = {
+                        target = scope:actor
+                        modifier = granted_vassal
+                    }
+                }
+            }
+        }
+    }
+}
+
 # Player: auto-create duchies when the ruler/character has the toggle modifier
 riseandfall_player_create_duchies_se = {
     # Called for a specific ruler (the caller should iterate every_ruler is_ai = no).

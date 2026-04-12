@@ -23,6 +23,11 @@ riseandfall_grant_counties:0 "Grant Surplus Counties"
 riseandfall_grant_counties_desc:0 "Create suitable vassals of your culture and faith and grant eligible surplus counties to them (excludes counties in the de jure kingdom containing your capital). You can enable or disable individual counties in the Title view menu."
 riseandfall_grant_counties_confirm:0 "Grant Surplus Counties"
 
+riseandfall_transfer_rightful_vassals:0 "Transfer Rightful Vassals"
+riseandfall_transfer_rightful_vassals_desc:0 "Transfer eligible direct vassals to their de jure liege now. If the immediate de jure holder is not your direct vassal, the transfer falls back to that holder's direct liege when vanilla transfer rules allow it."
+riseandfall_transfer_rightful_vassals_tooltip:0 "Transfer eligible direct vassals to their rightful liege now."
+riseandfall_transfer_rightful_vassals_confirm:0 "Transfer Rightful Vassals"
+
 riseandfall_grant_county_popup_title:0 "County granted"
 riseandfall_grant_county_popup_desc:0 "You granted the county: \n[SCOPE.sTitle('target_county').GetNameNoTierNoTooltip]"
 
