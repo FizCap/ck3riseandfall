@@ -1,12 +1,12 @@
-﻿# Rise and Fall — Stability Hover Tooltip
+# Rise and Fall � Stability Hover Tooltip
 # Mirrors the legitimacy_hud_tooltip pattern from hud.gui.
 # Loaded from gui/shared/ so it is available globally.
 #
 # Placeholder images (high / medium / low) are drawn from existing game textures.
 # Replace the three texture paths below with your actual DDS files when ready:
-#   High   → gfx/interface/illustrations/stability/stability_high.dds
-#   Medium → gfx/interface/illustrations/stability/stability_medium.dds
-#   Low    → gfx/interface/illustrations/stability/stability_low.dds
+#   High   ? gfx/interface/illustrations/stability/stability_high.dds
+#   Medium ? gfx/interface/illustrations/stability/stability_medium.dds
+#   Low    ? gfx/interface/illustrations/stability/stability_low.dds
 
 types RiseAndFallStabilityTooltipTypes
 {
@@ -14,31 +14,31 @@ types RiseAndFallStabilityTooltipTypes
 	{
 		visible = "[And( Character.HasLandedTitles, Character.MakeScope.Var('riseandfall_realm_stability_score').IsSet )]"
 
-		# ── Header title ─────────────────────────────────────────────────────────
+		# -- Header title ---------------------------------------------------------
 		blockoverride "title_text"
 		{
 			raw_text = ""
 		}
 
-		# ── Hide the top-right concept link (score shown in the HUD bar already) ──
+		# -- Hide the top-right concept link (score shown in the HUD bar already) --
 		blockoverride "concept_link"
 		{
 			raw_text = ""
 		}
 
-		# ── Coloured status subtitle ──────────────────────────────────────────────
+		# -- Coloured status subtitle ----------------------------------------------
 		blockoverride "subheading"
 		{
 			raw_text = ""
 		}
 
-		# ── Decorative header image — swaps based on stability level ──────────────
+		# -- Decorative header image � swaps based on stability level --------------
 		blockoverride "header_additions"
 		{
 			widget = {
 				size = { 500 92 }
 
-				# High stability (≥ 70)
+				# High stability (= 70)
 				widget = {
 					size = { 500 92 }
 					visible = "[GreaterThanOrEqualTo_CFixedPoint( Character.MakeScope.Var('riseandfall_realm_stability_score').GetValue, '(CFixedPoint)70' )]"
@@ -50,7 +50,7 @@ types RiseAndFallStabilityTooltipTypes
 					}
 				}
 
-				# Medium stability (31–69)
+				# Medium stability (31�69)
 				widget = {
 					size = { 500 92 }
 					visible = "[And( GreaterThanOrEqualTo_CFixedPoint( Character.MakeScope.Var('riseandfall_realm_stability_score').GetValue, '(CFixedPoint)31' ), LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_realm_stability_score').GetValue, '(CFixedPoint)70' ) )]"
@@ -62,7 +62,7 @@ types RiseAndFallStabilityTooltipTypes
 					}
 				}
 
-				# Low stability (≤ 30)
+				# Low stability (= 30)
 				widget = {
 					size = { 500 92 }
 					visible = "[LessThanOrEqualTo_CFixedPoint( Character.MakeScope.Var('riseandfall_realm_stability_score').GetValue, '(CFixedPoint)30' )]"
@@ -76,7 +76,7 @@ types RiseAndFallStabilityTooltipTypes
 			}
 		}
 
-		# ── Main body ─────────────────────────────────────────────────────────────
+		# -- Main body -------------------------------------------------------------
 		blockoverride "main_description"
 		{
 			vbox = {
@@ -92,7 +92,7 @@ types RiseAndFallStabilityTooltipTypes
 					margin_bottom = 4
 				}
 
-				# ── Wide colour-coded progress bar ───────────────────────────────
+				# -- Wide colour-coded progress bar -------------------------------
 				margin_widget = {
 					size = { 500 20 }
 					margin = { 10 0 }
@@ -133,33 +133,33 @@ types RiseAndFallStabilityTooltipTypes
 
 				spacer = { size = { 0 8 } }
 
-				# ── Numbers & Trend ───────────────────────────────────────────────
+				# -- Numbers & Trend -----------------------------------------------
 				cooltip_paragraph = {
 					text = "REALM_STABILITY_TT_NUMBERS"
 				}
 
 				spacer = { size = { 0 12 } }
 
-				# ── Low Stability Risk ────────────────────────────────────────────
+				# -- Low Stability Risk --------------------------------------------
 				cooltip_paragraph = {
 					text = "REALM_STABILITY_TT_LOW_RISK"
 				}
 
 				spacer = { size = { 0 12 } }
 
-				# ── Components (top 2) ────────────────────────────────────────────
+				# -- Components (top 2) --------------------------------------------
 				cooltip_paragraph = {
 					text = "REALM_STABILITY_TT_COMPONENTS"
 				}
 
 				spacer = { size = { 0 12 } }
 
-				# ── Legitimacy Multiplier ─────────────────────────────────────────
+				# -- Legitimacy Multiplier -----------------------------------------
 				cooltip_paragraph = {
 					text = "REALM_STABILITY_TT_LEGITIMACY_MULT"
 				}
 
-				# ── Civil War & War History (show when civil war penalty < 0 or war penalty > 0) ───
+				# -- Civil War & War History (show when civil war penalty < 0 or war penalty > 0) ---
 				vbox = {
 					visible = "[Or( LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_realm_stability_civil_war_penalty').GetValue, '(CFixedPoint)0' ), GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_war_penalty').GetValue, '(CFixedPoint)0' ) )]"
 					layoutpolicy_horizontal = expanding
@@ -177,7 +177,7 @@ types RiseAndFallStabilityTooltipTypes
 					}
 				}
 
-				# ── Puppet Regency (hidden at 100%) ──────────────────────────────
+				# -- Puppet Regency (hidden at 100%) ------------------------------
 				vbox = {
 					visible = "[LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_realm_stability_puppet_regency_multiplier').GetValue, '(CFixedPoint)100' )]"
 					layoutpolicy_horizontal = expanding
@@ -187,7 +187,7 @@ types RiseAndFallStabilityTooltipTypes
 					}
 				}
 
-				# ── Ruler Gender & Succession (hidden when penalty = 0) ───────────
+				# -- Ruler Gender & Succession (hidden when penalty = 0) -----------
 				vbox = {
 					visible = "[LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_realm_stability_sex_law_penalty').GetValue, '(CFixedPoint)0' )]"
 					layoutpolicy_horizontal = expanding
@@ -197,13 +197,54 @@ types RiseAndFallStabilityTooltipTypes
 					}
 				}
 
-				# ── Difficulty Multiplier (hidden when exactly 100%) ──────────────
+				# -- Difficulty Multiplier (hidden when exactly 100%) --------------
 				vbox = {
 					visible = "[Or( GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_difficulty_multiplier').GetValue, '(CFixedPoint)100' ), LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_difficulty_multiplier').GetValue, '(CFixedPoint)100' ) )]"
 					layoutpolicy_horizontal = expanding
 					spacer = { size = { 0 12 } }
 					cooltip_paragraph = {
 						text = "REALM_STABILITY_TT_DIFFICULTY"
+					}
+				}
+
+				# -- Story Mode (integrated category) -------------------------------
+				vbox = {
+					visible = "[Character.MakeScope.Var('riseandfall_low_stability_chance').IsSet]"
+					layoutpolicy_horizontal = expanding
+					spacer = { size = { 0 12 } }
+					cooltip_paragraph = {
+						text = "REALM_STABILITY_TT_STORY_MODE_HEADER"
+					}
+					cooltip_paragraph = {
+						text = "REALM_STABILITY_TT_STORY_FRACTURE"
+					}
+					cooltip_paragraph = {
+						visible = "[And( Character.MakeScope.Var('riseandfall_story_contrib_realm_size').IsSet, GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_contrib_realm_size').GetValue, '(CFixedPoint)0' ) )]"
+						text = "REALM_STABILITY_TT_STORY_REALM_SIZE"
+					}
+					cooltip_paragraph = {
+						visible = "[And( Character.MakeScope.Var('riseandfall_story_contrib_strong_vassals').IsSet, GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_contrib_strong_vassals').GetValue, '(CFixedPoint)0' ) )]"
+						text = "REALM_STABILITY_TT_STORY_STRONG_VASSALS"
+					}
+						visible = "[And( Character.MakeScope.Var('riseandfall_story_contrib_foreign_culture').IsSet, GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_contrib_foreign_culture').GetValue, '(CFixedPoint)0' ) )]"
+						text = "REALM_STABILITY_TT_STORY_FOREIGN_CULTURE"
+					}
+					cooltip_paragraph = {
+						visible = "[And( Character.MakeScope.Var('riseandfall_story_contrib_foreign_faith').IsSet, GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_contrib_foreign_faith').GetValue, '(CFixedPoint)0' ) )]"
+						text = "REALM_STABILITY_TT_STORY_FOREIGN_FAITH"
+					}
+					cooltip_paragraph = {
+						visible = "[And( Character.MakeScope.Var('riseandfall_story_contrib_noncore_regions').IsSet, GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_contrib_noncore_regions').GetValue, '(CFixedPoint)0' ) )]"
+						text = "REALM_STABILITY_TT_STORY_NONCORE_REGIONS"
+					}
+					}
+					cooltip_paragraph = {
+						visible = "[And( Character.MakeScope.Var('riseandfall_story_succession_shock').IsSet, GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_succession_shock').GetValue, '(CFixedPoint)0' ) )]"
+						text = "REALM_STABILITY_TT_STORY_SUCCESSION_SHOCK"
+					}
+					cooltip_paragraph = {
+						visible = "[And( Character.MakeScope.Var('riseandfall_story_contrib_resilience').IsSet, GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_contrib_resilience').GetValue, '(CFixedPoint)0' ) )]"
+						text = "REALM_STABILITY_TT_STORY_RESILIENCE"
 					}
 				}
 			}

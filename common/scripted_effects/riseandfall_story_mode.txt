@@ -1,14 +1,11 @@
 ﻿##########################
 # Rise and Fall - Dynamic Story Mode
-# Calculates total world realm size, identifies rulers controlling >=5% of the world,
-# and flags them for minimum 1% low stability event chance.
+# Calculates world-size flags and a multi-factor fracture pressure used by low-stability rolls.
+# Pressure sources: realm size, structural vassal pressure, identity/development strain,
+# succession shock, and historical strain.
 
 riseandfall_dynamic_story_mode_se = {
-    # For each independent ruler, compute the world total inside their scope
-    # (avoids undefined global scopes in on_actions). This repeats the total
-    # computation per ruler but is safe and deterministic.
-
-    # Compute world total once per playthrough and cache it as a global variable
+    # Compute world total once per playthrough and cache it as a global variable.
     if = {
         limit = { NOT = { exists = global_var:riseandfall_world_total } }
         set_global_variable = { name = riseandfall_world_total value = 0 }
@@ -17,41 +14,45 @@ riseandfall_dynamic_story_mode_se = {
         }
     }
 
-    # Clear any existing large realm flags first
+    # Clear previous yearly flags and pressure first.
     every_independent_ruler = {
         remove_variable = riseandfall_large_realm
         remove_variable = riseandfall_very_large_realm
         remove_variable = riseandfall_massive_realm
+        remove_variable = riseandfall_story_fracture_pressure
+        remove_variable = riseandfall_story_strong_vassal_count
+        remove_variable = riseandfall_story_noncore_regions
+        remove_variable = riseandfall_story_foreign_culture_county_pct
+        remove_variable = riseandfall_story_foreign_faith_county_pct
+        remove_variable = riseandfall_story_contrib_realm_size
+        remove_variable = riseandfall_story_contrib_strong_vassals
+        remove_variable = riseandfall_story_contrib_noncore_regions
+        remove_variable = riseandfall_story_contrib_foreign_culture
+        remove_variable = riseandfall_story_contrib_foreign_faith
+        remove_variable = riseandfall_story_contrib_resilience
+        remove_variable = riseandfall_story_aligned_identity_dev
+        remove_variable = riseandfall_story_foreign_identity_dev
+        remove_variable = riseandfall_story_foreign_identity_dev_ratio
     }
 
-    # Evaluate each ruler and flag if they control >=5% of world counties
+    # Evaluate each ruler and build story pressure if they are kingdom-tier or above.
     every_independent_ruler = {
-        # Save this ruler so inner loops can write back into their scope
         save_scope_as = outer_ruler
 
-        # Copy cached global world total into the saved outer ruler scope for per-ruler computations
         scope:outer_ruler = { set_variable = { name = tmp_world_total value = global_var:riseandfall_world_total } }
-
-        # Save the full world total for inspection
         scope:outer_ruler = { set_variable = { name = tmp_world_total_full value = var:tmp_world_total } }
 
-        # Compute percentage thresholds on the saved outer scope (integer math)
-        # 5% threshold
+        # Compute world-size thresholds on the saved outer scope (integer math).
         scope:outer_ruler = { change_variable = { name = tmp_world_total multiply = 5 } }
         scope:outer_ruler = { change_variable = { name = tmp_world_total divide = 100 } }
-        # 10% threshold
         scope:outer_ruler = { set_variable = { name = tmp_world_total_10 value = scope:outer_ruler.var:tmp_world_total_full } }
         scope:outer_ruler = { change_variable = { name = tmp_world_total_10 multiply = 10 } }
         scope:outer_ruler = { change_variable = { name = tmp_world_total_10 divide = 100 } }
-        # 15% threshold
         scope:outer_ruler = { set_variable = { name = tmp_world_total_15 value = scope:outer_ruler.var:tmp_world_total_full } }
         scope:outer_ruler = { change_variable = { name = tmp_world_total_15 multiply = 15 } }
         scope:outer_ruler = { change_variable = { name = tmp_world_total_15 divide = 100 } }
 
-        # Save the ruler's realm size for inspection
-        scope:outer_ruler = { set_variable = { name = tmp_realm_size value = realm_size } }
-
-        # Flag massive (>=15%), very large (>=10%), or large (>=5%) in that order
+        # Flag massive (>=15%), very large (>=10%), or large (>=5%) in that order.
         if = {
             limit = { realm_size >= scope:outer_ruler.var:tmp_world_total_15 }
             set_variable = { name = riseandfall_massive_realm value = 1 }
@@ -65,12 +66,579 @@ riseandfall_dynamic_story_mode_se = {
             set_variable = { name = riseandfall_large_realm value = 1 }
         }
 
-        # Clean up temporary vars from the saved scope and clear saved scope
+        # Seed debug values for all independent rulers so the tooltip can render consistently.
+        set_variable = { name = riseandfall_story_fracture_pressure value = 0 }
+        set_variable = { name = riseandfall_story_strong_vassal_count value = 0 }
+        set_variable = { name = riseandfall_story_noncore_regions value = 0 }
+        set_variable = { name = riseandfall_story_foreign_culture_county_pct value = 0 }
+        set_variable = { name = riseandfall_story_foreign_faith_county_pct value = 0 }
+        set_variable = { name = riseandfall_story_contrib_realm_size value = 0 }
+        set_variable = { name = riseandfall_story_contrib_strong_vassals value = 0 }
+        set_variable = { name = riseandfall_story_contrib_noncore_regions value = 0 }
+        set_variable = { name = riseandfall_story_contrib_foreign_culture value = 0 }
+        set_variable = { name = riseandfall_story_contrib_foreign_faith value = 0 }
+        set_variable = { name = riseandfall_story_contrib_resilience value = 0 }
+        set_variable = { name = riseandfall_story_aligned_identity_dev value = 0 }
+        set_variable = { name = riseandfall_story_foreign_identity_dev value = 0 }
+        set_variable = { name = riseandfall_story_foreign_identity_dev_ratio value = 0 }
+
+        # Kingdom+ rulers get detailed fracture pressure for collapse drama.
+        if = {
+            limit = { highest_held_title_tier >= tier_kingdom }
+
+            # Realm size is a minor background factor, not the primary collapse driver.
+            # A monoculture realm (e.g. unified China-equivalent) stays stable even when enormous.
+            # The real pressure comes from cultural/faith fragmentation and structural weaknesses below.
+            # Size synergy with fragmentation is added after the county culture/faith calculations.
+            if = {
+                limit = { has_variable = riseandfall_massive_realm }
+                set_variable = { name = riseandfall_story_contrib_realm_size value = 1 }
+                change_variable = { name = riseandfall_story_fracture_pressure add = 1 }
+            }
+            # Very large and large realms add no base pressure — cohesion determines stability, not raw size.
+
+            # Structural pressure from direct-vassal load and strong vassal blocs.
+            # We track strong vassals by cultural alignment: a foreign-culture warlord-vassal has both
+            # the military power AND the distinct identity to act independently (Mongol khanate scenario).
+            set_variable = { name = tmp_story_strong_vassal_threshold value = current_military_strength }
+            change_variable = { name = tmp_story_strong_vassal_threshold multiply = 0.35 }
+            set_variable = { name = tmp_story_strong_vassals value = 0 }
+            set_variable = { name = tmp_story_strong_foreign_culture_vassals value = 0 }
+            set_variable = { name = tmp_story_strong_foreign_faith_vassals value = 0 }
+            every_vassal = {
+                limit = {
+                    is_landed = yes
+                    primary_title.tier >= tier_county
+                }
+                if = {
+                    limit = {
+                        current_military_strength >= scope:outer_ruler.var:tmp_story_strong_vassal_threshold
+                    }
+                    scope:outer_ruler = { change_variable = { name = tmp_story_strong_vassals add = 1 } }
+                    # Foreign-culture strong vassal: independent identity + independent army = separatist risk.
+                    # Not mitigated by cultural acceptance < 40 (they haven't been assimilated into the realm).
+                    if = {
+                        limit = {
+                            NOT = { culture = scope:outer_ruler.culture }
+                            NOT = {
+                                culture = {
+                                    cultural_acceptance = {
+                                        target = scope:outer_ruler.culture
+                                        value >= 70
+                                    }
+                                }
+                            }
+                        }
+                        scope:outer_ruler = { change_variable = { name = tmp_story_strong_foreign_culture_vassals add = 1 } }
+                    }
+                    # Foreign-faith strong vassal (culturally aligned): less inherent motivation but still
+                    # dangerous during a crisis, as faith can become a rallying point for rebellion.
+                    else_if = {
+                        limit = {
+                            NOT = { faith = scope:outer_ruler.faith }
+                        }
+                        scope:outer_ruler = { change_variable = { name = tmp_story_strong_foreign_faith_vassals add = 1 } }
+                    }
+                }
+            }
+
+            set_variable = { name = riseandfall_story_strong_vassal_count value = var:tmp_story_strong_vassals }
+
+            # Elite pressure now only matters during succession/civil stress, not as a permanent blob tax.
+            set_variable = { name = tmp_story_elite_stress value = 0 }
+            if = {
+                limit = { has_variable = riseandfall_story_succession_shock }
+                set_variable = { name = tmp_story_elite_stress value = 1 }
+            }
+            if = {
+                limit = {
+                    has_variable = riseandfall_rs_civil_war_years
+                    var:riseandfall_rs_civil_war_years >= 6
+                }
+                set_variable = { name = tmp_story_elite_stress value = 1 }
+            }
+            if = {
+                limit = {
+                    has_variable = riseandfall_puppet_regency_years
+                    var:riseandfall_puppet_regency_years >= 3
+                }
+                set_variable = { name = tmp_story_elite_stress value = 1 }
+            }
+
+            # Foreign-culture strong vassals: structural separatist pressure that does NOT require a crisis.
+            # They already have the army and the distinct identity to act independently at any moment.
+            # Think of how Mongol khanates gradually asserted independence regardless of succession state.
+            if = {
+                limit = { var:tmp_story_strong_foreign_culture_vassals >= 3 }
+                set_variable = { name = riseandfall_story_contrib_strong_vassals value = 2 }
+                change_variable = { name = riseandfall_story_fracture_pressure add = 2 }
+            }
+            else_if = {
+                limit = { var:tmp_story_strong_foreign_culture_vassals >= 1 }
+                set_variable = { name = riseandfall_story_contrib_strong_vassals value = 1 }
+                change_variable = { name = riseandfall_story_fracture_pressure add = 1 }
+            }
+
+            # Foreign-faith strong vassals (same culture) only become dangerous during a succession
+            # or civil crisis — faith alone isn't enough motivation without an existing power vacuum.
+            if = {
+                limit = {
+                    var:tmp_story_elite_stress > 0
+                    var:tmp_story_strong_foreign_faith_vassals >= 2
+                }
+                change_variable = { name = riseandfall_story_contrib_strong_vassals add = 1 }
+                change_variable = { name = riseandfall_story_fracture_pressure add = 1 }
+            }
+
+            # County-level legitimacy pressure (critical for long-lived/immortal rulers).
+            # If most counties are foreign culture/faith, the realm should be structurally unstable.
+            set_variable = { name = tmp_story_realm_counties value = 0 }
+            set_variable = { name = tmp_story_native_culture_counties value = 0 }
+            set_variable = { name = tmp_story_native_faith_counties value = 0 }
+            set_variable = { name = tmp_story_foreign_culture_counties value = 0 }
+            set_variable = { name = tmp_story_foreign_faith_counties value = 0 }
+            set_variable = { name = tmp_story_aligned_identity_dev value = 0 }
+            set_variable = { name = tmp_story_foreign_identity_dev value = 0 }
+            set_variable = { name = tmp_story_total_identity_dev value = 0 }
+            every_realm_county = {
+                save_scope_as = story_mode_county
+                scope:outer_ruler = { change_variable = { name = tmp_story_realm_counties add = 1 } }
+                scope:outer_ruler = { change_variable = { name = tmp_story_total_identity_dev add = development_level } }
+
+                if = {
+                    limit = { culture = scope:outer_ruler.culture }
+                    scope:outer_ruler = { change_variable = { name = tmp_story_native_culture_counties add = 1 } }
+                }
+                # Treat high cultural acceptance as integrated culture rather than foreign fracture pressure.
+                else_if = {
+                    limit = {
+                        culture = {
+                            cultural_acceptance = {
+                                target = scope:outer_ruler.culture
+                                value >= 70
+                            }
+                        }
+                    }
+                    scope:outer_ruler = { change_variable = { name = tmp_story_native_culture_counties add = 1 } }
+                }
+                else_if = {
+                    limit = {
+                        exists = holder
+                        holder = { culture = scope:story_mode_county.culture }
+                    }
+                    scope:outer_ruler = { change_variable = { name = tmp_story_native_culture_counties add = 1 } }
+                }
+                else = {
+                    scope:outer_ruler = { change_variable = { name = tmp_story_foreign_culture_counties add = 1 } }
+                }
+
+                if = {
+                    limit = { faith = scope:outer_ruler.faith }
+                    scope:outer_ruler = { change_variable = { name = tmp_story_native_faith_counties add = 1 } }
+                }
+                else_if = {
+                    limit = {
+                        faith = {
+                            faith_hostility_level = {
+                                target = scope:outer_ruler.faith
+                                value <= faith_astray_level
+                            }
+                        }
+                    }
+                    scope:outer_ruler = { change_variable = { name = tmp_story_native_faith_counties add = 1 } }
+                }
+                else_if = {
+                    limit = {
+                        exists = holder
+                        holder = { faith = scope:story_mode_county.faith }
+                    }
+                    scope:outer_ruler = { change_variable = { name = tmp_story_native_faith_counties add = 1 } }
+                }
+                else = {
+                    scope:outer_ruler = { change_variable = { name = tmp_story_foreign_faith_counties add = 1 } }
+                }
+
+                # Economic identity split: "aligned" means county shares either ruler culture or ruler faith.
+                if = {
+                    limit = {
+                        NOT = { culture = scope:outer_ruler.culture }
+                        NOT = { faith = scope:outer_ruler.faith }
+                        NOT = {
+                            culture = {
+                                cultural_acceptance = {
+                                    target = scope:outer_ruler.culture
+                                    value >= 70
+                                }
+                            }
+                        }
+                        NOT = {
+                            faith = {
+                                faith_hostility_level = {
+                                    target = scope:outer_ruler.faith
+                                    value <= faith_astray_level
+                                }
+                            }
+                        }
+                        NOT = {
+                            AND = {
+                                exists = holder
+                                holder = { culture = scope:story_mode_county.culture }
+                            }
+                        }
+                        NOT = {
+                            AND = {
+                                exists = holder
+                                holder = { faith = scope:story_mode_county.faith }
+                            }
+                        }
+                    }
+                    scope:outer_ruler = { change_variable = { name = tmp_story_foreign_identity_dev add = development_level } }
+                }
+                else = {
+                    scope:outer_ruler = { change_variable = { name = tmp_story_aligned_identity_dev add = development_level } }
+                }
+
+                clear_saved_scope = story_mode_county
+            }
+
+            set_variable = { name = tmp_story_foreign_culture_county_pct value = 0 }
+            set_variable = { name = tmp_story_foreign_faith_county_pct value = 0 }
+            set_variable = { name = tmp_story_foreign_culture_contrib value = 0 }
+            set_variable = { name = tmp_story_foreign_faith_contrib value = 0 }
+
+            if = {
+                limit = { var:tmp_story_realm_counties >= 20 }
+                # Colonizer-state case: ruler has effectively no native cultural base in the realm.
+                if = {
+                    limit = {
+                        var:tmp_story_realm_counties >= 30
+                        var:tmp_story_native_culture_counties = 0
+                    }
+                    set_variable = { name = tmp_story_foreign_culture_county_pct value = 100 }
+                    set_variable = { name = tmp_story_foreign_culture_contrib value = 3 }
+                }
+                else = {
+                    set_variable = { name = tmp_story_foreign_culture_county_pct value = var:tmp_story_foreign_culture_counties }
+                    change_variable = { name = tmp_story_foreign_culture_county_pct multiply = 100 }
+                    change_variable = { name = tmp_story_foreign_culture_county_pct divide = var:tmp_story_realm_counties }
+                    if = {
+                        limit = { var:tmp_story_foreign_culture_county_pct >= 95 }
+                        set_variable = { name = tmp_story_foreign_culture_contrib value = 3 }
+                    }
+                    else_if = {
+                        limit = { var:tmp_story_foreign_culture_county_pct >= 85 }
+                        set_variable = { name = tmp_story_foreign_culture_contrib value = 2 }
+                    }
+                    else_if = {
+                        limit = { var:tmp_story_foreign_culture_county_pct >= 70 }
+                        set_variable = { name = tmp_story_foreign_culture_contrib value = 1 }
+                    }
+                }
+
+                # Faith mismatch still matters strongly for realm cohesion.
+                if = {
+                    limit = {
+                        var:tmp_story_realm_counties >= 30
+                        var:tmp_story_native_faith_counties = 0
+                    }
+                    set_variable = { name = tmp_story_foreign_faith_county_pct value = 100 }
+                    set_variable = { name = tmp_story_foreign_faith_contrib value = 2 }
+                }
+                else = {
+                    set_variable = { name = tmp_story_foreign_faith_county_pct value = var:tmp_story_foreign_faith_counties }
+                    change_variable = { name = tmp_story_foreign_faith_county_pct multiply = 100 }
+                    change_variable = { name = tmp_story_foreign_faith_county_pct divide = var:tmp_story_realm_counties }
+                    if = {
+                        limit = { var:tmp_story_foreign_faith_county_pct >= 90 }
+                        set_variable = { name = tmp_story_foreign_faith_contrib value = 2 }
+                    }
+                    else_if = {
+                        limit = { var:tmp_story_foreign_faith_county_pct >= 75 }
+                        set_variable = { name = tmp_story_foreign_faith_contrib value = 1 }
+                    }
+                }
+            }
+
+            set_variable = { name = riseandfall_story_contrib_foreign_culture value = var:tmp_story_foreign_culture_contrib }
+            set_variable = { name = riseandfall_story_contrib_foreign_faith value = var:tmp_story_foreign_faith_contrib }
+            change_variable = { name = riseandfall_story_fracture_pressure add = var:tmp_story_foreign_culture_contrib }
+            change_variable = { name = riseandfall_story_fracture_pressure add = var:tmp_story_foreign_faith_contrib }
+
+            # Size + fragmentation synergy: a massive realm that is also culturally fragmented faces
+            # amplified centrifugal pressure. A homogeneous empire (e.g. unified Han China) does NOT
+            # get this penalty — only realms combining vast scale with genuine cultural diversity do.
+            if = {
+                limit = {
+                    has_variable = riseandfall_massive_realm
+                    var:tmp_story_foreign_culture_county_pct >= 50
+                }
+                change_variable = { name = riseandfall_story_fracture_pressure add = 1 }
+            }
+
+            # Monoculture cohesion bonus: large or massive realms that are ethnically homogeneous
+            # have natural administrative resilience. Unified China does not fragment just because it is large.
+            if = {
+                limit = {
+                    OR = {
+                        has_variable = riseandfall_massive_realm
+                        has_variable = riseandfall_very_large_realm
+                    }
+                    var:tmp_story_foreign_culture_county_pct < 20
+                }
+                change_variable = { name = riseandfall_story_contrib_resilience add = 1 }
+                change_variable = { name = riseandfall_story_fracture_pressure add = -1 }
+            }
+
+            # Development-weighted identity strain replaces de-jure non-core pressure.
+            # Compare development of fully foreign counties (neither ruler culture nor ruler faith)
+            # against aligned counties (shares ruler culture or ruler faith).
+            set_variable = { name = tmp_story_foreign_identity_dev_pct value = 0 }
+            set_variable = { name = tmp_story_foreign_identity_dev_ratio value = 0 }
+            set_variable = { name = tmp_story_identity_dev_pressure value = 0 }
+
+            if = {
+                limit = { var:tmp_story_total_identity_dev > 0 }
+                set_variable = { name = tmp_story_foreign_identity_dev_pct value = var:tmp_story_foreign_identity_dev }
+                change_variable = { name = tmp_story_foreign_identity_dev_pct multiply = 100 }
+                change_variable = { name = tmp_story_foreign_identity_dev_pct divide = var:tmp_story_total_identity_dev }
+            }
+
+            if = {
+                limit = { var:tmp_story_aligned_identity_dev > 0 }
+                set_variable = { name = tmp_story_foreign_identity_dev_ratio value = var:tmp_story_foreign_identity_dev }
+                change_variable = { name = tmp_story_foreign_identity_dev_ratio multiply = 100 }
+                change_variable = { name = tmp_story_foreign_identity_dev_ratio divide = var:tmp_story_aligned_identity_dev }
+            }
+            else_if = {
+                limit = { var:tmp_story_foreign_identity_dev > 0 }
+                set_variable = { name = tmp_story_foreign_identity_dev_ratio value = 200 }
+            }
+
+            if = {
+                limit = {
+                    var:tmp_story_total_identity_dev >= 200
+                    var:tmp_story_foreign_identity_dev_pct >= 65
+                    var:tmp_story_foreign_identity_dev_ratio >= 90
+                }
+                set_variable = { name = tmp_story_identity_dev_pressure value = 2 }
+            }
+            else_if = {
+                limit = {
+                    var:tmp_story_total_identity_dev >= 120
+                    var:tmp_story_foreign_identity_dev_pct >= 50
+                    var:tmp_story_foreign_identity_dev_ratio >= 60
+                }
+                set_variable = { name = tmp_story_identity_dev_pressure value = 1 }
+            }
+
+            # Succession and elite crises make development mismatch more dangerous.
+            if = {
+                limit = {
+                    var:tmp_story_identity_dev_pressure = 0
+                    var:tmp_story_foreign_identity_dev_pct >= 40
+                    OR = {
+                        has_variable = riseandfall_story_succession_shock
+                        var:tmp_story_elite_stress > 0
+                    }
+                }
+                set_variable = { name = tmp_story_identity_dev_pressure value = 1 }
+            }
+
+            # Partition realms integrate peripheral development better over time.
+            if = {
+                limit = { has_realm_law_flag = partition_succession_law }
+                change_variable = { name = tmp_story_identity_dev_pressure add = -1 }
+            }
+            else_if = {
+                limit = {
+                    OR = {
+                        has_realm_law = single_heir_succession_law
+                        has_realm_law = single_heir_succession_law_youngest
+                        has_realm_law = single_heir_dynasty_house
+                    }
+                    var:tmp_story_identity_dev_pressure > 0
+                    OR = {
+                        has_variable = riseandfall_story_succession_shock
+                        var:tmp_story_elite_stress > 0
+                    }
+                }
+                change_variable = { name = tmp_story_identity_dev_pressure add = 1 }
+            }
+
+            clamp_variable = { name = tmp_story_identity_dev_pressure min = 0 max = 3 }
+            set_variable = { name = riseandfall_story_noncore_regions value = var:tmp_story_foreign_identity_dev_pct }
+            set_variable = { name = riseandfall_story_aligned_identity_dev value = var:tmp_story_aligned_identity_dev }
+            set_variable = { name = riseandfall_story_foreign_identity_dev value = var:tmp_story_foreign_identity_dev }
+            set_variable = { name = riseandfall_story_foreign_identity_dev_ratio value = var:tmp_story_foreign_identity_dev_ratio }
+            set_variable = { name = riseandfall_story_contrib_noncore_regions value = var:tmp_story_identity_dev_pressure }
+            change_variable = { name = riseandfall_story_fracture_pressure add = var:tmp_story_identity_dev_pressure }
+
+            # Succession shocks (good ruler -> weak heir) are applied by inheritance hooks.
+            if = {
+                limit = { has_variable = riseandfall_story_succession_shock }
+                change_variable = { name = riseandfall_story_fracture_pressure add = var:riseandfall_story_succession_shock }
+            }
+
+            # Institutional resilience dampens collapse pressure in historically cohesive empires.
+            if = {
+                limit = {
+                    has_variable = riseandfall_realm_stability_score
+                    var:riseandfall_realm_stability_score >= 70
+                }
+                change_variable = { name = riseandfall_story_contrib_resilience add = 2 }
+                change_variable = { name = riseandfall_story_fracture_pressure add = -2 }
+            }
+            else_if = {
+                limit = {
+                    has_variable = riseandfall_realm_stability_score
+                    var:riseandfall_realm_stability_score >= 55
+                }
+                change_variable = { name = riseandfall_story_contrib_resilience add = 1 }
+                change_variable = { name = riseandfall_story_fracture_pressure add = -1 }
+            }
+
+            if = {
+                limit = {
+                    has_variable = riseandfall_rs_legitimacy_multiplier
+                    var:riseandfall_rs_legitimacy_multiplier >= 110
+                }
+                change_variable = { name = riseandfall_story_contrib_resilience add = 1 }
+                change_variable = { name = riseandfall_story_fracture_pressure add = -1 }
+            }
+
+            if = {
+                limit = {
+                    NOT = { has_variable = riseandfall_story_succession_shock }
+                    has_variable = riseandfall_realm_stability_score
+                    var:riseandfall_realm_stability_score >= 60
+                    OR = {
+                        has_variable = riseandfall_massive_realm
+                        has_variable = riseandfall_very_large_realm
+                    }
+                }
+                change_variable = { name = riseandfall_story_contrib_resilience add = 1 }
+                change_variable = { name = riseandfall_story_fracture_pressure add = -1 }
+            }
+
+            clamp_variable = { name = riseandfall_story_fracture_pressure min = 0 max = 12 }
+
+            set_variable = { name = riseandfall_story_foreign_culture_county_pct value = var:tmp_story_foreign_culture_county_pct }
+            set_variable = { name = riseandfall_story_foreign_faith_county_pct value = var:tmp_story_foreign_faith_county_pct }
+
+            remove_variable = tmp_story_strong_vassal_threshold
+            remove_variable = tmp_story_strong_vassals
+            remove_variable = tmp_story_strong_foreign_culture_vassals
+            remove_variable = tmp_story_strong_foreign_faith_vassals
+            remove_variable = tmp_story_culture_pct
+            remove_variable = tmp_story_faith_pct
+            remove_variable = tmp_story_realm_counties
+            remove_variable = tmp_story_native_culture_counties
+            remove_variable = tmp_story_native_faith_counties
+            remove_variable = tmp_story_foreign_culture_counties
+            remove_variable = tmp_story_foreign_faith_counties
+            remove_variable = tmp_story_foreign_culture_county_pct
+            remove_variable = tmp_story_foreign_faith_county_pct
+            remove_variable = tmp_story_foreign_culture_contrib
+            remove_variable = tmp_story_foreign_faith_contrib
+            remove_variable = tmp_story_aligned_identity_dev
+            remove_variable = tmp_story_foreign_identity_dev
+            remove_variable = tmp_story_total_identity_dev
+            remove_variable = tmp_story_foreign_identity_dev_pct
+            remove_variable = tmp_story_foreign_identity_dev_ratio
+            remove_variable = tmp_story_identity_dev_pressure
+            remove_variable = tmp_story_elite_stress
+        }
+
         scope:outer_ruler = { remove_variable = tmp_world_total }
         scope:outer_ruler = { remove_variable = tmp_world_total_full }
         scope:outer_ruler = { remove_variable = tmp_world_total_10 }
         scope:outer_ruler = { remove_variable = tmp_world_total_15 }
-        scope:outer_ruler = { remove_variable = tmp_realm_size }
         clear_saved_scope = outer_ruler
+    }
+}
+
+# Mark rulers right after succession and rate succession shock based on stat drop.
+# Root scope: inheriting ruler
+# Expected saved scope: scope:predecessor
+riseandfall_mark_story_succession_shock_se = {
+    if = {
+        limit = {
+            has_game_rule = riseandfall_dynamic_story_mode_enabled
+            exists = scope:predecessor
+            scope:predecessor = { is_alive = no }
+        }
+        set_variable = { name = tmp_story_succession_shock value = 0 }
+
+        set_variable = { name = tmp_story_prev_skill_total value = scope:predecessor.diplomacy }
+        change_variable = { name = tmp_story_prev_skill_total add = scope:predecessor.martial }
+        change_variable = { name = tmp_story_prev_skill_total add = scope:predecessor.stewardship }
+        change_variable = { name = tmp_story_prev_skill_total add = scope:predecessor.intrigue }
+        change_variable = { name = tmp_story_prev_skill_total add = scope:predecessor.learning }
+
+        set_variable = { name = tmp_story_new_skill_total value = diplomacy }
+        change_variable = { name = tmp_story_new_skill_total add = martial }
+        change_variable = { name = tmp_story_new_skill_total add = stewardship }
+        change_variable = { name = tmp_story_new_skill_total add = intrigue }
+        change_variable = { name = tmp_story_new_skill_total add = learning }
+
+        # Shock only fires for meaningful leadership drops, not routine successions.
+        # Any downgrade (even tiny) or "skill <= 30" are intentionally removed as triggers —
+        # those thresholds fired in ~60% of successions, making shock feel unfair and arbitrary.
+
+        # 1. Genuinely incompetent heir: average < 5 per stat means the realm is in real trouble.
+        if = {
+            limit = { var:tmp_story_new_skill_total <= 25 }
+            change_variable = { name = tmp_story_succession_shock add = 1 }
+        }
+
+        # 2. Significant capability drop from a capable predecessor.
+        # Models Charlemagne → Louis the Pious: a clearly able ruler followed by a clearly weaker one.
+        if = {
+            limit = {
+                var:tmp_story_prev_skill_total >= 45
+                var:tmp_story_new_skill_total <= 30
+            }
+            change_variable = { name = tmp_story_succession_shock add = 1 }
+        }
+
+        # 3. Exceptional ruler → much weaker heir: the Genghis Khan drop.
+        # An outstanding predecessor (>=55) succeeded by a far less capable ruler (<=35).
+        # This stacks with condition 2 for a combined +2 before realm-size amplification.
+        if = {
+            limit = {
+                var:tmp_story_prev_skill_total >= 55
+                var:tmp_story_new_skill_total <= 35
+            }
+            change_variable = { name = tmp_story_succession_shock add = 1 }
+        }
+
+        # Large realm amplification: governing a vast empire demands stronger leadership.
+        # The same leadership gap that is tolerable in a small realm becomes a crisis in a large one.
+        # Uses realm_size directly (not yearly flags) since this runs at the moment of succession.
+        if = {
+            limit = {
+                var:tmp_story_succession_shock >= 1
+                OR = {
+                    has_variable = riseandfall_massive_realm
+                    has_variable = riseandfall_very_large_realm
+                    realm_size >= 150
+                }
+            }
+            change_variable = { name = tmp_story_succession_shock add = 1 }
+        }
+
+        clamp_variable = { name = tmp_story_succession_shock min = 0 max = 3 }
+
+        if = {
+            limit = { var:tmp_story_succession_shock > 0 }
+            set_variable = { name = riseandfall_story_succession_shock value = var:tmp_story_succession_shock years = 8 }
+        }
+        else = {
+            remove_variable = riseandfall_story_succession_shock
+        }
+
+        remove_variable = tmp_story_prev_skill_total
+        remove_variable = tmp_story_new_skill_total
+        remove_variable = tmp_story_succession_shock
     }
 }
