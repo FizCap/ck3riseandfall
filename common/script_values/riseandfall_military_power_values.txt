@@ -7,3 +7,8 @@ riseandfall_military_power_with_allies = {
         add = military_power
     }
 }
+
+riseandfall_military_power_with_allies_strong = {
+    value = riseandfall_military_power_with_allies
+    multiply = 1.5
+}

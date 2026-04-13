@@ -393,7 +393,8 @@ riseandfall_diadochi_try_peer_target_se = {
 			is_at_war = no
 			riseandfall_has_successor_primary_title_trigger = yes
 			primary_title.var:rf_successor_origin_title = scope:rf_diadochi_origin_title
-			root.riseandfall_military_power_with_allies > this.riseandfall_military_power_with_allies
+			root.riseandfall_military_power_with_allies_strong > this.riseandfall_military_power_with_allies
+			root.current_military_strength > this.capital_province.building_max_garrison
 		}
 		save_scope_as = rf_diadochi_target_ruler
 		primary_title = { save_scope_as = rf_diadochi_target_title }
@@ -415,7 +416,8 @@ riseandfall_diadochi_try_neighbor_peer_target_se = {
 				is_at_war = no
 				riseandfall_has_successor_primary_title_trigger = yes
 				primary_title.var:rf_successor_origin_title = scope:rf_diadochi_origin_title
-				root.riseandfall_military_power_with_allies > this.riseandfall_military_power_with_allies
+				root.riseandfall_military_power_with_allies_strong > this.riseandfall_military_power_with_allies
+				root.current_military_strength > this.capital_province.building_max_garrison
 			}
 		}
 		random_neighboring_realm_owner = {
@@ -428,7 +430,8 @@ riseandfall_diadochi_try_neighbor_peer_target_se = {
 				is_at_war = no
 				riseandfall_has_successor_primary_title_trigger = yes
 				primary_title.var:rf_successor_origin_title = scope:rf_diadochi_origin_title
-				root.riseandfall_military_power_with_allies > this.riseandfall_military_power_with_allies
+				root.riseandfall_military_power_with_allies_strong > this.riseandfall_military_power_with_allies
+				root.current_military_strength > this.capital_province.building_max_garrison
 			}
 			save_scope_as = rf_diadochi_target_ruler
 			primary_title = { save_scope_as = rf_diadochi_target_title }
@@ -450,9 +453,11 @@ riseandfall_diadochi_try_origin_target_se = {
 				is_imprisoned = no
 				is_at_war = no
 			}
-			riseandfall_military_power_with_allies > scope:rf_diadochi_origin_title.holder.riseandfall_military_power_with_allies
+			riseandfall_military_power_with_allies_strong > scope:rf_diadochi_origin_title.holder.riseandfall_military_power_with_allies
+			root.current_military_strength > scope:rf_diadochi_origin_title.holder.capital_province.building_max_garrison
 		}
 		scope:rf_diadochi_origin_title.holder = { save_scope_as = rf_diadochi_target_ruler }
 		scope:rf_diadochi_origin_title = { save_scope_as = rf_diadochi_target_title }
 	}
 }
+
