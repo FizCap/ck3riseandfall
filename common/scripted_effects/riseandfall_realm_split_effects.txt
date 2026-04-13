@@ -88,6 +88,19 @@ riseandfall_realm_split_se = {
         }
 
         if = {
+            limit = {
+                any_vassal = {
+                    is_landed = yes
+                    has_trait = warlord
+                }
+            }
+            every_vassal = {
+                limit = { is_landed = yes }
+                remove_trait = warlord
+            }
+        }
+
+        if = {
             limit = { realm_size >= 20 }
             add_character_flag = rf_split_small
         }
@@ -855,12 +868,7 @@ riseandfall_realm_split_se = {
 riseandfall_execute_realm_split_se = {
     save_scope_as = new_realm_ruler
     
-    # Pick a random naming style: 1 = Capital name, 2 = Ruler name
-    random_list = {
-        50 = { set_variable = { name = rf_title_style value = 1 } } # Capital name (e.g. "Constantinople Domain")
-        50 = { set_variable = { name = rf_title_style value = 2 } } # Ruler name (e.g. "Li's Realm")
-    }
-    
+    # Use capital-based naming style for breakaway titles
     # Create the new realm title
     # Note: Hegemony tier cannot have dynamic titles, so treat it as empire
     scope:original_ruler = {
@@ -893,21 +901,9 @@ riseandfall_execute_realm_split_se = {
                         }
                     }
                     else = {
-                        if = {
-                            limit = {
-                                has_variable = rf_title_style
-                                var:rf_title_style = 1
-                            }
-                            create_dynamic_title = {
-                                tier = empire
-                                name = RISEANDFALL_BREAKAWAY_NAME_CAPITAL
-                            }
-                        }
-                        else = {
-                            create_dynamic_title = {
-                                tier = empire
-                                name = RISEANDFALL_BREAKAWAY_NAME_RULER
-                            }
+                        create_dynamic_title = {
+                            tier = empire
+                            name = RISEANDFALL_BREAKAWAY_NAME_CAPITAL
                         }
                         if = {
                             limit = { exists = scope:new_title }
@@ -944,21 +940,9 @@ riseandfall_execute_realm_split_se = {
                         }
                     }
                     else = {
-                        if = {
-                            limit = {
-                                has_variable = rf_title_style
-                                var:rf_title_style = 1
-                            }
-                            create_dynamic_title = {
-                                tier = kingdom
-                                name = RISEANDFALL_BREAKAWAY_NAME_CAPITAL
-                            }
-                        }
-                        else = {
-                            create_dynamic_title = {
-                                tier = kingdom
-                                name = RISEANDFALL_BREAKAWAY_NAME_RULER
-                            }
+                        create_dynamic_title = {
+                            tier = kingdom
+                            name = RISEANDFALL_BREAKAWAY_NAME_CAPITAL
                         }
                         if = {
                             limit = { exists = scope:new_title }
@@ -993,21 +977,9 @@ riseandfall_execute_realm_split_se = {
                         }
                     }
                     else = {
-                        if = {
-                            limit = {
-                                has_variable = rf_title_style
-                                var:rf_title_style = 1
-                            }
-                            create_dynamic_title = {
-                                tier = duchy
-                                name = RISEANDFALL_BREAKAWAY_NAME_CAPITAL
-                            }
-                        }
-                        else = {
-                            create_dynamic_title = {
-                                tier = duchy
-                                name = RISEANDFALL_BREAKAWAY_NAME_RULER
-                            }
+                        create_dynamic_title = {
+                            tier = duchy
+                            name = RISEANDFALL_BREAKAWAY_NAME_CAPITAL
                         }
                         if = {
                             limit = { exists = scope:new_title }
@@ -1026,8 +998,6 @@ riseandfall_execute_realm_split_se = {
         }
     }
     
-    # Cleanup the style variable
-    remove_variable = rf_title_style
     
     # Give them the new title
     if = {

@@ -11,6 +11,7 @@ riseandfall_inherit_warlord_trait_se = {
             exists = scope:predecessor
             scope:predecessor = { has_trait = warlord }
             NOT = { is_independent_ruler = yes }  # heir is not an independent ruler
+            is_landed = yes
         }
         add_trait = warlord
     }

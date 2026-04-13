@@ -14,7 +14,10 @@ riseandfall_warlord_notify_vassals = {
 
 # Become a warlord: add trait, opinions, remove claims if not powerful, trigger next event if powerful
 riseandfall_warlord_become_warlord = {
-    add_trait = warlord
+    if = {
+        limit = { is_landed = yes }
+        add_trait = warlord
+    }
     if = {
         limit = { is_independent_ruler = no }
         liege = {

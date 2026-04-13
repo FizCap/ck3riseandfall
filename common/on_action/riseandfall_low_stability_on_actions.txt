@@ -83,6 +83,12 @@ riseandfall_check_puppet_regency = {
 
 riseandfall_warlord = {
     effect = {
+        # Remove warlord from any unlanded characters; only landed characters may hold the trait.
+        every_ruler = {
+            limit = { is_landed = no has_trait = warlord }
+            remove_trait = warlord
+        }
+
         # For independent rulers who are warlords, mark them retired warlords
         every_independent_ruler = {
             limit = { has_trait = warlord }
@@ -92,7 +98,7 @@ riseandfall_warlord = {
 
         # For non-independent rulers who were retired warlords, restore the warlord trait so they act
         every_ruler = {
-            limit = { is_independent_ruler = no has_trait = retiredwarlord }
+            limit = { is_independent_ruler = no has_trait = retiredwarlord is_landed = yes }
             remove_trait = retiredwarlord
             add_trait = warlord
         }
