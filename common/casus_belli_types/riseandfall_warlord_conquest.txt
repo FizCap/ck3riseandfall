@@ -355,17 +355,17 @@
     attacker_ticking_warscore = 0.1                       # Ticking warscore per day for attacker
     defender_ticking_warscore = 0.1                       # Ticking warscore per day for defender
 
-    # Scales — favor battles over occupation
-    attacker_score_from_occupation_scale = 25
-    defender_score_from_occupation_scale = 25
-    attacker_score_from_battles_scale = 100
-    defender_score_from_battles_scale = 100
+    # Scales — increase reward from battles and occupation
+    attacker_score_from_occupation_scale = 35
+    defender_score_from_occupation_scale = 30
+    attacker_score_from_battles_scale = 120
+    defender_score_from_battles_scale = 110
 
-    # Hard caps — battles can contribute up to 90 warscore, occupation much less
-    max_attacker_score_from_battles = 90
-    max_defender_score_from_battles = 90
-    max_attacker_score_from_occupation = 100
-    max_defender_score_from_occupation = 100
+    # Hard caps — battles can contribute more, occupation is more valuable too
+    max_attacker_score_from_battles = 100
+    max_defender_score_from_battles = 100
+    max_attacker_score_from_occupation = 120
+    max_defender_score_from_occupation = 110
 
     # Keep the vanilla/intent behavior flags
     full_occupation_by_defender_gives_victory = yes
