@@ -19,11 +19,7 @@ authority_collapse.1001 = {
                 every_realm_county = {
                     add_county_modifier = {
                         modifier = riseandfall_authority_collapse
-                        years = 10
-                    }
-                    # Force county control to 0 by subtracting the current control value
-                    change_county_control = {
-                        value = -100
+                        years = 5
                     }
                 }
                 # Set low stability cooldown on the ruler
