@@ -32,20 +32,25 @@ riseandfall_can_realm_split_trigger = {
         is_landed = yes
         primary_title.tier >= tier_county
     }
-    # Require at least one single landed vassal to control at least 20% of the realm.
+    # Only allow realm split when at least half of the realm territory is held by warlord vassals.
+    any_realm_county = {
+        count >= 1
+        percent >= 0.20
+        holder = {
+            is_landed = yes
+            has_trait = warlord
+        }
+    }
+
+    # Also require at least one single vassal to control a quarter of the realm.
     any_vassal = {
         count >= 1
         is_landed = yes
         primary_title.tier >= tier_county
         save_scope_as = rf_large_vassal
-        root = {
-            any_sub_realm_county = {
-                percent >= 0.20
-                OR = {
-                    holder = scope:rf_large_vassal
-                    holder = { target_is_liege_or_above = scope:rf_large_vassal }
-                }
-            }
+        any_realm_county = {
+            percent >= 0.20
+            holder = { this = scope:rf_large_vassal }
         }
     }
 }
