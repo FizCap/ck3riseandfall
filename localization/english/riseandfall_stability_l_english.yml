@@ -24,7 +24,7 @@ REALM_STABILITY_TOOLTIP:0 "#bold Realm Stability#!\n[Select_CString( GreaterThan
  REALM_STABILITY_TT_STORY_MODE_HEADER:0 "#bold Story Mode#!"
  REALM_STABILITY_TT_STORY_FRACTURE:0 "[Select_CString( GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_fracture_pressure').GetValue, '(CFixedPoint)0' ), '@change_down_bad_1! #color_red Fracture pressure: ', 'Fracture pressure: ' )][Character.MakeScope.Var('riseandfall_story_fracture_pressure').GetValue|0]#!"
  REALM_STABILITY_TT_STORY_REALM_SIZE:0 "@change_down_bad_1! #color_red Massive realm: +[Character.MakeScope.Var('riseandfall_story_contrib_realm_size').GetValue|0]#!"
- REALM_STABILITY_TT_STORY_STRONG_VASSALS:0 "@change_down_bad_1! #color_red Foreign-culture warlord vassals: +[Character.MakeScope.Var('riseandfall_story_contrib_strong_vassals').GetValue|0]#!"
+ REALM_STABILITY_TT_STORY_STRONG_VASSALS:0 "@change_down_bad_1! #color_red Strong Vassals: +[Character.MakeScope.Var('riseandfall_story_contrib_strong_vassals').GetValue|0]#!"
  REALM_STABILITY_TT_STORY_NONCORE_REGIONS:0 "@change_down_bad_1! #color_red Development integration strain: +[Character.MakeScope.Var('riseandfall_story_contrib_noncore_regions').GetValue|0]#!"
  REALM_STABILITY_TT_STORY_FOREIGN_CULTURE:0 "@change_down_bad_1! #color_red Foreign county culture: +[Character.MakeScope.Var('riseandfall_story_contrib_foreign_culture').GetValue|0]#!"
  REALM_STABILITY_TT_STORY_FOREIGN_FAITH:0 "@change_down_bad_1! #color_red Foreign county faith: +[Character.MakeScope.Var('riseandfall_story_contrib_foreign_faith').GetValue|0]#!"
