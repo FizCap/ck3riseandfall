@@ -100,6 +100,17 @@ palace_coup.1002 = {
 			# Also copy challenger's total onto the root character so a single tooltip subject can show both values
 			root = { set_variable = { name = riseandfall_total_prowess_chall value = scope:event_root.var:riseandfall_total_prowess_chall } }
 		}
+		root = {
+			set_variable = { name = riseandfall_total_prowess_margin value = 0 }
+			if = {
+				limit = { has_variable = riseandfall_total_prowess_root }
+				change_variable = { name = riseandfall_total_prowess_margin add = var:riseandfall_total_prowess_root }
+			}
+			if = {
+				limit = { has_variable = riseandfall_total_prowess_chall }
+				change_variable = { name = riseandfall_total_prowess_margin subtract = var:riseandfall_total_prowess_chall }
+			}
+		}
 
 		# For intrigue-based flee option, use individual character intrigue values (not a team total)
 		# compute AI add variables on root (clamped) for the duel and the intrigue flee choice
@@ -126,8 +137,7 @@ palace_coup.1002 = {
 		hidden_effect = { riseandfall_palace_coup_casualties = yes }
 
 		duel = {
-			challenge_variable = riseandfall_total_prowess
-			target = scope:challenger
+			value = var:riseandfall_total_prowess_margin
 
 			# Root wins duel
 		30 = {

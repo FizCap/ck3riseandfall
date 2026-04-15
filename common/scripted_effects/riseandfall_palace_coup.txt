@@ -879,6 +879,7 @@ riseandfall_palace_coup_cleanup_camp = {
 	root = { 
 		if = { limit = { is_alive = yes has_variable = riseandfall_total_prowess } remove_variable = riseandfall_total_prowess }
 		if = { limit = { is_alive = yes has_variable = riseandfall_total_prowess_root } remove_variable = riseandfall_total_prowess_root }
+		if = { limit = { is_alive = yes has_variable = riseandfall_total_prowess_margin } remove_variable = riseandfall_total_prowess_margin }
 		remove_variable = lost_titles
 	}
 	if = { limit = { exists = scope:challenger scope:challenger = { is_alive = yes } } 
