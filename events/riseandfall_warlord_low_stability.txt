@@ -74,9 +74,6 @@ warlord.1002 = {
             base = 0
             modifier = {
                 add = 100
-            }
-            modifier = {
-                add = 100
                 opinion = { target = liege value >= 75 }
             }
             modifier = {

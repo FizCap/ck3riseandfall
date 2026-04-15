@@ -24,7 +24,7 @@ riseandfall_warlord_cleanup_se = {
 
     # If the player chose loyalty, enforce it by abandoning the path
     every_ruler = {
-        limit = { is_player = yes has_character_flag = riseandfall_warlord_player_loyal has_trait = warlord }
+        limit = { is_ai = no has_character_flag = riseandfall_warlord_player_loyal has_trait = warlord }
         riseandfall_warlord_abandon_path = yes
     }
 }
