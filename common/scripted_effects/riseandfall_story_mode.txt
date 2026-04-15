@@ -203,7 +203,7 @@ riseandfall_dynamic_story_mode_se = {
             every_realm_county = {
                 save_scope_as = story_mode_county
                 scope:outer_ruler = { change_variable = { name = tmp_story_realm_counties add = 1 } }
-                scope:outer_ruler = { change_variable = { name = tmp_story_total_identity_dev add = development_level } }
+                scope:outer_ruler = { change_variable = { name = tmp_story_total_identity_dev add = scope:story_mode_county.development_level } }
 
                 if = {
                     limit = { culture = scope:outer_ruler.culture }
@@ -292,10 +292,10 @@ riseandfall_dynamic_story_mode_se = {
                             }
                         }
                     }
-                    scope:outer_ruler = { change_variable = { name = tmp_story_foreign_identity_dev add = development_level } }
+                    scope:outer_ruler = { change_variable = { name = tmp_story_foreign_identity_dev add = scope:story_mode_county.development_level } }
                 }
                 else = {
-                    scope:outer_ruler = { change_variable = { name = tmp_story_aligned_identity_dev add = development_level } }
+                    scope:outer_ruler = { change_variable = { name = tmp_story_aligned_identity_dev add = scope:story_mode_county.development_level } }
                 }
 
                 clear_saved_scope = story_mode_county
