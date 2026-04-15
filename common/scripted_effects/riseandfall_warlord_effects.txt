@@ -22,6 +22,18 @@ riseandfall_warlord_cleanup_se = {
         add_trait = warlord
     }
 
+    # Keep liege-title claims in sync for both player and AI warlord vassals.
+    # This runs from the yearly pulse and title-change on_actions, so growing past
+    # the threshold later still grants claims even if no event option is clicked.
+    every_ruler = {
+        limit = {
+            is_independent_ruler = no
+            is_landed = yes
+            has_trait = warlord
+        }
+        riseandfall_warlord_claim_liege_titles = yes
+    }
+
     # If the player chose loyalty, enforce it by abandoning the path
     every_ruler = {
         limit = { is_ai = no has_character_flag = riseandfall_warlord_player_loyal has_trait = warlord }

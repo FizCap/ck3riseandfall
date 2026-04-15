@@ -65,8 +65,8 @@ warlord.1002 = {
         set_variable = { name = riseandfall_warlord_choice_made value = yes years = 3 }
         # For the player, also set the loyal flag so the path manager decision becomes available
         if = {
-            limit = { is_player = yes }
-            set_character_flag = riseandfall_warlord_player_loyal
+            limit = { is_ai = no }
+            add_character_flag = riseandfall_warlord_player_loyal
         }
         riseandfall_warlord_remain_loyal = yes
         # small positive opinion or stability bonus could be added by scripted effects
@@ -99,7 +99,8 @@ warlord.1003 = {
 
     option = {
         name = warlord.1003.a
-        # Continue as warlord
+        # Continue as warlord: continually evaluate claims
+        riseandfall_warlord_claim_liege_titles = yes
         ai_chance = {
             base = 0
             modifier = {

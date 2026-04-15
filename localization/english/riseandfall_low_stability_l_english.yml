@@ -29,6 +29,7 @@ warlord.1003.d:0 "You have embraced the mantle of warlord, and now the path unfo
 warlord.1003.a:0 "Continue the path — press your claims"
 warlord.1003.b:0 "Abandon the path — renounce your warlord ambitions"
 
+riseandfall_warlord_path_manager:0 "Warlord Path Manager"
 riseandfall_warlord_path_manager_desc:0 "Choose whether your character follows the warlord path or remains a loyal vassal."
 riseandfall_warlord_path_manager_tooltip:0 "Toggle between rebellion and loyalty while you are a warlord vassal."
 riseandfall_warlord_path_manager_tooltip_tt:0 "Choose whether you will use the warlord trait to press claims or abandon the path and remain loyal to your liege."

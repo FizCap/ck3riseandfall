@@ -12,7 +12,7 @@ riseandfall_warlord_path_manager = {
     decision_group_type = riseandfall
 
     is_shown = {
-        is_player = yes
+        is_ai = no
         is_landed = yes
         NOT = { is_independent_ruler = yes }
         has_game_rule = riseandfall_low_stability_events_enabled
@@ -56,14 +56,14 @@ riseandfall_warlord_path_manager = {
             custom_tooltip = riseandfall_warlord_path_manager_tooltip_tt
             if = {
                 limit = { scope:riseandfall_choose_warlord_loyal = yes }
-                set_character_flag = riseandfall_warlord_player_loyal
-                set_character_flag = riseandfall_warlord_event_chosen
+                add_character_flag = riseandfall_warlord_player_loyal
+                add_character_flag = riseandfall_warlord_event_chosen
                 riseandfall_warlord_abandon_path = yes
             }
             else_if = {
                 limit = { scope:riseandfall_choose_warlord_rebel = yes }
                 remove_character_flag = riseandfall_warlord_player_loyal
-                set_character_flag = riseandfall_warlord_event_chosen
+                add_character_flag = riseandfall_warlord_event_chosen
                 riseandfall_warlord_become_warlord = yes
             }
         }
