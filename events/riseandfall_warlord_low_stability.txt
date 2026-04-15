@@ -48,7 +48,6 @@ warlord.1002 = {
             modifier = {
                 # only landed vassals consider rebellion
                 add = 100
-                is_independent_ruler = no
             }
             modifier = {
                 # low crown authority makes vassals emboldened
@@ -62,18 +61,22 @@ warlord.1002 = {
 
     option = {
         name = warlord.1002.b
-        # Remain loyal: boost relationzs with liege instead of adding trait
+        # Remain loyal: record the choice so this event is not offered again soon
+        set_variable = { name = riseandfall_warlord_choice_made value = yes years = 3 }
+        # For the player, also set the loyal flag so the path manager decision becomes available
+        if = {
+            limit = { is_player = yes }
+            set_character_flag = riseandfall_warlord_player_loyal
+        }
         riseandfall_warlord_remain_loyal = yes
         # small positive opinion or stability bonus could be added by scripted effects
         ai_chance = {
             base = 0
             modifier = {
                 add = 100
-                is_independent_ruler = yes
             }
             modifier = {
                 add = 100
-                is_independent_ruler = no
                 opinion = { target = liege value >= 75 }
             }
             modifier = {
@@ -99,33 +102,27 @@ warlord.1003 = {
 
     option = {
         name = warlord.1003.a
+        # Continue as warlord
         ai_chance = {
             base = 0
             modifier = {
                 add = 100
-                NOT = { is_independent_ruler = yes }
             }
         }
-        # Give claims on the liege's own titles to the warlord (only for powerful vassals)
-        riseandfall_warlord_claim_liege_titles = yes
     }
     option = {
         name = warlord.1003.b
-        # Remove the warlord trait and abandon the path if opinion >= 50
+        # Abandon the warlord path: remove trait and claims
+        riseandfall_warlord_abandon_path = yes
         ai_chance = {
             base = 0
             modifier = {
                 add = 100
-                is_independent_ruler = yes
             }
             modifier = {
                 add = 100
                 opinion = { target = liege value >= 75 }
             }
-        }
-        if = {
-            limit = { opinion = { target = liege value >= 75 } }
-            riseandfall_warlord_abandon_path = yes
         }
     }
 }

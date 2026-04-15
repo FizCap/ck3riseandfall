@@ -29,6 +29,18 @@ warlord.1003.d:0 "You have embraced the mantle of warlord, and now the path unfo
 warlord.1003.a:0 "Continue the path — press your claims"
 warlord.1003.b:0 "Abandon the path — renounce your warlord ambitions"
 
+riseandfall_warlord_path_manager_desc:0 "Choose whether your character follows the warlord path or remains a loyal vassal."
+riseandfall_warlord_path_manager_tooltip:0 "Toggle between rebellion and loyalty while you are a warlord vassal."
+riseandfall_warlord_path_manager_tooltip_tt:0 "Choose whether you will use the warlord trait to press claims or abandon the path and remain loyal to your liege."
+riseandfall_warlord_choice_currently_rebellious:0 "You are currently on the warlord path."
+riseandfall_warlord_choice_currently_loyal:0 "You are currently staying loyal to your liege."
+riseandfall_choose_warlord_loyal:0 "Remain loyal to my liege"
+riseandfall_choose_warlord_loyal_desc:0 "Set aside warlord ambitions and stay loyal to your liege, abandoning the warlord path."
+riseandfall_choose_warlord_loyal_tooltip:0 "Abandon the warlord path and remove your claims on your liege."
+riseandfall_choose_warlord_rebel:0 "Return to the warlord path"
+riseandfall_choose_warlord_rebel_desc:0 "Re-embrace your warlord ambitions and press your liege's claims again."
+riseandfall_choose_warlord_rebel_tooltip:0 "Become a warlord again and resume the path of rebellion."
+
  # Adventurer localization
 adventurer.1001.t:0 "Horde of Adventurers"
 adventurer.1001.d:0 "The realm's instability has attracted a swarm of landless adventurers, each with claims to your throne. They gather in the shadows, ready to invade and challenge your rule."

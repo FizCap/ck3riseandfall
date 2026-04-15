@@ -23,19 +23,19 @@ on_imprison = {
 
 on_title_gain = {
     on_actions = {
-        riseandfall_warlord
+        riseandfall_warlord_title_cleanup
     }
 }
 
 on_title_gain_inheritance = {
     on_actions = {
-        riseandfall_warlord
+        riseandfall_warlord_title_cleanup
     }
 }
 
 on_title_lost = {
     on_actions = {
-        riseandfall_warlord
+        riseandfall_warlord_title_cleanup
     }
 }
 
@@ -82,32 +82,37 @@ riseandfall_check_puppet_regency = {
 
 
 riseandfall_warlord = {
+    trigger = {
+        has_game_rule = riseandfall_low_stability_events_enabled
+    }
     effect = {
-        # Remove warlord from any unlanded characters; only landed characters may hold the trait.
-        every_ruler = {
-            limit = { is_landed = no has_trait = warlord }
-            remove_trait = warlord
-        }
+        # Cleanup: handle unlanded/independent warlords
+        riseandfall_warlord_cleanup_se = yes
 
-        # For independent rulers who are warlords, mark them retired warlords
-        every_independent_ruler = {
-            limit = { has_trait = warlord }
-            remove_trait = warlord
-            add_trait = retiredwarlord
-        }
-
-        # For non-independent rulers who were retired warlords, restore the warlord trait so they act
+        # Yearly reconsideration: fire warlord.1003 once per year for each AI warlord vassal
         every_ruler = {
-            limit = { is_independent_ruler = no has_trait = retiredwarlord is_landed = yes }
-            remove_trait = retiredwarlord
-            add_trait = warlord
+            limit = {
+                is_ai = yes
+                is_independent_ruler = no
+                is_landed = yes
+                has_trait = warlord
+                NOT = { has_variable = riseandfall_warlord_reconsider_cooldown }
+            }
+            # Set cooldown BEFORE firing so rapid re-calls cannot double-queue
+            set_variable = { name = riseandfall_warlord_reconsider_cooldown value = yes years = 1 }
+            trigger_event = { id = warlord.1003 }
         }
+    }
+}
 
-        # For non-independent rulers who are warlords, run the usual scripted effect
-        every_ruler = {
-            limit = { is_independent_ruler = no has_trait = warlord }
-            riseandfall_warlord_roll_se = yes
-        }
+# Lightweight cleanup used by on_title_gain / on_title_gain_inheritance / on_title_lost
+# Only enforces warlord trait consistency — never fires events
+riseandfall_warlord_title_cleanup = {
+    trigger = {
+        has_game_rule = riseandfall_low_stability_events_enabled
+    }
+    effect = {
+        riseandfall_warlord_cleanup_se = yes
     }
 }
 

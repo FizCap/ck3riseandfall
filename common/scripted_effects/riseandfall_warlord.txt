@@ -1,18 +1,21 @@
 ﻿# Rise and Fall - Warlord Scripted Effects
 # Contains scripted effects related to warlord events
 
-# Notify vassals to choose warlord path or remain loyal
+# Notify vassals to choose warlord path or remain loyal.
+# Only offer the choice to vassals who haven't already made it recently.
 riseandfall_warlord_notify_vassals = {
     every_vassal = {
         limit = {
+            is_landed = yes
             NOT = { has_trait = warlord }
-            NOT = { has_trait = loyal }
+            NOT = { has_character_flag = riseandfall_warlord_player_loyal }
+            NOT = { has_variable = riseandfall_warlord_choice_made }
         }
         trigger_event = { id = warlord.1002 }
     }
 }
 
-# Become a warlord: add trait, opinions, remove claims if not powerful, trigger next event if powerful
+# Become a warlord: add trait, add liege opinion modifier, and give claims on liege's titles
 riseandfall_warlord_become_warlord = {
     if = {
         limit = { is_landed = yes }
@@ -27,26 +30,8 @@ riseandfall_warlord_become_warlord = {
             }
         }
     }
-    # If not a powerful vassal, remove any existing claims on liege's titles
-    if = {
-        limit = {
-            NOT = { is_powerful_vassal = yes }
-        }
-        if = {
-            limit = { exists = liege }
-            liege = {
-                every_held_title = {
-                    limit = { root = { has_claim_on = prev } }
-                    root = { remove_claim = prev }
-                }
-            }
-        }
-    }
-    # Immediately run the warlord action event for this new warlord if the liege has no powerful vassals
-    if = {
-        limit = { liege = { riseandfall_no_powerful_vassals_trigger = yes } }
-        trigger_event = { id = warlord.1003 }
-    }
+    # Give claims on liege's highest titles immediately upon becoming a warlord
+    riseandfall_warlord_claim_liege_titles = yes
 }
 
 # Remain loyal: add loyalty opinion

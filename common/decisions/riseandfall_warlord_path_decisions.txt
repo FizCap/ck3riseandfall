@@ -1,0 +1,102 @@
+##############################################
+# Rise and Fall - Warlord Player Path Decisions
+# Lets the player toggle between warlord rebellion and remaining loyal.
+##############################################
+
+riseandfall_warlord_path_manager = {
+    picture = { reference = "gfx/interface/illustrations/decisions/decision_misc.dds" }
+    sort_order = 31
+    ai_check_interval = 0
+    desc = riseandfall_warlord_path_manager_desc
+    selection_tooltip = riseandfall_warlord_path_manager_tooltip
+    decision_group_type = riseandfall
+
+    is_shown = {
+        is_player = yes
+        is_landed = yes
+        NOT = { is_independent_ruler = yes }
+        has_game_rule = riseandfall_low_stability_events_enabled
+        OR = {
+            has_trait = warlord
+            has_character_flag = riseandfall_warlord_player_loyal
+        }
+    }
+
+    is_valid = {
+        is_landed = yes
+    }
+
+    widget = {
+        gui = "decision_view_widget_option_list_generic"
+        controller = decision_option_list_controller
+        decision_to_second_step_button = "CHOOSE_CHARACTER_ROLE_DECISION_NEXT_STEP_BUTTON"
+        show_from_start = yes
+
+        item = {
+            value = riseandfall_choose_warlord_rebel
+            is_shown = { has_character_flag = riseandfall_warlord_player_loyal }
+            is_valid = { always = yes }
+            current_description = riseandfall_warlord_choice_currently_loyal
+            localization = riseandfall_choose_warlord_rebel
+            icon = "gfx/interface/illustrations/decisions/decision_misc.dds"
+        }
+        item = {
+            value = riseandfall_choose_warlord_loyal
+            is_shown = { NOT = { has_character_flag = riseandfall_warlord_player_loyal } }
+            is_valid = { always = yes }
+            current_description = riseandfall_warlord_choice_currently_rebellious
+            localization = riseandfall_choose_warlord_loyal
+            icon = "gfx/interface/illustrations/decisions/decision_misc.dds"
+        }
+    }
+
+    effect = {
+        custom_tooltip = riseandfall_warlord_path_manager_tooltip_tt
+        hidden_effect = {
+            custom_tooltip = riseandfall_warlord_path_manager_tooltip_tt
+            if = {
+                limit = { scope:riseandfall_choose_warlord_loyal = yes }
+                set_character_flag = riseandfall_warlord_player_loyal
+                set_character_flag = riseandfall_warlord_event_chosen
+                riseandfall_warlord_abandon_path = yes
+            }
+            else_if = {
+                limit = { scope:riseandfall_choose_warlord_rebel = yes }
+                remove_character_flag = riseandfall_warlord_player_loyal
+                set_character_flag = riseandfall_warlord_event_chosen
+                riseandfall_warlord_become_warlord = yes
+            }
+        }
+    }
+
+    ai_potential = {}
+    ai_will_do = { base = 0 }
+}
+
+riseandfall_choose_warlord_loyal = {
+    picture = { reference = "gfx/interface/illustrations/decisions/decision_misc.dds" }
+    sort_order = 32
+    ai_check_interval = 0
+    desc = riseandfall_choose_warlord_loyal_desc
+    selection_tooltip = riseandfall_choose_warlord_loyal_tooltip
+    decision_group_type = riseandfall
+    is_shown = { always = no }
+    is_valid = { always = yes }
+    effect = {}
+    ai_potential = {}
+    ai_will_do = { base = 0 }
+}
+
+riseandfall_choose_warlord_rebel = {
+    picture = { reference = "gfx/interface/illustrations/decisions/decision_misc.dds" }
+    sort_order = 33
+    ai_check_interval = 0
+    desc = riseandfall_choose_warlord_rebel_desc
+    selection_tooltip = riseandfall_choose_warlord_rebel_tooltip
+    decision_group_type = riseandfall
+    is_shown = { always = no }
+    is_valid = { always = yes }
+    effect = {}
+    ai_potential = {}
+    ai_will_do = { base = 0 }
+}
