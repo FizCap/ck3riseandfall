@@ -57,9 +57,12 @@ riseandfall_warlord_claim_liege_titles = {
             # Only grant claims if this vassal controls at least 20% of the liege's realm counties
             limit = {
                 liege = {
-                    any_realm_county = {
+                    any_sub_realm_county = {
                         percent >= 0.20
-                        holder = { this = scope:rf_warlord_claimant }
+                        OR = {
+                            holder = scope:rf_warlord_claimant
+                            holder = { target_is_liege_or_above = scope:rf_warlord_claimant }
+                        }
                     }
                 }
             }
