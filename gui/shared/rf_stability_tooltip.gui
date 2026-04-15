@@ -1,4 +1,4 @@
-# Rise and Fall — Stability Hover Tooltip
+# Rise and Fall ï¿½ Stability Hover Tooltip
 # Mirrors the legitimacy_hud_tooltip pattern from hud.gui.
 # Loaded from gui/shared/ so it is available globally.
 #
@@ -32,7 +32,7 @@ types RiseAndFallStabilityTooltipTypes
 			raw_text = ""
 		}
 
-		# -- Decorative header image — swaps based on stability level --------------
+		# -- Decorative header image ï¿½ swaps based on stability level --------------
 		blockoverride "header_additions"
 		{
 			widget = {
@@ -50,7 +50,7 @@ types RiseAndFallStabilityTooltipTypes
 					}
 				}
 
-				# Medium stability (31–69)
+				# Medium stability (31ï¿½69)
 				widget = {
 					size = { 500 92 }
 					visible = "[And( GreaterThanOrEqualTo_CFixedPoint( Character.MakeScope.Var('riseandfall_realm_stability_score').GetValue, '(CFixedPoint)31' ), LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_realm_stability_score').GetValue, '(CFixedPoint)70' ) )]"
@@ -226,6 +226,7 @@ types RiseAndFallStabilityTooltipTypes
 						visible = "[And( Character.MakeScope.Var('riseandfall_story_contrib_strong_vassals').IsSet, GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_contrib_strong_vassals').GetValue, '(CFixedPoint)0' ) )]"
 						text = "REALM_STABILITY_TT_STORY_STRONG_VASSALS"
 					}
+					tooltip_paragraph = {
 						visible = "[And( Character.MakeScope.Var('riseandfall_story_contrib_foreign_culture').IsSet, GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_contrib_foreign_culture').GetValue, '(CFixedPoint)0' ) )]"
 						text = "REALM_STABILITY_TT_STORY_FOREIGN_CULTURE"
 					}
@@ -236,7 +237,6 @@ types RiseAndFallStabilityTooltipTypes
 					cooltip_paragraph = {
 						visible = "[And( Character.MakeScope.Var('riseandfall_story_contrib_noncore_regions').IsSet, GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_contrib_noncore_regions').GetValue, '(CFixedPoint)0' ) )]"
 						text = "REALM_STABILITY_TT_STORY_NONCORE_REGIONS"
-					}
 					}
 					cooltip_paragraph = {
 						visible = "[And( Character.MakeScope.Var('riseandfall_story_succession_shock').IsSet, GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_succession_shock').GetValue, '(CFixedPoint)0' ) )]"
