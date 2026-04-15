@@ -51,12 +51,16 @@ riseandfall_warlord_remain_loyal = {
 riseandfall_warlord_claim_liege_titles = {
     if = {
         limit = { exists = liege }
+        # Save the vassal scope so it can be referenced from inside the liege scope
+        save_scope_as = rf_warlord_claimant
         if = {
-            # Proceed for powerful vassals or when liege has no powerful vassals
+            # Only grant claims if this vassal controls at least 20% of the liege's realm counties
             limit = {
-                OR = {
-                    is_powerful_vassal = yes
-                    liege = { riseandfall_no_powerful_vassals_trigger = yes }
+                liege = {
+                    any_realm_county = {
+                        percent >= 0.20
+                        holder = { this = scope:rf_warlord_claimant }
+                    }
                 }
             }
             liege = {
