@@ -137,6 +137,7 @@ palace_coup.1002 = {
 		hidden_effect = { riseandfall_palace_coup_casualties = yes }
 
 		duel = {
+			target = scope:challenger
 			value = var:riseandfall_total_prowess_margin
 
 			# Root wins duel
