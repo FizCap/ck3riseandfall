@@ -116,7 +116,7 @@ riseandfall_dynamic_story_mode_se = {
                     }
                     scope:outer_ruler = { change_variable = { name = tmp_story_strong_vassals add = 1 } }
                     # Foreign-culture strong vassal: independent identity + independent army = separatist risk.
-                    # Not mitigated by cultural acceptance < 40 (they haven't been assimilated into the realm).
+                    # Not mitigated unless cultural acceptance reaches 70 (they haven't been assimilated into the realm).
                     if = {
                         limit = {
                             NOT = { culture = scope:outer_ruler.culture }
@@ -144,24 +144,10 @@ riseandfall_dynamic_story_mode_se = {
 
             set_variable = { name = riseandfall_story_strong_vassal_count value = var:tmp_story_strong_vassals }
 
-            # Elite pressure now only matters during succession/civil stress, not as a permanent blob tax.
+            # Elite pressure now only matters during succession stress, not as a permanent blob tax.
             set_variable = { name = tmp_story_elite_stress value = 0 }
             if = {
                 limit = { has_variable = riseandfall_story_succession_shock }
-                set_variable = { name = tmp_story_elite_stress value = 1 }
-            }
-            if = {
-                limit = {
-                    has_variable = riseandfall_rs_civil_war_years
-                    var:riseandfall_rs_civil_war_years >= 6
-                }
-                set_variable = { name = tmp_story_elite_stress value = 1 }
-            }
-            if = {
-                limit = {
-                    has_variable = riseandfall_puppet_regency_years
-                    var:riseandfall_puppet_regency_years >= 3
-                }
                 set_variable = { name = tmp_story_elite_stress value = 1 }
             }
 
@@ -179,8 +165,8 @@ riseandfall_dynamic_story_mode_se = {
                 change_variable = { name = riseandfall_story_fracture_pressure add = 1 }
             }
 
-            # Foreign-faith strong vassals (same culture) only become dangerous during a succession
-            # or civil crisis — faith alone isn't enough motivation without an existing power vacuum.
+            # Foreign-faith strong vassals (same culture) only become dangerous during succession stress —
+            # faith alone isn't enough motivation without an existing power vacuum.
             if = {
                 limit = {
                     var:tmp_story_elite_stress > 0
@@ -565,8 +551,8 @@ riseandfall_mark_story_succession_shock_se = {
         limit = {
             has_game_rule = riseandfall_dynamic_story_mode_enabled
             exists = scope:predecessor
-            scope:predecessor = { is_alive = no }
         }
+        # Predecessor may be alive in a stepdown/overthrow succession.
         set_variable = { name = tmp_story_succession_shock value = 0 }
 
         set_variable = { name = tmp_story_prev_skill_total value = scope:predecessor.diplomacy }
@@ -621,7 +607,6 @@ riseandfall_mark_story_succession_shock_se = {
                 OR = {
                     has_variable = riseandfall_massive_realm
                     has_variable = riseandfall_very_large_realm
-                    realm_size >= 150
                 }
             }
             change_variable = { name = tmp_story_succession_shock add = 1 }
