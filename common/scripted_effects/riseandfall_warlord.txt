@@ -73,9 +73,9 @@ riseandfall_warlord_claim_liege_titles = {
                     every_held_title = {
                         limit = {
                             tier = tier_hegemony
-                            NOT = { root = { has_claim_on = prev } }
+                            NOT = { scope:rf_warlord_claimant = { has_claim_on = prev } }
                         }
-                        root = { add_unpressed_claim = prev }
+                        scope:rf_warlord_claimant = { add_unpressed_claim = prev }
                     }
                 }
                 else_if = {
@@ -83,9 +83,9 @@ riseandfall_warlord_claim_liege_titles = {
                     every_held_title = {
                         limit = {
                             tier = tier_empire
-                            NOT = { root = { has_claim_on = prev } }
+                            NOT = { scope:rf_warlord_claimant = { has_claim_on = prev } }
                         }
-                        root = { add_unpressed_claim = prev }
+                        scope:rf_warlord_claimant = { add_unpressed_claim = prev }
                     }
                 }
                 else_if = {
@@ -93,9 +93,9 @@ riseandfall_warlord_claim_liege_titles = {
                     every_held_title = {
                         limit = {
                             tier = tier_kingdom
-                            NOT = { root = { has_claim_on = prev } }
+                            NOT = { scope:rf_warlord_claimant = { has_claim_on = prev } }
                         }
-                        root = { add_unpressed_claim = prev }
+                        scope:rf_warlord_claimant = { add_unpressed_claim = prev }
                     }
                 }
                 else_if = {
@@ -103,23 +103,23 @@ riseandfall_warlord_claim_liege_titles = {
                     every_held_title = {
                         limit = {
                             tier = tier_duchy
-                            NOT = { root = { has_claim_on = prev } }
+                            NOT = { scope:rf_warlord_claimant = { has_claim_on = prev } }
                         }
-                        root = { add_unpressed_claim = prev }
+                        scope:rf_warlord_claimant = { add_unpressed_claim = prev }
                     }
                 }
                 else = {
                     every_held_title = {
                         limit = {
                             tier = tier_county
-                            NOT = { root = { has_claim_on = prev } }
+                            NOT = { scope:rf_warlord_claimant = { has_claim_on = prev } }
                         }
-                        root = { add_unpressed_claim = prev }
+                        scope:rf_warlord_claimant = { add_unpressed_claim = prev }
                     }
                 }
                         
                 add_opinion = {
-                    target = root
+                    target = scope:rf_warlord_claimant
                     modifier = warlord_rebellion_opinion
                 }
             }
@@ -133,10 +133,11 @@ riseandfall_warlord_abandon_path = {
     # If this character had claims on their liege's titles, remove them
     if = {
         limit = { exists = liege }
+        save_scope_as = rf_warlord_claimant
         liege = {
             every_held_title = {
-                limit = { root = { has_claim_on = prev } }
-                root = { remove_claim = prev }
+                limit = { scope:rf_warlord_claimant = { has_claim_on = prev } }
+                scope:rf_warlord_claimant = { remove_claim = prev }
             }
         }
     }
