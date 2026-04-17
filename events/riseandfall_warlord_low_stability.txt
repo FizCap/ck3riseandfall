@@ -36,7 +36,7 @@ warlord.1002 = {
     right_portrait = root
 
     immediate = {
-        # Present a choice; effects happen in options below
+        save_opinion_value_as = { name = liege_opinion target = liege }
     }
 
     option = {
@@ -56,6 +56,47 @@ warlord.1002 = {
                     has_realm_law = crown_authority_0
                 }
             }
+            modifier = {
+                subtract = scope:liege_opinion
+            }
+            modifier = {
+                add = 40
+                has_trait = ambitious
+            }
+            modifier = {
+                add = 40
+                has_trait = vengeful
+            }
+            modifier = {
+                add = 20
+                has_trait = brave
+            }
+            modifier = {
+                add = 40
+                liege = {
+                    has_relation_rival = root
+                }
+            }
+            modifier = {
+                add = 40
+                has_trait = disloyal
+            }
+            modifier = {
+                add = 20
+                opinion = { target = liege value <= -20 }
+            }
+            modifier = {
+                add = -30
+                has_trait = loyal
+            }
+            modifier = {
+                add = -20
+                has_trait = craven
+            }
+            modifier = {
+                add = -20
+                has_trait = content
+            }
         }
     }
 
@@ -73,14 +114,51 @@ warlord.1002 = {
         ai_chance = {
             base = 0
             modifier = {
-                add = 100
-                opinion = { target = liege value >= 75 }
+                add = scope:liege_opinion
             }
             modifier = {
                 # high crown authority encourages loyalty
                 add = 100
                 liege = {
                     has_realm_law = crown_authority_2
+                }
+            }
+            modifier = {
+                add = 40
+                has_trait = loyal
+            }
+            modifier = {
+                add = 30
+                has_trait = patient
+            }
+            modifier = {
+                add = 30
+                has_trait = content
+            }
+            modifier = {
+                add = 20
+                has_trait = honest
+            }
+            modifier = {
+                add = 20
+                has_trait = just
+            }
+            modifier = {
+                add = -40
+                has_trait = vengeful
+            }
+            modifier = {
+                add = -30
+                has_trait = ambitious
+            }
+            modifier = {
+                add = -40
+                has_trait = disloyal
+            }
+            modifier = {
+                add = -40
+                liege = {
+                    has_relation_rival = root
                 }
             }
         }
@@ -97,6 +175,10 @@ warlord.1003 = {
     left_portrait = liege
     right_portrait = root
 
+    immediate = {
+        save_opinion_value_as = { name = liege_opinion target = liege }
+    }
+
     option = {
         name = warlord.1003.a
         # Continue as warlord: continually evaluate claims
@@ -105,6 +187,47 @@ warlord.1003 = {
             base = 0
             modifier = {
                 add = 100
+            }
+            modifier = {
+                subtract = scope:liege_opinion
+            }
+            modifier = {
+                add = 40
+                has_trait = ambitious
+            }
+            modifier = {
+                add = 40
+                has_trait = vengeful
+            }
+            modifier = {
+                add = 30
+                has_trait = brave
+            }
+            modifier = {
+                add = 40
+                has_trait = disloyal
+            }
+            modifier = {
+                add = 40
+                liege = {
+                    has_relation_rival = root
+                }
+            }
+            modifier = {
+                add = -30
+                has_trait = loyal
+            }
+            modifier = {
+                add = -20
+                has_trait = patient
+            }
+            modifier = {
+                add = -20
+                has_trait = content
+            }
+            modifier = {
+                add = -20
+                has_trait = honest
             }
         }
     }
@@ -115,8 +238,45 @@ warlord.1003 = {
         ai_chance = {
             base = 0
             modifier = {
-                add = 100
-                opinion = { target = liege value >= 75 }
+                add = scope:liege_opinion
+            }
+            modifier = {
+                add = 40
+                has_trait = loyal
+            }
+            modifier = {
+                add = 30
+                has_trait = patient
+            }
+            modifier = {
+                add = 30
+                has_trait = content
+            }
+            modifier = {
+                add = 20
+                has_trait = honest
+            }
+            modifier = {
+                add = 20
+                has_trait = just
+            }
+            modifier = {
+                add = -40
+                has_trait = vengeful
+            }
+            modifier = {
+                add = -30
+                has_trait = ambitious
+            }
+            modifier = {
+                add = -40
+                has_trait = disloyal
+            }
+            modifier = {
+                add = -40
+                liege = {
+                    has_relation_rival = root
+                }
             }
         }
     }
