@@ -69,6 +69,10 @@ riseandfall_overthrow_liege_effect = {
 	}
 	# Transfer all held titles from recipient to actor
 	scope:recipient = {
+		if = {
+			limit = { has_active_diarchy = yes }
+			end_diarchy = yes
+		}
         # If the recipient has a capital county, transfer that county first
         if = {
             limit = { scope:recipient = { capital_county = { exists = yes } } }

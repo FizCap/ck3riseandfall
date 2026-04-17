@@ -24,17 +24,17 @@ palace_coup.1001 = {
 		custom_tooltip = palace_coup.1001.tooltip
 		trigger = { exists = scope:challenger }
 		# Trigger the confirmation or choice event
-		trigger_event = { id = palace_coup.1001.1 }
+		trigger_event = { id = palace_coup.1101 }
 		ai_chance = { base = 100 }
 	}
 
 }
 
 # Player confirmation event: Asks the player challenger if they want to proceed with the palace coup
-palace_coup.1001.1 = {
+palace_coup.1101 = {
 	type = character_event
-	title = palace_coup.1001.1.t
-	desc = palace_coup.1001.1.d
+	title = palace_coup.1101.t
+	desc = palace_coup.1101.d
 	theme = court
 
 	left_portrait = {
@@ -52,8 +52,8 @@ palace_coup.1001.1 = {
 	}
 
 	option = {
-		name = palace_coup.1001.1.a
-		custom_tooltip = palace_coup.1001.1.tooltip
+		name = palace_coup.1101.a
+		custom_tooltip = palace_coup.1101.tooltip
 		trigger = { exists = scope:potential_challenger }
 		# Accept the palace coup
 		scope:potential_challenger = { save_scope_as = challenger }
@@ -62,8 +62,8 @@ palace_coup.1001.1 = {
 	}
 
 	option = {
-		name = palace_coup.1001.1.b
-		custom_tooltip = palace_coup.1001.1.tooltip_no
+		name = palace_coup.1101.b
+		custom_tooltip = palace_coup.1101.tooltip_no
 		trigger = { exists = scope:potential_challenger }
 		# Decline, use backup challenger
 		trigger_event = { id = palace_coup.1002 }
@@ -137,7 +137,6 @@ palace_coup.1002 = {
 		hidden_effect = { riseandfall_palace_coup_casualties = yes }
 
 		duel = {
-			target = scope:challenger
 			value = var:riseandfall_total_prowess_margin
 
 			# Root wins duel

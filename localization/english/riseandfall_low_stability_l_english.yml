@@ -104,12 +104,12 @@ palace_coup.1002.flee_tooltip:0 "Attempt to flee — an intrigue duel between yo
 palace_coup.1003.tooltip:0 "Trigger the warlord event to raise banners against the challenger."
 palace_coup.1004.tooltip:0 "Accept your defeat and the puppet master who will rule behind the throne."
 
-palace_coup.1001.1.t:0 "Palace Coup Confirmation"
-palace_coup.1001.1.d:0 "You have been selected to lead the palace coup against [root.GetTitledFirstName]. Do you wish to proceed with this dangerous endeavor?"
-palace_coup.1001.1.a:0 "Yes, I will seize the throne!"
-palace_coup.1001.1.b:0 "No, I decline."
-palace_coup.1001.1.tooltip:0 "Proceed with the palace coup."
-palace_coup.1001.1.tooltip_no:0 "Decline the palace coup; another challenger will be found."
+palace_coup.1101.t:0 "Palace Coup Confirmation"
+palace_coup.1101.d:0 "You have been selected to lead the palace coup against [root.GetTitledFirstName]. Do you wish to proceed with this dangerous endeavor?"
+palace_coup.1101.a:0 "Yes, I will seize the throne!"
+palace_coup.1101.b:0 "No, I decline."
+palace_coup.1101.tooltip:0 "Proceed with the palace coup."
+palace_coup.1101.tooltip_no:0 "Decline the palace coup; another challenger will be found."
 
 # Challenger notification events
 palace_coup.2001.t:0 "Defeat in the Duel"

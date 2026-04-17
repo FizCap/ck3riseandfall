@@ -385,7 +385,11 @@ riseandfall_palace_coup_setup = {
 		# Create a temporary landless adventurer camp
 		scope:challenger = {
 			if = {
-				limit = { is_alive = yes NOT = { is_landed = yes } }
+				limit = {
+					is_alive = yes
+					NOT = { is_landed = yes }
+					NOT = { government_has_flag = government_is_landless_adventurer }
+				}
 				create_adventurer_title = {
 					name = palace_coup_adventurer_camp_name
 					holder = scope:challenger
@@ -931,47 +935,6 @@ riseandfall_calculate_total_side_prowess = {
 			save_scope_as = riseandfall_prowess_courtier
 			scope:riseandfall_prowess_target = {
 				change_variable = { name = riseandfall_total_prowess add = scope:riseandfall_prowess_courtier.prowess }
-			}
-		}
-	}
-	
-	# After summing, store the result on the event root and on the appropriate character for localization
-	if = {
-		limit = { this = scope:challenger }
-		scope:event_root = { set_variable = { name = riseandfall_total_prowess_chall value = var:riseandfall_total_prowess } }
-		scope:challenger = { set_variable = { name = riseandfall_total_prowess_chall value = var:riseandfall_total_prowess } }
-	}
-	else = {
-		scope:event_root = { set_variable = { name = riseandfall_total_prowess_root value = var:riseandfall_total_prowess } }
-		root = { set_variable = { name = riseandfall_total_prowess_root value = var:riseandfall_total_prowess } }
-	}
-}
-
-# Apply random outcomes (death/wounded/maimed) to root knights and challenger courtiers
-##########################
-riseandfall_palace_coup_casualties = {
-	# Root side: every knight has a chance to live, die, be wounded, or be maimed
-	root = {
-		every_knight = {
-			limit = { is_alive = yes is_imprisoned = no }
-			random_list = {
-				50 = { }
-				20 = { death = { death_reason = death_in_palace_coup } }
-				10 = { add_trait = wounded_1 }
-				10 = { add_trait = maimed }
-			}
-		}
-	}
-	
-	# Challenger side: every courtier has a chance to live, die, be wounded, or be maimed
-	scope:challenger = {
-		every_courtier = {
-			limit = { is_alive = yes is_imprisoned = no is_adult = yes }
-			random_list = {
-				50 = { }
-				20 = { death = { death_reason = death_in_palace_coup } }
-				10 = { add_trait = wounded_1 }
-				10 = { add_trait = maimed }
 			}
 		}
 	}

@@ -32,7 +32,7 @@ authority_collapse.1001 = {
                     set_variable = { name = authority_collapse_treasury_loss value = treasury }
                     change_variable = { name = authority_collapse_treasury_loss multiply = 0.95 }
                     round_variable = { name = authority_collapse_treasury_loss nearest = 1 }
-                    remove_treasury = { value = authority_collapse_treasury_loss }
+                    remove_treasury = { value = var:authority_collapse_treasury_loss }
                     remove_variable = authority_collapse_treasury_loss
                 }
                 if = {
@@ -40,7 +40,7 @@ authority_collapse.1001 = {
                     set_variable = { name = authority_collapse_gold_loss value = gold }
                     change_variable = { name = authority_collapse_gold_loss multiply = 0.95 }
                     round_variable = { name = authority_collapse_gold_loss nearest = 1 }
-                    remove_short_term_gold = authority_collapse_gold_loss
+                    remove_short_term_gold = var:authority_collapse_gold_loss
                     remove_variable = authority_collapse_gold_loss
                 }
             }

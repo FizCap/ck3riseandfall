@@ -46,16 +46,7 @@ riseandfall_can_realm_split_trigger = {
         count >= 1
         is_landed = yes
         primary_title.tier >= tier_county
-        save_scope_as = rf_large_vassal
-        prev = {
-            any_sub_realm_county = {
-                percent >= 0.20
-                OR = {
-                    holder = scope:rf_large_vassal
-                    holder = { target_is_liege_or_above = scope:rf_large_vassal }
-                }
-            }
-        }
+        sub_realm_size >= scope:liege.25_percent_realm_size_value
     }
 }
 
