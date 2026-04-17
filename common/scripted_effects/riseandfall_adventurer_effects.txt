@@ -297,6 +297,11 @@ riseandfall_do_create_adventurer_se = {
                 }
             }
 
+            # Persist the origin claim target so the adventurer only presses the country used for its military size.
+            scope:adventurer_child = {
+                if = { limit = { exists = scope:claim_target_title } set_variable = { name = rf_adventurer_origin_claim_title value = scope:claim_target_title } }
+            }
+
             # Determine base levies defensively: prefer claim holder, then independent_ruler, then a small default.
             if = {
                 limit = { exists = scope:claim_target_title.holder }
@@ -435,18 +440,27 @@ riseandfall_adventurer_press_claims_se = {
     # To avoid mixing landed_title and character scopes, perform all claim selection
     # and war-declaration logic inside the character-specified scope.
     scope:independent_adventurer = {
-        # Choose a claim target from the adventurer's own claims (hegemony preferred, then empire, else kingdom)
+        # Prefer the origin claim target used during adventurer creation.
         if = {
-            limit = { any_claim = { tier >= tier_hegemony exists = holder holder = { is_independent_ruler = yes } } }
-            random_claim = { limit = { tier >= tier_hegemony exists = holder holder = { is_independent_ruler = yes } } save_scope_as = claim_target_title }
+            limit = { has_variable = rf_adventurer_origin_claim_title }
+            scope:independent_adventurer.var:rf_adventurer_origin_claim_title = { save_scope_as = claim_target_title }
         }
-        else_if = {
-            limit = { any_claim = { tier >= tier_empire exists = holder holder = { is_independent_ruler = yes } } }
-            random_claim = { limit = { tier >= tier_empire exists = holder holder = { is_independent_ruler = yes } } save_scope_as = claim_target_title }
-        }
-        else_if = {
-            limit = { any_claim = { tier >= tier_kingdom exists = holder holder = { is_independent_ruler = yes } } }
-            random_claim = { limit = { tier >= tier_kingdom exists = holder holder = { is_independent_ruler = yes } } save_scope_as = claim_target_title }
+
+        # If the original origin claim is unavailable, fall back to a new selected target.
+        else = {
+            # Choose a claim target from the adventurer's own claims (hegemony preferred, then empire, else kingdom)
+            if = {
+                limit = { any_claim = { tier >= tier_hegemony exists = holder holder = { is_independent_ruler = yes } } }
+                random_claim = { limit = { tier >= tier_hegemony exists = holder holder = { is_independent_ruler = yes } } save_scope_as = claim_target_title }
+            }
+            else_if = {
+                limit = { any_claim = { tier >= tier_empire exists = holder holder = { is_independent_ruler = yes } } }
+                random_claim = { limit = { tier >= tier_empire exists = holder holder = { is_independent_ruler = yes } } save_scope_as = claim_target_title }
+            }
+            else_if = {
+                limit = { any_claim = { tier >= tier_kingdom exists = holder holder = { is_independent_ruler = yes } } }
+                random_claim = { limit = { tier >= tier_kingdom exists = holder holder = { is_independent_ruler = yes } } save_scope_as = claim_target_title }
+            }
         }
 
         # If we have a valid claim target title, evaluate war options
