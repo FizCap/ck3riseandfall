@@ -23,8 +23,14 @@ palace_coup.1001 = {
 		name = palace_coup.1001.a
 		custom_tooltip = palace_coup.1001.tooltip
 		trigger = { exists = scope:challenger }
-		# Trigger the confirmation or choice event
-		trigger_event = { id = palace_coup.1101 }
+		# Ask a player challenger for confirmation, otherwise continue directly.
+		if = {
+			limit = { exists = scope:potential_challenger }
+			scope:potential_challenger = { trigger_event = { id = palace_coup.1101 } }
+		}
+		else = {
+			trigger_event = { id = palace_coup.1002 }
+		}
 		ai_chance = { base = 100 }
 	}
 
@@ -38,35 +44,26 @@ palace_coup.1101 = {
 	theme = court
 
 	left_portrait = {
-		character = root
+		character = scope:event_root
 	}
 	right_portrait = {
-		character = scope:potential_challenger
-	}
-
-	immediate = {
-		if = {
-			limit = { NOT = { exists = scope:potential_challenger } }
-			trigger_event = { id = palace_coup.1002 }
-		}
+		character = root
 	}
 
 	option = {
 		name = palace_coup.1101.a
 		custom_tooltip = palace_coup.1101.tooltip
-		trigger = { exists = scope:potential_challenger }
 		# Accept the palace coup
-		scope:potential_challenger = { save_scope_as = challenger }
-		trigger_event = { id = palace_coup.1002 }
+		save_scope_as = challenger
+		scope:event_root = { trigger_event = { id = palace_coup.1002 } }
 		ai_chance = { base = 0 }  # Players only
 	}
 
 	option = {
 		name = palace_coup.1101.b
 		custom_tooltip = palace_coup.1101.tooltip_no
-		trigger = { exists = scope:potential_challenger }
 		# Decline, use backup challenger
-		trigger_event = { id = palace_coup.1002 }
+		scope:event_root = { trigger_event = { id = palace_coup.1002 } }
 		ai_chance = { base = 100 }
 	}
 }
@@ -246,8 +243,6 @@ palace_coup.1003 = {
 		name = palace_coup.1003.a
 		custom_tooltip = palace_coup.1003.tooltip
 		# Call the banners / raise the vassal levy
-		# Trigger the warlord path for the challenger (raise banners handled there)
-		riseandfall_palace_coup_challenger_calls_banners = yes
 		ai_chance = { base = 100 }
 	}
 }

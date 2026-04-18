@@ -87,6 +87,18 @@ riseandfall_realm_split_se = {
             remove_variable = rf_execute_breakaway
         }
 
+        every_vassal = {
+            limit = {
+                is_landed = yes
+                has_character_flag = rf_forced_breakaway_seed
+            }
+            add_character_flag = { flag = rf_breakaway_ruler days = 30 }
+            capital_county.kingdom = { save_scope_as = rf_seed_kingdom }
+            set_variable = { name = rf_seeded_kingdom value = scope:rf_seed_kingdom }
+            set_variable = { name = rf_seeded_duchy value = capital_county.duchy }
+            scope:original_ruler = { change_variable = { name = rf_breakaway_seed_count add = 1 } }
+        }
+
         if = {
             limit = {
                 any_vassal = {
@@ -857,6 +869,10 @@ riseandfall_realm_split_se = {
         remove_character_flag = rf_split_major_fracture
         remove_character_flag = rf_split_total_collapse
         remove_character_flag = rf_split_lower_tier
+        every_vassal = {
+            limit = { has_character_flag = rf_forced_breakaway_seed }
+            remove_character_flag = rf_forced_breakaway_seed
+        }
     }
     set_variable = { name = rf_realm_split_cooldown value = 1 years = 5 }
 }
@@ -1057,10 +1073,20 @@ riseandfall_execute_realm_split_se = {
     
     resolve_title_and_vassal_change = scope:rf_indep_change
     
-    # Make tributary of original ruler
-    start_tributary = {
-        contract_group = tributary_settled
-        suzerain = scope:original_ruler
+    # Make tributary of original ruler unless this split should create fully
+    # independent successor states.
+    if = {
+        limit = {
+            NOT = {
+                scope:original_ruler = {
+                    has_variable = rf_realm_split_no_tributaries
+                }
+            }
+        }
+        start_tributary = {
+            contract_group = tributary_settled
+            suzerain = scope:original_ruler
+        }
     }
 
     # Add claim on original primary title
@@ -1136,4 +1162,5 @@ riseandfall_execute_realm_split_se = {
 
     # Remove flag
     remove_character_flag = rf_breakaway_ruler
+    remove_character_flag = rf_forced_breakaway_seed
 }

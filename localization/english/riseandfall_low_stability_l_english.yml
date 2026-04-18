@@ -73,7 +73,7 @@ palace_coup.1002.t:0 "The Challenge"
 palace_coup.1002.d:0 "[challenger.GetTitledFirstName] has stepped forward, surrounded by a band of loyal fighters.\n\n\"This ends now,\" [challenger.GetSheHe] declares. \"My champions against yours. Winner takes the throne.\"\n\nMy knights stand ready, hands on their hilts, awaiting my command."
 
 palace_coup.1003.t:0 "You Have Escaped — Raise the Banners"
-palace_coup.1003.d:0 "You stagger from the smoke-choked corridor into the cold night. Word spreads like wildfire: your life has been spared, but your throne was seized. Now is the hour to reclaim what is yours. Ride forth, call your vassals, and let every horn sound the summons to arms — raise the banners and reclaim the realm!"
+palace_coup.1003.d:0 "You stagger from the smoke-choked corridor into the cold night. The coup has shattered the realm: [challenger.GetTitledFirstName] now clings to the old capital and the ancient title, while much of the wider realm rallies to you as the rightful rival sovereign. If the outer territories are too large to hold together, other lords may seize the chaos to carve out successor states of their own. The civil war has already begun."
 
 palace_coup.1004.t:0 "Puppeted: Your Reign Continues in Name"
 palace_coup.1004.d:0 "You lost the duel. The palace coup has succeeded. Your life has been spared, but [challenger.GetTitledFirstName] now controls your realm as your puppet master. You remain the nominal ruler, but important decisions will be made by your puppet master."
@@ -87,7 +87,7 @@ palace_coup.1001.a:0 "Protect the palace"
 palace_coup.1001.b:0 "Flee the palace"
 palace_coup.1002.a:0 "My knights will crush you!"
 palace_coup.1002.b:0 "Attempt to Flee"
-palace_coup.1003.a:0 "Sound the horn — raise the banners"
+palace_coup.1003.a:0 "Hold the rival realm together"
 palace_coup.1004.a:0 "Accept your fate"
 
 # Child-specific option when ruler is a child
@@ -98,14 +98,14 @@ palace_coup.1002.child_tooltip:0 "The ruler is a child — you are forced to yie
 palace_coup.1001.tooltip:0 "Confront the challenger in a duel or attempt to flee."
 palace_coup.1002.win.tooltip:0 "You win the duel and kill the challenger."
 palace_coup.1002.lose.tooltip:0 "You will be spared but reduced to a puppet under [challenger.GetTitledFirstName]."
-palace_coup.1002.flee_success.tooltip:0 "You successfully flee and start a rebellion."
+palace_coup.1002.flee_success.tooltip:0 "You successfully flee, and the realm fractures into rival successor states."
 palace_coup.1002.fail.tooltip:0 "You get caught and assassinated."
 palace_coup.1002.flee_tooltip:0 "Attempt to flee — an intrigue duel between you and [challenger.GetTitledFirstName]."
-palace_coup.1003.tooltip:0 "Trigger the warlord event to raise banners against the challenger."
+palace_coup.1003.tooltip:0 "Your rival holds the original title, while the fleeing outer realm can splinter into further breakaway states if it is large enough."
 palace_coup.1004.tooltip:0 "Accept your defeat and the puppet master who will rule behind the throne."
 
 palace_coup.1101.t:0 "Palace Coup Confirmation"
-palace_coup.1101.d:0 "You have been selected to lead the palace coup against [root.GetTitledFirstName]. Do you wish to proceed with this dangerous endeavor?"
+palace_coup.1101.d:0 "You have been selected to lead the palace coup against [scope:event_root.GetTitledFirstName]. Do you wish to proceed with this dangerous endeavor?"
 palace_coup.1101.a:0 "Yes, I will seize the throne!"
 palace_coup.1101.b:0 "No, I decline."
 palace_coup.1101.tooltip:0 "Proceed with the palace coup."
@@ -113,22 +113,22 @@ palace_coup.1101.tooltip_no:0 "Decline the palace coup; another challenger will 
 
 # Challenger notification events
 palace_coup.2001.t:0 "Defeat in the Duel"
-palace_coup.2001.d:0 "The duel has ended in disaster. [root.GetTitledFirstName] proved victorious, and your challenge has failed. Your life ends here in the palace corridors."
+palace_coup.2001.d:0 "The duel has ended in disaster. [scope:event_root.GetTitledFirstName] proved victorious, and your challenge has failed. Your life ends here in the palace corridors."
 palace_coup.2001.a:0 "Accept your fate"
 palace_coup.2001.tooltip:0 "You lost the duel and will perish."
 
 palace_coup.2002.t:0 "Victory in the Duel"
-palace_coup.2002.d:0 "The duel is won! [root.GetTitledFirstName] lies defeated at your feet. You have seized control of the realm and established yourself as puppet master, ruling through a regency diarchy."
+palace_coup.2002.d:0 "The duel is won! [scope:event_root.GetTitledFirstName] lies defeated at your feet. You have seized control of the realm and established yourself as puppet master, ruling through a regency diarchy."
 palace_coup.2002.a:0 "Long live the new order"
 palace_coup.2002.tooltip:0 "You have won the duel and become puppet master of the realm."
 
 palace_coup.2003.t:0 "The Ruler Escapes"
-palace_coup.2003.d:0 "[root.GetTitledFirstName] has successfully fled the palace! Though defeated in the duel, [root.GetSheHe] lives to fight another day. Word has it that [root.GetSheHe] is already calling [root.GetHerHis] banners and rallying vassals to reclaim the throne."
+palace_coup.2003.d:0 "[scope:event_root.GetTitledFirstName] has successfully fled the palace. Instead of disappearing into exile, [scope:event_root.GetSheHe] has carried much of the outer realm with [scope:event_root.GetHerHim], leaving you with the old title and the capital core. The realm has fractured, and the fleeing ruler's outer territories may splinter further into additional successor states."
 palace_coup.2003.a:0 "Prepare for war"
-palace_coup.2003.tooltip:0 "The deposed ruler has escaped and is raising an army to reclaim the throne."
+palace_coup.2003.tooltip:0 "The coup has fractured the realm, and the fleeing ruler's outer realm may splinter into additional successor states."
 
 palace_coup.2004.t:0 "Escape Thwarted"
-palace_coup.2004.d:0 "[root.GetTitledFirstName] attempted to flee but was caught! You have successfully thwarted [root.GetHerHis] escape and established yourself as puppet master, ruling through a regency diarchy."
+palace_coup.2004.d:0 "[scope:event_root.GetTitledFirstName] attempted to flee but was caught! You have successfully thwarted [scope:event_root.GetHerHis] escape and established yourself as puppet master, ruling through a regency diarchy."
 palace_coup.2004.a:0 "Secure your victory"
 palace_coup.2004.tooltip:0 "You caught the fleeing ruler and have become puppet master of the realm."
 
@@ -155,6 +155,7 @@ realm_split.1002.a.tt:0 "You are now an independent ruler with your own realm."
  # Breakaway realms use capital-based names
 RISEANDFALL_BREAKAWAY_NAME_CAPITAL:0 "[rf_base_province.GetNameNoTooltip]"
 RISEANDFALL_BREAKAWAY_TITLE_NAME:0 "[rf_breakaway_ruler.GetFirstNamePossessive] Realm"
+RISEANDFALL_RUMP_REALM_NAME:0 "[root.GetFirstNamePossessive] Rump Realm"
 RISEANDFALL_BREAKAWAY_FACTION:0 "Breakaway Faction"
 RISEANDFALL_REALM_SPLIT_TRUCE:0 "Realm Split Truce"
 
