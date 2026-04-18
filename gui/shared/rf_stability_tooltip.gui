@@ -177,16 +177,6 @@ types RiseAndFallStabilityTooltipTypes
 					}
 				}
 
-				# -- Puppet Regency (hidden at 100%) ------------------------------
-				vbox = {
-					visible = "[LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_realm_stability_puppet_regency_multiplier').GetValue, '(CFixedPoint)100' )]"
-					layoutpolicy_horizontal = expanding
-					spacer = { size = { 0 12 } }
-					cooltip_paragraph = {
-						text = "REALM_STABILITY_TT_REGENCY"
-					}
-				}
-
 				# -- Ruler Gender & Succession (hidden when penalty = 0) -----------
 				vbox = {
 					visible = "[LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_realm_stability_sex_law_penalty').GetValue, '(CFixedPoint)0' )]"
@@ -207,44 +197,33 @@ types RiseAndFallStabilityTooltipTypes
 					}
 				}
 
-				# -- Story Mode (integrated category) -------------------------------
+				# -- Dynamic Realm Factors -----------------------------------------
 				vbox = {
-					visible = "[Character.MakeScope.Var('riseandfall_low_stability_chance').IsSet]"
+					visible = "[Or( GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_realm_size_component').GetValue, '(CFixedPoint)0' ), LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_realm_size_component').GetValue, '(CFixedPoint)0' ) )]"
 					layoutpolicy_horizontal = expanding
 					spacer = { size = { 0 12 } }
 					cooltip_paragraph = {
 						text = "REALM_STABILITY_TT_STORY_MODE_HEADER"
 					}
 					cooltip_paragraph = {
-						text = "REALM_STABILITY_TT_STORY_FRACTURE"
-					}
-					cooltip_paragraph = {
-						visible = "[And( Character.MakeScope.Var('riseandfall_story_contrib_realm_size').IsSet, GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_contrib_realm_size').GetValue, '(CFixedPoint)0' ) )]"
+						visible = "[Or( GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_realm_size_component').GetValue, '(CFixedPoint)0' ), LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_realm_size_component').GetValue, '(CFixedPoint)0' ) )]"
 						text = "REALM_STABILITY_TT_STORY_REALM_SIZE"
 					}
 					cooltip_paragraph = {
-						visible = "[And( Character.MakeScope.Var('riseandfall_story_contrib_strong_vassals').IsSet, GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_contrib_strong_vassals').GetValue, '(CFixedPoint)0' ) )]"
+						visible = "[Or( GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_strong_vassal_component').GetValue, '(CFixedPoint)0' ), LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_strong_vassal_component').GetValue, '(CFixedPoint)0' ) )]"
 						text = "REALM_STABILITY_TT_STORY_STRONG_VASSALS"
 					}
-					tooltip_paragraph = {
-						visible = "[And( Character.MakeScope.Var('riseandfall_story_contrib_foreign_culture').IsSet, GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_contrib_foreign_culture').GetValue, '(CFixedPoint)0' ) )]"
-						text = "REALM_STABILITY_TT_STORY_FOREIGN_CULTURE"
+					cooltip_paragraph = {
+						visible = "[Or( GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_culture_faith_component').GetValue, '(CFixedPoint)0' ), LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_culture_faith_component').GetValue, '(CFixedPoint)0' ) )]"
+						text = "REALM_STABILITY_TT_STORY_CULTURE_FAITH"
 					}
 					cooltip_paragraph = {
-						visible = "[And( Character.MakeScope.Var('riseandfall_story_contrib_foreign_faith').IsSet, GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_contrib_foreign_faith').GetValue, '(CFixedPoint)0' ) )]"
-						text = "REALM_STABILITY_TT_STORY_FOREIGN_FAITH"
+						visible = "[GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_partition_component').GetValue, '(CFixedPoint)0' )]"
+						text = "REALM_STABILITY_TT_STORY_PARTITION"
 					}
 					cooltip_paragraph = {
-						visible = "[And( Character.MakeScope.Var('riseandfall_story_contrib_noncore_regions').IsSet, GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_contrib_noncore_regions').GetValue, '(CFixedPoint)0' ) )]"
-						text = "REALM_STABILITY_TT_STORY_NONCORE_REGIONS"
-					}
-					cooltip_paragraph = {
-						visible = "[And( Character.MakeScope.Var('riseandfall_story_succession_shock').IsSet, GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_succession_shock').GetValue, '(CFixedPoint)0' ) )]"
+						visible = "[LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_succession_component').GetValue, '(CFixedPoint)0' )]"
 						text = "REALM_STABILITY_TT_STORY_SUCCESSION_SHOCK"
-					}
-					cooltip_paragraph = {
-						visible = "[And( Character.MakeScope.Var('riseandfall_story_contrib_resilience').IsSet, GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_contrib_resilience').GetValue, '(CFixedPoint)0' ) )]"
-						text = "REALM_STABILITY_TT_STORY_RESILIENCE"
 					}
 				}
 			}
