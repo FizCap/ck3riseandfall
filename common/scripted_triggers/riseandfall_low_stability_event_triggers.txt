@@ -24,11 +24,102 @@ riseandfall_low_stability_realm_split_available_trigger = {
     NOT = { exists = global_var:riseandfall_low_stability_event_realm_split_disabled }
 }
 
+# Nationalist/Religious Revolt: fires when significant cultural/faith diversity exists (component <= -10).
+# This maps to 30%+ foreign counties in the realm (tiers: 30-50% = -10, 50-70% = -20, 70%+ = -30).
+riseandfall_low_stability_nationalist_revolt_available_trigger = {
+    NOT = { exists = global_var:riseandfall_low_stability_event_nationalist_revolt_disabled }
+    # Require notable diversity — culture_faith_component at -10 or worse
+    has_variable = riseandfall_rs_culture_faith_component
+    NOT = { var:riseandfall_rs_culture_faith_component >= -9 }
+    NOT = {
+        any_realm_county = {
+            has_county_modifier = riseandfall_nationalist_revolt
+        }
+    }
+}
+
+# Vassal Authority Crisis: fires when powerful vassals challenge the crown OR overall vassal opinion is very low.
+riseandfall_low_stability_vassal_crisis_available_trigger = {
+    NOT = { exists = global_var:riseandfall_low_stability_event_vassal_crisis_disabled }
+    OR = {
+        AND = {
+            has_variable = riseandfall_rs_strong_vassal_component
+            NOT = { var:riseandfall_rs_strong_vassal_component >= -9 }
+        }
+        AND = {
+            has_variable = riseandfall_rs_vassals_component
+            NOT = { var:riseandfall_rs_vassals_component >= -14 }
+        }
+    }
+    NOT = { has_character_modifier = riseandfall_vassal_authority_crisis }
+}
+
+# Total Collapse: active crisis modifiers cannot be used for escalation because the low-stability
+# cooldown suppresses new events while those modifiers are active. Instead, we use persistent
+# recent-crisis flags set by 1001/1002 and require the realm to still be in severe distress when
+# the next yearly roll becomes eligible.
 riseandfall_low_stability_authority_collapse_available_trigger = {
     NOT = { exists = global_var:riseandfall_low_stability_event_authority_collapse_disabled }
+    NOT = { has_variable = riseandfall_recent_total_collapse }
     NOT = {
         any_realm_county = {
             has_county_modifier = riseandfall_authority_collapse
+        }
+    }
+    OR = {
+        # Compound crisis: both major crisis types happened recently and stability is still very poor.
+        AND = {
+            has_variable = riseandfall_recent_nationalist_revolt
+            has_variable = riseandfall_recent_vassal_crisis
+            has_variable = riseandfall_realm_stability_score
+            NOT = { var:riseandfall_realm_stability_score >= 21 }
+        }
+        # Nationalist revolt escalates into total collapse if identity pressure remains extreme.
+        AND = {
+            has_variable = riseandfall_recent_nationalist_revolt
+            has_variable = riseandfall_realm_stability_score
+            NOT = { var:riseandfall_realm_stability_score >= 16 }
+            has_variable = riseandfall_rs_culture_faith_component
+            NOT = { var:riseandfall_rs_culture_faith_component >= -19 }
+        }
+        # Vassal crisis escalates if the nobility remains openly defiant after the first crisis passes.
+        AND = {
+            has_variable = riseandfall_recent_vassal_crisis
+            has_variable = riseandfall_realm_stability_score
+            NOT = { var:riseandfall_realm_stability_score >= 16 }
+            OR = {
+                AND = {
+                    has_variable = riseandfall_rs_strong_vassal_component
+                    NOT = { var:riseandfall_rs_strong_vassal_component >= -19 }
+                }
+                AND = {
+                    has_variable = riseandfall_rs_vassals_component
+                    NOT = { var:riseandfall_rs_vassals_component >= -19 }
+                }
+            }
+        }
+        # Direct catastrophic failure: the realm is near-zero stability and one structural pressure is extreme.
+        AND = {
+            has_variable = riseandfall_realm_stability_score
+            NOT = { var:riseandfall_realm_stability_score >= 6 }
+            OR = {
+                AND = {
+                    has_variable = riseandfall_rs_culture_faith_component
+                    NOT = { var:riseandfall_rs_culture_faith_component >= -19 }
+                }
+                AND = {
+                    has_variable = riseandfall_rs_strong_vassal_component
+                    NOT = { var:riseandfall_rs_strong_vassal_component >= -19 }
+                }
+                AND = {
+                    has_variable = riseandfall_rs_vassals_component
+                    NOT = { var:riseandfall_rs_vassals_component >= -19 }
+                }
+                AND = {
+                    has_variable = riseandfall_rs_realm_size_component
+                    NOT = { var:riseandfall_rs_realm_size_component >= -9 }
+                }
+            }
         }
     }
 }

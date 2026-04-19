@@ -1,5 +1,11 @@
 ﻿namespace = authority_collapse
 
+##############################################
+# authority_collapse.1001 — Nationalist / Religious Revolt
+# Fires when the realm has significant non-approved cultures or hostile faiths (30%+ foreign counties).
+# Applies a severe popular-opinion collapse to every non-approved county for 3 years.
+# No development penalty — the people resist foreign rule, not progress itself.
+##############################################
 authority_collapse.1001 = {
     type = character_event
     title = authority_collapse.1001.t
@@ -13,20 +19,111 @@ authority_collapse.1001 = {
         custom_tooltip = authority_collapse.1001.tooltip
         ai_chance = { base = 100 }
         hidden_effect = {
-            # Run effects in the root character's scope to target their realm
             root = {
-                # Apply authority collapse modifier to all counties in the realm
+                # Persist beyond the cooldown so a later yearly roll can escalate into total collapse.
+                set_variable = { name = riseandfall_recent_nationalist_revolt value = yes years = 10 }
+                set_variable = { name = low_stability_cooldown value = yes years = 5 }
+                # Apply the revolt modifier only to non-approved culture or hostile-faith counties.
+                every_realm_county = {
+                    limit = {
+                        OR = {
+                            # Non-approved culture: not ruler's culture and acceptance < 70
+                            AND = {
+                                NOT = { culture = root.culture }
+                                NOT = {
+                                    culture = {
+                                        cultural_acceptance = {
+                                            target = root.culture
+                                            value >= 70
+                                        }
+                                    }
+                                }
+                            }
+                            # Hostile faith: different from ruler's faith and openly hostile (not merely astray)
+                            AND = {
+                                NOT = { faith = root.faith }
+                                NOT = {
+                                    faith = {
+                                        faith_hostility_level = {
+                                            target = root.faith
+                                            value <= faith_astray_level
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    add_county_modifier = {
+                        modifier = riseandfall_nationalist_revolt
+                        years = 5
+                    }
+                }
+            }
+        }
+    }
+}
+
+##############################################
+# authority_collapse.1002 — Vassal Authority Crisis
+# Fires when powerful vassals challenge the crown or overall vassal opinion is very low.
+# Applies a medium-severity liege debuff reducing vassal tax/levy contributions and opinion.
+# Homogeneous realms that collapse due to internal nobility defiance end up here.
+##############################################
+authority_collapse.1002 = {
+    type = character_event
+    title = authority_collapse.1002.t
+    desc = authority_collapse.1002.d
+    theme = realm
+
+    left_portrait = root
+
+    option = {
+        name = authority_collapse.1002.a
+        custom_tooltip = authority_collapse.1002.tooltip
+        ai_chance = { base = 100 }
+        hidden_effect = {
+            root = {
+                # Persist beyond the cooldown so a later yearly roll can escalate into total collapse.
+                set_variable = { name = riseandfall_recent_vassal_crisis value = yes years = 10 }
+                set_variable = { name = low_stability_cooldown value = yes years = 5 }
+                add_character_modifier = { modifier = riseandfall_vassal_authority_crisis years = 5 }
+            }
+        }
+    }
+}
+
+##############################################
+# authority_collapse.1003 — Total Collapse of Central Authority
+# Fires as an escalation when nationalist revolt or vassal crisis modifiers are already active,
+# OR as a general collapse fallback when neither specific crisis type applies.
+# Applies the full authority collapse to all counties and drains the treasury.
+##############################################
+authority_collapse.1003 = {
+    type = character_event
+    title = authority_collapse.1003.t
+    desc = authority_collapse.1003.d
+    theme = realm
+
+    left_portrait = root
+
+    option = {
+        name = authority_collapse.1003.a
+        custom_tooltip = authority_collapse.1003.tooltip
+        ai_chance = { base = 100 }
+        hidden_effect = {
+            root = {
+                # Reset the escalation chain and block another total collapse for a while.
+                remove_variable = riseandfall_recent_nationalist_revolt
+                remove_variable = riseandfall_recent_vassal_crisis
+                set_variable = { name = riseandfall_recent_total_collapse value = yes years = 10 }
                 every_realm_county = {
                     add_county_modifier = {
                         modifier = riseandfall_authority_collapse
                         years = 5
                     }
                 }
-                # Set low stability cooldown on the ruler
                 set_variable = { name = low_stability_cooldown value = yes years = 5 }
-                # Apply personal debuffs to the liege for the duration of the collapse
                 add_character_modifier = { modifier = riseandfall_authority_collapse_liege_debuff years = 5 }
-                # If the liege has a treasury, remove 95% of it; also remove 95% of their short-term gold
                 if = {
                     limit = { treasury > 0 }
                     set_variable = { name = authority_collapse_treasury_loss value = treasury }

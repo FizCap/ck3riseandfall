@@ -1,7 +1,13 @@
 ﻿# Rise and Fall Province Modifiers
 
 riseandfall_authority_collapse = {
-    development_decline = -1
+    county_opinion_add = -10000
+    icon = byzantine_crown_negative
+}
+
+# Applied only to non-approved culture/faith counties during a nationalist revolt.
+# Causes opinion collapse but no development damage — the people resist foreign rule, not progress.
+riseandfall_nationalist_revolt = {
     county_opinion_add = -1000
     icon = byzantine_crown_negative
 }

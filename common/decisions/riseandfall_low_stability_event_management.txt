@@ -79,7 +79,43 @@ riseandfall_low_stability_event_manager = {
             icon = "gfx/interface/illustrations/decisions/decision_misc.dds"
         }
 
-        # Authority collapse
+        # Nationalist / religious revolt
+        item = {
+            value = riseandfall_enable_low_stability_nationalist_revolt
+            is_shown = { exists = global_var:riseandfall_low_stability_event_nationalist_revolt_disabled }
+            is_valid = { always = yes }
+            current_description = riseandfall_low_stability_nationalist_revolt_currently_disabled
+            localization = riseandfall_enable_low_stability_nationalist_revolt
+            icon = "gfx/interface/illustrations/decisions/decision_misc.dds"
+        }
+        item = {
+            value = riseandfall_disable_low_stability_nationalist_revolt
+            is_shown = { NOT = { exists = global_var:riseandfall_low_stability_event_nationalist_revolt_disabled } }
+            is_valid = { always = yes }
+            current_description = riseandfall_low_stability_nationalist_revolt_currently_enabled
+            localization = riseandfall_disable_low_stability_nationalist_revolt
+            icon = "gfx/interface/illustrations/decisions/decision_misc.dds"
+        }
+
+        # Vassal authority crisis
+        item = {
+            value = riseandfall_enable_low_stability_vassal_crisis
+            is_shown = { exists = global_var:riseandfall_low_stability_event_vassal_crisis_disabled }
+            is_valid = { always = yes }
+            current_description = riseandfall_low_stability_vassal_crisis_currently_disabled
+            localization = riseandfall_enable_low_stability_vassal_crisis
+            icon = "gfx/interface/illustrations/decisions/decision_misc.dds"
+        }
+        item = {
+            value = riseandfall_disable_low_stability_vassal_crisis
+            is_shown = { NOT = { exists = global_var:riseandfall_low_stability_event_vassal_crisis_disabled } }
+            is_valid = { always = yes }
+            current_description = riseandfall_low_stability_vassal_crisis_currently_enabled
+            localization = riseandfall_disable_low_stability_vassal_crisis
+            icon = "gfx/interface/illustrations/decisions/decision_misc.dds"
+        }
+
+        # Total collapse
         item = {
             value = riseandfall_enable_low_stability_authority_collapse
             is_shown = { exists = global_var:riseandfall_low_stability_event_authority_collapse_disabled }
@@ -126,6 +162,22 @@ riseandfall_low_stability_event_manager = {
             else_if = {
                 limit = { scope:riseandfall_disable_low_stability_realm_split = yes }
                 set_global_variable = { name = riseandfall_low_stability_event_realm_split_disabled value = yes }
+            }
+            else_if = {
+                limit = { scope:riseandfall_enable_low_stability_nationalist_revolt = yes }
+                remove_global_variable = riseandfall_low_stability_event_nationalist_revolt_disabled
+            }
+            else_if = {
+                limit = { scope:riseandfall_disable_low_stability_nationalist_revolt = yes }
+                set_global_variable = { name = riseandfall_low_stability_event_nationalist_revolt_disabled value = yes }
+            }
+            else_if = {
+                limit = { scope:riseandfall_enable_low_stability_vassal_crisis = yes }
+                remove_global_variable = riseandfall_low_stability_event_vassal_crisis_disabled
+            }
+            else_if = {
+                limit = { scope:riseandfall_disable_low_stability_vassal_crisis = yes }
+                set_global_variable = { name = riseandfall_low_stability_event_vassal_crisis_disabled value = yes }
             }
             else_if = {
                 limit = { scope:riseandfall_enable_low_stability_authority_collapse = yes }
@@ -228,9 +280,65 @@ riseandfall_disable_low_stability_realm_split = {
     ai_will_do = { base = 0 }
 }
 
-riseandfall_enable_low_stability_authority_collapse = {
+riseandfall_enable_low_stability_nationalist_revolt = {
     picture = { reference = "gfx/interface/illustrations/decisions/decision_misc.dds" }
     sort_order = 37
+    ai_check_interval = 0
+    desc = riseandfall_enable_low_stability_nationalist_revolt_desc
+    selection_tooltip = riseandfall_enable_low_stability_nationalist_revolt_tooltip
+    decision_group_type = riseandfall
+    is_shown = { always = no }
+    is_valid = { always = yes }
+    effect = {}
+    ai_potential = {}
+    ai_will_do = { base = 0 }
+}
+
+riseandfall_disable_low_stability_nationalist_revolt = {
+    picture = { reference = "gfx/interface/illustrations/decisions/decision_misc.dds" }
+    sort_order = 38
+    ai_check_interval = 0
+    desc = riseandfall_disable_low_stability_nationalist_revolt_desc
+    selection_tooltip = riseandfall_disable_low_stability_nationalist_revolt_tooltip
+    decision_group_type = riseandfall
+    is_shown = { always = no }
+    is_valid = { always = yes }
+    effect = {}
+    ai_potential = {}
+    ai_will_do = { base = 0 }
+}
+
+riseandfall_enable_low_stability_vassal_crisis = {
+    picture = { reference = "gfx/interface/illustrations/decisions/decision_misc.dds" }
+    sort_order = 39
+    ai_check_interval = 0
+    desc = riseandfall_enable_low_stability_vassal_crisis_desc
+    selection_tooltip = riseandfall_enable_low_stability_vassal_crisis_tooltip
+    decision_group_type = riseandfall
+    is_shown = { always = no }
+    is_valid = { always = yes }
+    effect = {}
+    ai_potential = {}
+    ai_will_do = { base = 0 }
+}
+
+riseandfall_disable_low_stability_vassal_crisis = {
+    picture = { reference = "gfx/interface/illustrations/decisions/decision_misc.dds" }
+    sort_order = 40
+    ai_check_interval = 0
+    desc = riseandfall_disable_low_stability_vassal_crisis_desc
+    selection_tooltip = riseandfall_disable_low_stability_vassal_crisis_tooltip
+    decision_group_type = riseandfall
+    is_shown = { always = no }
+    is_valid = { always = yes }
+    effect = {}
+    ai_potential = {}
+    ai_will_do = { base = 0 }
+}
+
+riseandfall_enable_low_stability_authority_collapse = {
+    picture = { reference = "gfx/interface/illustrations/decisions/decision_misc.dds" }
+    sort_order = 41
     ai_check_interval = 0
     desc = riseandfall_enable_low_stability_authority_collapse_desc
     selection_tooltip = riseandfall_enable_low_stability_authority_collapse_tooltip
@@ -244,7 +352,7 @@ riseandfall_enable_low_stability_authority_collapse = {
 
 riseandfall_disable_low_stability_authority_collapse = {
     picture = { reference = "gfx/interface/illustrations/decisions/decision_misc.dds" }
-    sort_order = 38
+    sort_order = 42
     ai_check_interval = 0
     desc = riseandfall_disable_low_stability_authority_collapse_desc
     selection_tooltip = riseandfall_disable_low_stability_authority_collapse_tooltip

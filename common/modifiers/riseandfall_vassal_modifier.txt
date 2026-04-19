@@ -2,6 +2,15 @@
     vassal_limit = 1000
     icon = intrigue_positive
 }
+
+# Applied to a liege during a vassal authority crisis — nobility defies the crown.
+riseandfall_vassal_authority_crisis = {
+    vassal_levy_contribution_mult = -0.30
+    vassal_tax_mult = -0.30
+    vassal_opinion = -50
+    levy_size = -0.10
+    icon = intrigue_negative
+}
 # Temporary debuff applied to lieges when authority collapses
 riseandfall_authority_collapse_liege_debuff = {
     levy_size = -0.5

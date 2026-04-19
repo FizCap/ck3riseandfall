@@ -81,6 +81,8 @@ riseandfall_low_stability_random_event = {
                 riseandfall_low_stability_warlord_available_trigger = yes
                 riseandfall_low_stability_palace_coup_available_trigger = yes
                 riseandfall_low_stability_realm_split_available_trigger = yes
+                riseandfall_low_stability_nationalist_revolt_available_trigger = yes
+                riseandfall_low_stability_vassal_crisis_available_trigger = yes
                 riseandfall_low_stability_authority_collapse_available_trigger = yes
             }
         }
@@ -98,8 +100,16 @@ riseandfall_low_stability_random_event = {
                 trigger_event = { id = realm_split.1001 }
             }
             1 = {
-                trigger = { riseandfall_low_stability_authority_collapse_available_trigger = yes }
+                trigger = { riseandfall_low_stability_nationalist_revolt_available_trigger = yes }
                 trigger_event = { id = authority_collapse.1001 }
+            }
+            1 = {
+                trigger = { riseandfall_low_stability_vassal_crisis_available_trigger = yes }
+                trigger_event = { id = authority_collapse.1002 }
+            }
+            1 = {
+                trigger = { riseandfall_low_stability_authority_collapse_available_trigger = yes }
+                trigger_event = { id = authority_collapse.1003 }
             }
         }
     }
