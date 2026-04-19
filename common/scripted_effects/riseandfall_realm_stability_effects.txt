@@ -1467,6 +1467,27 @@ riseandfall_war_victory_se = {
     }
 }
 
+# Clear collapse-only county unrest when a peasant-led revolt successfully breaks away.
+riseandfall_clear_peasant_victory_low_stability_modifiers_se = {
+    if = {
+        limit = {
+            is_alive = yes
+            is_landed = yes
+            has_trait = peasant_leader
+        }
+        every_realm_county = {
+            if = {
+                limit = { has_county_modifier = riseandfall_nationalist_revolt }
+                remove_county_modifier = riseandfall_nationalist_revolt
+            }
+            if = {
+                limit = { has_county_modifier = riseandfall_authority_collapse }
+                remove_county_modifier = riseandfall_authority_collapse
+            }
+        }
+    }
+}
+
 # Called on the war loser scope (character) to increase the war penalty by +10
 riseandfall_war_loss_se = {
     # Only operate on living characters; variables are stored on character scopes
