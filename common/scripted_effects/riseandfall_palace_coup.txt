@@ -496,7 +496,7 @@ riseandfall_palace_coup_challenger_wins_prowess_duel = {
 			# Assign employer to challenger
 			if = {
 				limit = { employer != scope:challenger }
-				if = { limit = { exists = scope:challenger scope:challenger = { is_alive = yes NOT = { is_ruler = yes } has_title = scope:palace_coup_challenger_camp_title } } set_employer = scope:challenger }
+				if = { limit = { exists = scope:challenger scope:challenger = { is_alive = yes NOT = { is_ruler = yes } } } set_employer = scope:challenger }
 			}
 			random = {
 				chance = 100
@@ -548,12 +548,6 @@ riseandfall_palace_coup_challenger_wins_prowess_duel = {
 	if = {
 		limit = { root = { has_active_diarchy = yes } }
 		root = {
-			# If the challenger still holds the temporary camp title, destroy it first so they are not treated as a ruler
-			if = {
-				limit = { exists = scope:palace_coup_challenger_camp_title scope:challenger = { has_title = scope:palace_coup_challenger_camp_title } }
-				scope:challenger = { destroy_title = scope:palace_coup_challenger_camp_title }
-			}
-
 			# Make sure the (new) diarch is not employed by the challenger; as puppet master they must be in root's court.
 			# Only proceed if the challenger is a valid courtier-type character (unrulered) after camp cleanup.
 			if = {
@@ -593,6 +587,7 @@ riseandfall_palace_coup_challenger_wins_prowess_duel = {
 
 riseandfall_palace_coup_root_flees_success = {
 	save_scope_as = original_ruler
+	save_scope_as = palace_coup_original_ruler
 	primary_title = { save_scope_as = original_primary }
 	scope:challenger = { save_scope_as = palace_coup_challenger }
 	capital_county = { save_scope_as = palace_coup_old_capital_county }
@@ -865,6 +860,8 @@ riseandfall_palace_coup_root_flees_success = {
 			remove_variable = rf_realm_split_no_tributaries
 		}
 	}
+	# Restore scope:original_ruler to root (riseandfall_realm_split_se overwrites it to the challenger)
+	scope:palace_coup_original_ruler = { save_scope_as = original_ruler }
 
 	if = {
 		limit = { scope:original_ruler = { has_character_flag = rf_forced_breakaway_seed } }
@@ -1139,10 +1136,10 @@ riseandfall_palace_coup_root_flees_success = {
 				this != scope:challenger
 			}
 			
-			# Assign employer to challenger when possible
+			# Assign employer to challenger when possible (challenger is now a ruler after the split)
 			if = {
 				limit = { employer != scope:challenger }
-				if = { limit = { exists = scope:challenger scope:challenger = { is_alive = yes NOT = { is_ruler = yes } has_title = scope:palace_coup_challenger_camp_title } } set_employer = scope:challenger }
+				if = { limit = { exists = scope:challenger scope:challenger = { is_alive = yes is_ruler = yes } } set_employer = scope:challenger }
 			}
 			random = {
 				chance = 50
@@ -1171,16 +1168,6 @@ riseandfall_palace_coup_root_flees_failure = {
 	scope:event_root = { if = { limit = { gold > 1 } set_variable = { name = duel_transfer_gold value = gold } } }
 	scope:challenger = { if = { limit = { scope:event_root = { has_variable = duel_transfer_gold } } add_short_term_gold = scope:event_root.var:duel_transfer_gold } }
 	scope:event_root = { if = { limit = { scope:event_root = { has_variable = duel_transfer_gold } } remove_short_term_gold = scope:event_root.var:duel_transfer_gold } remove_variable = duel_transfer_gold }
-
-	# Destroy temporary camp title (if present) early so challenger is not treated as a ruler.
-	if = {
-		limit = {
-			exists = scope:palace_coup_challenger_camp_title
-			exists = scope:challenger
-			scope:challenger = { has_title = scope:palace_coup_challenger_camp_title }
-		}
-		scope:challenger = { destroy_title = scope:palace_coup_challenger_camp_title }
-	}
 
 	# Do NOT transfer titles or vassals — instead establish puppet regency on the root
 	if = {
@@ -1228,19 +1215,6 @@ riseandfall_palace_coup_root_flees_failure = {
 ##########################
 # Centralized cleanup for palace coup temporary camp title
 riseandfall_palace_coup_cleanup_camp = {
-	if = {
-		limit = {
-			exists = scope:palace_coup_challenger_camp_title
-			scope:challenger = { is_alive = yes has_title = scope:palace_coup_challenger_camp_title }
-		}
-		scope:challenger = { destroy_title = scope:palace_coup_challenger_camp_title }
-	}
-	else_if = {
-		limit = {
-			exists = scope:palace_coup_challenger_camp_title
-		}
-		root = { destroy_title = scope:palace_coup_challenger_camp_title }
-	}
 	# Remove temporary variables from event_root
 	scope:event_root = { 
 		if = { limit = { is_alive = yes } 

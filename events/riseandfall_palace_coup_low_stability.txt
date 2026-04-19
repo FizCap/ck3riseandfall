@@ -170,12 +170,6 @@ palace_coup.1004 = {
 			if = {
 				limit = { root = { has_active_diarchy = yes } }
 				root = {
-					# Destroy temporary camp title (if present) so challenger is not treated as a ruler
-					if = {
-						limit = { exists = scope:palace_coup_challenger_camp_title scope:challenger = { has_title = scope:palace_coup_challenger_camp_title } }
-						scope:challenger = { destroy_title = scope:palace_coup_challenger_camp_title }
-					}
-
 					# Only set diarch when challenger can be a valid puppet master courtier.
 					if = {
 						limit = { exists = scope:challenger scope:challenger = { is_alive = yes NOT = { is_ruler = yes } } }
