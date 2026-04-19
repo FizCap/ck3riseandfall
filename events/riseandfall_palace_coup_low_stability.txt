@@ -108,7 +108,10 @@ palace_coup.1002 = {
 	option = {
 		name = palace_coup.1002.b
 		custom_tooltip = palace_coup.1002.rebellion.tooltip
-		trigger = { exists = scope:challenger }
+		trigger = {
+			exists = scope:challenger
+			NOT = { primary_title = { has_variable = rf_successor_origin_title } }
+		}
 		hidden_effect = { riseandfall_palace_coup_start_rebellion = yes }
 
 		ai_chance = {
@@ -191,11 +194,6 @@ palace_coup.1004 = {
 					}
 				}
 			}
-			# Give challenger influence hook on the defeated ruler
-			if = {
-				limit = { scope:challenger = { is_alive = yes } root = { is_alive = yes } }
-				scope:challenger = { add_hook = { target = root type = strong_favor_hook } }
-			}
 		}
 		ai_chance = { base = 100 }
 	}
@@ -218,8 +216,6 @@ palace_coup.1005 = {
 			# Defensive: ensure puppet regency exists and challenger set as diarch
 			if = { limit = { NOT = { root = { has_active_diarchy = yes } } } root = { try_start_diarchy = puppet_regency } }
 			if = { limit = { root = { has_active_diarchy = yes } } root = { set_diarch = scope:challenger set_diarchy_type = puppet_regency set_diarchy_swing = 90 } }
-			# Give challenger a strong_favor_hook on the defeated ruler
-			scope:challenger = { add_hook = { target = root type = strong_favor_hook } }
 		}
 		ai_chance = { base = 100 }
 	}

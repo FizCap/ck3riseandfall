@@ -100,15 +100,24 @@ riseandfall_overthrow_liege_effect = {
 			}
 		}
 		every_vassal = {
-			limit = { NOT = { this = scope:actor } }
+			limit = {
+				NOT = { this = scope:actor }
+				liege = scope:recipient
+			}
 			change_liege = {
 				liege = scope:actor
 				change = scope:change
 			}
 		}
-		change_liege = {
-			liege = scope:actor
-			change = scope:change
+		if = {
+			limit = { is_landed = yes }
+			change_liege = {
+				liege = scope:actor
+				change = scope:change
+			}
+		}
+		else = {
+			set_employer = scope:actor
 		}
 	}
 	resolve_title_and_vassal_change = scope:change

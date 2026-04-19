@@ -419,17 +419,6 @@ riseandfall_palace_coup_become_puppet = {
 		}
 	}
 
-	if = {
-		limit = {
-			scope:challenger = {
-				is_alive = yes
-				NOT = { has_hook_of_type = { target = root type = strong_favor_hook } }
-			}
-			root = { is_alive = yes }
-		}
-		scope:challenger = { add_hook = { target = root type = strong_favor_hook } }
-	}
-
 	root = { trigger_event = { id = palace_coup.1004 } }
 
 	if = {

@@ -46,9 +46,8 @@ riseandfall_can_realm_split_trigger = {
         count >= 1
         is_landed = yes
         primary_title.tier >= tier_county
-        # Use the scripted trigger root explicitly here; this path is evaluated from a ruler scope
-        # where a dynamic `liege` event target is not guaranteed to exist.
-        sub_realm_size >= root.rf_25_percent_realm_size_value
+           # Inside any_vassal, the outer ruler scope is `prev`, not an event-target `root`.
+           sub_realm_size >= prev.rf_25_percent_realm_size_value
     }
 }
 
