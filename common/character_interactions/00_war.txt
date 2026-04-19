@@ -49,7 +49,7 @@
 		OR = {
 			NOT = {
 				scope:actor =  {
-					agot_has_three_daughters_trigger = yes
+					agot_part_of_three_daughters_confederation_trigger = yes
 					has_realm_law = free_city_election_succession_law
 				}
 			}
@@ -292,7 +292,14 @@
 		}
 		scope:actor = {
 			trigger_if = {
-				limit = { has_government = landless_adventurer_government }
+				#AGOT MODIFIED
+				#limit = { has_government = landless_adventurer_government }
+				limit = {
+					OR = {
+						has_government = landless_adventurer_government
+						agot_is_landless_pirate_character = yes
+					}
+				}
 				custom_tooltip = {
 					text = camp_located_in_defender_realm.tt
 					domicile.domicile_location.county.holder = {
@@ -321,7 +328,7 @@
 		OR = {
 			NOT = {
 				scope:actor =  {
-					agot_has_three_daughters_trigger = yes
+					agot_part_of_three_daughters_confederation_trigger = yes
 					has_realm_law = free_city_election_succession_law
 				}
 			}
