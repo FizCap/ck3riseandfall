@@ -542,24 +542,16 @@ riseandfall_calculate_realm_stability_se = {
         set_variable = { name = tmp_story_world_total value = global_var:riseandfall_world_total }
         if = { limit = { var:tmp_story_world_total < 1 } set_variable = { name = tmp_story_world_total value = 1 } }
 
-        # Continuous proportional scaling: component = -(realm_pct), where realm_pct = realm_size*100/world.
-        # Realms < 5% of the world get +5 (small-realm stability bonus).
-        # Larger realms lose 1 point per percentage point, capped at -15.
-        # e.g. 7% -> -7, 12% -> -12, 20%+ -> -15
+        # Continuous proportional scaling: lose 1 stability for every 1% of the world controlled.
+        # This keeps the penalty fully dynamic instead of using tiered thresholds.
+        # e.g. 7% -> -7, 12% -> -12, 50% -> -50
         set_variable = { name = tmp_rs_realm_pct value = realm_size }
         change_variable = { name = tmp_rs_realm_pct multiply = 100 }
         change_variable = { name = tmp_rs_realm_pct divide = var:tmp_story_world_total }
         round_variable = { name = tmp_rs_realm_pct nearest = 1 }
-
-        if = {
-            limit = { var:tmp_rs_realm_pct < 5 }
-            set_variable = { name = riseandfall_rs_realm_size_component value = 5 }
-        }
-        else = {
-            set_variable = { name = riseandfall_rs_realm_size_component value = var:tmp_rs_realm_pct }
-            change_variable = { name = riseandfall_rs_realm_size_component multiply = -1 }
-            clamp_variable = { name = riseandfall_rs_realm_size_component min = -15 max = 0 }
-        }
+        set_variable = { name = riseandfall_rs_realm_size_component value = var:tmp_rs_realm_pct }
+        change_variable = { name = riseandfall_rs_realm_size_component multiply = -1 }
+        clamp_variable = { name = riseandfall_rs_realm_size_component min = -100 max = 0 }
 
         # Strong-vassal pressure is now a direct stability component from +10 to -30.
         # Use max_military_strength so temporary war mobilisation doesn't skew the threshold.
@@ -937,49 +929,69 @@ riseandfall_calculate_realm_stability_se = {
     # DIFFICULTY MULTIPLIER (configured via game rule)
     if = { limit = { NOT = { has_variable = riseandfall_rs_difficulty_multiplier } } set_variable = { name = riseandfall_rs_difficulty_multiplier value = 100 } }
     if = { limit = { NOT = { has_variable = riseandfall_rs_difficulty_multiplier_display } } set_variable = { name = riseandfall_rs_difficulty_multiplier_display value = 1.0 } }
-    # Map selected game rule to the per-character difficulty multiplier
+    # Map selected game rule to a penalty-curve multiplier.
+    # We scale the distance from 100 instead of scaling the whole score, so a raw 100 target stays 100.
     if = { limit = { has_game_rule = riseandfall_realm_stability_very_unstable }
-        set_variable = { name = riseandfall_rs_difficulty_multiplier value = 80 }
-        set_variable = { name = riseandfall_rs_difficulty_multiplier_display value = 0.8 }
+        set_variable = { name = riseandfall_rs_difficulty_multiplier value = 120 }
+        set_variable = { name = riseandfall_rs_difficulty_multiplier_display value = 1.2 }
     }
     else_if = { limit = { has_game_rule = riseandfall_realm_stability_unstable }
-        set_variable = { name = riseandfall_rs_difficulty_multiplier value = 90 }
-        set_variable = { name = riseandfall_rs_difficulty_multiplier_display value = 0.9 }
+        set_variable = { name = riseandfall_rs_difficulty_multiplier value = 110 }
+        set_variable = { name = riseandfall_rs_difficulty_multiplier_display value = 1.1 }
     }
     else_if = { limit = { has_game_rule = riseandfall_realm_stability_normal }
         set_variable = { name = riseandfall_rs_difficulty_multiplier value = 100 }
         set_variable = { name = riseandfall_rs_difficulty_multiplier_display value = 1.0 }
     }
     else_if = { limit = { has_game_rule = riseandfall_realm_stability_stable }
-        set_variable = { name = riseandfall_rs_difficulty_multiplier value = 110 }
-        set_variable = { name = riseandfall_rs_difficulty_multiplier_display value = 1.1 }
+        set_variable = { name = riseandfall_rs_difficulty_multiplier value = 90 }
+        set_variable = { name = riseandfall_rs_difficulty_multiplier_display value = 0.9 }
     }
     else_if = { limit = { has_game_rule = riseandfall_realm_stability_very_stable }
-        set_variable = { name = riseandfall_rs_difficulty_multiplier value = 120 }
-        set_variable = { name = riseandfall_rs_difficulty_multiplier_display value = 1.2 }
+        set_variable = { name = riseandfall_rs_difficulty_multiplier value = 80 }
+        set_variable = { name = riseandfall_rs_difficulty_multiplier_display value = 0.8 }
     }
     # Apply the war penalty to the target score (use a negated temp var — `-var:` is not valid in scripts)
     set_variable = { name = tmp_war_penalty value = var:riseandfall_war_penalty }
     change_variable = { name = tmp_war_penalty multiply = -1 }
     change_variable = { name = tmp_target_score add = var:tmp_war_penalty }
-    # Apply difficulty game rule multiplier according to the new target setting
+    # Apply difficulty game rule by scaling how far the raw target sits below 100.
+    # If the raw target is 100, it stays 100 on every setting.
     # If the game rule is Player Only, apply only to player-controlled characters (is_ai = no).
     # If the game rule is AI Only, apply only to AI-controlled characters (is_ai = yes).
     # Otherwise apply to all characters (Both).
     if = {
         limit = { has_game_rule = riseandfall_realm_stability_difficulty_player_only is_ai = no }
-        change_variable = { name = tmp_target_score multiply = var:riseandfall_rs_difficulty_multiplier }
-        change_variable = { name = tmp_target_score divide = 100 }
+        set_variable = { name = tmp_difficulty_gap value = var:tmp_target_score }
+        change_variable = { name = tmp_difficulty_gap multiply = -1 }
+        change_variable = { name = tmp_difficulty_gap add = 100 }
+        change_variable = { name = tmp_difficulty_gap multiply = var:riseandfall_rs_difficulty_multiplier }
+        change_variable = { name = tmp_difficulty_gap divide = 100 }
+        set_variable = { name = tmp_target_score value = var:tmp_difficulty_gap }
+        change_variable = { name = tmp_target_score multiply = -1 }
+        change_variable = { name = tmp_target_score add = 100 }
     }
     else_if = {
         limit = { has_game_rule = riseandfall_realm_stability_difficulty_ai_only is_ai = yes }
-        change_variable = { name = tmp_target_score multiply = var:riseandfall_rs_difficulty_multiplier }
-        change_variable = { name = tmp_target_score divide = 100 }
+        set_variable = { name = tmp_difficulty_gap value = var:tmp_target_score }
+        change_variable = { name = tmp_difficulty_gap multiply = -1 }
+        change_variable = { name = tmp_difficulty_gap add = 100 }
+        change_variable = { name = tmp_difficulty_gap multiply = var:riseandfall_rs_difficulty_multiplier }
+        change_variable = { name = tmp_difficulty_gap divide = 100 }
+        set_variable = { name = tmp_target_score value = var:tmp_difficulty_gap }
+        change_variable = { name = tmp_target_score multiply = -1 }
+        change_variable = { name = tmp_target_score add = 100 }
     }
     else = {
         # Both (default) — apply to all characters
-        change_variable = { name = tmp_target_score multiply = var:riseandfall_rs_difficulty_multiplier }
-        change_variable = { name = tmp_target_score divide = 100 }
+        set_variable = { name = tmp_difficulty_gap value = var:tmp_target_score }
+        change_variable = { name = tmp_difficulty_gap multiply = -1 }
+        change_variable = { name = tmp_difficulty_gap add = 100 }
+        change_variable = { name = tmp_difficulty_gap multiply = var:riseandfall_rs_difficulty_multiplier }
+        change_variable = { name = tmp_difficulty_gap divide = 100 }
+        set_variable = { name = tmp_target_score value = var:tmp_difficulty_gap }
+        change_variable = { name = tmp_target_score multiply = -1 }
+        change_variable = { name = tmp_target_score add = 100 }
     }
     # Ensure we expose the difficulty multiplier for tooltip/use
     set_variable = { name = riseandfall_rs_difficulty_multiplier value = var:riseandfall_rs_difficulty_multiplier }

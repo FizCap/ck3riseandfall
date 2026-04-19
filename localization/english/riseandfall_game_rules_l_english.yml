@@ -40,24 +40,24 @@ setting_riseandfall_realm_stability_disabled_desc:0 "Realm stability is inactive
 # Realm Stability Settings (difficulty options)
 rule_riseandfall_realm_stability_difficulty:0 "Realm Stability Diffuclty"
 setting_riseandfall_realm_stability_very_unstable:0 "Very Unstable"
-setting_riseandfall_realm_stability_very_unstable_desc:0 "Realm stability calculations are more punishing."
+setting_riseandfall_realm_stability_very_unstable_desc:0 "Missing stability is amplified by 20%. A perfect 100 target still remains reachable."
 setting_riseandfall_realm_stability_unstable:0 "Unstable"
-setting_riseandfall_realm_stability_unstable_desc:0 "Slightly harder to maintain high stability."
+setting_riseandfall_realm_stability_unstable_desc:0 "Missing stability is amplified by 10%. A perfect 100 target still remains reachable."
 setting_riseandfall_realm_stability_normal:0 "Normal"
-setting_riseandfall_realm_stability_normal_desc:0 "Default realm stability behavior."
+setting_riseandfall_realm_stability_normal_desc:0 "Default realm stability behavior with no curve adjustment."
 setting_riseandfall_realm_stability_stable:0 "Stable"
-setting_riseandfall_realm_stability_stable_desc:0 "Generally easier to keep high stability."
+setting_riseandfall_realm_stability_stable_desc:0 "Missing stability is reduced by 10%, making recovery easier without raising the ceiling above 100."
 setting_riseandfall_realm_stability_very_stable:0 "Very Stable"
-setting_riseandfall_realm_stability_very_stable_desc:0 "Realm stability is easier to maintain."
+setting_riseandfall_realm_stability_very_stable_desc:0 "Missing stability is reduced by 20%, making recovery much easier without raising the ceiling above 100."
 
 # Realm Stability multiplier target (who the difficulty multiplier applies to)
 rule_riseandfall_realm_stability_difficulty_target:0 "Realm Stability Difficulty Target"
 setting_riseandfall_realm_stability_difficulty_both:0 "Both"
-setting_riseandfall_realm_stability_difficulty_both_desc:0 "Apply the realm stability difficulty multiplier to both player-controlled and AI-controlled characters."
+setting_riseandfall_realm_stability_difficulty_both_desc:0 "Apply the realm stability difficulty curve to both player-controlled and AI-controlled characters."
 setting_riseandfall_realm_stability_difficulty_player_only:0 "Player Only"
-setting_riseandfall_realm_stability_difficulty_player_only_desc:0 "Apply the realm stability difficulty multiplier only to player-controlled characters."
+setting_riseandfall_realm_stability_difficulty_player_only_desc:0 "Apply the realm stability difficulty curve only to player-controlled characters."
 setting_riseandfall_realm_stability_difficulty_ai_only:0 "AI Only"
-setting_riseandfall_realm_stability_difficulty_ai_only_desc:0 "Apply the realm stability difficulty multiplier only to AI-controlled characters."
+setting_riseandfall_realm_stability_difficulty_ai_only_desc:0 "Apply the realm stability difficulty curve only to AI-controlled characters."
 
 # Men-at-arms cap increase rule (administrative governments)
 rule_riseandfall_enable_mma_limit_modifier:0 "Men-at-Arms Cap Increase (Administrative Titles)"
