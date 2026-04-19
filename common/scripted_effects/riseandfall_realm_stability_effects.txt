@@ -763,7 +763,7 @@ riseandfall_calculate_realm_stability_se = {
         }
         set_variable = { name = riseandfall_rs_succession_component value = var:riseandfall_rs_succession_shock }
         change_variable = { name = riseandfall_rs_succession_component multiply = -1 }
-        clamp_variable = { name = riseandfall_rs_succession_component min = -30 max = 0 }
+        clamp_variable = { name = riseandfall_rs_succession_component min = -50 max = 0 }
 
         # Decay the stored shock by 5% yearly, with a minimum decay step of 1, so it fades away.
         set_variable = { name = tmp_rs_succession_decay value = var:riseandfall_rs_succession_shock }
@@ -778,7 +778,7 @@ riseandfall_calculate_realm_stability_se = {
             remove_variable = riseandfall_rs_succession_shock
         }
         else = {
-            clamp_variable = { name = riseandfall_rs_succession_shock min = 1 max = 30 }
+            clamp_variable = { name = riseandfall_rs_succession_shock min = 1 max = 50 }
         }
     }
 
@@ -1295,7 +1295,7 @@ round_variable = { name = tmp_target_score nearest = 1 }    # Persist the (possi
 
 }
 
-# Mark rulers right after succession and rate succession shock based on stat drop.
+# Mark rulers right after succession and rate succession shock based on per-stat downgrades.
 # Root scope: inheriting ruler
 # Expected saved scope: scope:predecessor
 riseandfall_mark_story_succession_shock_se = {
@@ -1307,67 +1307,64 @@ riseandfall_mark_story_succession_shock_se = {
         # Predecessor may be alive in a stepdown/overthrow succession.
         set_variable = { name = tmp_rs_succession_shock value = 0 }
 
-        set_variable = { name = tmp_rs_prev_skill_total value = scope:predecessor.diplomacy }
-        change_variable = { name = tmp_rs_prev_skill_total add = scope:predecessor.martial }
-        change_variable = { name = tmp_rs_prev_skill_total add = scope:predecessor.stewardship }
-        change_variable = { name = tmp_rs_prev_skill_total add = scope:predecessor.intrigue }
-        change_variable = { name = tmp_rs_prev_skill_total add = scope:predecessor.learning }
-
-        set_variable = { name = tmp_rs_new_skill_total value = diplomacy }
-        change_variable = { name = tmp_rs_new_skill_total add = martial }
-        change_variable = { name = tmp_rs_new_skill_total add = stewardship }
-        change_variable = { name = tmp_rs_new_skill_total add = intrigue }
-        change_variable = { name = tmp_rs_new_skill_total add = learning }
-
-        # Shock only fires for meaningful leadership drops, not routine successions.
-        # Any downgrade (even tiny) or "skill <= 30" are intentionally removed as triggers.
+        # Each lost point in Diplomacy/Martial/Stewardship/Intrigue/Learning adds 2 shock.
+        # Gains or ties do not reduce the penalty; total shock is capped at 50.
+        set_variable = { name = tmp_rs_stat_drop value = scope:predecessor.diplomacy }
+        set_variable = { name = tmp_rs_current_stat value = diplomacy }
+        change_variable = { name = tmp_rs_current_stat multiply = -1 }
+        change_variable = { name = tmp_rs_stat_drop add = var:tmp_rs_current_stat }
         if = {
-            limit = { var:tmp_rs_new_skill_total <= 25 }
-            change_variable = { name = tmp_rs_succession_shock add = 1 }
+            limit = { var:tmp_rs_stat_drop > 0 }
+            change_variable = { name = tmp_rs_stat_drop multiply = 2 }
+            change_variable = { name = tmp_rs_succession_shock add = var:tmp_rs_stat_drop }
         }
 
+        set_variable = { name = tmp_rs_stat_drop value = scope:predecessor.martial }
+        set_variable = { name = tmp_rs_current_stat value = martial }
+        change_variable = { name = tmp_rs_current_stat multiply = -1 }
+        change_variable = { name = tmp_rs_stat_drop add = var:tmp_rs_current_stat }
         if = {
-            limit = {
-                var:tmp_rs_prev_skill_total >= 45
-                var:tmp_rs_new_skill_total <= 30
-            }
-            change_variable = { name = tmp_rs_succession_shock add = 1 }
+            limit = { var:tmp_rs_stat_drop > 0 }
+            change_variable = { name = tmp_rs_stat_drop multiply = 2 }
+            change_variable = { name = tmp_rs_succession_shock add = var:tmp_rs_stat_drop }
         }
 
+        set_variable = { name = tmp_rs_stat_drop value = scope:predecessor.stewardship }
+        set_variable = { name = tmp_rs_current_stat value = stewardship }
+        change_variable = { name = tmp_rs_current_stat multiply = -1 }
+        change_variable = { name = tmp_rs_stat_drop add = var:tmp_rs_current_stat }
         if = {
-            limit = {
-                var:tmp_rs_prev_skill_total >= 55
-                var:tmp_rs_new_skill_total <= 35
-            }
-            change_variable = { name = tmp_rs_succession_shock add = 1 }
+            limit = { var:tmp_rs_stat_drop > 0 }
+            change_variable = { name = tmp_rs_stat_drop multiply = 2 }
+            change_variable = { name = tmp_rs_succession_shock add = var:tmp_rs_stat_drop }
         }
 
-        # Large-realm amplification still applies, but the stored realm-stability shock is now
-        # a direct 0..30 value rather than the old story-mode 0..3 bucket.
+        set_variable = { name = tmp_rs_stat_drop value = scope:predecessor.intrigue }
+        set_variable = { name = tmp_rs_current_stat value = intrigue }
+        change_variable = { name = tmp_rs_current_stat multiply = -1 }
+        change_variable = { name = tmp_rs_stat_drop add = var:tmp_rs_current_stat }
         if = {
-            limit = { var:tmp_rs_succession_shock >= 1 }
-            set_variable = { name = tmp_rs_world_total value = 1 }
-            if = {
-                limit = { exists = global_var:riseandfall_world_total }
-                set_variable = { name = tmp_rs_world_total value = global_var:riseandfall_world_total }
-            }
-            if = { limit = { var:tmp_rs_world_total < 1 } set_variable = { name = tmp_rs_world_total value = 1 } }
-            set_variable = { name = tmp_rs_world_total_10 value = var:tmp_rs_world_total }
-            change_variable = { name = tmp_rs_world_total_10 multiply = 10 }
-            change_variable = { name = tmp_rs_world_total_10 divide = 100 }
-            if = {
-                limit = { realm_size >= var:tmp_rs_world_total_10 }
-                change_variable = { name = tmp_rs_succession_shock add = 1 }
-            }
+            limit = { var:tmp_rs_stat_drop > 0 }
+            change_variable = { name = tmp_rs_stat_drop multiply = 2 }
+            change_variable = { name = tmp_rs_succession_shock add = var:tmp_rs_stat_drop }
         }
 
-        clamp_variable = { name = tmp_rs_succession_shock min = 0 max = 3 }
+        set_variable = { name = tmp_rs_stat_drop value = scope:predecessor.learning }
+        set_variable = { name = tmp_rs_current_stat value = learning }
+        change_variable = { name = tmp_rs_current_stat multiply = -1 }
+        change_variable = { name = tmp_rs_stat_drop add = var:tmp_rs_current_stat }
+        if = {
+            limit = { var:tmp_rs_stat_drop > 0 }
+            change_variable = { name = tmp_rs_stat_drop multiply = 2 }
+            change_variable = { name = tmp_rs_succession_shock add = var:tmp_rs_stat_drop }
+        }
+
+        clamp_variable = { name = tmp_rs_succession_shock min = 0 max = 50 }
 
         if = {
             limit = { var:tmp_rs_succession_shock > 0 }
-            change_variable = { name = tmp_rs_succession_shock multiply = 10 }
             set_variable = { name = riseandfall_rs_succession_shock value = var:tmp_rs_succession_shock }
-            clamp_variable = { name = riseandfall_rs_succession_shock min = 1 max = 30 }
+            clamp_variable = { name = riseandfall_rs_succession_shock min = 1 max = 50 }
         }
         else = {
             remove_variable = riseandfall_rs_succession_shock
