@@ -420,7 +420,13 @@ riseandfall_palace_coup_become_puppet = {
 	}
 
 	if = {
-		limit = { scope:challenger = { is_alive = yes } root = { is_alive = yes } }
+		limit = {
+			scope:challenger = {
+				is_alive = yes
+				NOT = { has_hook_of_type = { target = root type = strong_favor_hook } }
+			}
+			root = { is_alive = yes }
+		}
 		scope:challenger = { add_hook = { target = root type = strong_favor_hook } }
 	}
 
@@ -831,6 +837,8 @@ riseandfall_palace_coup_root_flees_success = {
 				is_landed = yes
 				is_vassal = yes
 				NOT = { liege = scope:palace_coup_challenger }
+				# Tier check: challenger must hold a higher-tier title or CK3 will reject the vassalage
+				primary_title.tier < scope:palace_coup_challenger.primary_title.tier
 			}
 		}
 		create_title_and_vassal_change = {
