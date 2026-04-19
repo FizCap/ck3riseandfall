@@ -67,42 +67,44 @@ trait_retiredwarlord_desc:0 "Once a stirring force who sowed chaos across the re
 
  # Titles & descriptions
 palace_coup.1001.t:0 "Palace Coup Attempt"
-palace_coup.1001.desc:0 "A disloyal knight in your court is staging a palace coup, moving to seize the throne by force. The corridors of your palace run thick with treachery. If you choose to fight, many in your court will perish in the fighting."
+palace_coup.1001.desc:0 "A faction within your court has seized the palace and now moves openly against you. This is no longer a matter of whispers and hidden daggers. Someone inside your own household means to rule through you, or in your place."
 
-palace_coup.1002.t:0 "The Challenge"
-palace_coup.1002.d:0 "[challenger.GetTitledFirstName] has stepped forward, surrounded by a band of loyal fighters.\n\n\"This ends now,\" [challenger.GetSheHe] declares. \"My champions against yours. Winner takes the throne.\"\n\nMy knights stand ready, hands on their hilts, awaiting my command."
+palace_coup.1002.t:0 "The Ultimatum"
+palace_coup.1002.d:0 "[challenger.GetTitledFirstName] stands before you with the palace already in conspiratorial hands. There will be no duel and no final bargain. Submit, and you may remain on the throne as a puppet. Slip away now, and the realm may fracture into rival successor states under the old banners of civil war."
 
-palace_coup.1003.t:0 "You Have Escaped — Raise the Banners"
-palace_coup.1003.d:0 "You stagger from the smoke-choked corridor into the cold night. The coup has shattered the realm: [challenger.GetTitledFirstName] now clings to the old capital and the ancient title, while much of the wider realm rallies to you as the rightful rival sovereign. If the outer territories are too large to hold together, other lords may seize the chaos to carve out successor states of their own. The civil war has already begun."
+palace_coup.1003.t:0 "You Slip Away Into Rebellion"
+palace_coup.1003.d:0 "You stagger from the palace with enough loyalists to keep the struggle alive. [challenger.GetTitledFirstName] now clings to the old capital and the ancient title, while the outer realm fractures around the old order. Rival successor states rise from the chaos, and civil war has begun in earnest."
 
-palace_coup.1004.t:0 "Puppeted: Your Reign Continues in Name"
-palace_coup.1004.d:0 "You lost the duel. The palace coup has succeeded. Your life has been spared, but [challenger.GetTitledFirstName] now controls your realm as your puppet master. You remain the nominal ruler, but important decisions will be made by your puppet master."
+palace_coup.1004.t:0 "A Puppet Throne"
+palace_coup.1004.d:0 "You yield before the conspirators. [challenger.GetTitledFirstName] now rules through you as puppet master. Your crown remains upon your brow, but authority has passed into other hands."
 
 palace_coup.1005.t:0 "Failed Escape — You Are Puppeted"
 palace_coup.1005.d:0 "Your attempt to flee was thwarted. [challenger.GetTitledFirstName] caught you and has placed you under a puppet regency. You remain the figurehead ruler, but the puppet master will pull the strings."
 palace_coup.1005.a:0 "Accept your fate"
 palace_coup.1005.tooltip:0 "You failed to flee — you will remain in name only, while [challenger.GetTitledFirstName] governs behind the curtain."
  # Option text (labels)
-palace_coup.1001.a:0 "Protect the palace"
+palace_coup.1001.a:0 "Hear the ultimatum"
 palace_coup.1001.b:0 "Flee the palace"
-palace_coup.1002.a:0 "My knights will crush you!"
-palace_coup.1002.b:0 "Attempt to Flee"
-palace_coup.1003.a:0 "Hold the rival realm together"
-palace_coup.1004.a:0 "Accept your fate"
+palace_coup.1002.a:0 "Surrender and accept a puppet regency"
+palace_coup.1002.b:0 "Retreat and raise a rebellion"
+palace_coup.1003.a:0 "Rally the loyalists"
+palace_coup.1004.a:0 "Endure the humiliation"
 
 # Child-specific option when ruler is a child
 palace_coup.1002.c:0 "I yield the throne."
 palace_coup.1002.child_tooltip:0 "The ruler is a child — you are forced to yield the throne to [challenger.GetTitledFirstName]."
 
  # UI tooltips used by options/duel outcomes
-palace_coup.1001.tooltip:0 "Confront the challenger in a duel or attempt to flee."
+palace_coup.1001.tooltip:0 "Decide whether to submit to the coup or escape and gather loyalists."
+palace_coup.1002.surrender.tooltip:0 "You submit to the coup and continue to reign only in name."
+palace_coup.1002.rebellion.tooltip:0 "You escape the palace, cede the capital to the challenger, and trigger the full realm-split civil war."
 palace_coup.1002.win.tooltip:0 "You win the duel and kill the challenger."
 palace_coup.1002.lose.tooltip:0 "You will be spared but reduced to a puppet under [challenger.GetTitledFirstName]."
 palace_coup.1002.flee_success.tooltip:0 "You successfully flee, and the realm fractures into rival successor states."
 palace_coup.1002.fail.tooltip:0 "You get caught and assassinated."
 palace_coup.1002.flee_tooltip:0 "Attempt to flee — an intrigue duel between you and [challenger.GetTitledFirstName]."
-palace_coup.1003.tooltip:0 "Your rival holds the original title, while the fleeing outer realm can splinter into further breakaway states if it is large enough."
-palace_coup.1004.tooltip:0 "Accept your defeat and the puppet master who will rule behind the throne."
+palace_coup.1003.tooltip:0 "The challenger keeps the old title and capital core while the wider realm fractures into successor states and civil war."
+palace_coup.1004.tooltip:0 "You remain on the throne only as [challenger.GetTitledFirstName]'s puppet."
 
 palace_coup.1101.t:0 "Palace Coup Confirmation"
 palace_coup.1101.d:0 "You have been selected to lead the palace coup against [scope:event_root.GetTitledFirstName]. Do you wish to proceed with this dangerous endeavor?"
@@ -117,15 +119,15 @@ palace_coup.2001.d:0 "The duel has ended in disaster. [scope:event_root.GetTitle
 palace_coup.2001.a:0 "Accept your fate"
 palace_coup.2001.tooltip:0 "You lost the duel and will perish."
 
-palace_coup.2002.t:0 "Victory in the Duel"
-palace_coup.2002.d:0 "The duel is won! [scope:event_root.GetTitledFirstName] lies defeated at your feet. You have seized control of the realm and established yourself as puppet master, ruling through a regency diarchy."
-palace_coup.2002.a:0 "Long live the new order"
-palace_coup.2002.tooltip:0 "You have won the duel and become puppet master of the realm."
+palace_coup.2002.t:0 "The Throne Submits"
+palace_coup.2002.d:0 "[scope:event_root.GetTitledFirstName] yields without a fight. You now govern as puppet master, guiding the realm from behind the throne while the crown remains on another's head."
+palace_coup.2002.a:0 "Power behind the curtain"
+palace_coup.2002.tooltip:0 "The ruler has yielded, leaving you to govern through a puppet regency."
 
-palace_coup.2003.t:0 "The Ruler Escapes"
-palace_coup.2003.d:0 "[scope:event_root.GetTitledFirstName] has successfully fled the palace. Instead of disappearing into exile, [scope:event_root.GetSheHe] has carried much of the outer realm with [scope:event_root.GetHerHim], leaving you with the old title and the capital core. The realm has fractured, and the fleeing ruler's outer territories may splinter further into additional successor states."
-palace_coup.2003.a:0 "Prepare for war"
-palace_coup.2003.tooltip:0 "The coup has fractured the realm, and the fleeing ruler's outer realm may splinter into additional successor states."
+palace_coup.2003.t:0 "The Coup Becomes Rebellion"
+palace_coup.2003.d:0 "[scope:event_root.GetTitledFirstName] escaped the palace before your grip fully closed. You hold the old title and the capital core, but much of the outer realm is splintering into rival successor states around the fleeing ruler. What began as court intrigue has become full civil war."
+palace_coup.2003.a:0 "Crush them"
+palace_coup.2003.tooltip:0 "You seized the throne, but the outer realm is now fracturing into successor states around the deposed ruler."
 
 palace_coup.2004.t:0 "Escape Thwarted"
 palace_coup.2004.d:0 "[scope:event_root.GetTitledFirstName] attempted to flee but was caught! You have successfully thwarted [scope:event_root.GetHerHis] escape and established yourself as puppet master, ruling through a regency diarchy."

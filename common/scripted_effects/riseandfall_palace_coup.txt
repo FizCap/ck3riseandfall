@@ -1,7 +1,7 @@
 ﻿##########################
 # Rise and Fall - Low Stability Events Scripted Effects
 # Contains scripted effects related to low stability events
-# Sets up the challenger selection, kills courtiers, creates adventurer title, and sets cooldowns
+# Selects a court challenger and resolves the simplified palace coup outcomes
 
 riseandfall_palace_coup_setup = {
 	root = {
@@ -78,11 +78,12 @@ riseandfall_palace_coup_setup = {
 				}
 			}
 		}
-		# Include vassals who are councilors
+		# Do not select landed rulers as palace coup challengers
 		every_vassal = {
 			limit = {
 				is_councillor = yes
 				is_alive = yes
+				is_ruler = no
 				age > 16
 			}
 			# Initialize candidate score from stats
@@ -182,7 +183,7 @@ riseandfall_palace_coup_setup = {
 		limit = { NOT = { exists = scope:challenger } }
 		root = {
 			random_courtier = {
-				limit = { is_adult = yes }
+				limit = { is_adult = yes is_ruler = no }
 				save_scope_as = challenger
 			}
 		}
@@ -253,7 +254,7 @@ riseandfall_palace_coup_setup = {
 					}
 				}
 			}
-			# Include vassals who are councilors
+			# Do not select landed rulers as palace coup challengers
 			every_vassal = {
 				limit = {
 					is_councillor = yes
@@ -261,6 +262,7 @@ riseandfall_palace_coup_setup = {
 					NOT = { is_close_family_of = root }
 					age > 16
 					NOT = { this = scope:potential_challenger }
+					is_ruler = no
 					is_ai = yes  # Only select AI characters for backup
 				}
 				# Initialize candidate score from stats
@@ -367,6 +369,7 @@ riseandfall_palace_coup_setup = {
 				random_courtier = {
 					limit = { 
 						is_adult = yes 
+						is_ruler = no
 						NOT = { this = scope:potential_challenger }
 						is_ai = yes
 					}
@@ -376,55 +379,7 @@ riseandfall_palace_coup_setup = {
 		}
 	}
 	
-	# ---------------------------------------------------------
-	# EXECUTION PHASE
-	# ---------------------------------------------------------
-	if = {
-		limit = { exists = scope:challenger }
-		
-		# Create a temporary landless adventurer camp
-		scope:challenger = {
-			if = {
-				limit = {
-					is_alive = yes
-					NOT = { is_landed = yes }
-					NOT = { government_has_flag = government_is_landless_adventurer }
-				}
-				create_adventurer_title = {
-					name = palace_coup_adventurer_camp_name
-					holder = scope:challenger
-					government = landless_adventurer_government
-					save_scope_as = palace_coup_challenger_camp_title
-				}
-				scope:palace_coup_challenger_camp_title = {
-					set_variable = { name = riseandfall_created_adventurer_title value = yes }
-				}
-				scope:event_root = { set_variable = { name = challenger_camp_created value = yes } }
-			}
-		}
-		
-		# -----------------------------------------------------
-		# MOVE ENTOURAGE
-		# -----------------------------------------------------
-		# Move 50% of courtiers to challenger's camp
-		if = {
-			limit = { scope:event_root = { has_variable = challenger_camp_created } exists = scope:challenger }
-			scope:event_root = {
-				every_courtier = {
-					limit = {
-						is_alive = yes
-						NOT = { this = root }
-						NOT = { this = scope:challenger }
-						employer != scope:challenger
-					}
-					random_list = {
-						50 = { set_employer = scope:challenger }
-						50 = { }
-					}
-				}
-			}
-		}
-	} # End of exists = challenger block
+	# Palace coup resolution no longer creates temporary camps or moves courtiers.
 	
 	# ---------------------------------------------------------
 	# COOLDOWNS
@@ -435,6 +390,56 @@ riseandfall_palace_coup_setup = {
 		limit = { exists = scope:challenger }
 		scope:challenger = { set_variable = { name = low_stability_cooldown value = yes years = 5 } }
 	}
+}
+
+# Rise and Fall - Palace Coup Submit
+# The ruler yields and remains on the throne only as a puppet
+
+riseandfall_palace_coup_become_puppet = {
+	if = {
+		limit = {
+			exists = scope:challenger
+			scope:challenger = { is_alive = yes NOT = { is_ruler = yes } }
+			NOT = { root = { has_active_diarchy = yes } }
+		}
+		root = { try_start_diarchy = puppet_regency }
+	}
+
+	if = {
+		limit = {
+			exists = scope:challenger
+			scope:challenger = { is_alive = yes NOT = { is_ruler = yes } }
+			root = { has_active_diarchy = yes }
+		}
+		root = {
+			set_diarch = scope:challenger
+			set_diarchy_type = puppet_regency
+			set_diarchy_swing = 90
+			set_variable = { name = puppet_master_cooldown value = yes days = 365 }
+		}
+	}
+
+	if = {
+		limit = { scope:challenger = { is_alive = yes } root = { is_alive = yes } }
+		scope:challenger = { add_hook = { target = root type = strong_favor_hook } }
+	}
+
+	root = { trigger_event = { id = palace_coup.1004 } }
+
+	if = {
+		limit = { exists = scope:challenger }
+		scope:challenger = { trigger_event = { id = palace_coup.2002 } }
+	}
+
+	hidden_effect = { riseandfall_palace_coup_cleanup_camp = yes }
+}
+
+##########################
+# Rise and Fall - Palace Coup Rebellion
+# The challenger seizes the throne and the deposed ruler immediately raises a claim war
+
+riseandfall_palace_coup_start_rebellion = {
+	riseandfall_palace_coup_root_flees_success = yes
 }
 
 # Rise and Fall - Palace Coup Root Wins Prowess Duel
