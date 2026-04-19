@@ -532,7 +532,7 @@ riseandfall_calculate_realm_stability_se = {
         round_variable = { name = tmp_rs_realm_pct nearest = 1 }
         set_variable = { name = riseandfall_rs_realm_size_component value = var:tmp_rs_realm_pct }
         change_variable = { name = riseandfall_rs_realm_size_component multiply = -1 }
-        clamp_variable = { name = riseandfall_rs_realm_size_component min = -100 max = 0 }
+        clamp_variable = { name = riseandfall_rs_realm_size_component min = -15 max = 0 }
 
         # Strong-vassal pressure is now a direct stability component from +10 to -30.
         # Use max_military_strength so temporary war mobilisation doesn't skew the threshold.
