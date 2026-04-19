@@ -2,7 +2,8 @@
     every_ruler = {
         limit = { has_diarchy_type = puppet_regency }
         if = {
-            limit = { is_landed = no }
+            # Mirror the puppet_regency type's intended automatic end condition.
+            limit = { OR = { is_landed = no is_independent_ruler = no } }
             end_diarchy = yes
         }
         else = {
