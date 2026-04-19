@@ -1464,23 +1464,31 @@ riseandfall_war_victory_se = {
     }
 }
 
+# Clear the low-stability county modifiers from the current county scope.
+riseandfall_clear_low_stability_county_modifiers_se = {
+    if = {
+        limit = { has_county_modifier = riseandfall_nationalist_revolt }
+        remove_county_modifier = riseandfall_nationalist_revolt
+    }
+    if = {
+        limit = { has_county_modifier = riseandfall_authority_collapse }
+        remove_county_modifier = riseandfall_authority_collapse
+    }
+}
+
 # Clear collapse-only county unrest when a peasant-led revolt successfully breaks away.
 riseandfall_clear_peasant_victory_low_stability_modifiers_se = {
     if = {
         limit = {
             is_alive = yes
             is_landed = yes
-            has_trait = peasant_leader
+            OR = {
+                has_trait = peasant_leader
+                has_trait = populist_leader
+            }
         }
         every_realm_county = {
-            if = {
-                limit = { has_county_modifier = riseandfall_nationalist_revolt }
-                remove_county_modifier = riseandfall_nationalist_revolt
-            }
-            if = {
-                limit = { has_county_modifier = riseandfall_authority_collapse }
-                remove_county_modifier = riseandfall_authority_collapse
-            }
+            riseandfall_clear_low_stability_county_modifiers_se = yes
         }
     }
 }
