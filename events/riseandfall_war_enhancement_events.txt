@@ -493,7 +493,7 @@ riseandfall_war_enhancement.2 = {
 						has_government = meritocratic_government
 						has_government = steppe_admin_government
 						has_government = japan_administrative_government
-						has_government = japan_fuedal_government
+						has_government = japan_feudal_government
 					}
 				}
 			}
@@ -1009,7 +1009,7 @@ riseandfall_war_enhancement.5 = { #Everything is falling apart, try to escape or
 			}
 			root = {
 				every_knight = {
-					limit = { is alive = yes is_imprisoned = no }
+					limit = { is_alive = yes is_imprisoned = no }
 					random_list = {
 						60 = { death = { death_reason = death_battle } }
 						20 = { add_trait = wounded_1 }
@@ -1028,7 +1028,7 @@ riseandfall_war_enhancement.5 = { #Everything is falling apart, try to escape or
 			}
 			root = {
 				every_knight = {
-					limit = { is alive = yes is_imprisoned = no }
+					limit = { is_alive = yes is_imprisoned = no }
 					random_list = {
 						30 = { death = { death_reason = death_battle } }
 						20 = { add_trait = wounded_1 }
@@ -1047,7 +1047,7 @@ riseandfall_war_enhancement.5 = { #Everything is falling apart, try to escape or
 			}
 			root = {
 				every_knight = {
-					limit = { is alive = yes is_imprisoned = no }
+					limit = { is_alive = yes is_imprisoned = no }
 					random_list = {
 						20 = { death = { death_reason = death_battle } }
 						10 = { add_trait = wounded_1 }
@@ -1066,7 +1066,7 @@ riseandfall_war_enhancement.5 = { #Everything is falling apart, try to escape or
 			}
 			root = {
 				every_knight = {
-					limit = { is alive = yes is_imprisoned = no }
+					limit = { is_alive = yes is_imprisoned = no }
 					random_list = {
 						10 = { death = { death_reason = death_battle } }
 						10 = { add_trait = wounded_1 }
@@ -1106,7 +1106,7 @@ riseandfall_war_enhancement.5 = { #Everything is falling apart, try to escape or
 				has_trait = lunatic_genetic
 				has_character_flag = make_suicide_available
 				has_character_flag = mourning_soulmate
-				has_character_flag = extremely_high_stress
+				stress >= extremely_high_stress
 			}
 		}
 	
@@ -1140,7 +1140,7 @@ riseandfall_war_enhancement.5 = { #Everything is falling apart, try to escape or
 			}
 			modifier = {
 				add = 10
-				has_trait = extremely_high_stress
+				stress >= extremely_high_stress
 			}
 			modifier = {
 				factor = 2

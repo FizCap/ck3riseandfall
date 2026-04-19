@@ -7,12 +7,18 @@ on_war_won_attacker = {
 	}
 }
 
+on_death = {
+	on_actions = {
+		riseandfall_war_enhancement_on_death
+	}
+}
+
 # Scripted effect triggered when the attacker wins a war.
 # Handles post-war succession and rebellion mechanics for specific casus belli.
 riseandfall_war_enhancement_war_won = {
-    trigger = {
-        has_game_rule = riseandfall_war_enhancement_enabled
-    }
+	trigger = {
+		has_game_rule = riseandfall_war_enhancement_enabled
+	}
 	effect = {
 		if = {
 			limit = {
@@ -45,9 +51,9 @@ riseandfall_war_enhancement_war_won = {
 			scope:war = {
 				ordered_war_attacker = {
 					limit = {
-						is_vassal_of = scope:riseandfall_war_enhancement_liege 
+						is_vassal_of = scope:riseandfall_war_enhancement_liege
 					}
-					order_by = { 
+					order_by = {
 						add = current_military_strength
 						add = {
 							value = diplomacy
@@ -80,26 +86,26 @@ riseandfall_war_enhancement_war_won = {
 					OR = {
 						#strongest military contender
 						AND = {
-							scope:riseandfall_war_enhancement_contender = { 
+							scope:riseandfall_war_enhancement_contender = {
 								current_military_strength > scope:riseandfall_war_enhancement_rebellion_leader.current_military_strength
 							}
-							scope:war = { 
+							scope:war = {
 								war_contribution = {
-									target = scope:riseandfall_war_enhancement_contender 
+									target = scope:riseandfall_war_enhancement_contender
 									value > 40%
 								}
 							}
 						}
 						#diplomatic option
 						AND = {
-							scope:riseandfall_war_enhancement_contender = { 
+							scope:riseandfall_war_enhancement_contender = {
 								diplomacy > scope:riseandfall_war_enhancement_rebellion_leader.diplomacy
 								martial > scope:riseandfall_war_enhancement_rebellion_leader.martial
 								current_military_strength > scope:riseandfall_war_enhancement_rebellion_leader.current_military_strength
 							}
-							scope:war = { 
+							scope:war = {
 								war_contribution = {
-									target = scope:riseandfall_war_enhancement_contender 
+									target = scope:riseandfall_war_enhancement_contender
 									value > 25%
 								}
 							}
@@ -129,188 +135,76 @@ riseandfall_war_enhancement_war_won = {
 		}
 	}
 }
+
+riseandfall_war_enhancement_on_death = {
+	trigger = {
+		has_game_rule = riseandfall_war_enhancement_enabled
+		exists = scope:killer
+		scope:killer = {
+			is_independent_ruler = yes
+		}
+	}
 	effect = {
+		save_scope_as = killed_man
+		every_close_family_member = { # find family members
+			limit = {
+				this.liege = scope:killer
+				highest_held_title_tier >= tier_county
+				is_at_war_with_liege = no
+				is_imprisoned = no
+			}
+			add_to_list = riseandfall_war_enhancement_members
+		}
 		if = {
 			limit = {
-				exists = scope:killer
-				scope:killer = {
-					is_independent_ruler = yes
+				exists = scope:killed_man.primary_heir
+				scope:killed_man.primary_heir.liege = scope:killer
+				scope:killed_man.primary_heir = {
+					age > 10
 				}
-			}
-			save_scope_as = killed_man
-			every_close_family_member = { # find family members
-				limit = {
-					this.liege = scope:killer
-					highest_held_title_tier >= tier_county
-					is_at_war_with_liege = no
-					is_imprisoned = no
-				}
-				add_to_list = riseandfall_war_enhancement_members
 			}
 			if = {
 				limit = {
-					exists = scope:killed_man.primary_heir
-					scope:killed_man.primary_heir.liege = scope:killer
 					scope:killed_man.primary_heir = {
-						age > 10
-					}
-					
-				}
-				if = {
-					limit = {
-						scope:killed_man.primary_heir = {
-							is_in_list = riseandfall_war_enhancement_members
-						}
-					}
-					scope:killed_man.primary_heir = {
-						save_scope_as = riseandfall_war_enhancement_highest_title_man
-						remove_from_list = riseandfall_war_enhancement_members
+						is_in_list = riseandfall_war_enhancement_members
 					}
 				}
-				else = {
-					scope:killed_man.primary_heir = {
-						save_scope_as = riseandfall_war_enhancement_highest_title_man
-					}
-				}
-				
-			}
-			if = {
-				limit = {
-					NOT = { exists = scope:riseandfall_war_enhancement_highest_title_man }
-				}
-				ordered_in_list = {
-					list = riseandfall_war_enhancement_members
-					order_by = highest_held_title_tier
-					position = 0
+				scope:killed_man.primary_heir = {
 					save_scope_as = riseandfall_war_enhancement_highest_title_man
 					remove_from_list = riseandfall_war_enhancement_members
 				}
 			}
-			scope:riseandfall_war_enhancement_highest_title_man = {
-				trigger_event = {
-					id = riseandfall_war_enhancement.3
-					days = 1
+			else = {
+				scope:killed_man.primary_heir = {
+					save_scope_as = riseandfall_war_enhancement_highest_title_man
 				}
 			}
-			every_in_list = {
+		}
+		if = {
+			limit = {
+				NOT = { exists = scope:riseandfall_war_enhancement_highest_title_man }
+			}
+			ordered_in_list = {
 				list = riseandfall_war_enhancement_members
-				trigger_event = {
-					id = riseandfall_war_enhancement.4
-					days = 4
-				}
+				order_by = highest_held_title_tier
+				position = 0
+				save_scope_as = riseandfall_war_enhancement_highest_title_man
 				remove_from_list = riseandfall_war_enhancement_members
 			}
 		}
-	}
-
-riseandfall_war_enhancement_war_won = {
-    trigger = {
-        has_game_rule = riseandfall_war_enhancement_enabled
-    }
-	effect = {
-		if = {
-			limit = {
-				scope:war = {
-					OR = {
-						using_cb = liberty_faction_war
-						using_cb = refused_liege_demand_war
-						#using_cb = depose_war
-					}
-				}
+		scope:riseandfall_war_enhancement_highest_title_man = {
+			trigger_event = {
+				id = riseandfall_war_enhancement.3
+				days = 1
 			}
-			scope:defender = {
-				save_scope_as = riseandfall_war_enhancement_prev_liege
+		}
+		every_in_list = {
+			list = riseandfall_war_enhancement_members
+			trigger_event = {
+				id = riseandfall_war_enhancement.4
+				days = 4
 			}
-			scope:defender.primary_title = {
-				save_scope_as = riseandfall_war_enhancement_liege_primary_title
-			}
-			
-			scope:attacker.liege = {
-				save_scope_as = riseandfall_war_enhancement_liege
-			}
-			scope:attacker = {
-				save_scope_as = riseandfall_war_enhancement_rebellion_leader
-			}
-			scope:war = {
-				ordered_war_attacker = {
-					limit = {
-						is_vassal_of = scope:riseandfall_war_enhancement_liege 
-					}
-					order_by = { 
-						add = current_military_strength
-						add = {
-							value = diplomacy
-							multiply = 35
-						}
-						add = {
-							value = martial
-							multiply = 50
-						}
-						add = {
-							value = stewardship
-							multiply = 20
-						}
-						add = {
-							value = intrigue
-							multiply = 20
-						}
-						add = {
-							value = learning
-							multiply = 20
-						}
-					}
-					save_scope_as = riseandfall_war_enhancement_contender
-				}
-			}
-			
-			if = {
-				limit = {
-					OR = {
-						#strongest military contender
-						AND = {
-							scope:riseandfall_war_enhancement_contender = { 
-								current_military_strength > scope:riseandfall_war_enhancement_rebellion_leader.current_military_strength
-							}
-							scope:war = { 
-								war_contribution = {
-									target = scope:riseandfall_war_enhancement_contender 
-									value > 40%
-								}
-							}
-						}
-						#diplomatic option
-						AND = {
-							scope:riseandfall_war_enhancement_contender = { 
-								diplomacy > scope:riseandfall_war_enhancement_rebellion_leader.diplomacy
-								martial > scope:riseandfall_war_enhancement_rebellion_leader.martial
-								current_military_strength > scope:riseandfall_war_enhancement_rebellion_leader.current_military_strength
-							}
-							scope:war = { 
-								war_contribution = {
-									target = scope:riseandfall_war_enhancement_contender 
-									value > 25%
-								}
-							}
-						}
-					}
-				}
-				scope:riseandfall_war_enhancement_contender = {
-					clear_saved_scope = riseandfall_war_enhancement_contender
-					save_scope_as = riseandfall_war_enhancement_attacker
-				}
-			}
-			else = {
-				scope:riseandfall_war_enhancement_rebellion_leader = {
-					clear_saved_scope = riseandfall_war_enhancement_rebellion_leader
-					save_scope_as = riseandfall_war_enhancement_attacker
-				}
-			}
-
-			scope:defender = {
-				trigger_event = {
-					id = riseandfall_war_enhancement.5 #everything is falling apart!
-				}
-			}
+			remove_from_list = riseandfall_war_enhancement_members
 		}
 	}
 }
