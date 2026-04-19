@@ -763,22 +763,23 @@ riseandfall_calculate_realm_stability_se = {
         }
         set_variable = { name = riseandfall_rs_succession_component value = var:riseandfall_rs_succession_shock }
         change_variable = { name = riseandfall_rs_succession_component multiply = -1 }
-        clamp_variable = { name = riseandfall_rs_succession_component min = -50 max = 0 }
+        clamp_variable = { name = riseandfall_rs_succession_component min = -50 max = 50 }
 
-        # Decay the stored shock by 5% yearly, with a minimum decay step of 1, so it fades away.
+        # Decay the stored shock toward zero by 5% yearly, with a minimum step of 1.
         set_variable = { name = tmp_rs_succession_decay value = var:riseandfall_rs_succession_shock }
+        if = { limit = { var:tmp_rs_succession_decay < 0 } change_variable = { name = tmp_rs_succession_decay multiply = -1 } }
         change_variable = { name = tmp_rs_succession_decay add = 19 }
         change_variable = { name = tmp_rs_succession_decay divide = 20 }
         if = { limit = { var:tmp_rs_succession_decay < 1 } set_variable = { name = tmp_rs_succession_decay value = 1 } }
         set_variable = { name = tmp_rs_succession_decay_neg value = var:tmp_rs_succession_decay }
-        change_variable = { name = tmp_rs_succession_decay_neg multiply = -1 }
+        if = { limit = { var:riseandfall_rs_succession_shock > 0 } change_variable = { name = tmp_rs_succession_decay_neg multiply = -1 } }
         change_variable = { name = riseandfall_rs_succession_shock add = var:tmp_rs_succession_decay_neg }
         if = {
-            limit = { var:riseandfall_rs_succession_shock <= 0 }
+            limit = { var:riseandfall_rs_succession_shock = 0 }
             remove_variable = riseandfall_rs_succession_shock
         }
         else = {
-            clamp_variable = { name = riseandfall_rs_succession_shock min = 1 max = 50 }
+            clamp_variable = { name = riseandfall_rs_succession_shock min = -50 max = 50 }
         }
     }
 
@@ -1307,64 +1308,55 @@ riseandfall_mark_story_succession_shock_se = {
         # Predecessor may be alive in a stepdown/overthrow succession.
         set_variable = { name = tmp_rs_succession_shock value = 0 }
 
-        # Each lost point in Diplomacy/Martial/Stewardship/Intrigue/Learning adds 2 shock.
-        # Gains or ties do not reduce the penalty; total shock is capped at 50.
+        # Each stat delta is capped at ±10.
+        # We only want a penalty, so positive total deltas are stored as shock;
+        # negative totals are clamped to 0 after aggregation.
         set_variable = { name = tmp_rs_stat_drop value = scope:predecessor.diplomacy }
         set_variable = { name = tmp_rs_current_stat value = diplomacy }
         change_variable = { name = tmp_rs_current_stat multiply = -1 }
         change_variable = { name = tmp_rs_stat_drop add = var:tmp_rs_current_stat }
-        if = {
-            limit = { var:tmp_rs_stat_drop > 0 }
-            change_variable = { name = tmp_rs_stat_drop multiply = 2 }
-            change_variable = { name = tmp_rs_succession_shock add = var:tmp_rs_stat_drop }
-        }
+        if = { limit = { var:tmp_rs_stat_drop > 10 } set_variable = { name = tmp_rs_stat_drop value = 10 } }
+        else_if = { limit = { var:tmp_rs_stat_drop < -10 } set_variable = { name = tmp_rs_stat_drop value = -10 } }
+        change_variable = { name = tmp_rs_succession_shock add = var:tmp_rs_stat_drop }
 
         set_variable = { name = tmp_rs_stat_drop value = scope:predecessor.martial }
         set_variable = { name = tmp_rs_current_stat value = martial }
         change_variable = { name = tmp_rs_current_stat multiply = -1 }
         change_variable = { name = tmp_rs_stat_drop add = var:tmp_rs_current_stat }
-        if = {
-            limit = { var:tmp_rs_stat_drop > 0 }
-            change_variable = { name = tmp_rs_stat_drop multiply = 2 }
-            change_variable = { name = tmp_rs_succession_shock add = var:tmp_rs_stat_drop }
-        }
+        if = { limit = { var:tmp_rs_stat_drop > 10 } set_variable = { name = tmp_rs_stat_drop value = 10 } }
+        else_if = { limit = { var:tmp_rs_stat_drop < -10 } set_variable = { name = tmp_rs_stat_drop value = -10 } }
+        change_variable = { name = tmp_rs_succession_shock add = var:tmp_rs_stat_drop }
 
         set_variable = { name = tmp_rs_stat_drop value = scope:predecessor.stewardship }
         set_variable = { name = tmp_rs_current_stat value = stewardship }
         change_variable = { name = tmp_rs_current_stat multiply = -1 }
         change_variable = { name = tmp_rs_stat_drop add = var:tmp_rs_current_stat }
-        if = {
-            limit = { var:tmp_rs_stat_drop > 0 }
-            change_variable = { name = tmp_rs_stat_drop multiply = 2 }
-            change_variable = { name = tmp_rs_succession_shock add = var:tmp_rs_stat_drop }
-        }
+        if = { limit = { var:tmp_rs_stat_drop > 10 } set_variable = { name = tmp_rs_stat_drop value = 10 } }
+        else_if = { limit = { var:tmp_rs_stat_drop < -10 } set_variable = { name = tmp_rs_stat_drop value = -10 } }
+        change_variable = { name = tmp_rs_succession_shock add = var:tmp_rs_stat_drop }
 
         set_variable = { name = tmp_rs_stat_drop value = scope:predecessor.intrigue }
         set_variable = { name = tmp_rs_current_stat value = intrigue }
         change_variable = { name = tmp_rs_current_stat multiply = -1 }
         change_variable = { name = tmp_rs_stat_drop add = var:tmp_rs_current_stat }
-        if = {
-            limit = { var:tmp_rs_stat_drop > 0 }
-            change_variable = { name = tmp_rs_stat_drop multiply = 2 }
-            change_variable = { name = tmp_rs_succession_shock add = var:tmp_rs_stat_drop }
-        }
+        if = { limit = { var:tmp_rs_stat_drop > 10 } set_variable = { name = tmp_rs_stat_drop value = 10 } }
+        else_if = { limit = { var:tmp_rs_stat_drop < -10 } set_variable = { name = tmp_rs_stat_drop value = -10 } }
+        change_variable = { name = tmp_rs_succession_shock add = var:tmp_rs_stat_drop }
 
         set_variable = { name = tmp_rs_stat_drop value = scope:predecessor.learning }
         set_variable = { name = tmp_rs_current_stat value = learning }
         change_variable = { name = tmp_rs_current_stat multiply = -1 }
         change_variable = { name = tmp_rs_stat_drop add = var:tmp_rs_current_stat }
-        if = {
-            limit = { var:tmp_rs_stat_drop > 0 }
-            change_variable = { name = tmp_rs_stat_drop multiply = 2 }
-            change_variable = { name = tmp_rs_succession_shock add = var:tmp_rs_stat_drop }
-        }
+        if = { limit = { var:tmp_rs_stat_drop > 10 } set_variable = { name = tmp_rs_stat_drop value = 10 } }
+        else_if = { limit = { var:tmp_rs_stat_drop < -10 } set_variable = { name = tmp_rs_stat_drop value = -10 } }
+        change_variable = { name = tmp_rs_succession_shock add = var:tmp_rs_stat_drop }
 
-        clamp_variable = { name = tmp_rs_succession_shock min = 0 max = 50 }
+        clamp_variable = { name = tmp_rs_succession_shock min = -50 max = 50 }
 
         if = {
             limit = { var:tmp_rs_succession_shock > 0 }
             set_variable = { name = riseandfall_rs_succession_shock value = var:tmp_rs_succession_shock }
-            clamp_variable = { name = riseandfall_rs_succession_shock min = 1 max = 50 }
+            clamp_variable = { name = riseandfall_rs_succession_shock min = 0 max = 50 }
         }
         else = {
             remove_variable = riseandfall_rs_succession_shock
