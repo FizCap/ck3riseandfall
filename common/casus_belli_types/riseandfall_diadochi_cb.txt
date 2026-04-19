@@ -152,7 +152,7 @@
         # realm title after being vassalized.
         if = {
             limit = { exists = scope:rf_defender_split_title }
-            destroy_title = scope:rf_defender_split_title
+            scope:attacker = { destroy_title = scope:rf_defender_split_title }
         }
 
         scope:defender = { ep3_war_loss_adventurer_tt_effect = yes }

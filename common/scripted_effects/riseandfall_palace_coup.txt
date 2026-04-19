@@ -824,7 +824,7 @@ riseandfall_palace_coup_root_flees_success = {
 		limit = {
 			scope:original_ruler = {
 				is_landed = yes
-				is_vassal = yes
+				is_independent_ruler = no
 				NOT = { liege = scope:palace_coup_challenger }
 				# Tier check: challenger must hold a higher-tier title or CK3 will reject the vassalage
 				primary_title.tier < scope:palace_coup_challenger.primary_title.tier
@@ -845,7 +845,7 @@ riseandfall_palace_coup_root_flees_success = {
 	}
 
 	if = {
-		limit = { scope:original_ruler = { is_landed = yes is_vassal = yes } }
+		limit = { scope:original_ruler = { is_landed = yes is_independent_ruler = no } }
 		scope:original_ruler = { add_character_flag = rf_forced_breakaway_seed }
 	}
 
@@ -877,7 +877,7 @@ riseandfall_palace_coup_root_flees_success = {
 		limit = {
 			scope:original_ruler = {
 				is_landed = yes
-				is_vassal = yes
+				is_independent_ruler = no
 			}
 		}
 		create_title_and_vassal_change = {

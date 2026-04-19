@@ -57,7 +57,8 @@ warlord.1002 = {
                 }
             }
             modifier = {
-                subtract = scope:liege_opinion
+                add = { subtract = scope:liege_opinion }
+                always = yes
             }
             modifier = {
                 add = 40
@@ -189,7 +190,8 @@ warlord.1003 = {
                 add = 100
             }
             modifier = {
-                subtract = scope:liege_opinion
+                add = { subtract = scope:liege_opinion }
+                always = yes
             }
             modifier = {
                 add = 40
