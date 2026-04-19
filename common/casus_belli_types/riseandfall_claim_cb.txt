@@ -1,49 +1,36 @@
-﻿adventurer_claim_cb = {
+adventurer_claim_cb = {
     icon = claim_cb
     group = claim
-    # Minor change from vanilla: allow landless adventurer attackers to press multiple claims
-    # by exempting them from the mutually_exclusive_titles check below. Other actors keep
-    # the original behavior.
     mutually_exclusive_titles = {
-        trigger_if = {
-            limit = {
-                scope:attacker = { government_has_flag = government_is_landless_adventurer }
-            }
-            # Adventurer attackers (landless adventurers) are allowed to press multiple
-            # claims when declaring wars — do not treat titles as mutually exclusive.
-            always = no
-        }
-        trigger_else = {
-            NOT = {
-                # If pushing personal claims, you can press multiple claims with the Divine Right innovation (High Medieval Era).
-                trigger_if = {
-                    limit = {
-                        scope:attacker = scope:claimant
-                    }
-                    scope:attacker = {
-                        OR = {
-                            culture = {
-                                has_innovation = innovation_chronicle_writing
-                            }
-                            AND = {
-                                government_has_flag = government_is_landless_adventurer
-                                has_realm_law = camp_purpose_legitimists
-                                var:legitimist_claimed_title = {
-                                    OR = {
-                                        holder = scope:defender
-                                        de_jure_liege = scope:defender
-                                    }
+        NOT = {
+            # If pushing personal claims, you can press multiple claims with the Divine Right innovation (High Medieval Era).
+            trigger_if = {
+                limit = {
+                    scope:attacker = scope:claimant
+                }
+                scope:attacker = {
+                    OR = {
+                        culture = {
+                            has_innovation = innovation_chronicle_writing
+                        }
+                        AND = {
+                            government_has_flag = government_is_landless_adventurer
+                            has_realm_law = camp_purpose_legitimists
+                            var:legitimist_claimed_title = {
+                                OR = {
+                                    holder = scope:defender
+                                    de_jure_liege = scope:defender
                                 }
                             }
                         }
                     }
                 }
-                # If pushing claims for someone else, you need the Rightful Ownership innovation to press multiple claims (Late Medieval Era).
-                trigger_else = {
-                    scope:attacker = {
-                        culture = {
-                            has_innovation = innovation_divine_right
-                        }
+            }
+            # If pushing claims for someone else, you need the Rightful Ownership innovation (Late Medieval Era).
+            trigger_else = {
+                scope:attacker = {
+                    culture = {
+                        has_innovation = innovation_divine_right
                     }
                 }
             }
@@ -304,6 +291,13 @@
     }
 
     on_victory = {
+        # Find the highest-tier claimed title (required by ep3_landless_invasion_titles_taken_effect)
+        ordered_in_list = {
+            list = target_titles
+            order_by = tier
+            save_scope_as = target
+        }
+
         scope:attacker = {
             if = {
                 limit = {
@@ -369,14 +363,33 @@
                 limit = {
                     is_independent_ruler = yes
                     government_allows = administrative
-                    primary_title = { is_in_list = target_titles }
+                    exists = scope:target
                 }
                 every_held_title = {
                     limit = {
                         is_noble_family_title = no
                         tier >= tier_county
+                        OR = {
+                            this = scope:target
+                            target_is_de_jure_liege_or_above = scope:target
+                        }
                     }
                     add_to_list = target_titles
+                }
+            }
+        }
+
+        # Use vanilla's ep3 landless invasion effect for full realm transfer:
+        # transfers the entire realm (including non-de-jure territory) via
+        # change_title_holder_include_vassals, matching vanilla claim_cb behaviour.
+        scope:claimant = {
+            if = {
+                limit = { is_landless_adventurer = yes }
+                ep3_landless_invasion_titles_taken_effect = {
+                    TITLE_GIVER = scope:defender
+                    TITLE_RECEIVER = scope:claimant
+                    TITLE = scope:target
+                    TITLE_LIST = target_titles
                 }
             }
         }
