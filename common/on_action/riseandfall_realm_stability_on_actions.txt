@@ -47,6 +47,19 @@ on_title_gain_inheritance = {
 on_title_gain = {
     on_actions = {
         riseandfall_on_title_gain_inheritance
+        riseandfall_peasant_realm_cleanup_on_structure_change
+    }
+}
+
+on_vassal_gained = {
+    on_actions = {
+        riseandfall_peasant_realm_cleanup_on_structure_change
+    }
+}
+
+on_vassal_change = {
+    on_actions = {
+        riseandfall_peasant_realm_cleanup_on_structure_change
     }
 }
 
@@ -167,6 +180,25 @@ riseandfall_on_title_gain_inheritance = {
             # No previous holder data or rank check failed; initialize fresh calculation
             riseandfall_calculate_realm_stability_se = yes
         }
+    }
+}
+
+riseandfall_peasant_realm_cleanup_on_structure_change = {
+    trigger = {
+        has_game_rule = riseandfall_realm_stability_enabled
+        is_landed = yes
+        has_trait = peasant_leader
+        OR = {
+            any_realm_county = {
+                has_county_modifier = riseandfall_nationalist_revolt
+            }
+            any_realm_county = {
+                has_county_modifier = riseandfall_authority_collapse
+            }
+        }
+    }
+    effect = {
+        riseandfall_clear_peasant_victory_low_stability_modifiers_se = yes
     }
 }
 
