@@ -120,8 +120,8 @@
 		scope:actor = {
 			trigger_if = {
 				limit = {
-						NOT = { government_allows = administrative }
-						NOT = { has_trait = warlord }
+					NOT = { government_allows = administrative }
+					NOT = { has_trait = warlord }
 					liege ?= {
 						has_realm_law_flag = vassal_all_wars_banned_permanent
 						this != scope:actor
@@ -143,7 +143,7 @@
 							has_participant_group_parameter = dynastic_cycle_vassal_internal_wars_allowed
 						}
 					}
-						NOT = { has_trait = warlord }
+					NOT = { has_trait = warlord }
 				}
 				custom_tooltip = {
 					text = admin_cannot_declare_internal_wars
