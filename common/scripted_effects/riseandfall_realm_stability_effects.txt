@@ -24,27 +24,8 @@ riseandfall_calculate_realm_stability_se = {
     remove_variable = riseandfall_rs_foreign_culture_county_pct
     remove_variable = riseandfall_rs_foreign_faith_county_pct
 
-    # Clean up legacy story-mode variables now that these factors feed stability directly.
-    remove_variable = riseandfall_large_realm
-    remove_variable = riseandfall_very_large_realm
-    remove_variable = riseandfall_massive_realm
-    remove_variable = riseandfall_story_fracture_pressure
-    remove_variable = riseandfall_story_strong_vassal_count
-    remove_variable = riseandfall_story_noncore_regions
-    remove_variable = riseandfall_story_foreign_culture_county_pct
-    remove_variable = riseandfall_story_foreign_faith_county_pct
-    remove_variable = riseandfall_story_contrib_realm_size
-    remove_variable = riseandfall_story_contrib_strong_vassals
-    remove_variable = riseandfall_story_contrib_noncore_regions
-    remove_variable = riseandfall_story_contrib_foreign_culture
-    remove_variable = riseandfall_story_contrib_foreign_faith
-    remove_variable = riseandfall_story_contrib_resilience
-    remove_variable = riseandfall_story_aligned_identity_dev
-    remove_variable = riseandfall_story_foreign_identity_dev
-    remove_variable = riseandfall_story_foreign_identity_dev_ratio
-    remove_variable = riseandfall_story_succession_shock
-    remove_variable = riseandfall_realm_stability_puppet_regency_multiplier
-    remove_variable = riseandfall_realm_stability_puppet_regency_years_tooltip
+    # Legacy story-mode variables were removed from active use.
+    # Avoid removing unset legacy vars here because CK3 logs that as a live use.
 
     ########################################
     # GLOBAL STAT AVERAGE CACHE (recomputed every 10 calendar years)
@@ -717,9 +698,6 @@ riseandfall_calculate_realm_stability_se = {
 
         remove_variable = tmp_story_world_total
         remove_variable = tmp_rs_realm_pct
-        remove_variable = tmp_story_world_total_5
-        remove_variable = tmp_story_world_total_10
-        remove_variable = tmp_story_world_total_15
         remove_variable = tmp_story_strong_vassal_threshold
         remove_variable = tmp_story_strong_vassals
         remove_variable = tmp_story_realm_counties
@@ -1394,8 +1372,6 @@ riseandfall_mark_story_succession_shock_se = {
         else = {
             remove_variable = riseandfall_rs_succession_shock
         }
-
-        remove_variable = riseandfall_story_succession_shock
     }
 }
 
@@ -1534,8 +1510,6 @@ riseandfall_clear_unlanded_stability_vars_se = {
         remove_variable = riseandfall_rs_popular_opinion_component
         remove_variable = riseandfall_rs_use_diarch_stats
         remove_variable = riseandfall_puppet_regency_years
-        remove_variable = riseandfall_realm_stability_puppet_regency_multiplier
-        remove_variable = riseandfall_realm_stability_puppet_regency_years_tooltip
         remove_variable = riseandfall_rs_civil_war_years
         remove_variable = riseandfall_realm_stability_civil_war_penalty
         remove_variable = riseandfall_realm_stability_war_multiplier
@@ -1544,24 +1518,6 @@ riseandfall_clear_unlanded_stability_vars_se = {
         remove_variable = riseandfall_realm_stability_sex_law_penalty
         remove_variable = riseandfall_rs_adjust_months
         remove_variable = riseandfall_realm_stability_predicted_change
-        remove_variable = riseandfall_large_realm
-        remove_variable = riseandfall_very_large_realm
-        remove_variable = riseandfall_massive_realm
-        remove_variable = riseandfall_story_fracture_pressure
-        remove_variable = riseandfall_story_strong_vassal_count
-        remove_variable = riseandfall_story_noncore_regions
-        remove_variable = riseandfall_story_foreign_culture_county_pct
-        remove_variable = riseandfall_story_foreign_faith_county_pct
-        remove_variable = riseandfall_story_succession_shock
-        remove_variable = riseandfall_story_contrib_realm_size
-        remove_variable = riseandfall_story_contrib_strong_vassals
-        remove_variable = riseandfall_story_contrib_noncore_regions
-        remove_variable = riseandfall_story_contrib_foreign_culture
-        remove_variable = riseandfall_story_contrib_foreign_faith
-        remove_variable = riseandfall_story_contrib_resilience
-        remove_variable = riseandfall_story_aligned_identity_dev
-        remove_variable = riseandfall_story_foreign_identity_dev
-        remove_variable = riseandfall_story_foreign_identity_dev_ratio
         # Remove any fine-grained stability modifiers (0..100)
         remove_character_modifier = riseandfall_stability_0
         remove_character_modifier = riseandfall_stability_1

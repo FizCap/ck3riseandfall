@@ -500,7 +500,7 @@ riseandfall_palace_coup_challenger_wins_prowess_duel = {
 			
 			# Assign employer to challenger
 			if = {
-				limit = { employer != scope:challenger scope:event_root = { has_variable = challenger_camp_created } }
+				limit = { employer != scope:challenger }
 				if = { limit = { exists = scope:challenger scope:challenger = { is_alive = yes NOT = { is_ruler = yes } has_title = scope:palace_coup_challenger_camp_title } } set_employer = scope:challenger }
 			}
 			random = {
@@ -1144,7 +1144,7 @@ riseandfall_palace_coup_root_flees_success = {
 			
 			# Assign employer to challenger when possible
 			if = {
-				limit = { employer != scope:challenger scope:event_root = { has_variable = challenger_camp_created } }
+				limit = { employer != scope:challenger }
 				if = { limit = { exists = scope:challenger scope:challenger = { is_alive = yes NOT = { is_ruler = yes } has_title = scope:palace_coup_challenger_camp_title } } set_employer = scope:challenger }
 			}
 			random = {
@@ -1233,7 +1233,6 @@ riseandfall_palace_coup_root_flees_failure = {
 riseandfall_palace_coup_cleanup_camp = {
 	if = {
 		limit = {
-			scope:event_root = { is_alive = yes has_variable = challenger_camp_created }
 			exists = scope:palace_coup_challenger_camp_title
 			scope:challenger = { is_alive = yes has_title = scope:palace_coup_challenger_camp_title }
 		}
@@ -1241,13 +1240,10 @@ riseandfall_palace_coup_cleanup_camp = {
 	}
 	else_if = {
 		limit = {
-			scope:event_root = { is_alive = yes has_variable = challenger_camp_created }
 			exists = scope:palace_coup_challenger_camp_title
 		}
 		root = { destroy_title = scope:palace_coup_challenger_camp_title }
 	}
-	# Remove marker variable from event_root
-	scope:event_root = { if = { limit = { is_alive = yes } remove_variable = challenger_camp_created } }
 	# Remove temporary variables from event_root
 	scope:event_root = { 
 		if = { limit = { is_alive = yes } 
@@ -1261,7 +1257,6 @@ riseandfall_palace_coup_cleanup_camp = {
 	root = { 
 		if = { limit = { is_alive = yes has_variable = riseandfall_total_prowess } remove_variable = riseandfall_total_prowess }
 		if = { limit = { is_alive = yes has_variable = riseandfall_total_prowess_root } remove_variable = riseandfall_total_prowess_root }
-		if = { limit = { is_alive = yes has_variable = riseandfall_total_prowess_margin } remove_variable = riseandfall_total_prowess_margin }
 		remove_variable = lost_titles
 	}
 	if = { limit = { exists = scope:challenger scope:challenger = { is_alive = yes } } 
