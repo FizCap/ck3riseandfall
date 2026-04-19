@@ -390,11 +390,9 @@ riseandfall_calculate_realm_stability_se = {
     set_variable = { name = riseandfall_rs_legitimacy_multiplier value = 100 }
 
     # Theocracy uses piety_level (0..5). Other governments with legitimacy use
-    # their respective `legitimacy_level` ranges. We use non-linear, per-government
-    # lookup tables here (explicit values) so higher-tier jumps produce much
-    # larger changes — this reflects how much harder high-level progression is.
-    # NOTE: We do not modify vanilla script_values here; this mapping only affects
-    # the realm stability multiplier applied by the mod.
+    # raw legitimacy progress against the vanilla max for their legitimacy system.
+    # That keeps the mod's output in the same -20..+15 band, but scales smoothly
+    # across different tiers/eras instead of snapping at legitimacy-level breakpoints.
     if = {
         limit = { has_government = theocracy_government }
         set_variable = { name = tmp_piety value = piety_level }
@@ -409,46 +407,34 @@ riseandfall_calculate_realm_stability_se = {
     else = {
         if = {
             limit = { has_legitimacy = yes }
-            # Mandala: treat as a wide progression but make late steps very costly
+            set_variable = { name = tmp_leg_current value = legitimacy }
             if = {
                 limit = { government_has_flag = government_is_mandala }
-                set_variable = { name = tmp_mand value = legitimacy_level }
-                if = { limit = { var:tmp_mand = 0 } set_variable = { name = tmp_mand_mapped value = 50 } }
-                else_if = { limit = { var:tmp_mand = 1 } set_variable = { name = tmp_mand_mapped value = 54 } }
-                else_if = { limit = { var:tmp_mand = 2 } set_variable = { name = tmp_mand_mapped value = 60 } }
-                else_if = { limit = { var:tmp_mand = 3 } set_variable = { name = tmp_mand_mapped value = 68 } }
-                else_if = { limit = { var:tmp_mand = 4 } set_variable = { name = tmp_mand_mapped value = 78 } }
-                else_if = { limit = { var:tmp_mand = 5 } set_variable = { name = tmp_mand_mapped value = 86 } }
-                else_if = { limit = { var:tmp_mand = 6 } set_variable = { name = tmp_mand_mapped value = 94 } }
-                else_if = { limit = { var:tmp_mand = 7 } set_variable = { name = tmp_mand_mapped value = 98 } }
-                else = { set_variable = { name = tmp_mand_mapped value = 100 } }
-                set_variable = { name = riseandfall_rs_legitimacy_multiplier value = var:tmp_mand_mapped }
+                set_variable = { name = tmp_leg_max value = mandala_legitimacy_max }
             }
-            # Celestial: make the uppermost jumps much steeper than the early ones
             else_if = {
                 limit = { has_government = celestial_government }
-                set_variable = { name = tmp_cel value = legitimacy_level }
-                if = { limit = { var:tmp_cel = 0 } set_variable = { name = tmp_cel_mapped value = -20 } }
-                else_if = { limit = { var:tmp_cel = 1 } set_variable = { name = tmp_cel_mapped value = -14 } }
-                else_if = { limit = { var:tmp_cel = 2 } set_variable = { name = tmp_cel_mapped value = -7 } }
-                else_if = { limit = { var:tmp_cel = 3 } set_variable = { name = tmp_cel_mapped value = 0 } }
-                else_if = { limit = { var:tmp_cel = 4 } set_variable = { name = tmp_cel_mapped value = 6 } }
-                else_if = { limit = { var:tmp_cel = 5 } set_variable = { name = tmp_cel_mapped value = 11 } }
-                else_if = { limit = { var:tmp_cel = 6 } set_variable = { name = tmp_cel_mapped value = 14 } }
-                else = { set_variable = { name = tmp_cel_mapped value = 15 } }
-                set_variable = { name = riseandfall_rs_legitimacy_component value = var:tmp_cel_mapped }
+                set_variable = { name = tmp_leg_max value = mandate_legitimacy_max }
             }
-            # Standard governments (0..5) - moderate non-linear steps
             else = {
-                set_variable = { name = tmp_leg value = legitimacy_level }
-                if = { limit = { var:tmp_leg = 0 } set_variable = { name = tmp_leg_mapped value = -20 } }
-                else_if = { limit = { var:tmp_leg = 1 } set_variable = { name = tmp_leg_mapped value = -12 } }
-                else_if = { limit = { var:tmp_leg = 2 } set_variable = { name = tmp_leg_mapped value = -4 } }
-                else_if = { limit = { var:tmp_leg = 3 } set_variable = { name = tmp_leg_mapped value = 4 } }
-                else_if = { limit = { var:tmp_leg = 4 } set_variable = { name = tmp_leg_mapped value = 10 } }
-                else = { set_variable = { name = tmp_leg_mapped value = 15 } }
-                set_variable = { name = riseandfall_rs_legitimacy_component value = var:tmp_leg_mapped }
+                set_variable = { name = tmp_leg_max value = legitimacy_max }
             }
+
+            if = {
+                limit = { var:tmp_leg_max > 0 }
+                set_variable = { name = tmp_leg_pct value = var:tmp_leg_current }
+                change_variable = { name = tmp_leg_pct divide = var:tmp_leg_max }
+                change_variable = { name = tmp_leg_pct multiply = 100 }
+            }
+            else = {
+                set_variable = { name = tmp_leg_pct value = 0 }
+            }
+
+            clamp_variable = { name = tmp_leg_pct min = 0 max = 100 }
+            set_variable = { name = riseandfall_rs_legitimacy_component value = var:tmp_leg_pct }
+            change_variable = { name = riseandfall_rs_legitimacy_component multiply = 0.35 }
+            change_variable = { name = riseandfall_rs_legitimacy_component add = -20 }
+            round_variable = { name = riseandfall_rs_legitimacy_component nearest = 1 }
         }
         else = {
             # No legitimacy mechanic available; fall back to influence_level (0..6)
