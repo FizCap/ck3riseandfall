@@ -93,14 +93,13 @@ riseandfall_puppet_regency_years_at_least_5 = {
 	}
 }
 
-# Liege has poor or worse health (GUI shows poor=3, dying=4)
+# Liege has poor or worse health
 riseandfall_liege_has_poor_health = {
 	# Friendly failure text for UI tooltips; actual condition lives inside the tooltip block
 	custom_tooltip = {
 		text = riseandfall_liege_has_poor_health
 		scope:recipient = {
-			# Check health is 3 or lower (poor, dying)
-			health <= 3
+			health <= poor_health
 		}
 	}
 }

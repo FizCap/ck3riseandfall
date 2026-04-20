@@ -3,6 +3,7 @@
 # Note: Some tokens here are placeholders pending your scripted effects/triggers; adjust as needed.
 
 # Interaction: Steal Gold
+
 riseandfall_steal_gold_interaction = {
 	interface_priority = 100
 	common_interaction = yes
@@ -134,6 +135,12 @@ riseandfall_curry_favor_interaction = {
 		scope:actor = { NOT = { has_hook_of_type = { target = scope:recipient type = strong_favor_hook } } }
 		scope:recipient = {
 			is_independent_ruler = yes
+		}
+	}
+
+	auto_accept = yes
+
+	on_accept = {
 		custom_tooltip = { text = riseandfall_curry_favor_interaction_desc }
 		hidden_effect = {
 			riseandfall_curry_favor_effect = yes
@@ -155,12 +162,13 @@ riseandfall_curry_favor_interaction = {
 			}
 		}
 	}
+
 	# How often AI considers this by top-title tier (months)
 	ai_frequency = 12
 	# Allow AI to consider this interaction
 	ai_potential = { exists = this is_alive = yes }
 
-    ai_targets = {
+	ai_targets = {
 		ai_recipients = liege
 		max = 1
 	}
