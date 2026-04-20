@@ -1,4 +1,4 @@
-adventurer_claim_cb = {
+﻿adventurer_claim_cb = {
     icon = claim_cb
     group = claim
     mutually_exclusive_titles = {
@@ -385,6 +385,12 @@ adventurer_claim_cb = {
         scope:claimant = {
             if = {
                 limit = { is_landless_adventurer = yes }
+                # The ep3 effect relies on a new_capital being defined
+                ordered_in_list = {
+                    list = target_titles
+                    order_by = tier
+                    save_scope_as = new_capital
+                }
                 ep3_landless_invasion_titles_taken_effect = {
                     TITLE_GIVER = scope:defender
                     TITLE_RECEIVER = scope:claimant
