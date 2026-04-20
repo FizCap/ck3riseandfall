@@ -656,36 +656,14 @@ riseandfall_calculate_realm_stability_se = {
             change_variable = { name = tmp_story_nonapproved_pct add = var:tmp_story_foreign_faith_county_pct }
             change_variable = { name = tmp_story_nonapproved_pct divide = 2 }
 
-            # Tiered homogeneity/diversity component:
-            #  < 5% foreign  -> +10 (near-homogeneous realm bonus)
-            #  5-15% foreign -> +5  (mostly homogeneous)
-            #  15-30% foreign ->  0  (neutral, minor diversity)
-            #  30-50% foreign -> -10 (notable minorities)
-            #  50-70% foreign -> -20 (significantly diverse)
-            #  70%+   foreign -> -30 (predominantly foreign realm)
-            if = {
-                limit = { var:tmp_story_nonapproved_pct < 5 }
-                set_variable = { name = riseandfall_rs_culture_faith_component value = 10 }
-            }
-            else_if = {
-                limit = { var:tmp_story_nonapproved_pct < 15 }
-                set_variable = { name = riseandfall_rs_culture_faith_component value = 5 }
-            }
-            else_if = {
-                limit = { var:tmp_story_nonapproved_pct < 30 }
-                set_variable = { name = riseandfall_rs_culture_faith_component value = 0 }
-            }
-            else_if = {
-                limit = { var:tmp_story_nonapproved_pct < 50 }
-                set_variable = { name = riseandfall_rs_culture_faith_component value = -10 }
-            }
-            else_if = {
-                limit = { var:tmp_story_nonapproved_pct < 70 }
-                set_variable = { name = riseandfall_rs_culture_faith_component value = -20 }
-            }
-            else = {
-                set_variable = { name = riseandfall_rs_culture_faith_component value = -30 }
-            }
+            # Continuous homogeneity/diversity component: map 0-100% foreign -> +10..-30
+            # This preserves the same endpoints as the old tiered mapping but scales smoothly.
+            set_variable = { name = riseandfall_rs_culture_faith_component value = var:tmp_story_nonapproved_pct }
+            change_variable = { name = riseandfall_rs_culture_faith_component multiply = -4 }
+            change_variable = { name = riseandfall_rs_culture_faith_component divide = 10 }
+            change_variable = { name = riseandfall_rs_culture_faith_component add = 10 }
+            round_variable = { name = riseandfall_rs_culture_faith_component nearest = 1 }
+            clamp_variable = { name = riseandfall_rs_culture_faith_component min = -30 max = 10 }
         }
 
         if = {
