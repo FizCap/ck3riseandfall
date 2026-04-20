@@ -86,17 +86,20 @@ riseandfall_overthrow_liege_effect = {
                 }
             }
         }
-		every_held_title = {
-			limit = {
-				holder = scope:recipient
-				# Avoid changing barony-level titles directly (engine requires changing the county instead)
-				NOT = { tier = tier_barony }
-				NOT = { is_noble_family_title = yes }
-			}
-			change_title_holder = {
-				holder = scope:actor
-				change = scope:change
-				take_baronies = yes
+		# Now iterate through all held titles explicitly and assign them to actor
+		scope:recipient = {
+			every_held_title = {
+				limit = {
+					# Don't transfer the baronies again if we transfer the top county, but we just skip baronies
+					NOT = { tier = tier_barony }
+					NOT = { is_noble_family_title = yes }
+					NOT = { is_head_of_faith = yes }
+				}
+				change_title_holder = {
+					holder = scope:actor
+					change = scope:change
+					take_baronies = yes
+				}
 			}
 		}
 		every_vassal = {
