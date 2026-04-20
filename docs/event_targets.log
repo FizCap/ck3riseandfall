@@ -430,6 +430,12 @@ Output Scopes: confederation
 
 --------------------
 
+council_owner - Get council owner of scoped character, or null character if they are not a councillor
+Input Scopes: character
+Output Scopes: character
+
+--------------------
+
 council_task - Scope to the active task of the scoped councillor
 Input Scopes: character
 Output Scopes: council_task
@@ -720,13 +726,6 @@ Output Scopes: faith
 
 --------------------
 
-story - Link to the character's (first) active story of the specified key
-Requires Data: yes
-Input Scopes: character
-Output Scopes: story
-
---------------------
-
 suzerain - Get the suzerain of the scoped character
 Input Scopes: character
 Output Scopes: character
@@ -956,6 +955,12 @@ Output Scopes: war
 
 --------------------
 
+house_aspiration - Get house aspiration of the scoped house
+Input Scopes: dynasty_house
+Output Scopes: house_aspiration
+
+--------------------
+
 house_confederation - Scope to the house's confederation
 Input Scopes: dynasty_house
 Output Scopes: confederation
@@ -977,12 +982,6 @@ Output Scopes: character
 house_head - Get house head of the scoped character
 Input Scopes: dynasty_house
 Output Scopes: character
-
---------------------
-
-house_power - Get house aspiration of the scoped house
-Input Scopes: dynasty_house
-Output Scopes: house_aspiration
 
 --------------------
 
@@ -1347,13 +1346,7 @@ Output Scopes: dynasty_house
 
 --------------------
 
-primary_type - Get the primary Accolade Type of given Accolade
-Input Scopes: accolade
-Output Scopes: accolade_type
-
---------------------
-
-secondary_type - Get the secondary Accolade Type of given Accolade
+initial_type - Get the initial Accolade Type of given Accolade
 Input Scopes: accolade
 Output Scopes: accolade_type
 
@@ -1824,6 +1817,8 @@ county
 barony
 councillor
 councillor_liege
+new_councillor
+swapped_position
 liege
 old_liege
 courtier
@@ -2023,6 +2018,8 @@ old_capital
 dynasty
 house
 other_house
+house_1
+house_2
 house_relation
 num_relations
 has_slot_with_obligation

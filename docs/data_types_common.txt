@@ -114,6 +114,12 @@ Return type: int32
 
 -----------------------
 
+ByteToString( Arg0 )
+Definition type: Global function
+Return type: CString
+
+-----------------------
+
 CalcProgressBetweenDates( Arg0, Arg1, Arg2 )
 Description: Gets a % how far the current date is between the start and end date.
 Definition type: Global function
@@ -745,6 +751,12 @@ Return type: int32
 
 -----------------------
 
+IntToString( Arg0 )
+Definition type: Global function
+Return type: CString
+
+-----------------------
+
 IntToUnsigned( Arg0 )
 Definition type: Global function
 Return type: float
@@ -840,6 +852,12 @@ Return type: bool
 -----------------------
 
 Localize( Arg0 )
+Definition type: Global function
+Return type: CString
+
+-----------------------
+
+LongToString( Arg0 )
 Definition type: Global function
 Return type: CString
 
@@ -1070,6 +1088,12 @@ Return type: bool
 
 -----------------------
 
+SByteToString( Arg0 )
+Definition type: Global function
+Return type: CString
+
+-----------------------
+
 SelectLocalization( Arg0, Arg1, Arg2 )
 Definition type: Global function
 Return type: CString
@@ -1166,6 +1190,12 @@ Return type: uint8
 
 -----------------------
 
+ShortToString( Arg0 )
+Definition type: Global function
+Return type: CString
+
+-----------------------
+
 StringIsEmpty( Arg0 )
 Definition type: Global function
 Return type: bool
@@ -1233,6 +1263,24 @@ Return type: CString
 -----------------------
 
 TrimFrontChars( Arg0, Arg1 )
+Definition type: Global function
+Return type: CString
+
+-----------------------
+
+UIntToString( Arg0 )
+Definition type: Global function
+Return type: CString
+
+-----------------------
+
+ULongToString( Arg0 )
+Definition type: Global function
+Return type: CString
+
+-----------------------
+
+UShortToString( Arg0 )
 Definition type: Global function
 Return type: CString
 

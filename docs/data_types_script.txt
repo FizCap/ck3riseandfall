@@ -277,6 +277,13 @@ Return type: Dlc
 
 -----------------------
 
+GetDoctrineGroupType( Arg0 )
+Description: Get the DoctrineGroupType object with the provided key in their database
+Definition type: Global promote
+Return type: DoctrineGroupType
+
+-----------------------
+
 GetDomicileBuilding( Arg0 )
 Description: Get the DomicileBuilding object with the provided key in their database
 Definition type: Global promote
@@ -333,10 +340,10 @@ Return type: FaithDoctrine
 
 -----------------------
 
-GetFaithDoctrineGroup( Arg0 )
-Description: Get the FaithDoctrineGroup object with the provided key in their database
+GetFaithType( Arg0 )
+Description: Get the FaithType object with the provided key in their database
 Definition type: Global promote
-Return type: FaithDoctrineGroup
+Return type: FaithType
 
 -----------------------
 
@@ -553,6 +560,13 @@ GetReligionFamily( Arg0 )
 Description: Get the ReligionFamily object with the provided key in their database
 Definition type: Global promote
 Return type: ReligionFamily
+
+-----------------------
+
+GetReligionType( Arg0 )
+Description: Get the ReligionType object with the provided key in their database
+Definition type: Global promote
+Return type: ReligionType
 
 -----------------------
 
@@ -1053,6 +1067,13 @@ Return type: [unregistered]
 
 -----------------------
 
+GetAllDoctrineGroupTypes
+Description: Get all DoctrineGroupType objects in their database
+Definition type: Global function
+Return type: [unregistered]
+
+-----------------------
+
 GetAllDomicileBuildings
 Description: Get all DomicileBuilding objects in their database
 Definition type: Global function
@@ -1102,15 +1123,15 @@ Return type: [unregistered]
 
 -----------------------
 
-GetAllFaithDoctrineGroups
-Description: Get all FaithDoctrineGroup objects in their database
+GetAllFaithDoctrines
+Description: Get all FaithDoctrine objects in their database
 Definition type: Global function
 Return type: [unregistered]
 
 -----------------------
 
-GetAllFaithDoctrines
-Description: Get all FaithDoctrine objects in their database
+GetAllFaithTypes
+Description: Get all FaithType objects in their database
 Definition type: Global function
 Return type: [unregistered]
 
@@ -1321,6 +1342,13 @@ Return type: [unregistered]
 
 GetAllReligionFamilys
 Description: Get all ReligionFamily objects in their database
+Definition type: Global function
+Return type: [unregistered]
+
+-----------------------
+
+GetAllReligionTypes
+Description: Get all ReligionType objects in their database
 Definition type: Global function
 Return type: [unregistered]
 
@@ -1683,6 +1711,13 @@ Return type: [unregistered]
 
 -----------------------
 
+GetDoctrineGroupType( Arg0 )
+Description: Get the DoctrineGroupType object with the provided key in their database
+Definition type: Global function
+Return type: [unregistered]
+
+-----------------------
+
 GetDomicileBuilding( Arg0 )
 Description: Get the DomicileBuilding object with the provided key in their database
 Definition type: Global function
@@ -1739,10 +1774,10 @@ Return type: [unregistered]
 
 -----------------------
 
-GetFaithDoctrineGroup( Arg0 )
-Description: Get the FaithDoctrineGroup object with the provided key in their database
+GetFaithType( Arg0 )
+Description: Get the FaithType object with the provided key in their database
 Definition type: Global function
-Return type: [unregistered]
+Return type: _null_type_
 
 -----------------------
 
@@ -1963,6 +1998,13 @@ Return type: [unregistered]
 
 GetReligionFamily( Arg0 )
 Description: Get the ReligionFamily object with the provided key in their database
+Definition type: Global function
+Return type: _null_type_
+
+-----------------------
+
+GetReligionType( Arg0 )
+Description: Get the ReligionType object with the provided key in their database
 Definition type: Global function
 Return type: _null_type_
 

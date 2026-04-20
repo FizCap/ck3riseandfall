@@ -550,6 +550,12 @@ Return type: Province
 
 -----------------------
 
+GetNullWar
+Definition type: Global promote
+Return type: War
+
+-----------------------
+
 GetPlayer
 Definition type: Global promote
 Return type: Character
@@ -832,6 +838,18 @@ Return type: ModifierItem
 
 -----------------------
 
+NEW_HOUSE_RELATION_LEVEL
+Definition type: Global promote
+Return type: HouseRelationLevel
+
+-----------------------
+
+OLD_HOUSE_RELATION_LEVEL
+Definition type: Global promote
+Return type: HouseRelationLevel
+
+-----------------------
+
 OLD_LAW
 Definition type: Global promote
 Return type: Law
@@ -853,6 +871,12 @@ Return type: PlayerMessageItem
 PROVINCE
 Definition type: Global promote
 Return type: Province
+
+-----------------------
+
+PdxAccount
+Definition type: Global promote
+Return type: PdxAccount
 
 -----------------------
 
@@ -1258,6 +1282,12 @@ Return type: bool
 
 -----------------------
 
+CanTickDay
+Definition type: Global function
+Return type: bool
+
+-----------------------
+
 ClearAdminVassalDetailCandidate
 Definition type: Global function
 Return type: void
@@ -1441,6 +1471,12 @@ Return type: CVector2f
 GetAbsoluteMousePositionInteger
 Definition type: Global function
 Return type: CVector2i
+
+-----------------------
+
+GetAccoladePose( Arg0 )
+Definition type: Global function
+Return type: CString
 
 -----------------------
 
@@ -1930,6 +1966,12 @@ Return type: [unregistered]
 
 -----------------------
 
+GetNullWar
+Definition type: Global function
+Return type: [unregistered]
+
+-----------------------
+
 GetNumberOfValidInteractionsWithFilter( Arg0, Arg1 )
 Definition type: Global function
 Return type: int32
@@ -2308,6 +2350,12 @@ Return type: bool
 
 -----------------------
 
+IsAltDown
+Definition type: Global function
+Return type: bool
+
+-----------------------
+
 IsAnySituationViewOpen
 Definition type: Global function
 Return type: bool
@@ -2362,6 +2410,12 @@ Return type: CFixedPoint
 
 -----------------------
 
+IsCtrlDown
+Definition type: Global function
+Return type: bool
+
+-----------------------
+
 IsDateToday( Arg0 )
 Definition type: Global function
 Return type: bool
@@ -2411,6 +2465,18 @@ Return type: bool
 -----------------------
 
 IsGamePaused
+Definition type: Global function
+Return type: bool
+
+-----------------------
+
+IsGameSettingEnabled( Arg0 )
+Definition type: Global function
+Return type: bool
+
+-----------------------
+
+IsGameSettingOptionSelected( Arg0, Arg1 )
 Definition type: Global function
 Return type: bool
 
@@ -2561,6 +2627,12 @@ Return type: bool
 -----------------------
 
 IsRightWindowOpen
+Definition type: Global function
+Return type: bool
+
+-----------------------
+
+IsShiftDown
 Definition type: Global function
 Return type: bool
 
@@ -3064,6 +3136,12 @@ Return type: bool
 
 -----------------------
 
+TickDay
+Definition type: Global function
+Return type: void
+
+-----------------------
+
 ToTextFormatColor( Arg0 )
 Definition type: Global function
 Return type: CString
@@ -3202,6 +3280,12 @@ Return type: bool
 
 -----------------------
 
+WhyCantTickDay
+Definition type: Global function
+Return type: CString
+
+-----------------------
+
 abandon_celibacy
 Definition type: Global function
 Return type: [unregistered]
@@ -3268,7 +3352,19 @@ Return type: [unregistered]
 
 -----------------------
 
+acclaimed
+Definition type: Global function
+Return type: [unregistered]
+
+-----------------------
+
 acclaimed_knight
+Definition type: Global function
+Return type: [unregistered]
+
+-----------------------
+
+acclaimed_knight_possessive
 Definition type: Global function
 Return type: [unregistered]
 
@@ -3281,6 +3377,12 @@ Return type: [unregistered]
 -----------------------
 
 accolade
+Definition type: Global function
+Return type: [unregistered]
+
+-----------------------
+
+accolade_possessive
 Definition type: Global function
 Return type: [unregistered]
 
@@ -3299,6 +3401,18 @@ Return type: [unregistered]
 -----------------------
 
 accolade_ranks
+Definition type: Global function
+Return type: [unregistered]
+
+-----------------------
+
+accolade_squire
+Definition type: Global function
+Return type: [unregistered]
+
+-----------------------
+
+accolade_squires
 Definition type: Global function
 Return type: [unregistered]
 
@@ -4156,6 +4270,12 @@ Return type: [unregistered]
 
 -----------------------
 
+barters
+Definition type: Global function
+Return type: [unregistered]
+
+-----------------------
+
 bastard
 Definition type: Global function
 Return type: [unregistered]
@@ -4325,6 +4445,12 @@ Return type: [unregistered]
 -----------------------
 
 bloc_houses
+Definition type: Global function
+Return type: [unregistered]
+
+-----------------------
+
+bloc_leader
 Definition type: Global function
 Return type: [unregistered]
 
@@ -5267,6 +5393,12 @@ Return type: [unregistered]
 -----------------------
 
 close_family_members
+Definition type: Global function
+Return type: [unregistered]
+
+-----------------------
+
+clouded_eyes_mitigation
 Definition type: Global function
 Return type: [unregistered]
 
@@ -6586,6 +6718,12 @@ Return type: [unregistered]
 
 -----------------------
 
+debug_test_story
+Definition type: Global function
+Return type: [unregistered]
+
+-----------------------
+
 deceitful_progress_hostile_schemes_decision
 Definition type: Global function
 Return type: [unregistered]
@@ -7750,6 +7888,12 @@ Return type: [unregistered]
 
 -----------------------
 
+elder_traits
+Definition type: Global function
+Return type: [unregistered]
+
+-----------------------
+
 elderly_health
 Definition type: Global function
 Return type: [unregistered]
@@ -8380,6 +8524,12 @@ Return type: [unregistered]
 
 -----------------------
 
+fame_traits
+Definition type: Global function
+Return type: [unregistered]
+
+-----------------------
+
 family
 Definition type: Global function
 Return type: [unregistered]
@@ -8710,6 +8860,12 @@ Return type: [unregistered]
 
 -----------------------
 
+fragile_bones_mitigation
+Definition type: Global function
+Return type: [unregistered]
+
+-----------------------
+
 friend
 Definition type: Global function
 Return type: [unregistered]
@@ -8968,6 +9124,12 @@ Return type: [unregistered]
 
 -----------------------
 
+governor_possessive
+Definition type: Global function
+Return type: [unregistered]
+
+-----------------------
+
 governor_salary
 Definition type: Global function
 Return type: [unregistered]
@@ -8975,6 +9137,12 @@ Return type: [unregistered]
 -----------------------
 
 governors
+Definition type: Global function
+Return type: [unregistered]
+
+-----------------------
+
+governors_possessive
 Definition type: Global function
 Return type: [unregistered]
 
@@ -9137,6 +9305,30 @@ Return type: [unregistered]
 -----------------------
 
 great_project_contributions
+Definition type: Global function
+Return type: [unregistered]
+
+-----------------------
+
+great_project_contributor
+Definition type: Global function
+Return type: [unregistered]
+
+-----------------------
+
+great_project_contributor_possessive
+Definition type: Global function
+Return type: [unregistered]
+
+-----------------------
+
+great_project_contributors
+Definition type: Global function
+Return type: [unregistered]
+
+-----------------------
+
+great_project_contributors_possessive
 Definition type: Global function
 Return type: [unregistered]
 
@@ -9329,12 +9521,6 @@ Return type: [unregistered]
 -----------------------
 
 hegemon
-Definition type: Global function
-Return type: [unregistered]
-
------------------------
-
-hegemon_possessive
 Definition type: Global function
 Return type: [unregistered]
 
@@ -10282,12 +10468,6 @@ Return type: [unregistered]
 
 -----------------------
 
-inactive_accolade
-Definition type: Global function
-Return type: [unregistered]
-
------------------------
-
 inbred
 Definition type: Global function
 Return type: [unregistered]
@@ -10373,6 +10553,12 @@ Return type: [unregistered]
 -----------------------
 
 infection_rates
+Definition type: Global function
+Return type: [unregistered]
+
+-----------------------
+
+infirm_mitigation
 Definition type: Global function
 Return type: [unregistered]
 
@@ -12640,6 +12826,12 @@ Return type: [unregistered]
 
 -----------------------
 
+occupies
+Definition type: Global function
+Return type: [unregistered]
+
+-----------------------
+
 occupy
 Definition type: Global function
 Return type: [unregistered]
@@ -14062,6 +14254,12 @@ Return type: [unregistered]
 
 -----------------------
 
+retirement_age
+Definition type: Global function
+Return type: [unregistered]
+
+-----------------------
+
 retract
 Definition type: Global function
 Return type: [unregistered]
@@ -14675,6 +14873,12 @@ Return type: [unregistered]
 -----------------------
 
 secure_iberian_foothold_decision
+Definition type: Global function
+Return type: [unregistered]
+
+-----------------------
+
+seize_peripheral_duchy
 Definition type: Global function
 Return type: [unregistered]
 
@@ -15425,6 +15629,18 @@ Return type: [unregistered]
 -----------------------
 
 story_content_wallada
+Definition type: Global function
+Return type: [unregistered]
+
+-----------------------
+
+story_cycle
+Definition type: Global function
+Return type: [unregistered]
+
+-----------------------
+
+story_cycles
 Definition type: Global function
 Return type: [unregistered]
 
@@ -17596,6 +17812,12 @@ Return type: [unregistered]
 
 -----------------------
 
+withering_mind_mitigation
+Definition type: Global function
+Return type: [unregistered]
+
+-----------------------
+
 yurt
 Definition type: Global function
 Return type: [unregistered]
@@ -17623,6 +17845,12 @@ Return type: [unregistered]
 ActivityTypeHasCooldown( Type )
 Macro replacement: GreaterThan_int32( Type.CalcCooldownDays( GetPlayer ), '(int32)0' )
 Description: Does the activity type have a cooldown
+Definition type: Global macro
+
+-----------------------
+
+BOPValue( VALUE )
+Macro replacement: SelectLocalization(GreaterThan_CFixedPoint(Character.MakeScope.Var(VALUE).GetValue, '(CFixedPoint)10000'), Concatenate(VALUE, '_k'), VALUE)
 Definition type: Global macro
 
 -----------------------
@@ -17658,6 +17886,13 @@ Definition type: Global macro
 CanPlayerSeeActivityLogEntry
 Macro replacement: Or( Not( ActivityLogEntry.HasTag( 'crime' ) ), ObjectsEqual( ActivityLogEntry.GetCharacter, GetPlayer ) )
 Description: Can the player see this log entry? Is the entry an intent entry, if it is: is the Character the local player?
+Definition type: Global macro
+
+-----------------------
+
+CanRazeHoldings( TargetCharacter )
+Macro replacement: TargetCharacter.GetGovernment.HasGovernmentFlag( 'can_raze_holdings' )
+Description: Can the character Raze holdings?
 Definition type: Global macro
 
 -----------------------
@@ -17840,6 +18075,13 @@ Definition type: Global macro
 ClearContestInfoTab
 Macro replacement: VariableSystem.Clear( 'activity_contest_info_tab' )
 Description: Clears the locale view's contest tab
+Definition type: Global macro
+
+-----------------------
+
+CoronationCharacter( ScopeCharacter )
+Macro replacement: GetScriptedGui( 'coronation_trigger_gui' ).IsValid( GuiScope.SetRoot( ScopeCharacter.MakeScope ).End )
+Description: Is the character one that will hold Coronations?
 Definition type: Global macro
 
 -----------------------
@@ -18029,6 +18271,13 @@ Definition type: Global macro
 GreaterThanZero_CFixedPoint( Value )
 Macro replacement: GreaterThan_CFixedPoint(Value, '(CFixedPoint)0')
 Description: Tests if a CFixedPoint is greater than zero or not
+Definition type: Global macro
+
+-----------------------
+
+HasAccessToMinistry( ScopeCharacter )
+Macro replacement: GetScriptedGui( 'tgp_has_access_to_ministry_trigger_gui' ).IsValid( GuiScope.AddScope( 'owner', ScopeCharacter.MakeScope ).End )
+Description: Has the character failed the Children examination?
 Definition type: Global macro
 
 -----------------------
@@ -19038,18 +19287,6 @@ Return type: Character
 
 -----------------------
 
-Accolade.GetPrimaryType
-Definition type: Promote
-Return type: AccoladeType
-
------------------------
-
-Accolade.GetSecondaryType
-Definition type: Promote
-Return type: AccoladeType
-
------------------------
-
 Accolade.GetSuccessor
 Definition type: Promote
 Return type: Character
@@ -19068,9 +19305,9 @@ Return type: [unregistered]
 
 -----------------------
 
-Accolade.Activate
+Accolade.BuildActiveEffectsForType( Arg0 )
 Definition type: Function
-Return type: void
+Return type: CString
 
 -----------------------
 
@@ -19080,9 +19317,9 @@ Return type: CString
 
 -----------------------
 
-Accolade.CanBeActivated
+Accolade.BuildNextRankEffectsForType( Arg0 )
 Definition type: Function
-Return type: bool
+Return type: CString
 
 -----------------------
 
@@ -19092,7 +19329,31 @@ Return type: bool
 
 -----------------------
 
+Accolade.Custom( Arg0 )
+Definition type: Function
+Return type: CString
+
+-----------------------
+
+Accolade.DestroyAccolade
+Definition type: Function
+Return type: void
+
+-----------------------
+
 Accolade.GetAcclaimedKnight
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+Accolade.GetAvailableLevelUpPoints
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+Accolade.GetAvailableTypes
 Definition type: Function
 Return type: [unregistered]
 
@@ -19176,43 +19437,13 @@ Return type: CString
 
 -----------------------
 
+Accolade.GetObtainedAccoladeTypes
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
 Accolade.GetOwner
-Definition type: Function
-Return type: [unregistered]
-
------------------------
-
-Accolade.GetPrimaryIcon
-Definition type: Function
-Return type: [unregistered]
-
------------------------
-
-Accolade.GetPrimaryRankEffects
-Definition type: Function
-Return type: CString
-
------------------------
-
-Accolade.GetPrimaryType
-Definition type: Function
-Return type: [unregistered]
-
------------------------
-
-Accolade.GetSecondaryIcon
-Definition type: Function
-Return type: [unregistered]
-
------------------------
-
-Accolade.GetSecondaryRankEffects
-Definition type: Function
-Return type: CString
-
------------------------
-
-Accolade.GetSecondaryType
 Definition type: Function
 Return type: [unregistered]
 
@@ -19260,37 +19491,7 @@ Return type: bool
 
 -----------------------
 
-Accolade.HasPrimaryAccoladeRequirements( Arg0 )
-Definition type: Function
-Return type: bool
-
------------------------
-
-Accolade.HasSecondaryAccoladeRequirements( Arg0 )
-Definition type: Function
-Return type: bool
-
------------------------
-
 Accolade.HasSuccessorRequirements( Arg0 )
-Definition type: Function
-Return type: bool
-
------------------------
-
-Accolade.IsActive
-Definition type: Function
-Return type: bool
-
------------------------
-
-Accolade.IsPrimaryType( Arg0 )
-Definition type: Function
-Return type: bool
-
------------------------
-
-Accolade.IsSecondaryType( Arg0 )
 Definition type: Function
 Return type: bool
 
@@ -19302,7 +19503,84 @@ Return type: bool
 
 -----------------------
 
+Accolade.MakeAddAccoladeTypeCommand( Arg0 )
+Definition type: Function
+Return type: Command
+
+-----------------------
+
 Accolade.Self
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+AccoladeAttributeSelectionView
+Definition type: Type
+
+-----------------------
+
+AccoladeAttributeSelectionView.GetAccolade
+Definition type: Promote
+Return type: Accolade
+
+-----------------------
+
+AccoladeAttributeSelectionView.GetSelectedType
+Definition type: Promote
+Return type: AccoladeType
+
+-----------------------
+
+AccoladeAttributeSelectionView.AccessSelf
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+AccoladeAttributeSelectionView.Close
+Definition type: Function
+Return type: void
+
+-----------------------
+
+AccoladeAttributeSelectionView.ConfirmSelection
+Definition type: Function
+Return type: void
+
+-----------------------
+
+AccoladeAttributeSelectionView.GetAllAttributes
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+AccoladeAttributeSelectionView.GetAvailableAttributes
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+AccoladeAttributeSelectionView.GetOtherAttributes
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+AccoladeAttributeSelectionView.GetSelectedType
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+AccoladeAttributeSelectionView.OnClick( Arg0 )
+Definition type: Function
+Return type: void
+
+-----------------------
+
+AccoladeAttributeSelectionView.Self
 Definition type: Function
 Return type: [unregistered]
 
@@ -19377,13 +19655,7 @@ Definition type: Type
 
 -----------------------
 
-AccoladeType.GetPrimaryMaaUnlock
-Definition type: Promote
-Return type: MenAtArmsType
-
------------------------
-
-AccoladeType.GetSecondaryMaaUnlock
+AccoladeType.GetMaaUnlock
 Definition type: Promote
 Return type: MenAtArmsType
 
@@ -19401,19 +19673,43 @@ Return type: CString
 
 -----------------------
 
-AccoladeType.BuildPrimaryEffects
+AccoladeType.GetIcon
 Definition type: Function
-Return type: CString
+Return type: [unregistered]
 
 -----------------------
 
-AccoladeType.BuildSecondaryEffects
+AccoladeType.GetKnightValidForAccoladeType( Arg0, Arg1 )
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+AccoladeType.GetKnightValidForAccoladeTypeDesc( Arg0 )
 Definition type: Function
 Return type: CString
 
 -----------------------
 
 AccoladeType.GetLevelAndGloryOfRank( Arg0 )
+Definition type: Function
+Return type: CString
+
+-----------------------
+
+AccoladeType.GetLevelOfRank( Arg0 )
+Definition type: Function
+Return type: CString
+
+-----------------------
+
+AccoladeType.GetMaaUnlock
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+AccoladeType.GetMaaUnlockWarning
 Definition type: Function
 Return type: CString
 
@@ -19437,19 +19733,7 @@ Return type: CString
 
 -----------------------
 
-AccoladeType.GetPrimaryMaaUnlock
-Definition type: Function
-Return type: [unregistered]
-
------------------------
-
-AccoladeType.GetPrimaryMaaUnlockWarning
-Definition type: Function
-Return type: CString
-
------------------------
-
-AccoladeType.GetPrimaryTypeRankEffects
+AccoladeType.GetPose
 Definition type: Function
 Return type: CString
 
@@ -19458,30 +19742,6 @@ Return type: CString
 AccoladeType.GetRanks
 Definition type: Function
 Return type: [unregistered]
-
------------------------
-
-AccoladeType.GetSecondaryMaaUnlock
-Definition type: Function
-Return type: [unregistered]
-
------------------------
-
-AccoladeType.GetSecondaryTypeRankEffects
-Definition type: Function
-Return type: CString
-
------------------------
-
-AccoladeType.IsPrimaryRank( Arg0 )
-Definition type: Function
-Return type: bool
-
------------------------
-
-AccoladeType.IsSecondaryRank( Arg0 )
-Definition type: Function
-Return type: bool
 
 -----------------------
 
@@ -19532,12 +19792,6 @@ Return type: [unregistered]
 
 -----------------------
 
-AccoladeView.CanDeactivateAccolade
-Definition type: Function
-Return type: bool
-
------------------------
-
 AccoladeView.ClearSuccessor
 Definition type: Function
 Return type: void
@@ -19545,12 +19799,6 @@ Return type: void
 -----------------------
 
 AccoladeView.Close
-Definition type: Function
-Return type: void
-
------------------------
-
-AccoladeView.DeactivateAccolade
 Definition type: Function
 Return type: void
 
@@ -19568,27 +19816,21 @@ Return type: [unregistered]
 
 -----------------------
 
-AccoladeView.GetDeactivateTooltip
+AccoladeView.GetAccoladeSquireQuality
 Definition type: Function
 Return type: CString
 
 -----------------------
 
-AccoladeView.GetNumPrimaryTraits
+AccoladeView.GetAccoladeSquireQualityBreakdown
 Definition type: Function
-Return type: int32
+Return type: CString
 
 -----------------------
 
-AccoladeView.GetNumSecondaryTraits
+AccoladeView.GetNumTraits
 Definition type: Function
 Return type: int32
-
------------------------
-
-AccoladeView.GetPrimaryTraits
-Definition type: Function
-Return type: [unregistered]
 
 -----------------------
 
@@ -19598,15 +19840,15 @@ Return type: [unregistered]
 
 -----------------------
 
-AccoladeView.GetSecondaryTraits
-Definition type: Function
-Return type: [unregistered]
-
------------------------
-
 AccoladeView.GetTempName
 Definition type: Function
 Return type: CUTF8String
+
+-----------------------
+
+AccoladeView.GetTraits
+Definition type: Function
+Return type: [unregistered]
 
 -----------------------
 
@@ -19628,15 +19870,15 @@ Return type: bool
 
 -----------------------
 
-AccoladeView.IsShowingPotentialAcclaimed
+AccoladeView.LevelUpAccoladeType( Arg0 )
 Definition type: Function
-Return type: bool
+Return type: void
 
 -----------------------
 
-AccoladeView.IsShowingSuccessors
+AccoladeView.OpenAttributeSelectorWindow
 Definition type: Function
-Return type: bool
+Return type: void
 
 -----------------------
 
@@ -19670,19 +19912,7 @@ Return type: void
 
 -----------------------
 
-AccoladeView.TogglePotentialAcclaimed
-Definition type: Function
-Return type: void
-
------------------------
-
 AccoladeView.ToggleRenaming
-Definition type: Function
-Return type: void
-
------------------------
-
-AccoladeView.ToggleSuccessors
 Definition type: Function
 Return type: void
 
@@ -25014,6 +25244,12 @@ Return type: Province
 
 -----------------------
 
+Army.GetOrders
+Definition type: Promote
+Return type: UnitOrders
+
+-----------------------
+
 Army.GetOwner
 Definition type: Promote
 Return type: Character
@@ -25059,6 +25295,12 @@ Return type: int32
 Army.CommanderIsOwner
 Definition type: Function
 Return type: bool
+
+-----------------------
+
+Army.Custom( Arg0 )
+Definition type: Function
+Return type: CString
 
 -----------------------
 
@@ -25233,6 +25475,12 @@ Return type: CString
 Army.GetMovementInfoForTooltip
 Definition type: Function
 Return type: CString
+
+-----------------------
+
+Army.GetMovementProgressRatio
+Definition type: Function
+Return type: CFixedPoint
 
 -----------------------
 
@@ -26023,6 +26271,12 @@ Return type: SkillItem
 
 -----------------------
 
+ArmyWindow.GetOrders
+Definition type: Promote
+Return type: UnitOrders
+
+-----------------------
+
 ArmyWindow.GetRaidIntent
 Definition type: Promote
 Return type: RaidIntent
@@ -26138,6 +26392,18 @@ Return type: bool
 -----------------------
 
 ArmyWindow.CanDisband
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+ArmyWindow.CanGoToNextArmy
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+ArmyWindow.CanGoToPreviousArmy
 Definition type: Function
 Return type: bool
 
@@ -26380,6 +26646,18 @@ Return type: CString
 ArmyWindow.GetTroopItems
 Definition type: Function
 Return type: [unregistered]
+
+-----------------------
+
+ArmyWindow.GoToNextArmy
+Definition type: Function
+Return type: void
+
+-----------------------
+
+ArmyWindow.GoToPreviousArmy
+Definition type: Function
+Return type: void
 
 -----------------------
 
@@ -27616,6 +27894,12 @@ Return type: CString
 
 -----------------------
 
+BarbershopAccessoryCategory.HasColorOverride
+Definition type: Function
+Return type: bool
+
+-----------------------
+
 BarbershopAccessoryCategory.HasItemsFiltered
 Definition type: Function
 Return type: bool
@@ -27653,6 +27937,12 @@ Return type: void
 -----------------------
 
 BarbershopAccessoryCategory.OnSelectFiltered( Arg0 )
+Definition type: Function
+Return type: void
+
+-----------------------
+
+BarbershopAccessoryCategory.ResetColorToNatural
 Definition type: Function
 Return type: void
 
@@ -28184,12 +28474,6 @@ Return type: void
 
 -----------------------
 
-BarbershopColorPickerHandler.ResetColorToNatural
-Definition type: Function
-Return type: void
-
------------------------
-
 BarbershopColorPickerHandler.Self
 Definition type: Function
 Return type: [unregistered]
@@ -28692,6 +28976,12 @@ Return type: [unregistered]
 
 -----------------------
 
+BarbershopWindow.HasChanges
+Definition type: Function
+Return type: bool
+
+-----------------------
+
 BarbershopWindow.HasPortraitShadow
 Definition type: Function
 Return type: bool
@@ -29031,6 +29321,106 @@ Return type: bool
 -----------------------
 
 BattleEvent.Self
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+BattleResult
+Definition type: Type
+
+-----------------------
+
+BattleResult.GetAttackers
+Definition type: Promote
+Return type: BattleResultSide
+
+-----------------------
+
+BattleResult.GetDefenders
+Definition type: Promote
+Return type: BattleResultSide
+
+-----------------------
+
+BattleResult.GetProvince
+Definition type: Promote
+Return type: Province
+
+-----------------------
+
+BattleResult.AccessSelf
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+BattleResult.AttackerInitiatedCombat
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+BattleResult.AttackerSideWon
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+BattleResult.GetProvince
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+BattleResult.GetWarScore
+Definition type: Function
+Return type: CFixedPoint
+
+-----------------------
+
+BattleResult.Self
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+BattleResultSide
+Definition type: Type
+
+-----------------------
+
+BattleResultSide.GetMainCommander
+Definition type: Promote
+Return type: Character
+
+-----------------------
+
+BattleResultSide.AccessSelf
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+BattleResultSide.GetMainCommander
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+BattleResultSide.GetNumberOfCasualties
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+BattleResultSide.GetNumberOfMen
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+BattleResultSide.Self
 Definition type: Function
 Return type: [unregistered]
 
@@ -29824,6 +30214,12 @@ Return type: CString
 -----------------------
 
 BookmarkCharacter.GetReligionName
+Definition type: Function
+Return type: CString
+
+-----------------------
+
+BookmarkCharacter.GetSubheading
 Definition type: Function
 Return type: CString
 
@@ -31460,6 +31856,12 @@ Return type: Character
 
 -----------------------
 
+Character.GetCommandingArmy
+Definition type: Promote
+Return type: Army
+
+-----------------------
+
 Character.GetConcubinist
 Definition type: Promote
 Return type: Character
@@ -32066,6 +32468,12 @@ Return type: bool
 
 -----------------------
 
+Character.CanImproveMeritRank
+Definition type: Function
+Return type: bool
+
+-----------------------
+
 Character.CanPlayerChangeMyFocus
 Definition type: Function
 Return type: bool
@@ -32264,7 +32672,7 @@ Return type: [unregistered]
 
 -----------------------
 
-Character.GetActiveAccolades
+Character.GetAccolades
 Definition type: Function
 Return type: [unregistered]
 
@@ -32345,6 +32753,12 @@ Return type: CString
 Character.GetAssignedTaxSlot
 Definition type: Function
 Return type: [unregistered]
+
+-----------------------
+
+Character.GetAverageDevelopment
+Definition type: Function
+Return type: CFixedPoint
 
 -----------------------
 
@@ -32669,6 +33083,12 @@ Return type: CString
 Character.GetCommanderLeadingOwnAdvantageDesc( Arg0 )
 Definition type: Function
 Return type: CString
+
+-----------------------
+
+Character.GetCommandingArmy
+Definition type: Function
+Return type: [unregistered]
 
 -----------------------
 
@@ -33980,12 +34400,6 @@ Return type: CString
 
 -----------------------
 
-Character.GetInactiveAccolades
-Definition type: Function
-Return type: [unregistered]
-
------------------------
-
 Character.GetIncomeAsReligiousHead
 Definition type: Function
 Return type: CFixedPoint
@@ -34016,9 +34430,27 @@ Return type: CFixedPoint
 
 -----------------------
 
+Character.GetInfluenceBalance
+Definition type: Function
+Return type: CFixedPoint
+
+-----------------------
+
+Character.GetInfluenceLevel
+Definition type: Function
+Return type: int32
+
+-----------------------
+
 Character.GetInfluenceLevelTexture
 Definition type: Function
 Return type: [unregistered]
+
+-----------------------
+
+Character.GetInfluenceProgressTowardNextLevel
+Definition type: Function
+Return type: CFixedPoint
 
 -----------------------
 
@@ -34316,7 +34748,19 @@ Return type: [unregistered]
 
 -----------------------
 
+Character.GetMenAtArmsStrength
+Definition type: Function
+Return type: int32
+
+-----------------------
+
 Character.GetMerit
+Definition type: Function
+Return type: CFixedPoint
+
+-----------------------
+
+Character.GetMeritBalance
 Definition type: Function
 Return type: CFixedPoint
 
@@ -34334,6 +34778,12 @@ Return type: int32
 
 -----------------------
 
+Character.GetMeritLevelDescription( Arg0 )
+Definition type: Function
+Return type: CString
+
+-----------------------
+
 Character.GetMeritLevelTextIcon
 Definition type: Function
 Return type: CString
@@ -34343,6 +34793,12 @@ Return type: CString
 Character.GetMeritLevelTexture
 Definition type: Function
 Return type: [unregistered]
+
+-----------------------
+
+Character.GetMeritProgressTowardNextLevel
+Definition type: Function
+Return type: CFixedPoint
 
 -----------------------
 
@@ -34628,19 +35084,13 @@ Return type: CString
 
 -----------------------
 
-Character.GetNumActiveAccolades
+Character.GetNumAccolades
 Definition type: Function
 Return type: int32
 
 -----------------------
 
 Character.GetNumFreeAccoladeSlots
-Definition type: Function
-Return type: int32
-
------------------------
-
-Character.GetNumInactiveAccolades
 Definition type: Function
 Return type: int32
 
@@ -34664,7 +35114,25 @@ Return type: int32
 
 -----------------------
 
+Character.GetNumberOfBuildings
+Definition type: Function
+Return type: int32
+
+-----------------------
+
 Character.GetNumberOfControlledHolySites
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+Character.GetNumberOfKillsKnownTo( Arg0 )
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+Character.GetNumberOfPrisoners
 Definition type: Function
 Return type: int32
 
@@ -34748,6 +35216,12 @@ Return type: CFixedPoint
 
 -----------------------
 
+Character.GetPietyBalance
+Definition type: Function
+Return type: CFixedPoint
+
+-----------------------
+
 Character.GetPietyLevel
 Definition type: Function
 Return type: int32
@@ -34757,6 +35231,12 @@ Return type: int32
 Character.GetPietyLevelTexture
 Definition type: Function
 Return type: [unregistered]
+
+-----------------------
+
+Character.GetPietyProgressTowardNextLevel
+Definition type: Function
+Return type: CFixedPoint
 
 -----------------------
 
@@ -34922,6 +35402,12 @@ Return type: CFixedPoint
 
 -----------------------
 
+Character.GetPrestigeBalance
+Definition type: Function
+Return type: CFixedPoint
+
+-----------------------
+
 Character.GetPrestigeLevel
 Definition type: Function
 Return type: int32
@@ -34931,6 +35417,12 @@ Return type: int32
 Character.GetPrestigeLevelTexture
 Definition type: Function
 Return type: [unregistered]
+
+-----------------------
+
+Character.GetPrestigeProgressTowardNextLevel
+Definition type: Function
+Return type: CFixedPoint
 
 -----------------------
 
@@ -35037,6 +35529,12 @@ Return type: CString
 -----------------------
 
 Character.GetRelationToStringExtended( Arg0 )
+Definition type: Function
+Return type: CString
+
+-----------------------
+
+Character.GetRelationToStringShort( Arg0 )
 Definition type: Function
 Return type: CString
 
@@ -35984,6 +36482,12 @@ Return type: [unregistered]
 
 -----------------------
 
+Character.GetTotalIncome
+Definition type: Function
+Return type: CFixedPoint
+
+-----------------------
+
 Character.GetTotalMerit
 Definition type: Function
 Return type: CString
@@ -36038,6 +36542,12 @@ Return type: CFixedPoint
 
 -----------------------
 
+Character.GetTraitsForCharacter
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
 Character.GetTravelLeaderCost
 Definition type: Function
 Return type: CString
@@ -36081,6 +36591,12 @@ Return type: CString
 -----------------------
 
 Character.GetTreasury
+Definition type: Function
+Return type: CFixedPoint
+
+-----------------------
+
+Character.GetTreasuryBalance
 Definition type: Function
 Return type: CFixedPoint
 
@@ -36788,6 +37304,12 @@ Return type: bool
 
 -----------------------
 
+Character.HasStaticModifier( Arg0 )
+Definition type: Function
+Return type: bool
+
+-----------------------
+
 Character.HasSuzerain
 Definition type: Function
 Return type: [unregistered]
@@ -36914,6 +37436,12 @@ Return type: bool
 
 -----------------------
 
+Character.IsAwayFromHome
+Definition type: Function
+Return type: bool
+
+-----------------------
+
 Character.IsBaronOrUnlanded
 Definition type: Function
 Return type: bool
@@ -36933,6 +37461,12 @@ Return type: bool
 -----------------------
 
 Character.IsCharacterCourtLanguage( Arg0 )
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+Character.IsCommandingArmy
 Definition type: Function
 Return type: bool
 
@@ -37846,6 +38380,12 @@ Return type: bool
 
 -----------------------
 
+CharacterInteraction.ShowsMilitaryStrength
+Definition type: Function
+Return type: bool
+
+-----------------------
+
 CharacterInteraction.UsesArtifactTarget
 Definition type: Function
 Return type: bool
@@ -37931,6 +38471,12 @@ Return type: InteractionSchemeInfo
 CharacterInteractionConfirmationWindow.GetActor
 Definition type: Promote
 Return type: Character
+
+-----------------------
+
+CharacterInteractionConfirmationWindow.GetArmyComposition( Arg0 )
+Definition type: Promote
+Return type: ArmyComposition
 
 -----------------------
 
@@ -38123,6 +38669,12 @@ Return type: CString
 CharacterInteractionConfirmationWindow.GetAnswerScore
 Definition type: Function
 Return type: int32
+
+-----------------------
+
+CharacterInteractionConfirmationWindow.GetArmyComposition( Arg0 )
+Definition type: Function
+Return type: [unregistered]
 
 -----------------------
 
@@ -39472,6 +40024,12 @@ Return type: [unregistered]
 
 -----------------------
 
+CharacterMemory.Custom( Arg0 )
+Definition type: Function
+Return type: CString
+
+-----------------------
+
 CharacterMemory.GetDescription
 Definition type: Function
 Return type: CString
@@ -40362,6 +40920,12 @@ Return type: void
 -----------------------
 
 CharacterWindow.OnWatch
+Definition type: Function
+Return type: void
+
+-----------------------
+
+CharacterWindow.OpenBarbershop
 Definition type: Function
 Return type: void
 
@@ -42385,6 +42949,12 @@ Return type: [unregistered]
 
 -----------------------
 
+CombatSide.Custom( Arg0 )
+Definition type: Function
+Return type: CString
+
+-----------------------
+
 CombatSide.GetComposition
 Definition type: Function
 Return type: [unregistered]
@@ -43299,6 +43869,12 @@ Return type: [unregistered]
 
 -----------------------
 
+Confederation.Custom( Arg0 )
+Definition type: Function
+Return type: CString
+
+-----------------------
+
 Confederation.GetCohesion
 Definition type: Function
 Return type: CFixedPoint
@@ -43827,6 +44403,12 @@ Return type: bool
 
 -----------------------
 
+ContributionItem.IsOwnerOnly
+Definition type: Function
+Return type: bool
+
+-----------------------
+
 ContributionItem.IsSelected
 Definition type: Function
 Return type: bool
@@ -43940,6 +44522,12 @@ Return type: CString
 -----------------------
 
 CouncilPositionType.GetName
+Definition type: Function
+Return type: CString
+
+-----------------------
+
+CouncilPositionType.GetNameForPlayer
 Definition type: Function
 Return type: CString
 
@@ -44539,6 +45127,12 @@ Return type: [unregistered]
 
 -----------------------
 
+County.GetCountyOpinion
+Definition type: Function
+Return type: int32
+
+-----------------------
+
 County.GetCulture
 Definition type: Function
 Return type: [unregistered]
@@ -44578,6 +45172,12 @@ Return type: CFixedPoint
 County.GetDevelopmentProgressOutOfMax
 Definition type: Function
 Return type: CString
+
+-----------------------
+
+County.GetDevelopmentRate
+Definition type: Function
+Return type: CFixedPoint
 
 -----------------------
 
@@ -48287,6 +48887,112 @@ Return type: void
 
 -----------------------
 
+CourtVisualSettingItem
+Definition type: Type
+
+-----------------------
+
+CourtVisualSettingItem.AccessSelf
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+CourtVisualSettingItem.GetBackground
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+CourtVisualSettingItem.GetBackgroundString
+Definition type: Function
+Return type: CString
+
+-----------------------
+
+CourtVisualSettingItem.GetDescription
+Definition type: Function
+Return type: CString
+
+-----------------------
+
+CourtVisualSettingItem.GetName
+Definition type: Function
+Return type: CString
+
+-----------------------
+
+CourtVisualSettingItem.IsDefault
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+CourtVisualSettingItem.Self
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+CourtVisualsWindow
+Definition type: Type
+
+-----------------------
+
+CourtVisualsWindow.GetActiveCourtVisualItem
+Definition type: Promote
+Return type: CourtVisualSettingItem
+
+-----------------------
+
+CourtVisualsWindow.GetRoyalCourtWindow
+Definition type: Promote
+Return type: RoyalCourtWindow
+
+-----------------------
+
+CourtVisualsWindow.AccessSelf
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+CourtVisualsWindow.ApplyCourtVisual( Arg0 )
+Definition type: Function
+Return type: void
+
+-----------------------
+
+CourtVisualsWindow.GetActiveCourtVisualItem
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+CourtVisualsWindow.GetCourtVisuals
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+CourtVisualsWindow.GetRoyalCourtWindow
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+CourtVisualsWindow.ResetCourtVisualToDefault
+Definition type: Function
+Return type: void
+
+-----------------------
+
+CourtVisualsWindow.Self
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
 CourtWindow
 Definition type: Type
 
@@ -48441,21 +49147,15 @@ Return type: ComplexBar
 
 -----------------------
 
+CreateAccoladeView.GetSelectedInitialType
+Definition type: Promote
+Return type: AccoladeType
+
+-----------------------
+
 CreateAccoladeView.GetSelectedKnight
 Definition type: Promote
 Return type: Character
-
------------------------
-
-CreateAccoladeView.GetSelectedPrimaryType
-Definition type: Promote
-Return type: AccoladeType
-
------------------------
-
-CreateAccoladeView.GetSelectedSecondaryType
-Definition type: Promote
-Return type: AccoladeType
 
 -----------------------
 
@@ -48507,13 +49207,7 @@ Return type: CString
 
 -----------------------
 
-CreateAccoladeView.GetChangePrimaryTypeTooltip
-Definition type: Function
-Return type: CString
-
------------------------
-
-CreateAccoladeView.GetChangeSecondaryTypeTooltip
+CreateAccoladeView.GetChangeInitialTypeTooltip
 Definition type: Function
 Return type: CString
 
@@ -48555,19 +49249,13 @@ Return type: [unregistered]
 
 -----------------------
 
+CreateAccoladeView.GetSelectedInitialType
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
 CreateAccoladeView.GetSelectedKnight
-Definition type: Function
-Return type: [unregistered]
-
------------------------
-
-CreateAccoladeView.GetSelectedPrimaryType
-Definition type: Function
-Return type: [unregistered]
-
------------------------
-
-CreateAccoladeView.GetSelectedSecondaryType
 Definition type: Function
 Return type: [unregistered]
 
@@ -48579,13 +49267,7 @@ Return type: CUTF8String
 
 -----------------------
 
-CreateAccoladeView.IsChangingPrimaryType
-Definition type: Function
-Return type: bool
-
------------------------
-
-CreateAccoladeView.IsChangingSecondaryType
+CreateAccoladeView.IsChangingInitialType
 Definition type: Function
 Return type: bool
 
@@ -48609,19 +49291,13 @@ Return type: [unregistered]
 
 -----------------------
 
+CreateAccoladeView.SetSelectedInitialType( Arg0 )
+Definition type: Function
+Return type: void
+
+-----------------------
+
 CreateAccoladeView.SetSelectedKnight( Arg0 )
-Definition type: Function
-Return type: void
-
------------------------
-
-CreateAccoladeView.SetSelectedPrimaryType( Arg0 )
-Definition type: Function
-Return type: void
-
------------------------
-
-CreateAccoladeView.SetSelectedSecondaryType( Arg0 )
 Definition type: Function
 Return type: void
 
@@ -48633,19 +49309,7 @@ Return type: void
 
 -----------------------
 
-CreateAccoladeView.SwapSelectedAttributeTypes
-Definition type: Function
-Return type: void
-
------------------------
-
-CreateAccoladeView.ToggleChangingPrimaryType
-Definition type: Function
-Return type: void
-
------------------------
-
-CreateAccoladeView.ToggleChangingSecondaryType
+CreateAccoladeView.ToggleChangingInitialType
 Definition type: Function
 Return type: void
 
@@ -48851,6 +49515,12 @@ Return type: CultureInnovationType
 
 -----------------------
 
+Culture.GetCreationDate
+Definition type: Promote
+Return type: Date
+
+-----------------------
+
 Culture.GetCultureEra
 Definition type: Promote
 Return type: CultureEra
@@ -48971,6 +49641,12 @@ Return type: bool
 
 -----------------------
 
+Culture.Custom( Arg0 )
+Definition type: Function
+Return type: CString
+
+-----------------------
+
 Culture.GetAcceptance( Arg0 )
 Definition type: Function
 Return type: CFixedPoint
@@ -48998,6 +49674,12 @@ Return type: CFixedPoint
 Culture.GetAddTraditionBlockers
 Definition type: Function
 Return type: CString
+
+-----------------------
+
+Culture.GetAverageDevelopment
+Definition type: Function
+Return type: int32
 
 -----------------------
 
@@ -49034,6 +49716,30 @@ Return type: CString
 Culture.GetCollectiveNounNoTooltip
 Definition type: Function
 Return type: CString
+
+-----------------------
+
+Culture.GetCountiesChange
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+Culture.GetCountiesGain
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+Culture.GetCountiesLoss
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+Culture.GetCreationDate
+Definition type: Function
+Return type: [unregistered]
 
 -----------------------
 
@@ -49211,7 +49917,25 @@ Return type: CString
 
 -----------------------
 
+Culture.GetNumberOfCharacters
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+Culture.GetNumberOfCounties
+Definition type: Function
+Return type: int32
+
+-----------------------
+
 Culture.GetNumberOfDiscoveredInnovations
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+Culture.GetNumberOfRulers
 Definition type: Function
 Return type: int32
 
@@ -49268,6 +49992,12 @@ Return type: [unregistered]
 Culture.GetTemplateData
 Definition type: Function
 Return type: [unregistered]
+
+-----------------------
+
+Culture.GetTotalMilitaryStrength
+Definition type: Function
+Return type: int32
 
 -----------------------
 
@@ -49500,6 +50230,12 @@ Return type: [unregistered]
 CultureEra.CanGainProgress
 Definition type: Function
 Return type: [unregistered]
+
+-----------------------
+
+CultureEra.CanProgressToNextEra
+Definition type: Function
+Return type: bool
 
 -----------------------
 
@@ -52506,6 +53242,18 @@ Return type: CFixedPoint
 
 -----------------------
 
+Diarchy.GetSwingForNextLevel
+Definition type: Function
+Return type: CFixedPoint
+
+-----------------------
+
+Diarchy.GetSwingForPrevLevel
+Definition type: Function
+Return type: CFixedPoint
+
+-----------------------
+
 Diarchy.IsValid
 Definition type: Function
 Return type: bool
@@ -53750,112 +54498,194 @@ Return type: void
 
 -----------------------
 
-DoctrineGroupWindow
+DoctrineCategoryFetcher
 Definition type: Type
 
 -----------------------
 
-DoctrineGroupWindow.GetDoctrineGroup
+DoctrineCategoryFetcher.AccessSelf
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+DoctrineCategoryFetcher.GetCategory
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+DoctrineCategoryFetcher.Self
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+DoctrineCategoryHelper
+Definition type: Type
+
+-----------------------
+
+DoctrineCategoryHelper.AccessSelf
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+DoctrineCategoryHelper.GetCategory
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+DoctrineCategoryHelper.Self
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+DoctrineCategoryWindow
+Definition type: Type
+
+-----------------------
+
+DoctrineCategoryWindow.GetDoctrineGroup
 Definition type: Promote
-Return type: FaithDoctrineGroup
+Return type: DoctrineGroupType
 
 -----------------------
 
-DoctrineGroupWindow.GetFaithCreationWindow
-Definition type: Promote
-Return type: FaithCreationWindow
-
------------------------
-
-DoctrineGroupWindow.AccessSelf
+DoctrineCategoryWindow.AccessSelf
 Definition type: Function
 Return type: [unregistered]
 
 -----------------------
 
-DoctrineGroupWindow.GetDoctrineGroup
+DoctrineCategoryWindow.GetDoctrineGroup
 Definition type: Function
 Return type: [unregistered]
 
 -----------------------
 
-DoctrineGroupWindow.GetDoctrines
+DoctrineCategoryWindow.GetDoctrines
 Definition type: Function
 Return type: [unregistered]
 
 -----------------------
 
-DoctrineGroupWindow.GetFaithCreationWindow
-Definition type: Function
-Return type: [unregistered]
-
------------------------
-
-DoctrineGroupWindow.GetSlotIndex
+DoctrineCategoryWindow.GetSlotIndex
 Definition type: Function
 Return type: int32
 
 -----------------------
 
-DoctrineGroupWindow.Self
+DoctrineCategoryWindow.Self
 Definition type: Function
 Return type: [unregistered]
 
 -----------------------
 
-DoctrineGroupWindow.ShowWindow( Arg0 )
+DoctrineCategoryWindow.ShowWindow( Arg0 )
 Definition type: Function
 Return type: void
 
 -----------------------
 
-DoctrineGroupWindow.ShowWindowSortList( Arg0 )
+DoctrineCategoryWindow.ShowWindowSortList( Arg0 )
 Definition type: Function
 Return type: void
 
 -----------------------
 
-DoctrineGroupingFetcher
+DoctrineGroupType
 Definition type: Type
 
 -----------------------
 
-DoctrineGroupingFetcher.AccessSelf
+DoctrineGroupType.AccessSelf
 Definition type: Function
 Return type: [unregistered]
 
 -----------------------
 
-DoctrineGroupingFetcher.GetGrouping
+DoctrineGroupType.GetBaseNameNoTooltip
+Definition type: Function
+Return type: CString
+
+-----------------------
+
+DoctrineGroupType.GetCategory
+Definition type: Function
+Return type: CString
+
+-----------------------
+
+DoctrineGroupType.GetIcon
 Definition type: Function
 Return type: [unregistered]
 
 -----------------------
 
-DoctrineGroupingFetcher.Self
+DoctrineGroupType.GetLogName
+Definition type: Function
+Return type: CString
+
+-----------------------
+
+DoctrineGroupType.GetName( Arg0 )
+Definition type: Function
+Return type: CString
+
+-----------------------
+
+DoctrineGroupType.HasIcon
 Definition type: Function
 Return type: [unregistered]
 
 -----------------------
 
-DoctrineGroupingFetcher2
+DoctrineGroupType.Self
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+DoctrineItem
 Definition type: Type
 
 -----------------------
 
-DoctrineGroupingFetcher2.AccessSelf
+DoctrineItem.GetDoctrine
+Definition type: Promote
+Return type: FaithDoctrine
+
+-----------------------
+
+DoctrineItem.GetFaith
+Definition type: Promote
+Return type: Faith
+
+-----------------------
+
+DoctrineItem.AccessSelf
 Definition type: Function
 Return type: [unregistered]
 
 -----------------------
 
-DoctrineGroupingFetcher2.GetGrouping
+DoctrineItem.GetDoctrine
 Definition type: Function
 Return type: [unregistered]
 
 -----------------------
 
-DoctrineGroupingFetcher2.Self
+DoctrineItem.GetFaith
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+DoctrineItem.Self
 Definition type: Function
 Return type: [unregistered]
 
@@ -53947,6 +54777,12 @@ Return type: bool
 Domicile.CancelConstruction
 Definition type: Function
 Return type: Command
+
+-----------------------
+
+Domicile.Custom( Arg0 )
+Definition type: Function
+Return type: CString
 
 -----------------------
 
@@ -55829,6 +56665,12 @@ Return type: bool
 
 -----------------------
 
+Dynasty.Custom( Arg0 )
+Definition type: Function
+Return type: CString
+
+-----------------------
+
 Dynasty.GetAliveMembers
 Definition type: Function
 Return type: [unregistered]
@@ -55937,6 +56779,24 @@ Return type: [unregistered]
 
 -----------------------
 
+Dynasty.GetNumberOfCounties
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+Dynasty.GetNumberOfDeadMembers
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+Dynasty.GetNumberOfLegacies
+Definition type: Function
+Return type: int32
+
+-----------------------
+
 Dynasty.GetNumberOfLivingMembers
 Definition type: Function
 Return type: int32
@@ -55944,6 +56804,12 @@ Return type: int32
 -----------------------
 
 Dynasty.GetNumberOfMembers
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+Dynasty.GetNumberOfRulers
 Definition type: Function
 Return type: int32
 
@@ -56018,6 +56884,12 @@ Return type: CString
 Dynasty.GetRequiredPowerToReplaceDynast
 Definition type: Function
 Return type: CFixedPoint
+
+-----------------------
+
+Dynasty.GetTotalMilitaryStrength
+Definition type: Function
+Return type: int32
 
 -----------------------
 
@@ -56205,6 +57077,12 @@ Return type: CoatOfArms
 
 -----------------------
 
+DynastyHouse.GetHouseRelationWith( Arg0 )
+Definition type: Promote
+Return type: HouseRelation
+
+-----------------------
+
 DynastyHouse.GetHouseTitle
 Definition type: Promote
 Return type: Title
@@ -56238,6 +57116,12 @@ Return type: int32
 DynastyHouse.CanPlayerCustomize
 Definition type: Function
 Return type: bool
+
+-----------------------
+
+DynastyHouse.Custom( Arg0 )
+Definition type: Function
+Return type: CString
 
 -----------------------
 
@@ -56403,6 +57287,12 @@ Return type: CString
 
 -----------------------
 
+DynastyHouse.GetHouseRelationWith( Arg0 )
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
 DynastyHouse.GetHouseTitle
 Definition type: Function
 Return type: [unregistered]
@@ -56445,7 +57335,31 @@ Return type: CString
 
 -----------------------
 
+DynastyHouse.GetNumberOfCounties
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+DynastyHouse.GetNumberOfDeadMembers
+Definition type: Function
+Return type: int32
+
+-----------------------
+
 DynastyHouse.GetNumberOfMembers
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+DynastyHouse.GetNumberOfRulers
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+DynastyHouse.GetTotalMilitaryStrength
 Definition type: Function
 Return type: int32
 
@@ -56470,6 +57384,12 @@ Return type: bool
 -----------------------
 
 DynastyHouse.HasHouseAspirationCooldown
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+DynastyHouse.HasHouseRelationWith( Arg0 )
 Definition type: Function
 Return type: bool
 
@@ -57660,6 +58580,12 @@ Return type: CFixedPoint
 
 -----------------------
 
+Epidemic.Custom( Arg0 )
+Definition type: Function
+Return type: CString
+
+-----------------------
+
 Epidemic.GetInfectionDataIn( Arg0 )
 Definition type: Function
 Return type: [unregistered]
@@ -58412,6 +59338,12 @@ Return type: [unregistered]
 
 -----------------------
 
+EventWindow.IsOnTop
+Definition type: Function
+Return type: bool
+
+-----------------------
+
 EventWindow.ResetContents
 Definition type: Function
 Return type: void
@@ -58629,6 +59561,12 @@ Return type: ToolPropertySearchList
 
 -----------------------
 
+EventWindowData.AccessVfxWidgetSearchList
+Definition type: Promote
+Return type: ToolPropertySearchList
+
+-----------------------
+
 EventWindowData.GetArtifact( Arg0 )
 Definition type: Promote
 Return type: Artifact
@@ -58696,6 +59634,12 @@ Return type: [unregistered]
 -----------------------
 
 EventWindowData.AccessThemeSearchList
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+EventWindowData.AccessVfxWidgetSearchList
 Definition type: Function
 Return type: [unregistered]
 
@@ -59429,6 +60373,12 @@ Return type: Character
 
 -----------------------
 
+Faction.GetSpecialCharacterOrLeader
+Definition type: Promote
+Return type: Character
+
+-----------------------
+
 Faction.GetSpecialTitle
 Definition type: Promote
 Return type: Title
@@ -59450,6 +60400,12 @@ Return type: Scope
 Faction.AccessSelf
 Definition type: Function
 Return type: [unregistered]
+
+-----------------------
+
+Faction.Custom( Arg0 )
+Definition type: Function
+Return type: CString
 
 -----------------------
 
@@ -59502,6 +60458,12 @@ Return type: CString
 -----------------------
 
 Faction.HasSpecialCharacter
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+Faction.HasSpecialCharacterOrLeader
 Definition type: Function
 Return type: bool
 
@@ -60384,6 +61346,24 @@ Return type: CString
 
 -----------------------
 
+Faith.GetCountiesChange
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+Faith.GetCountiesGain
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+Faith.GetCountiesLoss
+Definition type: Function
+Return type: int32
+
+-----------------------
+
 Faith.GetDefensiveGreatHolyWars
 Definition type: Function
 Return type: [unregistered]
@@ -60474,7 +61454,49 @@ Return type: CString
 
 -----------------------
 
+Faith.GetNumberOfControlledHolySites
+Definition type: Function
+Return type: int32
+
+-----------------------
+
 Faith.GetNumberOfCountiesOfFaith
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+Faith.GetNumberOfFollowers
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+Faith.GetNumberOfHolySites
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+Faith.GetNumberOfHolyWars
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+Faith.GetNumberOfRulers
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+Faith.GetNumberOfSinners
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+Faith.GetNumberOfVirtuous
 Definition type: Function
 Return type: int32
 
@@ -60507,6 +61529,12 @@ Return type: [unregistered]
 Faith.GetTextIcon
 Definition type: Function
 Return type: CString
+
+-----------------------
+
+Faith.GetTotalMilitaryStrength
+Definition type: Function
+Return type: int32
 
 -----------------------
 
@@ -61955,20 +62983,91 @@ Return type: [unregistered]
 
 -----------------------
 
+FaithCreationDoctrineItem
+Definition type: Type
+
+-----------------------
+
+FaithCreationDoctrineItem.GetDoctrineItem
+Definition type: Promote
+Return type: DoctrineItem
+
+-----------------------
+
+FaithCreationDoctrineItem.GetFaithCreationWindow
+Definition type: Promote
+Return type: FaithCreationWindow
+
+-----------------------
+
+FaithCreationDoctrineItem.AccessSelf
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+FaithCreationDoctrineItem.CanPick
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+FaithCreationDoctrineItem.GetBlockers
+Definition type: Function
+Return type: CString
+
+-----------------------
+
+FaithCreationDoctrineItem.GetDoctrineItem
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+FaithCreationDoctrineItem.GetFaithCreationWindow
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+FaithCreationDoctrineItem.GetSlotIndex
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+FaithCreationDoctrineItem.IsSelected
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+FaithCreationDoctrineItem.Self
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+FaithCreationDoctrineItem.ShouldDisplay
+Definition type: Function
+Return type: bool
+
+-----------------------
+
 FaithCreationWindow
 Definition type: Type
 
 -----------------------
 
-FaithCreationWindow.GetDoctrineGroupWindow
+FaithCreationWindow.GetCategoryHelper( Arg0 )
 Definition type: Promote
-Return type: DoctrineGroupWindow
+Return type: DoctrineCategoryFetcher
 
 -----------------------
 
-FaithCreationWindow.GetGroupingHelper( Arg0 )
+FaithCreationWindow.GetDoctrineCategoryWindow
 Definition type: Promote
-Return type: DoctrineGroupingFetcher
+Return type: DoctrineCategoryWindow
 
 -----------------------
 
@@ -62020,6 +63119,12 @@ Return type: void
 
 -----------------------
 
+FaithCreationWindow.GetCategoryHelper( Arg0 )
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
 FaithCreationWindow.GetColor
 Definition type: Function
 Return type: CVector4f
@@ -62032,15 +63137,9 @@ Return type: CString
 
 -----------------------
 
-FaithCreationWindow.GetDoctrineGroupWindow
+FaithCreationWindow.GetDoctrineCategoryWindow
 Definition type: Function
 Return type: [unregistered]
-
------------------------
-
-FaithCreationWindow.GetDoctrineGroupingName( Arg0 )
-Definition type: Function
-Return type: CString
 
 -----------------------
 
@@ -62057,12 +63156,6 @@ Return type: [unregistered]
 -----------------------
 
 FaithCreationWindow.GetFaithIcons
-Definition type: Function
-Return type: [unregistered]
-
------------------------
-
-FaithCreationWindow.GetGroupingHelper( Arg0 )
 Definition type: Function
 Return type: [unregistered]
 
@@ -62189,7 +63282,7 @@ Definition type: Type
 
 FaithDoctrine.GetGroup
 Definition type: Promote
-Return type: FaithDoctrineGroup
+Return type: DoctrineGroupType
 
 -----------------------
 
@@ -62253,6 +63346,12 @@ Return type: [unregistered]
 
 -----------------------
 
+FaithDoctrine.GetLogName
+Definition type: Function
+Return type: CString
+
+-----------------------
+
 FaithDoctrine.GetName( Arg0 )
 Definition type: Function
 Return type: CString
@@ -62283,42 +63382,89 @@ Return type: [unregistered]
 
 -----------------------
 
-FaithDoctrineGroup
+FaithIcon
 Definition type: Type
 
 -----------------------
 
-FaithDoctrineGroup.AccessSelf
+FaithIcon.AccessSelf
 Definition type: Function
 Return type: [unregistered]
 
 -----------------------
 
-FaithDoctrineGroup.GetGroupingKey
+FaithIcon.GetName
 Definition type: Function
 Return type: CString
 
 -----------------------
 
-FaithDoctrineGroup.GetIcon
+FaithIcon.GetTexture
 Definition type: Function
 Return type: [unregistered]
 
 -----------------------
 
-FaithDoctrineGroup.GetName( Arg0 )
+FaithIcon.IsSelected
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+FaithIcon.Self
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+FaithType
+Definition type: Type
+
+-----------------------
+
+FaithType.AccessSelf
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+FaithType.GetIndex
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+FaithType.GetKey
 Definition type: Function
 Return type: CString
 
 -----------------------
 
-FaithDoctrineGroup.HasIcon
+FaithType.GetLogName
 Definition type: Function
-Return type: [unregistered]
+Return type: CString
 
 -----------------------
 
-FaithDoctrineGroup.Self
+FaithType.GetName
+Definition type: Function
+Return type: CString
+
+-----------------------
+
+FaithType.IsValid
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+FaithType.Localize( Arg0 )
+Definition type: Function
+Return type: CString
+
+-----------------------
+
+FaithType.Self
 Definition type: Function
 Return type: [unregistered]
 
@@ -62329,15 +63475,21 @@ Definition type: Type
 
 -----------------------
 
+FaithWindow.GetCategoryHelper( Arg0 )
+Definition type: Promote
+Return type: DoctrineCategoryHelper
+
+-----------------------
+
 FaithWindow.GetFaith
 Definition type: Promote
 Return type: Faith
 
 -----------------------
 
-FaithWindow.GetGroupingHelper( Arg0 )
+FaithWindow.GetReligionSubWindow
 Definition type: Promote
-Return type: DoctrineGroupingFetcher2
+Return type: ReligionWindow
 
 -----------------------
 
@@ -62353,6 +63505,12 @@ Return type: void
 
 -----------------------
 
+FaithWindow.GetCategoryHelper( Arg0 )
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
 FaithWindow.GetDoctrines
 Definition type: Function
 Return type: [unregistered]
@@ -62365,13 +63523,13 @@ Return type: [unregistered]
 
 -----------------------
 
-FaithWindow.GetGroupingHelper( Arg0 )
+FaithWindow.GetHolySites
 Definition type: Function
 Return type: [unregistered]
 
 -----------------------
 
-FaithWindow.GetHolySites
+FaithWindow.GetReligionSubWindow
 Definition type: Function
 Return type: [unregistered]
 
@@ -62392,12 +63550,6 @@ Return type: [unregistered]
 FaithWindow.Self
 Definition type: Function
 Return type: [unregistered]
-
------------------------
-
-FaithWindow.ToggleReligionWindow
-Definition type: Function
-Return type: void
 
 -----------------------
 
@@ -63086,6 +64238,12 @@ Return type: [unregistered]
 
 -----------------------
 
+FrontEndMainView.GetSubscriptionStatusText
+Definition type: Function
+Return type: CString
+
+-----------------------
+
 FrontEndMainView.GoNextChallengeCharacter
 Definition type: Function
 Return type: void
@@ -63095,6 +64253,12 @@ Return type: void
 FrontEndMainView.GoPreviousChallengeCharacter
 Definition type: Function
 Return type: void
+
+-----------------------
+
+FrontEndMainView.IsSteamAvailable
+Definition type: Function
+Return type: bool
 
 -----------------------
 
@@ -63171,6 +64335,12 @@ Return type: void
 -----------------------
 
 FrontEndMainView.OnSettings
+Definition type: Function
+Return type: void
+
+-----------------------
+
+FrontEndMainView.OnSubscription
 Definition type: Function
 Return type: void
 
@@ -63377,7 +64547,7 @@ Return type: void
 
 -----------------------
 
-GUIAlertItem.PlayShowSound
+GUIAlertItem.PlayShowSound( Arg0 )
 Definition type: Function
 Return type: void
 
@@ -65324,6 +66494,12 @@ Return type: int32
 
 -----------------------
 
+GovernmentType.GetMinAppointmentTier
+Definition type: Function
+Return type: int32
+
+-----------------------
+
 GovernmentType.GetName
 Definition type: Function
 Return type: CString
@@ -65632,6 +66808,12 @@ Return type: [unregistered]
 
 -----------------------
 
+GraphicalUnitType.GetAccoladesBigIllustration
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
 GraphicalUnitType.GetKnightsBigIllustration
 Definition type: Function
 Return type: [unregistered]
@@ -65651,6 +66833,12 @@ Return type: [unregistered]
 -----------------------
 
 GraphicalUnitType.GetLeviesSmallIllustration
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+GraphicalUnitType.HasAccoladesBigIllustration
 Definition type: Function
 Return type: [unregistered]
 
@@ -66208,6 +67396,12 @@ Return type: Date
 
 -----------------------
 
+GreatProject.GetFounder
+Definition type: Promote
+Return type: Character
+
+-----------------------
+
 GreatProject.GetLastAvailableDateForContributions
 Definition type: Promote
 Return type: Date
@@ -66262,6 +67456,12 @@ Return type: bool
 
 -----------------------
 
+GreatProject.Custom( Arg0 )
+Definition type: Function
+Return type: CString
+
+-----------------------
+
 GreatProject.GetConstructionDaysLeft
 Definition type: Function
 Return type: CString
@@ -66295,6 +67495,12 @@ Return type: [unregistered]
 GreatProject.GetDeadlinePercentageForContributions
 Definition type: Function
 Return type: CFixedPoint
+
+-----------------------
+
+GreatProject.GetFounder
+Definition type: Function
+Return type: [unregistered]
 
 -----------------------
 
@@ -66690,6 +67896,30 @@ Return type: CString
 
 -----------------------
 
+GreatProjectType.GetNameForCharacter( Arg0 )
+Definition type: Function
+Return type: CString
+
+-----------------------
+
+GreatProjectType.GetNameForCharacterNoTooltip( Arg0 )
+Definition type: Function
+Return type: CString
+
+-----------------------
+
+GreatProjectType.GetNameForPlayer
+Definition type: Function
+Return type: CString
+
+-----------------------
+
+GreatProjectType.GetNameForPlayerNoTooltip
+Definition type: Function
+Return type: CString
+
+-----------------------
+
 GreatProjectType.GetNameNoTooltip
 Definition type: Function
 Return type: CString
@@ -66729,12 +67959,6 @@ Return type: CString
 GreatProjectType.GetProjectFailedEffectsDescription( Arg0 )
 Definition type: Function
 Return type: CString
-
------------------------
-
-GreatProjectType.HasIcon
-Definition type: Function
-Return type: [unregistered]
 
 -----------------------
 
@@ -67367,6 +68591,12 @@ Return type: CultureEra
 
 -----------------------
 
+GuiCultureEra.GetNextCultureEra
+Definition type: Promote
+Return type: CultureEra
+
+-----------------------
+
 GuiCultureEra.AccessSelf
 Definition type: Function
 Return type: [unregistered]
@@ -67394,6 +68624,18 @@ Return type: CString
 GuiCultureEra.GetJoinedLeftString
 Definition type: Function
 Return type: CString
+
+-----------------------
+
+GuiCultureEra.GetNextCultureEra
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+GuiCultureEra.HasNextCultureEra
+Definition type: Function
+Return type: bool
 
 -----------------------
 
@@ -67550,165 +68792,6 @@ Return type: [unregistered]
 
 -----------------------
 
-GuiFaithCreationDoctrineItem
-Definition type: Type
-
------------------------
-
-GuiFaithCreationDoctrineItem.GetFaithCreationWindow
-Definition type: Promote
-Return type: FaithCreationWindow
-
------------------------
-
-GuiFaithCreationDoctrineItem.GetGuiFaithDoctrineItem
-Definition type: Promote
-Return type: GuiFaithDoctrineItem
-
------------------------
-
-GuiFaithCreationDoctrineItem.AccessSelf
-Definition type: Function
-Return type: [unregistered]
-
------------------------
-
-GuiFaithCreationDoctrineItem.CanPick
-Definition type: Function
-Return type: bool
-
------------------------
-
-GuiFaithCreationDoctrineItem.GetBlockers
-Definition type: Function
-Return type: CString
-
------------------------
-
-GuiFaithCreationDoctrineItem.GetFaithCreationWindow
-Definition type: Function
-Return type: [unregistered]
-
------------------------
-
-GuiFaithCreationDoctrineItem.GetGuiFaithDoctrineItem
-Definition type: Function
-Return type: [unregistered]
-
------------------------
-
-GuiFaithCreationDoctrineItem.GetSlotIndex
-Definition type: Function
-Return type: int32
-
------------------------
-
-GuiFaithCreationDoctrineItem.IsSelected
-Definition type: Function
-Return type: bool
-
------------------------
-
-GuiFaithCreationDoctrineItem.Self
-Definition type: Function
-Return type: [unregistered]
-
------------------------
-
-GuiFaithCreationDoctrineItem.ShouldDisplay
-Definition type: Function
-Return type: bool
-
------------------------
-
-GuiFaithDoctrineItem
-Definition type: Type
-
------------------------
-
-GuiFaithDoctrineItem.GetDoctrine
-Definition type: Promote
-Return type: FaithDoctrine
-
------------------------
-
-GuiFaithDoctrineItem.GetFaith
-Definition type: Promote
-Return type: Faith
-
------------------------
-
-GuiFaithDoctrineItem.AccessSelf
-Definition type: Function
-Return type: [unregistered]
-
------------------------
-
-GuiFaithDoctrineItem.GetDoctrine
-Definition type: Function
-Return type: [unregistered]
-
------------------------
-
-GuiFaithDoctrineItem.GetFaith
-Definition type: Function
-Return type: [unregistered]
-
------------------------
-
-GuiFaithDoctrineItem.Self
-Definition type: Function
-Return type: [unregistered]
-
------------------------
-
-GuiFaithIcon
-Definition type: Type
-
------------------------
-
-GuiFaithIcon.GetFaithCreationWindow
-Definition type: Promote
-Return type: FaithCreationWindow
-
------------------------
-
-GuiFaithIcon.AccessSelf
-Definition type: Function
-Return type: [unregistered]
-
------------------------
-
-GuiFaithIcon.GetFaithCreationWindow
-Definition type: Function
-Return type: [unregistered]
-
------------------------
-
-GuiFaithIcon.GetIconName
-Definition type: Function
-Return type: CString
-
------------------------
-
-GuiFaithIcon.GetIconTexture
-Definition type: Function
-Return type: [unregistered]
-
------------------------
-
-GuiFaithIcon.IsSelected
-Definition type: Function
-Return type: bool
-
------------------------
-
-GuiFaithIcon.Self
-Definition type: Function
-Return type: [unregistered]
-
------------------------
-
 GuiGameRule
 Definition type: Type
 
@@ -67804,59 +68887,6 @@ Return type: bool
 -----------------------
 
 GuiGameRulePreset.Self
-Definition type: Function
-Return type: [unregistered]
-
------------------------
-
-GuiHolySiteItem
-Definition type: Type
-
------------------------
-
-GuiHolySiteItem.GetFaith
-Definition type: Promote
-Return type: Faith
-
------------------------
-
-GuiHolySiteItem.GetHolySite
-Definition type: Promote
-Return type: HolySite
-
------------------------
-
-GuiHolySiteItem.AccessSelf
-Definition type: Function
-Return type: [unregistered]
-
------------------------
-
-GuiHolySiteItem.GetControlDesc
-Definition type: Function
-Return type: CString
-
------------------------
-
-GuiHolySiteItem.GetFaith
-Definition type: Function
-Return type: [unregistered]
-
------------------------
-
-GuiHolySiteItem.GetHolySite
-Definition type: Function
-Return type: [unregistered]
-
------------------------
-
-GuiHolySiteItem.IsHeldByFaith
-Definition type: Function
-Return type: bool
-
------------------------
-
-GuiHolySiteItem.Self
 Definition type: Function
 Return type: [unregistered]
 
@@ -68326,53 +69356,6 @@ Return type: void
 -----------------------
 
 GuiUnitInfo.Self
-Definition type: Function
-Return type: [unregistered]
-
------------------------
-
-GuiVirtueOrSinItem
-Definition type: Type
-
------------------------
-
-GuiVirtueOrSinItem.GetTrait
-Definition type: Promote
-Return type: Trait
-
------------------------
-
-GuiVirtueOrSinItem.AccessSelf
-Definition type: Function
-Return type: [unregistered]
-
------------------------
-
-GuiVirtueOrSinItem.GetFullDescription
-Definition type: Function
-Return type: CString
-
------------------------
-
-GuiVirtueOrSinItem.GetTrait
-Definition type: Function
-Return type: [unregistered]
-
------------------------
-
-GuiVirtueOrSinItem.IsSin
-Definition type: Function
-Return type: bool
-
------------------------
-
-GuiVirtueOrSinItem.IsVirtue
-Definition type: Function
-Return type: bool
-
------------------------
-
-GuiVirtueOrSinItem.Self
 Definition type: Function
 Return type: [unregistered]
 
@@ -69218,6 +70201,18 @@ Return type: bool
 
 -----------------------
 
+Holding.HasGreatBuildingSlot
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+Holding.HasSpecialBuildingSlot
+Definition type: Function
+Return type: bool
+
+-----------------------
+
 Holding.IsConstructionInProgress
 Definition type: Function
 Return type: bool
@@ -69771,6 +70766,12 @@ Return type: bool
 
 -----------------------
 
+HoldingView.CanGoToNextCounty
+Definition type: Function
+Return type: bool
+
+-----------------------
+
 HoldingView.CanGrantTitle
 Definition type: Function
 Return type: bool
@@ -70030,6 +71031,12 @@ Return type: CString
 -----------------------
 
 HoldingView.GoToLocation
+Definition type: Function
+Return type: void
+
+-----------------------
+
+HoldingView.GoToNextCounty
 Definition type: Function
 Return type: void
 
@@ -70369,9 +71376,21 @@ Return type: CString
 
 -----------------------
 
+HolySite.GetLogName
+Definition type: Function
+Return type: CString
+
+-----------------------
+
 HolySite.GetName
 Definition type: Function
 Return type: CString
+
+-----------------------
+
+HolySite.HasParameter( Arg0 )
+Definition type: Function
+Return type: bool
 
 -----------------------
 
@@ -70386,9 +71405,9 @@ Definition type: Type
 
 -----------------------
 
-HolySiteIcon.GetHolySite
+HolySiteIcon.GetHolySiteItem
 Definition type: Promote
-Return type: GuiHolySiteItem
+Return type: HolySiteItem
 
 -----------------------
 
@@ -70398,13 +71417,66 @@ Return type: [unregistered]
 
 -----------------------
 
-HolySiteIcon.GetHolySite
+HolySiteIcon.GetHolySiteItem
 Definition type: Function
 Return type: [unregistered]
 
 -----------------------
 
 HolySiteIcon.Self
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+HolySiteItem
+Definition type: Type
+
+-----------------------
+
+HolySiteItem.GetFaith
+Definition type: Promote
+Return type: Faith
+
+-----------------------
+
+HolySiteItem.GetHolySite
+Definition type: Promote
+Return type: HolySite
+
+-----------------------
+
+HolySiteItem.AccessSelf
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+HolySiteItem.GetControlDesc
+Definition type: Function
+Return type: CString
+
+-----------------------
+
+HolySiteItem.GetFaith
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+HolySiteItem.GetHolySite
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+HolySiteItem.IsHeldByFaith
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+HolySiteItem.Self
 Definition type: Function
 Return type: [unregistered]
 
@@ -70707,7 +71779,7 @@ Return type: CFixedPoint
 
 -----------------------
 
-HouseAspiration.GetLevelDesc( Arg0 )
+HouseAspiration.GetLevelDesc( Arg0, Arg1 )
 Definition type: Function
 Return type: CString
 
@@ -71388,7 +72460,7 @@ Return type: CString
 
 -----------------------
 
-HouseRelationLevel.GetIcon
+HouseRelationLevel.GetFlatIcon
 Definition type: Function
 Return type: [unregistered]
 
@@ -71412,7 +72484,19 @@ Return type: CString
 
 -----------------------
 
-HouseRelationLevel.HasIcon
+HouseRelationLevel.GetRenderedIcon
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+HouseRelationLevel.HasFlatIcon
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+HouseRelationLevel.HasRenderedIcon
 Definition type: Function
 Return type: [unregistered]
 
@@ -72000,6 +73084,12 @@ Return type: bool
 
 -----------------------
 
+HybridizationWindow.HasLeftNamingStyle
+Definition type: Function
+Return type: bool
+
+-----------------------
+
 HybridizationWindow.HasLeftUnits
 Definition type: Function
 Return type: bool
@@ -72037,6 +73127,12 @@ Return type: bool
 -----------------------
 
 HybridizationWindow.HasRightNamingList
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+HybridizationWindow.HasRightNamingStyle
 Definition type: Function
 Return type: bool
 
@@ -72138,6 +73234,12 @@ Return type: void
 
 -----------------------
 
+HybridizationWindow.SetLeftNamingStyle
+Definition type: Function
+Return type: void
+
+-----------------------
+
 HybridizationWindow.SetLeftUnits
 Definition type: Function
 Return type: void
@@ -72175,6 +73277,12 @@ Return type: void
 -----------------------
 
 HybridizationWindow.SetRightNamingList
+Definition type: Function
+Return type: void
+
+-----------------------
+
+HybridizationWindow.SetRightNamingStyle
 Definition type: Function
 Return type: void
 
@@ -72504,6 +73612,12 @@ Return type: CFixedPoint
 
 -----------------------
 
+InGameBottomBar.GetDynasticCycleOwnedLandPercentage
+Definition type: Function
+Return type: CFixedPoint
+
+-----------------------
+
 InGameBottomBar.GetEpidemicsBorderingRealm
 Definition type: Function
 Return type: [unregistered]
@@ -72558,6 +73672,12 @@ Return type: [unregistered]
 
 -----------------------
 
+InGameBottomBar.GetOwnedCountiesInDynasticCycleCount
+Definition type: Function
+Return type: int32
+
+-----------------------
+
 InGameBottomBar.GetOwnedDynasticCycleLandPercentageTooltip
 Definition type: Function
 Return type: CString
@@ -72579,6 +73699,12 @@ Return type: [unregistered]
 InGameBottomBar.GetTopAdminMeritPool
 Definition type: Function
 Return type: [unregistered]
+
+-----------------------
+
+InGameBottomBar.GetTotalCountiesInDynasticCycleCount
+Definition type: Function
+Return type: int32
 
 -----------------------
 
@@ -72978,6 +74104,12 @@ Return type: Scope
 Inspiration.AccessSelf
 Definition type: Function
 Return type: [unregistered]
+
+-----------------------
+
+Inspiration.Custom( Arg0 )
+Definition type: Function
+Return type: CString
 
 -----------------------
 
@@ -75290,8 +76422,269 @@ Return type: [unregistered]
 
 -----------------------
 
+KnightPermissionHouseFilterOption
+Definition type: Type
+
+-----------------------
+
+KnightPermissionHouseFilterOption.AccessSelf
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+KnightPermissionHouseFilterOption.GetDescription
+Definition type: Function
+Return type: CString
+
+-----------------------
+
+KnightPermissionHouseFilterOption.GetName
+Definition type: Function
+Return type: CString
+
+-----------------------
+
+KnightPermissionHouseFilterOption.Self
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+KnightPermissionVassalFilterOption
+Definition type: Type
+
+-----------------------
+
+KnightPermissionVassalFilterOption.AccessSelf
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+KnightPermissionVassalFilterOption.GetDescription
+Definition type: Function
+Return type: CString
+
+-----------------------
+
+KnightPermissionVassalFilterOption.GetName
+Definition type: Function
+Return type: CString
+
+-----------------------
+
+KnightPermissionVassalFilterOption.Self
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+KnightPermissions
+Definition type: Type
+
+-----------------------
+
+KnightPermissions.AccessSelf
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+KnightPermissions.AdjustMinProwess( Arg0 )
+Definition type: Function
+Return type: void
+
+-----------------------
+
+KnightPermissions.GetAllowConcubines
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+KnightPermissions.GetAllowCouncillors
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+KnightPermissions.GetAllowInspiredCourtiers
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+KnightPermissions.GetAllowLovers
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+KnightPermissions.GetAllowNonCombatCourtPositions
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+KnightPermissions.GetAllowOtherChildren
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+KnightPermissions.GetAllowPlayerHeir
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+KnightPermissions.GetAllowPregnant
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+KnightPermissions.GetAllowSpouses
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+KnightPermissions.GetAllowSpousesOfChildren
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+KnightPermissions.GetAllowWithTraitWounded
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+KnightPermissions.GetHouseFilterIndex
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+KnightPermissions.GetMinProwess
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+KnightPermissions.GetVassalFilterIndex
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+KnightPermissions.IsDefault
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+KnightPermissions.ResetToDefault
+Definition type: Function
+Return type: void
+
+-----------------------
+
+KnightPermissions.Self
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+KnightPermissions.SetHouseFilterIndex
+Definition type: Function
+Return type: void
+
+-----------------------
+
+KnightPermissions.SetVassalFilterIndex
+Definition type: Function
+Return type: void
+
+-----------------------
+
+KnightPermissions.ToggleAllowConcubines
+Definition type: Function
+Return type: void
+
+-----------------------
+
+KnightPermissions.ToggleAllowCouncillors
+Definition type: Function
+Return type: void
+
+-----------------------
+
+KnightPermissions.ToggleAllowInspiredCourtiers
+Definition type: Function
+Return type: void
+
+-----------------------
+
+KnightPermissions.ToggleAllowLovers
+Definition type: Function
+Return type: void
+
+-----------------------
+
+KnightPermissions.ToggleAllowNonCombatCourtPositions
+Definition type: Function
+Return type: void
+
+-----------------------
+
+KnightPermissions.ToggleAllowOtherChildren
+Definition type: Function
+Return type: void
+
+-----------------------
+
+KnightPermissions.ToggleAllowPlayerHeir
+Definition type: Function
+Return type: void
+
+-----------------------
+
+KnightPermissions.ToggleAllowPregnant
+Definition type: Function
+Return type: void
+
+-----------------------
+
+KnightPermissions.ToggleAllowSpouses
+Definition type: Function
+Return type: void
+
+-----------------------
+
+KnightPermissions.ToggleAllowSpousesOfChildren
+Definition type: Function
+Return type: void
+
+-----------------------
+
+KnightPermissions.ToggleAllowWithTraitWounded
+Definition type: Function
+Return type: void
+
+-----------------------
+
 KnightsView
 Definition type: Type
+
+-----------------------
+
+KnightsView.GetKnightPermissions
+Definition type: Promote
+Return type: KnightPermissions
 
 -----------------------
 
@@ -75343,6 +76736,12 @@ Return type: CString
 
 -----------------------
 
+KnightsView.GetHouseFilterOptions
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
 KnightsView.GetMilitaryView
 Definition type: Function
 Return type: [unregistered]
@@ -75356,6 +76755,12 @@ Return type: int32
 -----------------------
 
 KnightsView.GetPotentialAccoladeTypes( Arg0 )
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+KnightsView.GetVassalFilterOptions
 Definition type: Function
 Return type: [unregistered]
 
@@ -75978,6 +77383,1151 @@ Return type: void
 LeaseOutBaroniesWindowTitleItem.Self
 Definition type: Function
 Return type: [unregistered]
+
+-----------------------
+
+LedgerArtifactItem
+Definition type: Type
+
+-----------------------
+
+LedgerArtifactItem.GetArtifact
+Definition type: Promote
+Return type: Artifact
+
+-----------------------
+
+LedgerArtifactItem.AccessSelf
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerArtifactItem.GetArtifact
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerArtifactItem.Self
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerCharacterItem
+Definition type: Type
+
+-----------------------
+
+LedgerCharacterItem.GetCharacter
+Definition type: Promote
+Return type: Character
+
+-----------------------
+
+LedgerCharacterItem.GetTraitArrays
+Definition type: Promote
+Return type: TraitArrays
+
+-----------------------
+
+LedgerCharacterItem.AccessSelf
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerCharacterItem.GetCharacter
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerCharacterItem.GetTraitArrays
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerCharacterItem.Self
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerCultureItem
+Definition type: Type
+
+-----------------------
+
+LedgerCultureItem.GetCulture
+Definition type: Promote
+Return type: Culture
+
+-----------------------
+
+LedgerCultureItem.AccessSelf
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerCultureItem.GetCulture
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerCultureItem.Self
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerDynastyHouseItem
+Definition type: Type
+
+-----------------------
+
+LedgerDynastyHouseItem.GetHouse
+Definition type: Promote
+Return type: DynastyHouse
+
+-----------------------
+
+LedgerDynastyHouseItem.AccessSelf
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerDynastyHouseItem.GetHouse
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerDynastyHouseItem.Self
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerDynastyItem
+Definition type: Type
+
+-----------------------
+
+LedgerDynastyItem.GetDynasty
+Definition type: Promote
+Return type: Dynasty
+
+-----------------------
+
+LedgerDynastyItem.AccessSelf
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerDynastyItem.GetDynasty
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerDynastyItem.Self
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerFaithItem
+Definition type: Type
+
+-----------------------
+
+LedgerFaithItem.GetFaith
+Definition type: Promote
+Return type: Faith
+
+-----------------------
+
+LedgerFaithItem.AccessSelf
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerFaithItem.GetFaith
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerFaithItem.Self
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerListFilter
+Definition type: Type
+
+-----------------------
+
+LedgerListFilter.AccessSelf
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerListFilter.GetCurrentFilterIndex
+Definition type: Function
+Return type: CVector2i
+
+-----------------------
+
+LedgerListFilter.GetName
+Definition type: Function
+Return type: CString
+
+-----------------------
+
+LedgerListFilter.GetOptions
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerListFilter.IsFilteringBy( Arg0 )
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+LedgerListFilter.Self
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerListFilter.SetCurrentFilter( Arg0 )
+Definition type: Function
+Return type: void
+
+-----------------------
+
+LedgerListFilter.SetCurrentFilterFromIndex
+Definition type: Function
+Return type: void
+
+-----------------------
+
+LedgerListFilterOption
+Definition type: Type
+
+-----------------------
+
+LedgerListFilterOption.AccessSelf
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerListFilterOption.GetDescription
+Definition type: Function
+Return type: CString
+
+-----------------------
+
+LedgerListFilterOption.GetKey
+Definition type: Function
+Return type: CString
+
+-----------------------
+
+LedgerListFilterOption.GetLocalizationKey
+Definition type: Function
+Return type: CString
+
+-----------------------
+
+LedgerListFilterOption.GetName
+Definition type: Function
+Return type: CString
+
+-----------------------
+
+LedgerListFilterOption.IsSelected
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+LedgerListFilterOption.OnClick
+Definition type: Function
+Return type: void
+
+-----------------------
+
+LedgerListFilterOption.Self
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerProvinceItem
+Definition type: Type
+
+-----------------------
+
+LedgerProvinceItem.GetGUIDuchyCapitalBuilding
+Definition type: Promote
+Return type: GUIBuildingItem
+
+-----------------------
+
+LedgerProvinceItem.GetGUIGreatBuilding
+Definition type: Promote
+Return type: GUIBuildingItem
+
+-----------------------
+
+LedgerProvinceItem.GetGUIHoldingBuilding
+Definition type: Promote
+Return type: GUIBuildingItem
+
+-----------------------
+
+LedgerProvinceItem.GetGUISpecialBuilding
+Definition type: Promote
+Return type: GUIBuildingItem
+
+-----------------------
+
+LedgerProvinceItem.GetProvince
+Definition type: Promote
+Return type: Province
+
+-----------------------
+
+LedgerProvinceItem.AccessSelf
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerProvinceItem.GetBuildings
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerProvinceItem.GetProvince
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerProvinceItem.Self
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerReligionItem
+Definition type: Type
+
+-----------------------
+
+LedgerReligionItem.GetReligion
+Definition type: Promote
+Return type: Religion
+
+-----------------------
+
+LedgerReligionItem.AccessSelf
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerReligionItem.GetReligion
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerReligionItem.Self
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerTitleItem
+Definition type: Type
+
+-----------------------
+
+LedgerTitleItem.GetTitle
+Definition type: Promote
+Return type: Title
+
+-----------------------
+
+LedgerTitleItem.AccessSelf
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerTitleItem.GetTitle
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerTitleItem.Self
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWarItem
+Definition type: Type
+
+-----------------------
+
+LedgerWarItem.GetAttackersComposition
+Definition type: Promote
+Return type: ArmyComposition
+
+-----------------------
+
+LedgerWarItem.GetDefendersComposition
+Definition type: Promote
+Return type: ArmyComposition
+
+-----------------------
+
+LedgerWarItem.GetWar
+Definition type: Promote
+Return type: War
+
+-----------------------
+
+LedgerWarItem.AccessSelf
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWarItem.GetAttackersParticipantItems
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWarItem.GetDefendersParticipantItems
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWarItem.GetWar
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWarItem.Self
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow
+Definition type: Type
+
+-----------------------
+
+LedgerWindow.GetCategory( Arg0 )
+Definition type: Promote
+Return type: CharacterListFilterCategory
+
+-----------------------
+
+LedgerWindow.GetFilter( Arg0 )
+Definition type: Promote
+Return type: LedgerListFilter
+
+-----------------------
+
+LedgerWindow.AccessSelf
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.CanResetFilters
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+LedgerWindow.Close
+Definition type: Function
+Return type: void
+
+-----------------------
+
+LedgerWindow.GetArtifacts
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetArtifactsPinned
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetArtifactsPodium
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetCategory( Arg0 )
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetCharactersPious
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetCharactersPiousPinned
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetCharactersPiousPodium
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetCharactersRich
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetCharactersRichPinned
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetCharactersRichPodium
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetCharactersStrong
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetCharactersStrongPinned
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetCharactersStrongPodium
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetCounties
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetCountiesPinned
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetCountiesPodium
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetCultures
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetCulturesPinned
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetCulturesPodium
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetDevelopers
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetDevelopersPinned
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetDevelopersPodium
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetDuchies
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetDuchiesPinned
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetDuchiesPodium
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetDynasties
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetDynastiesPinned
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetDynastiesPodium
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetEmpires
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetEmpiresPinned
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetEmpiresPodium
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetFaiths
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetFaithsPinned
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetFaithsPodium
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetFilter( Arg0 )
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetHegemonies
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetHegemoniesPinned
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetHegemoniesPodium
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetHouses
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetHousesPinned
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetHousesPodium
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetKillers
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetKillersPinned
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetKillersPodium
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetKingdoms
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetKingdomsPinned
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetKingdomsPodium
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetMilitaryStrengthTooltip( Arg0 )
+Definition type: Function
+Return type: CString
+
+-----------------------
+
+LedgerWindow.GetOrderByOptions
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetOrderBySelectedIndex
+Definition type: Function
+Return type: CVector2i
+
+-----------------------
+
+LedgerWindow.GetProvinces
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetProvincesPinned
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetProvincesPodium
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetRelations
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetRelationsPinned
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetRelationsPodium
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetReligions
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetReligionsPinned
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetReligionsPodium
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetSortOrder
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+LedgerWindow.GetWars
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetWarsPinned
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.GetWarsPodium
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.IsArtifactPinned( Arg0 )
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+LedgerWindow.IsCountyPinned( Arg0 )
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+LedgerWindow.IsCulturePinned( Arg0 )
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+LedgerWindow.IsDeveloperPinned( Arg0 )
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+LedgerWindow.IsDuchyPinned( Arg0 )
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+LedgerWindow.IsDynastyPinned( Arg0 )
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+LedgerWindow.IsEmpirePinned( Arg0 )
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+LedgerWindow.IsFaithPinned( Arg0 )
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+LedgerWindow.IsHegemonyPinned( Arg0 )
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+LedgerWindow.IsHousePinned( Arg0 )
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+LedgerWindow.IsKillerPinned( Arg0 )
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+LedgerWindow.IsKingdomPinned( Arg0 )
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+LedgerWindow.IsPiousPinned( Arg0 )
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+LedgerWindow.IsProvincePinned( Arg0 )
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+LedgerWindow.IsRelationPinned( Arg0 )
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+LedgerWindow.IsReligionPinned( Arg0 )
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+LedgerWindow.IsRichestPinned( Arg0 )
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+LedgerWindow.IsSortingBy( Arg0 )
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+LedgerWindow.IsStrongestPinned( Arg0 )
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+LedgerWindow.IsWarPinned( Arg0 )
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+LedgerWindow.OnOrderBySelectionChanged
+Definition type: Function
+Return type: void
+
+-----------------------
+
+LedgerWindow.OpenWarOverview( Arg0 )
+Definition type: Function
+Return type: void
+
+-----------------------
+
+LedgerWindow.ResetFilters
+Definition type: Function
+Return type: void
+
+-----------------------
+
+LedgerWindow.RevertSortOrder
+Definition type: Function
+Return type: void
+
+-----------------------
+
+LedgerWindow.Self
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LedgerWindow.SortBy( Arg0 )
+Definition type: Function
+Return type: void
+
+-----------------------
+
+LedgerWindow.ToggleArtifactPin( Arg0 )
+Definition type: Function
+Return type: void
+
+-----------------------
+
+LedgerWindow.ToggleCountyPin( Arg0 )
+Definition type: Function
+Return type: void
+
+-----------------------
+
+LedgerWindow.ToggleCulturePin( Arg0 )
+Definition type: Function
+Return type: void
+
+-----------------------
+
+LedgerWindow.ToggleDeveloperPin( Arg0 )
+Definition type: Function
+Return type: void
+
+-----------------------
+
+LedgerWindow.ToggleDuchyPin( Arg0 )
+Definition type: Function
+Return type: void
+
+-----------------------
+
+LedgerWindow.ToggleDynastyPin( Arg0 )
+Definition type: Function
+Return type: void
+
+-----------------------
+
+LedgerWindow.ToggleEmpirePin( Arg0 )
+Definition type: Function
+Return type: void
+
+-----------------------
+
+LedgerWindow.ToggleFaithPin( Arg0 )
+Definition type: Function
+Return type: void
+
+-----------------------
+
+LedgerWindow.ToggleHegemonyPin( Arg0 )
+Definition type: Function
+Return type: void
+
+-----------------------
+
+LedgerWindow.ToggleHousePin( Arg0 )
+Definition type: Function
+Return type: void
+
+-----------------------
+
+LedgerWindow.ToggleKillerPin( Arg0 )
+Definition type: Function
+Return type: void
+
+-----------------------
+
+LedgerWindow.ToggleKingdomPin( Arg0 )
+Definition type: Function
+Return type: void
+
+-----------------------
+
+LedgerWindow.TogglePiousPin( Arg0 )
+Definition type: Function
+Return type: void
+
+-----------------------
+
+LedgerWindow.ToggleProvincePin( Arg0 )
+Definition type: Function
+Return type: void
+
+-----------------------
+
+LedgerWindow.ToggleRelationPin( Arg0 )
+Definition type: Function
+Return type: void
+
+-----------------------
+
+LedgerWindow.ToggleReligionPin( Arg0 )
+Definition type: Function
+Return type: void
+
+-----------------------
+
+LedgerWindow.ToggleRichestPin( Arg0 )
+Definition type: Function
+Return type: void
+
+-----------------------
+
+LedgerWindow.ToggleStrongestPin( Arg0 )
+Definition type: Function
+Return type: void
+
+-----------------------
+
+LedgerWindow.ToggleWarPin( Arg0 )
+Definition type: Function
+Return type: void
 
 -----------------------
 
@@ -77535,6 +80085,12 @@ Return type: LocalPlayerNewArtifacts
 
 -----------------------
 
+LocalPlayerCachedData.AccessSituationData
+Definition type: Promote
+Return type: LocalPlayerSituationData
+
+-----------------------
+
 LocalPlayerCachedData.AccessActivityData
 Definition type: Function
 Return type: LocalPlayerActivityData
@@ -77556,6 +80112,12 @@ Return type: LocalPlayerNewArtifacts
 LocalPlayerCachedData.AccessSelf
 Definition type: Function
 Return type: [unregistered]
+
+-----------------------
+
+LocalPlayerCachedData.AccessSituationData
+Definition type: Function
+Return type: LocalPlayerSituationData
 
 -----------------------
 
@@ -77660,6 +80222,65 @@ Return type: void
 -----------------------
 
 LocalPlayerNewArtifacts.Self
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LocalPlayerSituationData
+Definition type: Type
+
+-----------------------
+
+LocalPlayerSituationData.AccessSelf
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+LocalPlayerSituationData.GetNumberNewSituations
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+LocalPlayerSituationData.GetNumberNewStories
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+LocalPlayerSituationData.GetNumberNewStruggles
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+LocalPlayerSituationData.HasAnyNewSituation
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+LocalPlayerSituationData.HasNewSituations
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+LocalPlayerSituationData.HasNewStories
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+LocalPlayerSituationData.HasNewStruggles
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+LocalPlayerSituationData.Self
 Definition type: Function
 Return type: [unregistered]
 
@@ -82850,6 +85471,47 @@ Return type: [unregistered]
 
 -----------------------
 
+ObtainedAccoladeType
+Definition type: Type
+
+-----------------------
+
+ObtainedAccoladeType.GetType
+Definition type: Promote
+Return type: AccoladeType
+
+-----------------------
+
+ObtainedAccoladeType.AccessSelf
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+ObtainedAccoladeType.GetLevel
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+ObtainedAccoladeType.GetRankEffects
+Definition type: Function
+Return type: CString
+
+-----------------------
+
+ObtainedAccoladeType.GetType
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+ObtainedAccoladeType.Self
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
 OptionEffectItem
 Definition type: Type
 
@@ -83027,6 +85689,41 @@ Return type: [unregistered]
 
 -----------------------
 
+OrderLedgerOption
+Definition type: Type
+
+-----------------------
+
+OrderLedgerOption.AccessSelf
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+OrderLedgerOption.GetKey
+Definition type: Function
+Return type: CString
+
+-----------------------
+
+OrderLedgerOption.GetLocalizationKey
+Definition type: Function
+Return type: CString
+
+-----------------------
+
+OrderLedgerOption.GetName
+Definition type: Function
+Return type: CString
+
+-----------------------
+
+OrderLedgerOption.Self
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
 OrderedActivityInviteRule
 Definition type: Type
 
@@ -83098,6 +85795,18 @@ Return type: [unregistered]
 -----------------------
 
 Outliner.GetPinnedCharacters
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+Outliner.GetPinnedProvinces
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+Outliner.GetPinnedTitles
 Definition type: Function
 Return type: [unregistered]
 
@@ -84939,6 +87648,12 @@ Return type: CharacterSelectionList
 
 -----------------------
 
+PotentialCouncillorWindow.GetCouncilPositionSkillItem
+Definition type: Promote
+Return type: SkillItem
+
+-----------------------
+
 PotentialCouncillorWindow.GetCouncilPositionType
 Definition type: Promote
 Return type: CouncilPositionType
@@ -85036,6 +87751,12 @@ Return type: [unregistered]
 -----------------------
 
 PotentialCouncillorWindow.HasCouncillor
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+PotentialCouncillorWindow.HasMainSkill
 Definition type: Function
 Return type: bool
 
@@ -85931,6 +88652,12 @@ Return type: bool
 
 -----------------------
 
+Province.IsPinned
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
 Province.IsRealmCapital
 Definition type: Function
 Return type: [unregistered]
@@ -85968,6 +88695,12 @@ Return type: Command
 -----------------------
 
 Province.Self
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+Province.ToggleProvincePinned
 Definition type: Function
 Return type: [unregistered]
 
@@ -87917,6 +90650,24 @@ Return type: CString
 
 -----------------------
 
+Religion.GetCountiesChange
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+Religion.GetCountiesGain
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+Religion.GetCountiesLoss
+Definition type: Function
+Return type: int32
+
+-----------------------
+
 Religion.GetFaiths
 Definition type: Function
 Return type: [unregistered]
@@ -87938,6 +90689,60 @@ Return type: CString
 Religion.GetNameNoTooltip
 Definition type: Function
 Return type: CString
+
+-----------------------
+
+Religion.GetNumberOfControlledHolySites
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+Religion.GetNumberOfCounties
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+Religion.GetNumberOfFollowers
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+Religion.GetNumberOfHolySites
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+Religion.GetNumberOfHolyWars
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+Religion.GetNumberOfRulers
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+Religion.GetNumberOfSinners
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+Religion.GetNumberOfVirtuous
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+Religion.GetTotalMilitaryStrength
+Definition type: Function
+Return type: int32
 
 -----------------------
 
@@ -87988,13 +90793,60 @@ Return type: CString
 
 -----------------------
 
-ReligionFamily.IsPagan
+ReligionFamily.Self
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+ReligionType
+Definition type: Type
+
+-----------------------
+
+ReligionType.AccessSelf
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+ReligionType.GetIndex
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+ReligionType.GetKey
+Definition type: Function
+Return type: CString
+
+-----------------------
+
+ReligionType.GetLogName
+Definition type: Function
+Return type: CString
+
+-----------------------
+
+ReligionType.GetName
+Definition type: Function
+Return type: CString
+
+-----------------------
+
+ReligionType.IsValid
 Definition type: Function
 Return type: bool
 
 -----------------------
 
-ReligionFamily.Self
+ReligionType.Localize( Arg0 )
+Definition type: Function
+Return type: CString
+
+-----------------------
+
+ReligionType.Self
 Definition type: Function
 Return type: [unregistered]
 
@@ -88053,6 +90905,12 @@ Return type: CString
 
 -----------------------
 
+ReligionWindow.IsVisible
+Definition type: Function
+Return type: bool
+
+-----------------------
+
 ReligionWindow.OnOrderBySelectionChanged
 Definition type: Function
 Return type: void
@@ -88074,6 +90932,12 @@ Return type: [unregistered]
 ReligionWindow.ShowOnlyReligionFaiths
 Definition type: Function
 Return type: bool
+
+-----------------------
+
+ReligionWindow.Toggle
+Definition type: Function
+Return type: void
 
 -----------------------
 
@@ -88575,6 +91439,12 @@ Return type: CourtTypeWindow
 
 -----------------------
 
+RoyalCourtWindow.AccessCourtVisualsWindow
+Definition type: Promote
+Return type: CourtVisualsWindow
+
+-----------------------
+
 RoyalCourtWindow.AccessInspirationsWindow
 Definition type: Promote
 Return type: InspirationsWindow
@@ -88608,6 +91478,12 @@ Return type: CourtGrandeurWindow
 RoyalCourtWindow.GetCourtSceneEditorWindow
 Definition type: Promote
 Return type: CourtSceneEditorWindow
+
+-----------------------
+
+RoyalCourtWindow.GetCourtVisualsWindow
+Definition type: Promote
+Return type: CourtVisualsWindow
 
 -----------------------
 
@@ -88654,6 +91530,12 @@ Return type: [unregistered]
 -----------------------
 
 RoyalCourtWindow.AccessCourtTypeWindow
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+RoyalCourtWindow.AccessCourtVisualsWindow
 Definition type: Function
 Return type: [unregistered]
 
@@ -88779,6 +91661,12 @@ Return type: [unregistered]
 
 -----------------------
 
+RoyalCourtWindow.GetCourtVisualsWindow
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
 RoyalCourtWindow.GetPetitionCharacter
 Definition type: Function
 Return type: [unregistered]
@@ -88858,6 +91746,12 @@ Return type: bool
 -----------------------
 
 RoyalCourtWindow.IsActiveThroneTab
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+RoyalCourtWindow.IsActiveVisualsTab
 Definition type: Function
 Return type: bool
 
@@ -88968,6 +91862,12 @@ Return type: void
 RoyalCourtWindow.SetSelectedArtifact( Arg0 )
 Definition type: Function
 Return type: void
+
+-----------------------
+
+RoyalCourtWindow.ShouldShowCourtVisualsTab
+Definition type: Function
+Return type: bool
 
 -----------------------
 
@@ -91319,6 +94219,12 @@ Return type: CString
 
 -----------------------
 
+Scheme.GetFrozenReason
+Definition type: Function
+Return type: CString
+
+-----------------------
+
 Scheme.GetFullActionName
 Definition type: Function
 Return type: CString
@@ -93615,6 +96521,12 @@ Return type: void
 
 -----------------------
 
+SilkRoadWindow.CloseCatalystWindow( Arg0 )
+Definition type: Function
+Return type: void
+
+-----------------------
+
 SilkRoadWindow.GetCatalystsForSelectedPhase( Arg0 )
 Definition type: Function
 Return type: [unregistered]
@@ -93628,6 +96540,12 @@ Return type: [unregistered]
 -----------------------
 
 SilkRoadWindow.IsBadPhase( Arg0 )
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+SilkRoadWindow.IsCurrentSubRegionToggled( Arg0 )
 Definition type: Function
 Return type: bool
 
@@ -93663,7 +96581,13 @@ Return type: void
 
 -----------------------
 
-SilkRoadWindow.ToggleSubRegionCatalyst( Arg0 )
+SilkRoadWindow.ToggleSubRegionCatalysts( Arg0 )
+Definition type: Function
+Return type: void
+
+-----------------------
+
+SilkRoadWindow.ToggleSubRegionParticipationList( Arg0 )
 Definition type: Function
 Return type: void
 
@@ -93775,6 +96699,12 @@ Return type: [unregistered]
 Situation.CatalystHistory
 Definition type: Function
 Return type: [unregistered]
+
+-----------------------
+
+Situation.Custom( Arg0 )
+Definition type: Function
+Return type: CString
 
 -----------------------
 
@@ -93943,6 +96873,12 @@ Return type: bool
 -----------------------
 
 Situation.HasMultipleSubRegions
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+Situation.IsParticipant( Arg0 )
 Definition type: Function
 Return type: bool
 
@@ -94322,6 +97258,18 @@ Return type: CString
 
 -----------------------
 
+SituationDynasticCycleWindow.GetMovementPowerValue( Arg0 )
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+SituationDynasticCycleWindow.GetMovementPowerValueDesc( Arg0 )
+Definition type: Function
+Return type: CString
+
+-----------------------
+
 SituationDynasticCycleWindow.GetParticipationWindowHeader
 Definition type: Function
 Return type: CString
@@ -94525,6 +97473,12 @@ Return type: [unregistered]
 
 -----------------------
 
+SituationGroupItem.GetNumInvolvedItems( Arg0 )
+Definition type: Function
+Return type: int32
+
+-----------------------
+
 SituationGroupItem.Self
 Definition type: Function
 Return type: [unregistered]
@@ -94660,6 +97614,12 @@ Return type: Situation
 
 -----------------------
 
+SituationItem.GetStoryCycle
+Definition type: Promote
+Return type: Story
+
+-----------------------
+
 SituationItem.GetStruggle
 Definition type: Promote
 Return type: Struggle
@@ -94678,6 +97638,12 @@ Return type: [unregistered]
 
 -----------------------
 
+SituationItem.GetStoryCycle
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
 SituationItem.GetStruggle
 Definition type: Function
 Return type: [unregistered]
@@ -94691,6 +97657,18 @@ Return type: bool
 -----------------------
 
 SituationItem.IsSituation
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+SituationItem.IsStoryCycle
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+SituationItem.IsStruggle
 Definition type: Function
 Return type: bool
 
@@ -94722,6 +97700,12 @@ Return type: void
 SituationListWindow.GetSituationGroupItems
 Definition type: Function
 Return type: [unregistered]
+
+-----------------------
+
+SituationListWindow.HasAnyInvolvedSituationGroups
+Definition type: Function
+Return type: bool
 
 -----------------------
 
@@ -94896,18 +97880,6 @@ Return type: void
 
 -----------------------
 
-SituationParticipantCharacterList.ToggleSelectedParticipantGroup( Arg0 )
-Definition type: Function
-Return type: void
-
------------------------
-
-SituationParticipantCharacterList.UnsetSelectedParticipantGroup
-Definition type: Function
-Return type: void
-
------------------------
-
 SituationParticipantGroup
 Definition type: Type
 
@@ -94940,6 +97912,12 @@ Return type: Scope
 SituationParticipantGroup.AccessSelf
 Definition type: Function
 Return type: [unregistered]
+
+-----------------------
+
+SituationParticipantGroup.Custom( Arg0 )
+Definition type: Function
+Return type: CString
 
 -----------------------
 
@@ -95471,6 +98449,12 @@ Return type: Scope
 SituationSubRegion.AccessSelf
 Definition type: Function
 Return type: [unregistered]
+
+-----------------------
+
+SituationSubRegion.Custom( Arg0 )
+Definition type: Function
+Return type: CString
 
 -----------------------
 
@@ -96402,6 +99386,12 @@ Definition type: Type
 
 -----------------------
 
+Story.GetOwner
+Definition type: Promote
+Return type: Character
+
+-----------------------
+
 Story.MakeScope
 Definition type: Promote
 Return type: Scope
@@ -96420,13 +99410,269 @@ Return type: CString
 
 -----------------------
 
+Story.GetArtifactLists
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+Story.GetBackground
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+Story.GetBasicCounters
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+Story.GetCharacterLists
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+Story.GetCustomString
+Definition type: Function
+Return type: CString
+
+-----------------------
+
+Story.GetDecisions
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+Story.GetDesc
+Definition type: Function
+Return type: CString
+
+-----------------------
+
+Story.GetIcon
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+Story.GetModifiers
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+Story.GetName
+Definition type: Function
+Return type: CString
+
+-----------------------
+
 Story.GetOwner
 Definition type: Function
 Return type: [unregistered]
 
 -----------------------
 
+Story.GetSpecificArtifacts
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+Story.GetSpecificCharacters
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+Story.GetSpecificTitles
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+Story.GetTitleLists
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+Story.GetTraits
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+Story.GetTugOfWarCounters
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+Story.HasArtifactLists
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+Story.HasBasicCounters
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+Story.HasCharacterLists
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+Story.HasCustomString
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+Story.HasDecisions
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+Story.HasModifiers
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+Story.HasSpecificArtifacts
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+Story.HasSpecificCharacters
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+Story.HasSpecificTitles
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+Story.HasTitleLists
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+Story.HasTraits
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+Story.HasTugOfWarCounters
+Definition type: Function
+Return type: bool
+
+-----------------------
+
 Story.Self
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+StoryCycleCounterVisualization
+Definition type: Type
+
+-----------------------
+
+StoryCycleCounterVisualization.AccessSelf
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+StoryCycleCounterVisualization.GetLabel
+Definition type: Function
+Return type: CString
+
+-----------------------
+
+StoryCycleCounterVisualization.GetMaxLabel
+Definition type: Function
+Return type: CString
+
+-----------------------
+
+StoryCycleCounterVisualization.GetMaxValue
+Definition type: Function
+Return type: CFixedPoint
+
+-----------------------
+
+StoryCycleCounterVisualization.GetMinLabel
+Definition type: Function
+Return type: CString
+
+-----------------------
+
+StoryCycleCounterVisualization.GetMinValue
+Definition type: Function
+Return type: CFixedPoint
+
+-----------------------
+
+StoryCycleCounterVisualization.GetTooltip( Arg0 )
+Definition type: Function
+Return type: CString
+
+-----------------------
+
+StoryCycleCounterVisualization.GetVariableName
+Definition type: Function
+Return type: CString
+
+-----------------------
+
+StoryCycleCounterVisualization.Self
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+StoryCycleVariableVisualization
+Definition type: Type
+
+-----------------------
+
+StoryCycleVariableVisualization.AccessSelf
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+StoryCycleVariableVisualization.GetLabel
+Definition type: Function
+Return type: CString
+
+-----------------------
+
+StoryCycleVariableVisualization.GetVariableName
+Definition type: Function
+Return type: CString
+
+-----------------------
+
+StoryCycleVariableVisualization.Self
 Definition type: Function
 Return type: [unregistered]
 
@@ -96558,6 +99804,12 @@ Return type: Scope
 Struggle.AccessSelf
 Definition type: Function
 Return type: [unregistered]
+
+-----------------------
+
+Struggle.Custom( Arg0 )
+Definition type: Function
+Return type: CString
 
 -----------------------
 
@@ -98756,6 +102008,12 @@ Return type: [unregistered]
 
 -----------------------
 
+TaskContract.Custom( Arg0 )
+Definition type: Function
+Return type: CString
+
+-----------------------
+
 TaskContract.GetCompletedContractRewardDesc
 Definition type: Function
 Return type: CString
@@ -99115,6 +102373,12 @@ Return type: [unregistered]
 TaxSlot.CheckObligationCooldown
 Definition type: Function
 Return type: bool
+
+-----------------------
+
+TaxSlot.Custom( Arg0 )
+Definition type: Function
+Return type: CString
 
 -----------------------
 
@@ -100117,6 +103381,18 @@ Return type: Title
 
 -----------------------
 
+Title.GetDominantCulture
+Definition type: Promote
+Return type: Culture
+
+-----------------------
+
+Title.GetDominantFaith
+Definition type: Promote
+Return type: Faith
+
+-----------------------
+
 Title.GetFaction
 Definition type: Promote
 Return type: Faction
@@ -100144,6 +103420,12 @@ Return type: Character
 Title.GetHolyOrder
 Definition type: Promote
 Return type: HolyOrder
+
+-----------------------
+
+Title.GetHouseMapModeTitleHolder
+Definition type: Promote
+Return type: Character
 
 -----------------------
 
@@ -100309,7 +103591,31 @@ Return type: CString
 
 -----------------------
 
+Title.GetAverageControl
+Definition type: Function
+Return type: CFixedPoint
+
+-----------------------
+
+Title.GetAverageDevelopment
+Definition type: Function
+Return type: CFixedPoint
+
+-----------------------
+
 Title.GetAverageFertility
+Definition type: Function
+Return type: CFixedPoint
+
+-----------------------
+
+Title.GetAverageOpinion
+Definition type: Function
+Return type: CFixedPoint
+
+-----------------------
+
+Title.GetAverageOpinionFor( Arg0 )
 Definition type: Function
 Return type: CFixedPoint
 
@@ -100453,6 +103759,30 @@ Return type: [unregistered]
 
 -----------------------
 
+Title.GetDominantCulture
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+Title.GetDominantCulturePercent
+Definition type: Function
+Return type: CFixedPoint
+
+-----------------------
+
+Title.GetDominantFaith
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+Title.GetDominantFaithPercent
+Definition type: Function
+Return type: CFixedPoint
+
+-----------------------
+
 Title.GetFaction
 Definition type: Function
 Return type: [unregistered]
@@ -100484,6 +103814,12 @@ Return type: [unregistered]
 -----------------------
 
 Title.GetHolderOrCountyHolder
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+Title.GetHouseMapModeTitleHolder
 Definition type: Function
 Return type: [unregistered]
 
@@ -100639,6 +103975,60 @@ Return type: [unregistered]
 
 -----------------------
 
+Title.GetNumberOfBuildingSlots
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+Title.GetNumberOfBuildings
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+Title.GetNumberOfClaimants
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+Title.GetNumberOfCounties
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+Title.GetNumberOfDeFactoCounties
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+Title.GetNumberOfDeJureCounties
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+Title.GetNumberOfHoldings
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+Title.GetNumberOfSpecialBuildingSlots
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+Title.GetNumberOfSpecialBuildings
+Definition type: Function
+Return type: int32
+
+-----------------------
+
 Title.GetPrefix
 Definition type: Function
 Return type: CString
@@ -100717,9 +104107,33 @@ Return type: CString
 
 -----------------------
 
+Title.GetTotalIncome
+Definition type: Function
+Return type: CFixedPoint
+
+-----------------------
+
+Title.GetTotalLevies
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+Title.GetTotalLoot
+Definition type: Function
+Return type: CFixedPoint
+
+-----------------------
+
 Title.GetTotalTitleMAATroopsDesc
 Definition type: Function
 Return type: CString
+
+-----------------------
+
+Title.HasDeJureCounties
+Definition type: Function
+Return type: bool
 
 -----------------------
 
@@ -100891,6 +104305,12 @@ Return type: bool
 
 -----------------------
 
+Title.IsPinned
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
 Title.IsPlayerElector
 Definition type: Function
 Return type: [unregistered]
@@ -100958,6 +104378,18 @@ Return type: [unregistered]
 -----------------------
 
 Title.Self
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+Title.ShowUsurp
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+Title.ToggleTitlePinned
 Definition type: Function
 Return type: [unregistered]
 
@@ -102617,6 +106049,12 @@ Return type: [unregistered]
 
 -----------------------
 
+TravelPlan.Custom( Arg0 )
+Definition type: Function
+Return type: CString
+
+-----------------------
+
 TravelPlan.GetID
 Definition type: Function
 Return type: uint32
@@ -102996,6 +106434,12 @@ Return type: [unregistered]
 TravelPlanData.GetTravelOptionsTotalCost
 Definition type: Function
 Return type: CString
+
+-----------------------
+
+TravelPlanData.HasActivity
+Definition type: Function
+Return type: bool
 
 -----------------------
 
@@ -103562,6 +107006,18 @@ Return type: bool
 
 -----------------------
 
+TravelPointsOfInterestIconData.OnClick
+Definition type: Function
+Return type: void
+
+-----------------------
+
+TravelPointsOfInterestIconData.OnRightClick
+Definition type: Function
+Return type: void
+
+-----------------------
+
 TravelPointsOfInterestIconData.Self
 Definition type: Function
 Return type: [unregistered]
@@ -103758,6 +107214,12 @@ Return type: bool
 
 -----------------------
 
+TravelRouteEditWindow.IsInQuickEditMode
+Definition type: Function
+Return type: bool
+
+-----------------------
+
 TravelRouteEditWindow.IsRouteValid
 Definition type: Function
 Return type: bool
@@ -103776,13 +107238,7 @@ Return type: bool
 
 -----------------------
 
-TravelRouteEditWindow.IsSelectingProvinceAtBegin( Arg0 )
-Definition type: Function
-Return type: bool
-
------------------------
-
-TravelRouteEditWindow.IsSelectingProvinceAtEnd( Arg0 )
+TravelRouteEditWindow.IsSelectingProvinceBeforeDestination( Arg0 )
 Definition type: Function
 Return type: bool
 
@@ -104863,6 +108319,29 @@ Return type: [unregistered]
 
 -----------------------
 
+UnitOrders
+Definition type: Type
+
+-----------------------
+
+UnitOrders.AccessSelf
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+UnitOrders.GetHalt
+Definition type: Function
+Return type: Command
+
+-----------------------
+
+UnitOrders.Self
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
 ValueBreakdown
 Definition type: Type
 
@@ -105152,6 +108631,53 @@ Return type: [unregistered]
 
 -----------------------
 
+VirtueOrSinItem
+Definition type: Type
+
+-----------------------
+
+VirtueOrSinItem.GetTrait
+Definition type: Promote
+Return type: Trait
+
+-----------------------
+
+VirtueOrSinItem.AccessSelf
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+VirtueOrSinItem.GetFullDescription
+Definition type: Function
+Return type: CString
+
+-----------------------
+
+VirtueOrSinItem.GetTrait
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+VirtueOrSinItem.IsSin
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+VirtueOrSinItem.IsVirtue
+Definition type: Function
+Return type: bool
+
+-----------------------
+
+VirtueOrSinItem.Self
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
 War
 Definition type: Type
 
@@ -105166,6 +108692,18 @@ Return type: ActiveCasusBelli
 War.GetActiveCasusBelli
 Definition type: Promote
 Return type: ActiveCasusBelli
+
+-----------------------
+
+War.GetAttackers
+Definition type: Promote
+Return type: WarSide
+
+-----------------------
+
+War.GetDefenders
+Definition type: Promote
+Return type: WarSide
 
 -----------------------
 
@@ -105211,13 +108749,55 @@ Return type: [unregistered]
 
 -----------------------
 
+War.GetBattleResults
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+War.GetBattlesWarScore
+Definition type: Function
+Return type: CFixedPoint
+
+-----------------------
+
+War.GetBattlesWarScoreTooltip
+Definition type: Function
+Return type: CString
+
+-----------------------
+
 War.GetID
 Definition type: Function
 Return type: uint32
 
 -----------------------
 
+War.GetImprisonmentWarScore
+Definition type: Function
+Return type: CFixedPoint
+
+-----------------------
+
+War.GetImprisonmentWarScoreTooltip
+Definition type: Function
+Return type: CString
+
+-----------------------
+
 War.GetName
+Definition type: Function
+Return type: CString
+
+-----------------------
+
+War.GetOccupationWarScore
+Definition type: Function
+Return type: CFixedPoint
+
+-----------------------
+
+War.GetOccupationWarScoreTooltip
 Definition type: Function
 Return type: CString
 
@@ -105232,6 +108812,30 @@ Return type: [unregistered]
 War.GetStartDate
 Definition type: Function
 Return type: [unregistered]
+
+-----------------------
+
+War.GetTickingWarScore
+Definition type: Function
+Return type: CFixedPoint
+
+-----------------------
+
+War.GetTickingWarScoreTooltip
+Definition type: Function
+Return type: CString
+
+-----------------------
+
+War.GetWarScore
+Definition type: Function
+Return type: CFixedPoint
+
+-----------------------
+
+War.GetWarScoreTooltip
+Definition type: Function
+Return type: CString
 
 -----------------------
 
@@ -105488,6 +109092,12 @@ Return type: HostageExchangeWindow
 
 -----------------------
 
+WarOverviewWindow.GetLeftSide
+Definition type: Promote
+Return type: WarSide
+
+-----------------------
+
 WarOverviewWindow.GetLeftSideComposition
 Definition type: Promote
 Return type: ArmyComposition
@@ -105521,6 +109131,12 @@ Return type: Character
 WarOverviewWindow.GetPlayerParticipantItem
 Definition type: Promote
 Return type: WarParticipantItem
+
+-----------------------
+
+WarOverviewWindow.GetRightSide
+Definition type: Promote
+Return type: WarSide
 
 -----------------------
 
@@ -105752,6 +109368,12 @@ Return type: CString
 
 -----------------------
 
+WarOverviewWindow.GetWar
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
 WarOverviewWindow.GetWarDuration
 Definition type: Function
 Return type: CString
@@ -105972,6 +109594,12 @@ Definition type: Type
 
 -----------------------
 
+WarResultsWindow.GetAttackerSide
+Definition type: Promote
+Return type: WarSide
+
+-----------------------
+
 WarResultsWindow.GetBeneficiary
 Definition type: Promote
 Return type: Character
@@ -105984,7 +109612,25 @@ Return type: Date
 
 -----------------------
 
+WarResultsWindow.GetGetDefenderSide
+Definition type: Promote
+Return type: WarSide
+
+-----------------------
+
 WarResultsWindow.GetOpponent
+Definition type: Promote
+Return type: Character
+
+-----------------------
+
+WarResultsWindow.GetOpponentSide
+Definition type: Promote
+Return type: WarSide
+
+-----------------------
+
+WarResultsWindow.GetPlayer
 Definition type: Promote
 Return type: Character
 
@@ -105992,7 +109638,7 @@ Return type: Character
 
 WarResultsWindow.GetPlayerSide
 Definition type: Promote
-Return type: Character
+Return type: WarSide
 
 -----------------------
 
@@ -106017,6 +109663,12 @@ Return type: void
 WarResultsWindow.Dismiss
 Definition type: Function
 Return type: void
+
+-----------------------
+
+WarResultsWindow.GetAttackerSide
+Definition type: Function
+Return type: [unregistered]
 
 -----------------------
 
@@ -106062,6 +109714,12 @@ Return type: CString
 
 -----------------------
 
+WarResultsWindow.GetGetDefenderSide
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
 WarResultsWindow.GetMessage
 Definition type: Function
 Return type: CString
@@ -106080,6 +109738,12 @@ Return type: CString
 
 -----------------------
 
+WarResultsWindow.GetOpponentSide
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
 WarResultsWindow.GetOutcome
 Definition type: Function
 Return type: CString
@@ -106089,6 +109753,12 @@ Return type: CString
 WarResultsWindow.GetPeaceDescription
 Definition type: Function
 Return type: CString
+
+-----------------------
+
+WarResultsWindow.GetPlayer
+Definition type: Function
+Return type: [unregistered]
 
 -----------------------
 
@@ -106177,6 +109847,71 @@ Return type: bool
 -----------------------
 
 WarResultsWindow.Self
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+WarSide
+Definition type: Type
+
+-----------------------
+
+WarSide.AccessSelf
+Definition type: Function
+Return type: [unregistered]
+
+-----------------------
+
+WarSide.GetAttritionLosses
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+WarSide.GetBattleLosses
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+WarSide.GetCharacterLossesTooltip
+Definition type: Function
+Return type: CString
+
+-----------------------
+
+WarSide.GetCharacterSiegeLosses
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+WarSide.GetCharactersLost
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+WarSide.GetCommandersLost
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+WarSide.GetKnightsLost
+Definition type: Function
+Return type: int32
+
+-----------------------
+
+WarSide.GetParticipantLossesTooltip
+Definition type: Function
+Return type: CString
+
+-----------------------
+
+WarSide.Self
 Definition type: Function
 Return type: [unregistered]
 

@@ -303,7 +303,7 @@ Supported Targets: character
 --------------------
 
 create_accolade - Create an accolade for the scoped character with the given knight and types. The name is an optional loc key, a default name will be generated otherwise.
-create_accolade = { knight = scope:character primary = accolade_type secondary = accolade_type name = loc_key }
+create_accolade = { knight = scope:character primary = accolade_type name = loc_key }
 Supported Scopes: none
 
 --------------------
@@ -514,6 +514,11 @@ Supported Targets: artifact
 
 --------------------
 
+disable_succession_calculation - Disables succession calculations, they can still be added to the queue for future calculations
+Supported Scopes: none
+
+--------------------
+
 divorce - Divorces the scope character from the target character. divorce = target
 Supported Scopes: none
 Supported Targets: character
@@ -561,6 +566,11 @@ Supported Scopes: none
 
 --------------------
 
+enable_and_run_succession_calculation - Enables succession calculations and runs any calculations currently in the queue.
+Supported Scopes: none
+
+--------------------
+
 end_inspiration_sponsorship - end_inspiration_sponsorship = inspiration
 Stops the sponsorship of the targeted inspiration
 Supported Scopes: none
@@ -595,7 +605,7 @@ Supported Targets: accolade_type
 
 --------------------
 
-every_active_dynasty - Iterate through all dynasties with dynasty head
+every_active_dynasty - Iterate through all dynasties with dynasty head. Deprecated - use 'every/any/random dynasty with the optional parameter instead.
 every_active_dynasty = { limit = { <triggers> } <effects> }
 Supported Scopes: none
 Supported Targets: dynasty
@@ -742,7 +752,7 @@ Supported Targets: landed_title
 
 --------------------
 
-every_dynasty - Iterate through all dynasties (even those without head)
+every_dynasty - Iterate through all dynasties. Use 'include_inactive = yes' to explicitly include inactive (without dynasty head) Dynasties.
 every_dynasty = { limit = { <triggers> } <effects> }
 Supported Scopes: none
 Supported Targets: dynasty
@@ -956,7 +966,24 @@ Supported Targets: religion
 
 --------------------
 
-every_ruler - Rulers list with a COUNT tier o above
+every_ruler - Rulers list with a COUNT tier o above.
+Can optionally filter by:
+* government:	government_type_filter = government_type:mandala_government (accepts saved scopes)
+* faith:		faith_filter = faith:catholic (accepts saved scopes)
+* culture:		culture_filter = culture:greek (accepts saved scopes)
+* tier:			tier_filter = kingdom (use county/duchy/kingdom/empire/hegemony, without tier_prefix. baronies are not supported)
+* independent:	only_independent = yes (if unspecified or set to 'no' vassals will be included in the list)
+
+usage:
+any_ruler = {
+	government_type = government_type:feudal_government
+	only_independent = yes
+	tier = duchy
+
+	limit = {}
+
+	your effect...
+}
 every_ruler = { limit = { <triggers> } <effects> }
 Supported Scopes: none
 Supported Targets: character
@@ -1107,7 +1134,7 @@ Supported Targets: accolade_type
 
 --------------------
 
-ordered_active_dynasty - Iterate through all dynasties with dynasty head
+ordered_active_dynasty - Iterate through all dynasties with dynasty head. Deprecated - use 'every/any/random dynasty with the optional parameter instead.
 ordered_active_dynasty = {
 limit = { <triggers> }
 order_by = script_value
@@ -1401,7 +1428,7 @@ Supported Targets: landed_title
 
 --------------------
 
-ordered_dynasty - Iterate through all dynasties (even those without head)
+ordered_dynasty - Iterate through all dynasties. Use 'include_inactive = yes' to explicitly include inactive (without dynasty head) Dynasties.
 ordered_dynasty = {
 limit = { <triggers> }
 order_by = script_value
@@ -1832,7 +1859,24 @@ Supported Targets: religion
 
 --------------------
 
-ordered_ruler - Rulers list with a COUNT tier o above
+ordered_ruler - Rulers list with a COUNT tier o above.
+Can optionally filter by:
+* government:	government_type_filter = government_type:mandala_government (accepts saved scopes)
+* faith:		faith_filter = faith:catholic (accepts saved scopes)
+* culture:		culture_filter = culture:greek (accepts saved scopes)
+* tier:			tier_filter = kingdom (use county/duchy/kingdom/empire/hegemony, without tier_prefix. baronies are not supported)
+* independent:	only_independent = yes (if unspecified or set to 'no' vassals will be included in the list)
+
+usage:
+any_ruler = {
+	government_type = government_type:feudal_government
+	only_independent = yes
+	tier = duchy
+
+	limit = {}
+
+	your effect...
+}
 ordered_ruler = {
 limit = { <triggers> }
 order_by = script_value
@@ -1960,7 +2004,7 @@ Supported Targets: accolade_type
 
 --------------------
 
-random_active_dynasty - Iterate through all dynasties with dynasty head
+random_active_dynasty - Iterate through all dynasties with dynasty head. Deprecated - use 'every/any/random dynasty with the optional parameter instead.
 random_active_dynasty = { limit = { <triggers> } (optional) weight = { mtth } <effects> }
 Supported Scopes: none
 Supported Targets: dynasty
@@ -2107,7 +2151,7 @@ Supported Targets: landed_title
 
 --------------------
 
-random_dynasty - Iterate through all dynasties (even those without head)
+random_dynasty - Iterate through all dynasties. Use 'include_inactive = yes' to explicitly include inactive (without dynasty head) Dynasties.
 random_dynasty = { limit = { <triggers> } (optional) weight = { mtth } <effects> }
 Supported Scopes: none
 Supported Targets: dynasty
@@ -2334,7 +2378,24 @@ Supported Targets: religion
 
 --------------------
 
-random_ruler - Rulers list with a COUNT tier o above
+random_ruler - Rulers list with a COUNT tier o above.
+Can optionally filter by:
+* government:	government_type_filter = government_type:mandala_government (accepts saved scopes)
+* faith:		faith_filter = faith:catholic (accepts saved scopes)
+* culture:		culture_filter = culture:greek (accepts saved scopes)
+* tier:			tier_filter = kingdom (use county/duchy/kingdom/empire/hegemony, without tier_prefix. baronies are not supported)
+* independent:	only_independent = yes (if unspecified or set to 'no' vassals will be included in the list)
+
+usage:
+any_ruler = {
+	government_type = government_type:feudal_government
+	only_independent = yes
+	tier = duchy
+
+	limit = {}
+
+	your effect...
+}
 random_ruler = { limit = { <triggers> } (optional) weight = { mtth } <effects> }
 Supported Scopes: none
 Supported Targets: character
@@ -3250,6 +3311,18 @@ Supported Targets: scheme
 
 --------------------
 
+always_fire_councillor - The scope character fires the target character from the council without rule checks e.g. ai_can_reassign_council_positions.
+Supported Scopes: character
+Supported Targets: character
+
+--------------------
+
+always_fire_councillor_skip_effects - The scope character fires the target character from the council without running on_actions and without rule checks e.g. ai_can_reassign_council_positions.
+Supported Scopes: character
+Supported Targets: character
+
+--------------------
+
 apply_ai_vassal_admin_province_obligation_liege_most_desired - Apply the new level for the most desired AI obligation level the liege in the contract wants
 Supported Scopes: character
 
@@ -3359,6 +3432,7 @@ Supported Scopes: character
 
 change_government - changes the government type of a ruler
 Supported Scopes: character
+Supported Targets: government_type
 
 --------------------
 
@@ -3832,7 +3906,7 @@ Supported Targets: character
 
 --------------------
 
-every_accolade - Iterate through all ( active and inactive ) Accolades of a given liege character's Acclaimed Knights
+every_accolade - Iterate through all Accolades of a given liege character's Acclaimed Knights
 every_accolade = { limit = { <triggers> } <effects> }
 Supported Scopes: character
 Supported Targets: accolade
@@ -4201,6 +4275,20 @@ Supported Targets: character
 
 --------------------
 
+every_grandparent - Iterate through all grand-parents of the scope character
+every_grandparent = { limit = { <triggers> } <effects> }
+Supported Scopes: character
+Supported Targets: character
+
+--------------------
+
+every_great_grandparent - Iterate through all great-grand-parents of the scope character
+every_great_grandparent = { limit = { <triggers> } <effects> }
+Supported Scopes: character
+Supported Targets: character
+
+--------------------
+
 every_heir - Heirs of the scoped character
 every_heir = { limit = { <triggers> } <effects> }
 Supported Scopes: character
@@ -4386,6 +4474,13 @@ Supported Targets: character
 
 --------------------
 
+every_neighboring_realm_with_tributaries_owner - A realm with a different top liege neighboring the realm of the scope character's top liege; switches to the holder of the realm. Can be based on borders a day or two out of date. Includes land and water borders extended by including tributaries.
+every_neighboring_realm_with_tributaries_owner = { limit = { <triggers> } <effects> }
+Supported Scopes: character
+Supported Targets: character
+
+--------------------
+
 every_neighboring_top_liege_realm - A realm with a different top liege neighboring the realm of the scope character's top liege; switches to the realm's top title. Can be based on borders a day or two out of date
 every_neighboring_top_liege_realm = { limit = { <triggers> } <effects> }
 Supported Scopes: character
@@ -4464,6 +4559,20 @@ every_pinned_character - Iterate through characters this player has pinned
 every_pinned_character = { limit = { <triggers> } <effects> }
 Supported Scopes: character
 Supported Targets: character
+
+--------------------
+
+every_pinned_province - Iterate through provinces this player has pinned
+every_pinned_province = { limit = { <triggers> } <effects> }
+Supported Scopes: character
+Supported Targets: province
+
+--------------------
+
+every_pinned_title - Iterate through titles this player has pinned
+every_pinned_title = { limit = { <triggers> } <effects> }
+Supported Scopes: character
+Supported Targets: landed_title
 
 --------------------
 
@@ -5181,7 +5290,7 @@ Supported Targets: character
 
 --------------------
 
-ordered_accolade - Iterate through all ( active and inactive ) Accolades of a given liege character's Acclaimed Knights
+ordered_accolade - Iterate through all Accolades of a given liege character's Acclaimed Knights
 ordered_accolade = {
 limit = { <triggers> }
 order_by = script_value
@@ -5907,6 +6016,34 @@ Supported Targets: character
 
 --------------------
 
+ordered_grandparent - Iterate through all grand-parents of the scope character
+ordered_grandparent = {
+limit = { <triggers> }
+order_by = script_value
+position = int
+min = int
+max = script_value
+check_range_bounds = no # If you don't want an error logged if the list is smaller than the min/max
+<effects> }
+Supported Scopes: character
+Supported Targets: character
+
+--------------------
+
+ordered_great_grandparent - Iterate through all great-grand-parents of the scope character
+ordered_great_grandparent = {
+limit = { <triggers> }
+order_by = script_value
+position = int
+min = int
+max = script_value
+check_range_bounds = no # If you don't want an error logged if the list is smaller than the min/max
+<effects> }
+Supported Scopes: character
+Supported Targets: character
+
+--------------------
+
 ordered_heir - Heirs of the scoped character
 ordered_heir = {
 limit = { <triggers> }
@@ -6274,6 +6411,20 @@ Supported Targets: character
 
 --------------------
 
+ordered_neighboring_realm_with_tributaries_owner - A realm with a different top liege neighboring the realm of the scope character's top liege; switches to the holder of the realm. Can be based on borders a day or two out of date. Includes land and water borders extended by including tributaries.
+ordered_neighboring_realm_with_tributaries_owner = {
+limit = { <triggers> }
+order_by = script_value
+position = int
+min = int
+max = script_value
+check_range_bounds = no # If you don't want an error logged if the list is smaller than the min/max
+<effects> }
+Supported Scopes: character
+Supported Targets: character
+
+--------------------
+
 ordered_neighboring_top_liege_realm - A realm with a different top liege neighboring the realm of the scope character's top liege; switches to the realm's top title. Can be based on borders a day or two out of date
 ordered_neighboring_top_liege_realm = {
 limit = { <triggers> }
@@ -6429,6 +6580,34 @@ check_range_bounds = no # If you don't want an error logged if the list is small
 <effects> }
 Supported Scopes: character
 Supported Targets: character
+
+--------------------
+
+ordered_pinned_province - Iterate through provinces this player has pinned
+ordered_pinned_province = {
+limit = { <triggers> }
+order_by = script_value
+position = int
+min = int
+max = script_value
+check_range_bounds = no # If you don't want an error logged if the list is smaller than the min/max
+<effects> }
+Supported Scopes: character
+Supported Targets: province
+
+--------------------
+
+ordered_pinned_title - Iterate through titles this player has pinned
+ordered_pinned_title = {
+limit = { <triggers> }
+order_by = script_value
+position = int
+min = int
+max = script_value
+check_range_bounds = no # If you don't want an error logged if the list is smaller than the min/max
+<effects> }
+Supported Scopes: character
+Supported Targets: landed_title
 
 --------------------
 
@@ -7374,7 +7553,7 @@ Supported Targets: character
 
 --------------------
 
-random_accolade - Iterate through all ( active and inactive ) Accolades of a given liege character's Acclaimed Knights
+random_accolade - Iterate through all Accolades of a given liege character's Acclaimed Knights
 random_accolade = { limit = { <triggers> } (optional) weight = { mtth } <effects> }
 Supported Scopes: character
 Supported Targets: accolade
@@ -7743,6 +7922,20 @@ Supported Targets: character
 
 --------------------
 
+random_grandparent - Iterate through all grand-parents of the scope character
+random_grandparent = { limit = { <triggers> } (optional) weight = { mtth } <effects> }
+Supported Scopes: character
+Supported Targets: character
+
+--------------------
+
+random_great_grandparent - Iterate through all great-grand-parents of the scope character
+random_great_grandparent = { limit = { <triggers> } (optional) weight = { mtth } <effects> }
+Supported Scopes: character
+Supported Targets: character
+
+--------------------
+
 random_heir - Heirs of the scoped character
 random_heir = { limit = { <triggers> } (optional) weight = { mtth } <effects> }
 Supported Scopes: character
@@ -7928,6 +8121,13 @@ Supported Targets: character
 
 --------------------
 
+random_neighboring_realm_with_tributaries_owner - A realm with a different top liege neighboring the realm of the scope character's top liege; switches to the holder of the realm. Can be based on borders a day or two out of date. Includes land and water borders extended by including tributaries.
+random_neighboring_realm_with_tributaries_owner = { limit = { <triggers> } (optional) weight = { mtth } <effects> }
+Supported Scopes: character
+Supported Targets: character
+
+--------------------
+
 random_neighboring_top_liege_realm - A realm with a different top liege neighboring the realm of the scope character's top liege; switches to the realm's top title. Can be based on borders a day or two out of date
 random_neighboring_top_liege_realm = { limit = { <triggers> } (optional) weight = { mtth } <effects> }
 Supported Scopes: character
@@ -8006,6 +8206,20 @@ random_pinned_character - Iterate through characters this player has pinned
 random_pinned_character = { limit = { <triggers> } (optional) weight = { mtth } <effects> }
 Supported Scopes: character
 Supported Targets: character
+
+--------------------
+
+random_pinned_province - Iterate through provinces this player has pinned
+random_pinned_province = { limit = { <triggers> } (optional) weight = { mtth } <effects> }
+Supported Scopes: character
+Supported Targets: province
+
+--------------------
+
+random_pinned_title - Iterate through titles this player has pinned
+random_pinned_title = { limit = { <triggers> } (optional) weight = { mtth } <effects> }
+Supported Scopes: character
+Supported Targets: landed_title
 
 --------------------
 
@@ -8576,6 +8790,12 @@ Supported Scopes: character
 
 --------------------
 
+remove_regnal_name - Remove the regnal name of a character.
+remove_regnal_name = yes
+Supported Scopes: character
+
+--------------------
+
 remove_relation_activity_recurrer - Removes scripted relationship
 Supported Scopes: character
 Supported Targets: character
@@ -8987,10 +9207,18 @@ Supported Scopes: character
 
 set_activity_intent - Sets the character's intent for their current activity to the specified intent.
 Will fail with error if the intent is not supported by the activity or not eligible for the character.
-Does not support targeting characters, only use for intents without a target.
 
 character = {
 	set_activity_intent = reduce_stress_intent
+}
+
+or 
+
+character = {
+	set_activity_intent = {
+		intent = reduce_stress_intent
+		target = scope:character
+	}
 }
 Supported Scopes: character
 
@@ -9292,6 +9520,13 @@ Supported Targets: landed_title
 
 --------------------
 
+set_regnal_name - Set the regnal name of a character.
+set_regnal_name = <localization_key> # All script scopes available
+set_regnal_name = { character = scope:character } # copy regnal/first name from the character
+Supported Scopes: character
+
+--------------------
+
 set_relation_activity_recurrer - Sets scripted relationship, set_relation_xxx = target, set_relation_xxx = { target = target reason = reason_key copy_reason = optional_other_relation province = optional_province involved_character = optional_character }
 Supported Scopes: character
 
@@ -9484,6 +9719,12 @@ Supported Scopes: character
 
 set_reserved_gold_maximum - Set the maximum (and also desired value) for the 'reserved' gold AI budget. This budget is saved up, even before the war chest budget. It will not correct the current gold in that budget to conform to the new maximum.character, set_reserved_gold_maximum = X
 Supported Scopes: character
+
+--------------------
+
+set_same_ethnicity_as - sets the ethnicity of the character to be the same as the ethnicity of the target
+Supported Scopes: character
+Supported Targets: character
 
 --------------------
 
@@ -11184,16 +11425,6 @@ Supported Scopes: landed_title
 
 --------------------
 
-set_vassal_wars_are_redirected_to_holder - Flags this title so that the holder will be called to defend their vassals or not according to the given value.
-This must be their primary title in order for the effect to take place.
-
-scope:landed_title = {
-	set_vassal_wars_are_redirected_to_holder = yes/no
-}
-Supported Scopes: landed_title
-
---------------------
-
 title_create_faction - the scoped landed title creates a faction of the specified type against the specified target, title_create_faction = { type = X target = Y }
 Supported Scopes: landed_title
 
@@ -11811,6 +12042,7 @@ add_from_contribution_attackers - Adds prestige, gold and piety based on contrib
 * dynasty_prestige is awarded to the participating rulers' dynasty
 * treasury is paid to the rulers' primary title's treasury cache, if it supports a treasury. Errors will occur otherwise.
 * herd and provisions are paid to the rulers' domicile, if it exists and supports the currency. Errors will occur otherwise.
+* Can only be called once per casus belli. Errors will occur otherwise
 
 Usage:
 
@@ -11946,6 +12178,23 @@ every_house_unity_member - Iterate through all valid house unity members
 every_house_unity_member = { limit = { <triggers> } <effects> }
 Supported Scopes: dynasty_house
 Supported Targets: character
+
+--------------------
+
+impact_house_relation - Set or change the relation between two houses.
+
+usage:
+some_house = {
+	impact_house_relation = {
+		target = <other house>
+		type = <type of relation> #optional
+		steps = 2.0 # Can be either full steps, or fractional ones
+		description = <dynamic description> # What caused this inception of or change to the relation
+		notification = <yes/no> # Optional (default: yes). Should we show a message if a players house is involved?
+		save_scope_as = <name> # Optional. Provide created relation to following scripts.
+	}
+}
+Supported Scopes: dynasty_house
 
 --------------------
 
@@ -13565,19 +13814,7 @@ Supported Targets: character
 
 --------------------
 
-activate_accolade - Activates the scoped Accolade, if there are free slots available else it will be deactivated
-activate_accolade = yes
-Supported Scopes: accolade
-
---------------------
-
 add_glory - Add this much to the Accolades glory
-Supported Scopes: accolade
-
---------------------
-
-deactivate_accolade - Deactivates the scoped Accolade, does nothing if it's already inactive
-deactivate_accolade = yes
 Supported Scopes: accolade
 
 --------------------
@@ -13585,6 +13822,13 @@ Supported Scopes: accolade
 remove_acclaimed_knight - Removes the acclaimed knight from this Accolade and passes it onto the successor ( if any )
 remove_acclaimed_knight = yes
 Supported Scopes: accolade
+
+--------------------
+
+set_accolade_successor - Sets the successor of an accolade to a character
+set_accolade_successor = character
+Supported Scopes: accolade
+Supported Targets: character
 
 --------------------
 
@@ -14581,11 +14825,12 @@ Supported Scopes: culture
 
 add_innovation - Add innovation to a culture. add_innovation = innovation_key
 Supported Scopes: culture
+Supported Targets: culture_innovation
 
 --------------------
 
 add_innovation_progress - Add X percentage of progress to the selected innovation.
-You can use either a hardcoded innovation key (innovation_burhs) or a saved innovation scope (scope:my_innovation).
+You can use either a hardcoded innovation key (culture_innovation:innovation_burhs) or a saved innovation scope (scope:my_innovation).
 
 add_innovation_progress = {
 	value = 15
@@ -14596,7 +14841,7 @@ Supported Scopes: culture
 --------------------
 
 add_innovation_progress_time - Add X months of progress to the selected innovation.
-You can use either a hardcoded innovation key (innovation_burhs) or a saved innovation scope (scope:my_innovation).
+You can use either a hardcoded innovation key (culture_innovation:innovation_burhs) or a saved innovation scope (scope:my_innovation).
 The value parameter supports scripted values.
 
 add_innovation_progress_time = {
@@ -14934,6 +15179,7 @@ Supported Targets: culture_tradition
 
 remove_innovation - Remove innovation from a culture. remove_innovation = innovation_key
 Supported Scopes: culture
+Supported Targets: culture_innovation
 
 --------------------
 

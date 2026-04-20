@@ -40,7 +40,7 @@ Supported Targets: accolade_type
 
 --------------------
 
-any_active_dynasty - Iterate through all dynasties with dynasty head
+any_active_dynasty - Iterate through all dynasties with dynasty head. Deprecated - use 'every/any/random dynasty with the optional parameter instead.
 any_active_dynasty = { <count=num/all> / <percent=fixed_point> <triggers> }
 Supported Scopes: none
 Supported Targets: dynasty
@@ -187,7 +187,7 @@ Supported Targets: landed_title
 
 --------------------
 
-any_dynasty - Iterate through all dynasties (even those without head)
+any_dynasty - Iterate through all dynasties. Use 'include_inactive = yes' to explicitly include inactive (without dynasty head) Dynasties.
 any_dynasty = { <count=num/all> / <percent=fixed_point> <triggers> }
 Supported Scopes: none
 Supported Targets: dynasty
@@ -406,7 +406,24 @@ Supported Targets: religion
 
 --------------------
 
-any_ruler - Rulers list with a COUNT tier o above
+any_ruler - Rulers list with a COUNT tier o above.
+Can optionally filter by:
+* government:	government_type_filter = government_type:mandala_government (accepts saved scopes)
+* faith:		faith_filter = faith:catholic (accepts saved scopes)
+* culture:		culture_filter = culture:greek (accepts saved scopes)
+* tier:			tier_filter = kingdom (use county/duchy/kingdom/empire/hegemony, without tier_prefix. baronies are not supported)
+* independent:	only_independent = yes (if unspecified or set to 'no' vassals will be included in the list)
+
+usage:
+any_ruler = {
+	government_type = government_type:feudal_government
+	only_independent = yes
+	tier = duchy
+
+	limit = {}
+
+	your effect...
+}
 any_ruler = { <count=num/all> / <percent=fixed_point> <triggers> }
 Supported Scopes: none
 Supported Targets: character
@@ -618,7 +635,7 @@ Supported Scopes: none
 --------------------
 
 has_dlc_feature - Does the host have DLC that enables this particular feature
-Traits: Valid Features: garments_of_the_hre, fashion_of_the_abbasid_court, the_northern_lords, hybridize_culture, diverge_culture, royal_court, reform_culture, court_artifacts, the_fate_of_iberia, friends_and_foes, tours_and_tournaments, advanced_activities, accolades, legacy_of_persia, elegance_of_the_empire, wards_and_wardens, legends_of_the_dead, legends, north_african_attire, couture_of_the_capets, landless_playable, admin_gov, roads_to_power, court_room_view, wandering_nobles, west_slavic_attire, medieval_monuments, khans_of_the_steppe, nomads, arctic_attire, crowns_of_the_world, landless_adventurer, coronations, all_under_heaven, merit_admin, advanced_aspirations, and barter_troops
+Traits: Valid Features: garments_of_the_hre, fashion_of_the_abbasid_court, the_northern_lords, hybridize_culture, diverge_culture, royal_court, reform_culture, court_artifacts, the_fate_of_iberia, friends_and_foes, tours_and_tournaments, advanced_activities, accolades, legacy_of_persia, elegance_of_the_empire, wards_and_wardens, legends_of_the_dead, legends, north_african_attire, couture_of_the_capets, landless_playable, admin_gov, roads_to_power, court_room_view, wandering_nobles, west_slavic_attire, medieval_monuments, khans_of_the_steppe, nomads, arctic_attire, crowns_of_the_world, landless_adventurer, coronations, all_under_heaven, merit_admin, advanced_aspirations, barter_troops, high_medieval_warfare_attire, holy_buildings, north_pacific_attire, east_asian_wonders, celestial_court_attire, symbols_of_authority, and songs_of_the_realm
 Supported Scopes: none
 
 --------------------
@@ -1146,7 +1163,7 @@ Supported Scopes: character
 
 --------------------
 
-ai_will_do_contribution - Compares the scope character's base willingness to make the contribution specified 
+ai_will_do_contribution - Compares the scope character's base willingness to make the contribution specified
 							scope:my_char.contribution_ai_will_do( scope:great_project_contribution ) > 25
 Traits: <, <=, =, !=, >, >=
 Supported Scopes: character
@@ -1205,7 +1222,7 @@ Supported Targets: character
 
 --------------------
 
-any_accolade - Iterate through all ( active and inactive ) Accolades of a given liege character's Acclaimed Knights
+any_accolade - Iterate through all Accolades of a given liege character's Acclaimed Knights
 any_accolade = { <count=num/all> / <percent=fixed_point> <triggers> }
 Supported Scopes: character
 Supported Targets: accolade
@@ -1574,6 +1591,20 @@ Supported Targets: character
 
 --------------------
 
+any_grandparent - Iterate through all grand-parents of the scope character
+any_grandparent = { <count=num/all> / <percent=fixed_point> <triggers> }
+Supported Scopes: character
+Supported Targets: character
+
+--------------------
+
+any_great_grandparent - Iterate through all great-grand-parents of the scope character
+any_great_grandparent = { <count=num/all> / <percent=fixed_point> <triggers> }
+Supported Scopes: character
+Supported Targets: character
+
+--------------------
+
 any_heir - Heirs of the scoped character
 any_heir = { <count=num/all> / <percent=fixed_point> <triggers> }
 Supported Scopes: character
@@ -1759,6 +1790,13 @@ Supported Targets: character
 
 --------------------
 
+any_neighboring_realm_with_tributaries_owner - A realm with a different top liege neighboring the realm of the scope character's top liege; switches to the holder of the realm. Can be based on borders a day or two out of date. Includes land and water borders extended by including tributaries.
+any_neighboring_realm_with_tributaries_owner = { <count=num/all> / <percent=fixed_point> <triggers> }
+Supported Scopes: character
+Supported Targets: character
+
+--------------------
+
 any_neighboring_top_liege_realm - A realm with a different top liege neighboring the realm of the scope character's top liege; switches to the realm's top title. Can be based on borders a day or two out of date
 any_neighboring_top_liege_realm = { <count=num/all> / <percent=fixed_point> <triggers> }
 Supported Scopes: character
@@ -1837,6 +1875,20 @@ any_pinned_character - Iterate through characters this player has pinned
 any_pinned_character = { <count=num/all> / <percent=fixed_point> <triggers> }
 Supported Scopes: character
 Supported Targets: character
+
+--------------------
+
+any_pinned_province - Iterate through provinces this player has pinned
+any_pinned_province = { <count=num/all> / <percent=fixed_point> <triggers> }
+Supported Scopes: character
+Supported Targets: province
+
+--------------------
+
+any_pinned_title - Iterate through titles this player has pinned
+any_pinned_title = { <count=num/all> / <percent=fixed_point> <triggers> }
+Supported Scopes: character
+Supported Targets: landed_title
 
 --------------------
 
@@ -2602,6 +2654,16 @@ Supported Targets: inspiration
 
 can_start_scheme - can the character start the scheme?
 can_start_scheme = { type = X target = Y }
+Supported Scopes: character
+
+--------------------
+
+can_vassals_be_attacked - Checks if the ruler has can_vassals_be_attacked modifier
+
+scope:character = {
+	can_vassals_be_attacked = yes
+}
+Traits: yes/no 
 Supported Scopes: character
 
 --------------------
@@ -3416,6 +3478,11 @@ Supported Scopes: character
 
 --------------------
 
+has_ethnicity - Does the character have this ethnicity?
+Supported Scopes: character
+
+--------------------
+
 has_execute_reason - Does the character have the execute reason towards the target?
 Traits: character target 
 Supported Scopes: character
@@ -3432,6 +3499,22 @@ Supported Targets: faith
 
 has_father - does the character have a valid living father?
 Traits: yes/no 
+Supported Scopes: character
+
+--------------------
+
+has_first_name - Does the current character have this first name / same as character? Cultural name equivalence is tested. Regnal name is used if set.
+Note: this is not a fast trigger, use with care.
+has_first_name = <localization_key> # All current script scopes available
+has_first_name = { character = scope:character } # check first name / regnal name from the character
+Supported Scopes: character
+
+--------------------
+
+has_first_name_strict - Does the current character have this first name / same as character? Only exact name equivalence is tested. Regnal name is used if set.
+Note: this is not a fast trigger, use with care.
+has_first_name_base_strict = <localization_key> # All current script scopes available
+has_first_name_base_strict = { character = scope:character } # check first name / regnal name from the character
 Supported Scopes: character
 
 --------------------
@@ -3535,6 +3618,22 @@ Supported Scopes: character
 --------------------
 
 has_opposite_relation - Does the scope character have an opposite relationship of the relation value with the target character? target = , relation = 
+Supported Scopes: character
+
+--------------------
+
+has_original_first_name - Does the current character have this first name / same as character? Cultural name equivalence is tested. Regnal names are ignored.
+Note: this is not a fast trigger, use with care.
+has_first_name = <localization_key> # All current script scopes available
+has_first_name = { character = scope:character } # check first name from the character
+Supported Scopes: character
+
+--------------------
+
+has_original_first_name_strict - Does the current character have this first name / same as character? Only exact name equivalence is tested. Regnal names are ignored.
+Note: this is not a fast trigger, use with care.
+has_first_name_strict = <localization_key> # All current script scopes available
+has_first_name_strict = { character = scope:character } # check first name from the character
 Supported Scopes: character
 
 --------------------
@@ -3654,6 +3753,26 @@ Supported Scopes: character
 --------------------
 
 has_realm_law_flag - Does the scoped character have a law with the given flag?
+Supported Scopes: character
+
+--------------------
+
+has_realm_law_in_group - Does the scoped character have a realm law in the given group?
+Supported Scopes: character
+
+--------------------
+
+has_regnal_name - Does the current character have this regnal name / same as character? Cultural name equivalence is tested. (regnal numbers are not part of the regnal name)
+has_regnal_name = <localization_key> # All current script scopes available
+has_regnal_name = { character = scope:character } # check regnal from the character
+Supported Scopes: character
+
+--------------------
+
+has_regnal_name_strict - Does the current character have this regnal name / same as character? Only exact name equivalence is tested. (regnal numbers are not part of the regnal name)
+Note: this is not a fast trigger, use with care.
+has_regnal_name_strict = <localization_key> # All current script scopes available
+has_regnal_name_strict = { character = scope:character } # check regnal from the character
 Supported Scopes: character
 
 --------------------
@@ -3941,6 +4060,12 @@ Supported Scopes: character
 --------------------
 
 has_same_culture_as - Does the character have the same culture as the target?
+Traits: character target 
+Supported Scopes: character
+
+--------------------
+
+has_same_ethnicity_as - Does the character have the same ethnicity as the target?
 Traits: character target 
 Supported Scopes: character
 
@@ -4474,6 +4599,14 @@ Supported Scopes: character
 is_a_faction_member - Is the scope character a member of a faction?
 Traits: yes/no 
 Supported Scopes: character
+
+--------------------
+
+is_acceptable_fit_for_accolade - Is the scoped character an acceptable fit to take over as successor of this Accolade?
+is_acceptable_fit_for_accolade = accolade
+Traits: accolade scope
+Supported Scopes: character
+Supported Targets: accolade
 
 --------------------
 
@@ -5097,6 +5230,14 @@ Supported Scopes: character
 
 --------------------
 
+is_knight_permitted - Is the scoped character permitted to be a knight as per the liege's permissions?
+is_knight_permitted = liege
+Traits: character scope
+Supported Scopes: character
+Supported Targets: character
+
+--------------------
+
 is_landed - Is the scope character landed (holds a county or barony)?
 Traits: yes/no 
 Supported Scopes: character
@@ -5219,6 +5360,14 @@ is_participant_in_war - is the scope character participating in the target war a
 Traits: war scope
 Supported Scopes: character
 Supported Targets: war
+
+--------------------
+
+is_perfect_fit_for_accolade - Is the scoped character a perfect fit to take over as successor of this Accolade?
+is_perfect_fit_for_accolade = accolade
+Traits: accolade scope
+Supported Scopes: character
+Supported Targets: accolade
 
 --------------------
 
@@ -5475,14 +5624,6 @@ is_valid_for_event_debug_cooldown - is the scoped character valid for the given 
 NOTE: this is only for debug purposes and will not work in release mode!
 is_valid_for_event_debug_cooldown = event_key
 Supported Scopes: character
-
---------------------
-
-is_valid_successor_for_accolade - Is the scoped character a valid candidate to take over as successor of this Accolade?
-is_valid_successor_for_accolade = accolade
-Traits: accolade scope
-Supported Scopes: character
-Supported Targets: accolade
 
 --------------------
 
@@ -5748,7 +5889,7 @@ Supported Scopes: character
 
 --------------------
 
-max_active_accolades - How many active accolades can this character have at most?
+max_accolades - How many accolades can this character have at most?
 max_active_accolades <= 3
 Traits: <, <=, =, !=, >, >=
 Supported Scopes: character
@@ -5963,15 +6104,8 @@ Supported Scopes: character
 
 --------------------
 
-num_active_accolades - How many active accolades does this character currently have?
+num_accolades - How many accolades does this character currently have?
 num_active_accolades < 4
-Traits: <, <=, =, !=, >, >=
-Supported Scopes: character
-
---------------------
-
-num_inactive_accolades - How many inactive accolades does this character currently have?
-num_inactive_accolades > 0
 Traits: <, <=, =, !=, >, >=
 Supported Scopes: character
 
@@ -7642,16 +7776,6 @@ Supported Targets: landed_title
 
 --------------------
 
-are_vassal_wars_redirected_to_holder - Checks whether the holder of this title will be called to protect their vassals should they be attacked.
-
-scope:landed_title = {
-	are_vassal_wars_redirected_to_holder = yes
-}
-Traits: yes/no 
-Supported Scopes: landed_title
-
---------------------
-
 can_be_leased_out - Can the scoped title be leased out?
 Traits: yes/no 
 Supported Scopes: landed_title
@@ -7803,7 +7927,8 @@ Supported Scopes: landed_title
 
 --------------------
 
-has_holy_site_flag - Does the barony have a holy site with the given flag? has_holy_site_flag = some flag
+has_holy_site_parameter - Does scoped barony have a holy site with given parameter?
+scope:barony = { has_holy_site_parameter = some_parameter }
 Supported Scopes: landed_title
 
 --------------------
@@ -8143,7 +8268,7 @@ Supported Targets: landed_title
 
 --------------------
 
-tier - What tier is the scoped title? barony = 1, empire = 5. Use the script values please, not raw numbers
+tier - What tier is the scoped title? barony = 1, hegemony = 6. Use the script values please, not raw numbers
 Traits: <, <=, =, !=, >, >=
 Supported Scopes: landed_title
 
@@ -8729,6 +8854,13 @@ Supported Targets: artifact
 
 --------------------
 
+has_house_aspiration_parameter - Does the given house a house power/aspiration with the given parameter?
+Can only check for boolean parameters.
+has_house_aspiration_parameter = parameter_key
+Supported Scopes: dynasty_house
+
+--------------------
+
 has_house_head_parameter - Does the given house a house head with the given parameter?
 Can only check for boolean parameters.
 has_house_head_parameter = parameter_key
@@ -8744,13 +8876,6 @@ Supported Scopes: dynasty_house
 
 has_house_modifier_duration_remaining - Does the scoped house have the duration remaining on a given modifier
 has_house_modifier_duration_remaining = name
-Supported Scopes: dynasty_house
-
---------------------
-
-has_house_power_parameter - Does the given house a house power/aspiration with the given parameter?
-Can only check for boolean parameters.
-has_house_power_parameter = parameter_key
 Supported Scopes: dynasty_house
 
 --------------------
@@ -8796,11 +8921,11 @@ Supported Scopes: dynasty_house
 
 --------------------
 
-has_same_house_power_as - Does this house have the same house power/aspiration as the target house?
+has_same_house_aspiration_as - Does this house have the same house power/aspiration as the target house?
 
 usage:
 <house> = {
-	has_same_house_power_as = scope:target_house
+	has_same_house_aspiration_as = scope:target_house
 }
 
 Traits: dynasty_house scope
@@ -9110,7 +9235,8 @@ Supported Scopes: faith
 
 --------------------
 
-controls_holy_site_with_flag - Does the faith control a holy site with the given flag? controls_holy_site_with_flag = some flag
+controls_holy_site_with_parameter - Does scoped faith control a holy site with given parameter?
+scope:faith = { controls_holy_site_with_parameter = some_parameter }
 Supported Scopes: faith
 
 --------------------
@@ -9145,7 +9271,7 @@ Supported Scopes: faith
 --------------------
 
 has_doctrine - Does the given faith have the given doctrine?? has_doctrine = doctrine_key
-Traits: class CFaithDoctrineDatabase key
+Traits: class CDoctrineTypeDatabase key
 Supported Scopes: faith
 Supported Targets: doctrine
 
@@ -9383,6 +9509,12 @@ Supported Scopes: character_memory
 
 --------------------
 
+domicile_building_has_free_internal_slot - Does scoped domicile have building with any free internal building slots?
+scope:domicile = { domicile_building_has_free_internal_slot = domicile building key }
+Supported Scopes: domicile
+
+--------------------
+
 domicile_uses_culture_and_faith - Does the scoped domicile use culture and faith?
 Traits: yes/no 
 Supported Scopes: domicile
@@ -9520,6 +9652,26 @@ Supported Scopes: army
 --------------------
 
 army_max_size - what size is this army's max size?
+Traits: <, <=, =, !=, >, >=
+Supported Scopes: army
+
+--------------------
+
+army_number_maa_regiments - How many MaA regiments does the scoped army have?
+Traits: <, <=, =, !=, >, >=
+Supported Scopes: army
+
+--------------------
+
+army_number_maa_regiments_of_base_type - Does the scoped army have the value amount of MaA of the specified base type?
+value = knight_army.army_number_maa_regiments_of_base_type:archers
+Traits: <, <=, =, !=, >, >=
+Supported Scopes: army
+
+--------------------
+
+army_number_maa_regiments_of_type - Does the scoped army have the value amount of MaA of the specified type?
+value = knight_army.army_number_maa_regiments_of_type:crossbowmen
 Traits: <, <=, =, !=, >, >=
 Supported Scopes: army
 
@@ -10236,7 +10388,29 @@ Supported Targets: situation_sub_region
 
 --------------------
 
-accolade_rank - How many ranks does this Accolade have unlocked?
+accolade_attribute_level - What level is this Accolade Attribute?
+accolade_attribute_level = {
+    type = bruiser_accolade
+    level > 2
+}
+Traits: <, <=, =, !=, >, >=
+Supported Scopes: accolade
+
+--------------------
+
+accolade_can_have_more_attributes - Can the scoped accolade have more attributes? i.e. it has not reached the maximum number of attributes
+Traits: yes/no 
+Supported Scopes: accolade
+
+--------------------
+
+accolade_can_spend_attribute - Does the scoped accolade have unspent attributes?
+Traits: yes/no 
+Supported Scopes: accolade
+
+--------------------
+
+accolade_rank - What rank is this Accolade?
 accolade_rank > 2
 Traits: <, <=, =, !=, >, >=
 Supported Scopes: accolade
@@ -10263,22 +10437,6 @@ Supported Scopes: accolade
 
 has_potential_accolade_successors - Does the given Accolade's Owner have any character in their court ( including guests ) that could act as Successor of this Accolade if made into a Knight?
 Traits: yes/no 
-Supported Scopes: accolade
-
---------------------
-
-is_accolade_active - Is the scoped Accolade active, i.e. assinged by their Liege?
-Traits: yes/no 
-Supported Scopes: accolade
-
---------------------
-
-primary_tier - Is the scoped Accolade's primary type tier equal to?
-Supported Scopes: accolade
-
---------------------
-
-secondary_tier - Is the scoped Accolade's secondary type tier equal to?
 Supported Scopes: accolade
 
 --------------------
@@ -11304,7 +11462,9 @@ Supported Targets: culture_tradition
 --------------------
 
 has_innovation - Have the culture discovered this innovation?
+Traits: class CCultureInnovationTypeDatabase key
 Supported Scopes: culture
+Supported Targets: culture_innovation
 
 --------------------
 
@@ -11781,7 +11941,7 @@ Supported Scopes: confederation
 has_cohesion_level_parameter - Does current cohesion level of the given confederation/bloc have the given parameter?
 usage:
 <bloc> = {
-	has_house_power_parameter = <parameter_key>
+	has_cohesion_level_parameter = <parameter_key>
 }
 Supported Scopes: confederation
 
