@@ -1030,11 +1030,6 @@ riseandfall_execute_realm_split_se = {
             }
         }
         resolve_title_and_vassal_change = scope:rf_title_change
-
-        # original ruler should get an unpressed claim on the brand new breakaway title
-        scope:original_ruler = {
-            add_unpressed_claim = scope:rf_new_title
-        }
     }
     
     # Transfer assigned vassals
@@ -1089,17 +1084,7 @@ riseandfall_execute_realm_split_se = {
         }
     }
 
-    # Add claim on original primary title
-    # If the original primary was a hegemon, ensure the original ruler
-    # gets an unpressed claim on the breakaway's (possibly newly-created)
-    # empire title so the hegemon can press for it later.
-    if = {
-        limit = { scope:original_primary.tier = tier_hegemony }
-        if = { limit = { exists = scope:rf_new_title } scope:original_ruler = { add_unpressed_claim = scope:rf_new_title } }
-        else = { if = { limit = { exists = scope:new_realm_ruler.primary_title } scope:original_ruler = { add_unpressed_claim = scope:new_realm_ruler.primary_title } } }
-    }
-
-    add_unpressed_claim = scope:original_primary
+    # Claims on titles removed; successor war CB handles claims now.
 
     if = {
         limit = { exists = scope:new_realm_ruler }
@@ -1147,8 +1132,6 @@ riseandfall_execute_realm_split_se = {
             has_weak_claim_on = scope:original_primary
         }
         save_scope_as = rf_peer_successor
-        scope:new_realm_ruler = { add_unpressed_claim = scope:rf_peer_successor.primary_title }
-        scope:rf_peer_successor = { add_unpressed_claim = scope:new_realm_ruler.primary_title }
     }
 
     # --- End new rivalry & cross-claims block ---

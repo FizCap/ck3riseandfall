@@ -1097,13 +1097,8 @@ riseandfall_palace_coup_root_flees_success = {
         scope:original_ruler = { remove_variable = tmp_successor_realm_size }
         scope:palace_coup_challenger = { remove_variable = tmp_successor_realm_size }
 
-        scope:original_ruler = { add_unpressed_claim = scope:original_primary }
-        if = {
-            limit = { exists = scope:palace_coup_root_successor_title }
-            scope:palace_coup_challenger = {
-                add_unpressed_claim = scope:palace_coup_root_successor_title
-            }
-        }
+        # Retreating ruler receives a strong claim on the original primary title
+        scope:original_ruler = { make_claim_strong = scope:original_primary }
 
 
         # Trigger escape follow-up: call banners event for root
