@@ -1,0 +1,634 @@
+﻿##########################
+# Rise and Fall - Nationalist / Religious Revolt Release Effects
+# Option B of authority_collapse.1001: release rebellious counties as new independent realms
+# whose rulers match each county's own culture and faith.
+#
+# Entry points:
+#   riseandfall_release_revolt_realms_se  — top-level effect called from the event
+#
+# Design notes:
+#   • Iterate all realm counties that triggered the revolt (non-approved culture or hostile faith).
+#   • Group them by dominant culture+faith (weighted by total_county_levies as a strength proxy).
+#   • Create one independent ruler per distinct culture/faith grouping; give them all matching counties.
+#   • If a county is already held by a vassal whose culture+faith already matches the county,
+#     that vassal becomes the seed ruler for that group instead of a new character being created.
+#   • Foreign-culture/faith vassals who hold qualifying counties lose those titles; they keep only
+#     counties that match their own culture/faith (or nothing, becoming unlanded courtiers).
+#   • The releasing ruler gets unpressed claims on every new realm and loses the revolt modifier.
+
+##########################
+# Helper: collect and group rebellious counties into virtual "shard" groups,
+# then create rulers for each group and transfer land.
+#
+# Scope when called: the releasing ruler (root)
+
+riseandfall_release_revolt_realms_se = {
+    save_scope_as = rf_revolt_liege
+    remove_variable = rf_revolt_personal_counties
+
+    # Defensive reset in case an earlier execution aborted before cleanup.
+    clear_global_variable_list = rf_revolt_rebel_counties
+    every_realm_county = {
+        remove_variable = rf_revolt_rebel_county
+        remove_variable = rf_revolt_assigned_seed
+        remove_variable = rf_revolt_group_seed
+        remove_variable = rf_revolt_option_a_fallback
+        holder = {
+            remove_variable = rf_revolt_safe_counties
+        }
+    }
+
+    # -----------------------------------------------------------------------
+    # Step 1: Tag all rebel counties and collect into a list.
+    # We use a temporary variable on each county to mark it "rebel" for
+    # the duration of this effect so we can iterate it multiple times.
+    # -----------------------------------------------------------------------
+    every_realm_county = {
+        limit = {
+            culture ?= { always = yes }
+            faith ?= { always = yes }
+            OR = {
+                AND = {
+                    NOT = { culture ?= scope:rf_revolt_liege.culture }
+                    NOT = {
+                        culture ?= {
+                            cultural_acceptance = {
+                                target = scope:rf_revolt_liege.culture
+                                value >= 70
+                            }
+                        }
+                    }
+                }
+                AND = {
+                    NOT = { faith ?= scope:rf_revolt_liege.faith }
+                    NOT = {
+                        faith ?= {
+                            faith_hostility_level = {
+                                target = scope:rf_revolt_liege.faith
+                                value <= faith_astray_level
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        set_variable = { name = rf_revolt_rebel_county value = 1 }
+        add_to_global_variable_list = { name = rf_revolt_rebel_counties target = this }
+    }
+
+    # Counties held by rulers already fighting their liege should stay in-place and
+    # fall back to the same unrest modifier as Option A instead of being released.
+    every_in_global_list = {
+        variable = rf_revolt_rebel_counties
+        limit = {
+            has_variable = rf_revolt_rebel_county
+            holder = {
+                exists = liege
+                is_at_war_with_liege = yes
+            }
+        }
+        add_county_modifier = {
+            modifier = riseandfall_nationalist_revolt
+            years = 5
+        }
+        set_variable = { name = rf_revolt_option_a_fallback value = 1 }
+        remove_variable = rf_revolt_rebel_county
+    }
+
+    # Record which rulers still hold at least one county outside the current nationalist unrest.
+    every_realm_county = {
+        limit = {
+            exists = holder
+            NOT = { has_variable = rf_revolt_rebel_county }
+            NOT = { has_variable = rf_revolt_option_a_fallback }
+            NOT = { has_county_modifier = riseandfall_nationalist_revolt }
+        }
+        holder = {
+            set_variable = { name = rf_revolt_safe_counties value = 1 }
+        }
+    }
+
+    # Do not give up the LIEGE's own capital unless they can fall back to another calm county.
+    # Vassal capitals are NOT protected here — they will be stripped in Step 3.
+    every_in_global_list = {
+        variable = rf_revolt_rebel_counties
+        limit = {
+            has_variable = rf_revolt_rebel_county
+            exists = holder
+            holder = scope:rf_revolt_liege
+            this = scope:rf_revolt_liege.capital_county
+            scope:rf_revolt_liege = { NOT = { has_variable = rf_revolt_safe_counties } }
+        }
+        add_county_modifier = {
+            modifier = riseandfall_nationalist_revolt
+            years = 5
+        }
+        set_variable = { name = rf_revolt_option_a_fallback value = 1 }
+        remove_variable = rf_revolt_rebel_county
+    }
+
+    # If the releasing ruler has only one county, convert all of their personal rebel counties
+    # to the Option A modifier (can't give away last county). If they have multiple counties
+    # but none of their personal counties are calm, convert ONLY their capital county to the
+    # Option A modifier (we cannot relinquish the capital unless they have a calm county to keep).
+    set_variable = { name = rf_revolt_personal_counties value = 0 }
+    every_held_title = {
+        limit = {
+            tier = tier_county
+            holder = scope:rf_revolt_liege
+        }
+        scope:rf_revolt_liege = {
+            change_variable = { name = rf_revolt_personal_counties add = 1 }
+        }
+    }
+
+    # Case A: liege only holds one county -> convert all their personal rebel counties
+    if = {
+        limit = {
+            AND = {
+                has_variable = rf_revolt_personal_counties
+                var:rf_revolt_personal_counties <= 1
+            }
+        }
+        every_in_global_list = {
+            variable = rf_revolt_rebel_counties
+            limit = {
+                has_variable = rf_revolt_rebel_county
+                holder = scope:rf_revolt_liege
+            }
+            add_county_modifier = {
+                modifier = riseandfall_nationalist_revolt
+                years = 5
+            }
+            set_variable = { name = rf_revolt_option_a_fallback value = 1 }
+            remove_variable = rf_revolt_rebel_county
+        }
+    }
+
+    # Case B: liege has multiple counties but no calm personal county -> protect capital only
+    else_if = {
+        limit = {
+            AND = {
+                has_variable = rf_revolt_personal_counties
+                var:rf_revolt_personal_counties > 1
+            }
+            NOT = { has_variable = rf_revolt_safe_counties }
+        }
+        every_in_global_list = {
+            variable = rf_revolt_rebel_counties
+            limit = {
+                has_variable = rf_revolt_rebel_county
+                exists = holder
+                this = holder.capital_county
+                holder = scope:rf_revolt_liege
+            }
+            add_county_modifier = {
+                modifier = riseandfall_nationalist_revolt
+                years = 5
+            }
+            set_variable = { name = rf_revolt_option_a_fallback value = 1 }
+            remove_variable = rf_revolt_rebel_county
+        }
+    }
+
+    # -----------------------------------------------------------------------
+    # Step 2: For each rebel county, create a canonical seed ruler based on
+    # the county's culture+faith and then group all matching counties in the
+    # same de jure kingdom under that seed.
+    #
+    # To avoid creating duplicate rulers for the same culture/faith pair we
+    # set rf_revolt_seed_ruler on the county referencing the chosen ruler.
+    # We then group by iterating again and transferring all counties to their seed.
+    # -----------------------------------------------------------------------
+
+    # Step 2: iterate each de jure kingdom and only process that kingdom's counties.
+    # This hard-locks grouping to one kingdom and avoids stale weak scopes from list entries.
+    every_realm_de_jure_kingdom = {
+        save_scope_as = rf_current_revolt_kingdom
+        every_de_jure_county = {
+            limit = {
+                has_variable = rf_revolt_rebel_county
+                NOT = { has_variable = rf_revolt_assigned_seed }
+                culture ?= { always = yes }
+                faith ?= { always = yes }
+            }
+            save_scope_as = rf_current_rebel_county
+            remove_variable = rf_revolt_group_seed
+
+            # Create a new revolt leader directly from this county's data.
+            create_character = {
+                location = scope:rf_current_rebel_county.title_province
+                template = populist_faction_leader_template
+                # Initialize with a guaranteed-valid fallback, then override below if county scopes are valid.
+                culture = scope:rf_revolt_liege.culture
+                faith = scope:rf_revolt_liege.faith
+                trait = populist_leader
+                gender_female_chance = {
+                    if = {
+                        limit = {
+                            scope:rf_current_rebel_county.faith = {
+                                has_doctrine = doctrine_gender_male_dominated
+                            }
+                        }
+                        add = 0
+                    }
+                    else_if = {
+                        limit = {
+                            scope:rf_current_rebel_county.faith = {
+                                has_doctrine = doctrine_gender_female_dominated
+                            }
+                        }
+                        add = 100
+                    }
+                    else = { add = 20 }
+                }
+                save_scope_as = rf_chosen_seed
+            }
+
+            if = {
+                limit = { exists = scope:rf_chosen_seed }
+                # Re-assert culture/faith from the source county when safe, otherwise keep liege fallback.
+                if = {
+                    limit = { scope:rf_current_rebel_county.culture ?= { always = yes } }
+                    scope:rf_chosen_seed = {
+                        set_culture = scope:rf_current_rebel_county.culture
+                    }
+                }
+                if = {
+                    limit = { scope:rf_current_rebel_county.faith ?= { always = yes } }
+                    scope:rf_chosen_seed = {
+                        set_character_faith = scope:rf_current_rebel_county.faith
+                    }
+                }
+                scope:rf_chosen_seed = {
+                    add_character_flag = { flag = rf_revolt_seed_assigned days = 30 }
+                }
+                scope:rf_current_rebel_county = {
+                    set_variable = { name = rf_revolt_group_seed value = scope:rf_chosen_seed }
+                }
+            }
+
+            # Assign all same culture+faith rebel counties in THIS kingdom to the same seed.
+            if = {
+                limit = {
+                    has_variable = rf_revolt_group_seed
+                    scope:rf_current_rebel_county.culture ?= { always = yes }
+                    scope:rf_current_rebel_county.faith ?= { always = yes }
+                }
+                scope:rf_current_revolt_kingdom = {
+                    every_de_jure_county = {
+                        limit = {
+                            has_variable = rf_revolt_rebel_county
+                            NOT = { has_variable = rf_revolt_assigned_seed }
+                            culture ?= scope:rf_current_rebel_county.culture
+                            faith ?= scope:rf_current_rebel_county.faith
+                        }
+                        set_variable = {
+                            name = rf_revolt_assigned_seed
+                            value = scope:rf_current_rebel_county.var:rf_revolt_group_seed
+                        }
+                    }
+                }
+            }
+
+            remove_variable = rf_revolt_group_seed
+        }
+    }
+
+    # -----------------------------------------------------------------------
+    # Step 3: Strip foreign-culture/faith holders of rebel counties.
+    # Any direct holder of a rebel county whose own culture+faith does NOT
+    # match the county should lose that county so it can be reassigned.
+    # -----------------------------------------------------------------------
+    every_in_global_list = {
+        variable = rf_revolt_rebel_counties
+        save_scope_as = rf_strip_county
+        if = {
+            limit = {
+                has_variable = rf_revolt_rebel_county
+                exists = holder
+                holder = { NOT = { this = scope:rf_revolt_liege } }
+                OR = {
+                    NOT = { holder = { culture ?= scope:rf_strip_county.culture } }
+                    NOT = { holder = { faith ?= scope:rf_strip_county.faith } }
+                }
+            }
+            # Transfer the county to the liege temporarily so we can redistribute below
+            create_title_and_vassal_change = {
+                type = conquest
+                save_scope_as = rf_strip_change
+                add_claim_on_loss = no
+            }
+            change_title_holder = {
+                holder = scope:rf_revolt_liege
+                change = scope:rf_strip_change
+                take_baronies = no
+            }
+            resolve_title_and_vassal_change = scope:rf_strip_change
+        }
+    }
+
+    # -----------------------------------------------------------------------
+    # Step 4: Distribute all rebel counties to their assigned seed rulers.
+    # Each seed becomes independent, gains their counties, and may usurp or
+    # create a kingdom title if they hold enough de jure land.
+    # -----------------------------------------------------------------------
+    every_in_global_list = {
+        variable = rf_revolt_rebel_counties
+        limit = {
+            has_variable = rf_revolt_assigned_seed
+            var:rf_revolt_assigned_seed ?= { is_alive = yes }
+        }
+        save_scope_as = rf_give_county
+
+        # Ensure the assigned seed character has a valid culture/faith before any
+        # title-holder changes. Some engine updates (men-at-arms, laws) evaluate
+        # culture-scoped triggers immediately during title changes; setting the
+        # seed's culture/faith first avoids 'weak (Culture - ...)' log entries.
+        if = {
+            limit = { var:rf_revolt_assigned_seed ?= { is_alive = yes } }
+            scope:rf_give_county.var:rf_revolt_assigned_seed = {
+                if = {
+                    limit = { scope:rf_give_county.culture ?= { always = yes } }
+                    set_culture = scope:rf_give_county.culture
+                }
+                else = { set_culture = scope:rf_revolt_liege.culture }
+
+                if = {
+                    limit = { scope:rf_give_county.faith ?= { always = yes } }
+                    set_character_faith = scope:rf_give_county.faith
+                }
+                else = { set_character_faith = scope:rf_revolt_liege.faith }
+            }
+        }
+
+        if = {
+            limit = { NOT = { holder = scope:rf_give_county.var:rf_revolt_assigned_seed } }
+            create_title_and_vassal_change = {
+                type = conquest_populist
+                save_scope_as = rf_give_change
+                add_claim_on_loss = yes
+            }
+            change_title_holder = {
+                holder = scope:rf_give_county.var:rf_revolt_assigned_seed
+                change = scope:rf_give_change
+                take_baronies = no
+            }
+            resolve_title_and_vassal_change = scope:rf_give_change
+        }
+
+        # Normalize the resulting county holder to valid culture/faith scopes.
+        # This prevents weak culture/faith objects from propagating into vanilla checks.
+        scope:rf_give_county.holder = {
+            if = {
+                limit = { scope:rf_give_county.culture ?= { always = yes } }
+                set_culture = scope:rf_give_county.culture
+            }
+            else = {
+                set_culture = scope:rf_revolt_liege.culture
+            }
+
+            if = {
+                limit = { scope:rf_give_county.faith ?= { always = yes } }
+                set_character_faith = scope:rf_give_county.faith
+            }
+            else = {
+                set_character_faith = scope:rf_revolt_liege.faith
+            }
+        }
+    }
+
+    # -----------------------------------------------------------------------
+    # Step 5: Make each seed ruler independent and grant a kingdom title if
+    # they hold > 50% of a de jure kingdom's counties.
+    # -----------------------------------------------------------------------
+    every_in_global_list = {
+        variable = rf_revolt_rebel_counties
+        limit = {
+            has_variable = rf_revolt_assigned_seed
+            var:rf_revolt_assigned_seed ?= { is_alive = yes }
+        }
+        save_scope_as = rf_step5_current_county
+        # Guard: only process each seed ruler once. `limit` is not valid inside a plain
+        # scope-switch block, so we use if = { limit = { var:X = { ... } } } instead.
+        if = {
+            limit = {
+                var:rf_revolt_assigned_seed ?= {
+                    NOT = { has_character_flag = rf_revolt_made_independent }
+                    is_landed = yes
+                }
+            }
+            var:rf_revolt_assigned_seed = {
+            save_scope_as = rf_current_seed
+
+            # Re-normalize seed identity before independence/law checks.
+            if = {
+                limit = { scope:rf_step5_current_county.culture ?= { always = yes } }
+                set_culture = scope:rf_step5_current_county.culture
+            }
+            else = {
+                set_culture = scope:rf_revolt_liege.culture
+            }
+            if = {
+                limit = { scope:rf_step5_current_county.faith ?= { always = yes } }
+                set_character_faith = scope:rf_step5_current_county.faith
+            }
+            else = {
+                set_character_faith = scope:rf_revolt_liege.faith
+            }
+
+            add_character_flag = { flag = rf_revolt_made_independent days = 30 }
+            add_gold = 500
+
+            # Make independent first
+            if = {
+                limit = { NOT = { is_independent_ruler = yes } }
+                create_title_and_vassal_change = {
+                    type = independency
+                    save_scope_as = rf_indep_change
+                    add_claim_on_loss = yes
+                }
+                becomes_independent = {
+                    change = scope:rf_indep_change
+                }
+                resolve_title_and_vassal_change = scope:rf_indep_change
+            }
+
+            # Make them a tributary of the releasing liege
+            if = {
+                limit = {
+                    is_independent_ruler = yes
+                    is_landed = yes
+                    NOT = { this = scope:rf_revolt_liege }
+                }
+                start_tributary = {
+                    contract_group = tributary_subjugated
+                    suzerain = scope:rf_revolt_liege
+                }
+            }
+
+            # Try to usurp or create a kingdom title if majority holder
+            if = {
+                limit = {
+                    any_realm_de_jure_kingdom = {
+                        any_de_jure_county = {
+                            percent > 0.5
+                            holder = scope:rf_current_seed
+                        }
+                    }
+                }
+                random_realm_de_jure_kingdom = {
+                    limit = {
+                        any_de_jure_county = {
+                            percent > 0.5
+                            holder = scope:rf_current_seed
+                        }
+                    }
+                    save_scope_as = rf_revolt_target_kingdom
+
+                    if = {
+                        limit = { holder = scope:rf_revolt_liege }
+                        # Liege holds it — cede it
+                        create_title_and_vassal_change = {
+                            type = conquest_populist
+                            save_scope_as = rf_kingdom_change
+                            add_claim_on_loss = yes
+                        }
+                        change_title_holder = {
+                            holder = scope:rf_current_seed
+                            change = scope:rf_kingdom_change
+                            take_baronies = no
+                        }
+                        resolve_title_and_vassal_change = scope:rf_kingdom_change
+                    }
+                    else_if = {
+                        limit = { NOT = { exists = holder } }
+                        # Unclaimed — create it
+                        scope:rf_current_seed = {
+                            create_title_and_vassal_change = {
+                                type = created
+                                save_scope_as = rf_kingdom_create_change
+                                add_claim_on_loss = no
+                            }
+                            scope:rf_revolt_target_kingdom = {
+                                change_title_holder = {
+                                    holder = scope:rf_current_seed
+                                    change = scope:rf_kingdom_create_change
+                                    take_baronies = no
+                                }
+                            }
+                            resolve_title_and_vassal_change = scope:rf_kingdom_create_change
+                        }
+                    }
+                    # else: someone else holds it — leave it for war
+                }
+            }
+
+            # Liege gets an unpressed claim on the new realm's primary title
+            if = {
+                limit = { exists = primary_title }
+                scope:rf_revolt_liege = {
+                    add_unpressed_claim = scope:rf_current_seed.primary_title
+                }
+            }
+            } # close var:rf_revolt_assigned_seed scope
+        } # close if = { limit = { NOT has rf_revolt_made_independent } }
+    }
+
+            # -----------------------------------------------------------------------
+            # Extra Cleanup: Force-reassign any remaining counties that are still
+            # held by characters whose culture or faith does not match the county.
+            # This catches edge cases where earlier passes left scattered pockets.
+            # Prefer assigned seeds when available; otherwise revert to the liege.
+            # -----------------------------------------------------------------------
+            every_in_global_list = {
+                variable = rf_revolt_rebel_counties
+                save_scope_as = rf_force_reassign
+                if = {
+                    limit = {
+                        has_variable = rf_revolt_rebel_county
+                        exists = holder
+                        holder = { OR = { NOT = { culture ?= scope:rf_force_reassign.culture } NOT = { faith ?= scope:rf_force_reassign.faith } } }
+                    }
+
+                    # If this county was assigned a seed and the seed is alive, hand it to them.
+                    if = {
+                        limit = {
+                            has_variable = rf_revolt_assigned_seed
+                            var:rf_revolt_assigned_seed ?= { is_alive = yes }
+                        }
+                        # Ensure seed has sane culture/faith scopes first (avoid weak-scope logs)
+                        scope:rf_force_reassign.var:rf_revolt_assigned_seed = {
+                            if = { limit = { scope:rf_force_reassign.culture ?= { always = yes } } set_culture = scope:rf_force_reassign.culture }
+                            else = { set_culture = scope:rf_revolt_liege.culture }
+
+                            if = { limit = { scope:rf_force_reassign.faith ?= { always = yes } } set_character_faith = scope:rf_force_reassign.faith }
+                            else = { set_character_faith = scope:rf_revolt_liege.faith }
+                        }
+
+                        create_title_and_vassal_change = {
+                            type = conquest_populist
+                            save_scope_as = rf_force_change
+                            add_claim_on_loss = yes
+                        }
+                        change_title_holder = {
+                            holder = scope:rf_force_reassign.var:rf_revolt_assigned_seed
+                            change = scope:rf_force_change
+                            take_baronies = no
+                        }
+                        resolve_title_and_vassal_change = scope:rf_force_change
+                    }
+                    else = {
+                        # No valid seed: temporarily give to liege so it can be processed/cleaned.
+                        create_title_and_vassal_change = {
+                            type = conquest
+                            save_scope_as = rf_force_change
+                            add_claim_on_loss = no
+                        }
+                        change_title_holder = {
+                            holder = scope:rf_revolt_liege
+                            change = scope:rf_force_change
+                            take_baronies = no
+                        }
+                        resolve_title_and_vassal_change = scope:rf_force_change
+                    }
+                }
+            }
+
+    # -----------------------------------------------------------------------
+    # Step 6: Clean up — remove all temporary variables and flags.
+    # -----------------------------------------------------------------------
+    every_in_global_list = {
+        variable = rf_revolt_rebel_counties
+        limit = {
+            has_county_modifier = riseandfall_nationalist_revolt
+            NOT = { has_variable = rf_revolt_option_a_fallback }
+        }
+        remove_county_modifier = riseandfall_nationalist_revolt
+    }
+    every_in_global_list = {
+        variable = rf_revolt_rebel_counties
+        remove_variable = rf_revolt_rebel_county
+        remove_variable = rf_revolt_assigned_seed
+        remove_variable = rf_revolt_option_a_fallback
+    }
+    clear_global_variable_list = rf_revolt_rebel_counties
+
+    scope:rf_revolt_liege = {
+        remove_variable = rf_revolt_personal_counties
+        every_vassal = {
+            limit = { has_character_flag = rf_revolt_seed_assigned }
+            remove_character_flag = rf_revolt_seed_assigned
+            remove_character_flag = rf_revolt_made_independent
+        }
+        every_realm_county = {
+            holder = {
+                remove_variable = rf_revolt_safe_counties
+            }
+        }
+        # Concession debuff removed per request; no temporary liege modifier applied here.
+        # Ensure the cooldown variable is set so a new revolt doesn't fire immediately
+        set_variable = { name = low_stability_cooldown value = yes years = 5 }
+        set_variable = { name = riseandfall_recent_nationalist_revolt value = yes years = 10 }
+    }
+}

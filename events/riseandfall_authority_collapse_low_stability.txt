@@ -3,7 +3,7 @@
 ##############################################
 # authority_collapse.1001 — Nationalist / Religious Revolt
 # Fires when the realm has significant non-approved cultures or hostile faiths (30%+ foreign counties).
-# Applies a severe popular-opinion collapse to every non-approved county for 3 years.
+# Applies a severe popular-opinion collapse to every non-approved county for 5 years.
 # No development penalty — the people resist foreign rule, not progress itself.
 ##############################################
 authority_collapse.1001 = {
@@ -13,21 +13,70 @@ authority_collapse.1001 = {
     theme = realm
 
     left_portrait = root
+    trigger = {
+        root.culture ?= { always = yes }
+        root.faith ?= { always = yes }
+    }
 
+    # Option A — Suppress the revolt: endure the popular-opinion collapse and hope to weather the storm.
     option = {
         name = authority_collapse.1001.a
         custom_tooltip = authority_collapse.1001.tooltip
-        ai_chance = { base = 100 }
+        ai_chance = {
+            base = 60
+            # More willing to fight when militarily strong
+            modifier = {
+                add = 30
+                trigger_if = {
+                    limit = { is_ai = yes }
+                    military_strength > 10000
+                }
+            }
+            # Ambitious rulers prefer to hold on to territory
+            modifier = {
+                add = 20
+                has_trait = ambitious
+            }
+            # Zealous rulers resist releasing heretics
+            modifier = {
+                add = 25
+                has_trait = zealous
+            }
+            # Arbitrary rulers don't think it through
+            modifier = {
+                add = 15
+                has_trait = arbitrary
+            }
+            # Less willing when already at war
+            modifier = {
+                add = -25
+                is_at_war = yes
+            }
+            # Less willing if treasury is low
+            modifier = {
+                add = -15
+                trigger_if = {
+                    limit = { is_ai = yes }
+                    gold < 100
+                }
+            }
+            # Content rulers are less inclined to fight
+            modifier = {
+                add = -10
+                has_trait = content
+            }
+        }
         hidden_effect = {
             root = {
                 # Persist beyond the cooldown so a later yearly roll can escalate into total collapse.
                 set_variable = { name = riseandfall_recent_nationalist_revolt value = yes years = 10 }
                 set_variable = { name = low_stability_cooldown value = yes years = 5 }
-                # Apply the revolt modifier only to non-approved culture or hostile-faith counties.
-                every_realm_county = {
-                    limit = {
-                        OR = {
-                            # Non-approved culture: not ruler's culture and acceptance < 70
+
+                # Apply the revolt modifier only for culture mismatches when the liege's culture is valid.
+                if = {
+                    limit = { root.culture ?= { always = yes } }
+                    every_realm_county = {
+                        limit = {
                             AND = {
                                 NOT = { culture = root.culture }
                                 NOT = {
@@ -39,7 +88,19 @@ authority_collapse.1001 = {
                                     }
                                 }
                             }
-                            # Hostile faith: different from ruler's faith and openly hostile (not merely astray)
+                        }
+                        add_county_modifier = {
+                            modifier = riseandfall_nationalist_revolt
+                            years = 5
+                        }
+                    }
+                }
+
+                # Apply the revolt modifier only for faith mismatches when the liege's faith is valid.
+                if = {
+                    limit = { root.faith ?= { always = yes } }
+                    every_realm_county = {
+                        limit = {
                             AND = {
                                 NOT = { faith = root.faith }
                                 NOT = {
@@ -52,11 +113,99 @@ authority_collapse.1001 = {
                                 }
                             }
                         }
+                        add_county_modifier = {
+                            modifier = riseandfall_nationalist_revolt
+                            years = 5
+                        }
                     }
-                    add_county_modifier = {
-                        modifier = riseandfall_nationalist_revolt
-                        years = 5
+                }
+            }
+        }
+    }
+
+    # Option B — Release the rebellious territories: grant the discontented peoples their own realms.
+    option = {
+        name = authority_collapse.1001.b
+        custom_tooltip = authority_collapse.1001.b.tooltip
+        ai_chance = {
+            base = 40
+            # Content rulers prefer peace to war
+            modifier = {
+                add = 20
+                has_trait = content
+            }
+            # Just rulers respect the will of the people
+            modifier = {
+                add = 15
+                has_trait = just
+            }
+            # Cynical rulers see releasing land as a pragmatic exit
+            modifier = {
+                add = 10
+                has_trait = cynical
+            }
+            # Already embroiled in war — release and focus elsewhere
+            modifier = {
+                add = 25
+                is_at_war = yes
+            }
+            # Treasury is very low — can't afford to fight
+            modifier = {
+                add = 20
+                trigger_if = {
+                    limit = { is_ai = yes }
+                    gold < 50
+                }
+            }
+            # Militarily weak relative to large realm — capitulate
+            modifier = {
+                add = 15
+                trigger_if = {
+                    limit = { is_ai = yes }
+                    military_strength < 3000
+                    realm_size >= 30
+                }
+            }
+            # Ambitious rulers don't like giving up land
+            modifier = {
+                add = -20
+                has_trait = ambitious
+            }
+            # Zealous rulers won't willingly release heretics to independence
+            modifier = {
+                add = -30
+                has_trait = zealous
+            }
+            # Cowardly rulers prefer to surrender rather than fight
+            modifier = {
+                add = 20
+                has_trait = craven
+            }
+            # If current military strength is a low fraction of capacity, strongly favour release.
+            # Compute: add = max(0, 40 - (current/max * 100)). At 20% this yields +20.
+            modifier = {
+                add = {
+                    value = 40
+                    subtract = {
+                        value = root.current_military_strength
+                        divide = { value = root.max_military_strength min = 1 }
+                        multiply = 100
                     }
+                    min = 0
+                }
+                limit = { is_ai = yes }
+            }
+            # Cultural/religious sympathy checks removed — avoid evaluating culture/faith scopes here.
+        }
+        hidden_effect = {
+            root = {
+                # Only execute the full release flow when liege culture/faith are valid.
+                if = {
+                    limit = {
+                        root.culture ?= { always = yes }
+                        root.faith ?= { always = yes }
+                    }
+                    riseandfall_release_revolt_realms_se = yes
                 }
             }
         }

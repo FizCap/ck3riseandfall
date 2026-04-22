@@ -81,3 +81,36 @@ Add this note whenever you persist per-realm or per-title variables in scripts; 
 - Files changed: `common/on_action/riseandfall_realm_stability_on_actions.txt` (tightened both death-path and title-gain-path guards to use correct tier comparisons).
 - How to test: reload the mod and reproduce the case where the bug occurred (e.g., an emperor inheriting a count's title via death or title transfer). Verify the emperor no longer receives the deceased's stability score. If it still happens, enable the optional debug instrumentation (see below).
 - Optional debug instrumentation: if the issue persists, add temporary set_variable calls inside `riseandfall_inherit_stability_score_se` to record `scope:predecessor.highest_held_title_tier` and `highest_held_title_tier` on the heir at runtime; this will make it trivial to see what numeric tiers the engine used and which event path invoked the effect.
+
+11) Merged scope map: stability inheritance hooks
+- Source merged from the stability quick-reference notes so this file is the single scope cheatsheet.
+- `on_death`:
+  - `root` = dying character
+  - `primary_heir` / `player_heir` are valid character targets
+  - Best practice: save `root` as `scope:predecessor`, then call transfer effects from heir scope.
+- `on_title_gain_inheritance`:
+  - `root` = new holder
+  - `scope:previous_holder` = old holder
+  - `scope:title` = transferred title
+  - `scope:transfer_type` can be used to distinguish inheritance paths from conquest paths.
+- Safe inheritance pattern:
+  - Require `scope:previous_holder = { has_variable = riseandfall_realm_stability_score }` before reading predecessor variables.
+  - If missing, compute fresh defaults instead of trying to read unset vars.
+
+12) Recent bug: weak-culture cascade during low-stability realm release
+- Symptom: repeated vanilla trigger errors `Scoped object of type 'culture' is not valid (weak Culture - 4294967295)` chained from `authority_collapse.1001` option B.
+- Root causes we hit:
+  - stale temporary county/seed variables from prior aborted runs,
+  - evaluating culture/faith on weak variable-backed character scopes,
+  - tributary setup attempted before seed independence/landed state was guaranteed.
+- Fix pattern:
+  1. At effect start, clear global lists and remove temporary county vars (`rf_revolt_rebel_county`, `rf_revolt_assigned_seed`, `rf_revolt_group_seed`).
+  2. Seed strictly per kingdom using `every_realm_de_jure_kingdom` + `every_de_jure_county` (not global-list filtering).
+  3. Create fresh seed rulers from county scope and immediately normalize using parser-safe effects:
+    - `scope:new_seed = { set_culture = scope:source_county.culture }`
+    - `scope:new_seed = { set_character_faith = scope:source_county.faith }`
+  4. Assign grouped counties only after seed scope exists.
+  5. Guard Step 5 operations:
+     - independence only if `NOT = { is_independent_ruler = yes }`
+     - tributary only if `is_independent_ruler = yes` AND `is_landed = yes`.
+- Practical rule: avoid adding defensive `var:seed = { exists = culture }` checks in hot paths when weak scopes are possible; prefer canonical seed creation and scope existence guards.

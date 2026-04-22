@@ -3,6 +3,9 @@
 ## Summary
 A character's realm stability score (0–100) is automatically inherited by their heir when they die or pass a title. This preserves the predecessor's hard-earned reputation and prevents sudden stability collapse on succession.
 
+Scope-note merge status
+- Scope-focused guidance from this quick reference is now consolidated in `.github/prompt/llm_scope_notes.md` under merged sections for inheritance hooks and weak-scope hardening.
+
 ---
 
 ## Key Features

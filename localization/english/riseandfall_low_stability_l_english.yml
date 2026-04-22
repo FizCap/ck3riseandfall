@@ -170,8 +170,10 @@ riseandfall_negotiated_peace_opinion_desc:0 "Our liege made concessions to keep 
  # Authority Collapse localization
 authority_collapse.1001.t:0 "A Tide of Nationalist Unrest"
  authority_collapse.1001.d:0 "The diverse peoples of your realm grow restless. Whispers of foreign rule and religious oppression spread through the provinces — those who feel unrepresented are rising in defiance. The counties that do not share your culture or faith are seething with resentment, and their anger threatens to spill into open revolt."
- authority_collapse.1001.a:0 "Attempt to quell the unrest"
- authority_collapse.1001.tooltip:0 "All non-approved culture and hostile-faith counties suffer a severe popular opinion collapse for 3 years. No development is harmed — the people resist foreign rule, not progress."
+ authority_collapse.1001.a:0 "Trial by fire — endure the storm"
+ authority_collapse.1001.tooltip:0 "All non-approved culture and hostile-faith counties suffer a severe popular opinion collapse for 5 years. No development is harmed — the people resist foreign rule, not progress."
+ authority_collapse.1001.b:0 "Release the rebellious peoples to self-rule"
+ authority_collapse.1001.b.tooltip:0 "The discontented counties are ceded to new independent realms. Rulers matching each region's culture and faith are raised to lead them. You suffer a prestige loss and vassal opinion penalty for yielding territory, but the revolt is extinguished and you retain unpressed claims on every new realm."
  authority_collapse.1002.t:0 "Vassal Authority Crisis"
  authority_collapse.1002.d:0 "Your vassals grow bold in your weakness. Emboldened by the realm's instability, lords withhold taxes, muster only token levies, and plot openly against the crown. Central authority over your nobility crumbles, and the oaths of fealty ring hollow."
  authority_collapse.1002.a:0 "Attempt to reassert control"
@@ -190,3 +192,4 @@ riseandfall_authority_collapse_liege_debuff:0 "Authority Collapse"
 riseandfall_authority_collapse_liege_debuff_desc:0 "Your personal authority has crumbled: levies and vassal contributions are halved, armies may partially desert, taxes falter as corruption empties the treasury, and mercenaries become prohibitively expensive for the duration of the collapse."
 riseandfall_vassal_authority_crisis:0 "Vassal Authority Crisis"
 riseandfall_vassal_authority_crisis_desc:0 "Your grip on the nobility has slipped: vassal tax and levy contributions are severely reduced while your lords grow ever more defiant of central authority."
+## (removed) riseandfall_revolt_concession_debuff localization entries
