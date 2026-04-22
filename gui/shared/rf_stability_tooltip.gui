@@ -198,8 +198,11 @@ types RiseAndFallStabilityTooltipTypes
 				}
 
 				# -- Dynamic Realm Factors -----------------------------------------
+				# Visible when realm_size OR culture_faith component is non-zero.
+				# Small realms (< ~0.5% of world) round realm_size to 0, so we must also
+				# check culture_faith to ensure tiny rulers with foreign territory see the section.
 				vbox = {
-					visible = "[Or( GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_realm_size_component').GetValue, '(CFixedPoint)0' ), LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_realm_size_component').GetValue, '(CFixedPoint)0' ) )]"
+					visible = "[Or( Or( GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_realm_size_component').GetValue, '(CFixedPoint)0' ), LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_realm_size_component').GetValue, '(CFixedPoint)0' ) ), Or( GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_culture_faith_component').GetValue, '(CFixedPoint)0' ), LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_culture_faith_component').GetValue, '(CFixedPoint)0' ) ) )]"
 					layoutpolicy_horizontal = expanding
 					spacer = { size = { 0 12 } }
 					cooltip_paragraph = {

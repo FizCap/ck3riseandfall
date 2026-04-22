@@ -573,11 +573,28 @@ riseandfall_calculate_realm_stability_se = {
             set_variable = { name = tmp_story_strong_vassal_component_target value = -30 }
         }
 
-        # Counties that do not share the ruler's accepted culture or approved faith
-        # form a -30..+10 stability component.
-        # Very homogeneous realms (<5% foreign) receive a +10 bonus;
-        # slightly diverse realms (5-15%) receive +5; 15-30% is neutral;
-        # beyond that, penalties scale up to -30 for almost entirely foreign realms.
+        if = {
+            limit = { has_realm_law_flag = partition_succession_law }
+            # Partition law provides short-term stability: children have guaranteed shares so they don't
+            # war with the ruler during their lifetime. The realm fragments automatically on succession,
+            # so no additional penalty is needed here — the fragmentation is the consequence.
+            set_variable = { name = riseandfall_rs_partition_component value = 10 }
+        }
+
+        remove_variable = tmp_story_world_total
+        remove_variable = tmp_rs_realm_pct
+        remove_variable = tmp_story_strong_vassal_threshold
+        remove_variable = tmp_story_strong_vassals
+    }
+
+    # Culture/faith county calculation: NOT gated on duchy tier.
+    # Any independent ruler holding foreign-culture/faith territory should feel the penalty,
+    # including small county-tier independent rulers who were previously excluded.
+    if = {
+        limit = {
+            has_game_rule = riseandfall_dynamic_story_mode_enabled
+            is_independent_ruler = yes
+        }
         set_variable = { name = tmp_story_realm_counties value = 0 }
         set_variable = { name = tmp_story_foreign_culture_counties value = 0 }
         set_variable = { name = tmp_story_foreign_faith_counties value = 0 }
@@ -666,18 +683,6 @@ riseandfall_calculate_realm_stability_se = {
             clamp_variable = { name = riseandfall_rs_culture_faith_component min = -30 max = 10 }
         }
 
-        if = {
-            limit = { has_realm_law_flag = partition_succession_law }
-            # Partition law provides short-term stability: children have guaranteed shares so they don't
-            # war with the ruler during their lifetime. The realm fragments automatically on succession,
-            # so no additional penalty is needed here — the fragmentation is the consequence.
-            set_variable = { name = riseandfall_rs_partition_component value = 10 }
-        }
-
-        remove_variable = tmp_story_world_total
-        remove_variable = tmp_rs_realm_pct
-        remove_variable = tmp_story_strong_vassal_threshold
-        remove_variable = tmp_story_strong_vassals
         remove_variable = tmp_story_realm_counties
         remove_variable = tmp_story_foreign_culture_counties
         remove_variable = tmp_story_foreign_faith_counties
