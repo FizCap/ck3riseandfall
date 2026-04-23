@@ -319,13 +319,19 @@ riseandfall_force_abdicate_interaction = {
 		scope:actor = { is_diarch_of_target = scope:recipient }
 	}
 
-	# Show only when liege has poor health and no cooldown
+	# Show only when liege has poor health; wrap every condition in custom_tooltip
+	# so the UI renderer never tries to auto-flatten cross-scope blocks
 	is_valid_showing_failures_only = {
-		# Only the diarch should be allowed to do this
-		scope:actor = { is_diarch_of_target = scope:recipient }
-		scope:recipient = {
-			is_independent_ruler = yes
-			riseandfall_liege_has_poor_health = yes
+		custom_tooltip = {
+			text = riseandfall_force_abdicate_diarch_only
+			scope:actor = { is_diarch_of_target = scope:recipient }
+		}
+		custom_tooltip = {
+			text = riseandfall_liege_has_poor_health
+			scope:recipient = {
+				is_independent_ruler = yes
+				health < fine_health
+			}
 		}
 	}
 

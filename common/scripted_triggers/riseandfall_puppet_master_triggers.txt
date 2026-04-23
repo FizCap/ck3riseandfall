@@ -19,11 +19,16 @@ riseandfall_liege_has_puppet_regency = {
 
 # Liege stability below 30 (recipient variable)
 riseandfall_liege_stability_below_30 = {
-	# Show a friendly tooltip when this trigger fails — place the actual condition inside custom_tooltip
+	# Actual condition: check recipient's stored stability score
+	scope:recipient = {
+		# Guard against unset variable to avoid engine errors when stability hasn't been initialized
+		has_variable = riseandfall_realm_stability_score
+		var:riseandfall_realm_stability_score < 30
+	}
+	# Show a friendly tooltip when this trigger fails
 	custom_tooltip = {
 		text = riseandfall_liege_stability_below_30
 		scope:recipient = {
-			# Guard against unset variable to avoid engine errors when stability hasn't been initialized
 			has_variable = riseandfall_realm_stability_score
 			var:riseandfall_realm_stability_score < 30
 		}
@@ -32,11 +37,15 @@ riseandfall_liege_stability_below_30 = {
 
 # Liege stability below 50 (recipient variable)
 riseandfall_liege_stability_below_50 = {
-	# Show a friendly tooltip when this trigger fails — place the actual condition inside custom_tooltip
+	# Actual condition: check recipient's stored stability score
+	scope:recipient = {
+		has_variable = riseandfall_realm_stability_score
+		var:riseandfall_realm_stability_score < 50
+	}
+	# Show a friendly tooltip when this trigger fails
 	custom_tooltip = {
 		text = riseandfall_liege_stability_below_50
 		scope:recipient = {
-			# Guard against unset variable to avoid engine errors when stability hasn't been initialized
 			has_variable = riseandfall_realm_stability_score
 			var:riseandfall_realm_stability_score < 50
 		}
@@ -45,15 +54,19 @@ riseandfall_liege_stability_below_50 = {
 
 # No cooldown active
 riseandfall_no_cooldown = {
-	# Friendly failure text for cooldown checks — put the check inside the tooltip block
+	# Actual condition: no puppet master cooldown variable present on the recipient
+	scope:recipient = { NOT = { has_variable = puppet_master_cooldown } }
+	# Friendly failure text for cooldown checks
 	custom_tooltip = {
 		text = riseandfall_no_cooldown
-		NOT = { has_variable = puppet_master_cooldown }
+		scope:recipient = { NOT = { has_variable = puppet_master_cooldown } }
 	}
 }
 
 # Liege has more than 0 gold
 riseandfall_liege_has_gold = {
+	# Actual condition: recipient must have positive gold
+	scope:recipient = { gold > 0 }
 	# Friendly failure text when liege has no gold
 	custom_tooltip = {
 		text = riseandfall_liege_has_gold
@@ -63,16 +76,20 @@ riseandfall_liege_has_gold = {
 
 # No existing hook on recipient (check in recipient scope whether they have a hook on the actor/root)
 riseandfall_no_existing_hook = {
-    # Friendly failure text when the recipient already has a hook on the actor; condition inside custom_tooltip
-    custom_tooltip = {
-        text = riseandfall_no_existing_hook
-        scope:recipient = { NOT = { has_hook = scope:actor } }
-    }
+	# Actual condition: recipient should NOT already have a hook on the actor
+	scope:recipient = { NOT = { has_hook = scope:actor } }
+	# Friendly failure text when the recipient already has a hook on the actor
+	custom_tooltip = {
+		text = riseandfall_no_existing_hook
+		scope:recipient = { NOT = { has_hook = scope:actor } }
+	}
 }
 
 # No low stability cooldown on actor
 riseandfall_no_low_stability_cooldown = {
-	# Friendly failure text for low stability cooldown checks — put the check inside the tooltip block
+	# Actual condition: recipient has no low_stability_cooldown variable
+	scope:recipient = { NOT = { has_variable = low_stability_cooldown } }
+	# Friendly failure text for low stability cooldown checks
 	custom_tooltip = {
 		text = riseandfall_no_low_stability_cooldown
 		scope:recipient = { NOT = { has_variable = low_stability_cooldown } }
@@ -82,11 +99,15 @@ riseandfall_no_low_stability_cooldown = {
 # Puppet regency years — require the recipient to have been a puppet regent for at least 5 years
 # Use this trigger in interactions that require a minimum puppet regency duration.
 riseandfall_puppet_regency_years_at_least_5 = {
-	# Friendly failure text for UI tooltips; actual condition lives inside the tooltip block
+	# Actual condition: recipient must have puppet regency years >= 5
+	scope:recipient = {
+		has_variable = riseandfall_puppet_regency_years
+		var:riseandfall_puppet_regency_years >= 5
+	}
+	# Friendly failure text for UI tooltips
 	custom_tooltip = {
 		text = riseandfall_puppet_regency_years_at_least_5
 		scope:recipient = {
-			# Guard against unset variable to avoid engine errors
 			has_variable = riseandfall_puppet_regency_years
 			var:riseandfall_puppet_regency_years >= 5
 		}
@@ -94,12 +115,8 @@ riseandfall_puppet_regency_years_at_least_5 = {
 }
 
 # Liege has poor or worse health
+# UI labels health as 'Poor' for any value < fine_health (3); poor_health (1) is the dying threshold.
+# Must be called from within a scope:recipient = { } block
 riseandfall_liege_has_poor_health = {
-	# Friendly failure text for UI tooltips; actual condition lives inside the tooltip block
-	custom_tooltip = {
-		text = riseandfall_liege_has_poor_health
-		scope:recipient = {
-			health <= poor_health
-		}
-	}
+	health < fine_health
 }

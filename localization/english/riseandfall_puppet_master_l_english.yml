@@ -58,3 +58,5 @@
 
   # Failure text for poor health check
   riseandfall_liege_has_poor_health:0 "Liege must have poor or worse health."
+  # Failure text: only the active diarch may use Force Abdication
+  riseandfall_force_abdicate_diarch_only:0 "You must be the active diarch of your liege."
