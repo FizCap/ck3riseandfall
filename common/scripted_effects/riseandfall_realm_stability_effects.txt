@@ -547,16 +547,14 @@ riseandfall_calculate_realm_stability_se = {
                 is_landed = yes
                 primary_title.tier >= tier_county
             }
-            # capture vassal strength in a temporary variable in the vassal scope
-            set_variable = { name = tmp_vassal_max_military value = max_military_strength }
+            save_scope_as = tmp_current_vassal
             if = {
                 limit = {
                     is_allied_to = scope:ruler
                 }
                 # allied vassals add their strength to the liege's effective strength
-                scope:ruler = { change_variable = { name = tmp_story_effective_liege_strength add = scope:tmp_vassal_max_military } }
+                scope:ruler = { change_variable = { name = tmp_story_effective_liege_strength add = scope:tmp_current_vassal.max_military_strength } }
             }
-            remove_variable = tmp_vassal_max_military
         }
 
         # Threshold is a fraction of the effective liege strength (including allied vassals)
