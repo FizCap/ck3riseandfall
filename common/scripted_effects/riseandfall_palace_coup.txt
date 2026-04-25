@@ -604,263 +604,155 @@ riseandfall_palace_coup_root_flees_success = {
         }
     }
 
-    if = {
-        limit = {
-            scope:original_primary = {
+    # Transfer ALL same-rank (and subordinate) titles to the challenger.
+    # For empire/hegemony rulers: transfer all kingdom titles and below.
+    # For kingdom rulers: transfer all kingdom titles the ruler personally holds.
+    # All direct vassals then change liege to the challenger.
+    # riseandfall_realm_split_se handles the geographical split afterwards.
+    scope:original_ruler = {
+        every_held_title = {
+            limit = {
+                NOT = { this = scope:original_primary }
+                NOT = { is_head_of_faith = yes }
+                NOT = { is_noble_family_title = yes }
                 OR = {
-                    tier = tier_empire
-                    tier = tier_hegemony
+                    tier = tier_kingdom
+                    tier = tier_duchy
+                    tier = tier_county
                 }
+            }
+            change_title_holder = {
+                holder = scope:palace_coup_challenger
+                change = scope:palace_coup_split_change
+                take_baronies = yes
             }
         }
-        scope:original_ruler = {
-            every_held_title = {
-                limit = {
-                    holder = scope:original_ruler
-                    NOT = { this = scope:original_primary }
-                    NOT = { is_head_of_faith = yes }
-                    NOT = { is_noble_family_title = yes }
-                    OR = {
-                        AND = {
-                            tier = tier_kingdom
-                            this = scope:palace_coup_core_kingdom
-                        }
-                        AND = {
-                            tier = tier_duchy
-                            de_jure_liege = scope:palace_coup_core_kingdom
-                        }
-                        AND = {
-                            tier = tier_county
-                            de_jure_liege = {
-                                exists = de_jure_liege
-                                de_jure_liege = { this = scope:palace_coup_core_kingdom }
-                            }
-                        }
-                    }
-                }
-                change_title_holder = {
-                    holder = scope:palace_coup_challenger
-                    change = scope:palace_coup_split_change
-                    take_baronies = yes
-                }
+        every_vassal = {
+            limit = { is_landed = yes }
+            change_liege = {
+                liege = scope:palace_coup_challenger
+                change = scope:palace_coup_split_change
             }
+        }
+    }
 
-            every_vassal = {
+    resolve_title_and_vassal_change = scope:palace_coup_split_change
+
+    # If the old ruler personally loses all land, take one county from the
+    # challenger's new realm so they can anchor a breakaway state.
+    # Search the CHALLENGER's vassals first. Fall back to the challenger's
+    # directly held counties for highly centralised realms (e.g. Byzantine
+    # Empire) where few or no sub-vassal lords exist after the transfer.
+    if = {
+        limit = { scope:original_ruler = { is_landed = no } }
+        # Search challenger's sub-vassals: prefer duchy lords outside the core duchy
+        scope:palace_coup_challenger = {
+            ordered_vassal = {
                 limit = {
                     is_landed = yes
+                    primary_title.tier >= tier_duchy
+                    NOT = { capital_county.duchy = scope:palace_coup_core_duchy }
                 }
-                # Instead of changing the liege of an entire vassal (which can pull distant
-                # holdings into the challenger's realm and create scattered pockets),
-                # transfer only the vassal-held titles whose de_jure liege matches the
-                # challenger's core kingdom. This keeps the transferred territory
-                # focused on the capital core and improves geographic contiguity.
-                every_held_title = {
+                order_by = current_military_strength
+                max = 1
+                save_scope_as = palace_coup_land_donor
+            }
+            if = {
+                limit = { NOT = { exists = scope:palace_coup_land_donor } }
+                ordered_vassal = {
                     limit = {
-                        NOT = { is_head_of_faith = yes }
-                        NOT = { is_noble_family_title = yes }
-                        OR = {
-                            AND = {
-                                tier = tier_kingdom
-                                this = scope:palace_coup_core_kingdom
-                            }
-                            AND = {
-                                tier = tier_duchy
-                                de_jure_liege = scope:palace_coup_core_kingdom
-                            }
-                            AND = {
-                                tier = tier_county
-                                de_jure_liege = {
-                                    exists = de_jure_liege
-                                    de_jure_liege = { this = scope:palace_coup_core_kingdom }
-                                }
-                            }
+                        is_landed = yes
+                        NOT = { capital_county.duchy = scope:palace_coup_core_duchy }
+                    }
+                    order_by = current_military_strength
+                    max = 1
+                    save_scope_as = palace_coup_land_donor
+                }
+            }
+            # Widest vassal fallback — any landed vassal (including core duchy)
+            if = {
+                limit = { NOT = { exists = scope:palace_coup_land_donor } }
+                ordered_vassal = {
+                    limit = { is_landed = yes }
+                    order_by = current_military_strength
+                    max = 1
+                    save_scope_as = palace_coup_land_donor
+                }
+            }
+        }
+
+        # Deep fallback for centralised realms (Byzantine-style) where the challenger
+        # holds most land personally with no sub-vassal to donate.
+        # Pick one of the challenger's directly held counties outside the core duchy.
+        if = {
+            limit = { NOT = { exists = scope:palace_coup_land_donor } }
+            scope:palace_coup_challenger = {
+                random_held_title = {
+                    limit = {
+                        tier = tier_county
+                        NOT = { this = scope:palace_coup_old_capital_county }
+                        NOT = { de_jure_liege = scope:palace_coup_core_duchy }
+                    }
+                    save_scope_as = palace_coup_direct_donor_title
+                }
+                if = {
+                    limit = { NOT = { exists = scope:palace_coup_direct_donor_title } }
+                    random_held_title = {
+                        limit = {
+                            tier = tier_county
+                            NOT = { this = scope:palace_coup_old_capital_county }
                         }
-                        change_title_holder = {
-                            holder = scope:palace_coup_challenger
-                            change = scope:palace_coup_split_change
-                            take_baronies = yes
-                        }
+                        save_scope_as = palace_coup_direct_donor_title
                     }
                 }
             }
         }
-        else = {
-            scope:original_ruler = {
-                every_held_title = {
-                    limit = {
-                        holder = scope:original_ruler
-                        NOT = { this = scope:original_primary }
-                        NOT = { is_head_of_faith = yes }
-                        NOT = { is_noble_family_title = yes }
-                        OR = {
-                            AND = {
-                                tier = tier_duchy
-                                this = scope:palace_coup_core_duchy
-                            }
-                            AND = {
-                                tier = tier_county
-                                de_jure_liege = scope:palace_coup_core_duchy
-                            }
-                        }
-                    }
+
+        # Apply whichever donor path succeeded
+        if = {
+            limit = { exists = scope:palace_coup_land_donor }
+            create_title_and_vassal_change = {
+                type = conquest
+                save_scope_as = palace_coup_land_change
+                add_claim_on_loss = yes
+            }
+            scope:palace_coup_land_donor = {
+                capital_county = {
                     change_title_holder = {
-                        holder = scope:palace_coup_challenger
-                        change = scope:palace_coup_split_change
+                        holder = scope:original_ruler
+                        change = scope:palace_coup_land_change
                         take_baronies = yes
                     }
                 }
-
-                every_vassal = {
-                    limit = {
-                        is_landed = yes
-                    }
-                    # Instead of changing the liege of an entire vassal, transfer only the
-                    # titles they hold whose de_jure liege matches the core duchy. This
-                    # avoids pulling geographically distant holdings into the challenger's
-                    # realm and reduces scattered pockets.
-                    every_held_title = {
-                        limit = {
-                            NOT = { is_head_of_faith = yes }
-                            NOT = { is_noble_family_title = yes }
-                            OR = {
-                                AND = {
-                                    tier = tier_duchy
-                                    this = scope:palace_coup_core_duchy
-                                }
-                                AND = {
-                                    tier = tier_county
-                                    de_jure_liege = scope:palace_coup_core_duchy
-                                }
-                            }
-                        }
-                        change_title_holder = {
-                            holder = scope:palace_coup_challenger
-                            change = scope:palace_coup_split_change
-                            take_baronies = yes
-                        }
-                    }
-                }
             }
+            resolve_title_and_vassal_change = scope:palace_coup_land_change
         }
-
-        resolve_title_and_vassal_change = scope:palace_coup_split_change
-
-        # If the old ruler personally loses all land, take one county from the
-        # outer subrealm so they can anchor one of the breakaway realms.
-        if = {
-            limit = { scope:original_ruler = { highest_held_title_tier < tier_county } }
-            if = {
-                limit = {
-                    scope:original_primary = {
-                        OR = {
-                            tier = tier_empire
-                            tier = tier_hegemony
-                        }
-                    }
-                }
-                scope:original_ruler = {
-                    ordered_vassal = {
-                        limit = {
-                            is_landed = yes
-                            primary_title.tier >= tier_duchy
-                            NOT = { capital_county.kingdom = scope:palace_coup_core_kingdom }
-                        }
-                        order_by = current_military_strength
-                        max = 1
-                        save_scope_as = palace_coup_land_donor
-                    }
-                    if = {
-                        limit = { NOT = { exists = scope:palace_coup_land_donor } }
-                        ordered_vassal = {
-                            limit = {
-                                is_landed = yes
-                                NOT = { capital_county.kingdom = scope:palace_coup_core_kingdom }
-                            }
-                            order_by = current_military_strength
-                            max = 1
-                            save_scope_as = palace_coup_land_donor
-                        }
-                    }
+        else_if = {
+            limit = { exists = scope:palace_coup_direct_donor_title }
+            create_title_and_vassal_change = {
+                type = conquest
+                save_scope_as = palace_coup_land_change
+                add_claim_on_loss = yes
+            }
+            scope:palace_coup_direct_donor_title = {
+                change_title_holder = {
+                    holder = scope:original_ruler
+                    change = scope:palace_coup_land_change
+                    take_baronies = yes
                 }
             }
-            else = {
-                scope:original_ruler = {
-                    ordered_vassal = {
-                        limit = {
-                            is_landed = yes
-                            primary_title.tier >= tier_duchy
-                            NOT = { capital_county.duchy = scope:palace_coup_core_duchy }
-                        }
-                        order_by = current_military_strength
-                        max = 1
-                        save_scope_as = palace_coup_land_donor
-                    }
-                    if = {
-                        limit = { NOT = { exists = scope:palace_coup_land_donor } }
-                        ordered_vassal = {
-                            limit = {
-                                is_landed = yes
-                                NOT = { capital_county.duchy = scope:palace_coup_core_duchy }
-                            }
-                            order_by = current_military_strength
-                            max = 1
-                            save_scope_as = palace_coup_land_donor
-                        }
-                    }
-                }
-            }
-
-            if = {
-                limit = { NOT = { exists = scope:palace_coup_land_donor } }
-                scope:original_ruler = {
-                    ordered_vassal = {
-                        limit = {
-                            is_landed = yes
-                            primary_title.tier >= tier_duchy
-                        }
-                        order_by = current_military_strength
-                        max = 1
-                        save_scope_as = palace_coup_land_donor
-                    }
-                    if = {
-                        limit = { NOT = { exists = scope:palace_coup_land_donor } }
-                        ordered_vassal = {
-                            limit = { is_landed = yes }
-                            order_by = current_military_strength
-                            max = 1
-                            save_scope_as = palace_coup_land_donor
-                        }
-                    }
-                }
-            }
-
-            if = {
-                limit = { exists = scope:palace_coup_land_donor }
-                create_title_and_vassal_change = {
-                    type = conquest
-                    save_scope_as = palace_coup_land_change
-                    add_claim_on_loss = yes
-                }
-                scope:palace_coup_land_donor = {
-                    capital_county = {
-                        change_title_holder = {
-                            holder = scope:original_ruler
-                            change = scope:palace_coup_land_change
-                            take_baronies = yes
-                        }
-                    }
-                }
-                resolve_title_and_vassal_change = scope:palace_coup_land_change
-            }
+            resolve_title_and_vassal_change = scope:palace_coup_land_change
         }
+    }
 
         # Make the fleeing ruler a direct vassal seed inside the challenger's new
         # realm so the full inherited realm can fracture around them.
+        # NOTE: is_independent_ruler check intentionally omitted — duchy/county-tier rulers
+        # become independent after losing their primary title, and must still be seeded.
         if = {
             limit = {
                 scope:original_ruler = {
                     is_landed = yes
-                    is_independent_ruler = no
                     NOT = { liege = scope:palace_coup_challenger }
                     # Tier check: challenger must hold a higher-tier title or CK3 will reject the vassalage
                     primary_title.tier < scope:palace_coup_challenger.primary_title.tier
@@ -881,7 +773,7 @@ riseandfall_palace_coup_root_flees_success = {
         }
 
         if = {
-            limit = { scope:original_ruler = { is_landed = yes is_independent_ruler = no } }
+            limit = { scope:original_ruler = { is_landed = yes } }
             scope:original_ruler = { add_character_flag = rf_forced_breakaway_seed }
         }
 
@@ -893,6 +785,13 @@ riseandfall_palace_coup_root_flees_success = {
                         is_landed = yes
                         primary_title.tier >= tier_county
                     }
+                }
+                # Only call the full realm split on the challenger when the fleeing ruler 
+                # has successfully become their direct vassal, OR if the fleeing ruler 
+                # stayed independent (e.g. they kept a secondary kingdom title).
+                OR = {
+                    scope:original_ruler = { liege = scope:palace_coup_challenger }
+                    scope:original_ruler = { is_independent_ruler = yes }
                 }
             }
             scope:palace_coup_challenger = {
@@ -1190,7 +1089,6 @@ riseandfall_palace_coup_root_flees_success = {
                 }
             }
         }
-    }
 }
 
 ##########################
