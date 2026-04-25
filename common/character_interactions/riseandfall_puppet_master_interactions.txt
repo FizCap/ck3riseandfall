@@ -1,5 +1,5 @@
-ï»¿##################################################
-# Rise and Fall â€” Puppet Master interactions
+##################################################
+# Rise and Fall — Puppet Master interactions
 # Note: Some tokens here are placeholders pending your scripted effects/triggers; adjust as needed.
 
 # Interaction: Steal Gold
@@ -49,7 +49,7 @@ riseandfall_steal_gold_interaction = {
 
 	# Can send (AI and players)
 	can_send = {
-		# Ensure we have something to steal â€” leave precise value check to effect
+		# Ensure we have something to steal — leave precise value check to effect
 		always = yes
 	}
 	# Allow AI to consider this interaction
@@ -90,14 +90,77 @@ riseandfall_steal_gold_interaction = {
 	ai_will_do = {
 		# Opportunistic: steal gold from a liege. Prefer greedy / deceitful actors and disliked/weak lieges.
 		base = 40
-
 		modifier = { scope:actor = { has_trait = greedy } add = 40 }
 		modifier = { scope:actor = { has_trait = deceitful } add = 30 }
 		modifier = { scope:actor = { has_trait = ambitious } add = 20 }
 		modifier = { scope:actor = { has_trait = honest } add = -30 }
 
-		modifier = { scope:recipient = { opinion = { target = scope:actor value < 0 } } add = 45 }
-		modifier = { scope:actor = { is_at_war = yes } add = -50 }
+		# Trait-driven behavior: cruel/arbitrary actors are more likely to destabilize; just actors avoid it
+		modifier = { scope:actor = { has_trait = callous } add = 30 }
+		modifier = { scope:actor = { has_trait = arbitrary } add = 25 }
+		modifier = { scope:actor = { has_trait = just } add = -50 }
+
+		modifier = { scope:recipient = { opinion = { target = scope:actor value < 0 } } add = 40 }
+		modifier = { scope:actor = { is_at_war = yes } add = -30 }
+
+		# Don't destabilise the realm further if stability is already critically low
+		modifier = {
+			scope:recipient = {
+				has_variable = riseandfall_realm_stability_score
+				NOT = { var:riseandfall_realm_stability_score >= 40 }
+			}
+			add = -40
+		}
+		# Cruel/arbitrary actors may ignore stability concerns
+		modifier = {
+			scope:actor = { has_trait = callous }
+			scope:recipient = {
+				has_variable = riseandfall_realm_stability_score
+				NOT = { var:riseandfall_realm_stability_score >= 40 }
+			}
+			add = 30
+		}
+		modifier = {
+			scope:actor = { has_trait = arbitrary }
+			scope:recipient = {
+				has_variable = riseandfall_realm_stability_score
+				NOT = { var:riseandfall_realm_stability_score >= 40 }
+			}
+			add = 25
+		}
+		# Preserve the puppet bonus when it's already running low
+		modifier = {
+			scope:recipient = {
+				has_variable = riseandfall_rs_puppet_stability_bonus
+				NOT = { var:riseandfall_rs_puppet_stability_bonus >= 20 }
+			}
+			add = -35
+		}
+		# Cruel/arbitrary actors also don't mind draining the puppet bonus; just actors avoid it
+		modifier = {
+			scope:actor = { has_trait = callous }
+			scope:recipient = {
+				has_variable = riseandfall_rs_puppet_stability_bonus
+				NOT = { var:riseandfall_rs_puppet_stability_bonus >= 20 }
+			}
+			add = 40
+		}
+		modifier = {
+			scope:actor = { has_trait = arbitrary }
+			scope:recipient = {
+				has_variable = riseandfall_rs_puppet_stability_bonus
+				NOT = { var:riseandfall_rs_puppet_stability_bonus >= 20 }
+			}
+			add = 35
+		}
+		modifier = {
+			scope:actor = { has_trait = just }
+			scope:recipient = {
+				has_variable = riseandfall_rs_puppet_stability_bonus
+				NOT = { var:riseandfall_rs_puppet_stability_bonus >= 20 }
+			}
+			add = -45
+		}
 	}
 }
 
@@ -181,13 +244,76 @@ riseandfall_curry_favor_interaction = {
 		modifier = { scope:actor = { has_trait = deceitful } add = 30 }
 		modifier = { scope:actor = { has_trait = greedy } add = 20 }
 		modifier = { scope:actor = { has_trait = honest } add = -30 }
-		modifier = { scope:actor = { has_trait = just } add = -20 }
+		modifier = { scope:actor = { has_trait = just } add = -50 }
+
+		# Trait-driven behavior: cruel/arbitrary actors are more likely to destabilize; just actors avoid it
+		modifier = { scope:actor = { has_trait = callous } add = 30 }
+		modifier = { scope:actor = { has_trait = arbitrary } add = 25 }
 
 		# If the liege already likes the diarch, easier to curry favor; otherwise it's harder.
 		modifier = { scope:recipient = { opinion = { target = scope:actor value >= 30 } } add = 20 }
 		modifier = { scope:recipient = { opinion = { target = scope:actor value <= -20 } } add = -20 }
 
 		modifier = { scope:actor = { is_at_war = yes } add = -30 }
+
+		# Don't destabilise the realm further if stability is already critically low
+		modifier = {
+			scope:recipient = {
+				has_variable = riseandfall_realm_stability_score
+				NOT = { var:riseandfall_realm_stability_score >= 40 }
+			}
+			add = -40
+		}
+		# Cruel/arbitrary actors may ignore stability concerns
+		modifier = {
+			scope:actor = { has_trait = callous }
+			scope:recipient = {
+				has_variable = riseandfall_realm_stability_score
+				NOT = { var:riseandfall_realm_stability_score >= 40 }
+			}
+			add = 30
+		}
+		modifier = {
+			scope:actor = { has_trait = arbitrary }
+			scope:recipient = {
+				has_variable = riseandfall_realm_stability_score
+				NOT = { var:riseandfall_realm_stability_score >= 40 }
+			}
+			add = 25
+		}
+		# Preserve the puppet bonus when it's already running low
+		modifier = {
+			scope:recipient = {
+				has_variable = riseandfall_rs_puppet_stability_bonus
+				NOT = { var:riseandfall_rs_puppet_stability_bonus >= 20 }
+			}
+			add = -35
+		}
+		# Cruel/arbitrary actors also don't mind draining the puppet bonus; just actors avoid it
+		modifier = {
+			scope:actor = { has_trait = callous }
+			scope:recipient = {
+				has_variable = riseandfall_rs_puppet_stability_bonus
+				NOT = { var:riseandfall_rs_puppet_stability_bonus >= 20 }
+			}
+			add = 40
+		}
+		modifier = {
+			scope:actor = { has_trait = arbitrary }
+			scope:recipient = {
+				has_variable = riseandfall_rs_puppet_stability_bonus
+				NOT = { var:riseandfall_rs_puppet_stability_bonus >= 20 }
+			}
+			add = 35
+		}
+		modifier = {
+			scope:actor = { has_trait = just }
+			scope:recipient = {
+				has_variable = riseandfall_rs_puppet_stability_bonus
+				NOT = { var:riseandfall_rs_puppet_stability_bonus >= 20 }
+			}
+			add = -45
+		}
 	}
 }
 
@@ -263,33 +389,71 @@ riseandfall_overthrow_liege_interaction = {
 		max = 1
 	}
 
-	# Rare/conditional â€” rebalanced to make overthrow achievable under clear conditions
+	# Rare/conditional — rebalanced to make overthrow achievable under clear conditions
 	ai_will_do = {
-		# Overthrow: major action â€” still rare, but more likely when stability, tenure, opinion or wartime conditions favor the actor
-		base = -200
+		# Overthrow: major action — still rare, but more likely when stability, tenure, opinion or wartime conditions favor the actor
+		base = -40
 
 		# Traits
-		modifier = { scope:actor = { has_trait = ambitious } add = 400 }
-		modifier = { scope:actor = { has_trait = greedy } add = 250 }
-		modifier = { scope:actor = { has_trait = vengeful } add = 200 }
-		modifier = { scope:actor = { has_trait = deceitful } add = 150 }
-		modifier = { scope:actor = { has_trait = honest } add = -300 }
+		modifier = { scope:actor = { has_trait = ambitious } add = 80 }
+		modifier = { scope:actor = { has_trait = greedy } add = 50 }
+		modifier = { scope:actor = { has_trait = vengeful } add = 40 }
+		modifier = { scope:actor = { has_trait = deceitful } add = 30 }
+		modifier = { scope:actor = { has_trait = honest } add = -60 }
+		# Trait-driven behavior: cruel/arbitrary actors are more willing to seize power; just actors avoid upheaval
+		modifier = { scope:actor = { has_trait = callous } add = 20 }
+		modifier = { scope:actor = { has_trait = arbitrary } add = 15 }
+		modifier = { scope:actor = { has_trait = just } add = -40 }
 
-		# Opinion tiers â€” stronger penalty for deeply negative relations
-		modifier = { scope:recipient = { opinion = { target = scope:actor value < 0 } } add = 300 }
-		modifier = { scope:recipient = { opinion = { target = scope:actor value <= -50 } } add = 200 }
+		# Opinion tiers — stronger incentive when relations are poor
+		modifier = { scope:recipient = { opinion = { target = scope:actor value < 0 } } add = 60 }
+		modifier = { scope:recipient = { opinion = { target = scope:actor value <= -50 } } add = 40 }
 
 		# Stability & tenure make overthrow easier
-		modifier = { scope:recipient = { riseandfall_liege_stability_below_30 = yes } add = 200 }
-		modifier = { scope:recipient = { has_variable = riseandfall_puppet_regency_years var:riseandfall_puppet_regency_years >= 10 } add = 200 }
-		modifier = { scope:recipient = { riseandfall_puppet_regency_years_at_least_5 = yes } add = 100 }
+		modifier = { scope:recipient = { riseandfall_liege_stability_below_30 = yes } add = 40 }
+		modifier = { scope:recipient = { has_variable = riseandfall_puppet_regency_years var:riseandfall_puppet_regency_years >= 10 } add = 40 }
+		modifier = { scope:recipient = { riseandfall_puppet_regency_years_at_least_5 = yes } add = 20 }
 
 		# Liege distracted / vulnerable
-		modifier = { scope:recipient = { is_at_war = yes } add = 150 }
+		modifier = { scope:recipient = { is_at_war = yes } add = 30 }
 
 		# Actor advantages
-		modifier = { scope:actor = { has_hook_of_type = { target = scope:recipient type = strong_favor_hook } } add = 100 }
-		modifier = { scope:actor = { is_at_war = yes } add = -150 }
+		modifier = { scope:actor = { has_hook_of_type = { target = scope:recipient type = strong_favor_hook } } add = 20 }
+		modifier = { scope:actor = { is_at_war = yes } add = -30 }
+
+		# Prefer not to overthrow if the realm is stable — the puppet master benefits from stability too
+		modifier = {
+			scope:recipient = {
+				has_variable = riseandfall_realm_stability_score
+				var:riseandfall_realm_stability_score >= 60
+			}
+			add = -30
+		}
+		# Cruel/arbitrary actors may ignore the stability restraint
+		modifier = {
+			scope:actor = { has_trait = callous }
+			scope:recipient = {
+				has_variable = riseandfall_realm_stability_score
+				var:riseandfall_realm_stability_score >= 60
+			}
+			add = 30
+		}
+		modifier = {
+			scope:actor = { has_trait = arbitrary }
+			scope:recipient = {
+				has_variable = riseandfall_realm_stability_score
+				var:riseandfall_realm_stability_score >= 60
+			}
+			add = 25
+		}
+		# More eager when the puppet bonus is fully depleted (realm already destabilised)
+		modifier = {
+			scope:recipient = {
+				has_variable = riseandfall_rs_puppet_stability_bonus
+				NOT = { var:riseandfall_rs_puppet_stability_bonus >= 10 }
+			}
+			add = 30
+		}
 	}
 }
 

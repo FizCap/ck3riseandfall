@@ -1,0 +1,166 @@
+﻿riseandfall_puppet_master_court_position = {
+	sort_order = 390
+	max_available_positions = 1
+	skill = intrigue
+
+	court_position_asset = {
+		animation = scheme
+		background = "gfx/interface/illustrations/event_scenes/throneroom_mediterranean.dds"
+	}
+
+	opinion = {
+		value = 25
+	}
+
+	aptitude_level_breakpoints = { 20 40 60 80 }
+
+	aptitude = {
+		value = 1
+		add = {
+			value = intrigue
+			multiply = 2
+			max = 100
+			desc = court_position_skill_intrigue
+		}
+	}
+
+	# Only visible while a puppet regency exists on the liege.
+	is_shown = {
+		has_diarchy_type = puppet_regency
+	}
+
+	valid_position = {
+		has_diarchy_type = puppet_regency
+		has_active_diarchy = yes
+	}
+
+	# This position is script-driven; only the active diarch is a valid candidate.
+	is_shown_character = {
+		scope:employee = {
+			OR = {
+				has_character_flag = rf_script_allow_puppet_master_position
+				has_court_position = riseandfall_puppet_master_court_position
+			}
+		}
+	}
+
+	valid_character = {
+		scope:employee = {
+			is_alive = yes
+			NOT = { is_ruler = yes }
+			OR = {
+				has_character_flag = rf_script_allow_puppet_master_position
+				has_court_position = riseandfall_puppet_master_court_position
+			}
+		}
+		scope:liege = {
+			has_diarchy_type = puppet_regency
+			has_active_diarchy = yes
+			diarch ?= scope:employee
+		}
+	}
+
+	revoke_cost = {
+		gold = {
+			value = 0
+		}
+	}
+
+	# The liege pays 5% of monthly revenue as salary.
+	salary = {
+		gold = {
+			value = 0
+			if = {
+				limit = {
+					exists = scope:liege
+					scope:liege = {
+						has_treasury = no
+					}
+				}
+				add = riseandfall_puppet_master_salary_value
+			}
+		}
+		treasury = {
+			value = 0
+			if = {
+				limit = {
+					exists = scope:liege
+					scope:liege = {
+						has_treasury = yes
+					}
+				}
+				add = riseandfall_puppet_master_treasury_salary_value
+			}
+		}
+		round = no
+	}
+
+	received_salary = {
+		gold = {
+			value = 0
+			if = {
+				limit = {
+					exists = scope:liege
+					scope:liege = {
+						has_treasury = no
+					}
+				}
+				add = riseandfall_puppet_master_salary_value
+			}
+			if = {
+				limit = {
+					exists = scope:liege
+					scope:liege = {
+						has_treasury = yes
+					}
+				}
+				add = riseandfall_puppet_master_treasury_salary_value
+			}
+		}
+		round = no
+	}
+
+	on_court_position_received = {
+		scope:liege = {
+			riseandfall_sync_puppet_master_court_position = yes
+		}
+	}
+
+	on_court_position_revoked = {
+		# Fire on scope:employee (vanilla pattern) so the event reliably queues on a character scope.
+		# The immediate sync is skipped here — appoint_court_position cannot run during a revoke callback.
+		scope:employee = {
+			trigger_event = {
+				id = riseandfall_puppet_master.100
+				days = 1
+			}
+		}
+	}
+
+	on_court_position_vacated = {
+		scope:liege = {
+			riseandfall_sync_puppet_master_court_position = yes
+		}
+	}
+
+	on_court_position_invalidated = {
+		scope:employee = {
+			trigger_event = {
+				id = riseandfall_puppet_master.100
+				days = 1
+			}
+		}
+	}
+
+	ai_position_score = {
+		value = 1000
+	}
+
+	ai_candidate_score = {
+		value = 1000
+		if = {
+			limit = { scope:firing_court_position = yes }
+			add = 10000
+		}
+	}
+}

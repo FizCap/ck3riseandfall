@@ -2,7 +2,87 @@
 # Rise and Fall — Puppet Master scripted effects
 # NOTE: Placeholder math/tokens; adjust to your mod's canonical script_values and effects
 
-# Steal 50% of liege short-term gold and give it to diarch
+# Keep the Puppet Master court position aligned to the active puppet-regency diarch.
+# Expected scope: root = liege
+riseandfall_sync_puppet_master_court_position = {
+	clear_saved_scope = rf_puppet_master_liege
+	clear_saved_scope = rf_current_puppet_master_diarch
+	clear_saved_scope = rf_current_puppet_master_holder
+	save_scope_as = rf_puppet_master_liege
+
+	if = {
+		limit = {
+			has_diarchy_type = puppet_regency
+			has_active_diarchy = yes
+			exists = diarch
+			diarch = {
+				is_alive = yes
+				NOT = { is_ruler = yes }
+			}
+		}
+		diarch = { save_scope_as = rf_current_puppet_master_diarch }
+	}
+
+	if = {
+		limit = { employs_court_position = riseandfall_puppet_master_court_position }
+		random_court_position_holder = {
+			type = riseandfall_puppet_master_court_position
+			save_scope_as = rf_current_puppet_master_holder
+		}
+	}
+
+	if = {
+		limit = {
+			exists = scope:rf_current_puppet_master_holder
+			scope:rf_current_puppet_master_holder = {
+				has_court_position = riseandfall_puppet_master_court_position
+			}
+			OR = {
+				NOT = { exists = scope:rf_current_puppet_master_diarch }
+				NOT = { scope:rf_current_puppet_master_holder ?= scope:rf_current_puppet_master_diarch }
+			}
+		}
+		scope:rf_current_puppet_master_holder = {
+			revoke_court_position = riseandfall_puppet_master_court_position
+		}
+	}
+
+	if = {
+		limit = {
+			exists = scope:rf_puppet_master_liege
+			exists = scope:rf_current_puppet_master_diarch
+			OR = {
+				NOT = { exists = scope:rf_current_puppet_master_holder }
+				NOT = { scope:rf_current_puppet_master_holder ?= scope:rf_current_puppet_master_diarch }
+			}
+		}
+		scope:rf_current_puppet_master_diarch = {
+			add_character_flag = rf_script_allow_puppet_master_position
+			if = {
+				limit = { employer != scope:rf_puppet_master_liege }
+				set_employer = scope:rf_puppet_master_liege
+			}
+		}
+		if = {
+			limit = {
+				scope:rf_current_puppet_master_diarch = {
+					NOT = { has_court_position = riseandfall_puppet_master_court_position }
+				}
+			}
+			scope:rf_puppet_master_liege = {
+				appoint_court_position = {
+					recipient = scope:rf_current_puppet_master_diarch
+					court_position = riseandfall_puppet_master_court_position
+				}
+			}
+		}
+		scope:rf_current_puppet_master_diarch = {
+			remove_character_flag = rf_script_allow_puppet_master_position
+		}
+	}
+}
+
+# Steal 5% of liege short-term gold and give it to diarch
 riseandfall_steal_gold_effect = {
 	# actor = diarch, recipient = liege
 	# Based on palace coup gold transfer
@@ -11,8 +91,8 @@ riseandfall_steal_gold_effect = {
 		set_variable = { name = rf_transfer_gold value = 0 }
 		# If the liege has gold, set the transfer amount to their gold first
 		if = { limit = { gold > 1 } set_variable = { name = rf_transfer_gold value = gold } }
-		# Use integer math: divide by 2 to transfer roughly 50%
-		if = { limit = { var:rf_transfer_gold > 0 } change_variable = { name = rf_transfer_gold divide = 2 } }
+		# Use integer math: divide by 20 to transfer roughly 5%
+		if = { limit = { var:rf_transfer_gold > 0 } change_variable = { name = rf_transfer_gold divide = 20 } }
 	}
 	# Give to diarch
 	if = { limit = { scope:recipient = { has_variable = rf_transfer_gold } scope:recipient = { var:rf_transfer_gold > 0 } } scope:actor = { add_short_term_gold = scope:recipient.var:rf_transfer_gold } }
@@ -23,6 +103,20 @@ riseandfall_steal_gold_effect = {
 	}
 	# Add cooldown
 	scope:recipient = { set_variable = { name = puppet_master_cooldown value = yes days = 365 } }
+	# Using this interaction reduces the puppet stability bonus (-10) and deals an
+	# immediate -10 hit to current stability to represent destabilising exploitation.
+	scope:recipient = {
+		if = {
+			limit = { has_variable = riseandfall_rs_puppet_stability_bonus }
+			change_variable = { name = riseandfall_rs_puppet_stability_bonus add = -10 }
+			clamp_variable = { name = riseandfall_rs_puppet_stability_bonus min = 0 max = 50 }
+		}
+		if = {
+			limit = { has_variable = riseandfall_realm_stability_score }
+			change_variable = { name = riseandfall_realm_stability_score add = -10 }
+			clamp_variable = { name = riseandfall_realm_stability_score min = 0 max = 100 }
+		}
+	}
 }
 
 # When a guest arrives at a court, ensure a visiting puppet master (diarch)
@@ -58,6 +152,20 @@ riseandfall_curry_favor_effect = {
 	}
 	# Add cooldown on the recipient (so the liege cannot be targeted again immediately)
 	scope:recipient = { set_variable = { name = puppet_master_cooldown value = yes days = 365 } }
+	# Using this interaction reduces the puppet stability bonus (-10) and deals an
+	# immediate -10 hit to current stability to represent destabilising exploitation.
+	scope:recipient = {
+		if = {
+			limit = { has_variable = riseandfall_rs_puppet_stability_bonus }
+			change_variable = { name = riseandfall_rs_puppet_stability_bonus add = -10 }
+			clamp_variable = { name = riseandfall_rs_puppet_stability_bonus min = 0 max = 50 }
+		}
+		if = {
+			limit = { has_variable = riseandfall_realm_stability_score }
+			change_variable = { name = riseandfall_realm_stability_score add = -10 }
+			clamp_variable = { name = riseandfall_realm_stability_score min = 0 max = 100 }
+		}
+	}
 }
 
 # Transfer all titles from liege to diarch (violent usurpation)
@@ -73,6 +181,7 @@ riseandfall_overthrow_liege_effect = {
 			limit = { has_active_diarchy = yes }
 			end_diarchy = yes
 		}
+		riseandfall_sync_puppet_master_court_position = yes
         # If the recipient has a capital county, transfer that county first
         if = {
             limit = { scope:recipient = { capital_county = { exists = yes } } }
@@ -378,9 +487,12 @@ riseandfall_force_abdicate_effect = {
 						set_diarch = scope:actor
 						set_diarchy_type = puppet_regency
 						set_diarchy_swing = 90
+						riseandfall_sync_puppet_master_court_position = yes
 					}
 				}
 			}
 		}
+		# Keep court-position assignment consistent if this effect exits early.
+		scope:recipient = { riseandfall_sync_puppet_master_court_position = yes }
 	}
 }

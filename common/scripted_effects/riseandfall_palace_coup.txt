@@ -416,6 +416,7 @@ riseandfall_palace_coup_become_puppet = {
             set_diarchy_type = puppet_regency
             set_diarchy_swing = 90
             set_variable = { name = puppet_master_cooldown value = yes days = 365 }
+            riseandfall_sync_puppet_master_court_position = yes
         }
     }
 
@@ -560,6 +561,7 @@ riseandfall_palace_coup_challenger_wins_prowess_duel = {
                 set_diarchy_type = puppet_regency
                 set_diarchy_swing = 90
                 set_variable = { name = puppet_master_cooldown value = yes days = 365 }
+                riseandfall_sync_puppet_master_court_position = yes
             }
         }
     }
@@ -1231,6 +1233,7 @@ riseandfall_palace_coup_root_flees_failure = {
             set_diarchy_type = puppet_regency
             set_diarchy_swing = 90
             set_variable = { name = puppet_master_cooldown value = yes days = 365 }
+            riseandfall_sync_puppet_master_court_position = yes
         }
     }
 

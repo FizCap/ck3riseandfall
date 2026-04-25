@@ -159,6 +159,16 @@ types RiseAndFallStabilityTooltipTypes
 					text = "REALM_STABILITY_TT_LEGITIMACY_MULT"
 				}
 
+				# -- Puppet Stability Bonus (only shown while puppet_regency is active) --
+				vbox = {
+					visible = "[Character.MakeScope.Var('riseandfall_rs_puppet_stability_bonus').IsSet]"
+					layoutpolicy_horizontal = expanding
+					spacer = { size = { 0 12 } }
+					cooltip_paragraph = {
+						text = "REALM_STABILITY_TT_PUPPET_BONUS"
+					}
+				}
+
 				# -- Civil War & War History (show when civil war penalty < 0 or war penalty > 0) ---
 				vbox = {
 					visible = "[Or( LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_realm_stability_civil_war_penalty').GetValue, '(CFixedPoint)0' ), GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_war_penalty').GetValue, '(CFixedPoint)0' ) )]"

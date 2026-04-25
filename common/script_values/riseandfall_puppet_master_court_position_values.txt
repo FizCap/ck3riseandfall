@@ -1,0 +1,17 @@
+﻿##################################################
+# Rise and Fall — Puppet Master court-position salary values
+
+# Monthly salary paid to the Puppet Master.
+# 5% of the liege's monthly revenue, clamped so negative income never creates negative salary.
+riseandfall_puppet_master_salary_value = {
+	value = scope:liege.monthly_character_income
+	multiply = 0.05
+	min = 0
+}
+
+# Treasury-government equivalent of the Puppet Master salary.
+riseandfall_puppet_master_treasury_salary_value = {
+	value = scope:liege.monthly_character_treasury_variable_income
+	multiply = 0.05
+	min = 0
+}

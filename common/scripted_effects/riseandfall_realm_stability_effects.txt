@@ -494,11 +494,103 @@ riseandfall_calculate_realm_stability_se = {
     clamp_variable = { name = riseandfall_rs_vassals_component min = -30 max = 30 }
 
     ########################################
-    # 3.6) PUPPET REGENCY TRACKING
-    # Keep the history counter for puppet-regency systems, but it no longer modifies stability.
+    # 3.6) PUPPET REGENCY TRACKING & STABILITY BONUS
+    # Tracks how long a puppet_regency has been active and manages the
+    # puppet stability bonus (riseandfall_rs_puppet_stability_bonus, 0..50).
+    # Starts at 50 on first year of puppet_regency; drifts yearly based on
+    # the puppet master's key stats (diplomacy/intrigue/stewardship) vs world averages.
     if = { limit = { NOT = { has_variable = riseandfall_puppet_regency_years } } set_variable = { name = riseandfall_puppet_regency_years value = 0 } }
     if = { limit = { has_diarchy_type = puppet_regency } change_variable = { name = riseandfall_puppet_regency_years add = 1 } }
     else = { if = { limit = { var:riseandfall_puppet_regency_years > 0 } change_variable = { name = riseandfall_puppet_regency_years add = -1 } } }
+
+    # Initialize puppet stability bonus based on the starting puppet master's stats
+    # Only set once per regency lifecycle — if the variable already exists we keep it
+    if = {
+        limit = {
+            has_diarchy_type = puppet_regency
+            has_active_diarchy = yes
+            exists = scope:diarch
+            NOT = { has_variable = riseandfall_rs_puppet_stability_bonus }
+        }
+        # Compute the puppet master's average across all five stats
+        set_variable = { name = tmp_pm_start_sum value = scope:diarch.diplomacy }
+        change_variable = { name = tmp_pm_start_sum add = scope:diarch.martial }
+        change_variable = { name = tmp_pm_start_sum add = scope:diarch.stewardship }
+        change_variable = { name = tmp_pm_start_sum add = scope:diarch.intrigue }
+        change_variable = { name = tmp_pm_start_sum add = scope:diarch.learning }
+        change_variable = { name = tmp_pm_start_sum divide = 5 }
+
+        # Compute delta vs precomputed world five-stat average (riseandfall_avg_total)
+        set_variable = { name = tmp_pm_start_baseline value = global_var:riseandfall_avg_total }
+        change_variable = { name = tmp_pm_start_baseline multiply = -1 }
+        change_variable = { name = tmp_pm_start_sum add = var:tmp_pm_start_baseline }
+        set_variable = { name = tmp_pm_start_delta value = var:tmp_pm_start_sum }
+
+        # Map delta to 0..50 starting bonus (better stats -> larger start)
+        if = { limit = { var:tmp_pm_start_delta >= 15 } set_variable = { name = tmp_pm_start_bonus value = 50 } }
+        else_if = { limit = { var:tmp_pm_start_delta >= 5 } set_variable = { name = tmp_pm_start_bonus value = 40 } }
+        else_if = { limit = { var:tmp_pm_start_delta >= 0 } set_variable = { name = tmp_pm_start_bonus value = 30 } }
+        else_if = { limit = { var:tmp_pm_start_delta >= -5 } set_variable = { name = tmp_pm_start_bonus value = 15 } }
+        else_if = { limit = { var:tmp_pm_start_delta >= -15 } set_variable = { name = tmp_pm_start_bonus value = 5 } }
+        else = { set_variable = { name = tmp_pm_start_bonus value = 0 } }
+
+        set_variable = { name = riseandfall_rs_puppet_stability_bonus value = var:tmp_pm_start_bonus }
+        clamp_variable = { name = riseandfall_rs_puppet_stability_bonus min = 0 max = 50 }
+
+        remove_variable = tmp_pm_start_sum
+        remove_variable = tmp_pm_start_baseline
+        remove_variable = tmp_pm_start_delta
+        remove_variable = tmp_pm_start_bonus
+    }
+
+    # Yearly drift: compute puppet master's relevant stats vs world averages
+    if = {
+        limit = {
+            has_diarchy_type = puppet_regency
+            has_active_diarchy = yes
+            exists = scope:diarch
+            has_variable = riseandfall_rs_puppet_stability_bonus
+        }
+        # Sum all five stats for the puppet master and compute the average
+        set_variable = { name = tmp_pm_stat_sum value = scope:diarch.diplomacy }
+        change_variable = { name = tmp_pm_stat_sum add = scope:diarch.martial }
+        change_variable = { name = tmp_pm_stat_sum add = scope:diarch.stewardship }
+        change_variable = { name = tmp_pm_stat_sum add = scope:diarch.intrigue }
+        change_variable = { name = tmp_pm_stat_sum add = scope:diarch.learning }
+        # Convert sum -> average (integer division)
+        change_variable = { name = tmp_pm_stat_sum divide = 5 }
+
+        # Subtract precomputed world-average-of-five-stats (riseandfall_avg_total)
+        set_variable = { name = tmp_pm_avg_baseline value = global_var:riseandfall_avg_total }
+        change_variable = { name = tmp_pm_avg_baseline multiply = -1 }
+        change_variable = { name = tmp_pm_stat_sum add = var:tmp_pm_avg_baseline }
+        # tmp_pm_stat_sum now holds (puppet_master_avg - world_avg)
+        set_variable = { name = tmp_pm_stat_delta value = var:tmp_pm_stat_sum }
+
+        # Map combined delta to a yearly drift (same thresholds as before)
+        if = { limit = { var:tmp_pm_stat_delta >= 15 } set_variable = { name = tmp_pm_drift value = 5 } }
+        else_if = { limit = { var:tmp_pm_stat_delta >= 5 } set_variable = { name = tmp_pm_drift value = 3 } }
+        else_if = { limit = { var:tmp_pm_stat_delta >= 0 } set_variable = { name = tmp_pm_drift value = 1 } }
+        else_if = { limit = { var:tmp_pm_stat_delta >= -5 } set_variable = { name = tmp_pm_drift value = -2 } }
+        else_if = { limit = { var:tmp_pm_stat_delta >= -15 } set_variable = { name = tmp_pm_drift value = -5 } }
+        else = { set_variable = { name = tmp_pm_drift value = -10 } }
+
+        change_variable = { name = riseandfall_rs_puppet_stability_bonus add = var:tmp_pm_drift }
+        clamp_variable = { name = riseandfall_rs_puppet_stability_bonus min = 0 max = 50 }
+
+        remove_variable = tmp_pm_stat_sum
+        remove_variable = tmp_pm_avg_baseline
+        remove_variable = tmp_pm_stat_delta
+        remove_variable = tmp_pm_drift
+    }
+    else_if = {
+        # Puppet regency ended — remove the bonus so it is no longer added to the target
+        limit = {
+            NOT = { has_diarchy_type = puppet_regency }
+            has_variable = riseandfall_rs_puppet_stability_bonus
+        }
+        remove_variable = riseandfall_rs_puppet_stability_bonus
+    }
 
     ########################################
     # 3.7) DYNAMIC REALM FACTORS
@@ -821,6 +913,13 @@ riseandfall_calculate_realm_stability_se = {
     change_variable = { name = tmp_target_score add = var:riseandfall_rs_succession_component }
     # Legitimacy is additive: -20 (none) to +15 (full). Transparent on the 0-100 scale.
     change_variable = { name = tmp_target_score add = var:riseandfall_rs_legitimacy_component }
+
+    # Puppet stability bonus: +0..+50 when a puppet_regency is active.
+    # Good puppet master stats drift it toward 50; bad stats or using interactions erode it.
+    if = {
+        limit = { has_variable = riseandfall_rs_puppet_stability_bonus }
+        change_variable = { name = tmp_target_score add = var:riseandfall_rs_puppet_stability_bonus }
+    }
 
     # Civil war adjustment applied to the TARGET score (so smoothing moves current toward
     # the penalized target) instead of modifying the persistent current score directly.

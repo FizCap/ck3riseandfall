@@ -1,19 +1,21 @@
 ﻿riseandfall_check_puppet_regency_end = {
     every_ruler = {
-        limit = { has_diarchy_type = puppet_regency }
-        if = {
-            # Mirror the puppet_regency type's intended automatic end condition.
-            limit = { OR = { is_landed = no is_independent_ruler = no } }
-            end_diarchy = yes
-        }
-        else = {
-            # For landed rulers with puppet regency, ensure the diarch is employed in the court
-            diarch = {
-                if = {
-                    limit = { NOT = { is_ruler = yes } employer != prev }
-                    set_employer = prev
-                }
+        limit = {
+            OR = {
+                has_diarchy_type = puppet_regency
+                employs_court_position = riseandfall_puppet_master_court_position
             }
         }
+        if = {
+            # Mirror the puppet_regency type's intended automatic end condition.
+            limit = {
+                has_diarchy_type = puppet_regency
+                OR = { is_landed = no is_independent_ruler = no }
+            }
+            end_diarchy = yes
+        }
+
+        # Script-driven court position assignment/cleanup.
+        riseandfall_sync_puppet_master_court_position = yes
     }
 }

@@ -4,6 +4,10 @@
   interaction_category_power_sharing:0 "Power Sharing"
   puppet_master_filter_tag_desc:0 "Puppet Master"
 
+  # Puppet Master court position
+  riseandfall_puppet_master_court_position:0 "Puppet Master"
+  riseandfall_puppet_master_court_position_desc:0 "A shadow regent imposed through a Puppet Regency. This office is assigned automatically by script and receives 5% of the liege's monthly revenue."
+
   # Steal Gold
   riseandfall_steal_gold_interaction:0 "Steal Gold"
   riseandfall_steal_gold_interaction_desc:0 "Steal 50% of your liege's gold, transferring it to your treasury. This action has a 1-year cooldown."

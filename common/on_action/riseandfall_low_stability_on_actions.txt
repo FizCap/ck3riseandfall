@@ -9,6 +9,27 @@
     }
 }
 
+# Quarterly fallback: re-sync puppet master court position for any liege whose position
+# is missing while a puppet_regency is still active. Ensures refill within 3 months
+# if the 1-day revoke event somehow fails.
+quarterly_playable_pulse = {
+    on_actions = {
+        riseandfall_puppet_master_quarterly_resync
+    }
+}
+
+riseandfall_puppet_master_quarterly_resync = {
+    trigger = {
+        has_game_rule = riseandfall_low_stability_events_enabled
+        has_diarchy_type = puppet_regency
+        has_active_diarchy = yes
+        NOT = { employs_court_position = riseandfall_puppet_master_court_position }
+    }
+    effect = {
+        riseandfall_sync_puppet_master_court_position = yes
+    }
+}
+
 random_yearly_everyone_pulse = {
     on_actions = {
         riseandfall_force_diadochi_wars
