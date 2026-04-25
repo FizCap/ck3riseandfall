@@ -143,9 +143,10 @@ riseandfall_calculate_realm_stability_se = {
     #   - stat above the global average => positive contribution of +1 per point above (cap +10)
     set_variable = { name = riseandfall_rs_stats_component value = 0 }
 
-    # If ruler is under regency/puppet_regency, save the active diarch scope so we can read their stats.
+    # If ruler is under a regular regency, save the active diarch scope so we can read the regent's stats.
+    # Puppet regencies now use the ruler's own stats for realm stability calculations.
     if = {
-        limit = { OR = { has_diarchy_type = regency has_diarchy_type = puppet_regency } }
+        limit = { has_diarchy_type = regency }
         diarch = { save_scope_as = diarch }
         set_variable = { name = riseandfall_rs_use_diarch_stats value = 1 }
     }
