@@ -969,7 +969,15 @@ riseandfall_calculate_realm_stability_se = {
             change_variable = { name = riseandfall_rs_civil_war_years add = var:tmp_cw_yearly_step }
         }
         else = {
-            if = { limit = { var:riseandfall_rs_civil_war_years > 0 } change_variable = { name = riseandfall_rs_civil_war_years add = -1 } }
+            # Decay the stored civil war pressure by 10% per year outside of war,
+            # but never reduce it by less than 1.
+            set_variable = { name = tmp_cw_decay value = var:riseandfall_rs_civil_war_years }
+            change_variable = { name = tmp_cw_decay multiply = 9 }
+            change_variable = { name = tmp_cw_decay divide = 10 }
+            if = { limit = { var:tmp_cw_decay < 1 } set_variable = { name = tmp_cw_decay value = 1 } }
+            set_variable = { name = tmp_cw_decay_neg value = var:tmp_cw_decay }
+            if = { limit = { var:riseandfall_rs_civil_war_years > 0 } change_variable = { name = tmp_cw_decay_neg multiply = -1 } }
+            if = { limit = { var:riseandfall_rs_civil_war_years > 0 } change_variable = { name = riseandfall_rs_civil_war_years add = var:tmp_cw_decay_neg } }
         }
 
     # Compute cumulative penalty from weighted pressure and subtract from target score
