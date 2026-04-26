@@ -149,8 +149,16 @@ riseandfall_realm_stability_difficulty = {
         flag = riseandfall_realm_stability_unstable
     }
 
+    riseandfall_realm_stability_slightly_unstable = {
+        flag = riseandfall_realm_stability_slightly_unstable
+    }
+
     riseandfall_realm_stability_normal = {
         flag = riseandfall_realm_stability_normal
+    }
+
+    riseandfall_realm_stability_slightly_stable = {
+        flag = riseandfall_realm_stability_slightly_stable
     }
 
     riseandfall_realm_stability_stable = {

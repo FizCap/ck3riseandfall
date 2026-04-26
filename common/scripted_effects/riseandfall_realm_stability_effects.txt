@@ -1028,10 +1028,14 @@ riseandfall_calculate_realm_stability_se = {
     # Map selected game rule to a penalty-curve multiplier.
     # We scale the distance from 100 instead of scaling the whole score, so a raw 100 target stays 100.
     if = { limit = { has_game_rule = riseandfall_realm_stability_very_unstable }
-        set_variable = { name = riseandfall_rs_difficulty_multiplier value = 120 }
-        set_variable = { name = riseandfall_rs_difficulty_multiplier_display value = 1.2 }
+        set_variable = { name = riseandfall_rs_difficulty_multiplier value = 150 }
+        set_variable = { name = riseandfall_rs_difficulty_multiplier_display value = 1.5 }
     }
     else_if = { limit = { has_game_rule = riseandfall_realm_stability_unstable }
+        set_variable = { name = riseandfall_rs_difficulty_multiplier value = 125 }
+        set_variable = { name = riseandfall_rs_difficulty_multiplier_display value = 1.25 }
+    }
+    else_if = { limit = { has_game_rule = riseandfall_realm_stability_slightly_unstable }
         set_variable = { name = riseandfall_rs_difficulty_multiplier value = 110 }
         set_variable = { name = riseandfall_rs_difficulty_multiplier_display value = 1.1 }
     }
@@ -1039,13 +1043,17 @@ riseandfall_calculate_realm_stability_se = {
         set_variable = { name = riseandfall_rs_difficulty_multiplier value = 100 }
         set_variable = { name = riseandfall_rs_difficulty_multiplier_display value = 1.0 }
     }
-    else_if = { limit = { has_game_rule = riseandfall_realm_stability_stable }
+    else_if = { limit = { has_game_rule = riseandfall_realm_stability_slightly_stable }
         set_variable = { name = riseandfall_rs_difficulty_multiplier value = 90 }
         set_variable = { name = riseandfall_rs_difficulty_multiplier_display value = 0.9 }
     }
+    else_if = { limit = { has_game_rule = riseandfall_realm_stability_stable }
+        set_variable = { name = riseandfall_rs_difficulty_multiplier value = 75 }
+        set_variable = { name = riseandfall_rs_difficulty_multiplier_display value = 0.75 }
+    }
     else_if = { limit = { has_game_rule = riseandfall_realm_stability_very_stable }
-        set_variable = { name = riseandfall_rs_difficulty_multiplier value = 80 }
-        set_variable = { name = riseandfall_rs_difficulty_multiplier_display value = 0.8 }
+        set_variable = { name = riseandfall_rs_difficulty_multiplier value = 50 }
+        set_variable = { name = riseandfall_rs_difficulty_multiplier_display value = 0.5 }
     }
     # Apply the war penalty to the target score (use a negated temp var — `-var:` is not valid in scripts)
     set_variable = { name = tmp_war_penalty value = var:riseandfall_war_penalty }
