@@ -17,7 +17,6 @@ riseandfall_sync_puppet_master_court_position = {
 			exists = diarch
 			diarch = {
 				is_alive = yes
-				NOT = { is_ruler = yes }
 			}
 		}
 		diarch = { save_scope_as = rf_current_puppet_master_diarch }
@@ -37,13 +36,13 @@ riseandfall_sync_puppet_master_court_position = {
 			scope:rf_current_puppet_master_holder = {
 				has_court_position = riseandfall_puppet_master_court_position
 			}
-			OR = {
-				NOT = { exists = scope:rf_current_puppet_master_diarch }
-				NOT = { scope:rf_current_puppet_master_holder ?= scope:rf_current_puppet_master_diarch }
-			}
+			NOT = { exists = scope:rf_current_puppet_master_diarch }
 		}
-		scope:rf_current_puppet_master_holder = {
-			revoke_court_position = riseandfall_puppet_master_court_position
+		scope:rf_puppet_master_liege = {
+			revoke_court_position = {
+				recipient = scope:rf_current_puppet_master_holder
+				court_position = riseandfall_puppet_master_court_position
+			}
 		}
 	}
 
@@ -51,20 +50,41 @@ riseandfall_sync_puppet_master_court_position = {
 		limit = {
 			exists = scope:rf_puppet_master_liege
 			exists = scope:rf_current_puppet_master_diarch
-			OR = {
-				NOT = { exists = scope:rf_current_puppet_master_holder }
-				NOT = { scope:rf_current_puppet_master_holder ?= scope:rf_current_puppet_master_diarch }
+			scope:rf_current_puppet_master_diarch = {
+				is_alive = yes
 			}
 		}
 		scope:rf_current_puppet_master_diarch = {
-			add_character_flag = rf_script_allow_puppet_master_position
 			if = {
-				limit = { employer != scope:rf_puppet_master_liege }
+				limit = {
+					NOR = {
+						is_vassal_of = scope:rf_puppet_master_liege
+						is_courtier_of = scope:rf_puppet_master_liege
+						employer = scope:rf_puppet_master_liege
+					}
+				}
 				set_employer = scope:rf_puppet_master_liege
 			}
 		}
 		if = {
 			limit = {
+				exists = scope:rf_current_puppet_master_holder
+				scope:rf_current_puppet_master_holder = {
+					has_court_position = riseandfall_puppet_master_court_position
+				}
+				NOT = { scope:rf_current_puppet_master_holder ?= scope:rf_current_puppet_master_diarch }
+			}
+			scope:rf_puppet_master_liege = {
+				replace_court_position = {
+					recipient = scope:rf_current_puppet_master_diarch
+					holder = scope:rf_current_puppet_master_holder
+					court_position = riseandfall_puppet_master_court_position
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				NOT = { exists = scope:rf_current_puppet_master_holder }
 				scope:rf_current_puppet_master_diarch = {
 					NOT = { has_court_position = riseandfall_puppet_master_court_position }
 				}
@@ -76,8 +96,40 @@ riseandfall_sync_puppet_master_court_position = {
 				}
 			}
 		}
-		scope:rf_current_puppet_master_diarch = {
-			remove_character_flag = rf_script_allow_puppet_master_position
+	}
+}
+
+# Claim the puppet master office when the active diarch is not currently the court position holder
+riseandfall_claim_puppet_master_office_effect = {
+	scope:recipient = {
+		if = {
+			limit = {
+				NOR = {
+					scope:actor = { is_courtier_of = scope:recipient }
+					scope:actor = { is_vassal_of = scope:recipient }
+					scope:actor = { employer = scope:recipient }
+				}
+			}
+			scope:actor = { set_employer = scope:recipient }
+		}
+
+		if = {
+			limit = { employs_court_position = riseandfall_puppet_master_court_position }
+			random_court_position_holder = {
+				type = riseandfall_puppet_master_court_position
+				save_scope_as = old_puppet_master
+			}
+			replace_court_position = {
+				recipient = scope:actor
+				holder = scope:old_puppet_master
+				court_position = riseandfall_puppet_master_court_position
+			}
+		}
+		else = {
+			appoint_court_position = {
+				recipient = scope:actor
+				court_position = riseandfall_puppet_master_court_position
+			}
 		}
 	}
 }
@@ -101,8 +153,7 @@ riseandfall_steal_gold_effect = {
 		if = { limit = { var:rf_transfer_gold > 0 } remove_short_term_gold = var:rf_transfer_gold }
 		remove_variable = rf_transfer_gold
 	}
-	# Add cooldown
-	scope:recipient = { set_variable = { name = puppet_master_cooldown value = yes days = 365 } }
+
 	# Using this interaction reduces the puppet stability bonus (-10) and deals an
 	# immediate -10 hit to current stability to represent destabilising exploitation.
 	scope:recipient = {
@@ -150,8 +201,7 @@ riseandfall_curry_favor_effect = {
 			type = strong_favor_hook
 		}
 	}
-	# Add cooldown on the recipient (so the liege cannot be targeted again immediately)
-	scope:recipient = { set_variable = { name = puppet_master_cooldown value = yes days = 365 } }
+
 	# Using this interaction reduces the puppet stability bonus (-10) and deals an
 	# immediate -10 hit to current stability to represent destabilising exploitation.
 	scope:recipient = {
@@ -168,8 +218,8 @@ riseandfall_curry_favor_effect = {
 	}
 }
 
-# Transfer all titles from liege to diarch (violent usurpation)
-riseandfall_overthrow_liege_effect = {
+
+	riseandfall_overthrow_liege_effect = {
 	# Based on palace coup overthrow
 	create_title_and_vassal_change = {
 		type = conquest
@@ -233,8 +283,7 @@ riseandfall_overthrow_liege_effect = {
 		}
 	}
 	resolve_title_and_vassal_change = scope:change
-	# Add cooldown
-	scope:recipient = { set_variable = { name = puppet_master_cooldown value = yes days = 365 } }
+
 }
 
 # Force liege to abdicate by transferring their titles to a chosen successor (youngest unlanded child; fallback to dynasty in court)
@@ -458,8 +507,7 @@ riseandfall_force_abdicate_effect = {
 				}
 			}
 			resolve_title_and_vassal_change = scope:change
-			# Add cooldown on the recipient to prevent immediate re-uses
-			scope:recipient = { set_variable = { name = puppet_master_cooldown value = yes days = 365 } }
+
 
 			# Re-establish puppet regency on the new liege so the puppet master stays in power
 			# (make the actor the diarch of the chosen_successor and set the puppet_regency type)
@@ -474,10 +522,19 @@ riseandfall_force_abdicate_effect = {
 				# If no active diarchy exists yet on the chosen_successor, try to start one
 				if = {
 					limit = { NOT = { scope:chosen_successor = { has_active_diarchy = yes } } }
-					scope:chosen_successor = { try_start_diarchy = puppet_regency }
+					scope:actor = {
+						if = { limit = { NOT = { employer = scope:chosen_successor } } set_employer = scope:chosen_successor }
+					}
+					scope:chosen_successor = {
+						try_start_diarchy = puppet_regency
+						set_diarch = scope:actor
+						set_diarchy_type = puppet_regency
+						set_diarchy_swing = 90
+						riseandfall_sync_puppet_master_court_position = yes
+					}
 				}
 				# Only set diarch/diarchy fields if an active diarchy now exists
-				if = {
+				else_if = {
 					limit = { scope:chosen_successor = { has_active_diarchy = yes } }
 					# Ensure the diarch is in the new liege's court before setting them as diarch
 					scope:actor = {

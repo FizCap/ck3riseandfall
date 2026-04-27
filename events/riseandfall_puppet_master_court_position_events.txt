@@ -3,13 +3,17 @@
 # Delayed safety resync. Fires on scope:employee (the just-revoked/invalidated diarch).
 # employer = liege after revoke, so we call sync in the liege scope.
 riseandfall_puppet_master.100 = {
+	type = character_event
 	hidden = yes
 	is_triggered_only = yes
 
 	immediate = {
-		# root = employee (the fired diarch); employer is still the liege
-		employer = {
-			riseandfall_sync_puppet_master_court_position = yes
+		# root = employee (the fired diarch); only resync if the court still exists.
+		if = {
+			limit = { exists = employer }
+			employer = {
+				riseandfall_sync_puppet_master_court_position = yes
+			}
 		}
 	}
 }

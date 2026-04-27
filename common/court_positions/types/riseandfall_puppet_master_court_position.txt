@@ -36,10 +36,15 @@
 
 	# This position is script-driven; only the active diarch is a valid candidate.
 	is_shown_character = {
-		scope:employee = {
-			OR = {
-				has_character_flag = rf_script_allow_puppet_master_position
+		OR = {
+			scope:employee = {
 				has_court_position = riseandfall_puppet_master_court_position
+			}
+			scope:liege = {
+				has_diarchy_type = puppet_regency
+				has_active_diarchy = yes
+				exists = diarch
+				diarch ?= scope:employee
 			}
 		}
 	}
@@ -47,15 +52,11 @@
 	valid_character = {
 		scope:employee = {
 			is_alive = yes
-			NOT = { is_ruler = yes }
-			OR = {
-				has_character_flag = rf_script_allow_puppet_master_position
-				has_court_position = riseandfall_puppet_master_court_position
-			}
 		}
 		scope:liege = {
 			has_diarchy_type = puppet_regency
 			has_active_diarchy = yes
+			exists = diarch
 			diarch ?= scope:employee
 		}
 	}

@@ -52,16 +52,7 @@ riseandfall_liege_stability_below_50 = {
 	}
 }
 
-# No cooldown active
-riseandfall_no_cooldown = {
-	# Actual condition: no puppet master cooldown variable present on the recipient
-	scope:recipient = { NOT = { has_variable = puppet_master_cooldown } }
-	# Friendly failure text for cooldown checks
-	custom_tooltip = {
-		text = riseandfall_no_cooldown
-		scope:recipient = { NOT = { has_variable = puppet_master_cooldown } }
-	}
-}
+
 
 # Liege has more than 0 gold
 riseandfall_liege_has_gold = {

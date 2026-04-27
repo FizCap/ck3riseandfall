@@ -184,7 +184,6 @@ palace_coup.1004 = {
 						set_diarch = scope:challenger
 						set_diarchy_type = puppet_regency
 						set_diarchy_swing = 90
-						set_variable = { name = puppet_master_cooldown value = yes days = 365 }
 						riseandfall_sync_puppet_master_court_position = yes
 					}
 				}
