@@ -23,9 +23,6 @@ riseandfall_no_powerful_vassals_trigger = {
 riseandfall_can_realm_split_trigger = {
     is_independent_ruler = yes
     primary_title.tier >= tier_kingdom
-    # Do not split again if this realm was recently created by a split.
-    # These variables live on the title for 50 years.
-    NOT = { primary_title = { has_variable = rf_successor_origin_title } }
     # Must have at least 2 landed vassals
     any_vassal = {
         count >= 2
@@ -58,7 +55,7 @@ riseandfall_has_successor_primary_title_trigger = {
     is_independent_ruler = yes
     primary_title = {
         has_variable = rf_is_successor_split_title
-        has_variable = rf_successor_origin_title
+        has_variable = rf_successor_root_origin_title
     }
 }
 
@@ -108,7 +105,7 @@ riseandfall_can_browse_diadochi_targets_trigger = {
         }
         AND = {
             riseandfall_has_successor_primary_title_trigger = yes
-            primary_title.var:rf_successor_origin_title = {
+            primary_title.var:rf_successor_root_origin_title = {
                 exists = holder
                 holder = {
                     NOT = { this = root }
@@ -122,7 +119,7 @@ riseandfall_can_browse_diadochi_targets_trigger = {
                         can_declare_war = {
                             defender = prev
                             casus_belli = riseandfall_diadochi_cb
-                            target_titles = { root.primary_title.var:rf_successor_origin_title }
+                            target_titles = { root.primary_title.var:rf_successor_root_origin_title }
                         }
                     }
                 }
@@ -142,20 +139,20 @@ riseandfall_is_diadochi_target_trigger = {
         AND = {
             riseandfall_has_successor_primary_title_trigger = yes
             scope:attacker = { riseandfall_has_successor_primary_title_trigger = yes }
-            scope:attacker.primary_title.var:rf_successor_origin_title = scope:defender.primary_title.var:rf_successor_origin_title
+            scope:attacker.primary_title.var:rf_successor_root_origin_title = scope:defender.primary_title.var:rf_successor_root_origin_title
         }
         # Origin ruler attacks one of its successor states.
         AND = {
             riseandfall_has_successor_primary_title_trigger = yes
             scope:attacker = {
-                has_title = scope:defender.primary_title.var:rf_successor_origin_title
+                has_title = scope:defender.primary_title.var:rf_successor_root_origin_title
             }
         }
         # Successor attacks its origin ruler.
         AND = {
             scope:attacker = { riseandfall_has_successor_primary_title_trigger = yes }
             scope:defender = {
-                has_title = scope:attacker.primary_title.var:rf_successor_origin_title
+                has_title = scope:attacker.primary_title.var:rf_successor_root_origin_title
             }
         }
     }

@@ -110,7 +110,7 @@ palace_coup.1002 = {
 		custom_tooltip = palace_coup.1002.rebellion.tooltip
 		trigger = {
 			exists = scope:challenger
-			NOT = { primary_title = { has_variable = rf_successor_origin_title } }
+			NOT = { primary_title = { has_variable = rf_successor_root_origin_title } }
 		}
 		hidden_effect = { riseandfall_palace_coup_start_rebellion = yes }
 

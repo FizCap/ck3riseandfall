@@ -1096,6 +1096,9 @@ riseandfall_execute_realm_split_se = {
     # Mark this realm as a successor state and link it to its split origin title.
     # Stored both on the ruler and the successor primary title for future mechanics.
     set_variable = { name = rf_successor_origin_title value = scope:original_primary }
+    # Seed a propagated "root origin" pointer so descendant splits can be
+    # associated with the original root of a split chain (enables multi-gen CBs).
+    set_variable = { name = rf_successor_root_origin_title value = scope:original_primary }
     add_character_flag = rf_successor_state_ruler
     if = {
         limit = { exists = scope:new_realm_ruler.primary_title }
@@ -1103,10 +1106,20 @@ riseandfall_execute_realm_split_se = {
         # a permanent snapshot on the title for future shrink checks.
         scope:rf_breakaway_ruler = { set_variable = { name = tmp_successor_realm_size value = realm_size } }
         scope:new_realm_ruler.primary_title = {
-            set_variable = { name = rf_successor_origin_title value = scope:original_primary years = 30 }
+            # immediate origin (the title that was split)
+            set_variable = { name = rf_successor_origin_title value = scope:original_primary years = 50 }
             set_variable = { name = rf_is_successor_split_title value = 1 years = 30 }
             # Permanent marker for this title indicating it's a split realm successor
             set_variable = { name = rf_is_permanent_successor_split value = 1 }
+            # Propagate and/or set the root origin: if the original_primary was
+            # itself a successor, inherit its root; otherwise use original_primary.
+            if = {
+                limit = { scope:original_primary = { has_variable = rf_successor_root_origin_title } }
+                set_variable = { name = rf_successor_root_origin_title value = scope:original_primary.var:rf_successor_root_origin_title years = 30 }
+            }
+            else = {
+                set_variable = { name = rf_successor_root_origin_title value = scope:original_primary years = 30 }
+            }
             # Store the baseline realm size (number of counties) on the title permanently
             # Only set if the title doesn't already have a snapshot to avoid accidental overwrite
             if = {

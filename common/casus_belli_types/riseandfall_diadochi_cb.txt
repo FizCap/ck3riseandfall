@@ -34,14 +34,14 @@
                 
                 # Target is the origin title of the attacking successor state
                 AND = {
-                    scope:attacker.primary_title = { has_variable = rf_successor_origin_title }
-                    this = scope:attacker.primary_title.var:rf_successor_origin_title
+                    scope:attacker.primary_title = { has_variable = rf_successor_root_origin_title }
+                    this = scope:attacker.primary_title.var:rf_successor_root_origin_title
                 }
                 
                 # Target is the origin title of the defending successor state (if origin attacks successor)
                 AND = {
-                    scope:defender.primary_title = { has_variable = rf_successor_origin_title }
-                    this = scope:defender.primary_title.var:rf_successor_origin_title
+                    scope:defender.primary_title = { has_variable = rf_successor_root_origin_title }
+                    this = scope:defender.primary_title.var:rf_successor_root_origin_title
                 }
             }
         }
@@ -309,7 +309,7 @@
                 limit = {
                     scope:attacker = { riseandfall_has_successor_primary_title_trigger = yes }
                     scope:defender = { riseandfall_has_successor_primary_title_trigger = yes }
-                    scope:attacker.primary_title.var:rf_successor_origin_title = scope:defender.primary_title.var:rf_successor_origin_title
+                    scope:attacker.primary_title.var:rf_successor_root_origin_title = scope:defender.primary_title.var:rf_successor_root_origin_title
                 }
                 add = 220
             }

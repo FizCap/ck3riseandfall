@@ -6,7 +6,7 @@ riseandfall_diadochi_wars_se = {
 	# Inputs: root is one independent ruler from a random yearly character pulse.
 	# Outputs: at most one Diadochi war started against a same-origin realm.
 	# Data shape: uses saved scopes for the origin title, target ruler, and target title.
-	# Error modes: no valid same-origin target, war cooldown active, or war blocked by truce/alliance/cb rules.
+	# Error modes: no valid same-origin target, war cooldown active, or war blocked by war rules.
 	save_scope_as = rf_diadochi_attacker
 
 	clear_saved_scope = rf_diadochi_origin_title
@@ -20,7 +20,7 @@ riseandfall_diadochi_wars_se = {
 			is_landed = yes
 			is_independent_ruler = yes
 			is_imprisoned = no
-			is_at_war = no
+			NOT = { has_trait = incapable }
 			NOR = {
 				government_has_flag = government_is_landless_adventurer
 			}
@@ -29,7 +29,7 @@ riseandfall_diadochi_wars_se = {
 				any_independent_ruler = {
 					NOT = { this = root }
 					riseandfall_has_successor_primary_title_trigger = yes
-					primary_title.var:rf_successor_origin_title = root.primary_title
+					primary_title.var:rf_successor_root_origin_title = root.primary_title
 				}
 			}
 		}
@@ -39,7 +39,7 @@ riseandfall_diadochi_wars_se = {
 		if = {
 			limit = { riseandfall_has_successor_primary_title_trigger = yes }
 			set_variable = { name = rf_diadochi_is_successor value = 1 }
-			primary_title.var:rf_successor_origin_title = { save_scope_as = rf_diadochi_origin_title }
+			primary_title.var:rf_successor_root_origin_title = { save_scope_as = rf_diadochi_origin_title }
 		}
 		else = {
 			primary_title = { save_scope_as = rf_diadochi_origin_title }
@@ -93,15 +93,88 @@ riseandfall_diadochi_wars_se = {
 				limit = {
 					exists = scope:rf_diadochi_target_ruler
 					exists = scope:rf_diadochi_target_title
-					NOT = { has_truce = scope:rf_diadochi_target_ruler }
-					NOT = { is_allied_to = scope:rf_diadochi_target_ruler }
 					NOT = { is_at_war_with = scope:rf_diadochi_target_ruler }
+					can_attack_in_hierarchy = scope:rf_diadochi_target_ruler
+					trigger_if = {
+						limit = {
+							NOT = {
+								government_has_flag = can_start_war_with_raised_troops
+							}
+						}
+						NOT = {
+							has_raised_armies = yes
+						}
+					}
+					trigger_else = {
+						NOT = {
+							any_army = {
+								location.county.holder ?= scope:rf_diadochi_target_ruler
+							}
+						}
+					}
+					has_any_display_cb_on = scope:rf_diadochi_target_ruler
+					NOT = {
+						is_allied_in_war = scope:rf_diadochi_target_ruler
+					}
+					is_in_debt = no
+					NOT = {
+						exists = involved_activity
+					}
+					trigger_if = {
+						limit = {
+							culture = { has_cultural_parameter = cannot_attack_allies }
+						}
+						NOT = {
+							is_allied_to = scope:rf_diadochi_target_ruler
+						}
+					}
+					trigger_if = {
+						limit = {
+							culture = { has_cultural_parameter = cannot_attack_truces }
+						}
+						NOT = {
+							has_truce = scope:rf_diadochi_target_ruler
+						}
+					}
+					is_imprisoned = no
+					trigger_if = {
+						limit = {
+							has_variable_list = subjugation_offer_under_consideration
+						}
+						NOT = {
+							is_target_in_variable_list = {
+								name = subjugation_offer_under_consideration
+								target = scope:rf_diadochi_target_ruler
+							}
+						}
+					}
+					trigger_if = {
+						limit = {
+							is_confederation_member = yes
+						}
+						NOT = {
+							scope:rf_diadochi_target_ruler = {
+								is_member_of_confederation = root.confederation
+							}
+						}
+					}
+					scope:rf_diadochi_target_ruler = {
+						NOT = { government_has_flag = government_is_herder }
+						NOT = { is_tributary_of_suzerain_or_above = root }
+						NOT = { has_strong_hook = root }
+						trigger_if = {
+							limit = { is_imprisoned = yes }
+							imprisoner != root
+						}
+					}
 					can_declare_war = {
 						defender = scope:rf_diadochi_target_ruler
 						casus_belli = riseandfall_diadochi_cb
 						target_titles = { scope:rf_diadochi_target_title }
 					}
 				}
+				# The pulse increases split-realm war frequency, while the legal gate
+				# mirrors the declare war interaction for independent rulers.
 				start_war = {
 					casus_belli = riseandfall_diadochi_cb
 					target = scope:rf_diadochi_target_ruler
@@ -257,7 +330,7 @@ riseandfall_diadochi_prepare_browser_targets_se = {
 
 		if = {
 			limit = { riseandfall_has_successor_primary_title_trigger = yes }
-			primary_title.var:rf_successor_origin_title = { save_scope_as = rf_diadochi_origin_title }
+			primary_title.var:rf_successor_root_origin_title = { save_scope_as = rf_diadochi_origin_title }
 
 			every_neighboring_realm_owner = {
 				limit = {
@@ -390,11 +463,18 @@ riseandfall_diadochi_try_peer_target_se = {
 			is_independent_ruler = yes
 			exists = primary_title
 			is_imprisoned = no
-			is_at_war = no
 			riseandfall_has_successor_primary_title_trigger = yes
-			primary_title.var:rf_successor_origin_title = scope:rf_diadochi_origin_title
-			root.riseandfall_military_power_with_allies_strong > this.riseandfall_military_power_with_allies
-			root.current_military_strength > this.capital_province.building_max_garrison
+			primary_title.var:rf_successor_root_origin_title = scope:rf_diadochi_origin_title
+			root = {
+				NOT = { is_at_war_with = prev }
+				can_attack_in_hierarchy = prev
+				has_any_display_cb_on = prev
+				can_declare_war = {
+					defender = prev
+					casus_belli = riseandfall_diadochi_cb
+					target_titles = { prev.primary_title }
+				}
+			}
 		}
 		save_scope_as = rf_diadochi_target_ruler
 		primary_title = { save_scope_as = rf_diadochi_target_title }
@@ -413,11 +493,18 @@ riseandfall_diadochi_try_neighbor_peer_target_se = {
 				is_independent_ruler = yes
 				exists = primary_title
 				is_imprisoned = no
-				is_at_war = no
 				riseandfall_has_successor_primary_title_trigger = yes
-				primary_title.var:rf_successor_origin_title = scope:rf_diadochi_origin_title
-				root.riseandfall_military_power_with_allies_strong > this.riseandfall_military_power_with_allies
-				root.current_military_strength > this.capital_province.building_max_garrison
+				primary_title.var:rf_successor_root_origin_title = scope:rf_diadochi_origin_title
+				root = {
+					NOT = { is_at_war_with = prev }
+					can_attack_in_hierarchy = prev
+					has_any_display_cb_on = prev
+					can_declare_war = {
+						defender = prev
+						casus_belli = riseandfall_diadochi_cb
+						target_titles = { prev.primary_title }
+					}
+				}
 			}
 		}
 		random_neighboring_realm_owner = {
@@ -427,11 +514,18 @@ riseandfall_diadochi_try_neighbor_peer_target_se = {
 				is_independent_ruler = yes
 				exists = primary_title
 				is_imprisoned = no
-				is_at_war = no
 				riseandfall_has_successor_primary_title_trigger = yes
-				primary_title.var:rf_successor_origin_title = scope:rf_diadochi_origin_title
-				root.riseandfall_military_power_with_allies_strong > this.riseandfall_military_power_with_allies
-				root.current_military_strength > this.capital_province.building_max_garrison
+				primary_title.var:rf_successor_root_origin_title = scope:rf_diadochi_origin_title
+				root = {
+					NOT = { is_at_war_with = prev }
+					can_attack_in_hierarchy = prev
+					has_any_display_cb_on = prev
+					can_declare_war = {
+						defender = prev
+						casus_belli = riseandfall_diadochi_cb
+						target_titles = { prev.primary_title }
+					}
+				}
 			}
 			save_scope_as = rf_diadochi_target_ruler
 			primary_title = { save_scope_as = rf_diadochi_target_title }
@@ -451,10 +545,15 @@ riseandfall_diadochi_try_origin_target_se = {
 				is_independent_ruler = yes
 				exists = primary_title
 				is_imprisoned = no
-				is_at_war = no
 			}
-			riseandfall_military_power_with_allies_strong > scope:rf_diadochi_origin_title.holder.riseandfall_military_power_with_allies
-			root.current_military_strength > scope:rf_diadochi_origin_title.holder.capital_province.building_max_garrison
+			NOT = { is_at_war_with = scope:rf_diadochi_origin_title.holder }
+			can_attack_in_hierarchy = scope:rf_diadochi_origin_title.holder
+			has_any_display_cb_on = scope:rf_diadochi_origin_title.holder
+			can_declare_war = {
+				defender = scope:rf_diadochi_origin_title.holder
+				casus_belli = riseandfall_diadochi_cb
+				target_titles = { scope:rf_diadochi_origin_title }
+			}
 		}
 		scope:rf_diadochi_origin_title.holder = { save_scope_as = rf_diadochi_target_ruler }
 		scope:rf_diadochi_origin_title = { save_scope_as = rf_diadochi_target_title }
