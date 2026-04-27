@@ -402,10 +402,23 @@ riseandfall_palace_coup_become_puppet = {
             scope:challenger = { is_alive = yes NOT = { is_ruler = yes } }
             NOT = { root = { has_active_diarchy = yes } }
         }
-        root = { try_start_diarchy = puppet_regency }
+        root = {
+            scope:challenger = {
+                if = { limit = { NOT = { employer = root } } set_employer = root }
+                every_courtier = {
+                    limit = { is_alive = yes NOT = { employer = root } }
+                    set_employer = root
+                }
+            }
+            try_start_diarchy = puppet_regency
+            set_diarch = scope:challenger
+            set_diarchy_type = puppet_regency
+            set_diarchy_swing = 90
+            riseandfall_sync_puppet_master_court_position = yes
+        }
     }
 
-    if = {
+    else_if = {
         limit = {
             exists = scope:challenger
             scope:challenger = { is_alive = yes NOT = { is_ruler = yes } }
@@ -415,7 +428,7 @@ riseandfall_palace_coup_become_puppet = {
             set_diarch = scope:challenger
             set_diarchy_type = puppet_regency
             set_diarchy_swing = 90
-            set_variable = { name = puppet_master_cooldown value = yes days = 365 }
+
             riseandfall_sync_puppet_master_court_position = yes
         }
     }
@@ -536,12 +549,25 @@ riseandfall_palace_coup_challenger_wins_prowess_duel = {
     if = {
         limit = {
             exists = scope:challenger
-            scope:challenger = { is_alive = yes }
+            scope:challenger = { is_alive = yes NOT = { is_ruler = yes } }
             NOT = { root = { has_active_diarchy = yes } }
         }
-        root = { try_start_diarchy = puppet_regency }
+        root = {
+            scope:challenger = {
+                if = { limit = { NOT = { employer = root } } set_employer = root }
+                every_courtier = {
+                    limit = { is_alive = yes NOT = { employer = root } }
+                    set_employer = root
+                }
+            }
+            try_start_diarchy = puppet_regency
+            set_diarch = scope:challenger
+            set_diarchy_type = puppet_regency
+            set_diarchy_swing = 90
+            riseandfall_sync_puppet_master_court_position = yes
+        }
     }
-    if = {
+    else_if = {
         limit = { root = { has_active_diarchy = yes } }
         root = {
             # Make sure the (new) diarch is not employed by the challenger; as puppet master they must be in root's court.
@@ -560,7 +586,7 @@ riseandfall_palace_coup_challenger_wins_prowess_duel = {
                 set_diarch = scope:challenger
                 set_diarchy_type = puppet_regency
                 set_diarchy_swing = 90
-                set_variable = { name = puppet_master_cooldown value = yes days = 365 }
+
                 riseandfall_sync_puppet_master_court_position = yes
             }
         }
@@ -588,6 +614,51 @@ riseandfall_palace_coup_root_flees_success = {
     capital_county.duchy = { save_scope_as = palace_coup_core_duchy }
     capital_county.kingdom = { save_scope_as = palace_coup_core_kingdom }
 
+    # Reserve one county on the deposed ruler so they remain landed through split resolve.
+    # Prefer any non-capital county; fallback to capital county if none exist.
+    scope:original_ruler = {
+        random_held_title = {
+            limit = {
+                tier = tier_county
+                NOT = { this = scope:palace_coup_old_capital_county }
+            }
+            save_scope_as = palace_coup_original_reserve_county
+        }
+        if = {
+            limit = { NOT = { exists = scope:palace_coup_original_reserve_county } }
+            capital_county = { save_scope_as = palace_coup_original_reserve_county }
+        }
+    }
+
+    # End any active diarchy before transferring titles to prevent on_diarch_change
+    # from firing with a null diarch when the primary title changes hands.
+    if = {
+        limit = { has_active_diarchy = yes }
+        end_diarchy = yes
+    }
+
+        # Transfer the capital county in its own resolved change first so the challenger
+        # is already landed when vanilla on_accolade_create_squire evaluates capital_province.
+        if = {
+            limit = {
+                exists = scope:palace_coup_old_capital_county
+                NOT = { scope:palace_coup_old_capital_county = { holder = scope:palace_coup_challenger } }
+                NOT = { scope:palace_coup_old_capital_county ?= scope:palace_coup_original_reserve_county }
+            }
+            create_title_and_vassal_change = {
+                type = conquest
+                save_scope_as = palace_coup_capital_change
+                add_claim_on_loss = yes
+            }
+            scope:palace_coup_old_capital_county = {
+                change_title_holder = {
+                    holder = scope:palace_coup_challenger
+                    change = scope:palace_coup_capital_change
+                }
+            }
+            resolve_title_and_vassal_change = scope:palace_coup_capital_change
+        }
+
     # Split the realm into two successor states: the challenger keeps the
     # original title plus the capital core, while the fleeing ruler keeps the
     # outer realm and forms the rival splinter state.
@@ -613,6 +684,8 @@ riseandfall_palace_coup_root_flees_success = {
         every_held_title = {
             limit = {
                 NOT = { this = scope:original_primary }
+                NOT = { this = scope:palace_coup_old_capital_county }
+                NOT = { this ?= scope:palace_coup_original_reserve_county }
                 NOT = { is_head_of_faith = yes }
                 NOT = { is_noble_family_title = yes }
                 OR = {
@@ -624,11 +697,13 @@ riseandfall_palace_coup_root_flees_success = {
             change_title_holder = {
                 holder = scope:palace_coup_challenger
                 change = scope:palace_coup_split_change
-                take_baronies = yes
             }
         }
         every_vassal = {
-            limit = { is_landed = yes }
+            limit = {
+                is_landed = yes
+                NOT = { this = scope:palace_coup_challenger }
+            }
             change_liege = {
                 liege = scope:palace_coup_challenger
                 change = scope:palace_coup_split_change
@@ -721,7 +796,6 @@ riseandfall_palace_coup_root_flees_success = {
                     change_title_holder = {
                         holder = scope:original_ruler
                         change = scope:palace_coup_land_change
-                        take_baronies = yes
                     }
                 }
             }
@@ -738,7 +812,6 @@ riseandfall_palace_coup_root_flees_success = {
                 change_title_holder = {
                     holder = scope:original_ruler
                     change = scope:palace_coup_land_change
-                    take_baronies = yes
                 }
             }
             resolve_title_and_vassal_change = scope:palace_coup_land_change
@@ -965,17 +1038,26 @@ riseandfall_palace_coup_root_flees_success = {
         # them as rival heirs of the same origin realm.
         scope:original_ruler = {
             set_variable = { name = rf_successor_origin_title value = scope:original_primary }
+            set_variable = { name = rf_successor_root_origin_title value = scope:original_primary }
             add_character_flag = rf_successor_state_ruler
             set_variable = { name = tmp_successor_realm_size value = realm_size }
         }
         scope:palace_coup_challenger = {
             set_variable = { name = rf_successor_origin_title value = scope:original_primary }
+            set_variable = { name = rf_successor_root_origin_title value = scope:original_primary }
             add_character_flag = rf_successor_state_ruler
             set_variable = { name = tmp_successor_realm_size value = realm_size }
         }
 
         scope:original_primary = {
             set_variable = { name = rf_successor_origin_title value = scope:original_primary years = 30 }
+            if = {
+                limit = { scope:original_primary = { has_variable = rf_successor_root_origin_title } }
+                set_variable = { name = rf_successor_root_origin_title value = scope:original_primary.var:rf_successor_root_origin_title years = 30 }
+            }
+            else = {
+                set_variable = { name = rf_successor_root_origin_title value = scope:original_primary years = 30 }
+            }
             set_variable = { name = rf_is_successor_split_title value = 1 years = 30 }
             set_variable = { name = rf_is_permanent_successor_split value = 1 }
             if = {
@@ -987,6 +1069,13 @@ riseandfall_palace_coup_root_flees_success = {
             limit = { exists = scope:palace_coup_root_successor_title }
             scope:palace_coup_root_successor_title = {
                 set_variable = { name = rf_successor_origin_title value = scope:original_primary years = 30 }
+                if = {
+                    limit = { scope:original_primary = { has_variable = rf_successor_root_origin_title } }
+                    set_variable = { name = rf_successor_root_origin_title value = scope:original_primary.var:rf_successor_root_origin_title years = 30 }
+                }
+                else = {
+                    set_variable = { name = rf_successor_root_origin_title value = scope:original_primary years = 30 }
+                }
                 set_variable = { name = rf_is_successor_split_title value = 1 years = 30 }
                 set_variable = { name = rf_is_permanent_successor_split value = 1 }
                 if = {
@@ -1108,9 +1197,22 @@ riseandfall_palace_coup_root_flees_failure = {
             scope:challenger = { is_alive = yes NOT = { is_ruler = yes } }
             NOT = { root = { has_active_diarchy = yes } }
         }
-        root = { try_start_diarchy = puppet_regency }
+        root = {
+            scope:challenger = {
+                if = { limit = { NOT = { employer = root } } set_employer = root }
+                every_courtier = {
+                    limit = { is_alive = yes NOT = { employer = root } }
+                    set_employer = root
+                }
+            }
+            try_start_diarchy = puppet_regency
+            set_diarch = scope:challenger
+            set_diarchy_type = puppet_regency
+            set_diarchy_swing = 90
+            riseandfall_sync_puppet_master_court_position = yes
+        }
     }
-    if = {
+    else_if = {
         limit = {
             exists = scope:challenger
             scope:challenger = { is_alive = yes NOT = { is_ruler = yes } }
@@ -1130,7 +1232,7 @@ riseandfall_palace_coup_root_flees_failure = {
             set_diarch = scope:challenger
             set_diarchy_type = puppet_regency
             set_diarchy_swing = 90
-            set_variable = { name = puppet_master_cooldown value = yes days = 365 }
+
             riseandfall_sync_puppet_master_court_position = yes
         }
     }

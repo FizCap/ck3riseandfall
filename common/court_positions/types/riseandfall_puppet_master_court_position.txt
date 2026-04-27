@@ -139,9 +139,13 @@
 	}
 
 	on_court_position_vacated = {
-		scope:liege = {
-			riseandfall_sync_puppet_master_court_position = yes
-		}
+                # Use delayed resync (same pattern as on_court_position_revoked) to avoid
+                # syncing during unstable title-batch transitions (e.g. palace coup / abdication).
+                scope:employee = {
+                        trigger_event = {
+                                id = riseandfall_puppet_master.100
+                                days = 1
+                        }
 	}
 
 	on_court_position_invalidated = {
