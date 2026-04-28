@@ -3,8 +3,8 @@
 # Computes a 0..100 realm stability score and stores it on the ruler as
 # riseandfall_realm_stability_score
 # Weighting (user spec):
-#  - Ruler stats: total contribution clamped to -30..+30 (five stats combined)
-#    Contributions still computed per-stat but overall clamped to the range above.
+#  - Ruler stats: each stat contributes (stat - 10), clamped to -6..+6.
+#    The five stat contributions are then summed and clamped to -30..+30.
 #  - Legitimacy: additive component (-20..+15); no legitimacy = -20, full legitimacy = +15
 #  - Vassal relations: mapped to -30..+30 (average direct vassal opinion -100..100)
 #    Powerful vassals count double. Noble relations dominated medieval stability.
@@ -134,17 +134,15 @@ riseandfall_calculate_realm_stability_se = {
     }
 
     ########################################
-    # 1) RULER STATS (per-stat -10..+10, total -50..+50)
-    # New rule: for each stat, contribution = stat - world_average, clamped to [-10,10].
-    #   - stat below global average => negative contribution (cap -10)
-    #   - stat above global average => positive contribution (cap +10)
-    # Total stats component is the sum of Diplomacy/Martial/Stewardship/Intrigue/Learning
-    #   - stat below the global average => negative contribution of -1 per point below (cap -10)
-    #   - stat above the global average => positive contribution of +1 per point above (cap +10)
+    # 1) RULER STATS
+    # Each stat contributes relative to a fixed baseline of 10.
+    # Per-stat contribution = clamp(stat - 10, -6, +6)
+    # Total stats component is the sum of Diplomacy/Martial/Stewardship/Intrigue/Learning,
+    # then clamped to -30..+30.
     set_variable = { name = riseandfall_rs_stats_component value = 0 }
 
     # If ruler is under a regular regency, save the active diarch scope so we can read the regent's stats.
-    # Puppet regencies now use the ruler's own stats for realm stability calculations.
+    # Puppet regencies use the ruler's own stats for realm stability calculations.
     if = {
         limit = { has_diarchy_type = regency }
         diarch = { save_scope_as = diarch }
@@ -152,209 +150,52 @@ riseandfall_calculate_realm_stability_se = {
     }
     else = { set_variable = { name = riseandfall_rs_use_diarch_stats value = 0 } }
 
-    # Helper macro-like repeated block for each stat: compute tmp_add = source_stat - global average and apply
-    # More aggressive negative scaling: stats far below the world average penalize much more.
-    # Positive scaling increased so good stats help more.
+    # Helper macro-like repeated block for each stat: compute tmp_add = source_stat - 10,
+    # clamp to -6..+6, then add to the total.
     # Diplomacy
     if = { limit = { var:riseandfall_rs_use_diarch_stats = 1 }
-        # Use diarch stats (same weighting for regency and puppet regency)
-        if = { limit = { has_diarchy_type = puppet_regency }
-            set_variable = { name = tmp_add value = scope:diarch.diplomacy }
-        }
-        else = {
-            # Regular regency: use diarch stats as-is
-            set_variable = { name = tmp_add value = scope:diarch.diplomacy }
-        }
+        set_variable = { name = tmp_add value = scope:diarch.diplomacy }
     }
     else = { set_variable = { name = tmp_add value = diplomacy } }
-    # subtract global average using a temporary negative value
-    set_variable = { name = tmp_baseline value = global_var:riseandfall_avg_diplomacy }
-    change_variable = { name = tmp_baseline multiply = -1 }
-    change_variable = { name = tmp_add add = var:tmp_baseline }
-    # Positive contributions (tmp_add > 1): apply curved scaling mirroring the negative side
-    # Use piecewise thresholds so high stats get diminishing returns instead of a linear x2
-    if = {
-        limit = { var:tmp_add > 1 }
-        set_variable = { name = tmp_pos value = var:tmp_add }
-        if = { limit = { var:tmp_pos >= 7 } set_variable = { name = tmp_stat_contrib value = 10 } }
-        else_if = { limit = { var:tmp_pos >= 5 } set_variable = { name = tmp_stat_contrib value = 8 } }
-        else_if = { limit = { var:tmp_pos >= 3 } set_variable = { name = tmp_stat_contrib value = 5 } }
-        else = { set_variable = { name = tmp_stat_contrib value = 2 } }
-        change_variable = { name = riseandfall_rs_stats_component add = var:tmp_stat_contrib }
-    }
-    else_if = {
-        limit = { var:tmp_add < -1 }
-        # Convert to positive distance below baseline (world average)
-        set_variable = { name = tmp_neg value = var:tmp_add }
-        change_variable = { name = tmp_neg multiply = -1 }
-        # Piecewise stronger penalties for lower stats (store in tmp_stat_contrib)
-        if = { limit = { var:tmp_neg >= 7 } set_variable = { name = tmp_stat_contrib value = -10 } }
-        else_if = { limit = { var:tmp_neg >= 5 } set_variable = { name = tmp_stat_contrib value = -8 } }
-        else_if = { limit = { var:tmp_neg >= 3 } set_variable = { name = tmp_stat_contrib value = -5 } }
-        else = { set_variable = { name = tmp_stat_contrib value = -2 } }
-        change_variable = { name = riseandfall_rs_stats_component add = var:tmp_stat_contrib }
-    }
-    else = {
-        # within [-1,1] -> treat as zero (no contribution)
-        set_variable = { name = tmp_stat_contrib value = 0 }
-        change_variable = { name = riseandfall_rs_stats_component add = var:tmp_stat_contrib }
-    }
+    change_variable = { name = tmp_add add = -10 }
+    clamp_variable = { name = tmp_add min = -6 max = 6 }
+    change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
 
     # Martial
     if = { limit = { var:riseandfall_rs_use_diarch_stats = 1 }
-        # Use diarch stats (same weighting for regency and puppet_regency)
-        if = { limit = { has_diarchy_type = puppet_regency }
-            set_variable = { name = tmp_add value = scope:diarch.martial }
-        }
-        else = {
-            # Regular regency: use diarch stats as-is
-            set_variable = { name = tmp_add value = scope:diarch.martial }
-        }
+        set_variable = { name = tmp_add value = scope:diarch.martial }
     }
     else = { set_variable = { name = tmp_add value = martial } }
-    set_variable = { name = tmp_baseline value = global_var:riseandfall_avg_martial }
-    change_variable = { name = tmp_baseline multiply = -1 }
-    change_variable = { name = tmp_add add = var:tmp_baseline }
-    if = {
-        limit = { var:tmp_add > 1 }
-        set_variable = { name = tmp_pos value = var:tmp_add }
-        if = { limit = { var:tmp_pos >= 7 } set_variable = { name = tmp_stat_contrib value = 10 } }
-        else_if = { limit = { var:tmp_pos >= 5 } set_variable = { name = tmp_stat_contrib value = 8 } }
-        else_if = { limit = { var:tmp_pos >= 3 } set_variable = { name = tmp_stat_contrib value = 5 } }
-        else = { set_variable = { name = tmp_stat_contrib value = 2 } }
-        change_variable = { name = riseandfall_rs_stats_component add = var:tmp_stat_contrib }
-    }
-    else_if = {
-        limit = { var:tmp_add < -1 }
-        set_variable = { name = tmp_neg value = var:tmp_add }
-        change_variable = { name = tmp_neg multiply = -1 }
-        if = { limit = { var:tmp_neg >= 7 } set_variable = { name = tmp_stat_contrib value = -10 } }
-        else_if = { limit = { var:tmp_neg >= 5 } set_variable = { name = tmp_stat_contrib value = -8 } }
-        else_if = { limit = { var:tmp_neg >= 3 } set_variable = { name = tmp_stat_contrib value = -5 } }
-        else = { set_variable = { name = tmp_stat_contrib value = -2 } }
-        change_variable = { name = riseandfall_rs_stats_component add = var:tmp_stat_contrib }
-    }
-    else = {
-        set_variable = { name = tmp_stat_contrib value = 0 }
-        change_variable = { name = riseandfall_rs_stats_component add = var:tmp_stat_contrib }
-    }
+    change_variable = { name = tmp_add add = -10 }
+    clamp_variable = { name = tmp_add min = -6 max = 6 }
+    change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
 
     # Stewardship
     if = { limit = { var:riseandfall_rs_use_diarch_stats = 1 }
-        # Use diarch stats (same weighting for regency and puppet_regency)
-        if = { limit = { has_diarchy_type = puppet_regency }
-            set_variable = { name = tmp_add value = scope:diarch.stewardship }
-        }
-        else = {
-            # Regular regency: use diarch stats as-is
-            set_variable = { name = tmp_add value = scope:diarch.stewardship }
-        }
+        set_variable = { name = tmp_add value = scope:diarch.stewardship }
     }
     else = { set_variable = { name = tmp_add value = stewardship } }
-    set_variable = { name = tmp_baseline value = global_var:riseandfall_avg_stewardship }
-    change_variable = { name = tmp_baseline multiply = -1 }
-    change_variable = { name = tmp_add add = var:tmp_baseline }
-    if = {
-        limit = { var:tmp_add > 1 }
-        set_variable = { name = tmp_pos value = var:tmp_add }
-        if = { limit = { var:tmp_pos >= 7 } set_variable = { name = tmp_stat_contrib value = 10 } }
-        else_if = { limit = { var:tmp_pos >= 5 } set_variable = { name = tmp_stat_contrib value = 8 } }
-        else_if = { limit = { var:tmp_pos >= 3 } set_variable = { name = tmp_stat_contrib value = 5 } }
-        else = { set_variable = { name = tmp_stat_contrib value = 2 } }
-        change_variable = { name = riseandfall_rs_stats_component add = var:tmp_stat_contrib }
-    }
-    else_if = {
-        limit = { var:tmp_add < -1 }
-        set_variable = { name = tmp_neg value = var:tmp_add }
-        change_variable = { name = tmp_neg multiply = -1 }
-        if = { limit = { var:tmp_neg >= 7 } set_variable = { name = tmp_stat_contrib value = -10 } }
-        else_if = { limit = { var:tmp_neg >= 5 } set_variable = { name = tmp_stat_contrib value = -8 } }
-        else_if = { limit = { var:tmp_neg >= 3 } set_variable = { name = tmp_stat_contrib value = -5 } }
-        else = { set_variable = { name = tmp_stat_contrib value = -2 } }
-        change_variable = { name = riseandfall_rs_stats_component add = var:tmp_stat_contrib }
-    }
-    else = {
-        set_variable = { name = tmp_stat_contrib value = 0 }
-        change_variable = { name = riseandfall_rs_stats_component add = var:tmp_stat_contrib }
-    }
+    change_variable = { name = tmp_add add = -10 }
+    clamp_variable = { name = tmp_add min = -6 max = 6 }
+    change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
 
     # Intrigue
     if = { limit = { var:riseandfall_rs_use_diarch_stats = 1 }
-        # Use diarch stats (same weighting for regency and puppet_regency)
-        if = { limit = { has_diarchy_type = puppet_regency }
-            set_variable = { name = tmp_add value = scope:diarch.intrigue }
-        }
-        else = {
-            # Regular regency: use diarch stats as-is
-            set_variable = { name = tmp_add value = scope:diarch.intrigue }
-        }
+        set_variable = { name = tmp_add value = scope:diarch.intrigue }
     }
     else = { set_variable = { name = tmp_add value = intrigue } }
-    set_variable = { name = tmp_baseline value = global_var:riseandfall_avg_intrigue }
-    change_variable = { name = tmp_baseline multiply = -1 }
-    change_variable = { name = tmp_add add = var:tmp_baseline }
-    if = {
-        limit = { var:tmp_add > 1 }
-        set_variable = { name = tmp_pos value = var:tmp_add }
-        if = { limit = { var:tmp_pos >= 7 } set_variable = { name = tmp_stat_contrib value = 10 } }
-        else_if = { limit = { var:tmp_pos >= 5 } set_variable = { name = tmp_stat_contrib value = 8 } }
-        else_if = { limit = { var:tmp_pos >= 3 } set_variable = { name = tmp_stat_contrib value = 5 } }
-        else = { set_variable = { name = tmp_stat_contrib value = 2 } }
-        change_variable = { name = riseandfall_rs_stats_component add = var:tmp_stat_contrib }
-    }
-    else_if = {
-        limit = { var:tmp_add < -1 }
-        set_variable = { name = tmp_neg value = var:tmp_add }
-        change_variable = { name = tmp_neg multiply = -1 }
-        if = { limit = { var:tmp_neg >= 7 } set_variable = { name = tmp_stat_contrib value = -10 } }
-        else_if = { limit = { var:tmp_neg >= 5 } set_variable = { name = tmp_stat_contrib value = -8 } }
-        else_if = { limit = { var:tmp_neg >= 3 } set_variable = { name = tmp_stat_contrib value = -5 } }
-        else = { set_variable = { name = tmp_stat_contrib value = -2 } }
-        change_variable = { name = riseandfall_rs_stats_component add = var:tmp_stat_contrib }
-    }
-    else = {
-        set_variable = { name = tmp_stat_contrib value = 0 }
-        change_variable = { name = riseandfall_rs_stats_component add = var:tmp_stat_contrib }
-    }
+    change_variable = { name = tmp_add add = -10 }
+    clamp_variable = { name = tmp_add min = -6 max = 6 }
+    change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
 
     # Learning
     if = { limit = { var:riseandfall_rs_use_diarch_stats = 1 }
-        # Use diarch stats (same weighting for regency and puppet_regency)
-        if = { limit = { has_diarchy_type = puppet_regency }
-            set_variable = { name = tmp_add value = scope:diarch.learning }
-        }
-        else = {
-            # Regular regency: use diarch stats as-is
-            set_variable = { name = tmp_add value = scope:diarch.learning }
-        }
+        set_variable = { name = tmp_add value = scope:diarch.learning }
     }
     else = { set_variable = { name = tmp_add value = learning } }
-    set_variable = { name = tmp_baseline value = global_var:riseandfall_avg_learning }
-    change_variable = { name = tmp_baseline multiply = -1 }
-    change_variable = { name = tmp_add add = var:tmp_baseline }
-    if = {
-        limit = { var:tmp_add > 1 }
-        set_variable = { name = tmp_pos value = var:tmp_add }
-        if = { limit = { var:tmp_pos >= 7 } set_variable = { name = tmp_stat_contrib value = 10 } }
-        else_if = { limit = { var:tmp_pos >= 5 } set_variable = { name = tmp_stat_contrib value = 8 } }
-        else_if = { limit = { var:tmp_pos >= 3 } set_variable = { name = tmp_stat_contrib value = 5 } }
-        else = { set_variable = { name = tmp_stat_contrib value = 2 } }
-        change_variable = { name = riseandfall_rs_stats_component add = var:tmp_stat_contrib }
-    }
-    else_if = {
-        limit = { var:tmp_add < -1 }
-        set_variable = { name = tmp_neg value = var:tmp_add }
-        change_variable = { name = tmp_neg multiply = -1 }
-        if = { limit = { var:tmp_neg >= 7 } set_variable = { name = tmp_stat_contrib value = -10 } }
-        else_if = { limit = { var:tmp_neg >= 5 } set_variable = { name = tmp_stat_contrib value = -8 } }
-        else_if = { limit = { var:tmp_neg >= 3 } set_variable = { name = tmp_stat_contrib value = -5 } }
-        else = { set_variable = { name = tmp_stat_contrib value = -2 } }
-        change_variable = { name = riseandfall_rs_stats_component add = var:tmp_stat_contrib }
-    }
-    else = {
-        set_variable = { name = tmp_stat_contrib value = 0 }
-        change_variable = { name = riseandfall_rs_stats_component add = var:tmp_stat_contrib }
-    }
+    change_variable = { name = tmp_add add = -10 }
+    clamp_variable = { name = tmp_add min = -6 max = 6 }
+    change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
 
     # Clamp stats component to -30..+30 (sum of five per-stat ranges centered at 0)
     clamp_variable = { name = riseandfall_rs_stats_component min = -30 max = 30 }
@@ -900,7 +741,7 @@ riseandfall_calculate_realm_stability_se = {
     if = { limit = { NOT = { has_variable = riseandfall_rs_succession_component } } set_variable = { name = riseandfall_rs_succession_component value = 0 } }
     # Start from 50 as the equilibrium midpoint; components shift toward 0 or 100
     set_variable = { name = tmp_target_score value = 50 }
-    # Stats component contributes directly in range -20..+20 (already clamped above)
+    # Stats component contributes directly in range -30..+30 (already clamped above)
     set_variable = { name = tmp_stats_scaled value = var:riseandfall_rs_stats_component }
     change_variable = { name = tmp_target_score add = var:tmp_stats_scaled }
     # NOTE: legitimacy multiplier will be applied after realm law/vassal additions to scale the
