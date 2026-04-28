@@ -113,6 +113,15 @@ palace_coup.1101.b:0 "No, I decline."
 palace_coup.1101.tooltip:0 "Proceed with the palace coup."
 palace_coup.1101.tooltip_no:0 "Decline the palace coup; another challenger will be found."
 
+palace_coup.1201.t:0 "The Realm Demands Your Banner"
+palace_coup.1201.d:0 "[scope:palace_coup_choice_ruler.GetTitledFirstName] has fled the palace, while [scope:palace_coup_choice_challenger.GetTitledFirstName] claims the old center of power. Your realm must decide whether to stand by the deposed ruler, accept the coup, or declare that both claimants have lost the right to command your loyalty."
+palace_coup.1201.a:0 "Stand with [scope:palace_coup_choice_ruler.GetFirstNameNoTooltip]"
+palace_coup.1201.a.tooltip:0 "You remain in the deposed ruler's camp. Lower-tier realms rejoin [scope:palace_coup_choice_ruler.GetHerHis] restored state; under a hegemony, empire-tier loyalists instead become allied successor states."
+palace_coup.1201.b:0 "Join [scope:palace_coup_choice_challenger.GetFirstNameNoTooltip]"
+palace_coup.1201.b.tooltip:0 "You accept the palace coup and remain inside the challenger's core successor realm."
+palace_coup.1201.c:0 "Neither deserves the throne"
+palace_coup.1201.c.tooltip:0 "You refuse both claimants and stay eligible for the wider realm fracture that follows the coup."
+
 # Challenger notification events
 palace_coup.2001.t:0 "Defeat in the Duel"
 palace_coup.2001.d:0 "The duel has ended in disaster. [scope:event_root.GetTitledFirstName] proved victorious, and your challenge has failed. Your life ends here in the palace corridors."

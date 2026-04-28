@@ -68,6 +68,62 @@ palace_coup.1101 = {
 	}
 }
 
+# Player direct-vassal choice during the fleeing-ruler branch.
+palace_coup.1201 = {
+	type = character_event
+	title = palace_coup.1201.t
+	desc = palace_coup.1201.d
+	theme = realm
+
+	immediate = {
+		if = {
+			limit = { has_variable = rf_palace_coup_choice_ruler }
+			var:rf_palace_coup_choice_ruler = { save_scope_as = palace_coup_choice_ruler }
+		}
+		if = {
+			limit = { has_variable = rf_palace_coup_choice_challenger }
+			var:rf_palace_coup_choice_challenger = { save_scope_as = palace_coup_choice_challenger }
+		}
+	}
+
+	left_portrait = {
+		character = scope:palace_coup_choice_ruler
+	}
+	right_portrait = {
+		character = scope:palace_coup_choice_challenger
+	}
+
+	option = {
+		name = palace_coup.1201.a
+		custom_tooltip = palace_coup.1201.a.tooltip
+		hidden_effect = {
+			riseandfall_palace_coup_mark_loyalist_se = yes
+			scope:palace_coup_choice_ruler = { riseandfall_palace_coup_continue_player_choices = yes }
+		}
+		ai_chance = { base = 0 }
+	}
+
+	option = {
+		name = palace_coup.1201.b
+		custom_tooltip = palace_coup.1201.b.tooltip
+		hidden_effect = {
+			riseandfall_palace_coup_mark_coup_se = yes
+			scope:palace_coup_choice_ruler = { riseandfall_palace_coup_continue_player_choices = yes }
+		}
+		ai_chance = { base = 0 }
+	}
+
+	option = {
+		name = palace_coup.1201.c
+		custom_tooltip = palace_coup.1201.c.tooltip
+		hidden_effect = {
+			riseandfall_palace_coup_mark_reject_se = yes
+			scope:palace_coup_choice_ruler = { riseandfall_palace_coup_continue_player_choices = yes }
+		}
+		ai_chance = { base = 0 }
+	}
+}
+
 # Main confrontation event: Ruler chooses whether to submit or slip away and raise a revolt
 palace_coup.1002 = {
 	type = character_event
