@@ -261,7 +261,7 @@ riseandfall_enable_dynamic_story_mode = {
     }
 
     # Default: disabled
-    default = riseandfall_dynamic_story_mode_enabled
+    default = riseandfall_dynamic_story_mode_disabled
 
     riseandfall_dynamic_story_mode_enabled = {
     }
