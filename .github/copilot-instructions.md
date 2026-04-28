@@ -120,6 +120,7 @@ Session learnings (concise)
   - Consult `docs/effects.log`, `docs/triggers.log`, and `docs/event_scopes.log` for the supported targets and tokens.
   - Use `set_variable` / `save_scope_as` only when the saved object type is compatible with future usage.
   - Add defensive guards: `has_variable`, `has_dynasty`, `exists = capital_barony` (or appropriate token) before using a saved link.
+  - Fix tooltips evaluating unset variables: CK3 tooltip validation evaluates `limit` triggers inside scripted effects but skips the effects themselves (like `set_variable`). This means any trigger comparing `var:X > var:Y` (e.g. `var:rf_score >= 0`) can throw 'unset scope' and 'wrong type' errors inside the game UI if not guarded. ALWAYS wrap variable value comparisons inside `if = { limit = { ... } }` or triggers with `has_variable = X`. For logic choices, prefer using `random_list = { 1 = { modifier = { add = var:X } ... } }` which evaluates safely in effect-context space rather than trigger limits.
 
 Keep this section short — add repo-specific follow-ups below it as needed.
 
