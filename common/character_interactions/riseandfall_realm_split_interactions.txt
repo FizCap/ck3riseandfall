@@ -1,4 +1,4 @@
-riseandfall_switch_sides_interaction = {
+﻿riseandfall_switch_sides_interaction = {
 	category = interaction_riseandfall
 	common_interaction = yes
 	ai_min_reply_days = 4
