@@ -452,9 +452,7 @@ riseandfall_calculate_realm_stability_se = {
 
     if = {
         limit = {
-            has_game_rule = riseandfall_dynamic_story_mode_enabled
             is_independent_ruler = yes
-            highest_held_title_tier >= tier_duchy
         }
 
         # Realm size now directly shifts stability instead of only increasing collapse pressure.
@@ -556,7 +554,7 @@ riseandfall_calculate_realm_stability_se = {
     # including small county-tier independent rulers who were previously excluded.
     if = {
         limit = {
-            has_game_rule = riseandfall_dynamic_story_mode_enabled
+        
             is_independent_ruler = yes
         }
         set_variable = { name = tmp_story_realm_counties value = 0 }
@@ -705,7 +703,6 @@ riseandfall_calculate_realm_stability_se = {
 
     if = {
         limit = {
-            has_game_rule = riseandfall_dynamic_story_mode_enabled
             has_variable = riseandfall_rs_succession_shock
         }
         set_variable = { name = riseandfall_rs_succession_component value = var:riseandfall_rs_succession_shock }
@@ -1272,7 +1269,6 @@ round_variable = { name = tmp_target_score nearest = 1 }    # Persist the (possi
 riseandfall_mark_story_succession_shock_se = {
     if = {
         limit = {
-            has_game_rule = riseandfall_dynamic_story_mode_enabled
             exists = scope:predecessor
         }
         # Predecessor may be alive in a stepdown/overthrow succession.
