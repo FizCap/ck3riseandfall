@@ -5,7 +5,6 @@
 riseandfall_puppet_master.100 = {
 	type = character_event
 	hidden = yes
-	is_triggered_only = yes
 
 	immediate = {
 		# root = employee (the fired diarch); only resync if the court still exists.

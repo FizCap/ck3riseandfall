@@ -24,12 +24,17 @@ authority_collapse.1001 = {
         custom_tooltip = authority_collapse.1001.tooltip
         ai_chance = {
             base = 60
-            # More willing to fight when militarily strong
+            # More willing to fight when militarily strong relative to realm size
+            # Calculated as (Military / Realm Size) / 15. E.g., 600 troops per county = +40 willingness.
             modifier = {
-                add = 30
-                trigger_if = {
-                    limit = { is_ai = yes }
-                    military_strength > 10000
+                add = {
+                    value = max_military_strength
+                    divide = {
+                        value = realm_size
+                        min = 1
+                    }
+                    divide = 15
+                    max = 60
                 }
             }
             # Ambitious rulers prefer to hold on to territory
@@ -159,11 +164,17 @@ authority_collapse.1001 = {
             }
             # Militarily weak relative to large realm — capitulate
             modifier = {
-                add = 15
-                trigger_if = {
-                    limit = { is_ai = yes }
-                    military_strength < 3000
-                    realm_size >= 30
+                add = {
+                    value = 40
+                    subtract = {
+                        value = max_military_strength
+                        divide = {
+                            value = realm_size
+                            min = 1
+                        }
+                        divide = 15
+                    }
+                    min = 0
                 }
             }
             # Ambitious rulers don't like giving up land
@@ -181,19 +192,11 @@ authority_collapse.1001 = {
                 add = 20
                 has_trait = craven
             }
-            # If current military strength is a low fraction of capacity, strongly favour release.
-            # Compute: add = max(0, 40 - (current/max * 100)). At 20% this yields +20.
+            # If current military strength is low, strongly favor release.
             modifier = {
-                add = {
-                    value = 40
-                    subtract = {
-                        value = root.current_military_strength
-                        divide = { value = root.max_military_strength min = 1 }
-                        multiply = 100
-                    }
-                    min = 0
-                }
-                limit = { is_ai = yes }
+                add = 30
+                is_ai = yes
+                current_military_strength < 1000
             }
             # Cultural/religious sympathy checks removed — avoid evaluating culture/faith scopes here.
         }
