@@ -154,18 +154,13 @@ riseandfall_steal_gold_effect = {
 		remove_variable = rf_transfer_gold
 	}
 
-	# Using this interaction reduces the puppet stability bonus (-10) and deals an
-	# immediate -10 hit to current stability to represent destabilising exploitation.
+	# Using this interaction spends 10 points of puppet stability mana.
 	scope:recipient = {
 		if = {
 			limit = { has_variable = riseandfall_rs_puppet_stability_bonus }
 			change_variable = { name = riseandfall_rs_puppet_stability_bonus add = -10 }
-			clamp_variable = { name = riseandfall_rs_puppet_stability_bonus min = 0 max = 50 }
-		}
-		if = {
-			limit = { has_variable = riseandfall_realm_stability_score }
-			change_variable = { name = riseandfall_realm_stability_score add = -10 }
-			clamp_variable = { name = riseandfall_realm_stability_score min = 0 max = 100 }
+			clamp_variable = { name = riseandfall_rs_puppet_stability_bonus min = -100 max = 100 }
+			round_variable = { name = riseandfall_rs_puppet_stability_bonus nearest = 1 }
 		}
 	}
 }
@@ -202,18 +197,13 @@ riseandfall_curry_favor_effect = {
 		}
 	}
 
-	# Using this interaction reduces the puppet stability bonus (-10) and deals an
-	# immediate -10 hit to current stability to represent destabilising exploitation.
+	# Using this interaction spends 10 points of puppet stability mana.
 	scope:recipient = {
 		if = {
 			limit = { has_variable = riseandfall_rs_puppet_stability_bonus }
 			change_variable = { name = riseandfall_rs_puppet_stability_bonus add = -10 }
-			clamp_variable = { name = riseandfall_rs_puppet_stability_bonus min = 0 max = 50 }
-		}
-		if = {
-			limit = { has_variable = riseandfall_realm_stability_score }
-			change_variable = { name = riseandfall_realm_stability_score add = -10 }
-			clamp_variable = { name = riseandfall_realm_stability_score min = 0 max = 100 }
+			clamp_variable = { name = riseandfall_rs_puppet_stability_bonus min = -100 max = 100 }
+			round_variable = { name = riseandfall_rs_puppet_stability_bonus nearest = 1 }
 		}
 	}
 }
@@ -289,6 +279,14 @@ riseandfall_curry_favor_effect = {
 # Force liege to abdicate by transferring their titles to a chosen successor (youngest unlanded child; fallback to dynasty in court)
 riseandfall_force_abdicate_effect = {
 	scope:recipient = {
+		# Using this interaction also spends 10 points of puppet stability mana.
+		if = {
+			limit = { has_variable = riseandfall_rs_puppet_stability_bonus }
+			change_variable = { name = riseandfall_rs_puppet_stability_bonus add = -10 }
+			clamp_variable = { name = riseandfall_rs_puppet_stability_bonus min = -100 max = 100 }
+			round_variable = { name = riseandfall_rs_puppet_stability_bonus nearest = 1 }
+		}
+
 		# initialize a big age to find the youngest
 		set_variable = { name = rf_candidate_best_age value = 999 }
 		# Choose candidate depending on realm succession law: prefer males/females per law settings
