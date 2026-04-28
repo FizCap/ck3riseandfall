@@ -56,29 +56,14 @@ riseandfall_diadochi_wars_se = {
 			# Prioritize neighboring successor states first for more realistic conquest patterns.
 			if = {
 				limit = { var:rf_diadochi_is_successor = 1 }
-				random_list = {
-					35 = {
-						riseandfall_diadochi_try_neighbor_peer_target_se = yes
-						if = {
-							limit = { NOT = { exists = scope:rf_diadochi_target_ruler } }
-							riseandfall_diadochi_try_peer_target_se = yes
-						}
-						if = {
-							limit = { NOT = { exists = scope:rf_diadochi_target_ruler } }
-							riseandfall_diadochi_try_origin_target_se = yes
-						}
-					}
-					65 = {
-						riseandfall_diadochi_try_origin_target_se = yes
-						if = {
-							limit = { NOT = { exists = scope:rf_diadochi_target_ruler } }
-							riseandfall_diadochi_try_neighbor_peer_target_se = yes
-						}
-						if = {
-							limit = { NOT = { exists = scope:rf_diadochi_target_ruler } }
-							riseandfall_diadochi_try_peer_target_se = yes
-						}
-					}
+				riseandfall_diadochi_try_neighbor_peer_target_se = yes
+				if = {
+					limit = { NOT = { exists = scope:rf_diadochi_target_ruler } }
+					riseandfall_diadochi_try_peer_target_se = yes
+				}
+				if = {
+					limit = { NOT = { exists = scope:rf_diadochi_target_ruler } }
+					riseandfall_diadochi_try_origin_target_se = yes
 				}
 			}
 			else = {
@@ -93,8 +78,10 @@ riseandfall_diadochi_wars_se = {
 				limit = {
 					exists = scope:rf_diadochi_target_ruler
 					exists = scope:rf_diadochi_target_title
+					is_at_war = no
 					NOT = { is_at_war_with = scope:rf_diadochi_target_ruler }
 					can_attack_in_hierarchy = scope:rf_diadochi_target_ruler
+					war_chest_gold >= war_chest_gold_maximum
 					trigger_if = {
 						limit = {
 							NOT = {
@@ -173,17 +160,29 @@ riseandfall_diadochi_wars_se = {
 						target_titles = { scope:rf_diadochi_target_title }
 					}
 				}
-				# The pulse increases split-realm war frequency, while the legal gate
-				# mirrors the declare war interaction for independent rulers.
-				start_war = {
-					casus_belli = riseandfall_diadochi_cb
-					target = scope:rf_diadochi_target_ruler
-					target_title = scope:rf_diadochi_target_title
-				}
-				# Shared cooldown on the origin title prevents several same-origin realms
-				# from chaining multiple declarations from the same pulse window.
-				scope:rf_diadochi_origin_title = {
-					set_variable = { name = rf_diadochi_war_cooldown value = 1 years = 2 }
+				# Let the engine score the prepared Diadochi war instead of forcing it
+				# outright, so distance and CB AI gates can reject irrational targets.
+				ai_start_best_war = {
+					cb = { riseandfall_diadochi_cb }
+					recalculate_cb_targets = yes
+					is_valid = {
+						scope:target_character = scope:rf_diadochi_target_ruler
+						scope:target_title = scope:rf_diadochi_target_title
+						scope:rf_diadochi_target_ruler = {
+							current_military_strength < root.current_military_strength
+							OR = {
+								gold < root.gold
+								current_military_strength <= root.fifty_percent_of_current_military_strength
+							}
+						}
+					}
+					on_success = {
+						# Shared cooldown on the origin title prevents several same-origin realms
+						# from chaining multiple declarations from the same pulse window.
+						scope:rf_diadochi_origin_title = {
+							set_variable = { name = rf_diadochi_war_cooldown value = 1 years = 2 }
+						}
+					}
 				}
 			}
 		}

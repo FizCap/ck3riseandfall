@@ -62,7 +62,6 @@ on_title_lost = {
 
 riseandfall_force_diadochi_wars = {
     trigger = {
-        has_game_rule = riseandfall_dynamic_story_mode_enabled
         is_ai = yes
     }
     effect = {

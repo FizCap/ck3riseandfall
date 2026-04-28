@@ -287,7 +287,7 @@
     landless_attacker_needs_armies = no
     allow_hostages = yes
 
-    max_ai_diplo_distance_to_title = 1200
+    max_ai_diplo_distance_to_title = 300
 
     ai_score_mult = {
         value = 1
