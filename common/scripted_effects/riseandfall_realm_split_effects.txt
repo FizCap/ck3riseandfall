@@ -1180,3 +1180,115 @@ riseandfall_execute_realm_split_se = {
     remove_character_flag = rf_breakaway_ruler
     remove_character_flag = rf_forced_breakaway_seed
 }
+
+riseandfall_realm_split_defect_to_recipient_se = {
+    scope:actor.liege = { save_temporary_scope_as = rf_former_split_liege }
+
+    scope:actor = {
+        set_variable = { name = rf_split_defection_cooldown value = yes years = 10 }
+    }
+    scope:rf_former_split_liege = {
+        set_variable = { name = rf_split_defection_realm_cooldown value = yes years = 2 }
+    }
+    scope:recipient = {
+        set_variable = { name = rf_split_defection_realm_cooldown value = yes years = 2 }
+    }
+
+    scope:rf_former_split_liege = {
+        add_opinion = {
+            target = scope:actor
+            modifier = riseandfall_split_defection_opinion
+        }
+    }
+    scope:actor = {
+        add_opinion = {
+            target = scope:rf_former_split_liege
+            modifier = riseandfall_split_defection_opinion
+        }
+    }
+
+    create_title_and_vassal_change = {
+        type = granted
+        save_scope_as = rf_split_defection_change
+        add_claim_on_loss = no
+    }
+    scope:actor = {
+        change_liege = {
+            liege = scope:recipient
+            change = scope:rf_split_defection_change
+        }
+    }
+    resolve_title_and_vassal_change = scope:rf_split_defection_change
+
+    if = {
+        limit = { scope:rf_former_split_liege = { is_ai = no } }
+        scope:rf_former_split_liege = {
+            set_variable = { name = rf_split_defection_defector value = scope:actor }
+            set_variable = { name = rf_split_defection_new_liege value = scope:recipient }
+            trigger_event = { id = realm_split.2001 }
+        }
+    }
+}
+
+riseandfall_realm_split_surrender_to_recipient_se = {
+    scope:actor.primary_title = { save_temporary_scope_as = rf_submitted_split_title }
+
+    scope:actor = {
+        if = {
+            limit = { is_tributary = yes }
+            end_tributary = yes
+        }
+    }
+
+    create_title_and_vassal_change = {
+        type = granted
+        save_scope_as = rf_split_submission_title_change
+        add_claim_on_loss = no
+    }
+    scope:rf_submitted_split_title = {
+        change_title_holder = {
+            holder = scope:recipient
+            change = scope:rf_split_submission_title_change
+            take_baronies = no
+        }
+    }
+    resolve_title_and_vassal_change = scope:rf_split_submission_title_change
+
+    scope:actor = {
+        remove_character_flag = rf_successor_state_ruler
+        remove_variable = rf_successor_origin_title
+        remove_variable = rf_successor_root_origin_title
+    }
+    scope:rf_submitted_split_title = {
+        remove_variable = rf_is_successor_split_title
+        remove_variable = rf_successor_origin_title
+        remove_variable = rf_successor_root_origin_title
+        remove_variable = rf_is_permanent_successor_split
+        remove_variable = rf_successor_permanent_realm_size
+    }
+
+    if = {
+        limit = {
+            scope:rf_submitted_split_title = {
+                is_titular = yes
+                holder = scope:recipient
+            }
+        }
+        scope:recipient = {
+            destroy_title = scope:rf_submitted_split_title
+        }
+    }
+
+    create_title_and_vassal_change = {
+        type = granted
+        save_scope_as = rf_split_submission_change
+        add_claim_on_loss = no
+    }
+    scope:actor = {
+        change_liege = {
+            liege = scope:recipient
+            change = scope:rf_split_submission_change
+        }
+    }
+    resolve_title_and_vassal_change = scope:rf_split_submission_change
+}

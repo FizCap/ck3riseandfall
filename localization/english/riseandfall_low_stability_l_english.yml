@@ -176,6 +176,21 @@ riseandfall_former_liege_opinion_desc:0 "This ruler was once our liege before th
 riseandfall_negotiated_peace_opinion:0 "Negotiated Settlement"
 riseandfall_negotiated_peace_opinion_desc:0 "Our liege made concessions to keep the realm together."
 
+riseandfall_split_defection_opinion:0 "Changed Sides"
+riseandfall_split_defection_opinion_desc:0 "This ruler abandoned the former balance of power and crossed into a rival camp during the successor struggle."
+
+realm_split.2001.t:0 "A Vassal Changes Sides"
+realm_split.2001.d:0 "[scope:split_defector.GetTitledFirstName] has abandoned your cause and sworn fealty to [scope:split_new_liege.GetTitledFirstName]. The fracturing of the realm has become still more bitter, as even your own camp is no longer secure."
+realm_split.2001.a:0 "Treachery."
+
+riseandfall_switch_sides_interaction:0 "Defect/Switch Sides"
+riseandfall_switch_sides_interaction_desc:0 "Offer to abandon your current camp and join [recipient.GetShortUINamePossessiveNoTooltip] side in the successor struggle."
+riseandfall_switch_sides_interaction_notification:0 "[actor.GetShortUIName] seeks to defect from [actor.GetLiege.GetShortUIName] and join your side in the successor struggle."
+
+riseandfall_surrender_to_successor_interaction:0 "Surrender Realm"
+riseandfall_surrender_to_successor_interaction_desc:0 "Offer to give up your successor crown and submit to [recipient.GetShortUINameNoTooltip] as a vassal."
+riseandfall_surrender_to_successor_interaction_notification:0 "[actor.GetShortUIName] offers to yield [actor.GetHerHis] successor crown and submit to you."
+
  # Authority Collapse localization
 authority_collapse.1001.t:0 "A Tide of Nationalist Unrest"
  authority_collapse.1001.d:0 "The diverse peoples of your realm grow restless. Whispers of foreign rule and religious oppression spread through the provinces — those who feel unrepresented are rising in defiance. The counties that do not share your culture or faith are seething with resentment, and their anger threatens to spill into open revolt."

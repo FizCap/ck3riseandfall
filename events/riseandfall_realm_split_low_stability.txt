@@ -169,3 +169,36 @@ realm_split.1002 = {
         custom_tooltip = realm_split.1002.a.tt
     }
 }
+
+realm_split.2001 = {
+    type = character_event
+    title = realm_split.2001.t
+    desc = realm_split.2001.d
+    theme = realm
+
+    immediate = {
+        if = {
+            limit = { has_variable = rf_split_defection_defector }
+            var:rf_split_defection_defector = { save_scope_as = split_defector }
+        }
+        if = {
+            limit = { has_variable = rf_split_defection_new_liege }
+            var:rf_split_defection_new_liege = { save_scope_as = split_new_liege }
+        }
+        remove_variable = rf_split_defection_defector
+        remove_variable = rf_split_defection_new_liege
+    }
+
+    left_portrait = {
+        character = scope:split_defector
+        animation = personality_bold
+    }
+    right_portrait = {
+        character = scope:split_new_liege
+        animation = personality_bold
+    }
+
+    option = {
+        name = realm_split.2001.a
+    }
+}

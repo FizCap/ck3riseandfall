@@ -652,24 +652,57 @@ riseandfall_palace_coup_score_vassal_alignment_se = {
 }
 
 riseandfall_palace_coup_apply_ai_vassal_alignment_se = {
+    # Seed scores to 0 so the scorer's change_variable calls have a valid base.
+    set_variable = { name = rf_palace_coup_loyalist_score value = 0 }
+    set_variable = { name = rf_palace_coup_coup_score value = 0 }
+    set_variable = { name = rf_palace_coup_reject_score value = 0 }
     riseandfall_palace_coup_score_vassal_alignment_se = yes
+
+    # Compute margins to avoid direct rhs `var:` links in triggers during tooltip build.
+    set_variable = { name = rf_palace_coup_loyalist_margin value = var:rf_palace_coup_loyalist_score }
+    
+    set_variable = { name = rf_palace_coup_tmp value = var:rf_palace_coup_coup_score }
+    change_variable = { name = rf_palace_coup_tmp multiply = -1 }
+    change_variable = { name = rf_palace_coup_loyalist_margin add = var:rf_palace_coup_tmp }
+    
+    set_variable = { name = rf_palace_coup_coup_margin value = var:rf_palace_coup_coup_score }
+    set_variable = { name = rf_palace_coup_tmp value = var:rf_palace_coup_reject_score }
+    change_variable = { name = rf_palace_coup_tmp multiply = -1 }
+    change_variable = { name = rf_palace_coup_coup_margin add = var:rf_palace_coup_tmp }
+    
+    remove_variable = rf_palace_coup_tmp
+
     if = {
-        limit = {
-            var:rf_palace_coup_loyalist_score >= var:rf_palace_coup_coup_score
-            var:rf_palace_coup_loyalist_score >= var:rf_palace_coup_reject_score
+        # Check if loyalist is >= coup
+        limit = { has_variable = rf_palace_coup_loyalist_margin var:rf_palace_coup_loyalist_margin >= 0 }
+        
+        # Check if loyalist is >= reject
+        set_variable = { name = rf_palace_coup_loyalist_reject_margin value = var:rf_palace_coup_loyalist_score }
+        set_variable = { name = rf_palace_coup_tmp value = var:rf_palace_coup_reject_score }
+        change_variable = { name = rf_palace_coup_tmp multiply = -1 }
+        change_variable = { name = rf_palace_coup_loyalist_reject_margin add = var:rf_palace_coup_tmp }
+        remove_variable = rf_palace_coup_tmp
+        
+        if = {
+            limit = { has_variable = rf_palace_coup_loyalist_reject_margin var:rf_palace_coup_loyalist_reject_margin >= 0 }
+            riseandfall_palace_coup_mark_loyalist_se = yes
         }
-        riseandfall_palace_coup_mark_loyalist_se = yes
+        else = {
+            riseandfall_palace_coup_mark_reject_se = yes
+        }
+        remove_variable = rf_palace_coup_loyalist_reject_margin
     }
     else_if = {
-        limit = {
-            var:rf_palace_coup_coup_score > var:rf_palace_coup_loyalist_score
-            var:rf_palace_coup_coup_score >= var:rf_palace_coup_reject_score
-        }
+        # coup > loyalist (already implied by else) and coup >= reject
+        limit = { has_variable = rf_palace_coup_coup_margin var:rf_palace_coup_coup_margin >= 0 }
         riseandfall_palace_coup_mark_coup_se = yes
     }
     else = {
         riseandfall_palace_coup_mark_reject_se = yes
     }
+    
+    remove_variable = rf_palace_coup_loyalist_margin
+    remove_variable = rf_palace_coup_coup_margin
 }
 
 riseandfall_palace_coup_continue_player_choices = {

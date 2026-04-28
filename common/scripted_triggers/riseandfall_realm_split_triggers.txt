@@ -157,3 +157,104 @@ riseandfall_is_diadochi_target_trigger = {
         }
     }
 }
+
+riseandfall_is_same_successor_conflict_interaction_trigger = {
+    scope:actor = {
+        is_landed = yes
+        exists = primary_title
+    }
+    scope:recipient = {
+        is_landed = yes
+        exists = primary_title
+    }
+    OR = {
+        AND = {
+            scope:actor = { riseandfall_has_successor_primary_title_trigger = yes }
+            scope:recipient = { riseandfall_has_successor_primary_title_trigger = yes }
+            scope:actor.primary_title.var:rf_successor_root_origin_title = scope:recipient.primary_title.var:rf_successor_root_origin_title
+        }
+        AND = {
+            scope:actor = { riseandfall_has_successor_primary_title_trigger = yes }
+            scope:recipient = {
+                has_title = scope:actor.primary_title.var:rf_successor_root_origin_title
+            }
+        }
+        AND = {
+            scope:recipient = { riseandfall_has_successor_primary_title_trigger = yes }
+            scope:actor = {
+                has_title = scope:recipient.primary_title.var:rf_successor_root_origin_title
+            }
+        }
+    }
+}
+
+riseandfall_can_switch_successor_sides_trigger = {
+    scope:actor = {
+        is_landed = yes
+        is_ruler = yes
+        is_independent_ruler = no
+        exists = liege
+        liege = top_liege
+        primary_title.tier >= tier_county
+        NOT = { government_has_flag = government_is_landless_adventurer }
+    }
+    scope:recipient = {
+        is_landed = yes
+        is_independent_ruler = yes
+        exists = primary_title
+        primary_title.tier > scope:actor.primary_title.tier
+        NOT = { this = scope:actor }
+        NOT = { is_at_war_with = scope:actor }
+        NOT = { government_has_flag = government_is_landless_adventurer }
+    }
+    scope:actor.liege != scope:recipient
+    OR = {
+        AND = {
+            scope:actor.liege = { riseandfall_has_successor_primary_title_trigger = yes }
+            scope:recipient = { riseandfall_has_successor_primary_title_trigger = yes }
+            scope:actor.liege.primary_title.var:rf_successor_root_origin_title = scope:recipient.primary_title.var:rf_successor_root_origin_title
+        }
+        AND = {
+            scope:actor.liege = { riseandfall_has_successor_primary_title_trigger = yes }
+            scope:recipient = {
+                has_title = scope:actor.liege.primary_title.var:rf_successor_root_origin_title
+            }
+        }
+        AND = {
+            scope:recipient = { riseandfall_has_successor_primary_title_trigger = yes }
+            scope:actor.liege = {
+                has_title = scope:recipient.primary_title.var:rf_successor_root_origin_title
+            }
+        }
+    }
+}
+
+riseandfall_can_surrender_successor_realm_trigger = {
+    scope:actor = {
+        is_landed = yes
+        is_independent_ruler = yes
+        riseandfall_has_successor_primary_title_trigger = yes
+        NOT = { this = scope:recipient }
+        NOT = { is_at_war_with = scope:recipient }
+        NOT = { government_has_flag = government_is_landless_adventurer }
+        any_held_title = {
+            tier >= tier_county
+            tier < scope:recipient.primary_title.tier
+            NOT = { this = scope:actor.primary_title }
+        }
+        NOT = {
+            any_held_title = {
+                tier >= scope:recipient.primary_title.tier
+                NOT = { this = scope:actor.primary_title }
+            }
+        }
+    }
+    scope:recipient = {
+        is_landed = yes
+        is_independent_ruler = yes
+        exists = primary_title
+        primary_title.tier >= scope:actor.primary_title.tier
+        NOT = { government_has_flag = government_is_landless_adventurer }
+    }
+    riseandfall_is_same_successor_conflict_interaction_trigger = yes
+}

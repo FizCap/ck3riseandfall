@@ -1,0 +1,189 @@
+riseandfall_switch_sides_interaction = {
+	category = interaction_riseandfall
+	common_interaction = yes
+	ai_min_reply_days = 4
+	ai_max_reply_days = 9
+	interface_priority = 72
+	icon = icon_riseandfall
+	popup_on_receive = yes
+	greeting = negative
+
+	send_name = riseandfall_switch_sides_interaction
+	desc = riseandfall_switch_sides_interaction_desc
+	notification_text = riseandfall_switch_sides_interaction_notification
+
+	is_shown = {
+		riseandfall_can_switch_successor_sides_trigger = yes
+	}
+
+	is_valid_showing_failures_only = {
+		riseandfall_can_switch_successor_sides_trigger = yes
+	}
+
+	auto_accept = no
+
+	on_accept = {
+		riseandfall_realm_split_defect_to_recipient_se = yes
+	}
+
+	cooldown = { years = 3 }
+	cooldown_against_recipient = { years = 5 }
+	ai_frequency = 18
+	ai_potential = {
+		exists = this
+		is_alive = yes
+		NOT = { has_variable = rf_split_defection_cooldown }
+		NOT = { liege = { has_variable = rf_split_defection_realm_cooldown } }
+	}
+
+	ai_targets = {
+		ai_recipients = neighboring_top_overlords_including_tributary_borders
+		max = 8
+	}
+
+	ai_accept = {
+		base = 40
+
+		modifier = {
+			scope:actor.liege = { riseandfall_has_successor_primary_title_trigger = yes }
+			scope:recipient = {
+				has_title = scope:actor.liege.primary_title.var:rf_successor_root_origin_title
+			}
+			add = 1000
+		}
+		modifier = { scope:actor = { has_same_culture_as = scope:recipient } add = 15 }
+		modifier = { scope:actor.faith = { this = scope:recipient.faith } add = 20 }
+		modifier = { scope:recipient = { is_allied_to = scope:actor } add = 20 }
+		modifier = { scope:recipient = { is_at_war_with = scope:actor.liege } add = 35 }
+		modifier = {
+			scope:actor.liege = {
+				has_variable = riseandfall_realm_stability_score
+				NOT = { var:riseandfall_realm_stability_score >= 40 }
+			}
+			add = 20
+		}
+		modifier = { scope:actor = { current_military_strength > scope:actor.liege.current_military_strength } add = 15 }
+		modifier = { scope:recipient = { has_relation_rival = scope:actor } add = -100 }
+		modifier = { scope:recipient = { has_relation_nemesis = scope:actor } add = -200 }
+	}
+
+	ai_will_do = {
+		base = -90
+
+		modifier = {
+			scope:recipient = { has_variable = rf_split_defection_realm_cooldown }
+			add = -1000
+		}
+
+		modifier = { scope:actor = { opinion = { target = scope:actor.liege value < 0 } } add = 40 }
+		modifier = { scope:actor = { opinion = { target = scope:actor.liege value <= -50 } } add = 35 }
+		modifier = { scope:actor.liege = { opinion = { target = scope:actor value < 0 } } add = 20 }
+		modifier = { scope:actor.liege = { opinion = { target = scope:actor value <= -50 } } add = 20 }
+		modifier = {
+			scope:actor.liege = {
+				has_variable = riseandfall_realm_stability_score
+				NOT = { var:riseandfall_realm_stability_score >= 40 }
+			}
+			add = 25
+		}
+		modifier = {
+			scope:actor.liege = {
+				has_variable = riseandfall_realm_stability_score
+				NOT = { var:riseandfall_realm_stability_score >= 20 }
+			}
+			add = 25
+		}
+		modifier = {
+			scope:recipient = {
+				has_variable = riseandfall_realm_stability_score
+				var:riseandfall_realm_stability_score >= 55
+			}
+			add = 20
+		}
+		modifier = { scope:recipient = { current_military_strength > scope:actor.liege.current_military_strength } add = 25 }
+		modifier = { scope:actor = { has_same_culture_as = scope:recipient } add = 15 }
+		modifier = { scope:actor.faith = { this = scope:recipient.faith } add = 15 }
+		modifier = { scope:recipient = { opinion = { target = scope:actor value < 0 } } add = -25 }
+		modifier = { scope:actor = { has_trait = ambitious } add = 20 }
+		modifier = { scope:actor = { has_trait = deceitful } add = 15 }
+		modifier = { scope:actor = { has_trait = arbitrary } add = 10 }
+		modifier = { scope:actor = { has_trait = content } add = -30 }
+		modifier = { scope:actor = { has_trait = honest } add = -20 }
+		modifier = { scope:actor = { has_trait = just } add = -15 }
+	}
+}
+
+riseandfall_surrender_to_successor_interaction = {
+	category = interaction_riseandfall
+	common_interaction = yes
+	ai_min_reply_days = 4
+	ai_max_reply_days = 9
+	interface_priority = 71
+	icon = icon_riseandfall
+	popup_on_receive = yes
+	greeting = positive
+
+	send_name = riseandfall_surrender_to_successor_interaction
+	desc = riseandfall_surrender_to_successor_interaction_desc
+	notification_text = riseandfall_surrender_to_successor_interaction_notification
+
+	is_shown = {
+		riseandfall_can_surrender_successor_realm_trigger = yes
+	}
+
+	is_valid_showing_failures_only = {
+		riseandfall_can_surrender_successor_realm_trigger = yes
+	}
+
+	auto_accept = no
+
+	on_accept = {
+		riseandfall_realm_split_surrender_to_recipient_se = yes
+	}
+
+	cooldown = { years = 5 }
+	cooldown_against_recipient = { years = 5 }
+	ai_frequency = 24
+	ai_potential = { exists = this is_alive = yes }
+
+	ai_targets = {
+		ai_recipients = neighboring_rulers_including_tributary_borders
+		max = 10
+	}
+
+	ai_accept = {
+		base = 1000
+	}
+
+	ai_will_do = {
+		base = -80
+
+		modifier = {
+			scope:actor = {
+				has_variable = riseandfall_realm_stability_score
+				NOT = { var:riseandfall_realm_stability_score >= 35 }
+			}
+			add = 25
+		}
+		modifier = {
+			scope:actor = {
+				has_variable = riseandfall_realm_stability_score
+				NOT = { var:riseandfall_realm_stability_score >= 20 }
+			}
+			add = 35
+		}
+		modifier = { scope:recipient = { current_military_strength > scope:actor.current_military_strength } add = 40 }
+		modifier = { scope:actor = { current_military_strength > scope:recipient.current_military_strength } add = -35 }
+		modifier = { scope:actor = { is_at_war = yes } add = 20 }
+		modifier = { scope:actor = { is_in_debt = yes } add = 20 }
+		modifier = { scope:actor = { opinion = { target = scope:recipient value >= 25 } } add = 20 }
+		modifier = { scope:actor = { opinion = { target = scope:recipient value <= -25 } } add = -30 }
+		modifier = { scope:actor = { has_same_culture_as = scope:recipient } add = 15 }
+		modifier = { scope:actor.faith = { this = scope:recipient.faith } add = 15 }
+		modifier = { scope:actor = { has_trait = craven } add = 20 }
+		modifier = { scope:actor = { has_trait = content } add = 15 }
+		modifier = { scope:actor = { has_trait = humble } add = 10 }
+		modifier = { scope:actor = { has_trait = brave } add = -20 }
+		modifier = { scope:actor = { has_trait = ambitious } add = -25 }
+	}
+}
