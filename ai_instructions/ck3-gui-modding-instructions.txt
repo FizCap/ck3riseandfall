@@ -1,0 +1,271 @@
+# CK3 GUI Modding Instructions for Rise and Fall
+
+Purpose
+- Help AI agents make correct, maintainable CK3 GUI changes for this mod.
+- Prioritize verified syntax from local `docs/data_types*.txt` and proven vanilla patterns.
+- Reduce common GUI failure loops: wrong scope, wrong datacontext, empty datamodel, stale override, missing loc.
+
+What Was Corrected In This Rewrite
+- Added missing supported calls from `data_types`:
+  - `ScriptedGui.ExecuteTooltip(...)`
+  - `ScriptedGui.IsShownTooltip(...)`
+  - `ScriptedGui.IsValidTooltip(...)`
+  - `TopScope.AddList(...)`
+  - `IsValidCommand(...)`
+  - `CreateCommandPopup(...)`
+- Clarified that `docs/data_types_internalclausewitzgui.txt` is mostly editor/tooling context, not runtime gameplay GUI API guidance.
+- Removed weak assumptions and kept only claims verified in:
+  - `docs/data_types*.txt`
+  - vanilla GUI files under `game/gui`
+  - vanilla scripted GUI files under `game/common/scripted_guis`
+  - this mod's own GUI/scripted_gui files.
+
+Primary References (Priority Order)
+1. Local syntax/type logs:
+   - `docs/data_types_gui.txt`
+   - `docs/data_types_script.txt`
+   - `docs/data_types_common.txt`
+   - `docs/data_types_uncategorized.txt`
+   - `docs/data_types_internalclausewitzgui.txt`
+2. Vanilla implementation examples:
+   - `C:\Program Files (x86)\Steam\steamapps\common\Crusader Kings III\game\gui`
+   - `C:\Program Files (x86)\Steam\steamapps\common\Crusader Kings III\game\common\scripted_guis`
+3. Mod implementation examples:
+   - `gui/window_title.gui`
+   - `gui/window_character.gui`
+   - `gui/map_icon_layer.gui`
+   - `gui/shared/*.gui`
+   - `common/scripted_guis/*.txt`
+
+File Placement
+- GUI overrides/custom GUI: `gui/`
+- Reusable shared tooltip/widget types: `gui/shared/`
+- Scripted GUI wrappers: `common/scripted_guis/`
+- UI localization: `localization/english/`
+- Never edit installed vanilla `game/` files.
+
+Encoding and Style
+- Use UTF-8 with BOM for CK3 content files (`.gui`, script `.txt`, localization `.yml`).
+- Keep edits ASCII unless the target file already intentionally uses non-ASCII.
+- Preserve vanilla style and naming when overriding vanilla windows.
+- Keep comments short and only for non-obvious logic.
+
+Runtime Mental Model
+- GUI is declarative and expression-driven.
+- Game-state mutations should usually go through:
+  - command objects (`IsValidCommand` + `CreateCommandPopup`)
+  - or scripted GUI wrappers (`ScriptedGui.Execute` -> scripted effect).
+- `datacontext` and `datamodel` determine everything:
+  - If context is wrong, valid syntax can still do nothing.
+  - If model is empty, widgets may "work" but never show.
+
+Verified Syntax Quick Reference (From `docs/data_types*.txt`)
+
+Global promotes and roots
+- `GetScriptedGui( 'key' )` -> `ScriptedGui`
+- `GuiScope` -> `TopScope`
+- `GetVariableSystem`
+
+Scripted GUI methods
+- `ScriptedGui.Execute( GuiScope... )`
+- `ScriptedGui.BuildTooltip( GuiScope... )`
+- `ScriptedGui.IsShown( GuiScope... )`
+- `ScriptedGui.IsValid( GuiScope... )`
+- `ScriptedGui.ExecuteTooltip( GuiScope... )`
+- `ScriptedGui.IsShownTooltip( GuiScope... )`
+- `ScriptedGui.IsValidTooltip( GuiScope... )`
+
+TopScope / GuiScope builder methods
+- `GuiScope.SetRoot( Scope )`
+- `GuiScope.AddScope( 'name', Scope )`
+- `GuiScope.AddList( 'name', ScopeList )`
+- `GuiScope.End`
+- `GuiScope.ScriptValue( 'named_script_value' )`
+- `GuiScope.GetScriptValueBreakdown( 'named_script_value' )`
+- `GuiScope.GetScriptValueDesc( 'named_script_value' )`
+
+Scope helpers
+- `Scope.Var( 'var_name' )`
+- `Scope.VarRemaining( 'var_name' )`
+- `Scope.GetList( 'list_name' )`
+- `Scope.ScriptValue( 'named_script_value' )`
+- `Scope.IsSet`
+
+Datamodel/list helpers
+- `DataModelHasItems( Model )`
+- `IsDataModelEmpty( Model )`
+- `GetDataModelSize( Model )`
+- `DataModelFirst( Model, Count )`
+- `DataModelSkipFirst( Model, Count )`
+- `DataModelSubSpan( Model, Offset, Count )`
+
+Comparisons and utility
+- `GreaterThan_CFixedPoint(...)`
+- `LessThan_CFixedPoint(...)`
+- `GreaterThan_int32(...)`
+- `LessThan_int32(...)`
+- `SelectLocalization( condition, 'KEY_TRUE', 'KEY_FALSE' )`
+
+UI state variables
+- `GetVariableSystem.Exists( 'key' )`
+- `GetVariableSystem.Set( 'key' )`
+- `GetVariableSystem.Clear( 'key' )`
+- `GetVariableSystem.Toggle( 'key' )`
+- `GetVariableSystem.SetOrToggle( 'key', value )`
+- `GetVariableSystem.HasValue( 'key', value )`
+
+Command gating and execution
+- `IsValidCommand( CommandObject )`
+- `CreateCommandPopup( CommandObject )`
+
+Core GUI Constructs To Prefer
+- `window`, `widget`, `container`, `vbox`, `hbox`, `flowcontainer`, `scrollbox`, `fixedgridbox`, `item`, `types`
+- `using = ...` for vanilla templates (`Window_Background`, `tooltip_ne`, etc.)
+- `block "name" {}` and `blockoverride "name" { ... }`
+- `visible`, `enabled`, `down`, `tooltip`, `tooltip_visible`, `onclick`, `onrightclick`, `oncreate`, `state`
+
+Vanilla-Proven Patterns To Copy
+
+1) Scripted GUI button with proper validity and tooltip
+```gui
+button_standard = {
+    datacontext = "[GetScriptedGui( 'create_head_of_faith' )]"
+    enabled = "[ScriptedGui.IsValid( GuiScope.SetRoot( GetPlayer.MakeScope ).AddScope( 'faith', Faith.MakeScope ).End )]"
+    onclick = "[ScriptedGui.Execute( GuiScope.SetRoot( GetPlayer.MakeScope ).AddScope( 'faith', Faith.MakeScope ).End )]"
+    tooltip = "[ScriptedGui.BuildTooltip( GuiScope.SetRoot( GetPlayer.MakeScope ).AddScope( 'faith', Faith.MakeScope ).End )]"
+}
+```
+
+2) Command-object button (safer for vanilla actions)
+```gui
+button_round = {
+    enabled = "[IsValidCommand( TitleViewWindow.GetDestroyTitle )]"
+    onclick = "[CreateCommandPopup( TitleViewWindow.GetDestroyTitle )]"
+    tooltip = "[TitleViewWindow.GetDestroyTitleButtonTooltip]"
+}
+```
+
+3) Datamodel guard for empty/non-empty views
+```gui
+visible = "[DataModelHasItems( TitleViewWindow.GetVassalGroupItems )]"
+visible = "[IsDataModelEmpty( TitleViewWindow.GetVassalGroupItems )]"
+```
+
+4) Chained datacontext is valid and common
+```gui
+datacontext = "[TitleViewWindow.GetTitle]"
+datacontext = "[Title.GetHolder]"
+```
+Use this when child context depends on a previous context hop.
+
+5) `oncreate` setup calls are normal
+```gui
+oncreate = "[BindFoldOutContext]"
+oncreate = "[PdxGuiFoldOut.Unfold]"
+```
+
+Scripted GUI Wrapper Rules (`common/scripted_guis`)
+- Treat scripted GUI entries as script bridges:
+  - `scope = <type>`
+  - optional `is_shown = {}`
+  - optional `is_valid = {}`
+  - optional `effect = {}`
+- Match wrapper `scope` exactly with the scope passed from GUI.
+- Prefer wrapper + scripted effect when a GUI button changes game state.
+
+Recommended wrapper shape
+```txt
+riseandfall_example_gui = {
+    scope = title
+
+    is_shown = { }
+    is_valid = { }
+
+    effect = {
+        riseandfall_some_effect = yes
+    }
+}
+```
+
+Datamodel and List Rules
+- A list UI needs a real data source:
+  - hardcoded controller outputs (`...Window.Get...`)
+  - or script-filled variable lists via `Scope.GetList( 'name' )`.
+- Do not assume a new `.gui` file can invent a controller list.
+- If item context is ambiguous, set it explicitly in `item` (example: `datacontext = "[Scope.Char]"` when appropriate).
+- Guard list UI with `DataModelHasItems` / `IsDataModelEmpty` to avoid blank layouts.
+
+Text and Localization Rules
+- Player-facing text should use localization keys.
+- `raw_text` / `raw_tooltip` are acceptable for debug/dev-only labels, but avoid for shipping UX.
+- Always add/check loc for:
+  - `text = "KEY"`
+  - `tooltip = "KEY"`
+  - any scripted tooltip path returning keys/descriptions.
+
+Project Patterns Already In Use
+- Title giveaway toggle:
+  - `gui/window_title.gui`
+  - `common/scripted_guis/riseandfall_toggle_giveaway_blocked.txt`
+  - uses `GetScriptedGui(...)`, `Title.MakeScope.Var(...).GetValue`, `GreaterThan_CFixedPoint(...)`.
+- Fort map mode state:
+  - `gui/shared/mapmodes.gui` toggles `GetVariableSystem.Toggle( 'riseandfall_fort_map_mode_active' )`
+  - `gui/map_icon_layer.gui` reads that state with `GetVariableSystem.Exists(...)`.
+- Shared tooltip types:
+  - `gui/shared/rf_stability_tooltip.gui`
+  - `gui/shared/rf_adventurer_tooltip.gui`
+  - both extend `object_tooltip_pop_out`.
+
+Override and Rebase Rules
+- When overriding vanilla files by path, keep diffs focused and clearly marked.
+- Recheck overridden files after each CK3 patch; full-window copies drift fast.
+- Prefer small inserts near existing vanilla blocks over broad rearrangement.
+- Use `ignoreinvisible = yes` in row/flow containers when hidden children should not leave gaps.
+
+Validation Workflow
+1. Verify syntax token exists:
+   - `rg -n "TokenName" docs/data_types*.txt`
+2. Verify vanilla usage exists:
+   - `rg -n "TokenName" "C:\Program Files (x86)\Steam\steamapps\common\Crusader Kings III\game\gui"`
+3. Check scope chain and context:
+   - wrapper `scope =` vs passed `MakeScope`
+   - `datacontext` hops are intentional and in order
+4. Guard lists and command buttons:
+   - `DataModelHasItems`/`IsDataModelEmpty`
+   - `IsValidCommand` before `CreateCommandPopup`
+5. Check localization coverage.
+6. Launch CK3 and test exactly the changed screens.
+7. If available, use GUI editor/log tools (`dump_data_types` confirms type dump support).
+
+Common Failure Modes (And Fast Fixes)
+- Widget never appears:
+  - Check `visible` expression first.
+  - Check datacontext object validity.
+- Button visible but does nothing:
+  - If command-based: validate `IsValidCommand(...)`.
+  - If scripted GUI-based: verify wrapper scope and `effect` path.
+- Tooltip missing or wrong:
+  - For scripted GUI, use `BuildTooltip(...)`.
+  - Ensure loc keys exist.
+- List area blank:
+  - Confirm datamodel actually has items.
+  - Confirm item context type matches UI calls.
+- Override seems ignored:
+  - Wrong file path or stale override against newer vanilla.
+  - Wrong `blockoverride` name.
+
+Minimal LLM Change Contract
+- Inputs required:
+  - exact target file/screen
+  - intended scope/context
+  - any new scripted_gui key(s)
+  - any new loc key(s)
+- Output required:
+  - changed GUI/scripted_gui files
+  - loc additions
+  - quick smoke-test steps
+- Success criteria:
+  - parses cleanly
+  - visibility/enabled logic matches intent
+  - action executes expected command/effect
+  - no raw missing loc keys in UI
