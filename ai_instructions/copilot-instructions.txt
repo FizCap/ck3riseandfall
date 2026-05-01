@@ -63,6 +63,8 @@ Game Rule Patterns
 Localization Rules
 - Every UI-facing key must exist in `localization/english/*.yml` under `l_english:`.
 - Validate dynamic scope text (`[scope.GetName]`, pronouns, title names, etc.) against real scope types.
+- In localization, saved event scopes use `[saved_scope_name.GetName]`, not `[scope:saved_scope_name.GetName]`.
+  - The `scope:` prefix is for script scope references; using it in loc can produce `Failed to find type 'scope:<name>'` errors and can break event option tooltips.
 - Missing keys show raw identifiers in game.
 
 Validation Workflow (before commit)
@@ -101,6 +103,9 @@ Known Helpful Patterns in This Repo
 - Use defensive `exists` and `has_variable` checks before dereferencing optional scopes.
 - For army spawn and travel to places, prefer province targets (`capital_province`) over title targets (`capital_barony`) when the effect expects a province.
 - Keep on_action handlers small and dispatch to scripted effects for maintainability.
+- For chained player-choice events, such as `palace_coup.1201`, guard the event with the pending flag and required variables so stale queued popups cannot display.
+- When an option clears variables/flags on the event receiver, re-save any scopes needed for follow-up effects before clearing them, and target the receiver explicitly with `root = { ... }`.
+- Before selecting the next player in a queue, clear stale saved scopes, verify the next target still has the pending flag, and prefer `trigger_event = { id = <event_id> delayed = yes }` so the current event closes before the next popup appears.
 
 What Not to Assume
 - Do not assume an on_action name from memory. Verify it in `docs/on_actions.log`.
