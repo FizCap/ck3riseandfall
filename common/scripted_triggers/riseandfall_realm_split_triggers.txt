@@ -193,14 +193,17 @@ riseandfall_can_switch_successor_sides_trigger = {
         is_landed = yes
         is_ruler = yes
         is_independent_ruler = no
+        is_at_war = no
         exists = liege
         liege = top_liege
+        liege = { is_at_war = no }
         primary_title.tier >= tier_county
         NOT = { government_has_flag = government_is_landless_adventurer }
     }
     scope:recipient = {
         is_landed = yes
         is_independent_ruler = yes
+        is_at_war = no
         exists = primary_title
         primary_title.tier > scope:actor.primary_title.tier
         NOT = { this = scope:actor }
@@ -233,6 +236,7 @@ riseandfall_can_surrender_successor_realm_trigger = {
     scope:actor = {
         is_landed = yes
         is_independent_ruler = yes
+        is_at_war = no
         riseandfall_has_successor_primary_title_trigger = yes
         NOT = { this = scope:recipient }
         NOT = { is_at_war_with = scope:recipient }
@@ -252,6 +256,7 @@ riseandfall_can_surrender_successor_realm_trigger = {
     scope:recipient = {
         is_landed = yes
         is_independent_ruler = yes
+        is_at_war = no
         exists = primary_title
         primary_title.tier >= scope:actor.primary_title.tier
         NOT = { government_has_flag = government_is_landless_adventurer }

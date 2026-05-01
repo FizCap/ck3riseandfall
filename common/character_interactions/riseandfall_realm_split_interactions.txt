@@ -23,7 +23,10 @@
 	auto_accept = no
 
 	on_accept = {
-		riseandfall_realm_split_defect_to_recipient_se = yes
+		if = {
+			limit = { riseandfall_can_switch_successor_sides_trigger = yes }
+			riseandfall_realm_split_defect_to_recipient_se = yes
+		}
 	}
 
 	cooldown = { years = 3 }
@@ -54,7 +57,24 @@
 		modifier = { scope:actor = { has_same_culture_as = scope:recipient } add = 15 }
 		modifier = { scope:actor.faith = { this = scope:recipient.faith } add = 20 }
 		modifier = { scope:recipient = { is_allied_to = scope:actor } add = 20 }
-		modifier = { scope:recipient = { is_at_war_with = scope:actor.liege } add = 35 }
+		modifier = {
+			scope:actor = {
+				primary_title = { is_neighbor_to_realm = scope:recipient }
+			}
+			add = 40
+		}
+		modifier = {
+			scope:actor = {
+				NOT = { primary_title = { is_neighbor_to_realm = scope:recipient } }
+			}
+			add = -40
+		}
+		modifier = {
+			scope:actor = {
+				capital_county.kingdom = scope:recipient.capital_county.kingdom
+			}
+			add = 25
+		}
 		modifier = {
 			scope:actor.liege = {
 				has_variable = riseandfall_realm_stability_score
@@ -62,7 +82,21 @@
 			}
 			add = 20
 		}
-		modifier = { scope:actor = { current_military_strength > scope:actor.liege.current_military_strength } add = 15 }
+		modifier = {
+			scope:actor = {
+				current_military_strength > {
+					value = scope:recipient.current_military_strength
+					multiply = 0.25
+				}
+				current_military_strength < scope:recipient.current_military_strength
+			}
+			add = 20
+		}
+		modifier = { scope:actor = { current_military_strength > scope:recipient.current_military_strength } add = -30 }
+		modifier = { scope:actor = { current_military_strength > scope:actor.liege.current_military_strength } add = 10 }
+		modifier = { scope:actor = { has_trait = deceitful } add = -10 }
+		modifier = { scope:actor = { has_trait = fickle } add = -15 }
+		modifier = { scope:actor = { has_trait = disloyal } add = -20 }
 		modifier = { scope:recipient = { has_relation_rival = scope:actor } add = -100 }
 		modifier = { scope:recipient = { has_relation_nemesis = scope:actor } add = -200 }
 	}
@@ -75,6 +109,24 @@
 			add = -1000
 		}
 
+		modifier = {
+			scope:actor = {
+				primary_title = { is_neighbor_to_realm = scope:recipient }
+			}
+			add = 35
+		}
+		modifier = {
+			scope:actor = {
+				NOT = { primary_title = { is_neighbor_to_realm = scope:recipient } }
+			}
+			add = -25
+		}
+		modifier = {
+			scope:actor = {
+				capital_county.kingdom = scope:recipient.capital_county.kingdom
+			}
+			add = 20
+		}
 		modifier = { scope:actor = { opinion = { target = scope:actor.liege value < 0 } } add = 40 }
 		modifier = { scope:actor = { opinion = { target = scope:actor.liege value <= -50 } } add = 35 }
 		modifier = { scope:actor.liege = { opinion = { target = scope:actor value < 0 } } add = 20 }
@@ -101,15 +153,25 @@
 			add = 20
 		}
 		modifier = { scope:recipient = { current_military_strength > scope:actor.liege.current_military_strength } add = 25 }
+		modifier = { scope:actor.liege = { current_military_strength > scope:recipient.current_military_strength } add = -20 }
 		modifier = { scope:actor = { has_same_culture_as = scope:recipient } add = 15 }
 		modifier = { scope:actor.faith = { this = scope:recipient.faith } add = 15 }
 		modifier = { scope:recipient = { opinion = { target = scope:actor value < 0 } } add = -25 }
+		modifier = { scope:actor = { is_allied_to = scope:actor.liege } add = -30 }
+		modifier = { scope:actor = { has_relation_friend = scope:actor.liege } add = -25 }
+		modifier = { scope:actor = { has_relation_best_friend = scope:actor.liege } add = -40 }
+		modifier = { scope:actor = { is_close_family_of = scope:actor.liege } add = -30 }
 		modifier = { scope:actor = { has_trait = ambitious } add = 20 }
 		modifier = { scope:actor = { has_trait = deceitful } add = 15 }
 		modifier = { scope:actor = { has_trait = arbitrary } add = 10 }
+		modifier = { scope:actor = { has_trait = disloyal } add = 25 }
+		modifier = { scope:actor = { has_trait = fickle } add = 20 }
+		modifier = { scope:actor = { has_trait = paranoid } add = 10 }
+		modifier = { scope:actor = { has_trait = craven } add = 10 }
 		modifier = { scope:actor = { has_trait = content } add = -30 }
 		modifier = { scope:actor = { has_trait = honest } add = -20 }
 		modifier = { scope:actor = { has_trait = just } add = -15 }
+		modifier = { scope:actor = { has_trait = loyal } add = -30 }
 	}
 }
 
@@ -138,7 +200,10 @@ riseandfall_surrender_to_successor_interaction = {
 	auto_accept = no
 
 	on_accept = {
-		riseandfall_realm_split_surrender_to_recipient_se = yes
+		if = {
+			limit = { riseandfall_can_surrender_successor_realm_trigger = yes }
+			riseandfall_realm_split_surrender_to_recipient_se = yes
+		}
 	}
 
 	cooldown = { years = 5 }
@@ -152,7 +217,31 @@ riseandfall_surrender_to_successor_interaction = {
 	}
 
 	ai_accept = {
-		base = 1000
+		base = 100
+
+		modifier = {
+			scope:actor = {
+				primary_title = { is_neighbor_to_realm = scope:recipient }
+			}
+			add = 50
+		}
+		modifier = {
+			scope:actor = {
+				capital_county.kingdom = scope:recipient.capital_county.kingdom
+			}
+			add = 25
+		}
+		modifier = {
+			scope:recipient = {
+				has_title = scope:actor.primary_title.var:rf_successor_root_origin_title
+			}
+			add = 50
+		}
+		modifier = { scope:actor = { has_same_culture_as = scope:recipient } add = 20 }
+		modifier = { scope:actor.faith = { this = scope:recipient.faith } add = 20 }
+		modifier = { scope:actor = { current_military_strength > scope:recipient.current_military_strength } add = -40 }
+		modifier = { scope:recipient = { has_relation_rival = scope:actor } add = -100 }
+		modifier = { scope:recipient = { has_relation_nemesis = scope:actor } add = -200 }
 	}
 
 	ai_will_do = {
@@ -172,12 +261,54 @@ riseandfall_surrender_to_successor_interaction = {
 			}
 			add = 35
 		}
+		modifier = {
+			scope:actor = {
+				primary_title = { is_neighbor_to_realm = scope:recipient }
+			}
+			add = 25
+		}
+		modifier = {
+			scope:actor = {
+				NOT = { primary_title = { is_neighbor_to_realm = scope:recipient } }
+			}
+			add = -25
+		}
+		modifier = {
+			scope:actor = {
+				capital_county.kingdom = scope:recipient.capital_county.kingdom
+			}
+			add = 20
+		}
+		modifier = {
+			scope:recipient = {
+				has_title = scope:actor.primary_title.var:rf_successor_root_origin_title
+			}
+			add = 30
+		}
 		modifier = { scope:recipient = { current_military_strength > scope:actor.current_military_strength } add = 40 }
 		modifier = { scope:actor = { current_military_strength > scope:recipient.current_military_strength } add = -35 }
-		modifier = { scope:actor = { is_at_war = yes } add = 20 }
+		modifier = {
+			scope:recipient = {
+				has_variable = riseandfall_realm_stability_score
+				var:riseandfall_realm_stability_score >= 55
+			}
+			add = 15
+		}
+		modifier = {
+			scope:recipient = {
+				has_variable = riseandfall_realm_stability_score
+				NOT = { var:riseandfall_realm_stability_score >= 35 }
+			}
+			add = -20
+		}
 		modifier = { scope:actor = { is_in_debt = yes } add = 20 }
 		modifier = { scope:actor = { opinion = { target = scope:recipient value >= 25 } } add = 20 }
 		modifier = { scope:actor = { opinion = { target = scope:recipient value <= -25 } } add = -30 }
+		modifier = { scope:recipient = { has_relation_rival = scope:actor } add = -40 }
+		modifier = { scope:recipient = { has_relation_nemesis = scope:actor } add = -80 }
+		modifier = { scope:actor = { is_allied_to = scope:recipient } add = 20 }
+		modifier = { scope:actor = { has_relation_friend = scope:recipient } add = 15 }
+		modifier = { scope:actor = { has_relation_best_friend = scope:recipient } add = 25 }
 		modifier = { scope:actor = { has_same_culture_as = scope:recipient } add = 15 }
 		modifier = { scope:actor.faith = { this = scope:recipient.faith } add = 15 }
 		modifier = { scope:actor = { has_trait = craven } add = 20 }
@@ -185,5 +316,7 @@ riseandfall_surrender_to_successor_interaction = {
 		modifier = { scope:actor = { has_trait = humble } add = 10 }
 		modifier = { scope:actor = { has_trait = brave } add = -20 }
 		modifier = { scope:actor = { has_trait = ambitious } add = -25 }
+		modifier = { scope:actor = { has_trait = arrogant } add = -15 }
+		modifier = { scope:actor = { has_trait = stubborn } add = -20 }
 	}
 }
