@@ -265,7 +265,6 @@ riseandfall_do_create_adventurer_se = {
             add_character_modifier = { modifier = riseandfall_adventurer_gold_mod }
             add_character_flag = { flag = riseandfall_newadventurer years = 30 }
             add_character_flag = { flag = riseandfall_adventurer }
-            add_character_flag = { flag = riseandfall_newadventurer_war_block years = 10 }
 
             remove_variable = adventurer_starting_gold
             remove_variable = adventurer_base_year_income
@@ -436,9 +435,9 @@ riseandfall_do_create_adventurer_se = {
 
 
 riseandfall_adventurer_press_claims_se = {
-    # Called with saved scope: scope:independent_adventurer = the adventurer character
-    # To avoid mixing landed_title and character scopes, perform all claim selection
-    # and war-declaration logic inside the character-specified scope.
+    # Called with saved scope: scope:independent_adventurer = the adventurer character.
+    # War declarations mirror the Diadochi path: validate against vanilla-style gates,
+    # then let the engine score and start the prepared adventurer claim war.
     scope:independent_adventurer = {
         # Prefer the origin claim target used during adventurer creation.
         if = {
@@ -463,37 +462,107 @@ riseandfall_adventurer_press_claims_se = {
             }
         }
 
-        # If we have a valid claim target title, evaluate war options
         if = {
-            limit = { exists = scope:claim_target_title.holder }
-
-            # If stronger than the holder, attempt a direct declare (respect truces/alliances and war block)
-            if = {
-                limit = { scope:independent_adventurer.military_power > scope:claim_target_title.holder.military_power }
-                if = {
-                    limit = { NOT = { OR = { scope:independent_adventurer = { has_truce = scope:claim_target_title.holder } scope:independent_adventurer = { is_allied_to = scope:claim_target_title.holder } } } }
-                        if = { limit = { NOT = { has_character_flag = riseandfall_newadventurer_war_block } NOT = { scope:independent_adventurer = { is_at_war_with = scope:claim_target_title.holder } } }
-                            start_war = { casus_belli = adventurer_claim_cb target = scope:claim_target_title.holder claimant = scope:independent_adventurer target_title = scope:claim_target_title }
-                        }
-                }
-            }
-            else = {
-                # Not stronger: small chance, respect truces/alliances
-                random_list = {
-                    5 = {
-                        if = {
-                            limit = { any_claim = { tier >= tier_kingdom } }
-                                    # Ensure the randomly chosen kingdom claim has an independent holder
-                                    random_claim = { limit = { tier >= tier_kingdom exists = holder holder = { is_independent_ruler = yes } } save_scope_as = claim_target_title }
-                            if = {
-                                limit = { NOT = { OR = { scope:independent_adventurer = { has_truce = scope:claim_target_title.holder } scope:independent_adventurer = { is_allied_to = scope:claim_target_title.holder } } } }
-                                    if = { limit = { NOT = { has_character_flag = riseandfall_newadventurer_war_block } NOT = { scope:independent_adventurer = { is_at_war_with = scope:claim_target_title.holder } } }
-                                        start_war = { casus_belli = adventurer_claim_cb target = scope:claim_target_title.holder claimant = scope:independent_adventurer target_title = scope:claim_target_title }
-                                    }
-                            }
+            limit = {
+                exists = scope:claim_target_title
+                exists = scope:claim_target_title.holder
+                is_at_war = no
+                NOT = { is_at_war_with = scope:claim_target_title.holder }
+                can_attack_in_hierarchy = scope:claim_target_title.holder
+                war_chest_gold >= war_chest_gold_maximum
+                trigger_if = {
+                    limit = {
+                        NOT = {
+                            government_has_flag = can_start_war_with_raised_troops
                         }
                     }
-                    95 = { }
+                    NOT = {
+                        has_raised_armies = yes
+                    }
+                }
+                trigger_else = {
+                    NOT = {
+                        any_army = {
+                            location.county.holder ?= scope:claim_target_title.holder
+                        }
+                    }
+                }
+                has_any_display_cb_on = scope:claim_target_title.holder
+                NOT = {
+                    is_allied_in_war = scope:claim_target_title.holder
+                }
+                is_in_debt = no
+                NOT = {
+                    exists = involved_activity
+                }
+                trigger_if = {
+                    limit = {
+                        culture = { has_cultural_parameter = cannot_attack_allies }
+                    }
+                    NOT = {
+                        is_allied_to = scope:claim_target_title.holder
+                    }
+                }
+                trigger_if = {
+                    limit = {
+                        culture = { has_cultural_parameter = cannot_attack_truces }
+                    }
+                    NOT = {
+                        has_truce = scope:claim_target_title.holder
+                    }
+                }
+                is_imprisoned = no
+                trigger_if = {
+                    limit = {
+                        has_variable_list = subjugation_offer_under_consideration
+                    }
+                    NOT = {
+                        is_target_in_variable_list = {
+                            name = subjugation_offer_under_consideration
+                            target = scope:claim_target_title.holder
+                        }
+                    }
+                }
+                trigger_if = {
+                    limit = {
+                        is_confederation_member = yes
+                    }
+                    NOT = {
+                        scope:claim_target_title.holder = {
+                            is_member_of_confederation = root.confederation
+                        }
+                    }
+                }
+                scope:claim_target_title.holder = {
+                    NOT = { government_has_flag = government_is_herder }
+                    NOT = { is_tributary_of_suzerain_or_above = root }
+                    NOT = { has_strong_hook = root }
+                    trigger_if = {
+                        limit = { is_imprisoned = yes }
+                        imprisoner != root
+                    }
+                }
+                can_declare_war = {
+                    defender = scope:claim_target_title.holder
+                    casus_belli = adventurer_claim_cb
+                    claimant = scope:independent_adventurer
+                    target_titles = { scope:claim_target_title }
+                }
+            }
+            ai_start_best_war = {
+                cb = { adventurer_claim_cb }
+                recalculate_cb_targets = yes
+                is_valid = {
+                    scope:target_character = scope:claim_target_title.holder
+                    scope:target_title = scope:claim_target_title
+                    scope:claimant = scope:independent_adventurer
+                    scope:claim_target_title.holder = {
+                        current_military_strength < root.current_military_strength
+                        OR = {
+                            gold < root.gold
+                            current_military_strength <= root.fifty_percent_of_current_military_strength
+                        }
+                    }
                 }
             }
         }

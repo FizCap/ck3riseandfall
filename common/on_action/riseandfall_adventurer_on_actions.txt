@@ -4,11 +4,16 @@
         riseandfall_yearly_remove_adventurer_gold_mod
         riseandfall_marry_male_target
         riseandfall_marry_female_target
-        riseandfall_yearly_adventurer_press_claims
         riseandfall_yearly_adventurer_cleanup_on_action
         riseandfall_yearly_adventurer_remove_variable
         riseandfall_apply_vassal_limit
         riseandfall_remove_vassal_limit
+    }
+}
+
+random_yearly_everyone_pulse = {
+    on_actions = {
+        riseandfall_yearly_adventurer_press_claims
     }
 }
 
@@ -56,18 +61,18 @@ riseandfall_yearly_adventurer_remove_variable = {
 }
 
 riseandfall_yearly_adventurer_press_claims = {
+    trigger = {
+        is_ai = yes
+        has_character_flag = riseandfall_newadventurer
+        has_government = landless_adventurer_government
+        is_landed = no
+        is_at_war = no
+        has_realm_law = camp_purpose_legitimists
+        is_imprisoned = no
+    }
     effect = {
-        every_ruler = {
-            limit = {
-                has_character_flag = riseandfall_newadventurer
-                is_at_war = no
-                has_realm_law = camp_purpose_legitimists
-                is_imprisoned = no
-            }
-            save_scope_as = independent_adventurer
-            # call the scripted effect on the adventurer leader
-            riseandfall_adventurer_press_claims_se = yes
-        }
+        save_scope_as = independent_adventurer
+        riseandfall_adventurer_press_claims_se = yes
     }
 }
 
