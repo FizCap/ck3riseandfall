@@ -17,3 +17,10 @@ riseandfall_random_score = {
         }
     }
 }
+
+riseandfall_clear_admin_nerf = {
+    every_living_character = {
+        limit = { has_variable = riseandfall_admin_nerf }
+        remove_variable = riseandfall_admin_nerf
+    }
+}

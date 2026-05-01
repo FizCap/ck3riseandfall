@@ -1,12 +1,14 @@
 ﻿yearly_global_pulse = {
     on_actions = {
         riseandfall_admin_score
+        riseandfall_admin_score_cleanup
     }
 }
 
 on_game_start_after_lobby = {
     on_actions = {
         riseandfall_admin_score
+        riseandfall_admin_score_cleanup
     }
 }
 
@@ -17,5 +19,13 @@ riseandfall_admin_score = {
     trigger = { has_game_rule = riseandfall_admin_score_nerf_enabled }
     effect = {
         riseandfall_random_score = yes
+    }
+}
+
+riseandfall_admin_score_cleanup = {
+    # If the rule is disabled, clear stale admin score variables from all characters
+    trigger = { has_game_rule = riseandfall_admin_score_nerf_disabled }
+    effect = {
+        riseandfall_clear_admin_nerf = yes
     }
 }
