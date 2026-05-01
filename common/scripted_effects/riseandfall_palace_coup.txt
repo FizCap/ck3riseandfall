@@ -3,6 +3,303 @@
 # Contains scripted effects related to low stability events
 # Selects a court challenger and resolves the simplified palace coup outcomes
 
+riseandfall_palace_coup_score_challenger_candidate = {
+    save_scope_as = palace_coup_candidate
+
+    # Puppet regencies are stabilized by the diarch's stats, but a coup leader needs soldiers.
+    # Martial is weighted twice; the other four stats still matter for puppet stability.
+    set_variable = { name = candidate_total value = diplomacy }
+    change_variable = { name = candidate_total add = martial }
+    change_variable = { name = candidate_total add = martial }
+    change_variable = { name = candidate_total add = stewardship }
+    change_variable = { name = candidate_total add = intrigue }
+    change_variable = { name = candidate_total add = learning }
+
+    if = {
+        limit = { exists = global_var:riseandfall_avg_total }
+        set_variable = { name = tmp_candidate_stat_edge value = var:candidate_total }
+        change_variable = { name = tmp_candidate_stat_edge divide = 6 }
+        set_variable = { name = tmp_candidate_stat_baseline value = global_var:riseandfall_avg_total }
+        change_variable = { name = tmp_candidate_stat_baseline multiply = -1 }
+        change_variable = { name = tmp_candidate_stat_edge add = var:tmp_candidate_stat_baseline }
+        change_variable = { name = tmp_candidate_stat_edge multiply = 3 }
+        change_variable = { name = candidate_total add = var:tmp_candidate_stat_edge }
+        remove_variable = tmp_candidate_stat_baseline
+        remove_variable = tmp_candidate_stat_edge
+    }
+
+    # Real institutional power makes outsider challengers much more plausible.
+    if = {
+        limit = { is_councillor_of = scope:event_root }
+        change_variable = { name = candidate_total add = 45 }
+    }
+    else_if = {
+        limit = { any_court_position_employer = { this = scope:event_root } }
+        change_variable = { name = candidate_total add = 20 }
+    }
+    if = { limit = { is_knight = yes } change_variable = { name = candidate_total add = 15 } }
+
+    if = {
+        limit = { scope:tmp_primary_title = { exists = yes } }
+        if = {
+            limit = { has_claim_on = scope:tmp_primary_title }
+            change_variable = { name = candidate_total add = 30 }
+            change_variable = { name = candidate_total multiply = 1.25 }
+        }
+        if = {
+            limit = { has_strong_claim_on = scope:tmp_primary_title }
+            change_variable = { name = candidate_total add = 25 }
+            change_variable = { name = candidate_total multiply = 1.15 }
+        }
+    }
+
+    # Judge legitimacy against the capital culture, not necessarily the current ruler's culture.
+    if = {
+        limit = { scope:event_root.capital_county.culture ?= { always = yes } }
+        if = {
+            limit = { culture ?= scope:event_root.capital_county.culture }
+            change_variable = { name = candidate_total multiply = 1.25 }
+        }
+        else_if = {
+            limit = {
+                culture = {
+                    cultural_acceptance = {
+                        target = scope:event_root.capital_county.culture
+                        value >= 80
+                    }
+                }
+            }
+            change_variable = { name = candidate_total multiply = 1.18 }
+        }
+        else_if = {
+            limit = {
+                culture = {
+                    cultural_acceptance = {
+                        target = scope:event_root.capital_county.culture
+                        value >= 70
+                    }
+                }
+            }
+            change_variable = { name = candidate_total multiply = 1.12 }
+        }
+        else_if = {
+            limit = {
+                culture = {
+                    cultural_acceptance = {
+                        target = scope:event_root.capital_county.culture
+                        value >= 50
+                    }
+                }
+            }
+            change_variable = { name = candidate_total add = -10 }
+        }
+        else_if = {
+            limit = {
+                culture = {
+                    cultural_acceptance = {
+                        target = scope:event_root.capital_county.culture
+                        value >= 30
+                    }
+                }
+            }
+            change_variable = { name = candidate_total add = -35 }
+        }
+        else = {
+            change_variable = { name = candidate_total add = -65 }
+        }
+    }
+
+    # Faith fit also follows the capital. Astray faiths can work; hostile faiths need power.
+    if = {
+        limit = { scope:event_root.capital_county.faith ?= { always = yes } }
+        if = {
+            limit = { faith ?= scope:event_root.capital_county.faith }
+            change_variable = { name = candidate_total multiply = 1.25 }
+        }
+        else_if = {
+            limit = {
+                faith = {
+                    faith_hostility_level = {
+                        target = scope:event_root.capital_county.faith
+                        value <= faith_astray_level
+                    }
+                }
+            }
+            change_variable = { name = candidate_total multiply = 1.12 }
+        }
+        else_if = {
+            limit = {
+                faith = {
+                    faith_hostility_level = {
+                        target = scope:event_root.capital_county.faith
+                        value >= faith_evil_level
+                    }
+                }
+            }
+            change_variable = { name = candidate_total add = -75 }
+        }
+        else_if = {
+            limit = {
+                faith = {
+                    faith_hostility_level = {
+                        target = scope:event_root.capital_county.faith
+                        value = faith_hostile_level
+                    }
+                }
+            }
+            change_variable = { name = candidate_total add = -45 }
+        }
+        else = {
+            change_variable = { name = candidate_total add = -25 }
+        }
+    }
+
+    # A hostile outsider without office should almost never be the palace faction's face.
+    if = {
+        limit = {
+            scope:event_root.capital_county.culture ?= { always = yes }
+            NOT = { culture ?= scope:event_root.capital_county.culture }
+            NOT = {
+                culture = {
+                    cultural_acceptance = {
+                        target = scope:event_root.capital_county.culture
+                        value >= 70
+                    }
+                }
+            }
+        }
+        if = {
+            limit = { is_councillor_of = scope:event_root }
+            change_variable = { name = candidate_total add = -15 }
+        }
+        else_if = {
+            limit = { any_court_position_employer = { this = scope:event_root } }
+            change_variable = { name = candidate_total add = -35 }
+        }
+        else = {
+            change_variable = { name = candidate_total add = -80 }
+        }
+    }
+    if = {
+        limit = {
+            scope:event_root.capital_county.faith ?= { always = yes }
+            NOT = { faith ?= scope:event_root.capital_county.faith }
+            NOT = {
+                faith = {
+                    faith_hostility_level = {
+                        target = scope:event_root.capital_county.faith
+                        value <= faith_astray_level
+                    }
+                }
+            }
+        }
+        if = {
+            limit = { is_councillor_of = scope:event_root }
+            change_variable = { name = candidate_total add = -20 }
+        }
+        else_if = {
+            limit = { any_court_position_employer = { this = scope:event_root } }
+            change_variable = { name = candidate_total add = -45 }
+        }
+        else = {
+            change_variable = { name = candidate_total add = -100 }
+        }
+    }
+    if = {
+        limit = {
+            scope:event_root.capital_county.culture ?= { always = yes }
+            scope:event_root.capital_county.faith ?= { always = yes }
+            NOT = { culture ?= scope:event_root.capital_county.culture }
+            NOT = { faith ?= scope:event_root.capital_county.faith }
+            NOT = {
+                culture = {
+                    cultural_acceptance = {
+                        target = scope:event_root.capital_county.culture
+                        value >= 70
+                    }
+                }
+            }
+            NOT = {
+                faith = {
+                    faith_hostility_level = {
+                        target = scope:event_root.capital_county.faith
+                        value <= faith_astray_level
+                    }
+                }
+            }
+        }
+        if = {
+            limit = { is_councillor_of = scope:event_root }
+            change_variable = { name = candidate_total add = -20 }
+        }
+        else_if = {
+            limit = { any_court_position_employer = { this = scope:event_root } }
+            change_variable = { name = candidate_total add = -60 }
+        }
+        else = {
+            change_variable = { name = candidate_total add = -120 }
+        }
+    }
+
+    # In a genuinely diverse realm, outsider challengers are less surprising.
+    if = {
+        limit = {
+            scope:event_root = { has_variable = riseandfall_rs_culture_faith_component }
+            OR = {
+                AND = {
+                    scope:event_root.capital_county.culture ?= { always = yes }
+                    NOT = { culture ?= scope:event_root.capital_county.culture }
+                }
+                AND = {
+                    scope:event_root.capital_county.faith ?= { always = yes }
+                    NOT = { faith ?= scope:event_root.capital_county.faith }
+                }
+            }
+        }
+        if = {
+            limit = { scope:event_root = { NOT = { var:riseandfall_rs_culture_faith_component >= -19 } } }
+            change_variable = { name = candidate_total add = 50 }
+        }
+        else_if = {
+            limit = { scope:event_root = { NOT = { var:riseandfall_rs_culture_faith_component >= -9 } } }
+            change_variable = { name = candidate_total add = 25 }
+        }
+    }
+
+    # Softer preference laws still matter. Hard sex laws are enforced last as disqualifiers.
+    if = {
+        limit = { scope:event_root = { has_realm_law = female_preference_law } }
+        if = { limit = { NOT = { is_female = yes } } change_variable = { name = candidate_total add = -1000 } }
+    }
+    if = {
+        limit = { scope:event_root = { has_realm_law = male_preference_law } }
+        if = { limit = { NOT = { is_male = yes } } change_variable = { name = candidate_total add = -1000 } }
+    }
+    if = {
+        limit = { scope:event_root = { has_realm_law = male_only_law } }
+        if = { limit = { NOT = { is_male = yes } } set_variable = { name = candidate_total value = -9999 } }
+    }
+    if = {
+        limit = { scope:event_root = { has_realm_law = female_only_law } }
+        if = { limit = { NOT = { is_female = yes } } set_variable = { name = candidate_total value = -9999 } }
+    }
+}
+
+riseandfall_palace_coup_try_challenger_candidate = {
+    riseandfall_palace_coup_score_challenger_candidate = yes
+    save_scope_as = candidate_for_score
+    scope:event_root = { set_variable = { name = tmp_candidate value = scope:candidate_for_score.var:candidate_total } }
+
+    if = {
+        limit = { scope:event_root = { has_variable = tmp_candidate } }
+        if = {
+            limit = { scope:event_root.var:tmp_candidate > scope:event_root.var:tmp_best_challenger_score }
+            save_scope_as = challenger
+            scope:event_root = { set_variable = { name = tmp_best_challenger_score value = scope:event_root.var:tmp_candidate } }
+        }
+    }
+}
+
 riseandfall_palace_coup_setup = {
     root = {
         every_held_title = {
@@ -30,108 +327,24 @@ riseandfall_palace_coup_setup = {
                 is_alive = yes
                 NOT = { is_close_family_of = root }
                 age > 16
+                is_ruler = no
+                NOT = { is_imprisoned = yes }
+                NOT = { is_incapable = yes }
             }
-            # Initialize candidate score from stats
-            set_variable = { name = candidate_total value = diplomacy }
-            change_variable = { name = candidate_total add = martial }
-            change_variable = { name = candidate_total add = stewardship }
-            change_variable = { name = candidate_total add = intrigue }
-            change_variable = { name = candidate_total add = learning }
-
-            # Apply realm succession law penalties
-            if = {
-                limit = { root = { has_realm_law = female_preference_law } }
-                if = { limit = { NOT = { is_female = yes } } change_variable = { name = candidate_total add = -1000 } }
-            }
-            if = {
-                limit = { root = { has_realm_law = male_only_law } }
-                if = { limit = { NOT = { is_male = yes } } set_variable = { name = candidate_total value = -9999 } }
-            }
-            if = {
-                limit = { root = { has_realm_law = male_preference_law } }
-                if = { limit = { NOT = { is_male = yes } } change_variable = { name = candidate_total add = -1000 } }
-            }
-            if = {
-                limit = { root = { has_realm_law = female_only_law } }
-                if = { limit = { NOT = { is_female = yes } } set_variable = { name = candidate_total value = -9999 } }
-            }
-
-            # Multiplier for claims
-            if = {
-                limit = { scope:tmp_primary_title = { exists = yes } }
-                if = { limit = { has_claim_on = scope:tmp_primary_title } change_variable = { name = candidate_total multiply = 1.5 } }
-            }
-
-            # Knights get a 1.5x multiplier
-            if = { limit = { is_knight = yes } change_variable = { name = candidate_total multiply = 1.5 } }
-
-            # Save candidate score to event_root and update best challenger if applicable
-            save_scope_as = candidate_for_score
-            scope:event_root = { set_variable = { name = tmp_candidate value = scope:candidate_for_score.var:candidate_total } }
-
-            if = {
-                limit = { scope:event_root = { has_variable = tmp_candidate } }
-                if = {
-                    limit = { scope:event_root.var:tmp_candidate > scope:event_root.var:tmp_best_challenger_score }
-                    save_scope_as = challenger
-                    scope:event_root = { set_variable = { name = tmp_best_challenger_score value = scope:event_root.var:tmp_candidate } }
-                }
-            }
+            riseandfall_palace_coup_try_challenger_candidate = yes
         }
         # Do not select landed rulers as palace coup challengers
         every_vassal = {
             limit = {
-                is_councillor = yes
+                is_councillor_of = scope:event_root
                 is_alive = yes
                 is_ruler = no
                 age > 16
+                NOT = { is_close_family_of = root }
+                NOT = { is_imprisoned = yes }
+                NOT = { is_incapable = yes }
             }
-            # Initialize candidate score from stats
-            set_variable = { name = candidate_total value = diplomacy }
-            change_variable = { name = candidate_total add = martial }
-            change_variable = { name = candidate_total add = stewardship }
-            change_variable = { name = candidate_total add = intrigue }
-            change_variable = { name = candidate_total add = learning }
-
-            # Apply realm succession law penalties
-            if = {
-                limit = { root = { has_realm_law = female_preference_law } }
-                if = { limit = { NOT = { is_female = yes } } change_variable = { name = candidate_total add = -1000 } }
-            }
-            if = {
-                limit = { root = { has_realm_law = male_only_law } }
-                if = { limit = { NOT = { is_male = yes } } set_variable = { name = candidate_total value = -9999 } }
-            }
-            if = {
-                limit = { root = { has_realm_law = male_preference_law } }
-                if = { limit = { NOT = { is_male = yes } } change_variable = { name = candidate_total add = -1000 } }
-            }
-            if = {
-                limit = { root = { has_realm_law = female_only_law } }
-                if = { limit = { NOT = { is_female = yes } } set_variable = { name = candidate_total value = -9999 } }
-            }
-
-            # Multiplier for claims
-            if = {
-                limit = { scope:tmp_primary_title = { exists = yes } }
-                if = { limit = { has_claim_on = scope:tmp_primary_title } change_variable = { name = candidate_total multiply = 1.5 } }
-            }
-
-            # Knights get a 1.5x multiplier (though vassals might not be knights, but keep for consistency)
-            if = { limit = { is_knight = yes } change_variable = { name = candidate_total multiply = 1.5 } }
-
-            # Save candidate score to event_root and update best challenger if applicable
-            save_scope_as = candidate_for_score
-            scope:event_root = { set_variable = { name = tmp_candidate value = scope:candidate_for_score.var:candidate_total } }
-
-            if = {
-                limit = { scope:event_root = { has_variable = tmp_candidate } }
-                if = {
-                    limit = { scope:event_root.var:tmp_candidate > scope:event_root.var:tmp_best_challenger_score }
-                    save_scope_as = challenger
-                    scope:event_root = { set_variable = { name = tmp_best_challenger_score value = scope:event_root.var:tmp_candidate } }
-                }
-            }
+            riseandfall_palace_coup_try_challenger_candidate = yes
         }
     }
 
@@ -140,50 +353,108 @@ riseandfall_palace_coup_setup = {
     # ---------------------------------------------------------
     if = {
         limit = { NOT = { exists = scope:challenger } }
-        if = {
-            limit = { root = { OR = { has_realm_law = male_only_law has_realm_law = male_preference_law } } }
+        root = {
             random_courtier = {
                 limit = {
                     is_landed = no
                     is_alive = yes
+                    NOT = { is_close_family_of = scope:event_root }
                     age > 16
-                    is_male = yes 
-                }
-                save_scope_as = challenger
-            }
-        }
-        else_if = {
-            limit = { root = { OR = { has_realm_law = female_only_law has_realm_law = female_preference_law } } }
-            random_courtier = {
-                limit = {
-                    is_landed = no
-                    is_alive = yes
-                    NOT = { is_close_family_of = root }
-                    age > 16
-                    is_female = yes
-                }
-                save_scope_as = challenger
-            }
-        }
-        else = {
-            random_courtier = {
-                limit = {
-                    is_landed = no
-                    is_alive = yes
-                    NOT = { is_close_family_of = root }
-                    age > 16
+                    NOT = { is_imprisoned = yes }
+                    NOT = { is_incapable = yes }
+                    OR = {
+                        scope:event_root = {
+                            NOT = { has_realm_law = male_only_law }
+                            NOT = { has_realm_law = female_only_law }
+                        }
+                        AND = {
+                            scope:event_root = { has_realm_law = male_only_law }
+                            is_male = yes
+                        }
+                        AND = {
+                            scope:event_root = { has_realm_law = female_only_law }
+                            is_female = yes
+                        }
+                    }
+                    OR = {
+                        is_councillor_of = scope:event_root
+                        any_court_position_employer = { this = scope:event_root }
+                        AND = {
+                            OR = {
+                                AND = {
+                                    scope:event_root.capital_county.culture ?= { always = yes }
+                                    culture ?= scope:event_root.capital_county.culture
+                                }
+                                AND = {
+                                    scope:event_root.capital_county.culture ?= { always = yes }
+                                    culture = {
+                                        cultural_acceptance = {
+                                            target = scope:event_root.capital_county.culture
+                                            value >= 70
+                                        }
+                                    }
+                                }
+                            }
+                            OR = {
+                                AND = {
+                                    scope:event_root.capital_county.faith ?= { always = yes }
+                                    faith ?= scope:event_root.capital_county.faith
+                                }
+                                AND = {
+                                    scope:event_root.capital_county.faith ?= { always = yes }
+                                    faith = {
+                                        faith_hostility_level = {
+                                            target = scope:event_root.capital_county.faith
+                                            value <= faith_astray_level
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
                 save_scope_as = challenger
             }
         }
     }
 
-    # Last-resort: if no challenger found yet, pick any alive courtier (including landed)
     if = {
         limit = { NOT = { exists = scope:challenger } }
         root = {
             random_courtier = {
-                limit = { is_adult = yes is_ruler = no }
+                limit = {
+                    is_landed = no
+                    is_alive = yes
+                    NOT = { is_close_family_of = scope:event_root }
+                    age > 16
+                    NOT = { is_imprisoned = yes }
+                    NOT = { is_incapable = yes }
+                    OR = {
+                        scope:event_root = {
+                            NOT = { has_realm_law = male_only_law }
+                            NOT = { has_realm_law = female_only_law }
+                        }
+                        AND = {
+                            scope:event_root = { has_realm_law = male_only_law }
+                            is_male = yes
+                        }
+                        AND = {
+                            scope:event_root = { has_realm_law = female_only_law }
+                            is_female = yes
+                        }
+                    }
+                }
+                save_scope_as = challenger
+            }
+        }
+    }
+
+    # Last-resort: if no challenger found yet, pick any alive unlanded courtier.
+    if = {
+        limit = { NOT = { exists = scope:challenger } }
+        root = {
+            random_courtier = {
+                limit = { is_adult = yes is_ruler = no NOT = { is_imprisoned = yes } NOT = { is_incapable = yes } }
                 save_scope_as = challenger
             }
         }
@@ -205,165 +476,135 @@ riseandfall_palace_coup_setup = {
                     is_alive = yes
                     NOT = { is_close_family_of = root }
                     age > 16
+                    is_ruler = no
+                    NOT = { is_imprisoned = yes }
+                    NOT = { is_incapable = yes }
                     NOT = { this = scope:potential_challenger }
                     is_ai = yes  # Only select AI characters for backup
                 }
-                # Initialize candidate score from stats
-                set_variable = { name = candidate_total value = diplomacy }
-                change_variable = { name = candidate_total add = martial }
-                change_variable = { name = candidate_total add = stewardship }
-                change_variable = { name = candidate_total add = intrigue }
-                change_variable = { name = candidate_total add = learning }
-
-                # Apply realm succession law penalties
-                if = {
-                    limit = { root = { has_realm_law = female_preference_law } }
-                    if = { limit = { NOT = { is_female = yes } } change_variable = { name = candidate_total add = -1000 } }
-                }
-                if = {
-                    limit = { root = { has_realm_law = male_only_law } }
-                    if = { limit = { NOT = { is_male = yes } } set_variable = { name = candidate_total value = -9999 } }
-                }
-                if = {
-                    limit = { root = { has_realm_law = male_preference_law } }
-                    if = { limit = { NOT = { is_male = yes } } change_variable = { name = candidate_total add = -1000 } }
-                }
-                if = {
-                    limit = { root = { has_realm_law = female_only_law } }
-                    if = { limit = { NOT = { is_female = yes } } set_variable = { name = candidate_total value = -9999 } }
-                }
-
-                # Multiplier for claims
-                if = {
-                    limit = { scope:tmp_primary_title = { exists = yes } }
-                    if = { limit = { has_claim_on = scope:tmp_primary_title } change_variable = { name = candidate_total multiply = 1.5 } }
-                }
-
-                # Knights get a 1.5x multiplier
-                if = { limit = { is_knight = yes } change_variable = { name = candidate_total multiply = 1.5 } }
-
-                # Save candidate score to event_root and update best challenger if applicable
-                save_scope_as = candidate_for_score
-                scope:event_root = { set_variable = { name = tmp_candidate value = scope:candidate_for_score.var:candidate_total } }
-
-                if = {
-                    limit = { scope:event_root = { has_variable = tmp_candidate } }
-                    if = {
-                        limit = { scope:event_root.var:tmp_candidate > scope:event_root.var:tmp_best_challenger_score }
-                        save_scope_as = challenger
-                        scope:event_root = { set_variable = { name = tmp_best_challenger_score value = scope:event_root.var:tmp_candidate } }
-                    }
-                }
+                riseandfall_palace_coup_try_challenger_candidate = yes
             }
             # Do not select landed rulers as palace coup challengers
             every_vassal = {
                 limit = {
-                    is_councillor = yes
+                    is_councillor_of = scope:event_root
                     is_alive = yes
                     NOT = { is_close_family_of = root }
                     age > 16
+                    NOT = { is_imprisoned = yes }
+                    NOT = { is_incapable = yes }
                     NOT = { this = scope:potential_challenger }
                     is_ruler = no
                     is_ai = yes  # Only select AI characters for backup
                 }
-                # Initialize candidate score from stats
-                set_variable = { name = candidate_total value = diplomacy }
-                change_variable = { name = candidate_total add = martial }
-                change_variable = { name = candidate_total add = stewardship }
-                change_variable = { name = candidate_total add = intrigue }
-                change_variable = { name = candidate_total add = learning }
-
-                # Apply realm succession law penalties
-                if = {
-                    limit = { root = { has_realm_law = female_preference_law } }
-                    if = { limit = { NOT = { is_female = yes } } change_variable = { name = candidate_total add = -1000 } }
-                }
-                if = {
-                    limit = { root = { has_realm_law = male_only_law } }
-                    if = { limit = { NOT = { is_male = yes } } set_variable = { name = candidate_total value = -9999 } }
-                }
-                if = {
-                    limit = { root = { has_realm_law = male_preference_law } }
-                    if = { limit = { NOT = { is_male = yes } } change_variable = { name = candidate_total add = -1000 } }
-                }
-                if = {
-                    limit = { root = { has_realm_law = female_only_law } }
-                    if = { limit = { NOT = { is_female = yes } } set_variable = { name = candidate_total value = -9999 } }
-                }
-
-                # Multiplier for claims
-                if = {
-                    limit = { scope:tmp_primary_title = { exists = yes } }
-                    if = { limit = { has_claim_on = scope:tmp_primary_title } change_variable = { name = candidate_total multiply = 1.5 } }
-                }
-
-                # Knights get a 1.5x multiplier
-                if = { limit = { is_knight = yes } change_variable = { name = candidate_total multiply = 1.5 } }
-
-                # Save candidate score to event_root and update best challenger if applicable
-                save_scope_as = candidate_for_score
-                scope:event_root = { set_variable = { name = tmp_candidate value = scope:candidate_for_score.var:candidate_total } }
-
-                if = {
-                    limit = { scope:event_root = { has_variable = tmp_candidate } }
-                    if = {
-                        limit = { scope:event_root.var:tmp_candidate > scope:event_root.var:tmp_best_challenger_score }
-                        save_scope_as = challenger
-                        scope:event_root = { set_variable = { name = tmp_best_challenger_score value = scope:event_root.var:tmp_candidate } }
-                    }
-                }
+                riseandfall_palace_coup_try_challenger_candidate = yes
             }
         }
 
         # Fallbacks for backup challenger, excluding potential, only AI
         if = {
             limit = { NOT = { exists = scope:challenger } }
-            if = {
-                limit = { root = { OR = { has_realm_law = male_only_law has_realm_law = male_preference_law } } }
+            root = {
                 random_courtier = {
                     limit = {
                         is_landed = no
                         is_alive = yes
-                        NOT = { is_close_family_of = root }
-                        age > 16
-                        is_male = yes
-                        NOT = { this = scope:potential_challenger }
-                        is_ai = yes
-                    }
-                    save_scope_as = challenger
-                }
-            }
-            else_if = {
-                limit = { root = { OR = { has_realm_law = female_only_law has_realm_law = female_preference_law } } }
-                random_courtier = {
-                    limit = {
-                        is_landed = no
-                        is_alive = yes
-                        NOT = { is_close_family_of = root }
-                        age > 16
-                        is_female = yes
-                        NOT = { this = scope:potential_challenger }
-                        is_ai = yes
-                    }
-                    save_scope_as = challenger
-                }
-            }
-            else = {
-                random_courtier = {
-                    limit = {
-                        is_landed = no
-                        is_alive = yes
-                        NOT = { is_close_family_of = root }
+                        NOT = { is_close_family_of = scope:event_root }
                         age > 16
                         NOT = { this = scope:potential_challenger }
                         is_ai = yes
+                        NOT = { is_imprisoned = yes }
+                        NOT = { is_incapable = yes }
+                        OR = {
+                            scope:event_root = {
+                                NOT = { has_realm_law = male_only_law }
+                                NOT = { has_realm_law = female_only_law }
+                            }
+                            AND = {
+                                scope:event_root = { has_realm_law = male_only_law }
+                                is_male = yes
+                            }
+                            AND = {
+                                scope:event_root = { has_realm_law = female_only_law }
+                                is_female = yes
+                            }
+                        }
+                        OR = {
+                            is_councillor_of = scope:event_root
+                            any_court_position_employer = { this = scope:event_root }
+                            AND = {
+                                OR = {
+                                    AND = {
+                                        scope:event_root.capital_county.culture ?= { always = yes }
+                                        culture ?= scope:event_root.capital_county.culture
+                                    }
+                                    AND = {
+                                        scope:event_root.capital_county.culture ?= { always = yes }
+                                        culture = {
+                                            cultural_acceptance = {
+                                                target = scope:event_root.capital_county.culture
+                                                value >= 70
+                                            }
+                                        }
+                                    }
+                                }
+                                OR = {
+                                    AND = {
+                                        scope:event_root.capital_county.faith ?= { always = yes }
+                                        faith ?= scope:event_root.capital_county.faith
+                                    }
+                                    AND = {
+                                        scope:event_root.capital_county.faith ?= { always = yes }
+                                        faith = {
+                                            faith_hostility_level = {
+                                                target = scope:event_root.capital_county.faith
+                                                value <= faith_astray_level
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                     save_scope_as = challenger
                 }
             }
         }
 
-        # Last-resort for backup: if no challenger found yet, pick any alive AI courtier (including landed), excluding potential
+        if = {
+            limit = { NOT = { exists = scope:challenger } }
+            root = {
+                random_courtier = {
+                    limit = {
+                        is_landed = no
+                        is_alive = yes
+                        NOT = { is_close_family_of = scope:event_root }
+                        age > 16
+                        NOT = { this = scope:potential_challenger }
+                        is_ai = yes
+                        NOT = { is_imprisoned = yes }
+                        NOT = { is_incapable = yes }
+                        OR = {
+                            scope:event_root = {
+                                NOT = { has_realm_law = male_only_law }
+                                NOT = { has_realm_law = female_only_law }
+                            }
+                            AND = {
+                                scope:event_root = { has_realm_law = male_only_law }
+                                is_male = yes
+                            }
+                            AND = {
+                                scope:event_root = { has_realm_law = female_only_law }
+                                is_female = yes
+                            }
+                        }
+                    }
+                    save_scope_as = challenger
+                }
+            }
+        }
+
+        # Last-resort for backup: if no challenger found yet, pick any alive unlanded AI courtier, excluding potential.
         if = {
             limit = { NOT = { exists = scope:challenger } }
             root = {
@@ -373,6 +614,8 @@ riseandfall_palace_coup_setup = {
                         is_ruler = no
                         NOT = { this = scope:potential_challenger }
                         is_ai = yes
+                        NOT = { is_imprisoned = yes }
+                        NOT = { is_incapable = yes }
                     }
                     save_scope_as = challenger
                 }
