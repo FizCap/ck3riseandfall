@@ -72,6 +72,11 @@
  riseandfall_debug_fire_low_stability_event_tooltip:0 "For debugging only."
  riseandfall_debug_fire_low_stability_event_confirm:0 "Execute"
 
+ riseandfall_debug_force_liege_palace_coup_player_challenger:0 "Debug: force liege palace coup"
+ riseandfall_debug_force_liege_palace_coup_player_challenger_desc:0 "Trigger a palace coup against your liege with you selected as the player challenger."
+ riseandfall_debug_force_liege_palace_coup_player_challenger_tooltip:0 "For debugging the player challenger accept and decline flow."
+ riseandfall_debug_force_liege_palace_coup_player_challenger_confirm:0 "Execute"
+
  # confirm strings for toggles
  riseandfall_enable_low_stability_warlord_confirm:0 "Enable"
  riseandfall_disable_low_stability_warlord_confirm:0 "Disable"

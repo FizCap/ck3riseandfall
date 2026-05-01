@@ -193,6 +193,7 @@ riseandfall_palace_coup_setup = {
     if = {
         limit = { exists = scope:challenger scope:challenger = { is_ai = no } }
         scope:challenger = { save_scope_as = potential_challenger }
+        clear_saved_scope = challenger
 
         # Reset score for backup selection
         scope:event_root = { set_variable = { name = tmp_best_challenger_score value = -9999 } }
@@ -377,6 +378,13 @@ riseandfall_palace_coup_setup = {
                 }
             }
         }
+
+        # If no AI backup exists, keep the player as the only valid challenger.
+        # The confirmation event hides the decline option in this case.
+        if = {
+            limit = { NOT = { exists = scope:challenger } }
+            scope:potential_challenger = { save_scope_as = challenger }
+        }
     }
 
     # Palace coup resolution no longer creates temporary camps or moves courtiers.
@@ -448,6 +456,8 @@ riseandfall_palace_coup_become_puppet = {
 riseandfall_palace_coup_clear_vassal_choice_se = {
     remove_character_flag = rf_palace_coup_split_protected
     remove_character_flag = rf_palace_coup_return_to_ruler
+    remove_character_flag = rf_palace_coup_neutral_rejector
+    remove_character_flag = rf_palace_coup_neutral_seed
     remove_character_flag = rf_palace_coup_pending_choice
     remove_variable = rf_palace_coup_choice_ruler
     remove_variable = rf_palace_coup_choice_challenger
@@ -469,6 +479,73 @@ riseandfall_palace_coup_mark_coup_se = {
 
 riseandfall_palace_coup_mark_reject_se = {
     riseandfall_palace_coup_clear_vassal_choice_se = yes
+    add_character_flag = { flag = rf_palace_coup_neutral_rejector days = 30 }
+}
+
+riseandfall_palace_coup_mark_neutral_seed_se = {
+    add_character_flag = { flag = rf_palace_coup_neutral_seed days = 30 }
+    add_character_flag = { flag = rf_forced_breakaway_seed days = 30 }
+}
+
+riseandfall_palace_coup_seed_neutral_rejectors_se = {
+    save_scope_as = palace_coup_challenger
+
+    # Claimants and major military powers are strong enough to reject both camps outright.
+    every_vassal = {
+        limit = {
+            is_landed = yes
+            has_character_flag = rf_palace_coup_neutral_rejector
+            NOT = { has_character_flag = rf_palace_coup_split_protected }
+            primary_title.tier >= tier_county
+            NOT = { has_character_flag = rf_forced_breakaway_seed }
+            OR = {
+                has_claim_on = scope:original_primary
+                current_military_strength >= {
+                    value = scope:palace_coup_challenger.current_military_strength
+                    multiply = 0.25
+                }
+            }
+        }
+        riseandfall_palace_coup_mark_neutral_seed_se = yes
+    }
+
+    # If a region has no neutral leader yet, the strongest substantial rejector
+    # there becomes the rally point. Weaker rejectors are merged regionally later.
+    every_realm_de_jure_kingdom = {
+        save_scope_as = palace_coup_neutral_region
+        if = {
+            limit = {
+                scope:palace_coup_challenger = {
+                    NOT = {
+                        any_vassal = {
+                            is_landed = yes
+                            has_character_flag = rf_palace_coup_neutral_seed
+                            capital_county.kingdom = scope:palace_coup_neutral_region
+                        }
+                    }
+                }
+            }
+            scope:palace_coup_challenger = {
+                ordered_vassal = {
+                    limit = {
+                        is_landed = yes
+                        has_character_flag = rf_palace_coup_neutral_rejector
+                        NOT = { has_character_flag = rf_palace_coup_split_protected }
+                        NOT = { has_character_flag = rf_forced_breakaway_seed }
+                        primary_title.tier >= tier_county
+                        capital_county.kingdom = scope:palace_coup_neutral_region
+                        current_military_strength >= {
+                            value = scope:palace_coup_challenger.current_military_strength
+                            multiply = 0.10
+                        }
+                    }
+                    order_by = current_military_strength
+                    max = 1
+                    riseandfall_palace_coup_mark_neutral_seed_se = yes
+                }
+            }
+        }
+    }
 }
 
 riseandfall_palace_coup_score_vassal_alignment_se = {
@@ -658,6 +735,12 @@ riseandfall_palace_coup_apply_ai_vassal_alignment_se = {
     set_variable = { name = rf_palace_coup_reject_score value = 0 }
     riseandfall_palace_coup_score_vassal_alignment_se = yes
 
+    # Claimants already have a throne bid, so AI claimants always refuse both camps.
+    if = {
+        limit = { has_claim_on = scope:original_primary }
+        set_variable = { name = rf_palace_coup_reject_score value = 9999 }
+    }
+
     # Compute margins to avoid direct rhs `var:` links in triggers during tooltip build.
     set_variable = { name = rf_palace_coup_loyalist_margin value = var:rf_palace_coup_loyalist_score }
     
@@ -707,6 +790,11 @@ riseandfall_palace_coup_apply_ai_vassal_alignment_se = {
 
 riseandfall_palace_coup_continue_player_choices = {
     save_scope_as = original_ruler
+    # Prevent stale saved scope from re-firing the same player choice event in a loop.
+    if = {
+        limit = { exists = scope:palace_coup_next_player_vassal }
+        clear_saved_scope = palace_coup_next_player_vassal
+    }
     ordered_vassal = {
         limit = {
             is_landed = yes
@@ -720,8 +808,11 @@ riseandfall_palace_coup_continue_player_choices = {
     }
 
     if = {
-        limit = { exists = scope:palace_coup_next_player_vassal }
-        scope:palace_coup_next_player_vassal = { trigger_event = { id = palace_coup.1201 } }
+        limit = {
+            exists = scope:palace_coup_next_player_vassal
+            scope:palace_coup_next_player_vassal = { has_character_flag = rf_palace_coup_pending_choice }
+        }
+        scope:palace_coup_next_player_vassal = { trigger_event = { id = palace_coup.1201 delayed = yes } }
     }
     else = {
         riseandfall_palace_coup_root_flees_success = yes
@@ -1182,6 +1273,10 @@ riseandfall_palace_coup_root_flees_success = {
         if = {
             limit = { scope:original_ruler = { is_landed = yes } }
             scope:original_ruler = { add_character_flag = rf_forced_breakaway_seed }
+        }
+
+        scope:palace_coup_challenger = {
+            riseandfall_palace_coup_seed_neutral_rejectors_se = yes
         }
 
         if = {

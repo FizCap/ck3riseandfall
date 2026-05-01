@@ -54,7 +54,7 @@ palace_coup.1101 = {
 		name = palace_coup.1101.a
 		custom_tooltip = palace_coup.1101.tooltip
 		# Accept the palace coup
-		save_scope_as = challenger
+		root = { save_scope_as = challenger }
 		scope:event_root = { trigger_event = { id = palace_coup.1002 } }
 		ai_chance = { base = 0 }  # Players only
 	}
@@ -62,6 +62,10 @@ palace_coup.1101 = {
 	option = {
 		name = palace_coup.1101.b
 		custom_tooltip = palace_coup.1101.tooltip_no
+		trigger = {
+			exists = scope:challenger
+			NOT = { this = scope:challenger }
+		}
 		# Decline, use backup challenger
 		scope:event_root = { trigger_event = { id = palace_coup.1002 } }
 		ai_chance = { base = 100 }
@@ -74,6 +78,12 @@ palace_coup.1201 = {
 	title = palace_coup.1201.t
 	desc = palace_coup.1201.d
 	theme = realm
+
+	trigger = {
+		has_character_flag = rf_palace_coup_pending_choice
+		has_variable = rf_palace_coup_choice_ruler
+		has_variable = rf_palace_coup_choice_challenger
+	}
 
 	immediate = {
 		if = {
@@ -97,8 +107,19 @@ palace_coup.1201 = {
 		name = palace_coup.1201.a
 		custom_tooltip = palace_coup.1201.a.tooltip
 		hidden_effect = {
-			riseandfall_palace_coup_mark_loyalist_se = yes
-			scope:palace_coup_choice_ruler = { riseandfall_palace_coup_continue_player_choices = yes }
+			if = {
+				limit = { has_variable = rf_palace_coup_choice_ruler }
+				var:rf_palace_coup_choice_ruler = { save_scope_as = palace_coup_choice_ruler }
+			}
+			if = {
+				limit = { has_variable = rf_palace_coup_choice_challenger }
+				var:rf_palace_coup_choice_challenger = { save_scope_as = palace_coup_choice_challenger }
+			}
+			root = { riseandfall_palace_coup_mark_loyalist_se = yes }
+			if = {
+				limit = { exists = scope:palace_coup_choice_ruler }
+				scope:palace_coup_choice_ruler = { riseandfall_palace_coup_continue_player_choices = yes }
+			}
 		}
 		ai_chance = { base = 0 }
 	}
@@ -107,8 +128,19 @@ palace_coup.1201 = {
 		name = palace_coup.1201.b
 		custom_tooltip = palace_coup.1201.b.tooltip
 		hidden_effect = {
-			riseandfall_palace_coup_mark_coup_se = yes
-			scope:palace_coup_choice_ruler = { riseandfall_palace_coup_continue_player_choices = yes }
+			if = {
+				limit = { has_variable = rf_palace_coup_choice_ruler }
+				var:rf_palace_coup_choice_ruler = { save_scope_as = palace_coup_choice_ruler }
+			}
+			if = {
+				limit = { has_variable = rf_palace_coup_choice_challenger }
+				var:rf_palace_coup_choice_challenger = { save_scope_as = palace_coup_choice_challenger }
+			}
+			root = { riseandfall_palace_coup_mark_coup_se = yes }
+			if = {
+				limit = { exists = scope:palace_coup_choice_ruler }
+				scope:palace_coup_choice_ruler = { riseandfall_palace_coup_continue_player_choices = yes }
+			}
 		}
 		ai_chance = { base = 0 }
 	}
@@ -117,8 +149,19 @@ palace_coup.1201 = {
 		name = palace_coup.1201.c
 		custom_tooltip = palace_coup.1201.c.tooltip
 		hidden_effect = {
-			riseandfall_palace_coup_mark_reject_se = yes
-			scope:palace_coup_choice_ruler = { riseandfall_palace_coup_continue_player_choices = yes }
+			if = {
+				limit = { has_variable = rf_palace_coup_choice_ruler }
+				var:rf_palace_coup_choice_ruler = { save_scope_as = palace_coup_choice_ruler }
+			}
+			if = {
+				limit = { has_variable = rf_palace_coup_choice_challenger }
+				var:rf_palace_coup_choice_challenger = { save_scope_as = palace_coup_choice_challenger }
+			}
+			root = { riseandfall_palace_coup_mark_reject_se = yes }
+			if = {
+				limit = { exists = scope:palace_coup_choice_ruler }
+				scope:palace_coup_choice_ruler = { riseandfall_palace_coup_continue_player_choices = yes }
+			}
 		}
 		ai_chance = { base = 0 }
 	}

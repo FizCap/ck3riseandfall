@@ -544,6 +544,57 @@ riseandfall_realm_split_se = {
         }
     }
 
+    # Palace coup neutral rejectors prefer the strongest neutral seed in their
+    # de jure kingdom, even if the old ruler was seeded there first.
+    if = {
+        limit = {
+            scope:original_ruler = {
+                any_vassal = {
+                    is_landed = yes
+                    has_character_flag = rf_palace_coup_neutral_seed
+                }
+            }
+        }
+        scope:original_ruler = {
+            every_realm_de_jure_kingdom = {
+                save_scope_as = rf_palace_coup_neutral_region
+                clear_saved_scope = rf_active_seed
+
+                scope:original_ruler = {
+                    ordered_vassal = {
+                        limit = {
+                            is_landed = yes
+                            has_character_flag = rf_palace_coup_neutral_seed
+                            capital_county.kingdom = scope:rf_palace_coup_neutral_region
+                        }
+                        order_by = current_military_strength
+                        max = 1
+                        save_scope_as = rf_active_seed
+                    }
+                }
+
+                if = {
+                    limit = { exists = scope:rf_active_seed }
+                    scope:original_ruler = {
+                        every_vassal = {
+                            limit = {
+                                is_landed = yes
+                                has_character_flag = rf_palace_coup_neutral_rejector
+                                NOT = { has_character_flag = rf_breakaway_ruler }
+                                NOT = { has_character_flag = rf_palace_coup_split_protected }
+                                primary_title.tier >= tier_county
+                                NOT = { primary_title.tier >= tier_empire }
+                                capital_county.kingdom = scope:rf_palace_coup_neutral_region
+                            }
+                            set_variable = { name = rf_my_breakaway value = scope:rf_active_seed }
+                        }
+                    }
+                }
+            }
+        }
+        clear_saved_scope = rf_active_seed
+    }
+
     # Phase 3: unseeded regions are claimed by nearby strong seeds so the
     # successor map keeps de jure borders but varies in size.
     if = {
@@ -893,6 +944,16 @@ riseandfall_realm_split_se = {
             limit = { has_character_flag = rf_forced_breakaway_seed }
             remove_character_flag = rf_forced_breakaway_seed
         }
+        every_vassal = {
+            limit = {
+                OR = {
+                    has_character_flag = rf_palace_coup_neutral_rejector
+                    has_character_flag = rf_palace_coup_neutral_seed
+                }
+            }
+            remove_character_flag = rf_palace_coup_neutral_rejector
+            remove_character_flag = rf_palace_coup_neutral_seed
+        }
     }
     set_variable = { name = rf_realm_split_cooldown value = 1 years = 5 }
 }
@@ -1070,6 +1131,8 @@ riseandfall_execute_realm_split_se = {
                 change = scope:rf_vassal_change
             }
             remove_variable = rf_my_breakaway
+            remove_character_flag = rf_palace_coup_neutral_rejector
+            remove_character_flag = rf_palace_coup_neutral_seed
         }
     }
     
@@ -1179,6 +1242,8 @@ riseandfall_execute_realm_split_se = {
     # Remove flag
     remove_character_flag = rf_breakaway_ruler
     remove_character_flag = rf_forced_breakaway_seed
+    remove_character_flag = rf_palace_coup_neutral_rejector
+    remove_character_flag = rf_palace_coup_neutral_seed
 }
 
 riseandfall_realm_split_defect_to_recipient_se = {

@@ -75,4 +75,84 @@
         }
     }
 
+    # Developer debug decision: force this character's liege into a palace coup with this character as challenger
+    riseandfall_debug_force_liege_palace_coup_player_challenger = {
+        picture = {
+            reference = "gfx/interface/illustrations/decisions/decision_misc.dds"
+        }
+        sort_order = 102
+        ai_check_interval = 0
+        desc = riseandfall_debug_force_liege_palace_coup_player_challenger_desc
+        selection_tooltip = riseandfall_debug_force_liege_palace_coup_player_challenger_tooltip
+        decision_group_type = admin
 
+        is_shown = {
+            debug_only = yes
+            is_ai = no
+            exists = liege
+        }
+
+        is_valid = {
+            is_alive = yes
+            is_adult = yes
+            liege = { is_alive = yes }
+        }
+
+        effect = {
+            save_scope_as = potential_challenger
+            save_scope_as = riseandfall_debug_player_challenger
+
+            liege = {
+                save_scope_as = event_root
+                clear_saved_scope = challenger
+
+                ordered_courtier_or_guest = {
+                    limit = {
+                        is_alive = yes
+                        age > 16
+                        is_ai = yes
+                        is_ruler = no
+                        NOT = { this = scope:riseandfall_debug_player_challenger }
+                        NOT = { is_close_family_of = scope:event_root }
+                    }
+                    order_by = current_military_strength
+                    max = 1
+                    save_scope_as = challenger
+                }
+
+                if = {
+                    limit = { NOT = { exists = scope:challenger } }
+                    ordered_vassal = {
+                        limit = {
+                            is_alive = yes
+                            is_councillor = yes
+                            is_ai = yes
+                            is_ruler = no
+                            NOT = { this = scope:riseandfall_debug_player_challenger }
+                            NOT = { is_close_family_of = scope:event_root }
+                        }
+                        order_by = current_military_strength
+                        max = 1
+                        save_scope_as = challenger
+                    }
+                }
+
+                # If no AI backup exists, the confirmation event hides Decline.
+                if = {
+                    limit = { NOT = { exists = scope:challenger } }
+                    scope:riseandfall_debug_player_challenger = { save_scope_as = challenger }
+                }
+
+                scope:riseandfall_debug_player_challenger = {
+                    trigger_event = { id = palace_coup.1101 }
+                }
+            }
+        }
+
+        ai_potential = {
+        }
+
+        ai_will_do = {
+            base = 0
+        }
+    }
