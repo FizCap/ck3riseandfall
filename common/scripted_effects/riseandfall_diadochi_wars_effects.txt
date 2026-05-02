@@ -166,9 +166,33 @@ riseandfall_diadochi_wars_se = {
 					cb = { riseandfall_diadochi_cb }
 					recalculate_cb_targets = yes
 					is_valid = {
-						scope:target_character = scope:rf_diadochi_target_ruler
-						scope:target_title = scope:rf_diadochi_target_title
-						scope:rf_diadochi_target_ruler = {
+						exists = scope:target_character
+						exists = scope:target_title
+						OR = {
+							AND = {
+								root = {
+									riseandfall_has_successor_primary_title_trigger = yes
+									exists = primary_title
+									primary_title = { has_variable = rf_successor_root_origin_title }
+								}
+								OR = {
+									scope:target_title = root.primary_title.var:rf_successor_root_origin_title
+									AND = {
+										scope:target_title = { has_variable = rf_successor_root_origin_title }
+										scope:target_title.var:rf_successor_root_origin_title = root.primary_title.var:rf_successor_root_origin_title
+									}
+								}
+							}
+							AND = {
+								root = {
+									NOT = { riseandfall_has_successor_primary_title_trigger = yes }
+									exists = primary_title
+								}
+								scope:target_title = { has_variable = rf_successor_root_origin_title }
+								scope:target_title.var:rf_successor_root_origin_title = root.primary_title
+							}
+						}
+						scope:target_character = {
 							current_military_strength < root.current_military_strength
 							OR = {
 								gold < root.gold
@@ -179,8 +203,22 @@ riseandfall_diadochi_wars_se = {
 					on_success = {
 						# Shared cooldown on the origin title prevents several same-origin realms
 						# from chaining multiple declarations from the same pulse window.
-						scope:rf_diadochi_origin_title = {
-							set_variable = { name = rf_diadochi_war_cooldown value = 1 years = 2 }
+						if = {
+							limit = {
+								root = {
+									riseandfall_has_successor_primary_title_trigger = yes
+									exists = primary_title
+									primary_title = { has_variable = rf_successor_root_origin_title }
+								}
+							}
+							root.primary_title.var:rf_successor_root_origin_title = {
+								set_variable = { name = rf_diadochi_war_cooldown value = 1 years = 2 }
+							}
+						}
+						else = {
+							root.primary_title = {
+								set_variable = { name = rf_diadochi_war_cooldown value = 1 years = 2 }
+							}
 						}
 					}
 				}
