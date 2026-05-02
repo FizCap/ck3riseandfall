@@ -57,7 +57,7 @@ riseandfall_sync_puppet_master_court_position = {
 		scope:rf_current_puppet_master_diarch = {
 			if = {
 				limit = {
-					NOT = { is_ruler = yes }
+					is_ruler = no
 					NOR = {
 						is_vassal_of = scope:rf_puppet_master_liege
 						is_courtier_of = scope:rf_puppet_master_liege
@@ -74,6 +74,7 @@ riseandfall_sync_puppet_master_court_position = {
 					has_court_position = riseandfall_puppet_master_court_position
 				}
 				scope:rf_current_puppet_master_diarch = {
+					is_ruler = no
 					OR = {
 						is_courtier_of = scope:rf_puppet_master_liege
 						employer = scope:rf_puppet_master_liege
@@ -93,6 +94,7 @@ riseandfall_sync_puppet_master_court_position = {
 			limit = {
 				NOT = { exists = scope:rf_current_puppet_master_holder }
 				scope:rf_current_puppet_master_diarch = {
+					is_ruler = no
 					NOT = { has_court_position = riseandfall_puppet_master_court_position }
 					OR = {
 						is_courtier_of = scope:rf_puppet_master_liege
@@ -215,6 +217,8 @@ riseandfall_set_guest_puppet_master_employer_se = {
 				is_diarch_of_target = scope:host
 				# Is the root a foreign court guest of the host (they have a liege)
 				is_foreign_court_guest_of = scope:host
+				# Rulers cannot be moved into another ruler's court.
+				is_ruler = no
 				# Make sure they are not already a courtier of the host
 				NOT = { is_courtier_of = scope:host }
 			}
