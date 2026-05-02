@@ -580,6 +580,9 @@ riseandfall_force_abdicate_interaction = {
 		scope:recipient = {
 			has_diarchy_type = puppet_regency
 			is_independent_ruler = yes
+			is_landed = yes
+			is_landless_ruler = no
+			NOT = { has_government = landless_adventurer_government }
 		}
 		# Only visible to the recipient's diarch
 		scope:actor = { is_diarch_of_target = scope:recipient }
@@ -596,6 +599,9 @@ riseandfall_force_abdicate_interaction = {
 			text = riseandfall_liege_has_poor_health
 			scope:recipient = {
 				is_independent_ruler = yes
+				is_landed = yes
+				is_landless_ruler = no
+				NOT = { has_government = landless_adventurer_government }
 				health < fine_health
 			}
 		}

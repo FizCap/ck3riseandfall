@@ -528,9 +528,43 @@ riseandfall_force_abdicate_effect = {
 					save_scope_as = rf_abdicate_capital_change
 				}
 				capital_county = {
-					change_title_holder = { holder = scope:chosen_successor change = scope:rf_abdicate_capital_change }
+					change_title_holder = {
+						holder = scope:chosen_successor
+						change = scope:rf_abdicate_capital_change
+						government_base = scope:recipient
+					}
 				}
 				resolve_title_and_vassal_change = scope:rf_abdicate_capital_change
+			}
+			if = {
+				limit = {
+					scope:chosen_successor = { NOT = { is_landed = yes } }
+					any_held_title = {
+						holder = scope:recipient
+						tier = tier_county
+						NOT = { is_head_of_faith = yes }
+						NOT = { is_noble_family_title = yes }
+					}
+				}
+				create_title_and_vassal_change = {
+					type = conquest
+					save_scope_as = rf_abdicate_county_change
+				}
+				random_held_title = {
+					limit = {
+						holder = scope:recipient
+						tier = tier_county
+						NOT = { is_head_of_faith = yes }
+						NOT = { is_noble_family_title = yes }
+					}
+					change_title_holder = {
+						holder = scope:chosen_successor
+						change = scope:rf_abdicate_county_change
+						take_baronies = no
+						government_base = scope:recipient
+					}
+				}
+				resolve_title_and_vassal_change = scope:rf_abdicate_county_change
 			}
 			# Create the main title transfer batch only after pre-landing transfer resolves.
 			create_title_and_vassal_change = {
@@ -550,6 +584,7 @@ riseandfall_force_abdicate_effect = {
 					holder = scope:chosen_successor
 					change = scope:change
 					take_baronies = no
+					government_base = scope:recipient
 				}
 			}
 			resolve_title_and_vassal_change = scope:change
@@ -561,9 +596,14 @@ riseandfall_force_abdicate_effect = {
 				limit = {
 					exists = scope:chosen_successor
 					scope:chosen_successor = { is_alive = yes }
+					scope:chosen_successor = { is_ruler = yes }
+					scope:chosen_successor = { is_landed = yes }
+					scope:chosen_successor = { is_landless_ruler = no }
+					scope:chosen_successor = { NOT = { has_government = landless_adventurer_government } }
 					exists = scope:actor
 					# Puppet-master diarch must be a valid courtier-type character (not a ruler)
 					scope:actor = { is_alive = yes NOT = { is_ruler = yes } }
+					scope:actor = { NOT = { has_government = landless_adventurer_government } }
 				}
 				# If no active diarchy exists yet on the chosen_successor, try to start one
 				if = {
