@@ -57,13 +57,11 @@ riseandfall_warlord_path_manager = {
             if = {
                 limit = { scope:riseandfall_choose_warlord_loyal = yes }
                 add_character_flag = riseandfall_warlord_player_loyal
-                add_character_flag = riseandfall_warlord_event_chosen
                 riseandfall_warlord_abandon_path = yes
             }
             else_if = {
                 limit = { scope:riseandfall_choose_warlord_rebel = yes }
                 remove_character_flag = riseandfall_warlord_player_loyal
-                add_character_flag = riseandfall_warlord_event_chosen
                 riseandfall_warlord_become_warlord = yes
             }
         }

@@ -2074,16 +2074,6 @@ riseandfall_calculate_total_side_prowess = {
         }
     }
 
-    # After summing, store the result on the event root and on the appropriate character for localization
-    if = {
-        limit = { this = scope:challenger }
-        scope:event_root = { set_variable = { name = riseandfall_total_prowess_chall value = var:riseandfall_total_prowess } }
-        scope:challenger = { set_variable = { name = riseandfall_total_prowess_chall value = var:riseandfall_total_prowess } }
-    }
-    else = {
-        scope:event_root = { set_variable = { name = riseandfall_total_prowess_root value = var:riseandfall_total_prowess } }
-        root = { set_variable = { name = riseandfall_total_prowess_root value = var:riseandfall_total_prowess } }
-    }
 }
 
 # Apply random outcomes (death/wounded/maimed) to root knights and challenger courtiers
