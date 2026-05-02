@@ -16,10 +16,11 @@
                         AND = {
                             government_has_flag = government_is_landless_adventurer
                             has_realm_law = camp_purpose_legitimists
+                            has_variable = legitimist_claimed_title
                             var:legitimist_claimed_title = {
                                 OR = {
                                     holder = scope:defender
-                                    de_jure_liege = scope:defender
+                                    de_jure_liege.holder = scope:defender
                                 }
                             }
                         }
