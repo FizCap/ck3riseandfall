@@ -55,44 +55,30 @@
                         NOT = { holder = scope:recipient.liege }
                         NOT = { holder = { is_ai = no } }
                         NOT = { scope:recipient = { highest_held_title_tier = tier_county } }  # Do not transfer direct counties from counts
-                        # Check if county's de jure kingdom is NOT the recipient's capital de jure kingdom
-                        NOT = { AND = { exists = scope:recipient.capital_province.county.de_jure_liege.de_jure_liege de_jure_liege = { de_jure_liege = { this = scope:recipient.capital_province.county.de_jure_liege.de_jure_liege } } } }
+                        # Transfer only counties outside every de jure title chain held by the recipient.
+                        NOT = { de_jure_liege = { holder = scope:recipient } }
+                        NOT = { de_jure_liege = { exists = de_jure_liege de_jure_liege = { holder = scope:recipient } } }
+                        NOT = { de_jure_liege = { exists = de_jure_liege de_jure_liege = { exists = de_jure_liege de_jure_liege = { holder = scope:recipient } } } }
+                        NOT = { de_jure_liege = { exists = de_jure_liege de_jure_liege = { exists = de_jure_liege de_jure_liege = { exists = de_jure_liege de_jure_liege = { holder = scope:recipient } } } } }
                     }
                 }
-                # Relaxed check: any directly held county whose de jure liege differs
-                custom_tooltip = {
-                    text = riseandfall_fix_bordergore.recipient_outside_dejure.tooltip
-                    subject = scope:recipient
-                    any_held_title = {
-                        tier = tier_county
-                        exists = de_jure_liege
-                        holder = scope:recipient
-                        NOT = { AND = { exists = scope:recipient.capital_province.county.de_jure_liege de_jure_liege = scope:recipient.capital_province.county.de_jure_liege } }
-                    }
-                }
-                # Subrealm counties (held by direct vassals) that would be transferred
+                # Subrealm counties (held by the recipient's vassals) that would be transferred
                 custom_tooltip = {
                     text = riseandfall_fix_bordergore.vassal_direct_counties.tooltip
                     subject = scope:recipient
-                    any_vassal = {
-                        any_held_title = {
-                            tier = tier_county
-                            exists = de_jure_liege
-                            NOT = { holder = scope:recipient.liege }
-                            NOT = { holder = { is_ai = no } }
-                            NOT = { holder = scope:recipient }
-                            NOT = { this = scope:recipient.liege.capital_province.county }
-                            NOT = { this = scope:recipient.capital_province.county }
-                            # Check if county's de jure kingdom is NOT the recipient's capital de jure kingdom
-                            NOT = {
-                                de_jure_liege = {
-                                    de_jure_liege = {
-                                        this = scope:recipient.capital_province.county.de_jure_liege.de_jure_liege
-                                    }
-                                }
-                            }
-                            NOT = { AND = { has_variable = Riseandfall_giveaway_blocked scope:recipient.liege = { is_ai = no } } }
-                        }
+                    any_sub_realm_county = {
+                        exists = this
+                        exists = de_jure_liege
+                        NOT = { holder = scope:recipient.liege }
+                        NOT = { holder = { is_ai = no } }
+                        NOT = { holder = scope:recipient }
+                        NOT = { this = scope:recipient.liege.capital_province.county }
+                        NOT = { this = scope:recipient.capital_province.county }
+                        NOT = { de_jure_liege = { holder = scope:recipient } }
+                        NOT = { de_jure_liege = { exists = de_jure_liege de_jure_liege = { holder = scope:recipient } } }
+                        NOT = { de_jure_liege = { exists = de_jure_liege de_jure_liege = { exists = de_jure_liege de_jure_liege = { holder = scope:recipient } } } }
+                        NOT = { de_jure_liege = { exists = de_jure_liege de_jure_liege = { exists = de_jure_liege de_jure_liege = { exists = de_jure_liege de_jure_liege = { holder = scope:recipient } } } } }
+                        NOT = { AND = { has_variable = Riseandfall_giveaway_blocked scope:recipient.liege = { is_ai = no } } }
                     }
                 }
             }

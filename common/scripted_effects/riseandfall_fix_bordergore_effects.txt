@@ -1,8 +1,7 @@
 ﻿############################################################
 # Rise and Fall: Fix Bordergore scripted effects
-# Called by a character interaction where a liege fixes vassal-held duchies/kingdoms
-# Behavior: iterate titles held by the recipient (duchy+). If the title's de jure liege
-# is the actor (the liege), transfer the title (and vassals) to the liege.
+# Called by a character interaction where a liege fixes vassal-held counties
+# outside the target vassal's de jure title chains.
 ############################################################
 
 riseandfall_fix_bordergore_se = {
