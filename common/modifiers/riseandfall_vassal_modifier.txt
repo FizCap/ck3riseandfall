@@ -22,8 +22,4 @@ riseandfall_authority_collapse_liege_debuff = {
     vassal_opinion = -200
     icon = intrigue_negative
 }
-riseandfall_vassal_limit_bonus_temp = {
-    vassal_limit = 1000
-    icon = intrigue_positive
-}
 # Applied to a ruler who chose to release rebel territories rather than fight

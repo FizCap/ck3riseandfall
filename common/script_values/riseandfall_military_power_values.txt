@@ -79,6 +79,7 @@ riseandfall_ai_advanced_kingdom_pressure_value = {
 
     if = { limit = { scope:emperor = { vassal_limit_available < -2 } } add = 300 }
     else_if = { limit = { scope:emperor = { vassal_limit_available < -1 } } add = 220 }
+    else_if = { limit = { scope:emperor = { vassal_limit_percentage >= 0.95 } } add = 200 }
     else_if = { limit = { scope:emperor = { vassal_limit_available < 1 } } add = 90 }
 
     if = {

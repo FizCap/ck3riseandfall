@@ -218,6 +218,68 @@ riseandfall_ai_advanced_grant_target_kingdom_se = {
     }
 }
 
+riseandfall_ai_advanced_grant_target_duchy_se = {
+    # Expected scope: king/liege character.
+    # Required saved scopes: scope:target_title = duchy, scope:rf_advanced_chosen_vassal = recipient.
+    save_scope_as = king
+
+    if = {
+        limit = {
+            is_ai = yes
+            exists = scope:target_title
+            exists = scope:rf_advanced_chosen_vassal
+            scope:target_title = {
+                tier = tier_duchy
+                holder = scope:king
+                any_dejure_vassal_title_holder = {
+                    this = scope:rf_advanced_chosen_vassal
+                }
+            }
+            scope:rf_advanced_chosen_vassal = {
+                is_landed = yes
+                highest_held_title_tier >= tier_county
+                highest_held_title_tier < tier_duchy
+                any_liege_or_above = { this = scope:king }
+                NOT = { this = scope:king }
+                is_adult = yes
+                is_imprisoned = no
+                NOT = { has_trait = incapable }
+                NOT = { has_trait = infirm }
+                NOT = { has_trait = warlord }
+                NOT = { has_trait = disloyal }
+                NOT = { is_at_war_with = scope:king }
+                NOT = { has_relation_rival = scope:king }
+                OR = {
+                    opinion = { target = scope:king value >= -20 }
+                    has_trait = loyal
+                    has_trait = trusting
+                    has_trait = content
+                }
+                OR = {
+                    NOT = { government_has_flag = government_is_theocracy }
+                    scope:king = { government_has_flag = government_is_theocracy }
+                }
+            }
+        }
+
+        create_title_and_vassal_change = { type = granted save_scope_as = rf_advanced_duchy_grant_change }
+        scope:target_title = {
+            change_title_holder_include_vassals = {
+                holder = scope:rf_advanced_chosen_vassal
+                change = scope:rf_advanced_duchy_grant_change
+                take_baronies = no
+            }
+        }
+        resolve_title_and_vassal_change = scope:rf_advanced_duchy_grant_change
+
+        set_variable = { name = riseandfall_ai_advanced_title_action_cooldown value = yes years = 5 }
+
+        scope:rf_advanced_chosen_vassal = {
+            add_opinion = { modifier = received_title_duchy target = scope:king days = 365 }
+        }
+    }
+}
+
 riseandfall_ai_advanced_destroy_unwanted_titles_se = {
     # Advanced mode should not let AI rulers hoard spare kingdom/empire/hegemony titles.
     # Duchies are intentionally ignored here.
@@ -477,9 +539,103 @@ riseandfall_ai_advanced_destroy_unwanted_titles_se = {
 }
 
 riseandfall_ai_advanced_title_handout_se = {
-    # Advanced mode: grant one pressure-driven kingdom when useful, then destroy
-    # leftover non-primary kingdom/empire/hegemony titles so AI cannot hoard them.
+    # Advanced mode: king-rank rulers relieve pressure with duchies first.
+    # Emperor/hegemony rulers grant one pressure-driven kingdom when useful, then
+    # destroy leftover non-primary kingdom/empire/hegemony titles so AI cannot hoard them.
     save_scope_as = emperor
+
+    if = {
+        limit = {
+            is_ai = yes
+            highest_held_title_tier >= tier_kingdom
+            vassal_limit_percentage >= 0.95
+            NOT = { has_variable = riseandfall_ai_advanced_title_action_cooldown }
+        }
+
+        ordered_realm_de_jure_duchy = {
+            order_by = tier
+            max = 1
+            check_range_bounds = no
+            limit = {
+                exists = this
+                holder = scope:emperor
+                NOT = { any_de_jure_county = { this = scope:emperor.capital_province.county } }
+                any_dejure_vassal_title_holder = {
+                    is_landed = yes
+                    highest_held_title_tier >= tier_county
+                    highest_held_title_tier < tier_duchy
+                    any_liege_or_above = { this = scope:emperor }
+                    NOT = { this = scope:emperor }
+                    is_adult = yes
+                    is_imprisoned = no
+                    NOT = { has_trait = incapable }
+                    NOT = { has_trait = infirm }
+                    NOT = { has_trait = warlord }
+                    NOT = { has_trait = disloyal }
+                    NOT = { is_at_war_with = scope:emperor }
+                    NOT = { has_relation_rival = scope:emperor }
+                    OR = {
+                        opinion = { target = scope:emperor value >= -20 }
+                        has_trait = loyal
+                        has_trait = trusting
+                        has_trait = content
+                    }
+                    OR = {
+                        NOT = { government_has_flag = government_is_theocracy }
+                        scope:emperor = { government_has_flag = government_is_theocracy }
+                    }
+                }
+            }
+            save_scope_as = target_title
+
+            scope:target_title = {
+                ordered_dejure_vassal_title_holder = {
+                    limit = {
+                        is_landed = yes
+                        highest_held_title_tier >= tier_county
+                        highest_held_title_tier < tier_duchy
+                        any_liege_or_above = { this = scope:emperor }
+                        NOT = { this = scope:emperor }
+                        is_adult = yes
+                        is_imprisoned = no
+                        NOT = { has_trait = incapable }
+                        NOT = { has_trait = infirm }
+                        NOT = { has_trait = warlord }
+                        NOT = { has_trait = disloyal }
+                        NOT = { is_at_war_with = scope:emperor }
+                        NOT = { has_relation_rival = scope:emperor }
+                        OR = {
+                            opinion = { target = scope:emperor value >= -20 }
+                            has_trait = loyal
+                            has_trait = trusting
+                            has_trait = content
+                        }
+                        OR = {
+                            NOT = { government_has_flag = government_is_theocracy }
+                            scope:emperor = { government_has_flag = government_is_theocracy }
+                        }
+                    }
+                    order_by = riseandfall_ai_advanced_title_grant_score_value
+                    max = 1
+                    check_range_bounds = no
+                    save_scope_as = rf_advanced_chosen_vassal
+                }
+            }
+
+            if = {
+                limit = {
+                    exists = scope:rf_advanced_chosen_vassal
+                    scope:target_title = {
+                        holder = scope:emperor
+                        any_dejure_vassal_title_holder = {
+                            this = scope:rf_advanced_chosen_vassal
+                        }
+                    }
+                }
+                scope:emperor = { riseandfall_ai_advanced_grant_target_duchy_se = yes }
+            }
+        }
+    }
 
     if = {
         limit = {
@@ -522,6 +678,7 @@ riseandfall_ai_advanced_title_handout_se = {
                 }
                 OR = {
                     scope:emperor = { vassal_limit_available < -1 }
+                    scope:emperor = { vassal_limit_percentage >= 0.95 }
                     AND = {
                         scope:emperor = { vassal_limit_available < 1 }
                         NOT = { is_neighbor_to_realm = scope:emperor }
@@ -710,15 +867,6 @@ riseandfall_grant_counties_se = {
                     scope:created_vassal = {
                         hidden_effect = {
                             add_opinion = { modifier = received_title_county target = scope:liege days = 365 }
-                        }
-                    }
-
-                    # If the liege is AI-controlled, give the liege a temporary vassal limit bonus
-                    # to keep realms stable after mass grants. Only apply if they don't already have it.
-                    scope:liege = {
-                        if = {
-                            limit = { is_ai = yes }
-                            add_character_modifier = { modifier = riseandfall_vassal_limit_bonus_temp years = 5 }
                         }
                     }
                 }
