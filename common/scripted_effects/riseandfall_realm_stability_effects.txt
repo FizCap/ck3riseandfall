@@ -778,7 +778,8 @@ riseandfall_calculate_realm_stability_se = {
         #   sum(sub_realm_size of direct vassals at war with liege) / ruler realm_size
         # Tier mapping (percent rebel share):
         #   5-20 => +1 pressure/year, 21-40 => +2, 41-60 => +3, 61-80 => +4, 81-100 => +5
-        # Pressure decays by 1/year while not in civil war. Final penalty is -pressure, capped at -50.
+        # Pressure decays by 10%/year while not in civil war, with a minimum step of 1.
+        # Final penalty is -pressure, capped at -50.
         save_scope_as = ruler
         set_variable = { name = tmp_cw_realm_counties value = 1 }
         set_variable = { name = tmp_cw_rebel_counties value = 0 }
@@ -814,12 +815,12 @@ riseandfall_calculate_realm_stability_se = {
             # Decay the stored civil war pressure by 10% per year outside of war,
             # but never reduce it by less than 1.
             set_variable = { name = tmp_cw_decay value = var:riseandfall_rs_civil_war_years }
-            change_variable = { name = tmp_cw_decay multiply = 9 }
             change_variable = { name = tmp_cw_decay divide = 10 }
             if = { limit = { var:tmp_cw_decay < 1 } set_variable = { name = tmp_cw_decay value = 1 } }
             set_variable = { name = tmp_cw_decay_neg value = var:tmp_cw_decay }
             if = { limit = { var:riseandfall_rs_civil_war_years > 0 } change_variable = { name = tmp_cw_decay_neg multiply = -1 } }
             if = { limit = { var:riseandfall_rs_civil_war_years > 0 } change_variable = { name = riseandfall_rs_civil_war_years add = var:tmp_cw_decay_neg } }
+            clamp_variable = { name = riseandfall_rs_civil_war_years min = 0 max = 50 }
         }
 
     # Compute cumulative penalty from weighted pressure and subtract from target score
