@@ -58,11 +58,7 @@ riseandfall_sync_puppet_master_court_position = {
 			if = {
 				limit = {
 					is_ruler = no
-					NOR = {
-						is_vassal_of = scope:rf_puppet_master_liege
-						is_courtier_of = scope:rf_puppet_master_liege
-						employer = scope:rf_puppet_master_liege
-					}
+					NOT = { employer = scope:rf_puppet_master_liege }
 				}
 				set_employer = scope:rf_puppet_master_liege
 			}
@@ -75,10 +71,7 @@ riseandfall_sync_puppet_master_court_position = {
 				}
 				scope:rf_current_puppet_master_diarch = {
 					is_ruler = no
-					OR = {
-						is_courtier_of = scope:rf_puppet_master_liege
-						employer = scope:rf_puppet_master_liege
-					}
+					employer = scope:rf_puppet_master_liege
 				}
 				NOT = { scope:rf_current_puppet_master_holder ?= scope:rf_current_puppet_master_diarch }
 			}
@@ -96,10 +89,7 @@ riseandfall_sync_puppet_master_court_position = {
 				scope:rf_current_puppet_master_diarch = {
 					is_ruler = no
 					NOT = { has_court_position = riseandfall_puppet_master_court_position }
-					OR = {
-						is_courtier_of = scope:rf_puppet_master_liege
-						employer = scope:rf_puppet_master_liege
-					}
+					employer = scope:rf_puppet_master_liege
 				}
 			}
 			scope:rf_puppet_master_liege = {
