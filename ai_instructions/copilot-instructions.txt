@@ -38,6 +38,8 @@ CK3 Scripting Rules to Follow
 - Scope correctness is critical. Validate scope chains in `docs/event_scopes.log` before writing triggers/effects.
 - `var:` numeric comparisons are supported in CK3. They are used in vanilla and in this mod.
 - Still guard risky variable reads with `has_variable` when values may be unset (especially in tooltip-evaluated paths).
+- For object/scope variable comparisons in tooltip-evaluated triggers, prefer CK3's optional comparison form `var:some_scope_var ?= scope:target`.
+  - Do not rely on `AND = { has_variable = some_scope_var var:some_scope_var = scope:target }` to short-circuit; CK3 can still evaluate the unset `var:` read while building interaction tooltips.
 - `spawn_army` requires a province for `location`.
   - Preferred pattern: `location = scope:some_character.capital_province`
   - `name = <loc_key>` is optional but recommended for clarity.

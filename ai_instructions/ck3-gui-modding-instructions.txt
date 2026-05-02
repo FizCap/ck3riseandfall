@@ -269,3 +269,15 @@ Minimal LLM Change Contract
   - visibility/enabled logic matches intent
   - action executes expected command/effect
   - no raw missing loc keys in UI
+
+CK3 GUI Rules to Follow
+- Main-tab HUD buttons should follow vanilla patterns from `gui/hud.gui`, `gui/window_court.gui`, and `gui/window_factions.gui` when opening vanilla/known game views.
+- `ToggleGameView('<key>')` and `IsGameViewOpen('<key>')` only open known/registered game views. Do not assume a new custom `window = { name = "<key>" }` file automatically registers a new game-view key.
+- For custom mod HUD panels, use a `GetVariableSystem` flag and put the actual panel widget inside an already-loaded HUD widget such as `ingame_topbar` in `gui/hud.gui`.
+  - button: `onclick = "[GetVariableSystem.Set('my_panel_open', 'true')]"`
+  - close button: `onclick = "[GetVariableSystem.Clear('my_panel_open')]"`
+  - panel: `visible = "[GetVariableSystem.Exists('my_panel_open')]"`
+- A standalone custom `.gui` file can parse cleanly but still fail to instantiate a top-level widget when clicked from the HUD.
+- If a GUI widget needs to display a character stored in a variable on the current `Character` context, bridge through `Scope` to avoid same-context datacontext errors:
+  - parent row: `datacontext = "[Character.MakeScope.Var('some_character_var')]"`
+  - `types Scope` row: `datacontext = "[Scope.Char]"`
