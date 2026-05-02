@@ -182,7 +182,13 @@ riseandfall_marry_male_target_se = {
         gender = female
         save_scope_as = created_spouse
     }
-    marry = scope:created_spouse
+    if = {
+        limit = {
+            exists = scope:created_spouse
+            can_marry_character_trigger = { CHARACTER = scope:created_spouse }
+        }
+        marry = scope:created_spouse
+    }
     # Clean up the created spouse if the marriage didn't occur (avoid orphan characters)
     if = {
         limit = { exists = scope:created_spouse scope:created_spouse = { NOT = { is_married = yes } } }
@@ -201,7 +207,13 @@ riseandfall_marry_female_target_se = {
         gender = male
         save_scope_as = created_spouse
     }
-    marry_matrilineal = scope:created_spouse
+    if = {
+        limit = {
+            exists = scope:created_spouse
+            can_marry_character_trigger = { CHARACTER = scope:created_spouse }
+        }
+        marry_matrilineal = scope:created_spouse
+    }
     # Clean up the created spouse if the marriage didn't occur (avoid orphan characters)
     if = {
         limit = { exists = scope:created_spouse scope:created_spouse = { NOT = { is_married = yes } } }

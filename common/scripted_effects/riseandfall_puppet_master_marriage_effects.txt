@@ -40,7 +40,12 @@ riseandfall_marry_puppet_master_male_se = {
             limit = { scope:liege = { exists = yes } }
             scope:created_spouse = { set_employer = scope:liege }
         }
-        marry = scope:created_spouse
+        if = {
+            limit = {
+                can_marry_character_trigger = { CHARACTER = scope:created_spouse }
+            }
+            marry = scope:created_spouse
+        }
     }
 
     # Clean up the created spouse if the marriage didn't occur (avoid orphan characters)
@@ -87,7 +92,12 @@ riseandfall_marry_puppet_master_female_se = {
             limit = { scope:liege = { exists = yes } }
             scope:created_spouse = { set_employer = scope:liege }
         }
-        marry_matrilineal = scope:created_spouse
+        if = {
+            limit = {
+                can_marry_character_trigger = { CHARACTER = scope:created_spouse }
+            }
+            marry_matrilineal = scope:created_spouse
+        }
     }
 
     # Clean up the created spouse if the marriage didn't occur

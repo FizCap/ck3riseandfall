@@ -113,6 +113,7 @@ riseandfall_marry_male_target = {
             limit = {
                 has_realm_law = camp_purpose_legitimists
                 NOT = { has_trait_with_flag = can_not_marry }
+                can_marry_trigger = yes
                 is_imprisoned = no
                 is_male = yes
                 is_adult = yes
@@ -134,6 +135,7 @@ riseandfall_marry_female_target = {
             limit = {
                 has_realm_law = camp_purpose_legitimists
                 NOT = { has_trait_with_flag = can_not_marry }
+                can_marry_trigger = yes
                 is_imprisoned = no
                 is_female = yes
                 is_adult = yes

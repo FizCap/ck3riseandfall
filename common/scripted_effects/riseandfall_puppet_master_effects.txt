@@ -57,6 +57,7 @@ riseandfall_sync_puppet_master_court_position = {
 		scope:rf_current_puppet_master_diarch = {
 			if = {
 				limit = {
+					NOT = { is_ruler = yes }
 					NOR = {
 						is_vassal_of = scope:rf_puppet_master_liege
 						is_courtier_of = scope:rf_puppet_master_liege
@@ -71,6 +72,12 @@ riseandfall_sync_puppet_master_court_position = {
 				exists = scope:rf_current_puppet_master_holder
 				scope:rf_current_puppet_master_holder = {
 					has_court_position = riseandfall_puppet_master_court_position
+				}
+				scope:rf_current_puppet_master_diarch = {
+					OR = {
+						is_courtier_of = scope:rf_puppet_master_liege
+						employer = scope:rf_puppet_master_liege
+					}
 				}
 				NOT = { scope:rf_current_puppet_master_holder ?= scope:rf_current_puppet_master_diarch }
 			}
@@ -87,6 +94,10 @@ riseandfall_sync_puppet_master_court_position = {
 				NOT = { exists = scope:rf_current_puppet_master_holder }
 				scope:rf_current_puppet_master_diarch = {
 					NOT = { has_court_position = riseandfall_puppet_master_court_position }
+					OR = {
+						is_courtier_of = scope:rf_puppet_master_liege
+						employer = scope:rf_puppet_master_liege
+					}
 				}
 			}
 			scope:rf_puppet_master_liege = {
@@ -104,31 +115,57 @@ riseandfall_claim_puppet_master_office_effect = {
 	scope:recipient = {
 		if = {
 			limit = {
-				NOR = {
-					scope:actor = { is_courtier_of = scope:recipient }
-					scope:actor = { is_vassal_of = scope:recipient }
-					scope:actor = { employer = scope:recipient }
+				scope:actor = {
+					is_alive = yes
+					NOT = { is_ruler = yes }
 				}
 			}
-			scope:actor = { set_employer = scope:recipient }
-		}
+			if = {
+				limit = {
+					NOR = {
+						scope:actor = { is_courtier_of = scope:recipient }
+						scope:actor = { is_vassal_of = scope:recipient }
+						scope:actor = { employer = scope:recipient }
+					}
+				}
+				scope:actor = { set_employer = scope:recipient }
+			}
 
-		if = {
-			limit = { employs_court_position = riseandfall_puppet_master_court_position }
-			random_court_position_holder = {
-				type = riseandfall_puppet_master_court_position
-				save_scope_as = old_puppet_master
+			if = {
+				limit = {
+					employs_court_position = riseandfall_puppet_master_court_position
+					scope:actor = {
+						OR = {
+							is_courtier_of = scope:recipient
+							employer = scope:recipient
+						}
+					}
+				}
+				random_court_position_holder = {
+					type = riseandfall_puppet_master_court_position
+					save_scope_as = old_puppet_master
+				}
+				replace_court_position = {
+					recipient = scope:actor
+					holder = scope:old_puppet_master
+					court_position = riseandfall_puppet_master_court_position
+				}
 			}
-			replace_court_position = {
-				recipient = scope:actor
-				holder = scope:old_puppet_master
-				court_position = riseandfall_puppet_master_court_position
-			}
-		}
-		else = {
-			appoint_court_position = {
-				recipient = scope:actor
-				court_position = riseandfall_puppet_master_court_position
+			else = {
+				if = {
+					limit = {
+						scope:actor = {
+							OR = {
+								is_courtier_of = scope:recipient
+								employer = scope:recipient
+							}
+						}
+					}
+					appoint_court_position = {
+						recipient = scope:actor
+						court_position = riseandfall_puppet_master_court_position
+					}
+				}
 			}
 		}
 	}
