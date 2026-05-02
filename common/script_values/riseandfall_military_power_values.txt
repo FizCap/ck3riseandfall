@@ -12,3 +12,111 @@ riseandfall_military_power_with_allies_strong = {
     value = riseandfall_military_power_with_allies
     multiply = 1.5
 }
+
+riseandfall_ai_advanced_title_grant_score_value = {
+    value = 0
+
+    # Prefer vassals who already anchor the target kingdom's de jure structure.
+    if = { limit = { highest_held_title_tier >= tier_duchy } add = 40 }
+    if = { limit = { highest_held_title_tier >= tier_kingdom } add = -25 }
+    if = { limit = { is_powerful_vassal = yes } add = 15 }
+    if = { limit = { primary_title = { de_jure_liege = scope:target_title } } add = 45 }
+    if = {
+        limit = {
+            exists = capital_county
+            capital_county = {
+                de_jure_liege = {
+                    de_jure_liege = scope:target_title
+                }
+            }
+        }
+        add = 35
+    }
+
+    # Personal loyalty to the current liege matters more than raw size.
+    if = { limit = { opinion = { target = scope:emperor value >= 60 } } add = 80 }
+    else_if = { limit = { opinion = { target = scope:emperor value >= 40 } } add = 55 }
+    else_if = { limit = { opinion = { target = scope:emperor value >= 20 } } add = 30 }
+    else_if = { limit = { opinion = { target = scope:emperor value >= 0 } } add = 10 }
+    if = { limit = { opinion = { target = scope:emperor value <= -50 } } add = -120 }
+    else_if = { limit = { opinion = { target = scope:emperor value <= -20 } } add = -60 }
+
+    if = { limit = { has_trait = loyal } add = 80 }
+    if = { limit = { has_trait = trusting } add = 45 }
+    if = { limit = { has_trait = content } add = 45 }
+    if = { limit = { has_trait = humble } add = 25 }
+    if = { limit = { has_trait = patient } add = 15 }
+    if = { limit = { has_trait = just } add = 15 }
+    if = { limit = { has_trait = honest } add = 10 }
+
+    if = { limit = { has_trait = warlord } add = -250 }
+    if = { limit = { has_trait = disloyal } add = -175 }
+    if = { limit = { has_trait = ambitious } add = -45 }
+    if = { limit = { has_trait = arrogant } add = -35 }
+    if = { limit = { has_trait = arbitrary } add = -25 }
+    if = { limit = { has_trait = greedy } add = -20 }
+    if = { limit = { has_trait = fickle } add = -20 }
+    if = { limit = { has_trait = paranoid } add = -15 }
+
+    if = { limit = { has_same_culture_as = scope:emperor } add = 15 }
+    if = { limit = { faith = scope:emperor.faith } add = 15 }
+    if = {
+        limit = {
+            has_dynasty = yes
+            scope:emperor = { has_dynasty = yes }
+            dynasty = scope:emperor.dynasty
+        }
+        add = 20
+    }
+
+    add = diplomacy
+}
+
+riseandfall_ai_advanced_kingdom_pressure_value = {
+    # Title-scoped value. Expects scope:emperor to be the AI ruler considering
+    # whether this kingdom should be created or handed out.
+    value = 0
+
+    if = { limit = { scope:emperor = { vassal_limit_available < -2 } } add = 300 }
+    else_if = { limit = { scope:emperor = { vassal_limit_available < -1 } } add = 220 }
+    else_if = { limit = { scope:emperor = { vassal_limit_available < 1 } } add = 90 }
+
+    if = {
+        limit = {
+            scope:emperor = { vassal_limit_available < 1 }
+            NOT = { is_neighbor_to_realm = scope:emperor }
+        }
+        add = 45
+    }
+
+    if = {
+        limit = {
+            any_dejure_vassal_title_holder = {
+                any_liege_or_above = { this = scope:emperor }
+                opinion = { target = scope:emperor value <= -50 }
+            }
+        }
+        add = 60
+    }
+    if = {
+        limit = {
+            scope:emperor = { vassal_limit_available < 2 }
+            any_dejure_vassal_title_holder = {
+                any_liege_or_above = { this = scope:emperor }
+                opinion = { target = scope:emperor value <= -75 }
+            }
+        }
+        add = 80
+    }
+
+    if = {
+        limit = {
+            scope:emperor = {
+                vassal_limit_available < 2
+                has_variable = riseandfall_realm_stability_score
+                NOT = { var:riseandfall_realm_stability_score >= 30 }
+            }
+        }
+        add = 100
+    }
+}

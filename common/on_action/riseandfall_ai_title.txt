@@ -3,6 +3,8 @@
         riseandfall_ai_create_titles
         riseandfall_ai_usurp_titles
         riseandfall_ai_title_handout
+        riseandfall_ai_advanced_create_titles
+        riseandfall_ai_advanced_title_handout
     }
 }
 
@@ -40,6 +42,29 @@ riseandfall_ai_title_handout = {
         every_ruler = {
             limit = { is_ai = yes }
             riseandfall_ai_title_handout_se = yes
+        }
+    }
+}
+
+riseandfall_ai_advanced_create_titles = {
+    trigger = {
+        has_game_rule = riseandfall_ai_kingdom_creation_advanced
+        years_from_game_start >= 2
+    }
+    effect = {
+        riseandfall_ai_create_titles_advanced_se = yes
+    }
+}
+
+riseandfall_ai_advanced_title_handout = {
+    trigger = {
+        has_game_rule = riseandfall_ai_kingdom_creation_advanced
+        years_from_game_start >= 2
+    }
+    effect = {
+        every_ruler = {
+            limit = { is_ai = yes }
+            riseandfall_ai_advanced_title_handout_se = yes
         }
     }
 }
