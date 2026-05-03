@@ -5512,48 +5512,44 @@ types CharacterWindow
 		}
 
 		divider_light = {
-			visible = "[And( Character.HasLandedTitles, Character.MakeScope.Var('riseandfall_realm_stability_score').IsSet )]"
+			visible = "[And( And( Character.HasLandedTitles, NotEqualTo_int32( Character.GetPrimaryTitle.GetTierFrame, '(int32)2' ) ), Character.MakeScope.Var('riseandfall_realm_stability_score').IsSet )]"
 			layoutpolicy_vertical = expanding
 		}
 
-		# Stability (modernized: icon + compact progress bar + ratio) — moved into its own vbox
-		# Put the box next to military strength in its own vbox and show it only
-		# for characters that actually have a stability score set (like we show
-		# military strength only for landed characters). This avoids showing the
-		# stability HUD for characters without stability data.
-		    vbox = {
-				name = "stability_vbox"
-				size = { 86 32 }
-				datacontext = "[AccessGameRules.AccessNamedGameRule( 'riseandfall_enable_realm_stability' ).GetSetting]"
-				tooltipwidget = {
-					stability_hud_tooltip = {}
-				}
-				using = tooltip_es
-				# Show stability HUD for landed rulers while the feature is enabled.
-				# Also require the stability variable to be set so this control doesn't
-				# show for characters who don't have realm stability.
-					visible = "[And( And( And( Character.HasLandedTitles, NotEqualTo_int32( Character.GetPrimaryTitle.GetTierFrame, '(int32)2' ) ), And( Not( Character.GetGovernment.IsType( 'landless_adventurer_government' ) ), Not( GameRuleSetting.HasFlag( 'riseandfall_realm_stability_disabled' ) ) ) ), Character.MakeScope.Var('riseandfall_realm_stability_score').IsSet )]"
+		# Stability
+		vbox = {
+			name = "stability_vbox"
+			size = { 92 32 }
+			datacontext = "[AccessGameRules.AccessNamedGameRule( 'riseandfall_enable_realm_stability' ).GetSetting]"
+			tooltipwidget = {
+				stability_hud_tooltip = {}
+			}
+			using = tooltip_es
+			visible = "[And( And( And( Character.HasLandedTitles, NotEqualTo_int32( Character.GetPrimaryTitle.GetTierFrame, '(int32)2' ) ), And( Not( Character.GetGovernment.IsType( 'landless_adventurer_government' ) ), Not( GameRuleSetting.HasFlag( 'riseandfall_realm_stability_disabled' ) ) ) ), Character.MakeScope.Var('riseandfall_realm_stability_score').IsSet )]"
+
+			background = {
+				using = Background_Area_Dark
+				margin = { 2 0 }
+			}
 
 			hbox = {
-				spacing = 6
+				spacing = -1
 
-				# Left: small circular icon (consistent with other stat boxes but modernized)
 				container = {
-					margin_left = 2
+					margin_left = 1
+					size = { 31 32 }
 
 					background = {
-						using = Background_Area_Dark
-						size = { 34 34 }
+						size = { 31 32 }
 						alwaystransparent = yes
-						margin = { 5 0 }
 					}
 
 					icon = {
 						name = "stability_icon"
-						size = { 27 27 }
+						size = { 30 30 }
 						texture = "gfx/interface/icons/scale_of_power.dds"
 						parentanchor = center
-						# Icon glow varies with stability
+
 						modify_texture = {
 							name = "icon_glow_high"
 							texture = "gfx/interface/colors/gold.dds"
@@ -5580,55 +5576,40 @@ types CharacterWindow
 					}
 				}
 
-				# Middle: numeric value above a compact progress bar (mirror military strength)
 				vbox = {
-					layoutpolicy_horizontal = expanding
-					layoutpolicy_vertical = expanding
-					spacing = 2
+					size = { 52 32 }
+					spacing = -2
 
-						text_single = {
+					text_single = {
 						name = "stability_score"
 						text = "[Character.MakeScope.Var('riseandfall_realm_stability_score').GetValue|0]"
 						default_format = "#high"
 						align = center|nobaseline
 						fontsize_min = 12
-						max_width = 60
-						# tooltip moved to vbox to show when hovering the entire stability box
+						max_width = 52
+						margin_top = 3
+					}
 
-						progressbar_green = {
-							name = "stability_progress"
-							parentanchor = bottom|hcenter
-							position = { 0 5 }
-							size = { 40 8 }
-							min = 0
-							max = 100
-							value = "[FixedPointToProgressbarValue( Divide_CFixedPoint( Character.MakeScope.Var('riseandfall_realm_stability_score').GetValue, '(CFixedPoint)100' ) )]"
-							# keep the progressbar shown while the stat is visible
-							visible = "[GreaterThanOrEqualTo_CFixedPoint( Character.MakeScope.Var('riseandfall_realm_stability_score').GetValue, '(CFixedPoint)0' )]"
-							# Overlay glows: change based on stability thresholds (high / medium / low)
-							modify_texture = {
-								name = "glow_high"
-								texture = "gfx/interface/colors/gold.dds"
-								blend_mode = colordodge
-								alpha = 0.35
-								visible = "[GreaterThanOrEqualTo_CFixedPoint( Character.MakeScope.Var('riseandfall_realm_stability_score').GetValue, '(CFixedPoint)70' )]"
-							}
+					progressbar_standard = {
+						name = "stability_progress"
+						margin_top = -1
+						size = { 46 8 }
+						min = 0
+						max = 100
+						value = "[FixedPointToProgressbarValue( Divide_CFixedPoint( Character.MakeScope.Var('riseandfall_realm_stability_score').GetValue, '(CFixedPoint)100' ) )]"
+						visible = "[GreaterThanOrEqualTo_CFixedPoint( Character.MakeScope.Var('riseandfall_realm_stability_score').GetValue, '(CFixedPoint)0' )]"
 
-							modify_texture = {
-								name = "glow_mid"
-								texture = "gfx/interface/colors/orange.dds"
-								blend_mode = colordodge
-								alpha = 0.22
-								visible = "[And( GreaterThanOrEqualTo_CFixedPoint( Character.MakeScope.Var('riseandfall_realm_stability_score').GetValue, '(CFixedPoint)31' ), LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_realm_stability_score').GetValue, '(CFixedPoint)70' ) )]"
-							}
+						blockoverride "progress_textures"
+						{
+							progresstexture = "gfx/interface/progressbars/progress_orange.dds"
+							noprogresstexture = "gfx/interface/progressbars/progress_orange_bg.dds"
+						}
 
-							modify_texture = {
-								name = "glow_low"
-								texture = "gfx/interface/colors/grey.dds"
-								blend_mode = alphamultiply
-								alpha = 0.28
-								visible = "[LessThanOrEqualTo_CFixedPoint( Character.MakeScope.Var('riseandfall_realm_stability_score').GetValue, '(CFixedPoint)30' )]"
-							}
+						modify_texture = {
+							name = "stability_gold_glow"
+							texture = "gfx/interface/colors/gold.dds"
+							blend_mode = colordodge
+							alpha = 0.45
 						}
 					}
 				}
