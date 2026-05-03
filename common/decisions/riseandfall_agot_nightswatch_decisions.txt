@@ -1,0 +1,46 @@
+﻿riseandfall_agot_restore_nights_watch_government_decision = {
+	picture = { reference = "gfx/interface/illustrations/event_scenes/ep2_western_army.dds" }
+	sort_order = 38
+	ai_check_interval = 0
+	desc = riseandfall_agot_restore_nights_watch_government_decision_desc
+	selection_tooltip = riseandfall_agot_restore_nights_watch_government_decision_tooltip
+	decision_group_type = riseandfall
+
+	is_shown = {
+		has_title = title:k_the_wall
+		OR = {
+			has_trait = nightswatch
+			has_trait = nightswatch_temp
+			has_trait = nightswatch_historical
+		}
+		OR = {
+			NOT = { government_has_flag = government_is_nw }
+			NOT = { has_realm_law = nights_watch_realm_succession_law }
+		}
+	}
+
+	is_valid = {
+		has_title = title:k_the_wall
+		OR = {
+			has_trait = nightswatch
+			has_trait = nightswatch_temp
+			has_trait = nightswatch_historical
+		}
+		OR = {
+			NOT = { government_has_flag = government_is_nw }
+			NOT = { has_realm_law = nights_watch_realm_succession_law }
+		}
+	}
+
+	effect = {
+		riseandfall_agot_restore_nights_watch_government_effect = yes
+	}
+
+	ai_potential = {
+		has_title = title:k_the_wall
+	}
+
+	ai_will_do = {
+		base = 100
+	}
+}
