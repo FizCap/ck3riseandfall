@@ -71,6 +71,9 @@
     on_defeat_desc = { desc = RISEANDFALL_DIADOCHI_ON_DEFEAT_DESC }
 
     on_victory = {
+        clear_saved_scope = rf_defender_split_title
+        clear_saved_scope = rf_attacker_old_split_title
+
         scope:attacker = { show_pow_release_message_effect = yes }
 
         add_legitimacy_attacker_victory_effect = yes
@@ -83,7 +86,7 @@
         }
         scope:defender = {
             # Save the defender's titular split title scope so we can destroy it
-            # AFTER all territory has been transferred. Destroying it here would
+            # or promote the attacker into it AFTER all territory has been transferred. Destroying it here would
             # change scope:defender.primary_title mid-block and cause every_held_title
             # and target_titles loops to filter on the wrong tier, leaving territory untransferred.
             if = {
@@ -94,6 +97,17 @@
                     }
                 }
                 primary_title = { save_scope_as = rf_defender_split_title }
+            }
+            scope:attacker = {
+                if = {
+                    limit = {
+                        primary_title = {
+                            has_variable = rf_is_successor_split_title
+                            is_titular = yes
+                        }
+                    }
+                    primary_title = { save_scope_as = rf_attacker_old_split_title }
+                }
             }
             every_held_title = {
                 limit = { tier = scope:defender.primary_title.tier holder = scope:defender }
@@ -147,11 +161,66 @@
 
         resolve_title_and_vassal_change = scope:change
 
-        # Destroy the defender's titular split title now that all territory and vassals
-        # have been transferred. This prevents the defender from retaining a duplicate
-        # realm title after being vassalized.
+        # If the defeated successor title outranks the attacker's successor shell,
+        # keep the conquered title as the surviving successor title and retire the
+        # old lower-tier shell. The shrink monitor follows primary_title variables.
         if = {
-            limit = { exists = scope:rf_defender_split_title }
+            limit = {
+                exists = scope:rf_defender_split_title
+                scope:rf_defender_split_title = {
+                    holder = scope:attacker
+                    OR = {
+                        this = scope:attacker.primary_title
+                        tier > scope:attacker.primary_title.tier
+                        AND = {
+                            exists = scope:rf_attacker_old_split_title
+                            tier > scope:rf_attacker_old_split_title.tier
+                        }
+                    }
+                }
+            }
+            scope:attacker = {
+                set_variable = { name = tmp_successor_realm_size value = realm_size }
+                set_primary_title_to = scope:rf_defender_split_title
+            }
+            scope:rf_defender_split_title = {
+                set_variable = { name = rf_is_successor_split_title value = 1 years = 30 }
+                set_variable = { name = rf_is_permanent_successor_split value = 1 }
+                set_variable = { name = rf_successor_permanent_realm_size value = scope:attacker.var:tmp_successor_realm_size }
+                if = {
+                    limit = { NOT = { has_variable = rf_successor_origin_title } }
+                    set_variable = { name = rf_successor_origin_title value = scope:target years = 50 }
+                }
+                if = {
+                    limit = { NOT = { has_variable = rf_successor_root_origin_title } }
+                    set_variable = { name = rf_successor_root_origin_title value = scope:target years = 30 }
+                }
+            }
+            scope:attacker = { remove_variable = tmp_successor_realm_size }
+
+            if = {
+                limit = {
+                    exists = scope:rf_attacker_old_split_title
+                    NOT = { scope:rf_attacker_old_split_title = scope:rf_defender_split_title }
+                }
+                scope:rf_attacker_old_split_title = {
+                    remove_variable = rf_is_successor_split_title
+                    remove_variable = rf_successor_origin_title
+                    remove_variable = rf_successor_root_origin_title
+                    remove_variable = rf_is_permanent_successor_split
+                    remove_variable = rf_successor_permanent_realm_size
+                }
+                scope:attacker = { destroy_title = scope:rf_attacker_old_split_title }
+            }
+        }
+        # Otherwise destroy the defender's titular split title now that all
+        # territory and vassals have been transferred. This prevents the defender
+        # from retaining a duplicate realm title after being vassalized.
+        else_if = {
+            limit = {
+                exists = scope:rf_defender_split_title
+                NOT = { scope:rf_defender_split_title = scope:attacker.primary_title }
+            }
             scope:attacker = { destroy_title = scope:rf_defender_split_title }
         }
 

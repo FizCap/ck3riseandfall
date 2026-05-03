@@ -1576,18 +1576,17 @@ riseandfall_palace_coup_root_flees_success = {
             resolve_title_and_vassal_change = scope:palace_coup_indep_change
         }
 
-        # Create a same-rank rival title for the fleeing ruler when they no longer
-        # hold one after the split.
+        # Create only the lowest title tier the fleeing ruler's final camp needs.
         if = {
             limit = {
-                scope:original_primary = {
-                    OR = {
-                        tier = tier_empire
-                        tier = tier_hegemony
-                    }
-                }
                 scope:original_ruler = { exists = capital_county }
                 scope:original_ruler = { highest_held_title_tier < tier_empire }
+                scope:original_ruler = {
+                    any_vassal = {
+                        is_landed = yes
+                        primary_title.tier >= tier_kingdom
+                    }
+                }
             }
             scope:original_ruler = {
                 capital_county = { save_scope_as = rf_base_county }
@@ -1611,19 +1610,21 @@ riseandfall_palace_coup_root_flees_success = {
                         change = scope:palace_coup_title_change
                     }
                     set_color_from_title = scope:rf_base_county
-                    if = {
-                        limit = { scope:original_ruler = { has_dynasty = yes } }
-                        set_coa = scope:original_ruler.dynasty
-                    }
+                    generate_coa = yes
                 }
                 resolve_title_and_vassal_change = scope:palace_coup_title_change
             }
         }
         else_if = {
             limit = {
-                scope:original_primary = { tier = tier_kingdom }
                 scope:original_ruler = { exists = capital_county }
                 scope:original_ruler = { highest_held_title_tier < tier_kingdom }
+                scope:original_ruler = {
+                    any_vassal = {
+                        is_landed = yes
+                        primary_title.tier >= tier_duchy
+                    }
+                }
             }
             scope:original_ruler = {
                 capital_county = { save_scope_as = rf_base_county }
@@ -1647,10 +1648,7 @@ riseandfall_palace_coup_root_flees_success = {
                         change = scope:palace_coup_title_change
                     }
                     set_color_from_title = scope:rf_base_county
-                    if = {
-                        limit = { scope:original_ruler = { has_dynasty = yes } }
-                        set_coa = scope:original_ruler.dynasty
-                    }
+                    generate_coa = yes
                 }
                 resolve_title_and_vassal_change = scope:palace_coup_title_change
             }
@@ -1659,6 +1657,12 @@ riseandfall_palace_coup_root_flees_success = {
             limit = {
                 scope:original_ruler = { exists = capital_county }
                 scope:original_ruler = { highest_held_title_tier < tier_duchy }
+                scope:original_ruler = {
+                    any_vassal = {
+                        is_landed = yes
+                        primary_title.tier >= tier_county
+                    }
+                }
             }
             scope:original_ruler = {
                 capital_county = { save_scope_as = rf_base_county }
@@ -1682,10 +1686,7 @@ riseandfall_palace_coup_root_flees_success = {
                         change = scope:palace_coup_title_change
                     }
                     set_color_from_title = scope:rf_base_county
-                    if = {
-                        limit = { scope:original_ruler = { has_dynasty = yes } }
-                        set_coa = scope:original_ruler.dynasty
-                    }
+                    generate_coa = yes
                 }
                 resolve_title_and_vassal_change = scope:palace_coup_title_change
             }
