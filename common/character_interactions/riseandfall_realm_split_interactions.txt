@@ -29,14 +29,12 @@
 		}
 	}
 
-	cooldown = { years = 3 }
-	cooldown_against_recipient = { years = 5 }
-	ai_frequency = 18
+	cooldown = { months = 6 }
+	cooldown_against_recipient = { years = 1 }
+	ai_frequency = 1
 	ai_potential = {
 		exists = this
 		is_alive = yes
-		NOT = { has_variable = rf_split_defection_cooldown }
-		NOT = { liege = { has_variable = rf_split_defection_realm_cooldown } }
 	}
 
 	ai_targets = {
@@ -206,9 +204,9 @@ riseandfall_surrender_to_successor_interaction = {
 		}
 	}
 
-	cooldown = { years = 5 }
-	cooldown_against_recipient = { years = 5 }
-	ai_frequency = 24
+	cooldown = { months = 6 }
+	cooldown_against_recipient = { years = 1 }
+	ai_frequency = 1
 	ai_potential = { exists = this is_alive = yes }
 
 	ai_targets = {
