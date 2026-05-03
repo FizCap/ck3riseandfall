@@ -45,12 +45,14 @@ on_imprison = {
 on_title_gain = {
     on_actions = {
         riseandfall_warlord_title_cleanup
+        riseandfall_successor_primary_title_sync
     }
 }
 
 on_title_gain_inheritance = {
     on_actions = {
         riseandfall_warlord_title_cleanup
+        riseandfall_successor_primary_title_sync
     }
 }
 
@@ -129,6 +131,15 @@ riseandfall_warlord_title_cleanup = {
     }
     effect = {
         riseandfall_warlord_cleanup_se = yes
+    }
+}
+
+riseandfall_successor_primary_title_sync = {
+    trigger = {
+        has_game_rule = riseandfall_low_stability_events_enabled
+    }
+    effect = {
+        riseandfall_realm_split_migrate_successor_primary_title_se = yes
     }
 }
 

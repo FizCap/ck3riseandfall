@@ -103,11 +103,6 @@
 		base = -90
 
 		modifier = {
-			scope:recipient = { has_variable = rf_split_defection_realm_cooldown }
-			add = -1000
-		}
-
-		modifier = {
 			scope:actor = {
 				primary_title = { is_neighbor_to_realm = scope:recipient }
 			}
