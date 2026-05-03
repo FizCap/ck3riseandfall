@@ -794,7 +794,7 @@ riseandfall_palace_coup_seed_neutral_rejectors_se = {
 riseandfall_palace_coup_score_vassal_alignment_se = {
     set_variable = { name = rf_palace_coup_loyalist_score value = 20 }
     set_variable = { name = rf_palace_coup_coup_score value = 0 }
-    set_variable = { name = rf_palace_coup_reject_score value = 5 }
+    set_variable = { name = rf_palace_coup_reject_score value = 10 }
 
     if = {
         limit = { is_allied_to = scope:original_ruler }
@@ -854,9 +854,48 @@ riseandfall_palace_coup_score_vassal_alignment_se = {
         change_variable = { name = rf_palace_coup_coup_score add = 15 }
     }
     if = {
+        limit = { opinion = { target = scope:palace_coup_challenger value <= -60 } }
+        change_variable = { name = rf_palace_coup_loyalist_score add = 35 }
+        change_variable = { name = rf_palace_coup_coup_score add = -70 }
+        change_variable = { name = rf_palace_coup_reject_score add = 50 }
+    }
+    else_if = {
         limit = { opinion = { target = scope:palace_coup_challenger value <= -20 } }
-        change_variable = { name = rf_palace_coup_loyalist_score add = 15 }
+        change_variable = { name = rf_palace_coup_loyalist_score add = 20 }
+        change_variable = { name = rf_palace_coup_coup_score add = -35 }
+        change_variable = { name = rf_palace_coup_reject_score add = 20 }
+    }
+    else_if = {
+        limit = { opinion = { target = scope:palace_coup_challenger value < 0 } }
+        change_variable = { name = rf_palace_coup_coup_score add = -10 }
+        change_variable = { name = rf_palace_coup_reject_score add = 5 }
+    }
+
+    # Cross-pressure matters: a vassal who dislikes the coup leader should not
+    # drift into the coup camp just because the old ruler is unpopular too.
+    if = {
+        limit = {
+            opinion = { target = scope:original_ruler value >= 10 }
+            opinion = { target = scope:palace_coup_challenger value <= -20 }
+        }
+        change_variable = { name = rf_palace_coup_loyalist_score add = 35 }
         change_variable = { name = rf_palace_coup_coup_score add = -20 }
+    }
+    if = {
+        limit = {
+            opinion = { target = scope:original_ruler value <= -20 }
+            opinion = { target = scope:palace_coup_challenger value <= -20 }
+        }
+        change_variable = { name = rf_palace_coup_coup_score add = -25 }
+        change_variable = { name = rf_palace_coup_reject_score add = 45 }
+    }
+    if = {
+        limit = {
+            opinion = { target = scope:original_ruler value <= -20 }
+            opinion = { target = scope:palace_coup_challenger value >= 40 }
+        }
+        change_variable = { name = rf_palace_coup_coup_score add = 25 }
+        change_variable = { name = rf_palace_coup_reject_score add = -10 }
     }
 
     if = {
@@ -948,6 +987,91 @@ riseandfall_palace_coup_score_vassal_alignment_se = {
             }
         }
         change_variable = { name = rf_palace_coup_reject_score add = 15 }
+    }
+    if = {
+        limit = {
+            OR = {
+                has_trait = loyal
+                has_trait = stubborn
+            }
+        }
+        change_variable = { name = rf_palace_coup_loyalist_score add = 25 }
+    }
+    if = {
+        limit = {
+            OR = {
+                has_trait = deceitful
+                has_trait = callous
+                has_trait = fickle
+            }
+        }
+        change_variable = { name = rf_palace_coup_coup_score add = 15 }
+        change_variable = { name = rf_palace_coup_reject_score add = 10 }
+    }
+    if = {
+        limit = { has_trait = paranoid }
+        change_variable = { name = rf_palace_coup_reject_score add = 20 }
+    }
+
+    if = {
+        limit = { ai_honor >= 50 }
+        change_variable = { name = rf_palace_coup_loyalist_score add = 20 }
+    }
+    if = {
+        limit = { ai_honor <= -50 }
+        change_variable = { name = rf_palace_coup_coup_score add = 15 }
+        change_variable = { name = rf_palace_coup_reject_score add = 10 }
+    }
+    if = {
+        limit = { ai_boldness >= 50 }
+        change_variable = { name = rf_palace_coup_coup_score add = 10 }
+        change_variable = { name = rf_palace_coup_reject_score add = 20 }
+    }
+    if = {
+        limit = { ai_boldness <= -50 }
+        change_variable = { name = rf_palace_coup_loyalist_score add = 10 }
+        change_variable = { name = rf_palace_coup_coup_score add = 10 }
+        change_variable = { name = rf_palace_coup_reject_score add = -15 }
+    }
+    if = {
+        limit = { ai_vengefulness >= 50 }
+        change_variable = { name = rf_palace_coup_coup_score add = 10 }
+        change_variable = { name = rf_palace_coup_reject_score add = 15 }
+    }
+    if = {
+        limit = {
+            ai_rationality >= 25
+            scope:original_ruler.current_military_strength > scope:palace_coup_challenger.current_military_strength
+        }
+        change_variable = { name = rf_palace_coup_loyalist_score add = 15 }
+    }
+    if = {
+        limit = {
+            ai_rationality >= 25
+            scope:palace_coup_challenger.current_military_strength > scope:original_ruler.current_military_strength
+        }
+        change_variable = { name = rf_palace_coup_coup_score add = 15 }
+    }
+
+    if = {
+        limit = {
+            has_dread_level_towards = {
+                target = scope:original_ruler
+                level >= 1
+            }
+        }
+        change_variable = { name = rf_palace_coup_loyalist_score add = 15 }
+        change_variable = { name = rf_palace_coup_reject_score add = -10 }
+    }
+    if = {
+        limit = {
+            has_dread_level_towards = {
+                target = scope:palace_coup_challenger
+                level >= 1
+            }
+        }
+        change_variable = { name = rf_palace_coup_coup_score add = 15 }
+        change_variable = { name = rf_palace_coup_reject_score add = -10 }
     }
 
     if = {
