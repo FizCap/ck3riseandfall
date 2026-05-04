@@ -1365,18 +1365,6 @@ riseandfall_realm_split_promote_recipient_for_incoming_se = {
     if = {
         limit = {
             exists = scope:rf_incoming_split_title
-            scope:rf_incoming_split_title = { tier >= tier_empire }
-            highest_held_title_tier < tier_hegemony
-        }
-        create_dynamic_title = {
-            tier = tier_hegemony
-            name = RISEANDFALL_BREAKAWAY_NAME_CAPITAL
-        }
-        if = { limit = { exists = scope:new_title } scope:new_title = { save_scope_as = rf_recipient_promoted_title } }
-    }
-    else_if = {
-        limit = {
-            exists = scope:rf_incoming_split_title
             scope:rf_incoming_split_title = { tier >= tier_kingdom }
             highest_held_title_tier < tier_empire
         }
@@ -1453,10 +1441,122 @@ riseandfall_realm_split_promote_recipient_for_incoming_se = {
     }
 }
 
+riseandfall_realm_split_lower_actor_primary_below_recipient_se = {
+    clear_saved_scope = rf_absorbed_split_title
+    clear_saved_scope = rf_absorbed_replacement_title
+
+    if = {
+        limit = {
+            exists = scope:recipient
+            exists = primary_title
+            scope:recipient = { exists = primary_title }
+            primary_title.tier >= scope:recipient.primary_title.tier
+        }
+        primary_title = { save_scope_as = rf_absorbed_split_title }
+
+        if = {
+            limit = { scope:recipient = { primary_title.tier >= tier_empire } }
+            random_held_title = {
+                limit = {
+                    tier = tier_kingdom
+                    NOT = { this = scope:rf_absorbed_split_title }
+                }
+                save_scope_as = rf_absorbed_replacement_title
+            }
+        }
+        if = {
+            limit = {
+                NOT = { exists = scope:rf_absorbed_replacement_title }
+                scope:recipient = { primary_title.tier >= tier_kingdom }
+            }
+            random_held_title = {
+                limit = {
+                    tier = tier_duchy
+                    NOT = { this = scope:rf_absorbed_split_title }
+                }
+                save_scope_as = rf_absorbed_replacement_title
+            }
+        }
+        if = {
+            limit = {
+                NOT = { exists = scope:rf_absorbed_replacement_title }
+                scope:recipient = { primary_title.tier >= tier_duchy }
+            }
+            random_held_title = {
+                limit = {
+                    tier = tier_county
+                    NOT = { this = scope:rf_absorbed_split_title }
+                }
+                save_scope_as = rf_absorbed_replacement_title
+            }
+        }
+
+        if = {
+            limit = { exists = scope:rf_absorbed_replacement_title }
+            if = {
+                limit = {
+                    any_vassal = {
+                        is_landed = yes
+                        primary_title.tier >= scope:rf_absorbed_replacement_title.tier
+                        primary_title.tier < scope:recipient.primary_title.tier
+                    }
+                }
+                create_title_and_vassal_change = {
+                    type = granted
+                    save_scope_as = rf_absorbed_vassal_change
+                    add_claim_on_loss = no
+                }
+                every_vassal = {
+                    limit = {
+                        is_landed = yes
+                        primary_title.tier >= scope:rf_absorbed_replacement_title.tier
+                        primary_title.tier < scope:recipient.primary_title.tier
+                    }
+                    change_liege = {
+                        liege = scope:recipient
+                        change = scope:rf_absorbed_vassal_change
+                    }
+                }
+                resolve_title_and_vassal_change = scope:rf_absorbed_vassal_change
+            }
+            scope:rf_absorbed_replacement_title = {
+                if = {
+                    limit = { scope:rf_absorbed_split_title = { has_variable = rf_successor_origin_title } }
+                    set_variable = { name = rf_successor_origin_title value = scope:rf_absorbed_split_title.var:rf_successor_origin_title years = 50 }
+                }
+                if = {
+                    limit = { scope:rf_absorbed_split_title = { has_variable = rf_successor_root_origin_title } }
+                    set_variable = { name = rf_successor_root_origin_title value = scope:rf_absorbed_split_title.var:rf_successor_root_origin_title years = 30 }
+                }
+                if = {
+                    limit = { scope:rf_absorbed_split_title = { has_variable = rf_successor_permanent_realm_size } }
+                    set_variable = { name = rf_successor_permanent_realm_size value = scope:rf_absorbed_split_title.var:rf_successor_permanent_realm_size }
+                }
+                else_if = {
+                    limit = { NOT = { has_variable = rf_successor_permanent_realm_size } }
+                    set_variable = { name = rf_successor_permanent_realm_size value = root.realm_size }
+                }
+                set_variable = { name = rf_is_successor_split_title value = 1 years = 30 }
+                set_variable = { name = rf_is_permanent_successor_split value = 1 }
+            }
+            set_primary_title_to = scope:rf_absorbed_replacement_title
+            scope:rf_absorbed_split_title = {
+                remove_variable = rf_is_successor_split_title
+                remove_variable = rf_successor_origin_title
+                remove_variable = rf_successor_root_origin_title
+                remove_variable = rf_is_permanent_successor_split
+                remove_variable = rf_successor_permanent_realm_size
+            }
+            destroy_title = scope:rf_absorbed_split_title
+        }
+    }
+}
+
 riseandfall_realm_split_defect_to_recipient_se = {
     scope:actor.liege = { save_temporary_scope_as = rf_former_split_liege }
     scope:actor.primary_title = { save_temporary_scope_as = rf_incoming_split_title }
     scope:recipient = { riseandfall_realm_split_promote_recipient_for_incoming_se = yes }
+    scope:actor = { riseandfall_realm_split_lower_actor_primary_below_recipient_se = yes }
 
     scope:actor = {
         set_variable = { name = rf_split_defection_cooldown value = yes years = 10 }
@@ -1480,10 +1580,17 @@ riseandfall_realm_split_defect_to_recipient_se = {
         save_scope_as = rf_split_defection_change
         add_claim_on_loss = no
     }
-    scope:actor = {
-        change_liege = {
-            liege = scope:recipient
-            change = scope:rf_split_defection_change
+    if = {
+        limit = {
+            scope:actor = {
+                primary_title.tier < scope:recipient.primary_title.tier
+            }
+        }
+        scope:actor = {
+            change_liege = {
+                liege = scope:recipient
+                change = scope:rf_split_defection_change
+            }
         }
     }
     resolve_title_and_vassal_change = scope:rf_split_defection_change
@@ -1502,6 +1609,7 @@ riseandfall_realm_split_surrender_to_recipient_se = {
     scope:actor.primary_title = { save_temporary_scope_as = rf_submitted_split_title }
     scope:rf_submitted_split_title = { save_temporary_scope_as = rf_incoming_split_title }
     scope:recipient = { riseandfall_realm_split_promote_recipient_for_incoming_se = yes }
+    scope:actor = { riseandfall_realm_split_lower_actor_primary_below_recipient_se = yes }
 
     scope:actor = {
         if = {
@@ -1511,7 +1619,12 @@ riseandfall_realm_split_surrender_to_recipient_se = {
     }
 
     if = {
-        limit = { scope:rf_submitted_split_title = { is_titular = yes } }
+        limit = {
+            scope:rf_submitted_split_title = {
+                exists = holder
+                is_titular = yes
+            }
+        }
         create_title_and_vassal_change = {
             type = granted
             save_scope_as = rf_split_submission_title_change
@@ -1532,17 +1645,21 @@ riseandfall_realm_split_surrender_to_recipient_se = {
         remove_variable = rf_successor_origin_title
         remove_variable = rf_successor_root_origin_title
     }
-    scope:rf_submitted_split_title = {
-        remove_variable = rf_is_successor_split_title
-        remove_variable = rf_successor_origin_title
-        remove_variable = rf_successor_root_origin_title
-        remove_variable = rf_is_permanent_successor_split
-        remove_variable = rf_successor_permanent_realm_size
+    if = {
+        limit = { scope:rf_submitted_split_title = { exists = holder } }
+        scope:rf_submitted_split_title = {
+            remove_variable = rf_is_successor_split_title
+            remove_variable = rf_successor_origin_title
+            remove_variable = rf_successor_root_origin_title
+            remove_variable = rf_is_permanent_successor_split
+            remove_variable = rf_successor_permanent_realm_size
+        }
     }
 
     if = {
         limit = {
             scope:rf_submitted_split_title = {
+                exists = holder
                 is_titular = yes
                 holder = scope:recipient
             }
@@ -1557,10 +1674,17 @@ riseandfall_realm_split_surrender_to_recipient_se = {
         save_scope_as = rf_split_submission_change
         add_claim_on_loss = no
     }
-    scope:actor = {
-        change_liege = {
-            liege = scope:recipient
-            change = scope:rf_split_submission_change
+    if = {
+        limit = {
+            scope:actor = {
+                primary_title.tier < scope:recipient.primary_title.tier
+            }
+        }
+        scope:actor = {
+            change_liege = {
+                liege = scope:recipient
+                change = scope:rf_split_submission_change
+            }
         }
     }
     resolve_title_and_vassal_change = scope:rf_split_submission_change
@@ -1783,7 +1907,6 @@ riseandfall_split_title_monitor_cleanup_se = {
                 set_variable = { name = rf_is_permanent_successor_split value = 1 }
                 set_variable = { name = rf_successor_permanent_realm_size value = scope:rf_split_title.var:rf_successor_permanent_realm_size }
             }
-            set_primary_title_to = scope:rf_replacement_split_title
             scope:rf_split_title = {
                 remove_variable = rf_is_successor_split_title
                 remove_variable = rf_successor_origin_title
@@ -1792,6 +1915,13 @@ riseandfall_split_title_monitor_cleanup_se = {
                 remove_variable = rf_successor_permanent_realm_size
             }
             destroy_title = scope:rf_split_title
+            if = {
+                limit = {
+                    exists = scope:rf_replacement_split_title
+                    primary_title.tier <= scope:rf_replacement_split_title.tier
+                }
+                set_primary_title_to = scope:rf_replacement_split_title
+            }
         }
 
         if = {
