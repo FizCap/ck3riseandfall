@@ -166,6 +166,7 @@
 		if = {
 			limit = { scope:firing_court_position = yes }
 			add = 10000
+			}
 		}
 	}
 }
