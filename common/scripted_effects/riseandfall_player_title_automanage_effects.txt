@@ -1,4 +1,4 @@
-﻿#################################################################################
+#################################################################################
 # Player-side automatic title automanagement scripted effects
 # These mirror the AI automation logic but are gated by character flags
 # (set/cleared by player decisions). They are invoked from the yearly global
@@ -204,6 +204,61 @@ riseandfall_player_create_duchies_se = {
                 resolve_title_and_vassal_change = scope:title_change
 
                 if = { limit = { primary_title.tier = tier_county } set_primary_title_to = prev }
+            }
+        }
+    }
+}
+
+# Warlord: create every uncreated de jure duchy, kingdom, and empire where the
+# warlord holds 51%+ of de jure counties (vanilla requirement enforced via
+# alert_creatable_title). Duchies/kingdoms/empires are created in ascending
+# tier order so duchy titles exist before kingdom titles are claimed.
+riseandfall_warlord_create_realm_titles_se = {
+    save_scope_as = acting_warlord
+
+    if = {
+        limit = {
+            is_landed = yes
+            has_trait = warlord
+        }
+
+        # Duchies first (tier_duchy), then kingdoms, then empires.
+        # every_alert_creatable_title uses the same engine check as the
+        # vanilla title-creation UI: the warlord (or their realm) must hold
+        # at least 51% of the title's de jure counties.
+        every_alert_creatable_title = {
+            limit = { tier = tier_duchy }
+            save_scope_as = target_title
+
+            scope:acting_warlord = {
+                create_title_and_vassal_change = { type = created save_scope_as = title_change add_claim_on_loss = no }
+                scope:target_title = { change_title_holder = { holder = scope:acting_warlord change = scope:title_change } }
+                resolve_title_and_vassal_change = scope:title_change
+                if = { limit = { primary_title.tier = tier_county } set_primary_title_to = scope:target_title }
+            }
+        }
+
+        every_alert_creatable_title = {
+            limit = { tier = tier_kingdom }
+            save_scope_as = target_title
+
+            scope:acting_warlord = {
+                create_title_and_vassal_change = { type = created save_scope_as = title_change add_claim_on_loss = no }
+                scope:target_title = { change_title_holder = { holder = scope:acting_warlord change = scope:title_change } }
+                resolve_title_and_vassal_change = scope:title_change
+                if = { limit = { scope:target_title.tier > primary_title.tier } set_primary_title_to = scope:target_title }
+            }
+        }
+
+        every_alert_creatable_title = {
+            limit = { tier = tier_empire }
+            save_scope_as = target_title
+
+            scope:acting_warlord = {
+                create_title_and_vassal_change = { type = created save_scope_as = title_change add_claim_on_loss = no }
+                scope:target_title = { change_title_holder = { holder = scope:acting_warlord change = scope:title_change } }
+                resolve_title_and_vassal_change = scope:title_change
+                if = { limit = { scope:target_title.tier > primary_title.tier } set_primary_title_to = scope:target_title }
             }
         }
     }

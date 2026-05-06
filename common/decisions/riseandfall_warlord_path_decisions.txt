@@ -1,4 +1,4 @@
-﻿##############################################
+##############################################
 # Rise and Fall - Warlord Player Path Decisions
 # Lets the player toggle between warlord rebellion and remaining loyal.
 ##############################################
@@ -69,6 +69,57 @@ riseandfall_warlord_path_manager = {
 
     ai_potential = {}
     ai_will_do = { base = 0 }
+}
+
+riseandfall_warlord_create_realm_titles = {
+    picture = { reference = "gfx/interface/illustrations/decisions/decision_misc.dds" }
+    sort_order = 34
+    ai_check_interval = 12
+    desc = riseandfall_warlord_create_realm_titles_desc
+    selection_tooltip = riseandfall_warlord_create_realm_titles_tooltip
+    decision_group_type = riseandfall
+
+    is_shown = {
+        is_landed = yes
+        has_trait = warlord
+        has_game_rule = riseandfall_low_stability_events_enabled
+        # Uses vanilla engine check: alert_creatable_title enforces the 51% de jure county threshold
+        any_alert_creatable_title = {
+            OR = {
+                tier = tier_duchy
+                tier = tier_kingdom
+                tier = tier_empire
+            }
+        }
+    }
+
+    is_valid = {
+        is_landed = yes
+        has_trait = warlord
+        # Uses vanilla engine check: alert_creatable_title enforces the 51% de jure county threshold
+        any_alert_creatable_title = {
+            OR = {
+                tier = tier_duchy
+                tier = tier_kingdom
+                tier = tier_empire
+            }
+        }
+    }
+
+    should_create_alert = {
+        is_ai = no
+    }
+
+    effect = {
+        riseandfall_warlord_create_realm_titles_se = yes
+    }
+
+    ai_potential = {
+        is_landed = yes
+        has_trait = warlord
+    }
+
+    ai_will_do = { base = 100 }
 }
 
 riseandfall_choose_warlord_loyal = {

@@ -44,6 +44,10 @@ riseandfall_choose_warlord_loyal_tooltip:0 "Abandon the warlord path and remove 
 riseandfall_choose_warlord_rebel:0 "Return to the warlord path"
 riseandfall_choose_warlord_rebel_desc:0 "Re-embrace your warlord ambitions and press your liege's claims again."
 riseandfall_choose_warlord_rebel_tooltip:0 "Become a warlord again and resume the path of rebellion."
+riseandfall_warlord_create_realm_titles:0 "Forge Warlord Titles"
+riseandfall_warlord_create_realm_titles_desc:0 "Create every unclaimed de jure duchy, kingdom, and empire where you or your vassals hold land, bypassing court formalities that were never meant to restrain a warlord."
+riseandfall_warlord_create_realm_titles_tooltip:0 "Create all available warlord titles in your realm."
+riseandfall_warlord_create_realm_titles_confirm:0 "Forge Titles"
 
  # Adventurer localization
 adventurer.1001.t:0 "Horde of Adventurers"
