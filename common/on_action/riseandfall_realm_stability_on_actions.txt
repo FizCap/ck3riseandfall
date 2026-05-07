@@ -1,4 +1,4 @@
-﻿# On_actions for the Realm Stability mechanic
+# On_actions for the Realm Stability mechanic
 # This file isolates the realm stability on_action so it can be enabled, disabled,
 # or scheduled independently from adventurer logic.
 
@@ -112,8 +112,8 @@ riseandfall_on_death_stability_inheritance = {
             player_heir = {
                 if = {
                     limit = {
-                        # Only inherit stability from a strictly higher-ranked predecessor.
-                        highest_held_title_tier < scope:predecessor.highest_held_title_tier
+                        # Only inherit stability from a higher or equal-ranked predecessor.
+                        highest_held_title_tier <= scope:predecessor.highest_held_title_tier
                     }
                     riseandfall_inherit_stability_score_se = yes
                 }
@@ -143,10 +143,10 @@ riseandfall_on_title_gain_inheritance = {
                 holds_landed_title = yes
                 exists = scope:previous_holder
                 scope:previous_holder = { has_variable = riseandfall_realm_stability_score }
-                # Only inherit when the previous holder is strictly higher-ranked than the inheritor.
+                # Only inherit when the previous holder is higher or equal-ranked than the inheritor.
                 # Note: game tier constants map higher numbers -> higher ranks
                 # (see common/script_values/00_title_tiers_values.txt: tier_county=2 ... tier_empire=5).
-                highest_held_title_tier < scope:previous_holder.highest_held_title_tier
+                highest_held_title_tier <= scope:previous_holder.highest_held_title_tier
             }
             # Inherit from the previous holder of this specific title
             scope:previous_holder = { save_scope_as = predecessor }
@@ -166,11 +166,12 @@ riseandfall_on_title_gain_inheritance = {
                 # secondary title (e.g., a barony) can overwrite these counters and make them look like
                 # they "randomly reset".
                 has_primary_title = scope:title
-                highest_held_title_tier < scope:previous_holder.highest_held_title_tier
+                highest_held_title_tier <= scope:previous_holder.highest_held_title_tier
             }
             # He already has a stability score; only inherit secondary history variables
             scope:previous_holder = { save_scope_as = predecessor }
             riseandfall_inherit_realm_history_se = yes
+            riseandfall_inherit_warlord_trait_se = yes
             riseandfall_mark_story_succession_shock_se = yes
             riseandfall_calculate_realm_stability_se = yes
         }
