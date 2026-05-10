@@ -539,7 +539,7 @@ riseandfall_calculate_realm_stability_se = {
         }
 
         if = {
-            limit = { has_realm_law_flag = partition_succession_law }
+            limit = { has_partition_succession_realm_law_trigger = yes }
             # Partition law provides short-term stability: children have guaranteed shares so they don't
             # war with the ruler during their lifetime. The realm fragments automatically on succession,
             # so no additional penalty is needed here — the fragmentation is the consequence.
