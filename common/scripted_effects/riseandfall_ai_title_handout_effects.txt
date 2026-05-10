@@ -107,16 +107,19 @@
                     # Skip granting if the target title has the giveaway-block variable AND the emperor is a human player.
                     if = {
                         limit = { NOT = { AND = { scope:target_title = { has_variable = Riseandfall_giveaway_blocked } scope:emperor = { is_ai = no } } } }
+                        scope:chosen_vassal = {
+                            hidden_effect = {
+                                add_opinion = {
+                                    target = scope:emperor
+                                    modifier = received_title_kingdom
+                                }
+                            }
+                        }
                         create_title_and_vassal_change = { type = granted save_scope_as = change }
                         scope:target_title = {
                             change_title_holder_include_vassals = { holder = scope:chosen_vassal change = scope:change take_baronies = no }
                         }
                         resolve_title_and_vassal_change = scope:change
-                    }
-                    
-                    # Apply positive opinion modifier from vassal to emperor for receiving the kingdom
-                    scope:chosen_vassal = {
-                        add_opinion = { modifier = received_title_kingdom target = scope:emperor days = 365 }
                     }
                 }
                 else = {
@@ -180,6 +183,15 @@ riseandfall_ai_advanced_grant_target_kingdom_se = {
             }
         }
 
+        scope:rf_advanced_chosen_vassal = {
+            hidden_effect = {
+                add_opinion = {
+                    target = scope:emperor
+                    modifier = received_title_kingdom
+                }
+            }
+        }
+
         create_title_and_vassal_change = { type = granted save_scope_as = rf_advanced_kingdom_change }
         scope:target_title = {
             change_title_holder_include_vassals = {
@@ -191,10 +203,6 @@ riseandfall_ai_advanced_grant_target_kingdom_se = {
         resolve_title_and_vassal_change = scope:rf_advanced_kingdom_change
 
         set_variable = { name = riseandfall_ai_advanced_title_action_cooldown value = yes years = 5 }
-
-        scope:rf_advanced_chosen_vassal = {
-            add_opinion = { modifier = received_title_kingdom target = scope:emperor days = 365 }
-        }
 
         # If the emperor personally holds duchies inside the granted kingdom, move them too.
         scope:target_title = {
@@ -262,6 +270,15 @@ riseandfall_ai_advanced_grant_target_duchy_se = {
             }
         }
 
+        scope:rf_advanced_chosen_vassal = {
+            hidden_effect = {
+                add_opinion = {
+                    target = scope:king
+                    modifier = received_title_duchy
+                }
+            }
+        }
+
         create_title_and_vassal_change = { type = granted save_scope_as = rf_advanced_duchy_grant_change }
         scope:target_title = {
             change_title_holder_include_vassals = {
@@ -273,10 +290,6 @@ riseandfall_ai_advanced_grant_target_duchy_se = {
         resolve_title_and_vassal_change = scope:rf_advanced_duchy_grant_change
 
         set_variable = { name = riseandfall_ai_advanced_title_action_cooldown value = yes years = 5 }
-
-        scope:rf_advanced_chosen_vassal = {
-            add_opinion = { modifier = received_title_duchy target = scope:king days = 365 }
-        }
     }
 }
 
@@ -847,6 +860,14 @@ riseandfall_grant_counties_se = {
                     scope:target_county = {
                         if = {
                             limit = { NOT = { AND = { has_variable = Riseandfall_giveaway_blocked scope:liege = { is_ai = no } } } }
+                            scope:created_vassal = {
+                                hidden_effect = {
+                                    add_opinion = {
+                                        target = scope:liege
+                                        modifier = received_title_county
+                                    }
+                                }
+                            }
                             create_title_and_vassal_change = { type = granted save_scope_as = change }
                             change_title_holder_include_vassals = { holder = scope:created_vassal change = scope:change take_baronies = no }
                             resolve_title_and_vassal_change = scope:change
@@ -859,14 +880,6 @@ riseandfall_grant_counties_se = {
                                     left_icon = scope:created_vassal
                                 }
                             }
-                        }
-                    }
-
-                    # Apply a small opinion bonus so the new vassal likes the liege who granted them land
-                    # Reuse the existing received_title_kingdom modifier as a general "received title" bonus.
-                    scope:created_vassal = {
-                        hidden_effect = {
-                            add_opinion = { modifier = received_title_county target = scope:liege days = 365 }
                         }
                     }
                 }
