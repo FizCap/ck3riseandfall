@@ -1,4 +1,4 @@
-#################################################################################
+﻿#################################################################################
 # Player-side automatic title automanagement scripted effects
 # These mirror the AI automation logic but are gated by character flags
 # (set/cleared by player decisions). They are invoked from the yearly global
