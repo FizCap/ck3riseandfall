@@ -18,6 +18,7 @@ riseandfall_calculate_realm_stability_se = {
     remove_variable = riseandfall_rs_vassals_component
     remove_variable = riseandfall_rs_realm_size_component
     remove_variable = riseandfall_rs_culture_faith_component
+    remove_variable = riseandfall_rs_epidemic_component
     remove_variable = riseandfall_rs_partition_component
     remove_variable = riseandfall_rs_succession_component
     remove_variable = riseandfall_rs_story_pressure_component
@@ -26,6 +27,7 @@ riseandfall_calculate_realm_stability_se = {
     remove_variable = riseandfall_rs_strong_vassal_count
     remove_variable = riseandfall_rs_foreign_culture_county_pct
     remove_variable = riseandfall_rs_foreign_faith_county_pct
+    remove_variable = riseandfall_rs_epidemic_province_pct
 
     # Legacy story-mode variables were removed from active use.
     # Avoid removing unset legacy vars here because CK3 logs that as a live use.
@@ -446,11 +448,13 @@ riseandfall_calculate_realm_stability_se = {
     # Story-mode pressure now feeds stability directly instead of producing fracture vars.
     set_variable = { name = riseandfall_rs_realm_size_component value = 0 }
     set_variable = { name = riseandfall_rs_culture_faith_component value = 0 }
+    set_variable = { name = riseandfall_rs_epidemic_component value = 0 }
     set_variable = { name = riseandfall_rs_partition_component value = 0 }
     set_variable = { name = riseandfall_rs_succession_component value = 0 }
     set_variable = { name = riseandfall_rs_strong_vassal_count value = 0 }
     set_variable = { name = riseandfall_rs_foreign_culture_county_pct value = 0 }
     set_variable = { name = riseandfall_rs_foreign_faith_county_pct value = 0 }
+    set_variable = { name = riseandfall_rs_epidemic_province_pct value = 0 }
     set_variable = { name = tmp_story_strong_vassal_component_target value = 0 }
 
     if = {
@@ -563,8 +567,11 @@ riseandfall_calculate_realm_stability_se = {
         set_variable = { name = tmp_story_realm_counties value = 0 }
         set_variable = { name = tmp_story_foreign_culture_counties value = 0 }
         set_variable = { name = tmp_story_foreign_faith_counties value = 0 }
+        set_variable = { name = tmp_story_realm_provinces value = 0 }
+        set_variable = { name = tmp_story_epidemic_provinces value = 0 }
         set_variable = { name = tmp_story_foreign_culture_county_pct value = 0 }
         set_variable = { name = tmp_story_foreign_faith_county_pct value = 0 }
+        set_variable = { name = tmp_story_epidemic_province_pct value = 0 }
         set_variable = { name = tmp_story_nonapproved_pct value = 0 }
         every_realm_county = {
             save_scope_as = story_mode_county
@@ -616,6 +623,14 @@ riseandfall_calculate_realm_stability_se = {
                 scope:ruler = { change_variable = { name = tmp_story_foreign_faith_counties add = 1 } }
             }
 
+            every_county_province = {
+                scope:ruler = { change_variable = { name = tmp_story_realm_provinces add = 1 } }
+                if = {
+                    limit = { any_province_epidemic = {} }
+                    scope:ruler = { change_variable = { name = tmp_story_epidemic_provinces add = 1 } }
+                }
+            }
+
             clear_saved_scope = story_mode_county
         }
 
@@ -634,6 +649,21 @@ riseandfall_calculate_realm_stability_se = {
             set_variable = { name = riseandfall_rs_foreign_culture_county_pct value = var:tmp_story_foreign_culture_county_pct }
             set_variable = { name = riseandfall_rs_foreign_faith_county_pct value = var:tmp_story_foreign_faith_county_pct }
 
+            if = { limit = { var:tmp_story_realm_provinces < 1 } set_variable = { name = tmp_story_realm_provinces value = 1 } }
+            set_variable = { name = tmp_story_epidemic_province_pct value = var:tmp_story_epidemic_provinces }
+            change_variable = { name = tmp_story_epidemic_province_pct multiply = 100 }
+            change_variable = { name = tmp_story_epidemic_province_pct divide = var:tmp_story_realm_provinces }
+            round_variable = { name = tmp_story_epidemic_province_pct nearest = 1 }
+            set_variable = { name = riseandfall_rs_epidemic_province_pct value = var:tmp_story_epidemic_province_pct }
+
+            # Epidemic pressure scales with the share of affected realm provinces.
+            # 25% affected -> -10 stability, 50% -> -20, 100% -> -40.
+            set_variable = { name = riseandfall_rs_epidemic_component value = var:tmp_story_epidemic_province_pct }
+            change_variable = { name = riseandfall_rs_epidemic_component multiply = -40 }
+            change_variable = { name = riseandfall_rs_epidemic_component divide = 100 }
+            round_variable = { name = riseandfall_rs_epidemic_component nearest = 1 }
+            clamp_variable = { name = riseandfall_rs_epidemic_component min = -40 max = 0 }
+
             set_variable = { name = tmp_story_nonapproved_pct value = var:tmp_story_foreign_culture_county_pct }
             change_variable = { name = tmp_story_nonapproved_pct add = var:tmp_story_foreign_faith_county_pct }
             change_variable = { name = tmp_story_nonapproved_pct divide = 2 }
@@ -651,8 +681,11 @@ riseandfall_calculate_realm_stability_se = {
         remove_variable = tmp_story_realm_counties
         remove_variable = tmp_story_foreign_culture_counties
         remove_variable = tmp_story_foreign_faith_counties
+        remove_variable = tmp_story_realm_provinces
+        remove_variable = tmp_story_epidemic_provinces
         remove_variable = tmp_story_foreign_culture_county_pct
         remove_variable = tmp_story_foreign_faith_county_pct
+        remove_variable = tmp_story_epidemic_province_pct
         remove_variable = tmp_story_nonapproved_pct
     }
 
@@ -743,6 +776,7 @@ riseandfall_calculate_realm_stability_se = {
     if = { limit = { NOT = { has_variable = riseandfall_rs_realm_size_component } } set_variable = { name = riseandfall_rs_realm_size_component value = 0 } }
     if = { limit = { NOT = { has_variable = riseandfall_rs_strong_vassal_component } } set_variable = { name = riseandfall_rs_strong_vassal_component value = 0 } }
     if = { limit = { NOT = { has_variable = riseandfall_rs_culture_faith_component } } set_variable = { name = riseandfall_rs_culture_faith_component value = 0 } }
+    if = { limit = { NOT = { has_variable = riseandfall_rs_epidemic_component } } set_variable = { name = riseandfall_rs_epidemic_component value = 0 } }
     if = { limit = { NOT = { has_variable = riseandfall_rs_partition_component } } set_variable = { name = riseandfall_rs_partition_component value = 0 } }
     if = { limit = { NOT = { has_variable = riseandfall_rs_succession_component } } set_variable = { name = riseandfall_rs_succession_component value = 0 } }
     if = { limit = { NOT = { has_variable = riseandfall_rs_story_pressure_component } } set_variable = { name = riseandfall_rs_story_pressure_component value = 0 } }
@@ -758,6 +792,7 @@ riseandfall_calculate_realm_stability_se = {
     change_variable = { name = tmp_target_score add = var:riseandfall_rs_realm_size_component }
     change_variable = { name = tmp_target_score add = var:riseandfall_rs_strong_vassal_component }
     change_variable = { name = tmp_target_score add = var:riseandfall_rs_culture_faith_component }
+    change_variable = { name = tmp_target_score add = var:riseandfall_rs_epidemic_component }
     change_variable = { name = tmp_target_score add = var:riseandfall_rs_partition_component }
     change_variable = { name = tmp_target_score add = var:riseandfall_rs_succession_component }
     change_variable = { name = tmp_target_score add = var:riseandfall_rs_story_pressure_component }
@@ -1492,6 +1527,7 @@ riseandfall_clear_unlanded_stability_vars_se = {
         remove_variable = riseandfall_rs_realm_size_component
         remove_variable = riseandfall_rs_strong_vassal_component
         remove_variable = riseandfall_rs_culture_faith_component
+        remove_variable = riseandfall_rs_epidemic_component
         remove_variable = riseandfall_rs_partition_component
         remove_variable = riseandfall_rs_succession_component
         remove_variable = riseandfall_rs_story_pressure_component
@@ -1501,6 +1537,7 @@ riseandfall_clear_unlanded_stability_vars_se = {
         remove_variable = riseandfall_rs_strong_vassal_count
         remove_variable = riseandfall_rs_foreign_culture_county_pct
         remove_variable = riseandfall_rs_foreign_faith_county_pct
+        remove_variable = riseandfall_rs_epidemic_province_pct
         remove_variable = riseandfall_rs_legitimacy_component
         remove_variable = riseandfall_rs_legitimacy_multiplier
         remove_variable = riseandfall_rs_popular_opinion_component

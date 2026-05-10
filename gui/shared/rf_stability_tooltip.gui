@@ -538,7 +538,7 @@ types RiseAndFallStabilityTooltipTypes
 					}
 
 					vbox = {
-						visible = "[Or( Or( Or( Or( GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_vassals_component').GetValue, '(CFixedPoint)0' ), LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_vassals_component').GetValue, '(CFixedPoint)0' ) ), Or( GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_realm_size_component').GetValue, '(CFixedPoint)0' ), LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_realm_size_component').GetValue, '(CFixedPoint)0' ) ) ), Or( Or( GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_strong_vassal_component').GetValue, '(CFixedPoint)0' ), LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_strong_vassal_component').GetValue, '(CFixedPoint)0' ) ), Or( GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_culture_faith_component').GetValue, '(CFixedPoint)0' ), LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_culture_faith_component').GetValue, '(CFixedPoint)0' ) ) ) ), Or( GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_partition_component').GetValue, '(CFixedPoint)0' ), LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_succession_component').GetValue, '(CFixedPoint)0' ) ) )]"
+						visible = "[Or( Or( Or( Or( GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_vassals_component').GetValue, '(CFixedPoint)0' ), LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_vassals_component').GetValue, '(CFixedPoint)0' ) ), Or( GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_realm_size_component').GetValue, '(CFixedPoint)0' ), LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_realm_size_component').GetValue, '(CFixedPoint)0' ) ) ), Or( Or( GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_strong_vassal_component').GetValue, '(CFixedPoint)0' ), LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_strong_vassal_component').GetValue, '(CFixedPoint)0' ) ), Or( GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_culture_faith_component').GetValue, '(CFixedPoint)0' ), LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_culture_faith_component').GetValue, '(CFixedPoint)0' ) ) ) ), Or( Or( LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_epidemic_component').GetValue, '(CFixedPoint)0' ), GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_partition_component').GetValue, '(CFixedPoint)0' ) ), LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_succession_component').GetValue, '(CFixedPoint)0' ) ) )]"
 						layoutpolicy_horizontal = expanding
 						vbox = {
 							layoutpolicy_horizontal = expanding
@@ -612,6 +612,19 @@ types RiseAndFallStabilityTooltipTypes
 									expand = {}
 									text_single = {
 										text = "REALM_STABILITY_TT_CULTURE_FAITH_R"
+										default_format = "#low"
+									}
+								}
+								hbox = {
+									visible = "[LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_epidemic_component').GetValue, '(CFixedPoint)0' )]"
+									layoutpolicy_horizontal = expanding
+									text_single = {
+										text = "REALM_STABILITY_TT_EPIDEMIC_L"
+										default_format = "#low"
+									}
+									expand = {}
+									text_single = {
+										text = "REALM_STABILITY_TT_EPIDEMIC_R"
 										default_format = "#low"
 									}
 								}
