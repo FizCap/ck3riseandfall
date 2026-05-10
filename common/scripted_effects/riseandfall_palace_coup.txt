@@ -1393,6 +1393,7 @@ riseandfall_palace_coup_root_flees_success = {
     save_scope_as = original_ruler
     save_scope_as = palace_coup_original_ruler
     primary_title = { save_scope_as = original_primary }
+    primary_title = { save_scope_as = palace_coup_original_primary }
     if = {
         limit = { has_variable = rf_palace_coup_active_challenger }
         var:rf_palace_coup_active_challenger = { save_scope_as = palace_coup_challenger }
@@ -1504,6 +1505,7 @@ riseandfall_palace_coup_root_flees_success = {
     }
 
     resolve_title_and_vassal_change = scope:palace_coup_split_change
+    scope:palace_coup_challenger = { set_primary_title_to = scope:original_primary }
 
     # If the old ruler personally loses all land, take one county from the
     # challenger's new realm so they can anchor a breakaway state.
@@ -1672,6 +1674,7 @@ riseandfall_palace_coup_root_flees_success = {
         }
         # Restore scope:original_ruler to root (riseandfall_realm_split_se overwrites it to the challenger)
         scope:palace_coup_original_ruler = { save_scope_as = original_ruler }
+        scope:palace_coup_original_primary = { save_scope_as = original_primary }
 
         if = {
             limit = { scope:original_ruler = { has_character_flag = rf_forced_breakaway_seed } }
@@ -1700,21 +1703,20 @@ riseandfall_palace_coup_root_flees_success = {
             resolve_title_and_vassal_change = scope:palace_coup_indep_change
         }
 
-        # Create only the lowest title tier the fleeing ruler's final camp needs.
+        # Match the deposed ruler's original rank for retreat dynamic titles.
+        # Hegemony retreats fall back to empire-tier dynamic titles.
         if = {
             limit = {
                 scope:original_ruler = { exists = capital_county }
                 scope:original_ruler = { highest_held_title_tier < tier_empire }
-                scope:original_ruler = {
-                    any_vassal = {
-                        is_landed = yes
-                        primary_title.tier >= tier_kingdom
-                    }
+                OR = {
+                    scope:original_primary = { tier = tier_hegemony }
+                    scope:original_primary = { tier = tier_empire }
                 }
             }
             scope:original_ruler = {
                 capital_county = { save_scope_as = rf_base_county }
-                capital_province = { save_scope_as = rf_base_province }
+                capital_barony = { save_scope_as = rf_base_capital_barony }
                 create_dynamic_title = {
                     tier = empire
                     name = RISEANDFALL_BREAKAWAY_NAME_CAPITAL
@@ -1743,16 +1745,11 @@ riseandfall_palace_coup_root_flees_success = {
             limit = {
                 scope:original_ruler = { exists = capital_county }
                 scope:original_ruler = { highest_held_title_tier < tier_kingdom }
-                scope:original_ruler = {
-                    any_vassal = {
-                        is_landed = yes
-                        primary_title.tier >= tier_duchy
-                    }
-                }
+                scope:original_primary = { tier = tier_kingdom }
             }
             scope:original_ruler = {
                 capital_county = { save_scope_as = rf_base_county }
-                capital_province = { save_scope_as = rf_base_province }
+                capital_barony = { save_scope_as = rf_base_capital_barony }
                 create_dynamic_title = {
                     tier = kingdom
                     name = RISEANDFALL_BREAKAWAY_NAME_CAPITAL
@@ -1781,16 +1778,11 @@ riseandfall_palace_coup_root_flees_success = {
             limit = {
                 scope:original_ruler = { exists = capital_county }
                 scope:original_ruler = { highest_held_title_tier < tier_duchy }
-                scope:original_ruler = {
-                    any_vassal = {
-                        is_landed = yes
-                        primary_title.tier >= tier_county
-                    }
-                }
+                scope:original_primary = { tier = tier_duchy }
             }
             scope:original_ruler = {
                 capital_county = { save_scope_as = rf_base_county }
-                capital_province = { save_scope_as = rf_base_province }
+                capital_barony = { save_scope_as = rf_base_capital_barony }
                 create_dynamic_title = {
                     tier = duchy
                     name = RISEANDFALL_BREAKAWAY_NAME_CAPITAL

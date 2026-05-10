@@ -196,6 +196,7 @@ riseandfall_can_switch_successor_sides_trigger = {
         exists = liege
         liege = top_liege
         primary_title.tier >= tier_county
+        primary_title.tier < tier_hegemony
         NOT = { government_has_flag = government_is_landless_adventurer }
     }
     scope:recipient = {
@@ -206,6 +207,16 @@ riseandfall_can_switch_successor_sides_trigger = {
         NOT = { government_has_flag = government_is_landless_adventurer }
     }
     scope:actor.liege != scope:recipient
+    OR = {
+        scope:recipient = { primary_title.tier >= tier_hegemony }
+        scope:actor = { primary_title.tier < tier_empire }
+        scope:actor = {
+            any_held_title = {
+                tier < tier_empire
+                NOT = { this = scope:actor.primary_title }
+            }
+        }
+    }
     OR = {
         AND = {
             scope:actor.liege = { riseandfall_has_successor_primary_title_trigger = yes }
@@ -240,6 +251,17 @@ riseandfall_can_surrender_successor_realm_trigger = {
         is_independent_ruler = yes
         exists = primary_title
         NOT = { government_has_flag = government_is_landless_adventurer }
+    }
+    OR = {
+        scope:actor = { primary_title.tier = tier_hegemony }
+        scope:recipient = { primary_title.tier >= tier_hegemony }
+        scope:actor = { primary_title.tier < tier_empire }
+        scope:actor = {
+            any_held_title = {
+                tier < tier_empire
+                NOT = { this = scope:actor.primary_title }
+            }
+        }
     }
     riseandfall_is_same_successor_conflict_interaction_trigger = yes
 }
