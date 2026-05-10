@@ -483,7 +483,7 @@ types RiseAndFallStabilityTooltipTypes
 					}
 
 					vbox = {
-						visible = "[Or( GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_difficulty_multiplier').GetValue, '(CFixedPoint)100' ), LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_difficulty_multiplier').GetValue, '(CFixedPoint)100' ) )]"
+						visible = "[Or( Or( GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_difficulty_multiplier').GetValue, '(CFixedPoint)100' ), LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_difficulty_multiplier').GetValue, '(CFixedPoint)100' ) ), Or( GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_story_pressure_component').GetValue, '(CFixedPoint)0' ), LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_story_pressure_component').GetValue, '(CFixedPoint)0' ) ) )]"
 						layoutpolicy_horizontal = expanding
 						vbox = {
 							layoutpolicy_horizontal = expanding
@@ -497,7 +497,7 @@ types RiseAndFallStabilityTooltipTypes
 									margin_right = 4
 								}
 								text_single = {
-									text = "REALM_STABILITY_TT_DIFFICULTY_HEADER"
+									text = "REALM_STABILITY_TT_WORLD_RULES_HEADER"
 									default_format = "#high"
 									align = nobaseline
 								}
@@ -506,7 +506,9 @@ types RiseAndFallStabilityTooltipTypes
 							vbox = {
 								layoutpolicy_horizontal = expanding
 								margin = { 50 0 }
+								spacing = 2
 								hbox = {
+									visible = "[Or( GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_difficulty_multiplier').GetValue, '(CFixedPoint)100' ), LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_difficulty_multiplier').GetValue, '(CFixedPoint)100' ) )]"
 									layoutpolicy_horizontal = expanding
 									text_single = {
 										text = "REALM_STABILITY_TT_DIFFICULTY_L"
@@ -515,6 +517,19 @@ types RiseAndFallStabilityTooltipTypes
 									expand = {}
 									text_single = {
 										text = "REALM_STABILITY_TT_DIFFICULTY_R"
+										default_format = "#low"
+									}
+								}
+								hbox = {
+									visible = "[Or( GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_story_pressure_component').GetValue, '(CFixedPoint)0' ), LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_story_pressure_component').GetValue, '(CFixedPoint)0' ) )]"
+									layoutpolicy_horizontal = expanding
+									text_single = {
+										text = "REALM_STABILITY_TT_DYNAMIC_STORY_L"
+										default_format = "#low"
+									}
+									expand = {}
+									text_single = {
+										text = "REALM_STABILITY_TT_DYNAMIC_STORY_R"
 										default_format = "#low"
 									}
 								}

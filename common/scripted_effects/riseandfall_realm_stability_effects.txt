@@ -20,6 +20,9 @@ riseandfall_calculate_realm_stability_se = {
     remove_variable = riseandfall_rs_culture_faith_component
     remove_variable = riseandfall_rs_partition_component
     remove_variable = riseandfall_rs_succession_component
+    remove_variable = riseandfall_rs_story_pressure_component
+    remove_variable = riseandfall_story_recovery_component
+    remove_variable = riseandfall_story_pressure_chance_bonus
     remove_variable = riseandfall_rs_strong_vassal_count
     remove_variable = riseandfall_rs_foreign_culture_county_pct
     remove_variable = riseandfall_rs_foreign_faith_county_pct
@@ -727,6 +730,8 @@ riseandfall_calculate_realm_stability_se = {
         }
     }
 
+    riseandfall_apply_dynamic_story_pressure_se = yes
+
     ########################################
     # 4) Sum components into final 0..100 TARGET score (don't overwrite the persistent current score yet)
     # Ensure component vars exist (safe defaults) to avoid unset-variable engine errors
@@ -740,6 +745,7 @@ riseandfall_calculate_realm_stability_se = {
     if = { limit = { NOT = { has_variable = riseandfall_rs_culture_faith_component } } set_variable = { name = riseandfall_rs_culture_faith_component value = 0 } }
     if = { limit = { NOT = { has_variable = riseandfall_rs_partition_component } } set_variable = { name = riseandfall_rs_partition_component value = 0 } }
     if = { limit = { NOT = { has_variable = riseandfall_rs_succession_component } } set_variable = { name = riseandfall_rs_succession_component value = 0 } }
+    if = { limit = { NOT = { has_variable = riseandfall_rs_story_pressure_component } } set_variable = { name = riseandfall_rs_story_pressure_component value = 0 } }
     # Start from 50 as the equilibrium midpoint; components shift toward 0 or 100
     set_variable = { name = tmp_target_score value = 50 }
     # Stats component contributes directly in range -30..+30 (already clamped above)
@@ -754,6 +760,7 @@ riseandfall_calculate_realm_stability_se = {
     change_variable = { name = tmp_target_score add = var:riseandfall_rs_culture_faith_component }
     change_variable = { name = tmp_target_score add = var:riseandfall_rs_partition_component }
     change_variable = { name = tmp_target_score add = var:riseandfall_rs_succession_component }
+    change_variable = { name = tmp_target_score add = var:riseandfall_rs_story_pressure_component }
     # Legitimacy is additive: -20 (none) to +15 (full). Transparent on the 0-100 scale.
     change_variable = { name = tmp_target_score add = var:riseandfall_rs_legitimacy_component }
 
@@ -1487,6 +1494,10 @@ riseandfall_clear_unlanded_stability_vars_se = {
         remove_variable = riseandfall_rs_culture_faith_component
         remove_variable = riseandfall_rs_partition_component
         remove_variable = riseandfall_rs_succession_component
+        remove_variable = riseandfall_rs_story_pressure_component
+        remove_variable = riseandfall_story_recovery_component
+        remove_variable = riseandfall_story_pressure_chance_bonus
+        remove_variable = riseandfall_story_fatigue
         remove_variable = riseandfall_rs_strong_vassal_count
         remove_variable = riseandfall_rs_foreign_culture_county_pct
         remove_variable = riseandfall_rs_foreign_faith_county_pct

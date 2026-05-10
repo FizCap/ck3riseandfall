@@ -140,7 +140,9 @@ setting_riseandfall_admin_score_nerf_disabled_desc:0 "Admin succession scoring i
 
 # Dynamic Story Mode rule
 rule_riseandfall_enable_dynamic_story_mode:0 "Dynamic Story Mode (BETA)"
-setting_riseandfall_dynamic_story_mode_enabled:0 "Enabled"
-setting_riseandfall_dynamic_story_mode_enabled_desc:0 "Doesn't do anything for the time being."
-setting_riseandfall_dynamic_story_mode_disabled:0 "Disabled"
-setting_riseandfall_dynamic_story_mode_disabled_desc:0 "Doesn't do anything for the time being."
+setting_riseandfall_dynamic_story_mode_off:0 "Off"
+setting_riseandfall_dynamic_story_mode_off_desc:0 "Dynamic Story Mode is inactive."
+setting_riseandfall_dynamic_story_mode_dynamic:0 "Dynamic"
+setting_riseandfall_dynamic_story_mode_dynamic_desc:0 "The world stability climate adds pressure when too many realms are stable and limited recovery when too many realms are unstable."
+setting_riseandfall_dynamic_story_mode_forced:0 "Forced"
+setting_riseandfall_dynamic_story_mode_forced_desc:0 "Large empires and hegemony-tier realms build collapse pressure over time even when they remain stable."

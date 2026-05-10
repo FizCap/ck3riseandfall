@@ -1,9 +1,10 @@
-# On_actions for the Realm Stability mechanic
+﻿# On_actions for the Realm Stability mechanic
 # This file isolates the realm stability on_action so it can be enabled, disabled,
 # or scheduled independently from adventurer logic.
 
 yearly_global_pulse = {
     on_actions = {
+        riseandfall_story_world_climate
         riseandfall_yearly_realm_stability
         riseandfall_clear_unlanded_realm_stability
     }
@@ -11,6 +12,7 @@ yearly_global_pulse = {
 
 on_game_start_after_lobby = {
     on_actions = {
+        riseandfall_story_world_climate
         riseandfall_yearly_realm_stability
         riseandfall_low_stability_grace_period
         riseandfall_clear_unlanded_realm_stability
@@ -259,6 +261,19 @@ riseandfall_yearly_realm_stability = {
                 riseandfall_warlord_legitimacy_loss_se = yes
             }
         }
+    }
+}
+
+riseandfall_story_world_climate = {
+    trigger = {
+        has_game_rule = riseandfall_realm_stability_enabled
+        OR = {
+            has_game_rule = riseandfall_dynamic_story_mode_dynamic
+            has_game_rule = riseandfall_dynamic_story_mode_forced
+        }
+    }
+    effect = {
+        riseandfall_story_world_climate_se = yes
     }
 }
 
