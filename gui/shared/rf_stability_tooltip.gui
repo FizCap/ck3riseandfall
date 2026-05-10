@@ -1,4 +1,4 @@
-# Rise and Fall - Stability Hover Tooltip
+﻿# Rise and Fall - Stability Hover Tooltip
 # Loaded from gui/shared/ so it is available globally.
 
 types RiseAndFallStabilityTooltipTypes
@@ -71,13 +71,6 @@ types RiseAndFallStabilityTooltipTypes
 				layoutpolicy_horizontal = expanding
 				margin = { 8 6 }
 				spacing = 8
-
-				text_single = {
-					text = "REALM_STABILITY_TT_TITLE"
-					default_format = "#T"
-					layoutpolicy_horizontal = expanding
-					align = hcenter|nobaseline
-				}
 
 				widget = {
 					size = { 500 92 }

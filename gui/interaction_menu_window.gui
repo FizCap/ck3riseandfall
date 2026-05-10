@@ -114,7 +114,9 @@ window = {
 							datacontext = "[AccessGameRules.AccessNamedGameRule( 'riseandfall_enable_interaction_stability' ).GetSetting]"
 							# Show only when the current setting does NOT have the disabled flag
 							visible = "[Not( GameRuleSetting.HasFlag( 'riseandfall_interaction_stability_disabled' ) )]"
-							tooltip = "ADVENTURER_CHANCE_TOOLTIP"
+							tooltipwidget = {
+								adventurer_chance_tooltip = {}
+							}
 							using = tooltip_ne
 							spacing = -3
 							margin_right = 5

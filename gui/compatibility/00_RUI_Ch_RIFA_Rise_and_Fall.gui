@@ -25,7 +25,10 @@ types CharacterWindow
 			default_format = "#high"
 		}
 
-		tooltip = "ADVENTURER_CHANCE_TOOLTIP"
+		tooltipwidget = {
+			adventurer_chance_tooltip = {}
+		}
+		using = tooltip_ne
 	}
 	type RUI_Ch_RIFA_type_02 = vbox {
 		name = "stability"
