@@ -58,6 +58,15 @@ riseandfall_low_stability_roll_se = {
                     }
                     change_variable = { name = tmp_chance add = var:riseandfall_story_pressure_chance_bonus }
                 }
+                if = {
+                    limit = {
+                        has_variable = riseandfall_story_successor_grace
+                        var:riseandfall_story_successor_grace > 0
+                        var:riseandfall_realm_stability_score >= 20
+                    }
+                    change_variable = { name = tmp_chance divide = 2 }
+                }
+
                 clamp_variable = { name = tmp_chance min = 0 max = 100 }
 
                 # Store the calculated chance on the character for tooltip display (persists until next yearly update)
@@ -104,28 +113,192 @@ riseandfall_low_stability_random_event = {
             }
         }
         random_list = {
-            1 = {
-                trigger = { riseandfall_low_stability_warlord_available_trigger = yes }
-                trigger_event = { id = warlord.1001 }
-            }
-            1 = {
-                trigger = { riseandfall_low_stability_palace_coup_available_trigger = yes }
-                trigger_event = { id = palace_coup.1001 }
-            }
-            1 = {
-                trigger = { riseandfall_low_stability_realm_split_available_trigger = yes }
+            1200 = {
+                trigger = {
+                    exists = global_var:riseandfall_low_stability_event_realm_split_high
+                    has_variable = riseandfall_story_collapse_pressure
+                    var:riseandfall_story_collapse_pressure >= 50
+                    riseandfall_low_stability_realm_split_available_trigger = yes
+                }
                 trigger_event = { id = realm_split.1001 }
             }
-            1 = {
-                trigger = { riseandfall_low_stability_nationalist_revolt_available_trigger = yes }
+            400 = {
+                trigger = {
+                    NOT = { exists = global_var:riseandfall_low_stability_event_realm_split_high }
+                    NOT = { exists = global_var:riseandfall_low_stability_event_realm_split_low }
+                    has_variable = riseandfall_story_collapse_pressure
+                    var:riseandfall_story_collapse_pressure >= 50
+                    riseandfall_low_stability_realm_split_available_trigger = yes
+                }
+                trigger_event = { id = realm_split.1001 }
+            }
+            132 = {
+                trigger = {
+                    exists = global_var:riseandfall_low_stability_event_realm_split_low
+                    has_variable = riseandfall_story_collapse_pressure
+                    var:riseandfall_story_collapse_pressure >= 50
+                    riseandfall_low_stability_realm_split_available_trigger = yes
+                }
+                trigger_event = { id = realm_split.1001 }
+            }
+            900 = {
+                trigger = {
+                    exists = global_var:riseandfall_low_stability_event_palace_coup_high
+                    has_variable = riseandfall_story_collapse_pressure
+                    var:riseandfall_story_collapse_pressure >= 40
+                    riseandfall_low_stability_palace_coup_available_trigger = yes
+                }
+                trigger_event = { id = palace_coup.1001 }
+            }
+            300 = {
+                trigger = {
+                    NOT = { exists = global_var:riseandfall_low_stability_event_palace_coup_high }
+                    NOT = { exists = global_var:riseandfall_low_stability_event_palace_coup_low }
+                    has_variable = riseandfall_story_collapse_pressure
+                    var:riseandfall_story_collapse_pressure >= 40
+                    riseandfall_low_stability_palace_coup_available_trigger = yes
+                }
+                trigger_event = { id = palace_coup.1001 }
+            }
+            99 = {
+                trigger = {
+                    exists = global_var:riseandfall_low_stability_event_palace_coup_low
+                    has_variable = riseandfall_story_collapse_pressure
+                    var:riseandfall_story_collapse_pressure >= 40
+                    riseandfall_low_stability_palace_coup_available_trigger = yes
+                }
+                trigger_event = { id = palace_coup.1001 }
+            }
+            300 = {
+                trigger = {
+                    exists = global_var:riseandfall_low_stability_event_warlord_high
+                    riseandfall_low_stability_warlord_available_trigger = yes
+                }
+                trigger_event = { id = warlord.1001 }
+            }
+            100 = {
+                trigger = {
+                    NOT = { exists = global_var:riseandfall_low_stability_event_warlord_high }
+                    NOT = { exists = global_var:riseandfall_low_stability_event_warlord_low }
+                    riseandfall_low_stability_warlord_available_trigger = yes
+                }
+                trigger_event = { id = warlord.1001 }
+            }
+            33 = {
+                trigger = {
+                    exists = global_var:riseandfall_low_stability_event_warlord_low
+                    riseandfall_low_stability_warlord_available_trigger = yes
+                }
+                trigger_event = { id = warlord.1001 }
+            }
+            300 = {
+                trigger = {
+                    exists = global_var:riseandfall_low_stability_event_palace_coup_high
+                    riseandfall_low_stability_palace_coup_available_trigger = yes
+                }
+                trigger_event = { id = palace_coup.1001 }
+            }
+            100 = {
+                trigger = {
+                    NOT = { exists = global_var:riseandfall_low_stability_event_palace_coup_high }
+                    NOT = { exists = global_var:riseandfall_low_stability_event_palace_coup_low }
+                    riseandfall_low_stability_palace_coup_available_trigger = yes
+                }
+                trigger_event = { id = palace_coup.1001 }
+            }
+            33 = {
+                trigger = {
+                    exists = global_var:riseandfall_low_stability_event_palace_coup_low
+                    riseandfall_low_stability_palace_coup_available_trigger = yes
+                }
+                trigger_event = { id = palace_coup.1001 }
+            }
+            300 = {
+                trigger = {
+                    exists = global_var:riseandfall_low_stability_event_realm_split_high
+                    riseandfall_low_stability_realm_split_available_trigger = yes
+                }
+                trigger_event = { id = realm_split.1001 }
+            }
+            100 = {
+                trigger = {
+                    NOT = { exists = global_var:riseandfall_low_stability_event_realm_split_high }
+                    NOT = { exists = global_var:riseandfall_low_stability_event_realm_split_low }
+                    riseandfall_low_stability_realm_split_available_trigger = yes
+                }
+                trigger_event = { id = realm_split.1001 }
+            }
+            33 = {
+                trigger = {
+                    exists = global_var:riseandfall_low_stability_event_realm_split_low
+                    riseandfall_low_stability_realm_split_available_trigger = yes
+                }
+                trigger_event = { id = realm_split.1001 }
+            }
+            300 = {
+                trigger = {
+                    exists = global_var:riseandfall_low_stability_event_nationalist_revolt_high
+                    riseandfall_low_stability_nationalist_revolt_available_trigger = yes
+                }
                 trigger_event = { id = authority_collapse.1001 }
             }
-            1 = {
-                trigger = { riseandfall_low_stability_vassal_crisis_available_trigger = yes }
+            100 = {
+                trigger = {
+                    NOT = { exists = global_var:riseandfall_low_stability_event_nationalist_revolt_high }
+                    NOT = { exists = global_var:riseandfall_low_stability_event_nationalist_revolt_low }
+                    riseandfall_low_stability_nationalist_revolt_available_trigger = yes
+                }
+                trigger_event = { id = authority_collapse.1001 }
+            }
+            33 = {
+                trigger = {
+                    exists = global_var:riseandfall_low_stability_event_nationalist_revolt_low
+                    riseandfall_low_stability_nationalist_revolt_available_trigger = yes
+                }
+                trigger_event = { id = authority_collapse.1001 }
+            }
+            300 = {
+                trigger = {
+                    exists = global_var:riseandfall_low_stability_event_vassal_crisis_high
+                    riseandfall_low_stability_vassal_crisis_available_trigger = yes
+                }
                 trigger_event = { id = authority_collapse.1002 }
             }
-            1 = {
-                trigger = { riseandfall_low_stability_authority_collapse_available_trigger = yes }
+            100 = {
+                trigger = {
+                    NOT = { exists = global_var:riseandfall_low_stability_event_vassal_crisis_high }
+                    NOT = { exists = global_var:riseandfall_low_stability_event_vassal_crisis_low }
+                    riseandfall_low_stability_vassal_crisis_available_trigger = yes
+                }
+                trigger_event = { id = authority_collapse.1002 }
+            }
+            33 = {
+                trigger = {
+                    exists = global_var:riseandfall_low_stability_event_vassal_crisis_low
+                    riseandfall_low_stability_vassal_crisis_available_trigger = yes
+                }
+                trigger_event = { id = authority_collapse.1002 }
+            }
+            300 = {
+                trigger = {
+                    exists = global_var:riseandfall_low_stability_event_authority_collapse_high
+                    riseandfall_low_stability_authority_collapse_available_trigger = yes
+                }
+                trigger_event = { id = authority_collapse.1003 }
+            }
+            100 = {
+                trigger = {
+                    NOT = { exists = global_var:riseandfall_low_stability_event_authority_collapse_high }
+                    NOT = { exists = global_var:riseandfall_low_stability_event_authority_collapse_low }
+                    riseandfall_low_stability_authority_collapse_available_trigger = yes
+                }
+                trigger_event = { id = authority_collapse.1003 }
+            }
+            33 = {
+                trigger = {
+                    exists = global_var:riseandfall_low_stability_event_authority_collapse_low
+                    riseandfall_low_stability_authority_collapse_available_trigger = yes
+                }
                 trigger_event = { id = authority_collapse.1003 }
             }
         }
