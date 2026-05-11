@@ -171,6 +171,8 @@ types RiseAndFallStabilityTooltipTypes
 
 					widget = {
 						size = { 156 96 }
+						tooltip = "REALM_STABILITY_TT_PREDICTED_TOOLTIP"
+						using = tooltip_ne
 						background = { using = Background_Area_Dark }
 
 						vbox = {
@@ -211,6 +213,8 @@ types RiseAndFallStabilityTooltipTypes
 
 					widget = {
 						size = { 156 96 }
+						tooltip = "REALM_STABILITY_TT_RISK_TOOLTIP"
+						using = tooltip_ne
 						background = { using = Background_Area_Dark }
 
 						vbox = {
@@ -250,6 +254,8 @@ types RiseAndFallStabilityTooltipTypes
 
 					widget = {
 						size = { 156 96 }
+						tooltip = "REALM_STABILITY_TT_TARGET_TOOLTIP"
+						using = tooltip_ne
 						background = { using = Background_Area_Dark }
 
 						vbox = {
@@ -290,7 +296,9 @@ types RiseAndFallStabilityTooltipTypes
 
 				widget = {
 					visible = "[Or( Character.MakeScope.Var('riseandfall_story_role').IsSet, Or( Character.MakeScope.Var('riseandfall_story_collapse_pressure').IsSet, Character.MakeScope.Var('riseandfall_story_world_climate').IsSet ) )]"
-					size = { 500 104 }
+					size = { 500 206 }
+					tooltip = "REALM_STABILITY_TT_STORY_MODE_TOOLTIP"
+					using = tooltip_ne
 					background = { using = Background_Area_Dark }
 
 					vbox = {
@@ -298,18 +306,17 @@ types RiseAndFallStabilityTooltipTypes
 						spacing = 4
 						hbox = {
 							layoutpolicy_horizontal = expanding
+							tooltip = "REALM_STABILITY_TT_STORY_MODE_TOOLTIP"
+							using = tooltip_ne
 							expand = {}
 							icon = {
 								size = { 24 24 }
 								texture = "gfx/interface/icons/dynasty/legitimist_revolt.dds"
-								margin_right = 4
 							}
 							text_single = {
-								raw_text = "#underline Story Mode#!"
+								text = "REALM_STABILITY_TT_STORY_DIRECTOR_HEADER"
 								default_format = "#high"
 								align = nobaseline
-								tooltip = "REALM_STABILITY_TT_STORY_MODE_TOOLTIP"
-								using = tooltip_ne
 							}
 							expand = {}
 						}
@@ -380,6 +387,118 @@ types RiseAndFallStabilityTooltipTypes
 								}
 							}
 						}
+						vbox = {
+							visible = "[Or( Or( Or( GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_reign_tension').GetValue, '(CFixedPoint)0' ), GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_stagnation_pressure').GetValue, '(CFixedPoint)0' ) ), Or( GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_ancient_regime').GetValue, '(CFixedPoint)0' ), GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_complacent_vassals').GetValue, '(CFixedPoint)0' ) ) ), Or( GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_complacent_vassal_pressure').GetValue, '(CFixedPoint)0' ), GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_no_rival_pressure').GetValue, '(CFixedPoint)0' ) ) )]"
+							layoutpolicy_horizontal = expanding
+							spacing = 2
+							hbox = {
+								layoutpolicy_horizontal = expanding
+								tooltip = "REALM_STABILITY_TT_STORY_PRESSURE_INPUTS_TOOLTIP"
+								using = tooltip_ne
+								expand = {}
+								text_single = {
+									text = "REALM_STABILITY_TT_STORY_PRESSURE_INPUTS_HEADER"
+									default_format = "#high"
+									align = hcenter|nobaseline
+								}
+								expand = {}
+							}
+							vbox = {
+								layoutpolicy_horizontal = expanding
+								margin = { 50 0 }
+								spacing = 2
+								hbox = {
+									visible = "[GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_reign_tension').GetValue, '(CFixedPoint)0' )]"
+									layoutpolicy_horizontal = expanding
+									tooltip = "REALM_STABILITY_TT_REIGN_TENSION_TOOLTIP"
+									using = tooltip_ne
+									text_single = {
+										text = "REALM_STABILITY_TT_REIGN_TENSION_L"
+										default_format = "#high"
+									}
+									expand = {}
+									text_single = {
+										text = "REALM_STABILITY_TT_REIGN_TENSION_R"
+										default_format = "#high"
+									}
+								}
+								hbox = {
+									visible = "[GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_stagnation_pressure').GetValue, '(CFixedPoint)0' )]"
+									layoutpolicy_horizontal = expanding
+									tooltip = "REALM_STABILITY_TT_STAGNATION_PRESSURE_TOOLTIP"
+									using = tooltip_ne
+									text_single = {
+										text = "REALM_STABILITY_TT_STAGNATION_PRESSURE_L"
+										default_format = "#high"
+									}
+									expand = {}
+									text_single = {
+										text = "REALM_STABILITY_TT_STAGNATION_PRESSURE_R"
+										default_format = "#high"
+									}
+								}
+								hbox = {
+									visible = "[GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_ancient_regime').GetValue, '(CFixedPoint)0' )]"
+									layoutpolicy_horizontal = expanding
+									tooltip = "REALM_STABILITY_TT_ANCIENT_REGIME_TOOLTIP"
+									using = tooltip_ne
+									text_single = {
+										text = "REALM_STABILITY_TT_ANCIENT_REGIME_L"
+										default_format = "#high"
+									}
+									expand = {}
+									text_single = {
+										text = "REALM_STABILITY_TT_ANCIENT_REGIME_R"
+										default_format = "#high"
+									}
+								}
+								hbox = {
+									visible = "[GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_complacent_vassals').GetValue, '(CFixedPoint)0' )]"
+									layoutpolicy_horizontal = expanding
+									tooltip = "REALM_STABILITY_TT_COMPLACENT_VASSALS_TOOLTIP"
+									using = tooltip_ne
+									text_single = {
+										text = "REALM_STABILITY_TT_COMPLACENT_VASSALS_L"
+										default_format = "#high"
+									}
+									expand = {}
+									text_single = {
+										text = "REALM_STABILITY_TT_COMPLACENT_VASSALS_R"
+										default_format = "#high"
+									}
+								}
+								hbox = {
+									visible = "[GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_complacent_vassal_pressure').GetValue, '(CFixedPoint)0' )]"
+									layoutpolicy_horizontal = expanding
+									tooltip = "REALM_STABILITY_TT_COMPLACENT_VASSAL_PRESSURE_TOOLTIP"
+									using = tooltip_ne
+									text_single = {
+										text = "REALM_STABILITY_TT_COMPLACENT_VASSAL_PRESSURE_L"
+										default_format = "#high"
+									}
+									expand = {}
+									text_single = {
+										text = "REALM_STABILITY_TT_COMPLACENT_VASSAL_PRESSURE_R"
+										default_format = "#high"
+									}
+								}
+								hbox = {
+									visible = "[GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_no_rival_pressure').GetValue, '(CFixedPoint)0' )]"
+									layoutpolicy_horizontal = expanding
+									tooltip = "REALM_STABILITY_TT_NO_RIVAL_PRESSURE_TOOLTIP"
+									using = tooltip_ne
+									text_single = {
+										text = "REALM_STABILITY_TT_NO_RIVAL_PRESSURE_L"
+										default_format = "#high"
+									}
+									expand = {}
+									text_single = {
+										text = "REALM_STABILITY_TT_NO_RIVAL_PRESSURE_R"
+										default_format = "#high"
+									}
+								}
+							}
+						}
 					}
 				}
 
@@ -393,14 +512,17 @@ types RiseAndFallStabilityTooltipTypes
 
 					vbox = {
 						layoutpolicy_horizontal = expanding
+						tooltip = "REALM_STABILITY_TT_RULER_SECTION_TOOLTIP"
+						using = tooltip_ne
 						margin = { 8 6 }
 						hbox = {
 							layoutpolicy_horizontal = expanding
+							tooltip = "REALM_STABILITY_TT_RULER_SECTION_TOOLTIP"
+							using = tooltip_ne
 							expand = {}
 							icon = {
 								size = { 22 22 }
 								texture = "gfx/interface/icons/empire_crown.dds"
-								margin_right = 4
 							}
 							text_single = {
 								text = "REALM_STABILITY_TT_RULER_REALM_HEADER"
@@ -416,6 +538,8 @@ types RiseAndFallStabilityTooltipTypes
 
 							hbox = {
 								layoutpolicy_horizontal = expanding
+								tooltip = "REALM_STABILITY_TT_STATS_TOOLTIP"
+								using = tooltip_ne
 								text_single = {
 									text = "REALM_STABILITY_TT_STATS_L"
 									default_format = "#low"
@@ -455,44 +579,32 @@ types RiseAndFallStabilityTooltipTypes
 									default_format = "#low"
 								}
 							}
-						}
-					}
 
-					vbox = {
-						visible = "[Character.MakeScope.Var('riseandfall_rs_puppet_stability_bonus').IsSet]"
-						layoutpolicy_horizontal = expanding
-						vbox = {
-							layoutpolicy_horizontal = expanding
-							margin = { 8 6 }
 							hbox = {
+								visible = "[Character.MakeScope.Var('riseandfall_rs_puppet_stability_bonus').IsSet]"
 								layoutpolicy_horizontal = expanding
-								expand = {}
-								icon = {
-									size = { 22 22 }
-									texture = "gfx/interface/icons/character_interactions/scroll_scales.dds"
-									margin_right = 4
-								}
 								text_single = {
-									text = "REALM_STABILITY_TT_REGENCY"
-									default_format = "#high"
-									align = nobaseline
+									text = "REALM_STABILITY_TT_PUPPET_BONUS_L"
+									default_format = "#low"
 								}
 								expand = {}
+								text_single = {
+									text = "REALM_STABILITY_TT_PUPPET_BONUS_R"
+									default_format = "#low"
+								}
 							}
-							vbox = {
+
+							hbox = {
+								visible = "[LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_realm_stability_sex_law_penalty').GetValue, '(CFixedPoint)0' )]"
 								layoutpolicy_horizontal = expanding
-								margin = { 50 0 }
-								hbox = {
-									layoutpolicy_horizontal = expanding
-									text_single = {
-										text = "REALM_STABILITY_TT_PUPPET_BONUS_L"
-										default_format = "#low"
-									}
-									expand = {}
-									text_single = {
-										text = "REALM_STABILITY_TT_PUPPET_BONUS_R"
-										default_format = "#low"
-									}
+								text_single = {
+									text = "REALM_STABILITY_TT_GENDER_L"
+									default_format = "#low"
+								}
+								expand = {}
+								text_single = {
+									text = "REALM_STABILITY_TT_GENDER_R"
+									default_format = "#low"
 								}
 							}
 						}
@@ -501,16 +613,19 @@ types RiseAndFallStabilityTooltipTypes
 					vbox = {
 						visible = "[Or( LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_realm_stability_civil_war_penalty').GetValue, '(CFixedPoint)0' ), GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_war_penalty').GetValue, '(CFixedPoint)0' ) )]"
 						layoutpolicy_horizontal = expanding
+						tooltip = "REALM_STABILITY_TT_WAR_SECTION_TOOLTIP"
+						using = tooltip_ne
 						vbox = {
 							layoutpolicy_horizontal = expanding
 							margin = { 8 6 }
 							hbox = {
 								layoutpolicy_horizontal = expanding
+								tooltip = "REALM_STABILITY_TT_WAR_SECTION_TOOLTIP"
+								using = tooltip_ne
 								expand = {}
 								icon = {
 									size = { 22 22 }
 									texture = "gfx/interface/icons/war_status/war_icon.dds"
-									margin_right = 4
 								}
 								text_single = {
 									text = "REALM_STABILITY_TT_WAR_HEADER_PLAIN"
@@ -554,58 +669,21 @@ types RiseAndFallStabilityTooltipTypes
 					}
 
 					vbox = {
-						visible = "[LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_realm_stability_sex_law_penalty').GetValue, '(CFixedPoint)0' )]"
+						visible = "[Or( Or( Or( GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_difficulty_multiplier').GetValue, '(CFixedPoint)100' ), LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_difficulty_multiplier').GetValue, '(CFixedPoint)100' ) ), Or( GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_protection').GetValue, '(CFixedPoint)0' ), GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_recovery_component').GetValue, '(CFixedPoint)0' ) ) ), GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_collapse_pressure').GetValue, '(CFixedPoint)0' ) )]"
 						layoutpolicy_horizontal = expanding
+						tooltip = "REALM_STABILITY_TT_WORLD_RULES_SECTION_TOOLTIP"
+						using = tooltip_ne
 						vbox = {
 							layoutpolicy_horizontal = expanding
 							margin = { 8 6 }
 							hbox = {
 								layoutpolicy_horizontal = expanding
-								expand = {}
-								icon = {
-									size = { 22 22 }
-									texture = "gfx/interface/icons/title_status/icon_title_law.dds"
-									margin_right = 4
-								}
-								text_single = {
-									text = "REALM_STABILITY_TT_GENDER_HEADER"
-									default_format = "#high"
-									align = nobaseline
-								}
-								expand = {}
-							}
-							vbox = {
-								layoutpolicy_horizontal = expanding
-								margin = { 50 0 }
-								hbox = {
-									layoutpolicy_horizontal = expanding
-									text_single = {
-										text = "REALM_STABILITY_TT_GENDER_L"
-										default_format = "#low"
-									}
-									expand = {}
-									text_single = {
-										text = "REALM_STABILITY_TT_GENDER_R"
-										default_format = "#low"
-									}
-								}
-							}
-						}
-					}
-
-					vbox = {
-						visible = "[Or( Or( Or( Or( GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_difficulty_multiplier').GetValue, '(CFixedPoint)100' ), LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_difficulty_multiplier').GetValue, '(CFixedPoint)100' ) ), Or( GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_reign_tension').GetValue, '(CFixedPoint)0' ), GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_stagnation_pressure').GetValue, '(CFixedPoint)0' ) ) ), Or( GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_ancient_regime').GetValue, '(CFixedPoint)0' ), GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_complacent_vassals').GetValue, '(CFixedPoint)0' ) ) ), Or( GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_complacent_vassal_pressure').GetValue, '(CFixedPoint)0' ), GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_collapse_pressure').GetValue, '(CFixedPoint)0' ) ) )]"
-						layoutpolicy_horizontal = expanding
-						vbox = {
-							layoutpolicy_horizontal = expanding
-							margin = { 8 6 }
-							hbox = {
-								layoutpolicy_horizontal = expanding
+								tooltip = "REALM_STABILITY_TT_WORLD_RULES_SECTION_TOOLTIP"
+								using = tooltip_ne
 								expand = {}
 								icon = {
 									size = { 22 22 }
 									texture = "gfx/interface/icons/control.dds"
-									margin_right = 4
 								}
 								text_single = {
 									text = "REALM_STABILITY_TT_WORLD_RULES_HEADER"
@@ -632,77 +710,32 @@ types RiseAndFallStabilityTooltipTypes
 									}
 								}
 								hbox = {
-									visible = "[GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_reign_tension').GetValue, '(CFixedPoint)0' )]"
+									visible = "[GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_protection').GetValue, '(CFixedPoint)0' )]"
 									layoutpolicy_horizontal = expanding
-									tooltip = "REALM_STABILITY_TT_REIGN_TENSION_TOOLTIP"
+									tooltip = "REALM_STABILITY_TT_STORY_PROTECTION_TOOLTIP"
 									using = tooltip_ne
 									text_single = {
-										text = "REALM_STABILITY_TT_REIGN_TENSION_L"
+										text = "REALM_STABILITY_TT_STORY_PROTECTION_L"
 										default_format = "#low"
 									}
 									expand = {}
 									text_single = {
-										text = "REALM_STABILITY_TT_REIGN_TENSION_R"
+										text = "REALM_STABILITY_TT_STORY_PROTECTION_R"
 										default_format = "#low"
 									}
 								}
 								hbox = {
-									visible = "[GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_stagnation_pressure').GetValue, '(CFixedPoint)0' )]"
+									visible = "[GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_recovery_component').GetValue, '(CFixedPoint)0' )]"
 									layoutpolicy_horizontal = expanding
-									tooltip = "REALM_STABILITY_TT_STAGNATION_PRESSURE_TOOLTIP"
+									tooltip = "REALM_STABILITY_TT_STORY_RECOVERY_TOOLTIP"
 									using = tooltip_ne
 									text_single = {
-										text = "REALM_STABILITY_TT_STAGNATION_PRESSURE_L"
+										text = "REALM_STABILITY_TT_STORY_RECOVERY_L"
 										default_format = "#low"
 									}
 									expand = {}
 									text_single = {
-										text = "REALM_STABILITY_TT_STAGNATION_PRESSURE_R"
-										default_format = "#low"
-									}
-								}
-								hbox = {
-									visible = "[GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_ancient_regime').GetValue, '(CFixedPoint)0' )]"
-									layoutpolicy_horizontal = expanding
-									tooltip = "REALM_STABILITY_TT_ANCIENT_REGIME_TOOLTIP"
-									using = tooltip_ne
-									text_single = {
-										text = "REALM_STABILITY_TT_ANCIENT_REGIME_L"
-										default_format = "#low"
-									}
-									expand = {}
-									text_single = {
-										text = "REALM_STABILITY_TT_ANCIENT_REGIME_R"
-										default_format = "#low"
-									}
-								}
-								hbox = {
-									visible = "[GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_complacent_vassals').GetValue, '(CFixedPoint)0' )]"
-									layoutpolicy_horizontal = expanding
-									tooltip = "REALM_STABILITY_TT_COMPLACENT_VASSALS_TOOLTIP"
-									using = tooltip_ne
-									text_single = {
-										text = "REALM_STABILITY_TT_COMPLACENT_VASSALS_L"
-										default_format = "#low"
-									}
-									expand = {}
-									text_single = {
-										text = "REALM_STABILITY_TT_COMPLACENT_VASSALS_R"
-										default_format = "#low"
-									}
-								}
-								hbox = {
-									visible = "[GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_complacent_vassal_pressure').GetValue, '(CFixedPoint)0' )]"
-									layoutpolicy_horizontal = expanding
-									tooltip = "REALM_STABILITY_TT_COMPLACENT_VASSAL_PRESSURE_TOOLTIP"
-									using = tooltip_ne
-									text_single = {
-										text = "REALM_STABILITY_TT_COMPLACENT_VASSAL_PRESSURE_L"
-										default_format = "#low"
-									}
-									expand = {}
-									text_single = {
-										text = "REALM_STABILITY_TT_COMPLACENT_VASSAL_PRESSURE_R"
+										text = "REALM_STABILITY_TT_STORY_RECOVERY_R"
 										default_format = "#low"
 									}
 								}
@@ -728,16 +761,19 @@ types RiseAndFallStabilityTooltipTypes
 					vbox = {
 						visible = "[Or( Or( Or( Or( GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_vassals_component').GetValue, '(CFixedPoint)0' ), LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_vassals_component').GetValue, '(CFixedPoint)0' ) ), Or( GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_realm_size_component').GetValue, '(CFixedPoint)0' ), LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_realm_size_component').GetValue, '(CFixedPoint)0' ) ) ), Or( Or( GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_strong_vassal_component').GetValue, '(CFixedPoint)0' ), LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_strong_vassal_component').GetValue, '(CFixedPoint)0' ) ), Or( GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_culture_faith_component').GetValue, '(CFixedPoint)0' ), LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_culture_faith_component').GetValue, '(CFixedPoint)0' ) ) ) ), Or( Or( LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_epidemic_component').GetValue, '(CFixedPoint)0' ), GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_partition_component').GetValue, '(CFixedPoint)0' ) ), LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_succession_component').GetValue, '(CFixedPoint)0' ) ) )]"
 						layoutpolicy_horizontal = expanding
+						tooltip = "REALM_STABILITY_TT_REALM_FACTORS_SECTION_TOOLTIP"
+						using = tooltip_ne
 						vbox = {
 							layoutpolicy_horizontal = expanding
 							margin = { 8 6 }
 							hbox = {
 								layoutpolicy_horizontal = expanding
+								tooltip = "REALM_STABILITY_TT_REALM_FACTORS_SECTION_TOOLTIP"
+								using = tooltip_ne
 								expand = {}
 								icon = {
 									size = { 22 22 }
 									texture = "gfx/interface/icons/icon_holding_castle.dds"
-									margin_right = 4
 								}
 								text_single = {
 									text = "REALM_STABILITY_TT_STORY_MODE_HEADER_PLAIN"

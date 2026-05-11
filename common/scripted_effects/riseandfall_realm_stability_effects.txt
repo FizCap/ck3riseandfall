@@ -39,14 +39,27 @@ riseandfall_calculate_realm_stability_se = {
     # Initialize tracking globals if missing.
     if = { limit = { NOT = { exists = global_var:riseandfall_stat_avg_last_year } } set_global_variable = { name = riseandfall_stat_avg_last_year value = 0 } }
     if = { limit = { NOT = { exists = global_var:riseandfall_stat_avg_years } } set_global_variable = { name = riseandfall_stat_avg_years value = 0 } }
-    if = { limit = { NOT = { exists = global_var:riseandfall_avg_diplomacy } } set_global_variable = { name = riseandfall_avg_diplomacy value = 10 } }
-    if = { limit = { NOT = { exists = global_var:riseandfall_avg_martial } } set_global_variable = { name = riseandfall_avg_martial value = 10 } }
-    if = { limit = { NOT = { exists = global_var:riseandfall_avg_stewardship } } set_global_variable = { name = riseandfall_avg_stewardship value = 10 } }
-    if = { limit = { NOT = { exists = global_var:riseandfall_avg_intrigue } } set_global_variable = { name = riseandfall_avg_intrigue value = 10 } }
-    if = { limit = { NOT = { exists = global_var:riseandfall_avg_learning } } set_global_variable = { name = riseandfall_avg_learning value = 10 } }
+    if = { limit = { NOT = { exists = global_var:riseandfall_avg_diplomacy } } set_global_variable = { name = riseandfall_avg_diplomacy value = 0 } }
+    if = { limit = { NOT = { exists = global_var:riseandfall_avg_martial } } set_global_variable = { name = riseandfall_avg_martial value = 0 } }
+    if = { limit = { NOT = { exists = global_var:riseandfall_avg_stewardship } } set_global_variable = { name = riseandfall_avg_stewardship value = 0 } }
+    if = { limit = { NOT = { exists = global_var:riseandfall_avg_intrigue } } set_global_variable = { name = riseandfall_avg_intrigue value = 0 } }
+    if = { limit = { NOT = { exists = global_var:riseandfall_avg_learning } } set_global_variable = { name = riseandfall_avg_learning value = 0 } }
     if = { limit = { NOT = { exists = global_var:riseandfall_ruler_count } } set_global_variable = { name = riseandfall_ruler_count value = 0 } }
-    if = { limit = { NOT = { exists = global_var:riseandfall_avg_total } } set_global_variable = { name = riseandfall_avg_total value = 10 } }
+    if = { limit = { NOT = { exists = global_var:riseandfall_avg_total } } set_global_variable = { name = riseandfall_avg_total value = 0 } }
     if = { limit = { NOT = { exists = global_var:riseandfall_world_total } } set_global_variable = { name = riseandfall_world_total value = 1 } }
+
+    if = {
+        limit = {
+            OR = {
+                global_var:riseandfall_avg_diplomacy <= 0
+                global_var:riseandfall_avg_martial <= 0
+                global_var:riseandfall_avg_stewardship <= 0
+                global_var:riseandfall_avg_intrigue <= 0
+                global_var:riseandfall_avg_learning <= 0
+            }
+        }
+        set_global_variable = { name = riseandfall_stat_avg_last_year value = 0 }
+    }
 
     # run once per year (and run an initial calculation on first call)
     if = {
@@ -87,11 +100,6 @@ riseandfall_calculate_realm_stability_se = {
                 change_global_variable = { name = riseandfall_avg_total divide = global_var:riseandfall_ruler_count }
                 change_global_variable = { name = riseandfall_avg_total divide = 5 }
 
-                clamp_global_variable = { name = riseandfall_avg_diplomacy min = 10 }
-                clamp_global_variable = { name = riseandfall_avg_martial min = 10 }
-                clamp_global_variable = { name = riseandfall_avg_stewardship min = 10 }
-                clamp_global_variable = { name = riseandfall_avg_intrigue min = 10 }
-                clamp_global_variable = { name = riseandfall_avg_learning min = 10 }
             }
         }
         change_global_variable = { name = riseandfall_stat_avg_years add = 1 }
@@ -104,6 +112,7 @@ riseandfall_calculate_realm_stability_se = {
             set_global_variable = { name = riseandfall_avg_stewardship value = 0 }
             set_global_variable = { name = riseandfall_avg_intrigue value = 0 }
             set_global_variable = { name = riseandfall_avg_learning value = 0 }
+            set_global_variable = { name = riseandfall_avg_total value = 0 }
             set_global_variable = { name = riseandfall_ruler_count value = 0 }
             every_ruler = {
                 change_global_variable = { name = riseandfall_ruler_count add = 1 }
@@ -128,11 +137,6 @@ riseandfall_calculate_realm_stability_se = {
                 change_global_variable = { name = riseandfall_avg_total divide = global_var:riseandfall_ruler_count }
                 change_global_variable = { name = riseandfall_avg_total divide = 5 }
 
-                clamp_global_variable = { name = riseandfall_avg_diplomacy min = 10 }
-                clamp_global_variable = { name = riseandfall_avg_martial min = 10 }
-                clamp_global_variable = { name = riseandfall_avg_stewardship min = 10 }
-                clamp_global_variable = { name = riseandfall_avg_intrigue min = 10 }
-                clamp_global_variable = { name = riseandfall_avg_learning min = 10 }
             }
         }
     }
@@ -802,39 +806,9 @@ riseandfall_calculate_realm_stability_se = {
         limit = { has_variable = riseandfall_story_successor_grace }
         change_variable = { name = tmp_target_score add = var:riseandfall_story_successor_grace }
     }
-    if = {
-        limit = {
-            has_variable = riseandfall_story_role
-            var:riseandfall_story_role = 1
-            NOT = { var:tmp_target_score >= 55 }
-        }
-        set_variable = { name = tmp_target_score value = 55 }
-    }
-    else_if = {
-        limit = {
-            has_variable = riseandfall_story_role
-            var:riseandfall_story_role = 2
-            NOT = { var:tmp_target_score >= 45 }
-        }
-        set_variable = { name = tmp_target_score value = 45 }
-    }
-    else_if = {
-        limit = {
-            has_variable = riseandfall_story_role
-            var:riseandfall_story_role = 4
-            has_variable = riseandfall_story_world_climate
-            var:riseandfall_story_world_climate >= 3
-            NOT = { var:tmp_target_score >= 35 }
-        }
-        set_variable = { name = tmp_target_score value = 35 }
-    }
-    if = {
-        limit = {
-            has_variable = riseandfall_story_successor_grace
-            NOT = { var:tmp_target_score >= 60 }
-        }
-        set_variable = { name = tmp_target_score value = 60 }
-    }
+    # Story roles should protect realms through visible additive support only.
+    # Do not apply hidden Anchor/Rival/Wildcard target floors here, because they make the tooltip math impossible to reconcile.
+    # Successor grace is a visible flat bonus. Avoid a hidden target floor so the tooltip rows stay accountable.
     # Legitimacy is additive: -20 (none) to +15 (full). Transparent on the 0-100 scale.
     change_variable = { name = tmp_target_score add = var:riseandfall_rs_legitimacy_component }
 
@@ -1025,39 +999,8 @@ riseandfall_calculate_realm_stability_se = {
     set_variable = { name = riseandfall_rs_difficulty_multiplier value = var:riseandfall_rs_difficulty_multiplier }
     set_variable = { name = riseandfall_rs_difficulty_multiplier_display value = var:riseandfall_rs_difficulty_multiplier_display }
 
-    if = {
-        limit = {
-            has_variable = riseandfall_story_successor_grace
-            NOT = { var:tmp_target_score >= 60 }
-        }
-        set_variable = { name = tmp_target_score value = 60 }
-    }
-    else_if = {
-        limit = {
-            has_variable = riseandfall_story_role
-            var:riseandfall_story_role = 1
-            NOT = { var:tmp_target_score >= 55 }
-        }
-        set_variable = { name = tmp_target_score value = 55 }
-    }
-    else_if = {
-        limit = {
-            has_variable = riseandfall_story_role
-            var:riseandfall_story_role = 2
-            NOT = { var:tmp_target_score >= 45 }
-        }
-        set_variable = { name = tmp_target_score value = 45 }
-    }
-    else_if = {
-        limit = {
-            has_variable = riseandfall_story_role
-            var:riseandfall_story_role = 4
-            has_variable = riseandfall_story_world_climate
-            var:riseandfall_story_world_climate >= 3
-            NOT = { var:tmp_target_score >= 35 }
-        }
-        set_variable = { name = tmp_target_score value = 35 }
-    }
+    # Successor grace and Story role support are already included as visible additive rows.
+    # Keeping this section free of hidden role floors makes the visible rows add up to the stored target.
 
     # Ensure the target stays within 0..100 after applying war penalties
     clamp_variable = { name = tmp_target_score min = 0 max = 100 }
@@ -1160,39 +1103,7 @@ riseandfall_calculate_realm_stability_se = {
     }
 
     # Ensure current score remains clamped and integer
-    if = {
-        limit = {
-            has_variable = riseandfall_story_successor_grace
-            NOT = { var:riseandfall_realm_stability_score >= 50 }
-        }
-        set_variable = { name = riseandfall_realm_stability_score value = 50 }
-    }
-    else_if = {
-        limit = {
-            has_variable = riseandfall_story_role
-            var:riseandfall_story_role = 1
-            NOT = { var:riseandfall_realm_stability_score >= 35 }
-        }
-        set_variable = { name = riseandfall_realm_stability_score value = 35 }
-    }
-    else_if = {
-        limit = {
-            has_variable = riseandfall_story_role
-            var:riseandfall_story_role = 2
-            NOT = { var:riseandfall_realm_stability_score >= 30 }
-        }
-        set_variable = { name = riseandfall_realm_stability_score value = 30 }
-    }
-    else_if = {
-        limit = {
-            has_variable = riseandfall_story_role
-            var:riseandfall_story_role = 4
-            has_variable = riseandfall_story_world_climate
-            var:riseandfall_story_world_climate >= 3
-            NOT = { var:riseandfall_realm_stability_score >= 20 }
-        }
-        set_variable = { name = riseandfall_realm_stability_score value = 20 }
-    }
+    # Story Mode does not silently floor the current score. Grace and role help are shown through visible additive rows.
     clamp_variable = { name = riseandfall_realm_stability_score min = 0 max = 100 }
     round_variable = { name = riseandfall_realm_stability_score nearest = 1 }
     
@@ -1753,6 +1664,9 @@ riseandfall_clear_unlanded_stability_vars_se = {
         remove_variable = riseandfall_story_ruler_shield
         remove_variable = riseandfall_story_complacent_vassals
         remove_variable = riseandfall_story_complacent_vassal_pressure
+        remove_variable = riseandfall_story_rival_count
+        remove_variable = riseandfall_story_no_rival_years
+        remove_variable = riseandfall_story_no_rival_pressure
         remove_variable = riseandfall_rs_strong_vassal_count
         remove_variable = riseandfall_rs_foreign_culture_county_pct
         remove_variable = riseandfall_rs_foreign_faith_county_pct
