@@ -1,16 +1,27 @@
 ﻿##########################
 # Rise and Fall - Dynamic Story Mode
-# Keeps world-climate and per-realm story pressure outside the main stability file.
+# Campaign director for world climate, story roles, collapse pressure, and successor grace.
 
 riseandfall_story_world_climate_se = {
     set_global_variable = { name = riseandfall_story_world_eligible_count value = 0 }
     set_global_variable = { name = riseandfall_story_world_stable_count value = 0 }
     set_global_variable = { name = riseandfall_story_world_unstable_count value = 0 }
     set_global_variable = { name = riseandfall_story_world_crisis_count value = 0 }
+    set_global_variable = { name = riseandfall_story_world_empire_count value = 0 }
+    set_global_variable = { name = riseandfall_story_world_hegemony_count value = 0 }
+    set_global_variable = { name = riseandfall_story_world_blob_count value = 0 }
     set_global_variable = { name = riseandfall_story_world_stable_pct value = 0 }
     set_global_variable = { name = riseandfall_story_world_unstable_pct value = 0 }
     set_global_variable = { name = riseandfall_story_world_crisis_pct value = 0 }
     set_global_variable = { name = riseandfall_story_world_pressure value = 0 }
+    set_global_variable = { name = riseandfall_story_world_climate value = 0 }
+    set_global_variable = { name = riseandfall_world_total value = 0 }
+
+    every_independent_ruler = {
+        limit = { is_landed = yes }
+        change_global_variable = { name = riseandfall_world_total add = realm_size }
+    }
+    if = { limit = { global_var:riseandfall_world_total < 1 } set_global_variable = { name = riseandfall_world_total value = 1 } }
 
     every_independent_ruler = {
         limit = {
@@ -40,6 +51,32 @@ riseandfall_story_world_climate_se = {
             }
             change_global_variable = { name = riseandfall_story_world_crisis_count add = 1 }
         }
+        if = {
+            limit = { primary_title.tier >= tier_empire }
+            change_global_variable = { name = riseandfall_story_world_empire_count add = 1 }
+        }
+        if = {
+            limit = { primary_title.tier >= tier_hegemony }
+            change_global_variable = { name = riseandfall_story_world_hegemony_count add = 1 }
+        }
+
+        set_variable = { name = tmp_story_world_total value = global_var:riseandfall_world_total }
+        if = { limit = { var:tmp_story_world_total < 1 } set_variable = { name = tmp_story_world_total value = 1 } }
+        set_variable = { name = tmp_story_realm_pct value = realm_size }
+        change_variable = { name = tmp_story_realm_pct multiply = 100 }
+        change_variable = { name = tmp_story_realm_pct divide = var:tmp_story_world_total }
+        round_variable = { name = tmp_story_realm_pct nearest = 1 }
+        if = {
+            limit = {
+                OR = {
+                    var:tmp_story_realm_pct >= 8
+                    primary_title.tier >= tier_hegemony
+                }
+            }
+            change_global_variable = { name = riseandfall_story_world_blob_count add = 1 }
+        }
+        remove_variable = tmp_story_world_total
+        remove_variable = tmp_story_realm_pct
     }
 
     if = {
@@ -61,27 +98,136 @@ riseandfall_story_world_climate_se = {
     }
 
     if = {
-        limit = { global_var:riseandfall_story_world_stable_pct >= 75 }
+        limit = {
+            global_var:riseandfall_story_world_stable_pct >= 70
+            NOT = { global_var:riseandfall_story_world_crisis_pct >= 10 }
+        }
         set_global_variable = { name = riseandfall_story_world_pressure value = 2 }
+        set_global_variable = { name = riseandfall_story_world_climate value = 1 }
     }
     else_if = {
-        limit = { global_var:riseandfall_story_world_stable_pct >= 60 }
+        limit = { global_var:riseandfall_story_world_stable_pct >= 55 }
         set_global_variable = { name = riseandfall_story_world_pressure value = 1 }
+        set_global_variable = { name = riseandfall_story_world_climate value = 1 }
     }
     else_if = {
         limit = { global_var:riseandfall_story_world_crisis_pct >= 25 }
         set_global_variable = { name = riseandfall_story_world_pressure value = -2 }
+        set_global_variable = { name = riseandfall_story_world_climate value = 4 }
     }
     else_if = {
         limit = { global_var:riseandfall_story_world_unstable_pct >= 45 }
         set_global_variable = { name = riseandfall_story_world_pressure value = -1 }
+        set_global_variable = { name = riseandfall_story_world_climate value = 3 }
     }
+    else = {
+        set_global_variable = { name = riseandfall_story_world_climate value = 2 }
+    }
+}
+
+riseandfall_clear_story_director_vars_se = {
+    remove_variable = riseandfall_story_role
+    remove_variable = riseandfall_story_role_years
+    remove_variable = riseandfall_story_protection
+    remove_variable = riseandfall_story_collapse_pressure
+    remove_variable = riseandfall_story_arc_cooldown
+    remove_variable = riseandfall_story_world_climate
+    remove_variable = riseandfall_story_blob_pressure
+    remove_variable = riseandfall_story_fatigue
+    remove_variable = riseandfall_story_reign_tension
+    remove_variable = riseandfall_story_stagnation_pressure
+    remove_variable = riseandfall_story_ancient_regime
+    remove_variable = riseandfall_story_last_succession_year
+    remove_variable = riseandfall_story_no_succession_years
+    remove_variable = riseandfall_story_ruler_shield
+    remove_variable = riseandfall_story_complacent_vassals
+    remove_variable = riseandfall_story_complacent_vassal_pressure
+}
+
+riseandfall_apply_successor_realm_grace_se = {
+    if = {
+        limit = { is_landed = yes }
+        set_variable = { name = riseandfall_story_successor_grace value = 45 }
+        set_variable = { name = riseandfall_story_successor_grace_years value = 12 }
+        set_variable = { name = riseandfall_story_successor_grace_decay value = 4 }
+        set_variable = { name = low_stability_cooldown value = yes years = 10 }
+        add_character_flag = { flag = rf_story_successor_grace days = 4380 }
+        if = {
+            limit = {
+                has_variable = riseandfall_realm_stability_score
+                NOT = { var:riseandfall_realm_stability_score >= 55 }
+            }
+            set_variable = { name = riseandfall_realm_stability_score value = 55 }
+        }
+    }
+}
+
+riseandfall_apply_palace_coup_successor_grace_se = {
+    riseandfall_apply_successor_realm_grace_se = yes
+    set_variable = { name = riseandfall_story_successor_grace value = 50 }
+    set_variable = { name = riseandfall_story_successor_grace_decay value = 5 }
+}
+
+riseandfall_update_successor_realm_grace_se = {
+    if = {
+        limit = { has_variable = riseandfall_story_successor_grace }
+        if = {
+            limit = { NOT = { has_variable = riseandfall_story_successor_grace_decay } }
+            set_variable = { name = riseandfall_story_successor_grace_decay value = 3 }
+        }
+        if = {
+            limit = { NOT = { has_variable = riseandfall_story_successor_grace_years } }
+            set_variable = { name = riseandfall_story_successor_grace_years value = 1 }
+        }
+        set_variable = { name = tmp_story_successor_grace_decay value = var:riseandfall_story_successor_grace_decay }
+        change_variable = { name = tmp_story_successor_grace_decay multiply = -1 }
+        change_variable = { name = riseandfall_story_successor_grace add = var:tmp_story_successor_grace_decay }
+        change_variable = { name = riseandfall_story_successor_grace_years add = -1 }
+        if = {
+            limit = {
+                OR = {
+                    NOT = { var:riseandfall_story_successor_grace > 0 }
+                    NOT = { var:riseandfall_story_successor_grace_years > 0 }
+                }
+            }
+            remove_variable = riseandfall_story_successor_grace
+            remove_variable = riseandfall_story_successor_grace_years
+            remove_variable = riseandfall_story_successor_grace_decay
+            remove_variable = tmp_story_successor_grace_decay
+            remove_character_flag = rf_story_successor_grace
+        }
+        else = {
+            remove_variable = tmp_story_successor_grace_decay
+        }
+    }
+}
+
+riseandfall_mark_story_succession_year_se = {
+    set_variable = { name = riseandfall_story_last_succession_year value = current_year }
+    set_variable = { name = riseandfall_story_no_succession_years value = 0 }
+    remove_variable = riseandfall_story_reign_tension
+    remove_variable = riseandfall_story_stagnation_pressure
+    remove_variable = riseandfall_story_ancient_regime
 }
 
 riseandfall_apply_dynamic_story_pressure_se = {
     set_variable = { name = riseandfall_rs_story_pressure_component value = 0 }
     set_variable = { name = riseandfall_story_recovery_component value = 0 }
-    set_variable = { name = riseandfall_story_pressure_chance_bonus value = 0 }
+    set_variable = { name = riseandfall_story_protection value = 0 }
+    set_variable = { name = riseandfall_story_blob_pressure value = 0 }
+    set_variable = { name = riseandfall_story_stagnation_pressure value = 0 }
+    set_variable = { name = riseandfall_story_ancient_regime value = 0 }
+    set_variable = { name = riseandfall_story_ruler_shield value = 0 }
+    set_variable = { name = riseandfall_story_complacent_vassals value = 0 }
+    set_variable = { name = riseandfall_story_complacent_vassal_pressure value = 0 }
+
+    if = {
+        limit = { exists = global_var:riseandfall_story_world_climate }
+        set_variable = { name = riseandfall_story_world_climate value = global_var:riseandfall_story_world_climate }
+    }
+    else = {
+        set_variable = { name = riseandfall_story_world_climate value = 2 }
+    }
 
     if = {
         limit = {
@@ -95,105 +241,354 @@ riseandfall_apply_dynamic_story_pressure_se = {
                 }
             }
         }
-        remove_variable = riseandfall_story_fatigue
+        riseandfall_clear_story_director_vars_se = yes
     }
     else_if = {
         limit = {
             is_independent_ruler = yes
             primary_title.tier >= tier_kingdom
         }
-        if = { limit = { NOT = { has_variable = riseandfall_story_fatigue } } set_variable = { name = riseandfall_story_fatigue value = 0 } }
+        if = { limit = { NOT = { has_variable = riseandfall_story_role_years } } set_variable = { name = riseandfall_story_role_years value = 0 } }
+        change_variable = { name = riseandfall_story_role_years add = 1 }
 
-        set_variable = { name = tmp_story_fatigue_step value = 0 }
         set_variable = { name = tmp_story_world_total value = global_var:riseandfall_world_total }
         if = { limit = { var:tmp_story_world_total < 1 } set_variable = { name = tmp_story_world_total value = 1 } }
         set_variable = { name = tmp_story_realm_pct value = realm_size }
         change_variable = { name = tmp_story_realm_pct multiply = 100 }
         change_variable = { name = tmp_story_realm_pct divide = var:tmp_story_world_total }
         round_variable = { name = tmp_story_realm_pct nearest = 1 }
+        set_variable = { name = tmp_story_stress_score value = 0 }
+        save_scope_as = ruler
 
+        set_variable = { name = riseandfall_story_role value = 5 }
         if = {
-            limit = {
-                has_game_rule = riseandfall_dynamic_story_mode_dynamic
-            }
-            if = { limit = { global_var:riseandfall_story_world_pressure = 2 } change_variable = { name = tmp_story_fatigue_step add = 3 } }
-            else_if = { limit = { global_var:riseandfall_story_world_pressure = 1 } change_variable = { name = tmp_story_fatigue_step add = 2 } }
-
-            if = { limit = { has_variable = riseandfall_realm_stability_score var:riseandfall_realm_stability_score >= 80 } change_variable = { name = tmp_story_fatigue_step add = 2 } }
-            else_if = { limit = { has_variable = riseandfall_realm_stability_score var:riseandfall_realm_stability_score >= 70 } change_variable = { name = tmp_story_fatigue_step add = 1 } }
-            if = { limit = { primary_title.tier >= tier_empire } change_variable = { name = tmp_story_fatigue_step add = 1 } }
-            if = { limit = { primary_title.tier >= tier_hegemony } change_variable = { name = tmp_story_fatigue_step add = 1 } }
-            if = { limit = { var:tmp_story_realm_pct >= 10 } change_variable = { name = tmp_story_fatigue_step add = 2 } }
-            else_if = { limit = { var:tmp_story_realm_pct >= 5 } change_variable = { name = tmp_story_fatigue_step add = 1 } }
-
-            if = { limit = { global_var:riseandfall_story_world_pressure = -1 } change_variable = { name = tmp_story_fatigue_step add = -3 } }
-            else_if = { limit = { global_var:riseandfall_story_world_pressure = -2 } change_variable = { name = tmp_story_fatigue_step add = -5 } }
+            limit = { has_variable = riseandfall_story_successor_grace }
+            set_variable = { name = riseandfall_story_role value = 5 }
         }
         else_if = {
-            limit = { has_game_rule = riseandfall_dynamic_story_mode_forced }
-            if = { limit = { primary_title.tier >= tier_hegemony } change_variable = { name = tmp_story_fatigue_step add = 6 } }
-            else_if = { limit = { primary_title.tier >= tier_empire } change_variable = { name = tmp_story_fatigue_step add = 4 } }
-            else_if = { limit = { var:tmp_story_realm_pct >= 8 } change_variable = { name = tmp_story_fatigue_step add = 3 } }
-
-            if = { limit = { has_variable = riseandfall_realm_stability_score var:riseandfall_realm_stability_score >= 70 } change_variable = { name = tmp_story_fatigue_step add = 1 } }
-            if = { limit = { var:tmp_story_realm_pct >= 10 } change_variable = { name = tmp_story_fatigue_step add = 2 } }
+            limit = {
+                OR = {
+                    has_game_rule = riseandfall_dynamic_story_mode_forced
+                    global_var:riseandfall_story_world_pressure >= 1
+                    var:tmp_story_realm_pct >= 8
+                }
+                OR = {
+                    primary_title.tier >= tier_empire
+                    var:tmp_story_realm_pct >= 8
+                }
+                has_variable = riseandfall_realm_stability_score
+                var:riseandfall_realm_stability_score >= 60
+            }
+            set_variable = { name = riseandfall_story_role value = 3 }
+        }
+        else_if = {
+            limit = {
+                has_variable = riseandfall_realm_stability_score
+                NOT = { var:riseandfall_realm_stability_score >= 40 }
+            }
+            set_variable = { name = riseandfall_story_role value = 4 }
+        }
+        else_if = {
+            limit = {
+                OR = {
+                    primary_title.tier >= tier_empire
+                    realm_size >= 50
+                }
+            }
+            set_variable = { name = riseandfall_story_role value = 2 }
+        }
+        else_if = {
+            limit = {
+                has_variable = riseandfall_realm_stability_score
+                NOT = { var:riseandfall_realm_stability_score >= 65 }
+            }
+            set_variable = { name = riseandfall_story_role value = 1 }
         }
 
-        if = { limit = { has_variable = riseandfall_realm_stability_score NOT = { var:riseandfall_realm_stability_score >= 40 } } change_variable = { name = tmp_story_fatigue_step add = -4 } }
-        if = { limit = { is_in_civil_war = yes } change_variable = { name = tmp_story_fatigue_step add = -6 } }
+        if = {
+            limit = { var:riseandfall_story_role = 1 }
+            if = { limit = { has_variable = riseandfall_realm_stability_score NOT = { var:riseandfall_realm_stability_score >= 35 } } set_variable = { name = riseandfall_story_protection value = 35 } }
+            else_if = { limit = { has_variable = riseandfall_realm_stability_score NOT = { var:riseandfall_realm_stability_score >= 55 } } set_variable = { name = riseandfall_story_protection value = 25 } }
+            else_if = { limit = { has_variable = riseandfall_realm_stability_score NOT = { var:riseandfall_realm_stability_score >= 70 } } set_variable = { name = riseandfall_story_protection value = 12 } }
+            else = { set_variable = { name = riseandfall_story_protection value = 4 } }
+        }
+        else_if = {
+            limit = { var:riseandfall_story_role = 2 }
+            if = { limit = { has_variable = riseandfall_realm_stability_score NOT = { var:riseandfall_realm_stability_score >= 30 } } set_variable = { name = riseandfall_story_protection value = 28 } }
+            else_if = { limit = { has_variable = riseandfall_realm_stability_score NOT = { var:riseandfall_realm_stability_score >= 50 } } set_variable = { name = riseandfall_story_protection value = 18 } }
+            else_if = { limit = { has_variable = riseandfall_realm_stability_score NOT = { var:riseandfall_realm_stability_score >= 65 } } set_variable = { name = riseandfall_story_protection value = 8 } }
+            else = { set_variable = { name = riseandfall_story_protection value = 2 } }
+        }
+        else_if = {
+            limit = {
+                var:riseandfall_story_role = 4
+                has_variable = riseandfall_realm_stability_score
+                NOT = { var:riseandfall_realm_stability_score >= 25 }
+            }
+            set_variable = { name = riseandfall_story_protection value = 20 }
+        }
 
-        change_variable = { name = riseandfall_story_fatigue add = var:tmp_story_fatigue_step }
-        clamp_variable = { name = riseandfall_story_fatigue min = 0 max = 100 }
-        round_variable = { name = riseandfall_story_fatigue nearest = 1 }
+        if = {
+            limit = { NOT = { has_variable = riseandfall_story_last_succession_year } }
+            set_variable = { name = riseandfall_story_last_succession_year value = current_year }
+            set_variable = { name = tmp_story_years_as_ruler value = years_as_ruler }
+            change_variable = { name = tmp_story_years_as_ruler multiply = -1 }
+            change_variable = { name = riseandfall_story_last_succession_year add = var:tmp_story_years_as_ruler }
+            remove_variable = tmp_story_years_as_ruler
+        }
+        set_variable = { name = riseandfall_story_no_succession_years value = current_year }
+        set_variable = { name = tmp_story_last_succession_year value = var:riseandfall_story_last_succession_year }
+        change_variable = { name = tmp_story_last_succession_year multiply = -1 }
+        change_variable = { name = riseandfall_story_no_succession_years add = var:tmp_story_last_succession_year }
+        clamp_variable = { name = riseandfall_story_no_succession_years min = 0 max = 1000 }
 
         if = {
             limit = {
-                has_game_rule = riseandfall_dynamic_story_mode_dynamic
+                years_as_ruler >= 50
+                OR = {
+                    primary_title.tier >= tier_empire
+                    realm_size >= 50
+                    var:tmp_story_realm_pct >= 5
+                }
             }
-            set_variable = { name = riseandfall_rs_story_pressure_component value = var:riseandfall_story_fatigue }
-            change_variable = { name = riseandfall_rs_story_pressure_component divide = 5 }
-            change_variable = { name = riseandfall_rs_story_pressure_component multiply = -1 }
-            clamp_variable = { name = riseandfall_rs_story_pressure_component min = -20 max = 0 }
+            if = { limit = { NOT = { has_variable = riseandfall_story_reign_tension } } set_variable = { name = riseandfall_story_reign_tension value = 0 } }
+            change_variable = { name = riseandfall_story_reign_tension add = 1 }
+            if = { limit = { years_as_ruler >= 100 } change_variable = { name = riseandfall_story_reign_tension add = 1 } }
+            if = { limit = { years_as_ruler >= 200 } change_variable = { name = riseandfall_story_reign_tension add = 2 } }
+            if = { limit = { years_as_ruler >= 500 } change_variable = { name = riseandfall_story_reign_tension add = 4 } }
+            if = { limit = { primary_title.tier >= tier_hegemony } change_variable = { name = riseandfall_story_reign_tension add = 1 } }
+            if = { limit = { var:tmp_story_realm_pct >= 8 } change_variable = { name = riseandfall_story_reign_tension add = 1 } }
+            if = { limit = { var:tmp_story_realm_pct >= 15 } change_variable = { name = riseandfall_story_reign_tension add = 1 } }
+            if = { limit = { has_game_rule = riseandfall_dynamic_story_mode_forced } change_variable = { name = riseandfall_story_reign_tension add = 2 } }
 
             if = {
                 limit = {
-                    global_var:riseandfall_story_world_pressure < 0
                     has_variable = riseandfall_realm_stability_score
-                    NOT = { var:riseandfall_realm_stability_score >= 50 }
+                    var:riseandfall_realm_stability_score >= 70
                 }
-                if = { limit = { NOT = { var:riseandfall_realm_stability_score >= 40 } } set_variable = { name = riseandfall_story_recovery_component value = 10 } }
-                else = { set_variable = { name = riseandfall_story_recovery_component value = 5 } }
+                change_variable = { name = riseandfall_story_ruler_shield add = 2 }
+            }
+            if = {
+                limit = {
+                    has_variable = riseandfall_rs_stats_component
+                    var:riseandfall_rs_stats_component >= 10
+                }
+                change_variable = { name = riseandfall_story_ruler_shield add = 1 }
+            }
+            if = {
+                limit = {
+                    has_variable = riseandfall_rs_legitimacy_component
+                    var:riseandfall_rs_legitimacy_component >= 8
+                }
+                change_variable = { name = riseandfall_story_ruler_shield add = 1 }
+            }
+            if = {
+                limit = {
+                    has_variable = riseandfall_rs_vassals_component
+                    var:riseandfall_rs_vassals_component >= 10
+                }
+                change_variable = { name = riseandfall_story_ruler_shield add = 1 }
+            }
+            if = {
+                limit = {
+                    years_as_ruler < 100
+                    var:riseandfall_story_ruler_shield > 0
+                }
+                set_variable = { name = tmp_story_shield_decay value = var:riseandfall_story_ruler_shield }
+                change_variable = { name = tmp_story_shield_decay multiply = -1 }
+                change_variable = { name = riseandfall_story_reign_tension add = var:tmp_story_shield_decay }
+            }
+            else_if = {
+                limit = {
+                    years_as_ruler < 200
+                    var:riseandfall_story_ruler_shield > 1
+                }
+                set_variable = { name = tmp_story_shield_decay value = var:riseandfall_story_ruler_shield }
+                change_variable = { name = tmp_story_shield_decay divide = 2 }
+                change_variable = { name = tmp_story_shield_decay multiply = -1 }
+                change_variable = { name = riseandfall_story_reign_tension add = var:tmp_story_shield_decay }
+            }
+            if = { limit = { has_variable = tmp_story_shield_decay } remove_variable = tmp_story_shield_decay }
+            clamp_variable = { name = riseandfall_story_reign_tension min = 0 max = 100 }
+            if = {
+                limit = { years_as_ruler >= 200 }
+                set_variable = { name = riseandfall_story_ancient_regime value = 1 }
+            }
+            if = {
+                limit = { years_as_ruler >= 500 }
+                set_variable = { name = riseandfall_story_ancient_regime value = 2 }
             }
         }
         else_if = {
-            limit = { has_game_rule = riseandfall_dynamic_story_mode_forced }
-            set_variable = { name = riseandfall_rs_story_pressure_component value = var:riseandfall_story_fatigue }
-            change_variable = { name = riseandfall_rs_story_pressure_component multiply = 2 }
-            change_variable = { name = riseandfall_rs_story_pressure_component divide = 5 }
-            change_variable = { name = riseandfall_rs_story_pressure_component multiply = -1 }
-            clamp_variable = { name = riseandfall_rs_story_pressure_component min = -40 max = 0 }
+            limit = { has_variable = riseandfall_story_reign_tension }
+            change_variable = { name = riseandfall_story_reign_tension add = -2 }
+            if = { limit = { NOT = { var:riseandfall_story_reign_tension > 0 } } remove_variable = riseandfall_story_reign_tension }
+        }
 
+        if = { limit = { is_in_civil_war = yes } change_variable = { name = tmp_story_stress_score add = 3 } }
+        if = { limit = { has_variable = riseandfall_war_penalty var:riseandfall_war_penalty >= 20 } change_variable = { name = tmp_story_stress_score add = 2 } }
+        if = { limit = { has_variable = riseandfall_rs_legitimacy_component NOT = { var:riseandfall_rs_legitimacy_component >= -5 } } change_variable = { name = tmp_story_stress_score add = 1 } }
+        if = { limit = { has_variable = riseandfall_rs_legitimacy_component NOT = { var:riseandfall_rs_legitimacy_component >= -15 } } change_variable = { name = tmp_story_stress_score add = 1 } }
+        if = { limit = { has_variable = riseandfall_rs_culture_faith_component NOT = { var:riseandfall_rs_culture_faith_component >= -10 } } change_variable = { name = tmp_story_stress_score add = 2 } }
+        if = { limit = { has_variable = riseandfall_rs_strong_vassal_component NOT = { var:riseandfall_rs_strong_vassal_component >= -10 } } change_variable = { name = tmp_story_stress_score add = 2 } }
+        if = { limit = { has_variable = riseandfall_realm_stability_score NOT = { var:riseandfall_realm_stability_score >= 45 } } change_variable = { name = tmp_story_stress_score add = 2 } }
+        if = { limit = { var:tmp_story_realm_pct >= 8 } change_variable = { name = tmp_story_stress_score add = 1 } }
+        if = { limit = { var:tmp_story_realm_pct >= 15 } change_variable = { name = tmp_story_stress_score add = 1 } }
+        if = { limit = { has_variable = riseandfall_story_no_succession_years var:riseandfall_story_no_succession_years >= 100 } change_variable = { name = tmp_story_stress_score add = 1 } }
+        if = { limit = { has_variable = riseandfall_story_no_succession_years var:riseandfall_story_no_succession_years >= 200 } change_variable = { name = tmp_story_stress_score add = 1 } }
+
+        if = {
+            limit = {
+                OR = {
+                    years_as_ruler >= 50
+                    AND = {
+                        has_variable = riseandfall_story_no_succession_years
+                        var:riseandfall_story_no_succession_years >= 50
+                    }
+                    var:tmp_story_realm_pct >= 8
+                    primary_title.tier >= tier_empire
+                    realm_size >= 50
+                }
+            }
+            every_powerful_vassal = {
+                limit = {
+                    is_landed = yes
+                    NOT = { is_allied_to = scope:ruler }
+                }
+                scope:ruler = { change_variable = { name = riseandfall_story_complacent_vassals add = 1 } }
+                if = {
+                    limit = { years_as_ruler >= 30 }
+                    scope:ruler = { change_variable = { name = riseandfall_story_complacent_vassals add = 1 } }
+                }
+                if = {
+                    limit = { years_as_ruler >= 100 }
+                    scope:ruler = { change_variable = { name = riseandfall_story_complacent_vassals add = 2 } }
+                }
+            }
             if = {
-                limit = { var:riseandfall_story_fatigue >= 60 }
-                set_variable = { name = riseandfall_story_pressure_chance_bonus value = var:riseandfall_story_fatigue }
-                change_variable = { name = riseandfall_story_pressure_chance_bonus divide = 5 }
-                clamp_variable = { name = riseandfall_story_pressure_chance_bonus min = 0 max = 20 }
+                limit = {
+                    has_variable = riseandfall_rs_strong_vassal_count
+                    var:riseandfall_rs_strong_vassal_count >= 2
+                }
+                change_variable = { name = riseandfall_story_complacent_vassals add = 2 }
+            }
+            if = {
+                limit = {
+                    has_variable = riseandfall_rs_strong_vassal_count
+                    var:riseandfall_rs_strong_vassal_count >= 4
+                }
+                change_variable = { name = riseandfall_story_complacent_vassals add = 2 }
+            }
+            if = { limit = { years_as_ruler >= 100 } change_variable = { name = riseandfall_story_complacent_vassals add = 1 } }
+            if = { limit = { years_as_ruler >= 200 } change_variable = { name = riseandfall_story_complacent_vassals add = 2 } }
+            if = { limit = { has_variable = riseandfall_story_no_succession_years var:riseandfall_story_no_succession_years >= 100 } change_variable = { name = riseandfall_story_complacent_vassals add = 1 } }
+            if = { limit = { has_variable = riseandfall_story_no_succession_years var:riseandfall_story_no_succession_years >= 200 } change_variable = { name = riseandfall_story_complacent_vassals add = 2 } }
+            if = { limit = { var:tmp_story_realm_pct >= 8 } change_variable = { name = riseandfall_story_complacent_vassals add = 1 } }
+            if = { limit = { var:tmp_story_realm_pct >= 15 } change_variable = { name = riseandfall_story_complacent_vassals add = 2 } }
+            if = { limit = { has_game_rule = riseandfall_dynamic_story_mode_forced } change_variable = { name = riseandfall_story_complacent_vassals add = 2 } }
+            clamp_variable = { name = riseandfall_story_complacent_vassals min = 0 max = 40 }
+            if = {
+                limit = { var:riseandfall_story_complacent_vassals >= 3 }
+                set_variable = { name = riseandfall_story_complacent_vassal_pressure value = var:riseandfall_story_complacent_vassals }
+                change_variable = { name = riseandfall_story_complacent_vassal_pressure divide = 3 }
+                if = { limit = { years_as_ruler >= 100 } change_variable = { name = riseandfall_story_complacent_vassal_pressure add = 1 } }
+                if = { limit = { years_as_ruler >= 200 } change_variable = { name = riseandfall_story_complacent_vassal_pressure add = 2 } }
+                if = { limit = { has_game_rule = riseandfall_dynamic_story_mode_forced } change_variable = { name = riseandfall_story_complacent_vassal_pressure add = 2 } }
+                clamp_variable = { name = riseandfall_story_complacent_vassal_pressure min = 0 max = 18 }
             }
         }
 
+        if = {
+            limit = {
+                has_variable = riseandfall_story_reign_tension
+                var:riseandfall_story_reign_tension >= 15
+                OR = {
+                    var:tmp_story_stress_score >= 3
+                    has_game_rule = riseandfall_dynamic_story_mode_forced
+                    years_as_ruler >= 200
+                }
+            }
+            set_variable = { name = riseandfall_story_stagnation_pressure value = var:riseandfall_story_reign_tension }
+            change_variable = { name = riseandfall_story_stagnation_pressure divide = 8 }
+            change_variable = { name = riseandfall_story_stagnation_pressure add = var:tmp_story_stress_score }
+            if = { limit = { years_as_ruler >= 200 } change_variable = { name = riseandfall_story_stagnation_pressure add = 2 } }
+            if = { limit = { years_as_ruler >= 500 } change_variable = { name = riseandfall_story_stagnation_pressure add = 4 } }
+            if = { limit = { has_game_rule = riseandfall_dynamic_story_mode_forced } change_variable = { name = riseandfall_story_stagnation_pressure add = 3 } }
+            clamp_variable = { name = riseandfall_story_stagnation_pressure min = 0 max = 30 }
+        }
+
+        if = {
+            limit = {
+                var:riseandfall_story_role = 3
+                NOT = { has_variable = riseandfall_story_successor_grace }
+            }
+            if = { limit = { NOT = { has_variable = riseandfall_story_collapse_pressure } } set_variable = { name = riseandfall_story_collapse_pressure value = 0 } }
+            change_variable = { name = riseandfall_story_collapse_pressure add = 2 }
+            if = { limit = { global_var:riseandfall_story_world_pressure >= 2 } change_variable = { name = riseandfall_story_collapse_pressure add = 2 } }
+            if = { limit = { primary_title.tier >= tier_empire } change_variable = { name = riseandfall_story_collapse_pressure add = 2 } }
+            if = { limit = { primary_title.tier >= tier_hegemony } change_variable = { name = riseandfall_story_collapse_pressure add = 3 } }
+            if = { limit = { var:tmp_story_realm_pct >= 10 } change_variable = { name = riseandfall_story_collapse_pressure add = 3 } }
+            if = { limit = { has_game_rule = riseandfall_dynamic_story_mode_forced } change_variable = { name = riseandfall_story_collapse_pressure add = 3 } }
+            if = { limit = { var:riseandfall_story_stagnation_pressure > 0 } change_variable = { name = riseandfall_story_collapse_pressure add = var:riseandfall_story_stagnation_pressure } }
+            if = { limit = { var:riseandfall_story_complacent_vassal_pressure > 0 } change_variable = { name = riseandfall_story_collapse_pressure add = var:riseandfall_story_complacent_vassal_pressure } }
+            clamp_variable = { name = riseandfall_story_collapse_pressure min = 0 max = 100 }
+        }
+        else_if = {
+            limit = {
+                OR = {
+                    var:riseandfall_story_stagnation_pressure > 0
+                    var:riseandfall_story_complacent_vassal_pressure > 0
+                }
+                NOT = { has_variable = riseandfall_story_successor_grace }
+            }
+            if = { limit = { NOT = { has_variable = riseandfall_story_collapse_pressure } } set_variable = { name = riseandfall_story_collapse_pressure value = 0 } }
+            change_variable = { name = riseandfall_story_collapse_pressure add = var:riseandfall_story_stagnation_pressure }
+            change_variable = { name = riseandfall_story_collapse_pressure add = var:riseandfall_story_complacent_vassal_pressure }
+            clamp_variable = { name = riseandfall_story_collapse_pressure min = 0 max = 100 }
+        }
+        else_if = {
+            limit = { has_variable = riseandfall_story_collapse_pressure }
+            change_variable = { name = riseandfall_story_collapse_pressure add = -3 }
+            if = { limit = { NOT = { var:riseandfall_story_collapse_pressure > 0 } } remove_variable = riseandfall_story_collapse_pressure }
+        }
+
+        if = {
+            limit = { has_variable = riseandfall_story_collapse_pressure }
+            set_variable = { name = riseandfall_story_blob_pressure value = var:riseandfall_story_collapse_pressure }
+            change_variable = { name = riseandfall_story_blob_pressure divide = 5 }
+            change_variable = { name = riseandfall_story_blob_pressure multiply = -1 }
+            if = { limit = { has_game_rule = riseandfall_dynamic_story_mode_forced } change_variable = { name = riseandfall_story_blob_pressure multiply = 2 } }
+            clamp_variable = { name = riseandfall_story_blob_pressure min = -40 max = 0 }
+        }
+
+        if = {
+            limit = {
+                global_var:riseandfall_story_world_pressure < 0
+                has_variable = riseandfall_realm_stability_score
+                NOT = { var:riseandfall_realm_stability_score >= 50 }
+            }
+            if = { limit = { NOT = { var:riseandfall_realm_stability_score >= 25 } } set_variable = { name = riseandfall_story_recovery_component value = 25 } }
+            else_if = { limit = { NOT = { var:riseandfall_realm_stability_score >= 40 } } set_variable = { name = riseandfall_story_recovery_component value = 18 } }
+            else = { set_variable = { name = riseandfall_story_recovery_component value = 8 } }
+        }
+
+        set_variable = { name = riseandfall_rs_story_pressure_component value = 0 }
+        change_variable = { name = riseandfall_rs_story_pressure_component add = var:riseandfall_story_protection }
         change_variable = { name = riseandfall_rs_story_pressure_component add = var:riseandfall_story_recovery_component }
+        change_variable = { name = riseandfall_rs_story_pressure_component add = var:riseandfall_story_blob_pressure }
         if = {
             limit = {
                 has_variable = riseandfall_realm_stability_score
-                var:riseandfall_realm_stability_score >= 50
+                var:riseandfall_realm_stability_score >= 70
                 var:riseandfall_rs_story_pressure_component > 0
             }
             set_variable = { name = riseandfall_rs_story_pressure_component value = 0 }
         }
-        clamp_variable = { name = riseandfall_rs_story_pressure_component min = -40 max = 10 }
+        clamp_variable = { name = riseandfall_rs_story_pressure_component min = -40 max = 35 }
 
-        remove_variable = tmp_story_fatigue_step
         remove_variable = tmp_story_world_total
         remove_variable = tmp_story_realm_pct
+        remove_variable = tmp_story_stress_score
+        remove_variable = tmp_story_last_succession_year
     }
 }

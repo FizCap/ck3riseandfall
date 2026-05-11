@@ -1928,6 +1928,7 @@ riseandfall_palace_coup_root_flees_success = {
                     }
                     create_alliance = scope:original_ruler
                 }
+                riseandfall_apply_palace_coup_successor_grace_se = yes
                 remove_character_flag = rf_palace_coup_return_to_ruler
                 remove_character_flag = rf_palace_coup_split_protected
             }
@@ -2011,12 +2012,14 @@ riseandfall_palace_coup_root_flees_success = {
             set_variable = { name = rf_successor_origin_title value = scope:original_primary }
             set_variable = { name = rf_successor_root_origin_title value = scope:original_primary }
             add_character_flag = rf_successor_state_ruler
+            riseandfall_apply_palace_coup_successor_grace_se = yes
             set_variable = { name = tmp_successor_realm_size value = realm_size }
         }
         scope:palace_coup_challenger = {
             set_variable = { name = rf_successor_origin_title value = scope:original_primary }
             set_variable = { name = rf_successor_root_origin_title value = scope:original_primary }
             add_character_flag = rf_successor_state_ruler
+            riseandfall_apply_palace_coup_successor_grace_se = yes
             set_variable = { name = tmp_successor_realm_size value = realm_size }
         }
 

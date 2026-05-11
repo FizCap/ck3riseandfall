@@ -1491,6 +1491,7 @@ riseandfall_execute_realm_split_se = {
     # associated with the original root of a split chain (enables multi-gen CBs).
     set_variable = { name = rf_successor_root_origin_title value = scope:original_primary }
     add_character_flag = rf_successor_state_ruler
+    riseandfall_apply_successor_realm_grace_se = yes
     if = {
         limit = { exists = scope:new_realm_ruler.primary_title }
         # Capture the initial realm size on the new realm ruler so we can store

@@ -23,7 +23,6 @@ riseandfall_calculate_realm_stability_se = {
     remove_variable = riseandfall_rs_succession_component
     remove_variable = riseandfall_rs_story_pressure_component
     remove_variable = riseandfall_story_recovery_component
-    remove_variable = riseandfall_story_pressure_chance_bonus
     remove_variable = riseandfall_rs_strong_vassal_count
     remove_variable = riseandfall_rs_foreign_culture_county_pct
     remove_variable = riseandfall_rs_foreign_faith_county_pct
@@ -763,6 +762,7 @@ riseandfall_calculate_realm_stability_se = {
         }
     }
 
+    riseandfall_update_successor_realm_grace_se = yes
     riseandfall_apply_dynamic_story_pressure_se = yes
 
     ########################################
@@ -780,6 +780,8 @@ riseandfall_calculate_realm_stability_se = {
     if = { limit = { NOT = { has_variable = riseandfall_rs_partition_component } } set_variable = { name = riseandfall_rs_partition_component value = 0 } }
     if = { limit = { NOT = { has_variable = riseandfall_rs_succession_component } } set_variable = { name = riseandfall_rs_succession_component value = 0 } }
     if = { limit = { NOT = { has_variable = riseandfall_rs_story_pressure_component } } set_variable = { name = riseandfall_rs_story_pressure_component value = 0 } }
+    if = { limit = { NOT = { has_variable = riseandfall_story_protection } } set_variable = { name = riseandfall_story_protection value = 0 } }
+    if = { limit = { NOT = { has_variable = riseandfall_story_blob_pressure } } set_variable = { name = riseandfall_story_blob_pressure value = 0 } }
     # Start from 50 as the equilibrium midpoint; components shift toward 0 or 100
     set_variable = { name = tmp_target_score value = 50 }
     # Stats component contributes directly in range -30..+30 (already clamped above)
@@ -796,6 +798,43 @@ riseandfall_calculate_realm_stability_se = {
     change_variable = { name = tmp_target_score add = var:riseandfall_rs_partition_component }
     change_variable = { name = tmp_target_score add = var:riseandfall_rs_succession_component }
     change_variable = { name = tmp_target_score add = var:riseandfall_rs_story_pressure_component }
+    if = {
+        limit = { has_variable = riseandfall_story_successor_grace }
+        change_variable = { name = tmp_target_score add = var:riseandfall_story_successor_grace }
+    }
+    if = {
+        limit = {
+            has_variable = riseandfall_story_role
+            var:riseandfall_story_role = 1
+            NOT = { var:tmp_target_score >= 55 }
+        }
+        set_variable = { name = tmp_target_score value = 55 }
+    }
+    else_if = {
+        limit = {
+            has_variable = riseandfall_story_role
+            var:riseandfall_story_role = 2
+            NOT = { var:tmp_target_score >= 45 }
+        }
+        set_variable = { name = tmp_target_score value = 45 }
+    }
+    else_if = {
+        limit = {
+            has_variable = riseandfall_story_role
+            var:riseandfall_story_role = 4
+            has_variable = riseandfall_story_world_climate
+            var:riseandfall_story_world_climate >= 3
+            NOT = { var:tmp_target_score >= 35 }
+        }
+        set_variable = { name = tmp_target_score value = 35 }
+    }
+    if = {
+        limit = {
+            has_variable = riseandfall_story_successor_grace
+            NOT = { var:tmp_target_score >= 60 }
+        }
+        set_variable = { name = tmp_target_score value = 60 }
+    }
     # Legitimacy is additive: -20 (none) to +15 (full). Transparent on the 0-100 scale.
     change_variable = { name = tmp_target_score add = var:riseandfall_rs_legitimacy_component }
 
@@ -986,9 +1025,44 @@ riseandfall_calculate_realm_stability_se = {
     set_variable = { name = riseandfall_rs_difficulty_multiplier value = var:riseandfall_rs_difficulty_multiplier }
     set_variable = { name = riseandfall_rs_difficulty_multiplier_display value = var:riseandfall_rs_difficulty_multiplier_display }
 
-# Ensure the target stays within 0..100 after applying war penalties
-clamp_variable = { name = tmp_target_score min = 0 max = 100 }
-round_variable = { name = tmp_target_score nearest = 1 }    # Persist the (possibly penalized) target so smoothing moves the current score toward it
+    if = {
+        limit = {
+            has_variable = riseandfall_story_successor_grace
+            NOT = { var:tmp_target_score >= 60 }
+        }
+        set_variable = { name = tmp_target_score value = 60 }
+    }
+    else_if = {
+        limit = {
+            has_variable = riseandfall_story_role
+            var:riseandfall_story_role = 1
+            NOT = { var:tmp_target_score >= 55 }
+        }
+        set_variable = { name = tmp_target_score value = 55 }
+    }
+    else_if = {
+        limit = {
+            has_variable = riseandfall_story_role
+            var:riseandfall_story_role = 2
+            NOT = { var:tmp_target_score >= 45 }
+        }
+        set_variable = { name = tmp_target_score value = 45 }
+    }
+    else_if = {
+        limit = {
+            has_variable = riseandfall_story_role
+            var:riseandfall_story_role = 4
+            has_variable = riseandfall_story_world_climate
+            var:riseandfall_story_world_climate >= 3
+            NOT = { var:tmp_target_score >= 35 }
+        }
+        set_variable = { name = tmp_target_score value = 35 }
+    }
+
+    # Ensure the target stays within 0..100 after applying war penalties
+    clamp_variable = { name = tmp_target_score min = 0 max = 100 }
+    round_variable = { name = tmp_target_score nearest = 1 }
+    # Persist the (possibly penalized) target so smoothing moves the current score toward it
     set_variable = { name = riseandfall_realm_stability_target value = var:tmp_target_score }
 
     # Smooth the persistent current score (`riseandfall_realm_stability_score`) toward the target
@@ -1007,6 +1081,13 @@ round_variable = { name = tmp_target_score nearest = 1 }    # Persist the (possi
     if = {
         limit = { NOT = { has_variable = riseandfall_realm_stability_score } }
         set_variable = { name = riseandfall_realm_stability_score value = var:riseandfall_realm_stability_target }
+        if = {
+            limit = {
+                has_variable = riseandfall_story_successor_grace
+                NOT = { var:riseandfall_realm_stability_score >= 55 }
+            }
+            set_variable = { name = riseandfall_realm_stability_score value = 55 }
+        }
         # No predicted change on initialization
         set_variable = { name = riseandfall_realm_stability_predicted_change value = 0 }
     }
@@ -1079,6 +1160,39 @@ round_variable = { name = tmp_target_score nearest = 1 }    # Persist the (possi
     }
 
     # Ensure current score remains clamped and integer
+    if = {
+        limit = {
+            has_variable = riseandfall_story_successor_grace
+            NOT = { var:riseandfall_realm_stability_score >= 50 }
+        }
+        set_variable = { name = riseandfall_realm_stability_score value = 50 }
+    }
+    else_if = {
+        limit = {
+            has_variable = riseandfall_story_role
+            var:riseandfall_story_role = 1
+            NOT = { var:riseandfall_realm_stability_score >= 35 }
+        }
+        set_variable = { name = riseandfall_realm_stability_score value = 35 }
+    }
+    else_if = {
+        limit = {
+            has_variable = riseandfall_story_role
+            var:riseandfall_story_role = 2
+            NOT = { var:riseandfall_realm_stability_score >= 30 }
+        }
+        set_variable = { name = riseandfall_realm_stability_score value = 30 }
+    }
+    else_if = {
+        limit = {
+            has_variable = riseandfall_story_role
+            var:riseandfall_story_role = 4
+            has_variable = riseandfall_story_world_climate
+            var:riseandfall_story_world_climate >= 3
+            NOT = { var:riseandfall_realm_stability_score >= 20 }
+        }
+        set_variable = { name = riseandfall_realm_stability_score value = 20 }
+    }
     clamp_variable = { name = riseandfall_realm_stability_score min = 0 max = 100 }
     round_variable = { name = riseandfall_realm_stability_score nearest = 1 }
     
@@ -1532,8 +1646,25 @@ riseandfall_clear_unlanded_stability_vars_se = {
         remove_variable = riseandfall_rs_succession_component
         remove_variable = riseandfall_rs_story_pressure_component
         remove_variable = riseandfall_story_recovery_component
-        remove_variable = riseandfall_story_pressure_chance_bonus
         remove_variable = riseandfall_story_fatigue
+        remove_variable = riseandfall_story_role
+        remove_variable = riseandfall_story_role_years
+        remove_variable = riseandfall_story_protection
+        remove_variable = riseandfall_story_collapse_pressure
+        remove_variable = riseandfall_story_successor_grace
+        remove_variable = riseandfall_story_successor_grace_years
+        remove_variable = riseandfall_story_successor_grace_decay
+        remove_variable = riseandfall_story_arc_cooldown
+        remove_variable = riseandfall_story_world_climate
+        remove_variable = riseandfall_story_blob_pressure
+        remove_variable = riseandfall_story_reign_tension
+        remove_variable = riseandfall_story_stagnation_pressure
+        remove_variable = riseandfall_story_ancient_regime
+        remove_variable = riseandfall_story_last_succession_year
+        remove_variable = riseandfall_story_no_succession_years
+        remove_variable = riseandfall_story_ruler_shield
+        remove_variable = riseandfall_story_complacent_vassals
+        remove_variable = riseandfall_story_complacent_vassal_pressure
         remove_variable = riseandfall_rs_strong_vassal_count
         remove_variable = riseandfall_rs_foreign_culture_county_pct
         remove_variable = riseandfall_rs_foreign_faith_county_pct
