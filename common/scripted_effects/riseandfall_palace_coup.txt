@@ -701,6 +701,7 @@ riseandfall_palace_coup_clear_vassal_choice_se = {
     remove_character_flag = rf_palace_coup_return_to_ruler
     remove_character_flag = rf_palace_coup_neutral_rejector
     remove_character_flag = rf_palace_coup_neutral_seed
+    remove_character_flag = rf_palace_coup_retreat_anchor
     remove_character_flag = rf_palace_coup_pending_choice
     remove_variable = rf_palace_coup_choice_ruler
     remove_variable = rf_palace_coup_choice_challenger
@@ -713,6 +714,7 @@ riseandfall_palace_coup_mark_loyalist_se = {
     riseandfall_palace_coup_clear_vassal_choice_se = yes
     add_character_flag = { flag = rf_palace_coup_split_protected days = 30 }
     add_character_flag = { flag = rf_palace_coup_return_to_ruler days = 30 }
+    add_character_flag = { flag = rf_palace_coup_retreat_anchor days = 30 }
 }
 
 riseandfall_palace_coup_mark_coup_se = {
@@ -750,6 +752,47 @@ riseandfall_palace_coup_seed_neutral_rejectors_se = {
             }
         }
         riseandfall_palace_coup_mark_neutral_seed_se = yes
+    }
+
+    # Hegemony-scale coups can produce empire-sized neutral power bases before
+    # the normal kingdom pass adds smaller local rally points.
+    if = {
+        limit = { scope:original_primary = { tier = tier_hegemony } }
+        every_realm_de_jure_empire = {
+            save_scope_as = palace_coup_neutral_empire
+            if = {
+                limit = {
+                    scope:palace_coup_challenger = {
+                        NOT = {
+                            any_vassal = {
+                                is_landed = yes
+                                has_character_flag = rf_palace_coup_neutral_seed
+                                capital_county.kingdom = { de_jure_liege = scope:palace_coup_neutral_empire }
+                            }
+                        }
+                    }
+                }
+                scope:palace_coup_challenger = {
+                    ordered_vassal = {
+                        limit = {
+                            is_landed = yes
+                            has_character_flag = rf_palace_coup_neutral_rejector
+                            NOT = { has_character_flag = rf_palace_coup_split_protected }
+                            NOT = { has_character_flag = rf_forced_breakaway_seed }
+                            primary_title.tier >= tier_county
+                            capital_county.kingdom = { de_jure_liege = scope:palace_coup_neutral_empire }
+                            current_military_strength >= {
+                                value = scope:palace_coup_challenger.current_military_strength
+                                multiply = 0.12
+                            }
+                        }
+                        order_by = current_military_strength
+                        max = 1
+                        riseandfall_palace_coup_mark_neutral_seed_se = yes
+                    }
+                }
+            }
+        }
     }
 
     # If a region has no neutral leader yet, the strongest substantial rejector
@@ -814,6 +857,30 @@ riseandfall_palace_coup_score_vassal_alignment_se = {
         limit = { is_at_war_with = scope:palace_coup_challenger }
         change_variable = { name = rf_palace_coup_loyalist_score add = 90 }
         change_variable = { name = rf_palace_coup_coup_score add = -40 }
+    }
+
+    if = {
+        limit = { capital_county.duchy = scope:original_ruler.capital_county.duchy }
+        change_variable = { name = rf_palace_coup_loyalist_score add = 90 }
+        change_variable = { name = rf_palace_coup_reject_score add = -25 }
+    }
+    else_if = {
+        limit = { capital_county.kingdom = scope:original_ruler.capital_county.kingdom }
+        change_variable = { name = rf_palace_coup_loyalist_score add = 45 }
+    }
+    if = {
+        limit = { primary_title = { is_neighbor_to_realm = scope:original_ruler } }
+        change_variable = { name = rf_palace_coup_loyalist_score add = 35 }
+    }
+    if = {
+        limit = {
+            NOT = { capital_county.kingdom = scope:original_ruler.capital_county.kingdom }
+            current_military_strength >= {
+                value = scope:original_ruler.current_military_strength
+                multiply = 0.20
+            }
+        }
+        change_variable = { name = rf_palace_coup_reject_score add = 35 }
     }
 
     if = {
@@ -1708,7 +1775,6 @@ riseandfall_palace_coup_root_flees_success = {
         if = {
             limit = {
                 scope:original_ruler = { exists = capital_county }
-                scope:original_ruler = { highest_held_title_tier < tier_empire }
                 OR = {
                     scope:original_primary = { tier = tier_hegemony }
                     scope:original_primary = { tier = tier_empire }
@@ -1744,7 +1810,6 @@ riseandfall_palace_coup_root_flees_success = {
         else_if = {
             limit = {
                 scope:original_ruler = { exists = capital_county }
-                scope:original_ruler = { highest_held_title_tier < tier_kingdom }
                 scope:original_primary = { tier = tier_kingdom }
             }
             scope:original_ruler = {
@@ -1777,7 +1842,6 @@ riseandfall_palace_coup_root_flees_success = {
         else_if = {
             limit = {
                 scope:original_ruler = { exists = capital_county }
-                scope:original_ruler = { highest_held_title_tier < tier_duchy }
                 scope:original_primary = { tier = tier_duchy }
             }
             scope:original_ruler = {
@@ -1911,10 +1975,12 @@ riseandfall_palace_coup_root_flees_success = {
                     OR = {
                         has_character_flag = rf_palace_coup_return_to_ruler
                         has_character_flag = rf_palace_coup_split_protected
+                        has_character_flag = rf_palace_coup_retreat_anchor
                     }
                 }
                 remove_character_flag = rf_palace_coup_return_to_ruler
                 remove_character_flag = rf_palace_coup_split_protected
+                remove_character_flag = rf_palace_coup_retreat_anchor
             }
         }
         scope:palace_coup_challenger = {
@@ -1924,10 +1990,12 @@ riseandfall_palace_coup_root_flees_success = {
                     OR = {
                         has_character_flag = rf_palace_coup_return_to_ruler
                         has_character_flag = rf_palace_coup_split_protected
+                        has_character_flag = rf_palace_coup_retreat_anchor
                     }
                 }
                 remove_character_flag = rf_palace_coup_return_to_ruler
                 remove_character_flag = rf_palace_coup_split_protected
+                remove_character_flag = rf_palace_coup_retreat_anchor
             }
         }
 
