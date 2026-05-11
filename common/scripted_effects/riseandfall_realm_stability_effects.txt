@@ -1551,6 +1551,94 @@ riseandfall_inherit_stability_score_se = {
     }
 }
 
+# Merge an inherited realm's stored stability into an established ruler's score.
+# Root scope: inheriting ruler with an existing stability score.
+# Expected scopes: scope:predecessor has the inherited realm's score; scope:title is the gained realm title.
+riseandfall_merge_inherited_realm_stability_se = {
+    if = {
+        limit = {
+            has_game_rule = riseandfall_realm_stability_enabled
+            has_variable = riseandfall_realm_stability_score
+            exists = scope:predecessor
+            scope:predecessor = { has_variable = riseandfall_realm_stability_score }
+            exists = scope:title
+            scope:title = {
+                tier >= tier_duchy
+                tier = scope:predecessor.highest_held_title_tier
+            }
+            realm_size >= 1
+        }
+        save_scope_as = rf_stability_inheritor
+        set_variable = { name = tmp_rf_inherited_realm_counties value = 0 }
+        if = {
+            limit = {
+                scope:predecessor = {
+                    has_variable = riseandfall_rs_inheritance_realm_size
+                    var:riseandfall_rs_inheritance_realm_size > 0
+                }
+            }
+            set_variable = { name = tmp_rf_inherited_realm_counties value = scope:predecessor.var:riseandfall_rs_inheritance_realm_size }
+        }
+        else = {
+            scope:title = {
+                every_in_de_jure_hierarchy = {
+                    limit = {
+                        tier = tier_county
+                        holder = {
+                            OR = {
+                                this = scope:rf_stability_inheritor
+                                target_is_liege_or_above = scope:rf_stability_inheritor
+                            }
+                        }
+                    }
+                    scope:rf_stability_inheritor = {
+                        change_variable = { name = tmp_rf_inherited_realm_counties add = 1 }
+                    }
+                }
+            }
+        }
+        if = {
+            limit = { var:tmp_rf_inherited_realm_counties > 0 }
+            set_variable = { name = tmp_rf_total_realm_counties value = realm_size }
+            if = {
+                limit = { var:tmp_rf_inherited_realm_counties > var:tmp_rf_total_realm_counties }
+                set_variable = { name = tmp_rf_inherited_realm_counties value = var:tmp_rf_total_realm_counties }
+            }
+            set_variable = { name = tmp_rf_existing_realm_counties value = var:tmp_rf_total_realm_counties }
+            set_variable = { name = tmp_rf_inherited_realm_counties_neg value = var:tmp_rf_inherited_realm_counties }
+            change_variable = { name = tmp_rf_inherited_realm_counties_neg multiply = -1 }
+            change_variable = { name = tmp_rf_existing_realm_counties add = var:tmp_rf_inherited_realm_counties_neg }
+            if = { limit = { var:tmp_rf_existing_realm_counties < 0 } set_variable = { name = tmp_rf_existing_realm_counties value = 0 } }
+
+            set_variable = { name = tmp_rf_existing_stability_weighted value = var:riseandfall_realm_stability_score }
+            change_variable = { name = tmp_rf_existing_stability_weighted multiply = var:tmp_rf_existing_realm_counties }
+            set_variable = { name = tmp_rf_inherited_stability_weighted value = scope:predecessor.var:riseandfall_realm_stability_score }
+            change_variable = { name = tmp_rf_inherited_stability_weighted multiply = var:tmp_rf_inherited_realm_counties }
+            set_variable = { name = riseandfall_realm_stability_score value = var:tmp_rf_existing_stability_weighted }
+            change_variable = { name = riseandfall_realm_stability_score add = var:tmp_rf_inherited_stability_weighted }
+            change_variable = { name = riseandfall_realm_stability_score divide = var:tmp_rf_total_realm_counties }
+            clamp_variable = { name = riseandfall_realm_stability_score min = 0 max = 100 }
+            round_variable = { name = riseandfall_realm_stability_score nearest = 1 }
+
+            set_variable = { name = riseandfall_rs_inherited_realm_share value = var:tmp_rf_inherited_realm_counties }
+            change_variable = { name = riseandfall_rs_inherited_realm_share multiply = 100 }
+            change_variable = { name = riseandfall_rs_inherited_realm_share divide = var:tmp_rf_total_realm_counties }
+            clamp_variable = { name = riseandfall_rs_inherited_realm_share min = 0 max = 100 }
+            round_variable = { name = riseandfall_rs_inherited_realm_share nearest = 1 }
+
+            set_variable = { name = riseandfall_rs_inherited_realm_stability value = scope:predecessor.var:riseandfall_realm_stability_score }
+            clamp_variable = { name = riseandfall_rs_inherited_realm_stability min = 0 max = 100 }
+            round_variable = { name = riseandfall_rs_inherited_realm_stability nearest = 1 }
+
+            # The immediate merge is the inheritance adjustment. Let the following
+            # recalculation refresh components and modifiers without applying an extra smoothing step.
+            set_variable = { name = riseandfall_rs_adjust_months value = -1 }
+            set_variable = { name = riseandfall_realm_stability_predicted_change value = 0 }
+            set_variable = { name = riseandfall_rs_last_stability_merge_predecessor value = scope:predecessor }
+        }
+    }
+}
+
 #External Scripts
 
 riseandfall_low_stability_grace_period_se = {
@@ -1682,6 +1770,10 @@ riseandfall_clear_unlanded_stability_vars_se = {
         remove_variable = riseandfall_realm_stability_sex_law_penalty
         remove_variable = riseandfall_rs_adjust_months
         remove_variable = riseandfall_realm_stability_predicted_change
+        remove_variable = riseandfall_rs_inheritance_realm_size
+        remove_variable = riseandfall_rs_inherited_realm_share
+        remove_variable = riseandfall_rs_inherited_realm_stability
+        remove_variable = riseandfall_rs_last_stability_merge_predecessor
         # Remove any fine-grained stability modifiers (0..100)
         remove_character_modifier = riseandfall_stability_0
         remove_character_modifier = riseandfall_stability_1

@@ -48,7 +48,7 @@ on_title_gain_inheritance = {
 
 on_title_gain = {
     on_actions = {
-        riseandfall_on_title_gain_inheritance
+        riseandfall_on_title_gain_realm_stability_refresh
         riseandfall_peasant_realm_cleanup_on_structure_change
     }
 }
@@ -77,6 +77,7 @@ riseandfall_on_death_stability_inheritance = {
     effect = {
     # Save the dying character as the predecessor for heir to reference
         save_scope_as = predecessor
+        set_variable = { name = riseandfall_rs_inheritance_realm_size value = realm_size }
         # If a primary heir exists, transfer stability to them
         if = {
             limit = {
@@ -96,6 +97,7 @@ riseandfall_on_death_stability_inheritance = {
                             scope:predecessor = { is_landed = no }
                             highest_held_title_tier <= scope:predecessor.highest_held_title_tier
                         }
+                        NOT = { has_variable = riseandfall_realm_stability_score }
                     }
                     riseandfall_inherit_stability_score_se = yes
                 }
@@ -117,6 +119,7 @@ riseandfall_on_death_stability_inheritance = {
                     limit = {
                         # Only inherit stability from a higher or equal-ranked predecessor.
                         highest_held_title_tier <= scope:predecessor.highest_held_title_tier
+                        NOT = { has_variable = riseandfall_realm_stability_score }
                     }
                     riseandfall_inherit_stability_score_se = yes
                 }
@@ -166,16 +169,25 @@ riseandfall_on_title_gain_inheritance = {
                 holds_landed_title = yes
                 exists = scope:previous_holder
                 scope:previous_holder = { has_variable = riseandfall_realm_stability_score }
-                # Only inherit "realm history" (civil war years / puppet regency years / war multiplier)
-                # when the gained title is the character's primary title. Otherwise, inheriting a random
-                # secondary title (e.g., a barony) can overwrite these counters and make them look like
-                # they "randomly reset".
-                has_primary_title = scope:title
+                NOT = { var:riseandfall_rs_last_stability_merge_predecessor ?= scope:previous_holder }
+                # Only merge top-tier realm titles from the inherited ruler.
+                # Lower titles under the same inheritance can fire their own title-gain events.
                 highest_held_title_tier <= scope:previous_holder.highest_held_title_tier
+                exists = scope:title
+                scope:title = {
+                    tier >= tier_duchy
+                    tier = scope:previous_holder.highest_held_title_tier
+                }
             }
-            # He already has a stability score; only inherit secondary history variables
+            # He already has a stability score; merge the inherited realm's stability
+            # by the gained title's de jure county share. Only copy secondary history
+            # when this inheritance became the ruler's primary title.
             scope:previous_holder = { save_scope_as = predecessor }
-            riseandfall_inherit_realm_history_se = yes
+            riseandfall_merge_inherited_realm_stability_se = yes
+            if = {
+                limit = { has_primary_title = scope:title }
+                riseandfall_inherit_realm_history_se = yes
+            }
             riseandfall_inherit_warlord_trait_se = yes
             riseandfall_mark_story_succession_shock_se = yes
             riseandfall_mark_story_succession_year_se = yes
@@ -187,6 +199,24 @@ riseandfall_on_title_gain_inheritance = {
                 holds_landed_title = yes
             }
             # No previous holder data or rank check failed; initialize fresh calculation
+            riseandfall_calculate_realm_stability_se = yes
+        }
+    }
+}
+
+riseandfall_on_title_gain_realm_stability_refresh = {
+    # Expected scope: character (the new title holder)
+    # Generic title gains should not inherit or merge predecessor stability;
+    # this only initializes stability for newly landed rulers.
+    trigger = {
+        has_game_rule = riseandfall_realm_stability_enabled
+    }
+    effect = {
+        if = {
+            limit = {
+                NOT = { has_variable = riseandfall_realm_stability_score }
+                holds_landed_title = yes
+            }
             riseandfall_calculate_realm_stability_se = yes
         }
     }
