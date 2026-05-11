@@ -28,6 +28,7 @@
     valid_to_start = {
         # Allow targeting the designated successor state title OR the unifying origin title
         scope:target = {
+            tier = scope:defender.primary_title.tier
             OR = {
                 # Target is an active successor state title
                 has_variable = rf_is_successor_split_title
@@ -334,7 +335,8 @@
 
     interface_priority = 80
 
-    attacker_wargoal_percentage = 0.8
+    use_de_jure_wargoal_only = yes
+    attacker_wargoal_percentage = 0.0
 
     attacker_ticking_warscore_delay = { months = 12 }
     defender_ticking_warscore_delay = { months = 12 }

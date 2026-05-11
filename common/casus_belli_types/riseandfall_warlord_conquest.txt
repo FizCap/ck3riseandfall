@@ -32,6 +32,9 @@
 
     valid_to_start = {
         scope:target = {
+            tier = scope:defender.primary_title.tier
+        }
+        scope:target = {
             any_in_de_jure_hierarchy = {
                 tier = tier_county
                 neighboring_county_or_viking_conquest_trigger = { CHARACTER = root }
@@ -405,7 +408,8 @@
 
     interface_priority = 79
 
-    attacker_wargoal_percentage = 0.8
+    use_de_jure_wargoal_only = yes
+    attacker_wargoal_percentage = 0.0
 
     # War score tuning — prioritize battles (cap battles contribution at 90)
     attacker_ticking_warscore_delay = { months = 12 }    # Delay before ticking warscore increases for attacker

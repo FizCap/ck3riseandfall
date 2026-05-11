@@ -655,7 +655,8 @@
 
     should_show_war_goal_subview = yes
 
-    attacker_wargoal_percentage = 0.8
+    use_de_jure_wargoal_only = yes
+    attacker_wargoal_percentage = 0.0
     attacker_ticking_warscore_delay = { months = 24 }    # Increase delay before ticking War Score starts
     defender_ticking_warscore_delay = { months = 24 }
     attacker_ticking_warscore = 0.2                     # Increase daily ticking War Score
