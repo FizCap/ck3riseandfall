@@ -74,7 +74,7 @@ riseandfall_warlord_path_manager = {
 riseandfall_warlord_create_realm_titles = {
     picture = { reference = "gfx/interface/illustrations/decisions/decision_misc.dds" }
     sort_order = 34
-    ai_check_interval = 12
+    ai_check_interval = 1
     desc = riseandfall_warlord_create_realm_titles_desc
     selection_tooltip = riseandfall_warlord_create_realm_titles_tooltip
     decision_group_type = riseandfall
@@ -117,6 +117,16 @@ riseandfall_warlord_create_realm_titles = {
     ai_potential = {
         is_landed = yes
         has_trait = warlord
+        has_game_rule = riseandfall_low_stability_events_enabled
+        # Keep AI checks aligned with the actual title-creation gate so
+        # warlords take this decision as soon as a valid title exists.
+        any_alert_creatable_title = {
+            OR = {
+                tier = tier_duchy
+                tier = tier_kingdom
+                tier = tier_empire
+            }
+        }
     }
 
     ai_will_do = { base = 100 }
