@@ -170,6 +170,9 @@ riseandfall_clear_story_director_vars_se = {
     remove_variable = riseandfall_story_complacent_vassals
     remove_variable = riseandfall_story_complacent_vassal_pressure
     remove_variable = riseandfall_story_rival_count
+    remove_variable = riseandfall_story_strongest_rival_pct
+    remove_variable = riseandfall_story_external_rival_relief
+    remove_variable = riseandfall_story_collapse_gain_last
     remove_variable = riseandfall_story_no_rival_years
     remove_variable = riseandfall_story_no_rival_pressure
 }
@@ -264,6 +267,9 @@ riseandfall_apply_dynamic_story_pressure_se = {
     set_variable = { name = riseandfall_story_complacent_vassals value = 0 }
     set_variable = { name = riseandfall_story_complacent_vassal_pressure value = 0 }
     set_variable = { name = riseandfall_story_rival_count value = 0 }
+    set_variable = { name = riseandfall_story_strongest_rival_pct value = 0 }
+    set_variable = { name = riseandfall_story_external_rival_relief value = 0 }
+    set_variable = { name = riseandfall_story_collapse_gain_last value = 0 }
     set_variable = { name = riseandfall_story_no_rival_pressure value = 0 }
 
     if = {
@@ -305,10 +311,11 @@ riseandfall_apply_dynamic_story_pressure_se = {
         round_variable = { name = tmp_story_realm_pct nearest = 1 }
         set_variable = { name = tmp_story_stress_score value = 0 }
         set_variable = { name = tmp_story_blob_score value = 0 }
-        # A credible outside rival needs at least 60% of this realm's max strength and must be nearby.
-        set_variable = { name = tmp_story_rival_threshold value = max_military_strength }
-        change_variable = { name = tmp_story_rival_threshold multiply = 60 }
-        change_variable = { name = tmp_story_rival_threshold divide = 100 }
+        # Rival strength is dynamic: measure the strongest nearby non-allied
+        # kingdom+ realm as a percent of this ruler's max military strength.
+        # A 35% rival is a minor threat; a 100% rival is a true peer.
+        set_variable = { name = tmp_story_ruler_strength value = max_military_strength }
+        if = { limit = { var:tmp_story_ruler_strength < 1 } set_variable = { name = tmp_story_ruler_strength value = 1 } }
         save_scope_as = ruler
 
         # Local danger thresholds mirror the low-stability event curve. Story Mode
@@ -322,26 +329,43 @@ riseandfall_apply_dynamic_story_pressure_se = {
         set_variable = { name = tmp_story_decline_threshold value = var:tmp_story_low_threshold }
         change_variable = { name = tmp_story_decline_threshold add = 20 }
 
-        # Count credible nearby rivals before assigning roles. A huge neighbor or
-        # across-water peer is story fuel: Rome and Parthia should hold each other
-        # together because the border conflict is more interesting than instant
-        # self-destruction. Distant powers do not count.
+        # Find the strongest nearby rival before assigning roles. Distant powers
+        # and allies do not count; only a border or close across-water rival gives
+        # vassals a reason to tolerate the imperial center.
         every_neighboring_and_across_water_top_liege_realm_owner = {
             limit = {
                 is_landed = yes
                 primary_title.tier >= tier_kingdom
                 NOT = { this = scope:ruler }
                 NOT = { is_allied_to = scope:ruler }
-                max_military_strength >= scope:ruler.var:tmp_story_rival_threshold
             }
-            scope:ruler = { change_variable = { name = riseandfall_story_rival_count add = 1 } }
+            save_scope_as = story_rival_candidate
+            scope:ruler = {
+                change_variable = { name = riseandfall_story_rival_count add = 1 }
+                set_variable = { name = tmp_story_candidate_rival_strength value = scope:story_rival_candidate.max_military_strength }
+                set_variable = { name = tmp_story_candidate_rival_pct value = var:tmp_story_candidate_rival_strength }
+                change_variable = { name = tmp_story_candidate_rival_pct multiply = 100 }
+                change_variable = { name = tmp_story_candidate_rival_pct divide = var:tmp_story_ruler_strength }
+                if = {
+                    limit = { var:tmp_story_candidate_rival_pct > var:riseandfall_story_strongest_rival_pct }
+                    set_variable = { name = riseandfall_story_strongest_rival_pct value = var:tmp_story_candidate_rival_pct }
+                }
+            }
         }
+        clamp_variable = { name = riseandfall_story_strongest_rival_pct min = 0 max = 150 }
+        round_variable = { name = riseandfall_story_strongest_rival_pct nearest = 1 }
+
+        # Convert rival strength into yearly collapse-gain relief. This is a
+        # pressure reducer, not immunity: 35% strength => about 1.8 relief/year,
+        # 60% => 3, 100% => 5, and superior rivals cap at 7.5.
+        set_variable = { name = riseandfall_story_external_rival_relief value = var:riseandfall_story_strongest_rival_pct }
+        change_variable = { name = riseandfall_story_external_rival_relief divide = 20 }
+        clamp_variable = { name = riseandfall_story_external_rival_relief min = 0 max = 7.5 }
 
         # Story roles are recalculated each pass:
         # 1 anchor, 2 rival, 3 declining power, 4 wildcard, 5 background.
-        # Declining power is reserved for stable oversized realms that lack a
-        # credible external rival. Rival-backed empires stay intact longer because
-        # their enemy gives vassals a reason to tolerate the center.
+        # Declining power is based on realm scale and stability. External rivals
+        # no longer hard-block it; they dynamically reduce collapse buildup later.
         set_variable = { name = riseandfall_story_role value = 5 }
         if = {
             limit = { has_variable = riseandfall_story_successor_grace }
@@ -370,7 +394,6 @@ riseandfall_apply_dynamic_story_pressure_se = {
                 }
                 has_variable = riseandfall_realm_stability_score
                 var:riseandfall_realm_stability_score >= var:tmp_story_decline_threshold
-                NOT = { var:riseandfall_story_rival_count > 0 }
             }
             set_variable = { name = riseandfall_story_role value = 3 }
         }
@@ -542,17 +565,22 @@ riseandfall_apply_dynamic_story_pressure_se = {
         if = { limit = { has_variable = riseandfall_story_no_succession_years var:riseandfall_story_no_succession_years >= 100 } change_variable = { name = tmp_story_blob_score add = 1 } }
         if = { limit = { has_variable = riseandfall_story_no_succession_years var:riseandfall_story_no_succession_years >= 200 } change_variable = { name = tmp_story_blob_score add = 1 } }
 
-        # No-rival pressure models complacency. Only neighboring or close across-water top lieges count, so distant superpowers do not suppress it.
+        # No-rival pressure models complacency. It scales from the strongest
+        # nearby rival: below 60% military strength is not enough to stop
+        # isolation, but even minor threats still reduce collapse gain later.
         if = {
             limit = {
                 var:tmp_story_blob_score >= 3
                 has_variable = riseandfall_realm_stability_score
                 var:riseandfall_realm_stability_score >= 70
-                NOT = { var:riseandfall_story_rival_count > 0 }
+                var:riseandfall_story_strongest_rival_pct < 60
                 NOT = { has_variable = riseandfall_story_successor_grace }
             }
             if = { limit = { NOT = { has_variable = riseandfall_story_no_rival_years } } set_variable = { name = riseandfall_story_no_rival_years value = 0 } }
-            change_variable = { name = riseandfall_story_no_rival_years add = 1 }
+            set_variable = { name = tmp_story_isolation_year_gain value = 1 }
+            if = { limit = { var:riseandfall_story_strongest_rival_pct < 40 } change_variable = { name = tmp_story_isolation_year_gain add = 1 } }
+            if = { limit = { var:riseandfall_story_strongest_rival_pct < 20 } change_variable = { name = tmp_story_isolation_year_gain add = 1 } }
+            change_variable = { name = riseandfall_story_no_rival_years add = var:tmp_story_isolation_year_gain }
             if = { limit = { has_game_rule = riseandfall_dynamic_story_mode_forced } change_variable = { name = riseandfall_story_no_rival_years add = 1 } }
             clamp_variable = { name = riseandfall_story_no_rival_years min = 0 max = 100 }
         }
@@ -574,20 +602,6 @@ riseandfall_apply_dynamic_story_pressure_se = {
             if = { limit = { has_game_rule = riseandfall_dynamic_story_mode_forced } change_variable = { name = riseandfall_story_no_rival_pressure add = 2 } }
             clamp_variable = { name = riseandfall_story_no_rival_pressure min = 0 max = 20 }
         }
-
-        # Nearby peers create external discipline. This is not a protection floor;
-        # it is a pressure reducer used later, scaled by actual rival count so a
-        # contested frontier matters more than a single weak neighbor.
-        set_variable = { name = tmp_story_external_rival_relief value = 0 }
-        if = {
-            limit = { var:riseandfall_story_rival_count > 0 }
-            set_variable = { name = tmp_story_external_rival_relief value = var:riseandfall_story_rival_count }
-            change_variable = { name = tmp_story_external_rival_relief multiply = 2 }
-            if = { limit = { var:tmp_story_blob_score >= 5 } change_variable = { name = tmp_story_external_rival_relief add = 1 } }
-            if = { limit = { var:tmp_story_blob_score >= 8 } change_variable = { name = tmp_story_external_rival_relief add = 1 } }
-            if = { limit = { primary_title.tier >= tier_hegemony } change_variable = { name = tmp_story_external_rival_relief add = 1 } }
-        }
-
         # Powerful non-allied vassals become a separate internal pressure source in old or oversized realms.
         if = {
             limit = {
@@ -710,8 +724,8 @@ riseandfall_apply_dynamic_story_pressure_se = {
                 change_variable = { name = tmp_story_collapse_gain add = 2 }
             }
             if = {
-                limit = { var:tmp_story_external_rival_relief > 0 }
-                set_variable = { name = tmp_story_external_rival_relief_negative value = var:tmp_story_external_rival_relief }
+                limit = { var:riseandfall_story_external_rival_relief > 0 }
+                set_variable = { name = tmp_story_external_rival_relief_negative value = var:riseandfall_story_external_rival_relief }
                 change_variable = { name = tmp_story_external_rival_relief_negative multiply = -1 }
                 change_variable = { name = tmp_story_collapse_gain add = var:tmp_story_external_rival_relief_negative }
             }
@@ -728,6 +742,10 @@ riseandfall_apply_dynamic_story_pressure_se = {
                 limit = { has_game_rule = riseandfall_dynamic_story_mode_forced }
                 clamp_variable = { name = tmp_story_collapse_gain min = 0 max = 14 }
             }
+            # Store the net yearly meter change for the GUI. The director-note
+            # rows show raw warning scores, but this value is what actually gets
+            # added to collapse buildup after scaling, rival relief, and caps.
+            set_variable = { name = riseandfall_story_collapse_gain_last value = var:tmp_story_collapse_gain }
             change_variable = { name = riseandfall_story_collapse_pressure add = var:tmp_story_collapse_gain }
             clamp_variable = { name = riseandfall_story_collapse_pressure min = 0 max = 100 }
         }
@@ -739,7 +757,7 @@ riseandfall_apply_dynamic_story_pressure_se = {
                     var:riseandfall_story_no_rival_pressure > 0
                 }
                 OR = {
-                    NOT = { var:riseandfall_story_rival_count > 0 }
+                    var:riseandfall_story_strongest_rival_pct < 60
                     var:riseandfall_story_no_rival_pressure > 0
                     AND = {
                         var:riseandfall_story_complacent_vassal_pressure > 4
@@ -771,14 +789,14 @@ riseandfall_apply_dynamic_story_pressure_se = {
             }
             if = { limit = { has_game_rule = riseandfall_dynamic_story_mode_forced } change_variable = { name = tmp_story_collapse_gain add = 1 } }
             if = {
-                limit = { var:tmp_story_external_rival_relief > 0 }
-                set_variable = { name = tmp_story_external_rival_relief_negative value = var:tmp_story_external_rival_relief }
+                limit = { var:riseandfall_story_external_rival_relief > 0 }
+                set_variable = { name = tmp_story_external_rival_relief_negative value = var:riseandfall_story_external_rival_relief }
                 change_variable = { name = tmp_story_external_rival_relief_negative multiply = -1 }
                 change_variable = { name = tmp_story_collapse_gain add = var:tmp_story_external_rival_relief_negative }
             }
             if = {
                 limit = {
-                    NOT = { var:riseandfall_story_rival_count > 0 }
+                    var:riseandfall_story_strongest_rival_pct < 60
                     var:tmp_story_collapse_gain < 1
                 }
                 set_variable = { name = tmp_story_collapse_gain value = 1 }
@@ -794,11 +812,15 @@ riseandfall_apply_dynamic_story_pressure_se = {
                 limit = { has_game_rule = riseandfall_dynamic_story_mode_forced }
                 clamp_variable = { name = tmp_story_collapse_gain min = 0 max = 8 }
             }
+            # Store the softer indirect-pressure gain separately so the GUI can
+            # explain why raw warnings like vassal ambition do not add 1:1.
+            set_variable = { name = riseandfall_story_collapse_gain_last value = var:tmp_story_collapse_gain }
             change_variable = { name = riseandfall_story_collapse_pressure add = var:tmp_story_collapse_gain }
             clamp_variable = { name = riseandfall_story_collapse_pressure min = 0 max = 100 }
         }
         else_if = {
             limit = { has_variable = riseandfall_story_collapse_pressure }
+            set_variable = { name = riseandfall_story_collapse_gain_last value = -3 }
             change_variable = { name = riseandfall_story_collapse_pressure add = -3 }
             if = { limit = { NOT = { var:riseandfall_story_collapse_pressure > 0 } } remove_variable = riseandfall_story_collapse_pressure }
         }
@@ -846,11 +868,13 @@ riseandfall_apply_dynamic_story_pressure_se = {
         remove_variable = tmp_story_realm_pct
         remove_variable = tmp_story_stress_score
         remove_variable = tmp_story_blob_score
-        remove_variable = tmp_story_rival_threshold
+        remove_variable = tmp_story_ruler_strength
+        if = { limit = { has_variable = tmp_story_candidate_rival_strength } remove_variable = tmp_story_candidate_rival_strength }
+        if = { limit = { has_variable = tmp_story_candidate_rival_pct } remove_variable = tmp_story_candidate_rival_pct }
         remove_variable = tmp_story_low_threshold
         remove_variable = tmp_story_stable_threshold
         remove_variable = tmp_story_decline_threshold
-        remove_variable = tmp_story_external_rival_relief
+        if = { limit = { has_variable = tmp_story_isolation_year_gain } remove_variable = tmp_story_isolation_year_gain }
         if = { limit = { has_variable = tmp_story_external_rival_relief_negative } remove_variable = tmp_story_external_rival_relief_negative }
         if = { limit = { has_variable = tmp_story_collapse_gain } remove_variable = tmp_story_collapse_gain }
         if = { limit = { has_variable = tmp_story_scaled_stagnation } remove_variable = tmp_story_scaled_stagnation }
