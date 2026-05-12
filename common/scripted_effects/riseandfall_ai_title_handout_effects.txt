@@ -8,14 +8,17 @@
     # Save the current emperor scope for reference
     save_scope_as = emperor
 
-    # Only attempt kingdom handouts if the saved emperor scope actually holds an empire-tier title
+    # Only attempt kingdom handouts if the saved ruler actually outranks kingdoms.
     if = {
-        limit = { scope:emperor = { highest_held_title_tier >= tier_empire } }
+        limit = { scope:emperor = { primary_title.tier >= tier_empire } }
         every_realm_de_jure_kingdom = {
         # Iterate every de-jure kingdom. Check each one to see if the emperor is the current holder.
         limit = { 
             exists = this 
             holder = scope:emperor
+            # Never hand out a title at the ruler's own primary rank.
+            # A king granting a kingdom makes the recipient independent.
+            tier < scope:emperor.primary_title.tier
         }
         save_scope_as = target_title
 
@@ -23,7 +26,10 @@
         # This prevents the bug where vassals become independent or the title changes hands every year.
         if = {
             limit = { 
-                scope:target_title = { holder = scope:emperor }
+                scope:target_title = {
+                    holder = scope:emperor
+                    tier < scope:emperor.primary_title.tier
+                }
             }
 
             # Now we're in the emperor scope. Check whether the kingdom is not de jure to the emperor
@@ -136,7 +142,7 @@
         }
     }
     else = {
-        # Not an emperor-tier holder; skip kingdom handout to avoid accidental grants
+        # Not an empire-tier holder; skip kingdom handout to avoid accidental grants
     }
 }
 
@@ -148,11 +154,15 @@ riseandfall_ai_advanced_grant_target_kingdom_se = {
     if = {
         limit = {
             is_ai = yes
+            primary_title.tier >= tier_empire
             exists = scope:target_title
             exists = scope:rf_advanced_chosen_vassal
             scope:target_title = {
                 tier = tier_kingdom
                 holder = scope:emperor
+                # The liege must outrank the title being granted, or the grant
+                # can split the recipient out as an independent ruler.
+                tier < scope:emperor.primary_title.tier
                 any_dejure_vassal_title_holder = {
                     this = scope:rf_advanced_chosen_vassal
                 }
@@ -239,6 +249,8 @@ riseandfall_ai_advanced_grant_target_duchy_se = {
             scope:target_title = {
                 tier = tier_duchy
                 holder = scope:king
+                # Do not grant a title at the liege's own primary rank.
+                tier < scope:king.primary_title.tier
                 any_dejure_vassal_title_holder = {
                     this = scope:rf_advanced_chosen_vassal
                 }
@@ -306,199 +318,9 @@ riseandfall_ai_advanced_destroy_unwanted_titles_se = {
             primary_title.tier >= tier_kingdom
         }
 
-        # Hegemonies can technically have empire vassals, but advanced AI should
-        # break those down unless the hegemon is near or over the vassal limit.
-        if = {
-            limit = {
-                primary_title.tier = tier_empire
-                primary_title = {
-                    is_landless_type_title = no
-                    NOT = { is_head_of_faith = yes }
-                    NOT = { is_nomad_title = yes }
-                    NOT = { is_noble_family_title = yes }
-                    NOT = { is_holy_order = yes }
-                    NOT = { is_figurehead_title = yes }
-                }
-                any_liege_or_above = {
-                    is_ai = yes
-                    primary_title.tier >= tier_hegemony
-                    vassal_limit_available >= 4
-                }
-                OR = {
-                    any_held_title = {
-                        tier = tier_kingdom
-                        holder = scope:rf_advanced_cleanup_ruler
-                        NOT = { this = scope:rf_advanced_cleanup_ruler.primary_title }
-                        is_landless_type_title = no
-                        NOT = { is_head_of_faith = yes }
-                        NOT = { is_nomad_title = yes }
-                        NOT = { is_noble_family_title = yes }
-                        NOT = { is_holy_order = yes }
-                        NOT = { is_figurehead_title = yes }
-                    }
-                    any_held_title = {
-                        tier = tier_duchy
-                        holder = scope:rf_advanced_cleanup_ruler
-                        NOT = { this = scope:rf_advanced_cleanup_ruler.primary_title }
-                        is_landless_type_title = no
-                        NOT = { is_head_of_faith = yes }
-                        NOT = { is_nomad_title = yes }
-                        NOT = { is_noble_family_title = yes }
-                        NOT = { is_holy_order = yes }
-                        NOT = { is_figurehead_title = yes }
-                    }
-                    any_held_title = {
-                        tier = tier_county
-                        holder = scope:rf_advanced_cleanup_ruler
-                        NOT = { this = scope:rf_advanced_cleanup_ruler.primary_title }
-                        is_landless_type_title = no
-                        NOT = { is_head_of_faith = yes }
-                        NOT = { is_nomad_title = yes }
-                        NOT = { is_noble_family_title = yes }
-                        NOT = { is_holy_order = yes }
-                        NOT = { is_figurehead_title = yes }
-                    }
-                }
-            }
-
-            primary_title = { save_temporary_scope_as = rf_advanced_vassal_empire_title }
-
-            if = {
-                limit = {
-                    any_held_title = {
-                        tier = tier_kingdom
-                        holder = scope:rf_advanced_cleanup_ruler
-                        NOT = { this = scope:rf_advanced_cleanup_ruler.primary_title }
-                        is_landless_type_title = no
-                        NOT = { is_head_of_faith = yes }
-                        NOT = { is_nomad_title = yes }
-                        NOT = { is_noble_family_title = yes }
-                        NOT = { is_holy_order = yes }
-                        NOT = { is_figurehead_title = yes }
-                    }
-                }
-                random_held_title = {
-                    limit = {
-                        tier = tier_kingdom
-                        holder = scope:rf_advanced_cleanup_ruler
-                        NOT = { this = scope:rf_advanced_cleanup_ruler.primary_title }
-                        is_landless_type_title = no
-                        NOT = { is_head_of_faith = yes }
-                        NOT = { is_nomad_title = yes }
-                        NOT = { is_noble_family_title = yes }
-                        NOT = { is_holy_order = yes }
-                        NOT = { is_figurehead_title = yes }
-                    }
-                    save_temporary_scope_as = rf_advanced_kingdom_fallback_title
-                }
-                if = {
-                    limit = {
-                        exists = scope:rf_advanced_vassal_empire_title
-                        exists = scope:rf_advanced_kingdom_fallback_title
-                        scope:rf_advanced_vassal_empire_title = {
-                            holder = scope:rf_advanced_cleanup_ruler
-                            tier = tier_empire
-                        }
-                        scope:rf_advanced_kingdom_fallback_title = {
-                            holder = scope:rf_advanced_cleanup_ruler
-                            tier = tier_kingdom
-                        }
-                    }
-                    set_primary_title_to = scope:rf_advanced_kingdom_fallback_title
-                    destroy_title = scope:rf_advanced_vassal_empire_title
-                }
-            }
-            else_if = {
-                limit = {
-                    any_held_title = {
-                        tier = tier_duchy
-                        holder = scope:rf_advanced_cleanup_ruler
-                        NOT = { this = scope:rf_advanced_cleanup_ruler.primary_title }
-                        is_landless_type_title = no
-                        NOT = { is_head_of_faith = yes }
-                        NOT = { is_nomad_title = yes }
-                        NOT = { is_noble_family_title = yes }
-                        NOT = { is_holy_order = yes }
-                        NOT = { is_figurehead_title = yes }
-                    }
-                }
-                random_held_title = {
-                    limit = {
-                        tier = tier_duchy
-                        holder = scope:rf_advanced_cleanup_ruler
-                        NOT = { this = scope:rf_advanced_cleanup_ruler.primary_title }
-                        is_landless_type_title = no
-                        NOT = { is_head_of_faith = yes }
-                        NOT = { is_nomad_title = yes }
-                        NOT = { is_noble_family_title = yes }
-                        NOT = { is_holy_order = yes }
-                        NOT = { is_figurehead_title = yes }
-                    }
-                    save_temporary_scope_as = rf_advanced_duchy_fallback_title
-                }
-                if = {
-                    limit = {
-                        exists = scope:rf_advanced_vassal_empire_title
-                        exists = scope:rf_advanced_duchy_fallback_title
-                        scope:rf_advanced_vassal_empire_title = {
-                            holder = scope:rf_advanced_cleanup_ruler
-                            tier = tier_empire
-                        }
-                        scope:rf_advanced_duchy_fallback_title = {
-                            holder = scope:rf_advanced_cleanup_ruler
-                            tier = tier_duchy
-                        }
-                    }
-                    set_primary_title_to = scope:rf_advanced_duchy_fallback_title
-                    destroy_title = scope:rf_advanced_vassal_empire_title
-                }
-            }
-            else_if = {
-                limit = {
-                    any_held_title = {
-                        tier = tier_county
-                        holder = scope:rf_advanced_cleanup_ruler
-                        NOT = { this = scope:rf_advanced_cleanup_ruler.primary_title }
-                        is_landless_type_title = no
-                        NOT = { is_head_of_faith = yes }
-                        NOT = { is_nomad_title = yes }
-                        NOT = { is_noble_family_title = yes }
-                        NOT = { is_holy_order = yes }
-                        NOT = { is_figurehead_title = yes }
-                    }
-                }
-                random_held_title = {
-                    limit = {
-                        tier = tier_county
-                        holder = scope:rf_advanced_cleanup_ruler
-                        NOT = { this = scope:rf_advanced_cleanup_ruler.primary_title }
-                        is_landless_type_title = no
-                        NOT = { is_head_of_faith = yes }
-                        NOT = { is_nomad_title = yes }
-                        NOT = { is_noble_family_title = yes }
-                        NOT = { is_holy_order = yes }
-                        NOT = { is_figurehead_title = yes }
-                    }
-                    save_temporary_scope_as = rf_advanced_county_fallback_title
-                }
-                if = {
-                    limit = {
-                        exists = scope:rf_advanced_vassal_empire_title
-                        exists = scope:rf_advanced_county_fallback_title
-                        scope:rf_advanced_vassal_empire_title = {
-                            holder = scope:rf_advanced_cleanup_ruler
-                            tier = tier_empire
-                        }
-                        scope:rf_advanced_county_fallback_title = {
-                            holder = scope:rf_advanced_cleanup_ruler
-                            tier = tier_county
-                        }
-                    }
-                    set_primary_title_to = scope:rf_advanced_county_fallback_title
-                    destroy_title = scope:rf_advanced_vassal_empire_title
-                }
-            }
-        }
+        # Do not try to demote empire-tier primary titles by swapping to a
+        # kingdom/duchy/county primary. CK3 rejects lower-tier primary swaps,
+        # so this cleanup only destroys extra non-primary titles below.
 
         every_held_title = {
             limit = {
@@ -572,6 +394,9 @@ riseandfall_ai_advanced_title_handout_se = {
             limit = {
                 exists = this
                 holder = scope:emperor
+                # Same-rank grants break vassalage, so only lower-tier titles
+                # are eligible for advanced title handouts.
+                tier < scope:emperor.primary_title.tier
                 NOT = { any_de_jure_county = { this = scope:emperor.capital_province.county } }
                 any_dejure_vassal_title_holder = {
                     is_landed = yes
@@ -640,6 +465,7 @@ riseandfall_ai_advanced_title_handout_se = {
                     exists = scope:rf_advanced_chosen_vassal
                     scope:target_title = {
                         holder = scope:emperor
+                        tier < scope:emperor.primary_title.tier
                         any_dejure_vassal_title_holder = {
                             this = scope:rf_advanced_chosen_vassal
                         }
@@ -653,7 +479,7 @@ riseandfall_ai_advanced_title_handout_se = {
     if = {
         limit = {
             is_ai = yes
-            highest_held_title_tier >= tier_empire
+            primary_title.tier >= tier_empire
             NOT = { has_variable = riseandfall_ai_advanced_title_action_cooldown }
         }
 
@@ -664,6 +490,9 @@ riseandfall_ai_advanced_title_handout_se = {
             limit = {
                 exists = this
                 holder = scope:emperor
+                # Same-rank grants break vassalage, so only lower-tier titles
+                # are eligible for advanced title handouts.
+                tier < scope:emperor.primary_title.tier
                 NOT = { any_de_jure_county = { this = scope:emperor.capital_province.county } }
                 any_dejure_vassal_title_holder = {
                     is_landed = yes
@@ -771,6 +600,7 @@ riseandfall_ai_advanced_title_handout_se = {
                         exists = scope:rf_advanced_chosen_vassal
                         scope:target_title = {
                             holder = scope:emperor
+                            tier < scope:emperor.primary_title.tier
                             any_dejure_vassal_title_holder = {
                                 this = scope:rf_advanced_chosen_vassal
                             }

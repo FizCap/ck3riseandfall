@@ -14,6 +14,8 @@
             is_landed = no
             is_ruler = no
             has_game_rule = riseandfall_lite_mode_disabled
+            # Include implicit claims so claimant adventurers can use inherited/hegemony claims.
+            any_claim = { explicit = all tier >= tier_kingdom exists = holder holder = { is_independent_ruler = yes } }
         }
         scope:recipient = scope:actor # Self-targeting: actor == recipient
     }
@@ -24,6 +26,8 @@
             is_landed = no
             is_ruler = no
             has_game_rule = riseandfall_lite_mode_disabled
+            # Keep this aligned with the camp purpose assigned below.
+            any_claim = { explicit = all tier >= tier_kingdom exists = holder holder = { is_independent_ruler = yes } }
         }
         scope:recipient = scope:actor
     }
@@ -39,15 +43,42 @@
     # The action: turn actor into an adventurer by creating a landless adventurer title for them
     on_accept = {
         scope:actor = {
-            create_adventurer_title = {
-                name = riseandfall_adventurer_title_name_player
-                holder = scope:actor
-                save_scope_as = riseandfall_created_adventurer_title
+            clear_saved_scope = claim_target_title
+            clear_saved_scope = independent_ruler
+
+            # Use the same target selection/setup path as AI-created adventurers:
+            # highest-tier valid claim first, with the holder saved for gold/host scaling.
+            if = {
+                limit = { any_claim = { explicit = all tier >= tier_hegemony exists = holder holder = { is_independent_ruler = yes } } }
+                random_claim = {
+                    explicit = all
+                    limit = { tier >= tier_hegemony exists = holder holder = { is_independent_ruler = yes } }
+                    save_scope_as = claim_target_title
+                }
+            }
+            else_if = {
+                limit = { any_claim = { explicit = all tier >= tier_empire exists = holder holder = { is_independent_ruler = yes } } }
+                random_claim = {
+                    explicit = all
+                    limit = { tier >= tier_empire exists = holder holder = { is_independent_ruler = yes } }
+                    save_scope_as = claim_target_title
+                }
+            }
+            else_if = {
+                limit = { any_claim = { explicit = all tier >= tier_kingdom exists = holder holder = { is_independent_ruler = yes } } }
+                random_claim = {
+                    explicit = all
+                    limit = { tier >= tier_kingdom exists = holder holder = { is_independent_ruler = yes } }
+                    save_scope_as = claim_target_title
+                }
             }
 
-            scope:riseandfall_created_adventurer_title = {
-                set_variable = { name = riseandfall_created_adventurer_title value = yes }
+            if = {
+                limit = { exists = scope:claim_target_title.holder }
+                scope:claim_target_title.holder = { save_scope_as = independent_ruler }
             }
+
+            riseandfall_do_create_adventurer_se = yes
 
             # Send immediate UI confirmation to the player
             hidden_effect = {

@@ -2201,7 +2201,12 @@ riseandfall_split_title_monitor_cleanup_se = {
             }
             change_variable = { name = rf_snapshot multiply = 0.25 }
             if = {
-                limit = { var:rf_current_realm_size <= var:rf_snapshot }
+                limit = {
+                    var:rf_current_realm_size <= var:rf_snapshot
+                    # The under-25% collapse check only destroys old successor titular titles
+                    # after their initial 50-year origin grace marker has expired.
+                    primary_title = { NOT = { has_variable = rf_successor_origin_title } }
+                }
                 primary_title = { save_scope_as = rf_split_title }
                 if = {
                     limit = { scope:rf_split_title = { is_titular = yes } }

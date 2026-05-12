@@ -48,6 +48,15 @@
             is_landless_adventurer = yes
             has_character_flag = riseandfall_newadventurer
         }
+        # This custom AI path can target implicit hegemony claims, so do not rely on
+        # the vanilla `claim` target-title generator to expose every valid title.
+        scope:claimant = {
+            OR = {
+                has_claim_on = root
+                has_strong_implicit_claim_on = root
+                has_weak_implicit_claim_on = root
+            }
+        }
         trigger_if = {
             limit = {
                 scope:attacker = {
@@ -200,7 +209,7 @@
         }
     }
 
-    target_titles = claim
+    target_titles = all
 
     on_declaration = {
         on_declared_war = yes

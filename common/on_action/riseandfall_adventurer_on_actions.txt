@@ -1,6 +1,7 @@
 ﻿yearly_global_pulse = {
     on_actions = {
         riseandfall_yearly_adventurer
+        riseandfall_yearly_adventurer_press_claims_scan
         riseandfall_yearly_remove_adventurer_gold_mod
         riseandfall_marry_male_target
         riseandfall_marry_female_target
@@ -67,12 +68,31 @@ riseandfall_yearly_adventurer_press_claims = {
         has_government = landless_adventurer_government
         is_landed = no
         is_at_war = no
-        has_realm_law = camp_purpose_legitimists
         is_imprisoned = no
     }
     effect = {
         save_scope_as = independent_adventurer
         riseandfall_adventurer_press_claims_se = yes
+    }
+}
+
+riseandfall_yearly_adventurer_press_claims_scan = {
+    trigger = {
+        has_game_rule = riseandfall_adventurer_creator_enabled
+    }
+    effect = {
+        every_ruler = {
+            limit = {
+                is_ai = yes
+                has_character_flag = riseandfall_newadventurer
+                has_government = landless_adventurer_government
+                is_landed = no
+                is_at_war = no
+                is_imprisoned = no
+            }
+            save_scope_as = independent_adventurer
+            riseandfall_adventurer_press_claims_se = yes
+        }
     }
 }
 
