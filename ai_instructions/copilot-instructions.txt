@@ -26,6 +26,10 @@ Encoding and File Hygiene
 - For CK3 content files (`.txt`, `.yml`, `.gui`), use UTF-8 with BOM.
 - Keep brace structure strict and readable.
 - Keep IDs stable once released unless migration is intentional.
+- When adding or changing CK3 script logic, add concise `#` comments that explain what the new block does and why it exists.
+  - Comment design intent, non-obvious scope changes, thresholds, weights, and math.
+  - Do not comment every line; prefer short section comments before meaningful logic blocks.
+  - Use CK3 `#` comments in `.txt` and `.gui` script files.
 
 Current Project Conventions
 - IDs are namespaced by subsystem, not only one namespace.
