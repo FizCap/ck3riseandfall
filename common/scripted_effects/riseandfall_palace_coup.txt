@@ -1770,8 +1770,12 @@ riseandfall_palace_coup_root_flees_success = {
             resolve_title_and_vassal_change = scope:palace_coup_indep_change
         }
 
-        # Match the deposed ruler's original rank for retreat dynamic titles.
-        # Hegemony retreats fall back to empire-tier dynamic titles.
+        clear_saved_scope = palace_coup_root_successor_title
+
+        # Match realm split: the fleeing ruler gets a newly-created dynamic title
+        # at the origin title's rank before successor-state markers are applied.
+        # Hegemony origins fall back to empire-tier dynamic titles, matching
+        # riseandfall_execute_realm_split_se.
         if = {
             limit = {
                 scope:original_ruler = { exists = capital_county }
@@ -1879,6 +1883,16 @@ riseandfall_palace_coup_root_flees_success = {
                     limit = { exists = primary_title }
                     primary_title = { save_scope_as = palace_coup_root_successor_title }
                 }
+            }
+        }
+
+        # The fleeing ruler must use the newly-created origin-rank retreat title
+        # as primary; otherwise a reserve county/duchy can become the successor
+        # title even though kingdom/empire origins require kingdom/empire heirs.
+        if = {
+            limit = { exists = scope:palace_coup_root_successor_title }
+            scope:original_ruler = {
+                set_primary_title_to = scope:palace_coup_root_successor_title
             }
         }
 

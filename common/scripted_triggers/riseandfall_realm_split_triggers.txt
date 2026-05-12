@@ -207,15 +207,10 @@ riseandfall_can_switch_successor_sides_trigger = {
         NOT = { government_has_flag = government_is_landless_adventurer }
     }
     scope:actor.liege != scope:recipient
-    OR = {
-        scope:recipient = { primary_title.tier >= tier_hegemony }
-        scope:actor = { primary_title.tier < tier_empire }
-        scope:actor = {
-            any_held_title = {
-                tier < tier_empire
-                NOT = { this = scope:actor.primary_title }
-            }
-        }
+    # Defection is a vassalage move; the new liege must already outrank the actor
+    # so the effect never has to demote the defector's primary title.
+    scope:actor = {
+        primary_title.tier < scope:recipient.primary_title.tier
     }
     OR = {
         AND = {
@@ -252,16 +247,13 @@ riseandfall_can_surrender_successor_realm_trigger = {
         exists = primary_title
         NOT = { government_has_flag = government_is_landless_adventurer }
     }
+    # Surrender may promote the recipient above king/duke/count actors, but empire
+    # actors need an already higher hegemony recipient because dynamic promotion
+    # only creates up to empire-tier titles.
     OR = {
         scope:actor = { primary_title.tier = tier_hegemony }
         scope:recipient = { primary_title.tier >= tier_hegemony }
         scope:actor = { primary_title.tier < tier_empire }
-        scope:actor = {
-            any_held_title = {
-                tier < tier_empire
-                NOT = { this = scope:actor.primary_title }
-            }
-        }
     }
     riseandfall_is_same_successor_conflict_interaction_trigger = yes
 }

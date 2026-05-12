@@ -46,6 +46,12 @@
 		base = 40
 
 		modifier = {
+			scope:recipient = {
+				primary_title.tier < scope:actor.primary_title.tier
+			}
+			add = -1000
+		}
+		modifier = {
 			scope:actor.liege = { riseandfall_has_successor_primary_title_trigger = yes }
 			scope:recipient = {
 				has_title = scope:actor.liege.primary_title.var:rf_successor_root_origin_title
@@ -102,6 +108,12 @@
 	ai_will_do = {
 		base = -150
 
+		modifier = {
+			scope:recipient = {
+				primary_title.tier < scope:actor.primary_title.tier
+			}
+			add = -1000
+		}
 		modifier = {
 			scope:actor = {
 				primary_title = { is_neighbor_to_realm = scope:recipient }
@@ -239,6 +251,12 @@ riseandfall_surrender_to_successor_interaction = {
 		base = 100
 
 		modifier = {
+			scope:recipient = {
+				primary_title.tier < scope:actor.primary_title.tier
+			}
+			add = -1000
+		}
+		modifier = {
 			scope:actor = {
 				primary_title = { is_neighbor_to_realm = scope:recipient }
 			}
@@ -266,6 +284,12 @@ riseandfall_surrender_to_successor_interaction = {
 	ai_will_do = {
 		base = -150
 
+		modifier = {
+			scope:recipient = {
+				primary_title.tier < scope:actor.primary_title.tier
+			}
+			add = -1000
+		}
 		modifier = {
 			scope:actor = {
 				has_variable = riseandfall_realm_stability_score

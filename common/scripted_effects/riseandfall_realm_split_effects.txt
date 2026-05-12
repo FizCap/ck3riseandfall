@@ -1420,6 +1420,15 @@ riseandfall_execute_realm_split_se = {
         }
         resolve_title_and_vassal_change = scope:rf_title_change
     }
+
+    # CK3 may keep a reserve lower title as primary after title handoff; force the
+    # same-rank successor title primary before successor war markers are applied.
+    if = {
+        limit = { exists = scope:rf_new_title }
+        scope:new_realm_ruler = {
+            set_primary_title_to = scope:rf_new_title
+        }
+    }
     
     # Transfer assigned vassals
     create_title_and_vassal_change = {
@@ -1897,8 +1906,6 @@ riseandfall_realm_split_lower_actor_primary_below_recipient_se = {
 riseandfall_realm_split_defect_to_recipient_se = {
     scope:actor.liege = { save_temporary_scope_as = rf_former_split_liege }
     scope:actor.primary_title = { save_temporary_scope_as = rf_incoming_split_title }
-    scope:recipient = { riseandfall_realm_split_promote_recipient_for_incoming_se = yes }
-    scope:actor = { riseandfall_realm_split_lower_actor_primary_below_recipient_se = yes }
 
     scope:actor = {
         set_variable = { name = rf_split_defection_cooldown value = yes years = 10 }
@@ -1979,33 +1986,11 @@ riseandfall_realm_split_surrender_to_recipient_se = {
         }
         resolve_title_and_vassal_change = scope:rf_split_submission_title_change
         scope:recipient = { set_primary_title_to = scope:rf_submitted_split_title }
-        scope:actor = { riseandfall_realm_split_lower_actor_primary_below_recipient_se = yes }
     }
     else = {
+        # Surrender upgrades the recipient above the submitted ruler instead of
+        # downgrading the submitted ruler's kingdom-or-higher primary title.
         scope:recipient = { riseandfall_realm_split_promote_recipient_for_incoming_se = yes }
-        scope:actor = { riseandfall_realm_split_lower_actor_primary_below_recipient_se = yes }
-
-        if = {
-            limit = {
-                scope:rf_submitted_split_title = {
-                    exists = holder
-                    is_titular = yes
-                }
-            }
-            create_title_and_vassal_change = {
-                type = granted
-                save_scope_as = rf_split_submission_title_change
-                add_claim_on_loss = no
-            }
-            scope:rf_submitted_split_title = {
-                change_title_holder = {
-                    holder = scope:recipient
-                    change = scope:rf_split_submission_title_change
-                    take_baronies = no
-                }
-            }
-            resolve_title_and_vassal_change = scope:rf_split_submission_title_change
-        }
     }
 
     scope:actor = {
@@ -2021,20 +2006,6 @@ riseandfall_realm_split_surrender_to_recipient_se = {
             remove_variable = rf_successor_root_origin_title
             remove_variable = rf_is_permanent_successor_split
             remove_variable = rf_successor_permanent_realm_size
-        }
-    }
-
-    if = {
-        limit = {
-            scope:rf_submitted_split_title = {
-                exists = holder
-                is_titular = yes
-                NOT = { tier = tier_hegemony }
-                holder = scope:recipient
-            }
-        }
-        scope:recipient = {
-            destroy_title = scope:rf_submitted_split_title
         }
     }
 
@@ -2074,191 +2045,98 @@ riseandfall_split_title_monitor_cleanup_se = {
         primary_title = { save_scope_as = rf_split_title }
         clear_saved_scope = rf_replacement_split_title
 
-        # If a successor titular title is now above the rank its remaining vassal
-        # hierarchy needs, move the successor marker to the lowest viable primary
-        # title before retiring it.
+        # Legacy safety repair: older palace-coup/split paths could leave the
+        # successor marker on a lower-rank primary. Promote those states back to
+        # the stored root origin rank, matching normal realm split behavior.
         if = {
             limit = {
                 scope:rf_split_title = {
-                    is_titular = yes
+                    has_variable = rf_successor_root_origin_title
+                    var:rf_successor_root_origin_title = {
+                        OR = {
+                            tier = tier_hegemony
+                            tier = tier_empire
+                        }
+                    }
+                    tier < tier_empire
+                }
+            }
+            random_held_title = {
+                limit = {
                     tier = tier_empire
+                    NOT = { this = scope:rf_split_title }
                 }
-                NOT = {
-                    any_vassal = {
-                        is_landed = yes
-                        primary_title.tier >= tier_kingdom
-                    }
-                }
+                save_scope_as = rf_replacement_split_title
             }
             if = {
-                limit = {
-                    any_vassal = {
-                        is_landed = yes
-                        primary_title.tier >= tier_duchy
-                    }
-                }
-                random_held_title = {
-                    limit = {
-                        tier = tier_kingdom
-                        NOT = { this = scope:rf_split_title }
-                    }
-                    save_scope_as = rf_replacement_split_title
+                limit = { NOT = { exists = scope:rf_replacement_split_title } }
+                create_dynamic_title = {
+                    tier = empire
+                    name = RISEANDFALL_BREAKAWAY_NAME_CAPITAL
                 }
                 if = {
-                    limit = { NOT = { exists = scope:rf_replacement_split_title } }
-                    create_dynamic_title = {
-                        tier = kingdom
-                        name = RISEANDFALL_BREAKAWAY_NAME_CAPITAL
+                    limit = { exists = scope:new_title }
+                    scope:new_title = { save_scope_as = rf_replacement_split_title }
+                    create_title_and_vassal_change = {
+                        type = created
+                        save_scope_as = rf_replacement_title_change
+                        add_claim_on_loss = no
                     }
-                    if = {
-                        limit = { exists = scope:new_title }
-                        scope:new_title = { save_scope_as = rf_replacement_split_title }
-                        create_title_and_vassal_change = {
-                            type = created
-                            save_scope_as = rf_replacement_title_change
-                            add_claim_on_loss = no
+                    scope:rf_replacement_split_title = {
+                        change_title_holder = {
+                            holder = scope:rf_ruler
+                            change = scope:rf_replacement_title_change
                         }
-                        scope:rf_replacement_split_title = {
-                            change_title_holder = {
-                                holder = scope:rf_ruler
-                                change = scope:rf_replacement_title_change
-                            }
-                            generate_coa = yes
-                        }
-                        resolve_title_and_vassal_change = scope:rf_replacement_title_change
+                        generate_coa = yes
                     }
-                }
-            }
-            else_if = {
-                limit = {
-                    any_vassal = {
-                        is_landed = yes
-                        primary_title.tier >= tier_county
-                    }
-                }
-                random_held_title = {
-                    limit = {
-                        tier = tier_duchy
-                        NOT = { this = scope:rf_split_title }
-                    }
-                    save_scope_as = rf_replacement_split_title
-                }
-                if = {
-                    limit = { NOT = { exists = scope:rf_replacement_split_title } }
-                    create_dynamic_title = {
-                        tier = duchy
-                        name = RISEANDFALL_BREAKAWAY_NAME_CAPITAL
-                    }
-                    if = {
-                        limit = { exists = scope:new_title }
-                        scope:new_title = { save_scope_as = rf_replacement_split_title }
-                        create_title_and_vassal_change = {
-                            type = created
-                            save_scope_as = rf_replacement_title_change
-                            add_claim_on_loss = no
-                        }
-                        scope:rf_replacement_split_title = {
-                            change_title_holder = {
-                                holder = scope:rf_ruler
-                                change = scope:rf_replacement_title_change
-                            }
-                            generate_coa = yes
-                        }
-                        resolve_title_and_vassal_change = scope:rf_replacement_title_change
-                    }
-                }
-            }
-            else = {
-                random_held_title = {
-                    limit = {
-                        tier = tier_county
-                        NOT = { this = scope:rf_split_title }
-                    }
-                    save_scope_as = rf_replacement_split_title
+                    resolve_title_and_vassal_change = scope:rf_replacement_title_change
                 }
             }
         }
         else_if = {
             limit = {
-                scope:rf_split_title = {
-                    is_titular = yes
-                    tier = tier_kingdom
-                }
-                NOT = {
-                    any_vassal = {
-                        is_landed = yes
-                        primary_title.tier >= tier_duchy
+                OR = {
+                    scope:rf_split_title = {
+                        has_variable = rf_successor_root_origin_title
+                        var:rf_successor_root_origin_title = { tier = tier_kingdom }
+                        tier < tier_kingdom
                     }
-                }
-            }
-            if = {
-                limit = {
-                    any_vassal = {
-                        is_landed = yes
-                        primary_title.tier >= tier_county
-                    }
-                }
-                random_held_title = {
-                    limit = {
-                        tier = tier_duchy
-                        NOT = { this = scope:rf_split_title }
-                    }
-                    save_scope_as = rf_replacement_split_title
-                }
-                if = {
-                    limit = { NOT = { exists = scope:rf_replacement_split_title } }
-                    create_dynamic_title = {
-                        tier = duchy
-                        name = RISEANDFALL_BREAKAWAY_NAME_CAPITAL
-                    }
-                    if = {
-                        limit = { exists = scope:new_title }
-                        scope:new_title = { save_scope_as = rf_replacement_split_title }
-                        create_title_and_vassal_change = {
-                            type = created
-                            save_scope_as = rf_replacement_title_change
-                            add_claim_on_loss = no
-                        }
-                        scope:rf_replacement_split_title = {
-                            change_title_holder = {
-                                holder = scope:rf_ruler
-                                change = scope:rf_replacement_title_change
-                            }
-                            generate_coa = yes
-                        }
-                        resolve_title_and_vassal_change = scope:rf_replacement_title_change
-                    }
-                }
-            }
-            else = {
-                random_held_title = {
-                    limit = {
-                        tier = tier_county
-                        NOT = { this = scope:rf_split_title }
-                    }
-                    save_scope_as = rf_replacement_split_title
-                }
-            }
-        }
-        else_if = {
-            limit = {
-                scope:rf_split_title = {
-                    is_titular = yes
-                    tier = tier_duchy
-                }
-                NOT = {
-                    any_vassal = {
-                        is_landed = yes
-                        primary_title.tier >= tier_county
+                    scope:rf_split_title = {
+                        NOT = { has_variable = rf_successor_root_origin_title }
+                        tier < tier_kingdom
                     }
                 }
             }
             random_held_title = {
                 limit = {
-                    tier = tier_county
+                    tier = tier_kingdom
                     NOT = { this = scope:rf_split_title }
                 }
                 save_scope_as = rf_replacement_split_title
+            }
+            if = {
+                limit = { NOT = { exists = scope:rf_replacement_split_title } }
+                create_dynamic_title = {
+                    tier = kingdom
+                    name = RISEANDFALL_BREAKAWAY_NAME_CAPITAL
+                }
+                if = {
+                    limit = { exists = scope:new_title }
+                    scope:new_title = { save_scope_as = rf_replacement_split_title }
+                    create_title_and_vassal_change = {
+                        type = created
+                        save_scope_as = rf_replacement_title_change
+                        add_claim_on_loss = no
+                    }
+                    scope:rf_replacement_split_title = {
+                        change_title_holder = {
+                            holder = scope:rf_ruler
+                            change = scope:rf_replacement_title_change
+                        }
+                        generate_coa = yes
+                    }
+                    resolve_title_and_vassal_change = scope:rf_replacement_title_change
+                }
             }
         }
 
@@ -2287,7 +2165,10 @@ riseandfall_split_title_monitor_cleanup_se = {
                 remove_variable = rf_is_permanent_successor_split
                 remove_variable = rf_successor_permanent_realm_size
             }
-            destroy_title = scope:rf_split_title
+            if = {
+                limit = { scope:rf_split_title = { is_titular = yes } }
+                destroy_title = scope:rf_split_title
+            }
             if = {
                 limit = {
                     exists = scope:rf_replacement_split_title
