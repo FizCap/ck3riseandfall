@@ -656,7 +656,10 @@
     should_show_war_goal_subview = yes
 
     use_de_jure_wargoal_only = yes
-    attacker_wargoal_percentage = 0.0
+    # Claim wars target the defender's de jure title. The attacker should need
+    # broad occupation, while the defender gets ticking score for holding it.
+    attacker_wargoal_percentage = 0.8
+    defender_wargoal_percentage = 0.75
     attacker_ticking_warscore_delay = { months = 24 }    # Increase delay before ticking War Score starts
     defender_ticking_warscore_delay = { months = 24 }
     attacker_ticking_warscore = 0.2                     # Increase daily ticking War Score

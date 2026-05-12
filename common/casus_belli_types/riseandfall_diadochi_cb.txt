@@ -336,7 +336,11 @@
     interface_priority = 80
 
     use_de_jure_wargoal_only = yes
-    attacker_wargoal_percentage = 0.0
+    # Successor wars target the defender's de jure realm title. The attacker
+    # should need broad occupation of that target, while the defender should
+    # gain ticking score for keeping most of the target unsieged.
+    attacker_wargoal_percentage = 0.8
+    defender_wargoal_percentage = 0.75
 
     attacker_ticking_warscore_delay = { months = 12 }
     defender_ticking_warscore_delay = { months = 12 }

@@ -409,7 +409,11 @@
     interface_priority = 79
 
     use_de_jure_wargoal_only = yes
-    attacker_wargoal_percentage = 0.0
+    # Warlord conquests use the defender's de jure target title. The attacker
+    # should need broad occupation, while the defender gets ticking score for
+    # keeping most of the target unsieged.
+    attacker_wargoal_percentage = 0.8
+    defender_wargoal_percentage = 0.75
 
     # War score tuning — prioritize battles (cap battles contribution at 90)
     attacker_ticking_warscore_delay = { months = 12 }    # Delay before ticking warscore increases for attacker
