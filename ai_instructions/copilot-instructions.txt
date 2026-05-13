@@ -99,9 +99,23 @@ Validation Workflow (before commit)
 - Launch CK3 with the mod enabled.
 - Reproduce one minimal scenario per changed system (event trigger, interaction, modifier, on_action hook).
 
+Changelog Rules
+- When changing or adding mod files, also update `ai_instructions/changelog.txt` with a Steam Workshop-ready plaintext changelog entry.
+- Keep the format simple and matching existing Steam changelogs:
+  - First line: `CK3: Rise and Fall vX.Y.Z`
+  - Second line: `<Update Subtitle>`
+  - Blank line before each feature-area header.
+  - Feature-area headers use plain text, such as `Puppet Master`.
+  - Bullets use `- `, one player-facing change per line.
+- If the target version or update subtitle is unknown, add the entry under `CK3: Rise and Fall - Unreleased`.
+- Group bullets by feature area, such as Puppet Master, Realm Splits, Adventurer Claim War, UI, Localization, Balance, AI, or Bug Fixes.
+- Write concise player-facing bullets in past tense. Mention visible behavior, balance changes, AI changes, localization, compatibility, and important bug fixes.
+- Combine tiny internal edits into one clear bullet when they support the same user-facing change.
+- Do not list validation-only commands, whitespace-only edits, or purely mechanical file hygiene unless they matter to players or future maintainers.
+
 Minimal LLM Change Contract
 - Inputs: files touched, expected scope(s), and any new IDs/loc keys.
-- Outputs: behavior change and cross-file links updated.
+- Outputs: behavior change, cross-file links updated, and Steam plaintext changelog entry added.
 - Success: no parse errors, valid scopes, loc keys present, and in-game repro works.
 - Failure modes: missing loc, bad scope chain, wrong target type, ID collisions.
 

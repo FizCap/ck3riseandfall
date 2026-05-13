@@ -34,7 +34,10 @@ types CharacterWindow
 		name = "stability"
 		spacing = -2
 		visible = "[AccessGameRules.AccessNamedGameRule('riseandfall_enable_realm_stability').GetSetting]"
-		tooltip = "REALM_STABILITY_TOOLTIP"
+		tooltipwidget = {
+			stability_hud_tooltip = {}
+		}
+		using = tooltip_ne
 		icon = {
 			name = "icon_stability"
 			size = { 32 32 }
