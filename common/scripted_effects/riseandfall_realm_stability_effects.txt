@@ -346,12 +346,23 @@ riseandfall_calculate_realm_stability_se = {
     ########################################
     # 3.6) PUPPET REGENCY TRACKING & STABILITY BONUS
     # Tracks how long a puppet_regency has been active and manages the
-    # puppet stability bonus (riseandfall_rs_puppet_stability_bonus, -100..100).
+    # puppet stability bonus (riseandfall_rs_puppet_stability_bonus, -35..35).
     # The pool starts from the puppet master's opening stat edge vs the world
     # average, then regenerates or decays yearly like a stability mana reserve.
     if = { limit = { NOT = { has_variable = riseandfall_puppet_regency_years } } set_variable = { name = riseandfall_puppet_regency_years value = 0 } }
     if = { limit = { has_diarchy_type = puppet_regency } change_variable = { name = riseandfall_puppet_regency_years add = 1 } }
     else = { if = { limit = { var:riseandfall_puppet_regency_years > 0 } change_variable = { name = riseandfall_puppet_regency_years add = -1 } } }
+
+    # Puppet regencies do not use the normal regency stat source above, so save the
+    # active puppet master explicitly before reading stats for the mana reserve.
+    if = {
+        limit = {
+            has_diarchy_type = puppet_regency
+            has_active_diarchy = yes
+            exists = diarch
+        }
+        diarch = { save_scope_as = rf_puppet_stability_diarch }
+    }
 
     # Initialize puppet stability bonus from the starting puppet master's average stats.
     # Only set once per regency lifecycle; later years only regen or decay it.
@@ -359,15 +370,15 @@ riseandfall_calculate_realm_stability_se = {
         limit = {
             has_diarchy_type = puppet_regency
             has_active_diarchy = yes
-            exists = scope:diarch
+            exists = scope:rf_puppet_stability_diarch
             NOT = { has_variable = riseandfall_rs_puppet_stability_bonus }
         }
         # Compute the puppet master's average across all five stats
-        set_variable = { name = tmp_pm_start_sum value = scope:diarch.diplomacy }
-        change_variable = { name = tmp_pm_start_sum add = scope:diarch.martial }
-        change_variable = { name = tmp_pm_start_sum add = scope:diarch.stewardship }
-        change_variable = { name = tmp_pm_start_sum add = scope:diarch.intrigue }
-        change_variable = { name = tmp_pm_start_sum add = scope:diarch.learning }
+        set_variable = { name = tmp_pm_start_sum value = scope:rf_puppet_stability_diarch.diplomacy }
+        change_variable = { name = tmp_pm_start_sum add = scope:rf_puppet_stability_diarch.martial }
+        change_variable = { name = tmp_pm_start_sum add = scope:rf_puppet_stability_diarch.stewardship }
+        change_variable = { name = tmp_pm_start_sum add = scope:rf_puppet_stability_diarch.intrigue }
+        change_variable = { name = tmp_pm_start_sum add = scope:rf_puppet_stability_diarch.learning }
         change_variable = { name = tmp_pm_start_sum divide = 5 }
 
         # Compute delta vs precomputed world five-stat average (riseandfall_avg_total)
@@ -378,12 +389,12 @@ riseandfall_calculate_realm_stability_se = {
 
         # Convert the opening stat edge into starting stability mana.
         set_variable = { name = tmp_pm_start_bonus value = var:tmp_pm_start_delta }
-        change_variable = { name = tmp_pm_start_bonus multiply = 5 }
-        clamp_variable = { name = tmp_pm_start_bonus min = -100 max = 100 }
+        change_variable = { name = tmp_pm_start_bonus multiply = 2 }
+        clamp_variable = { name = tmp_pm_start_bonus min = -25 max = 25 }
         round_variable = { name = tmp_pm_start_bonus nearest = 1 }
 
         set_variable = { name = riseandfall_rs_puppet_stability_bonus value = var:tmp_pm_start_bonus }
-        clamp_variable = { name = riseandfall_rs_puppet_stability_bonus min = -100 max = 100 }
+        clamp_variable = { name = riseandfall_rs_puppet_stability_bonus min = -35 max = 35 }
         round_variable = { name = riseandfall_rs_puppet_stability_bonus nearest = 1 }
         set_variable = { name = tmp_pm_skip_yearly_drift value = 1 }
 
@@ -398,16 +409,16 @@ riseandfall_calculate_realm_stability_se = {
         limit = {
             has_diarchy_type = puppet_regency
             has_active_diarchy = yes
-            exists = scope:diarch
+            exists = scope:rf_puppet_stability_diarch
             has_variable = riseandfall_rs_puppet_stability_bonus
             NOT = { has_variable = tmp_pm_skip_yearly_drift }
         }
         # Sum all five stats for the puppet master and compute the average
-        set_variable = { name = tmp_pm_stat_sum value = scope:diarch.diplomacy }
-        change_variable = { name = tmp_pm_stat_sum add = scope:diarch.martial }
-        change_variable = { name = tmp_pm_stat_sum add = scope:diarch.stewardship }
-        change_variable = { name = tmp_pm_stat_sum add = scope:diarch.intrigue }
-        change_variable = { name = tmp_pm_stat_sum add = scope:diarch.learning }
+        set_variable = { name = tmp_pm_stat_sum value = scope:rf_puppet_stability_diarch.diplomacy }
+        change_variable = { name = tmp_pm_stat_sum add = scope:rf_puppet_stability_diarch.martial }
+        change_variable = { name = tmp_pm_stat_sum add = scope:rf_puppet_stability_diarch.stewardship }
+        change_variable = { name = tmp_pm_stat_sum add = scope:rf_puppet_stability_diarch.intrigue }
+        change_variable = { name = tmp_pm_stat_sum add = scope:rf_puppet_stability_diarch.learning }
         # Convert sum -> average (integer division)
         change_variable = { name = tmp_pm_stat_sum divide = 5 }
 
@@ -420,11 +431,22 @@ riseandfall_calculate_realm_stability_se = {
 
         # Convert the average stat edge directly into yearly mana gain/loss.
         set_variable = { name = tmp_pm_drift value = var:tmp_pm_stat_delta }
-        clamp_variable = { name = tmp_pm_drift min = -10 max = 10 }
+        # Personality nudges make puppet masters feel like actors, not only stat sticks.
+        if = { limit = { scope:rf_puppet_stability_diarch = { has_trait = diligent } } change_variable = { name = tmp_pm_drift add = 1 } }
+        if = { limit = { scope:rf_puppet_stability_diarch = { has_trait = patient } } change_variable = { name = tmp_pm_drift add = 1 } }
+        if = { limit = { scope:rf_puppet_stability_diarch = { has_trait = just } } change_variable = { name = tmp_pm_drift add = 1 } }
+        if = { limit = { scope:rf_puppet_stability_diarch = { has_trait = temperate } } change_variable = { name = tmp_pm_drift add = 1 } }
+        if = { limit = { scope:rf_puppet_stability_diarch = { has_trait = calm } } change_variable = { name = tmp_pm_drift add = 1 } }
+        if = { limit = { scope:rf_puppet_stability_diarch = { has_trait = greedy } } change_variable = { name = tmp_pm_drift add = -1 } }
+        if = { limit = { scope:rf_puppet_stability_diarch = { has_trait = deceitful } } change_variable = { name = tmp_pm_drift add = -1 } }
+        if = { limit = { scope:rf_puppet_stability_diarch = { has_trait = callous } } change_variable = { name = tmp_pm_drift add = -1 } }
+        if = { limit = { scope:rf_puppet_stability_diarch = { has_trait = arbitrary } } change_variable = { name = tmp_pm_drift add = -1 } }
+        if = { limit = { scope:rf_puppet_stability_diarch = { has_trait = ambitious } } change_variable = { name = tmp_pm_drift add = -1 } }
+        clamp_variable = { name = tmp_pm_drift min = -5 max = 5 }
         round_variable = { name = tmp_pm_drift nearest = 1 }
 
         change_variable = { name = riseandfall_rs_puppet_stability_bonus add = var:tmp_pm_drift }
-        clamp_variable = { name = riseandfall_rs_puppet_stability_bonus min = -100 max = 100 }
+        clamp_variable = { name = riseandfall_rs_puppet_stability_bonus min = -35 max = 35 }
         round_variable = { name = riseandfall_rs_puppet_stability_bonus nearest = 1 }
 
         remove_variable = tmp_pm_stat_sum
@@ -671,14 +693,14 @@ riseandfall_calculate_realm_stability_se = {
             change_variable = { name = tmp_story_nonapproved_pct add = var:tmp_story_foreign_faith_county_pct }
             change_variable = { name = tmp_story_nonapproved_pct divide = 2 }
 
-            # Continuous homogeneity/diversity component: map 0-100% foreign -> +10..-30
-            # This preserves the same endpoints as the old tiered mapping but scales smoothly.
+            # Continuous homogeneity/diversity component: map 0-100% foreign -> +15..-30
+            # Homogeneous realms can now earn a stronger stability bonus while diversity penalties stay capped.
             set_variable = { name = riseandfall_rs_culture_faith_component value = var:tmp_story_nonapproved_pct }
-            change_variable = { name = riseandfall_rs_culture_faith_component multiply = -4 }
-            change_variable = { name = riseandfall_rs_culture_faith_component divide = 10 }
-            change_variable = { name = riseandfall_rs_culture_faith_component add = 10 }
+            change_variable = { name = riseandfall_rs_culture_faith_component multiply = -45 }
+            change_variable = { name = riseandfall_rs_culture_faith_component divide = 100 }
+            change_variable = { name = riseandfall_rs_culture_faith_component add = 15 }
             round_variable = { name = riseandfall_rs_culture_faith_component nearest = 1 }
-            clamp_variable = { name = riseandfall_rs_culture_faith_component min = -30 max = 10 }
+            clamp_variable = { name = riseandfall_rs_culture_faith_component min = -30 max = 15 }
         }
 
         remove_variable = tmp_story_realm_counties
@@ -812,7 +834,7 @@ riseandfall_calculate_realm_stability_se = {
     # Legitimacy is additive: -20 (none) to +15 (full). Transparent on the 0-100 scale.
     change_variable = { name = tmp_target_score add = var:riseandfall_rs_legitimacy_component }
 
-    # Puppet stability bonus: -100..+100 while a puppet_regency is active.
+    # Puppet stability bonus: -35..+35 while a puppet_regency is active.
     # Good puppet master stats replenish it; poor stats or exploitative actions drain it.
     if = {
         limit = { has_variable = riseandfall_rs_puppet_stability_bonus }

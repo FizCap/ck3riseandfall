@@ -10,13 +10,18 @@
 
   # Steal Gold
   riseandfall_steal_gold_interaction:0 "Steal Gold"
-  riseandfall_steal_gold_interaction_desc:0 "Steal 50% of your liege's gold, transferring it to your treasury. This action has a 1-year cooldown."
+  riseandfall_steal_gold_interaction_desc:0 "Steal a portion of your liege's gold, transferring it to your treasury and draining puppet stability mana. This action has a 1-year cooldown."
   riseandfall_steal_gold_interaction_notification_text:0 "You redirect funds from [recipient.GetShortUINamePossessive] treasury."
 
   # Curry Favor
   riseandfall_curry_favor_interaction:0 "Curry Favor"
   riseandfall_curry_favor_interaction_desc:0 "Gain a Strong Favor Hook on your liege, allowing you to influence their decisions. Requires no existing hook and has a 1-year cooldown."
   riseandfall_curry_favor_interaction_notification_text:0 "You secure leverage over [recipient.GetShortUIName]."
+
+  # Seize Liege Land
+  riseandfall_seize_liege_land_interaction:0 "Seize Liege Land"
+  riseandfall_seize_liege_land_interaction_desc:0 "Seize one eligible county outside your liege's capital duchy, along with a matching duchy or kingdom title when it strengthens your rightful sphere or raises your rank. This drains puppet stability mana and has a 5-year cooldown."
+  riseandfall_seize_liege_land_interaction_notification_text:0 "You carve a new power base from [recipient.GetShortUINamePossessive] personal lands."
 
   # Overthrow Liege
   riseandfall_overthrow_liege_interaction:0 "Overthrow Liege"
@@ -30,6 +35,7 @@
   riseandfall_liege_has_gold:0 "Liege must have more than 0 gold."
   riseandfall_no_low_stability_cooldown:0 "Liege is under low stability cooldown."
   riseandfall_puppet_regency_years_at_least_5:0 "Recipient must have served as puppet regent for at least 5 years."
+  riseandfall_puppet_master_has_seizable_liege_land:0 "Your liege must personally hold an eligible county outside their capital duchy that either belongs in your de jure sphere or can raise your rank."
 
   # Steal Gold popup and notification
   riseandfall_steal_gold_popup_title:0 "Gold Stolen by Puppet Master"
@@ -42,6 +48,12 @@
   riseandfall_curry_favor_popup_desc:0 "Your puppet master has gained a strong favor hook on you."
   riseandfall_curry_favor_vassal_notification_title:0 "Liege Influenced by Puppet Master"
   riseandfall_curry_favor_vassal_notification_desc:0 "Your liege's puppet master has gained significant influence over them."
+
+  # Seize Liege Land popup and notification
+  riseandfall_seize_liege_land_popup_title:0 "Land Seized by Puppet Master"
+  riseandfall_seize_liege_land_popup_desc:0 "Your puppet master has seized part of your personal domain to strengthen their own power base."
+  riseandfall_seize_liege_land_vassal_notification_title:0 "Liege's Land Seized"
+  riseandfall_seize_liege_land_vassal_notification_desc:0 "Your liege's puppet master has seized land from the ruler's personal domain."
 
   # Overthrow Liege popup and notification
   riseandfall_overthrow_liege_popup_title:0 "Overthrown by Puppet Master"
@@ -71,6 +83,7 @@
 
   # Failure text for poor health check
   riseandfall_liege_has_poor_health:0 "Liege must have poor or worse health."
+  riseandfall_puppet_master_diarch_only:0 "You must be the active diarch of your liege."
   # Failure text: only the active diarch may use Force Abdication
   riseandfall_force_abdicate_diarch_only:0 "You must be the active diarch of your liege."
   riseandfall_claim_puppet_master_office_diarch_only:0 "You must be the active diarch of your liege."

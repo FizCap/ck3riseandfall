@@ -103,6 +103,7 @@ riseandfall_on_death_stability_inheritance = {
                 }
                 riseandfall_inherit_warlord_trait_se = yes
                 riseandfall_mark_story_succession_shock_se = yes
+                riseandfall_inherit_story_collapse_buildup_se = yes
                 riseandfall_mark_story_succession_year_se = yes
             }
         }
@@ -125,6 +126,7 @@ riseandfall_on_death_stability_inheritance = {
                 }
                 riseandfall_inherit_warlord_trait_se = yes
                 riseandfall_mark_story_succession_shock_se = yes
+                riseandfall_inherit_story_collapse_buildup_se = yes
                 riseandfall_mark_story_succession_year_se = yes
             }
         }
@@ -160,6 +162,7 @@ riseandfall_on_title_gain_inheritance = {
             riseandfall_inherit_stability_score_se = yes
             riseandfall_inherit_warlord_trait_se = yes
             riseandfall_mark_story_succession_shock_se = yes
+            riseandfall_inherit_story_collapse_buildup_se = yes
             riseandfall_mark_story_succession_year_se = yes
             riseandfall_calculate_realm_stability_se = yes
         }
@@ -187,6 +190,7 @@ riseandfall_on_title_gain_inheritance = {
             if = {
                 limit = { has_primary_title = scope:title }
                 riseandfall_inherit_realm_history_se = yes
+                riseandfall_inherit_story_collapse_buildup_se = yes
             }
             riseandfall_inherit_warlord_trait_se = yes
             riseandfall_mark_story_succession_shock_se = yes

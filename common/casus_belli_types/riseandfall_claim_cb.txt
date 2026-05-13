@@ -43,6 +43,13 @@
     # scope:claimant is the claimant
     # scope:attacker is the attacker
     # scope:defender is the defender
+    allowed_for_character = {
+        # This CB is only for Rise and Fall-created adventurers; without this
+        # top-level gate, `target_titles = all` can expose blank claim rows.
+        is_landless_adventurer = yes
+        has_character_flag = riseandfall_newadventurer
+    }
+
     is_allowed_claim_title = {
         scope:attacker = { 
             is_landless_adventurer = yes
@@ -209,7 +216,9 @@
         }
     }
 
-    target_titles = all
+    # Use the claim target generator so the Declare War UI gets a valid
+    # claimant/title pair instead of enumerating every title as a blank claim.
+    target_titles = claim
 
     on_declaration = {
         on_declared_war = yes
@@ -656,10 +665,10 @@
     attacker_allies_inherit = yes
     defender_allies_inherit = yes
 
-    war_name = "CLAIM_WAR_NAME"
-    my_war_name = "CLAIM_WAR_NAME_MY"
-    war_name_base = "CLAIM_WAR_NAME_BASE"
-    cb_name = "CLAIM_CB_NAME"
+    war_name = "RISEANDFALL_ADVENTURER_CLAIM_WAR_NAME"
+    my_war_name = "RISEANDFALL_ADVENTURER_CLAIM_WAR_NAME_MY"
+    war_name_base = "RISEANDFALL_ADVENTURER_CLAIM_WAR_NAME_BASE"
+    cb_name = "RISEANDFALL_ADVENTURER_CLAIM_CB_NAME"
     interface_priority = 60
 
     should_show_war_goal_subview = yes

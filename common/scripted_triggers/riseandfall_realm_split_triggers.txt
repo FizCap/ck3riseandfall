@@ -188,6 +188,53 @@ riseandfall_is_same_successor_conflict_interaction_trigger = {
     }
 }
 
+riseandfall_can_demote_successor_primary_below_recipient_trigger = {
+    # Equal-or-higher rank moves only work when the actor can shed their
+    # successor crown and keep a real lower title under the new liege. Titular
+    # successor crowns are destroyed; non-titular crowns are handed upward.
+    exists = primary_title
+    scope:recipient = { exists = primary_title }
+    primary_title = {
+        has_variable = rf_is_successor_split_title
+        has_variable = rf_successor_root_origin_title
+    }
+    primary_title.tier >= scope:recipient.primary_title.tier
+    OR = {
+        AND = {
+            scope:recipient = { primary_title.tier >= tier_hegemony }
+            any_held_title = {
+                tier = tier_empire
+                is_titular = no
+                NOT = { this = prev.primary_title }
+            }
+        }
+        AND = {
+            scope:recipient = { primary_title.tier >= tier_empire }
+            any_held_title = {
+                tier = tier_kingdom
+                is_titular = no
+                NOT = { this = prev.primary_title }
+            }
+        }
+        AND = {
+            scope:recipient = { primary_title.tier >= tier_kingdom }
+            any_held_title = {
+                tier = tier_duchy
+                is_titular = no
+                NOT = { this = prev.primary_title }
+            }
+        }
+        AND = {
+            scope:recipient = { primary_title.tier >= tier_duchy }
+            any_held_title = {
+                tier = tier_county
+                is_titular = no
+                NOT = { this = prev.primary_title }
+            }
+        }
+    }
+}
+
 riseandfall_can_switch_successor_sides_trigger = {
     scope:actor = {
         is_landed = yes
@@ -207,10 +254,11 @@ riseandfall_can_switch_successor_sides_trigger = {
         NOT = { government_has_flag = government_is_landless_adventurer }
     }
     scope:actor.liege != scope:recipient
-    # Defection is a vassalage move; the new liege must already outrank the actor
-    # so the effect never has to demote the defector's primary title.
-    scope:actor = {
-        primary_title.tier < scope:recipient.primary_title.tier
+    # Defection is a vassalage move. Equal-or-higher rank actors must shed a
+    # titular successor crown and remain landed through a real lower title.
+    OR = {
+        scope:actor = { primary_title.tier < scope:recipient.primary_title.tier }
+        scope:actor = { riseandfall_can_demote_successor_primary_below_recipient_trigger = yes }
     }
     OR = {
         AND = {
@@ -247,13 +295,12 @@ riseandfall_can_surrender_successor_realm_trigger = {
         exists = primary_title
         NOT = { government_has_flag = government_is_landless_adventurer }
     }
-    # Surrender may promote the recipient above king/duke/count actors, but empire
-    # actors need an already higher hegemony recipient because dynamic promotion
-    # only creates up to empire-tier titles.
+    # Surrender no longer creates promotion titles. Equal-or-higher rank actors
+    # must either transfer a hegemony title or drop a titular successor crown.
     OR = {
+        scope:actor = { primary_title.tier < scope:recipient.primary_title.tier }
         scope:actor = { primary_title.tier = tier_hegemony }
-        scope:recipient = { primary_title.tier >= tier_hegemony }
-        scope:actor = { primary_title.tier < tier_empire }
+        scope:actor = { riseandfall_can_demote_successor_primary_below_recipient_trigger = yes }
     }
     riseandfall_is_same_successor_conflict_interaction_trigger = yes
 }

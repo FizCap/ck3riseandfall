@@ -1694,91 +1694,6 @@ riseandfall_realm_split_migrate_successor_primary_title_se = {
     }
 }
 
-riseandfall_realm_split_promote_recipient_for_incoming_se = {
-    primary_title = { save_temporary_scope_as = rf_recipient_old_primary }
-    capital_county = { save_temporary_scope_as = rf_recipient_base_county }
-    capital_barony = { save_scope_as = rf_base_capital_barony }
-    clear_saved_scope = rf_recipient_promoted_title
-
-    if = {
-        limit = {
-            exists = scope:rf_incoming_split_title
-            scope:rf_incoming_split_title = { tier >= tier_kingdom }
-            highest_held_title_tier < tier_empire
-        }
-        create_dynamic_title = {
-            tier = empire
-            name = RISEANDFALL_BREAKAWAY_NAME_CAPITAL
-        }
-        if = { limit = { exists = scope:new_title } scope:new_title = { save_scope_as = rf_recipient_promoted_title } }
-    }
-    else_if = {
-        limit = {
-            exists = scope:rf_incoming_split_title
-            scope:rf_incoming_split_title = { tier >= tier_duchy }
-            highest_held_title_tier < tier_kingdom
-        }
-        create_dynamic_title = {
-            tier = kingdom
-            name = RISEANDFALL_BREAKAWAY_NAME_CAPITAL
-        }
-        if = { limit = { exists = scope:new_title } scope:new_title = { save_scope_as = rf_recipient_promoted_title } }
-    }
-    else_if = {
-        limit = {
-            exists = scope:rf_incoming_split_title
-            scope:rf_incoming_split_title = { tier >= tier_county }
-            highest_held_title_tier < tier_duchy
-        }
-        create_dynamic_title = {
-            tier = duchy
-            name = RISEANDFALL_BREAKAWAY_NAME_CAPITAL
-        }
-        if = { limit = { exists = scope:new_title } scope:new_title = { save_scope_as = rf_recipient_promoted_title } }
-    }
-
-    if = {
-        limit = { exists = scope:rf_recipient_promoted_title }
-        scope:rf_recipient_promoted_title = {
-            if = {
-                limit = { exists = scope:rf_recipient_base_county }
-                set_color_from_title = scope:rf_recipient_base_county
-            }
-            generate_coa = yes
-        }
-        create_title_and_vassal_change = {
-            type = created
-            save_scope_as = rf_recipient_promotion_change
-            add_claim_on_loss = no
-        }
-        scope:rf_recipient_promoted_title = {
-            change_title_holder = {
-                holder = scope:recipient
-                change = scope:rf_recipient_promotion_change
-            }
-        }
-        resolve_title_and_vassal_change = scope:rf_recipient_promotion_change
-        set_primary_title_to = scope:rf_recipient_promoted_title
-    }
-
-    riseandfall_realm_split_sync_successor_primary_title_se = yes
-
-    if = {
-        limit = {
-            exists = scope:rf_recipient_promoted_title
-            exists = scope:rf_recipient_old_primary
-            NOT = { scope:rf_recipient_promoted_title = scope:rf_recipient_old_primary }
-        }
-        scope:rf_recipient_old_primary = {
-            remove_variable = rf_is_successor_split_title
-            remove_variable = rf_successor_origin_title
-            remove_variable = rf_successor_root_origin_title
-            remove_variable = rf_is_permanent_successor_split
-            remove_variable = rf_successor_permanent_realm_size
-        }
-    }
-}
-
 riseandfall_realm_split_lower_actor_primary_below_recipient_se = {
     clear_saved_scope = rf_absorbed_split_title
     clear_saved_scope = rf_absorbed_replacement_title
@@ -1788,15 +1703,22 @@ riseandfall_realm_split_lower_actor_primary_below_recipient_se = {
             exists = scope:recipient
             exists = primary_title
             scope:recipient = { exists = primary_title }
+            primary_title = {
+                has_variable = rf_is_successor_split_title
+                has_variable = rf_successor_root_origin_title
+            }
             primary_title.tier >= scope:recipient.primary_title.tier
         }
         primary_title = { save_scope_as = rf_absorbed_split_title }
 
+        # Demotion needs a real lower title to preserve the actor as a landed
+        # vassal after their successor crown is destroyed or handed upward.
         if = {
             limit = { scope:recipient = { primary_title.tier >= tier_hegemony } }
             random_held_title = {
                 limit = {
                     tier = tier_empire
+                    is_titular = no
                     NOT = { this = scope:rf_absorbed_split_title }
                 }
                 save_scope_as = rf_absorbed_replacement_title
@@ -1810,6 +1732,7 @@ riseandfall_realm_split_lower_actor_primary_below_recipient_se = {
             random_held_title = {
                 limit = {
                     tier = tier_kingdom
+                    is_titular = no
                     NOT = { this = scope:rf_absorbed_split_title }
                 }
                 save_scope_as = rf_absorbed_replacement_title
@@ -1823,6 +1746,7 @@ riseandfall_realm_split_lower_actor_primary_below_recipient_se = {
             random_held_title = {
                 limit = {
                     tier = tier_duchy
+                    is_titular = no
                     NOT = { this = scope:rf_absorbed_split_title }
                 }
                 save_scope_as = rf_absorbed_replacement_title
@@ -1836,6 +1760,7 @@ riseandfall_realm_split_lower_actor_primary_below_recipient_se = {
             random_held_title = {
                 limit = {
                     tier = tier_county
+                    is_titular = no
                     NOT = { this = scope:rf_absorbed_split_title }
                 }
                 save_scope_as = rf_absorbed_replacement_title
@@ -1844,32 +1769,6 @@ riseandfall_realm_split_lower_actor_primary_below_recipient_se = {
 
         if = {
             limit = { exists = scope:rf_absorbed_replacement_title }
-            if = {
-                limit = {
-                    any_vassal = {
-                        is_landed = yes
-                        primary_title.tier >= scope:rf_absorbed_replacement_title.tier
-                        primary_title.tier < scope:recipient.primary_title.tier
-                    }
-                }
-                create_title_and_vassal_change = {
-                    type = granted
-                    save_scope_as = rf_absorbed_vassal_change
-                    add_claim_on_loss = no
-                }
-                every_vassal = {
-                    limit = {
-                        is_landed = yes
-                        primary_title.tier >= scope:rf_absorbed_replacement_title.tier
-                        primary_title.tier < scope:recipient.primary_title.tier
-                    }
-                    change_liege = {
-                        liege = scope:recipient
-                        change = scope:rf_absorbed_vassal_change
-                    }
-                }
-                resolve_title_and_vassal_change = scope:rf_absorbed_vassal_change
-            }
             scope:rf_absorbed_replacement_title = {
                 if = {
                     limit = { scope:rf_absorbed_split_title = { has_variable = rf_successor_origin_title } }
@@ -1898,7 +1797,36 @@ riseandfall_realm_split_lower_actor_primary_below_recipient_se = {
                 remove_variable = rf_is_permanent_successor_split
                 remove_variable = rf_successor_permanent_realm_size
             }
-            destroy_title = scope:rf_absorbed_split_title
+            if = {
+                limit = { scope:rf_absorbed_split_title = { is_titular = no } }
+                # Real equal-rank crowns are submitted to the new liege. This
+                # lets an empire-tier successor join another empire without
+                # creating a stronger dynamic title for the recipient.
+                create_title_and_vassal_change = {
+                    type = granted
+                    save_scope_as = rf_absorbed_title_change
+                    add_claim_on_loss = no
+                }
+                scope:rf_absorbed_split_title = {
+                    change_title_holder = {
+                        holder = scope:recipient
+                        change = scope:rf_absorbed_title_change
+                        take_baronies = no
+                    }
+                }
+                resolve_title_and_vassal_change = scope:rf_absorbed_title_change
+                scope:recipient = {
+                    if = {
+                        limit = { primary_title.tier <= scope:rf_absorbed_split_title.tier }
+                        set_primary_title_to = scope:rf_absorbed_split_title
+                    }
+                }
+            }
+            else = {
+                # Titular successor shells have no de jure land to preserve, so
+                # they are simply removed once the actor has a real title below.
+                destroy_title = scope:rf_absorbed_split_title
+            }
         }
     }
 }
@@ -1923,6 +1851,8 @@ riseandfall_realm_split_defect_to_recipient_se = {
             modifier = riseandfall_split_defection_opinion
         }
     }
+
+    scope:actor = { riseandfall_realm_split_lower_actor_primary_below_recipient_se = yes }
 
     create_title_and_vassal_change = {
         type = granted
@@ -1988,9 +1918,9 @@ riseandfall_realm_split_surrender_to_recipient_se = {
         scope:recipient = { set_primary_title_to = scope:rf_submitted_split_title }
     }
     else = {
-        # Surrender upgrades the recipient above the submitted ruler instead of
-        # downgrading the submitted ruler's kingdom-or-higher primary title.
-        scope:recipient = { riseandfall_realm_split_promote_recipient_for_incoming_se = yes }
+        # Surrender drops a titular successor crown when needed; it never
+        # creates a dynamic promotion title for the recipient.
+        scope:actor = { riseandfall_realm_split_lower_actor_primary_below_recipient_se = yes }
     }
 
     scope:actor = {

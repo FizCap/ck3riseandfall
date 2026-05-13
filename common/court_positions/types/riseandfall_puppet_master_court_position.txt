@@ -128,9 +128,9 @@
 	}
 
 	on_court_position_revoked = {
-		# Fire on scope:employee (vanilla pattern) so the event reliably queues on a character scope.
-		# The immediate sync is skipped here — appoint_court_position cannot run during a revoke callback.
-		scope:employee = {
+		# Delay the resync on the liege so a fired Puppet Master is rehired after
+		# the revoke callback finishes, even when the diarch is landed/vassal.
+		scope:liege = {
 			trigger_event = {
 				id = riseandfall_puppet_master.100
 				days = 1
@@ -139,17 +139,18 @@
 	}
 
 	on_court_position_vacated = {
-                # Use delayed resync (same pattern as on_court_position_revoked) to avoid
-                # syncing during unstable title-batch transitions (e.g. palace coup / abdication).
-                scope:employee = {
-                        trigger_event = {
-                                id = riseandfall_puppet_master.100
-                                days = 1
-                        }
+		# Use delayed resync (same pattern as on_court_position_revoked) to avoid
+		# syncing during unstable title-batch transitions (e.g. palace coup / abdication).
+		scope:liege = {
+			trigger_event = {
+				id = riseandfall_puppet_master.100
+				days = 1
+			}
+		}
 	}
 
 	on_court_position_invalidated = {
-		scope:employee = {
+		scope:liege = {
 			trigger_event = {
 				id = riseandfall_puppet_master.100
 				days = 1
@@ -164,9 +165,8 @@
 	ai_candidate_score = {
 		value = 1000
 		if = {
-			limit = { scope:firing_court_position = yes }
+			limit = { exists = scope:firing_court_position }
 			add = 10000
-			}
 		}
 	}
 }

@@ -252,6 +252,47 @@ riseandfall_mark_story_succession_year_se = {
     remove_variable = riseandfall_story_ancient_regime
 }
 
+riseandfall_inherit_story_collapse_buildup_se = {
+    # Collapse buildup is pressure attached to the realm's story, not only the
+    # dying ruler. Preserve the predecessor's accumulated meter so inheritance
+    # cannot wipe a long-running collapse arc.
+    if = {
+        limit = {
+            exists = scope:predecessor
+            OR = {
+                has_game_rule = riseandfall_dynamic_story_mode_dynamic
+                has_game_rule = riseandfall_dynamic_story_mode_forced
+            }
+        }
+        if = {
+            limit = {
+                scope:predecessor = { has_variable = riseandfall_story_collapse_pressure }
+                OR = {
+                    NOT = { has_variable = riseandfall_story_collapse_pressure }
+                    var:riseandfall_story_collapse_pressure < scope:predecessor.var:riseandfall_story_collapse_pressure
+                }
+            }
+            set_variable = { name = riseandfall_story_collapse_pressure value = scope:predecessor.var:riseandfall_story_collapse_pressure }
+            clamp_variable = { name = riseandfall_story_collapse_pressure min = 0 max = 100 }
+        }
+        if = {
+            limit = {
+                scope:predecessor = { has_variable = riseandfall_story_no_rival_years }
+                OR = {
+                    NOT = { has_variable = riseandfall_story_no_rival_years }
+                    var:riseandfall_story_no_rival_years < scope:predecessor.var:riseandfall_story_no_rival_years
+                }
+            }
+            set_variable = { name = riseandfall_story_no_rival_years value = scope:predecessor.var:riseandfall_story_no_rival_years }
+            clamp_variable = { name = riseandfall_story_no_rival_years min = 0 max = 100 }
+        }
+        if = {
+            limit = { has_variable = riseandfall_story_collapse_pressure }
+            set_variable = { name = riseandfall_story_collapse_gain_last value = 0 }
+        }
+    }
+}
+
 riseandfall_apply_dynamic_story_pressure_se = {
     # Per-ruler campaign director. This effect converts the global climate and
     # local realm story into a transparent stability component:

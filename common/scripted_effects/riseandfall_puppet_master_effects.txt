@@ -69,10 +69,6 @@ riseandfall_sync_puppet_master_court_position = {
 				scope:rf_current_puppet_master_holder = {
 					has_court_position = riseandfall_puppet_master_court_position
 				}
-				scope:rf_current_puppet_master_diarch = {
-					is_ruler = no
-					employer = scope:rf_puppet_master_liege
-				}
 				NOT = { scope:rf_current_puppet_master_holder ?= scope:rf_current_puppet_master_diarch }
 			}
 			scope:rf_puppet_master_liege = {
@@ -87,9 +83,7 @@ riseandfall_sync_puppet_master_court_position = {
 			limit = {
 				NOT = { exists = scope:rf_current_puppet_master_holder }
 				scope:rf_current_puppet_master_diarch = {
-					is_ruler = no
 					NOT = { has_court_position = riseandfall_puppet_master_court_position }
-					employer = scope:rf_puppet_master_liege
 				}
 			}
 			scope:rf_puppet_master_liege = {
@@ -109,11 +103,12 @@ riseandfall_claim_puppet_master_office_effect = {
 			limit = {
 				scope:actor = {
 					is_alive = yes
-					NOT = { is_ruler = yes }
+					is_diarch_of_target = scope:recipient
 				}
 			}
 			if = {
 				limit = {
+					scope:actor = { is_ruler = no }
 					NOR = {
 						scope:actor = { is_courtier_of = scope:recipient }
 						scope:actor = { is_vassal_of = scope:recipient }
@@ -126,12 +121,6 @@ riseandfall_claim_puppet_master_office_effect = {
 			if = {
 				limit = {
 					employs_court_position = riseandfall_puppet_master_court_position
-					scope:actor = {
-						OR = {
-							is_courtier_of = scope:recipient
-							employer = scope:recipient
-						}
-					}
 				}
 				random_court_position_holder = {
 					type = riseandfall_puppet_master_court_position
@@ -146,12 +135,7 @@ riseandfall_claim_puppet_master_office_effect = {
 			else = {
 				if = {
 					limit = {
-						scope:actor = {
-							OR = {
-								is_courtier_of = scope:recipient
-								employer = scope:recipient
-							}
-						}
+						scope:actor = { NOT = { has_court_position = riseandfall_puppet_master_court_position } }
 					}
 					appoint_court_position = {
 						recipient = scope:actor
@@ -183,12 +167,12 @@ riseandfall_steal_gold_effect = {
 		remove_variable = rf_transfer_gold
 	}
 
-	# Using this interaction spends 10 points of puppet stability mana.
+	# Using this interaction spends 8 points of puppet stability mana.
 	scope:recipient = {
 		if = {
 			limit = { has_variable = riseandfall_rs_puppet_stability_bonus }
-			change_variable = { name = riseandfall_rs_puppet_stability_bonus add = -10 }
-			clamp_variable = { name = riseandfall_rs_puppet_stability_bonus min = -100 max = 100 }
+			change_variable = { name = riseandfall_rs_puppet_stability_bonus add = -8 }
+			clamp_variable = { name = riseandfall_rs_puppet_stability_bonus min = -35 max = 35 }
 			round_variable = { name = riseandfall_rs_puppet_stability_bonus nearest = 1 }
 		}
 	}
@@ -233,8 +217,343 @@ riseandfall_curry_favor_effect = {
 		if = {
 			limit = { has_variable = riseandfall_rs_puppet_stability_bonus }
 			change_variable = { name = riseandfall_rs_puppet_stability_bonus add = -10 }
-			clamp_variable = { name = riseandfall_rs_puppet_stability_bonus min = -100 max = 100 }
+			clamp_variable = { name = riseandfall_rs_puppet_stability_bonus min = -35 max = 35 }
 			round_variable = { name = riseandfall_rs_puppet_stability_bonus nearest = 1 }
+		}
+	}
+}
+
+# Seize one smart de jure bundle from the puppet liege: an eligible county outside
+# the capital duchy, plus personally held duchy/kingdom titles when they rank up
+# or consolidate the puppet master's existing de jure sphere.
+riseandfall_seize_liege_land_effect = {
+	clear_saved_scope = rf_puppet_seized_county
+	clear_saved_scope = rf_puppet_seized_duchy
+	clear_saved_scope = rf_puppet_seized_kingdom
+	clear_saved_scope = rf_puppet_seized_empire
+
+	scope:recipient = {
+		# Prefer land that belongs under the puppet master's existing titles.
+		random_held_title = {
+			title_tier = county
+			limit = {
+				riseandfall_puppet_seize_liege_land_eligible_county = yes
+				riseandfall_puppet_seize_liege_land_in_actor_sphere = yes
+			}
+			save_scope_as = rf_puppet_seized_county
+		}
+
+		# Fallback: seize land only when the bundle can raise the puppet master's rank.
+		if = {
+			limit = { NOT = { exists = scope:rf_puppet_seized_county } }
+			random_held_title = {
+				title_tier = county
+				limit = {
+					riseandfall_puppet_seize_liege_land_eligible_county = yes
+					riseandfall_puppet_seize_liege_land_can_rank_actor = yes
+				}
+				save_scope_as = rf_puppet_seized_county
+			}
+		}
+
+		# Final fallback: a personally held higher title can be seized directly when
+		# it ranks up the puppet master, even if the liege holds no seed county there.
+		if = {
+			limit = { NOT = { exists = scope:rf_puppet_seized_county } }
+			random_held_title = {
+				title_tier = empire
+				limit = {
+					NOT = { this ?= scope:recipient.capital_county.de_jure_liege.de_jure_liege.de_jure_liege }
+					NOT = { this ?= scope:recipient.primary_title }
+					scope:recipient = { primary_title.tier > tier_empire }
+					scope:actor = {
+						AND = {
+							exists = primary_title
+							primary_title.tier < tier_empire
+						}
+					}
+				}
+				save_scope_as = rf_puppet_seized_empire
+			}
+		}
+		if = {
+			limit = {
+				NOT = { exists = scope:rf_puppet_seized_county }
+				NOT = { exists = scope:rf_puppet_seized_empire }
+			}
+			random_held_title = {
+				title_tier = kingdom
+				limit = {
+					NOT = { this ?= scope:recipient.capital_county.de_jure_liege.de_jure_liege }
+					NOT = { this ?= scope:recipient.primary_title }
+					scope:recipient = { primary_title.tier > tier_kingdom }
+					scope:actor = {
+						AND = {
+							exists = primary_title
+							primary_title.tier < tier_kingdom
+						}
+					}
+				}
+				save_scope_as = rf_puppet_seized_kingdom
+			}
+		}
+		if = {
+			limit = {
+				NOT = { exists = scope:rf_puppet_seized_county }
+				NOT = { exists = scope:rf_puppet_seized_empire }
+				NOT = { exists = scope:rf_puppet_seized_kingdom }
+			}
+			random_held_title = {
+				title_tier = duchy
+				limit = {
+					NOT = { this ?= scope:recipient.capital_county.de_jure_liege }
+					NOT = { this ?= scope:recipient.primary_title }
+					scope:recipient = { primary_title.tier > tier_duchy }
+					scope:actor = {
+						AND = {
+							exists = primary_title
+							primary_title.tier < tier_duchy
+						}
+					}
+				}
+				save_scope_as = rf_puppet_seized_duchy
+			}
+		}
+	}
+
+	if = {
+		limit = {
+			OR = {
+				exists = scope:rf_puppet_seized_county
+				exists = scope:rf_puppet_seized_duchy
+				exists = scope:rf_puppet_seized_kingdom
+				exists = scope:rf_puppet_seized_empire
+			}
+		}
+		if = {
+			limit = { exists = scope:rf_puppet_seized_county }
+			scope:rf_puppet_seized_county = {
+				# Save any personally held higher title that should travel with the county.
+				if = {
+					limit = {
+						de_jure_liege ?= { holder = scope:recipient }
+						scope:recipient = { primary_title.tier > tier_duchy }
+						NOT = { de_jure_liege ?= scope:recipient.primary_title }
+						OR = {
+							scope:actor = { NOT = { exists = primary_title } }
+							scope:actor = {
+								AND = {
+									exists = primary_title
+									primary_title.tier < tier_duchy
+								}
+							}
+							de_jure_liege.de_jure_liege ?= { holder = scope:actor }
+							de_jure_liege.de_jure_liege.de_jure_liege ?= { holder = scope:actor }
+						}
+					}
+					de_jure_liege = { save_scope_as = rf_puppet_seized_duchy }
+				}
+				if = {
+					limit = {
+						de_jure_liege.de_jure_liege ?= { holder = scope:recipient }
+						scope:recipient = { primary_title.tier > tier_kingdom }
+						NOT = { de_jure_liege.de_jure_liege ?= scope:recipient.primary_title }
+						OR = {
+							scope:actor = { NOT = { exists = primary_title } }
+							scope:actor = {
+								AND = {
+									exists = primary_title
+									primary_title.tier < tier_kingdom
+								}
+							}
+							de_jure_liege.de_jure_liege.de_jure_liege ?= { holder = scope:actor }
+						}
+					}
+					de_jure_liege.de_jure_liege = { save_scope_as = rf_puppet_seized_kingdom }
+				}
+				if = {
+					limit = {
+						de_jure_liege.de_jure_liege.de_jure_liege ?= { holder = scope:recipient }
+						scope:recipient = { primary_title.tier > tier_empire }
+						NOT = { de_jure_liege.de_jure_liege.de_jure_liege ?= scope:recipient.primary_title }
+						OR = {
+							scope:actor = { NOT = { exists = primary_title } }
+							scope:actor = {
+								AND = {
+									exists = primary_title
+									primary_title.tier < tier_empire
+								}
+							}
+							de_jure_liege.de_jure_liege.de_jure_liege.de_jure_liege ?= { holder = scope:actor }
+						}
+					}
+					de_jure_liege.de_jure_liege.de_jure_liege = { save_scope_as = rf_puppet_seized_empire }
+				}
+			}
+		}
+
+		scope:recipient = {
+			create_title_and_vassal_change = {
+				type = granted
+				save_scope_as = rf_puppet_seize_change
+				add_claim_on_loss = no
+			}
+		}
+
+		if = {
+			limit = { exists = scope:rf_puppet_seized_empire }
+			scope:recipient = {
+				every_held_title = {
+					title_tier = county
+					limit = {
+						de_jure_liege.de_jure_liege.de_jure_liege ?= scope:rf_puppet_seized_empire
+						NOT = { this = scope:recipient.capital_county }
+						NOT = { de_jure_liege ?= scope:recipient.capital_county.de_jure_liege }
+					}
+					change_title_holder = {
+						holder = scope:actor
+						change = scope:rf_puppet_seize_change
+						take_baronies = yes
+					}
+				}
+			}
+		}
+		else_if = {
+			limit = { exists = scope:rf_puppet_seized_kingdom }
+			scope:recipient = {
+				every_held_title = {
+					title_tier = county
+					limit = {
+						de_jure_liege.de_jure_liege ?= scope:rf_puppet_seized_kingdom
+						NOT = { this = scope:recipient.capital_county }
+						NOT = { de_jure_liege ?= scope:recipient.capital_county.de_jure_liege }
+					}
+					change_title_holder = {
+						holder = scope:actor
+						change = scope:rf_puppet_seize_change
+						take_baronies = yes
+					}
+				}
+			}
+		}
+		else_if = {
+			limit = { exists = scope:rf_puppet_seized_duchy }
+			scope:recipient = {
+				every_held_title = {
+					title_tier = county
+					limit = {
+						de_jure_liege ?= scope:rf_puppet_seized_duchy
+						NOT = { this = scope:recipient.capital_county }
+						NOT = { de_jure_liege ?= scope:recipient.capital_county.de_jure_liege }
+					}
+					change_title_holder = {
+						holder = scope:actor
+						change = scope:rf_puppet_seize_change
+						take_baronies = yes
+					}
+				}
+			}
+		}
+		else = {
+			scope:rf_puppet_seized_county = {
+				change_title_holder = {
+					holder = scope:actor
+					change = scope:rf_puppet_seize_change
+					take_baronies = yes
+				}
+			}
+		}
+		if = {
+			limit = { exists = scope:rf_puppet_seized_duchy }
+			scope:rf_puppet_seized_duchy = {
+				change_title_holder_include_vassals = {
+					holder = scope:actor
+					change = scope:rf_puppet_seize_change
+					take_baronies = no
+				}
+			}
+		}
+		if = {
+			limit = { exists = scope:rf_puppet_seized_kingdom }
+			scope:rf_puppet_seized_kingdom = {
+				change_title_holder_include_vassals = {
+					holder = scope:actor
+					change = scope:rf_puppet_seize_change
+					take_baronies = no
+				}
+			}
+		}
+		if = {
+			limit = { exists = scope:rf_puppet_seized_empire }
+			scope:rf_puppet_seized_empire = {
+				change_title_holder_include_vassals = {
+					holder = scope:actor
+					change = scope:rf_puppet_seize_change
+					take_baronies = no
+				}
+			}
+		}
+
+		scope:recipient = { resolve_title_and_vassal_change = scope:rf_puppet_seize_change }
+
+		# Make the new title visible as the puppet master's primary if it promoted them.
+		scope:actor = {
+			if = {
+				limit = {
+					exists = scope:rf_puppet_seized_empire
+					OR = {
+						NOT = { exists = primary_title }
+						AND = {
+							exists = primary_title
+							primary_title.tier < tier_empire
+						}
+					}
+				}
+				set_primary_title_to = scope:rf_puppet_seized_empire
+			}
+			else_if = {
+				limit = {
+					exists = scope:rf_puppet_seized_kingdom
+					OR = {
+						NOT = { exists = primary_title }
+						AND = {
+							exists = primary_title
+							primary_title.tier < tier_kingdom
+						}
+					}
+				}
+				set_primary_title_to = scope:rf_puppet_seized_kingdom
+			}
+			else_if = {
+				limit = {
+					exists = scope:rf_puppet_seized_duchy
+					OR = {
+						NOT = { exists = primary_title }
+						AND = {
+							exists = primary_title
+							primary_title.tier < tier_duchy
+						}
+					}
+				}
+				set_primary_title_to = scope:rf_puppet_seized_duchy
+			}
+			else_if = {
+				limit = {
+					exists = scope:rf_puppet_seized_county
+					NOT = { exists = primary_title }
+				}
+				set_primary_title_to = scope:rf_puppet_seized_county
+			}
+		}
+
+		# This is a major power grab and spends 20 points of puppet stability mana.
+		scope:recipient = {
+			if = {
+				limit = { has_variable = riseandfall_rs_puppet_stability_bonus }
+				change_variable = { name = riseandfall_rs_puppet_stability_bonus add = -20 }
+				clamp_variable = { name = riseandfall_rs_puppet_stability_bonus min = -35 max = 35 }
+				round_variable = { name = riseandfall_rs_puppet_stability_bonus nearest = 1 }
+			}
 		}
 	}
 }
@@ -310,11 +629,11 @@ riseandfall_curry_favor_effect = {
 # Force liege to abdicate by transferring their titles to a chosen successor (youngest unlanded child; fallback to dynasty in court)
 riseandfall_force_abdicate_effect = {
 	scope:recipient = {
-		# Using this interaction also spends 10 points of puppet stability mana.
+		# Using this interaction also spends 15 points of puppet stability mana.
 		if = {
 			limit = { has_variable = riseandfall_rs_puppet_stability_bonus }
-			change_variable = { name = riseandfall_rs_puppet_stability_bonus add = -10 }
-			clamp_variable = { name = riseandfall_rs_puppet_stability_bonus min = -100 max = 100 }
+			change_variable = { name = riseandfall_rs_puppet_stability_bonus add = -15 }
+			clamp_variable = { name = riseandfall_rs_puppet_stability_bonus min = -35 max = 35 }
 			round_variable = { name = riseandfall_rs_puppet_stability_bonus nearest = 1 }
 		}
 

@@ -49,7 +49,21 @@
 			scope:recipient = {
 				primary_title.tier < scope:actor.primary_title.tier
 			}
+			scope:actor = {
+				NOT = { riseandfall_can_demote_successor_primary_below_recipient_trigger = yes }
+			}
 			add = -1000
+		}
+		modifier = {
+			scope:actor = { riseandfall_can_demote_successor_primary_below_recipient_trigger = yes }
+			add = -20
+		}
+		modifier = {
+			scope:actor = {
+				riseandfall_can_demote_successor_primary_below_recipient_trigger = yes
+				primary_title = { is_titular = no }
+			}
+			add = -60
 		}
 		modifier = {
 			scope:actor.liege = { riseandfall_has_successor_primary_title_trigger = yes }
@@ -112,7 +126,21 @@
 			scope:recipient = {
 				primary_title.tier < scope:actor.primary_title.tier
 			}
+			scope:actor = {
+				NOT = { riseandfall_can_demote_successor_primary_below_recipient_trigger = yes }
+			}
 			add = -1000
+		}
+		modifier = {
+			scope:actor = { riseandfall_can_demote_successor_primary_below_recipient_trigger = yes }
+			add = -35
+		}
+		modifier = {
+			scope:actor = {
+				riseandfall_can_demote_successor_primary_below_recipient_trigger = yes
+				primary_title = { is_titular = no }
+			}
+			add = -90
 		}
 		modifier = {
 			scope:actor = {
@@ -254,7 +282,21 @@ riseandfall_surrender_to_successor_interaction = {
 			scope:recipient = {
 				primary_title.tier < scope:actor.primary_title.tier
 			}
+			scope:actor = {
+				NOT = { riseandfall_can_demote_successor_primary_below_recipient_trigger = yes }
+			}
 			add = -1000
+		}
+		modifier = {
+			scope:actor = { riseandfall_can_demote_successor_primary_below_recipient_trigger = yes }
+			add = -20
+		}
+		modifier = {
+			scope:actor = {
+				riseandfall_can_demote_successor_primary_below_recipient_trigger = yes
+				primary_title = { is_titular = no }
+			}
+			add = -60
 		}
 		modifier = {
 			scope:actor = {
@@ -288,7 +330,21 @@ riseandfall_surrender_to_successor_interaction = {
 			scope:recipient = {
 				primary_title.tier < scope:actor.primary_title.tier
 			}
+			scope:actor = {
+				NOT = { riseandfall_can_demote_successor_primary_below_recipient_trigger = yes }
+			}
 			add = -1000
+		}
+		modifier = {
+			scope:actor = { riseandfall_can_demote_successor_primary_below_recipient_trigger = yes }
+			add = -35
+		}
+		modifier = {
+			scope:actor = {
+				riseandfall_can_demote_successor_primary_below_recipient_trigger = yes
+				primary_title = { is_titular = no }
+			}
+			add = -90
 		}
 		modifier = {
 			scope:actor = {

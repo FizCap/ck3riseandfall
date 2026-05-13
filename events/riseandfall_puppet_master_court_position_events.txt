@@ -1,18 +1,20 @@
 ﻿namespace = riseandfall_puppet_master
 
-# Delayed safety resync. Fires on scope:employee (the just-revoked/invalidated diarch).
-# employer = liege after revoke, so we call sync in the liege scope.
+# Delayed safety resync. Fires on the liege that owns the court position, so it
+# still works when the fired Puppet Master is landed and has no employer scope.
 riseandfall_puppet_master.100 = {
 	type = character_event
 	hidden = yes
 
 	immediate = {
-		# root = employee (the fired diarch); only resync if the court still exists.
+		# root = liege/employer; rehire the active puppet-regency diarch if valid.
 		if = {
-			limit = { exists = employer }
-			employer = {
-				riseandfall_sync_puppet_master_court_position = yes
+			limit = {
+				has_diarchy_type = puppet_regency
+				has_active_diarchy = yes
+				exists = diarch
 			}
+			riseandfall_sync_puppet_master_court_position = yes
 		}
 	}
 }

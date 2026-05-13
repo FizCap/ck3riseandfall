@@ -406,6 +406,141 @@ riseandfall_curry_favor_interaction = {
 	}
 }
 
+# Interaction: Seize Liege Land (take one smart de jure bundle from the puppet ruler)
+riseandfall_seize_liege_land_interaction = {
+	interface_priority = 88
+	common_interaction = yes
+	category = interaction_riseandfall
+	icon = icon_riseandfall
+	show_effects_in_notification = yes
+	desc = riseandfall_seize_liege_land_interaction_desc
+	diarch_interaction = yes
+
+	is_shown = {
+		OR = {
+			scope:actor = { is_ai = yes }
+			AND = {
+				scope:actor = { is_ai = no }
+				has_game_rule = riseandfall_lite_mode_disabled
+			}
+		}
+
+		scope:recipient = {
+			has_diarchy_type = puppet_regency
+			is_independent_ruler = yes
+			is_landed = yes
+			is_landless_ruler = no
+			NOT = { has_government = landless_adventurer_government }
+		}
+		scope:actor = { is_diarch_of_target = scope:recipient }
+	}
+
+	is_valid_showing_failures_only = {
+		custom_tooltip = {
+			text = riseandfall_puppet_master_diarch_only
+			scope:actor = { is_diarch_of_target = scope:recipient }
+		}
+		scope:recipient = {
+			is_independent_ruler = yes
+			is_landed = yes
+			is_landless_ruler = no
+			NOT = { has_government = landless_adventurer_government }
+		}
+		riseandfall_puppet_master_has_seizable_liege_land = yes
+	}
+
+	auto_accept = yes
+
+	can_send = { always = yes }
+
+	on_accept = {
+		custom_tooltip = { text = riseandfall_seize_liege_land_interaction_desc }
+		hidden_effect = {
+			riseandfall_seize_liege_land_effect = yes
+			scope:recipient = {
+				send_interface_popup = {
+					type = send_interface_message_bad
+					title = riseandfall_seize_liege_land_popup_title
+					custom_tooltip = riseandfall_seize_liege_land_popup_desc
+					left_icon = scope:actor
+				}
+				every_vassal = {
+					send_interface_message = {
+						type = send_interface_message_bad
+						title = riseandfall_seize_liege_land_vassal_notification_title
+						custom_tooltip = riseandfall_seize_liege_land_vassal_notification_desc
+						left_icon = scope:actor
+					}
+				}
+			}
+		}
+	}
+
+	ai_frequency = 24
+	cooldown = { years = 5 }
+	cooldown_against_recipient = { years = 5 }
+
+	ai_potential = { exists = this is_alive = yes }
+
+	ai_targets = {
+		ai_recipients = liege
+		max = 1
+	}
+
+	ai_will_do = {
+		base = 10
+
+		modifier = { scope:actor = { has_trait = ambitious } add = 50 }
+		modifier = { scope:actor = { has_trait = greedy } add = 35 }
+		modifier = { scope:actor = { has_trait = deceitful } add = 25 }
+		modifier = { scope:actor = { has_trait = callous } add = 25 }
+		modifier = { scope:actor = { has_trait = vengeful } add = 20 }
+		modifier = { scope:actor = { has_trait = arbitrary } add = 15 }
+
+		modifier = { scope:actor = { has_trait = just } add = -60 }
+		modifier = { scope:actor = { has_trait = honest } add = -45 }
+		modifier = { scope:actor = { has_trait = calm } add = -25 }
+		modifier = { scope:actor = { has_trait = content } add = -25 }
+
+		# Puppet masters are more willing to seize land when the liege dislikes them
+		# or when the realm is already visibly unstable.
+		modifier = { scope:recipient = { opinion = { target = scope:actor value < 0 } } add = 20 }
+		modifier = { scope:recipient = { opinion = { target = scope:actor value <= -50 } } add = 20 }
+		modifier = {
+			scope:recipient = {
+				has_variable = riseandfall_realm_stability_score
+				NOT = { var:riseandfall_realm_stability_score >= 45 }
+			}
+			add = 20
+		}
+
+		# Avoid pushing a puppet regime that is already running negative mana,
+		# unless the actor is especially predatory.
+		modifier = {
+			scope:recipient = {
+				has_variable = riseandfall_rs_puppet_stability_bonus
+				NOT = { var:riseandfall_rs_puppet_stability_bonus >= 0 }
+			}
+			add = -45
+		}
+		modifier = {
+			scope:actor = {
+				OR = {
+					has_trait = ambitious
+					has_trait = greedy
+					has_trait = callous
+					has_trait = arbitrary
+				}
+			}
+			scope:recipient = {
+				has_variable = riseandfall_rs_puppet_stability_bonus
+				NOT = { var:riseandfall_rs_puppet_stability_bonus >= 0 }
+			}
+			add = 35
+		}
+	}
+}
+
 # Interaction: Overthrow Liege (transfer all titles to diarch)
 riseandfall_overthrow_liege_interaction = {
 	interface_priority = 80

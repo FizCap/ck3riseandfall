@@ -105,6 +105,126 @@ riseandfall_puppet_regency_years_at_least_5 = {
 	}
 }
 
+# Title scope: eligible county for a puppet master land seizure.
+# Expected scopes: scope:actor = puppet master, scope:recipient = puppet liege.
+riseandfall_puppet_seize_liege_land_eligible_county = {
+	tier = tier_county
+	holder = scope:recipient
+	NOT = { this = scope:recipient.capital_county }
+	NOT = { de_jure_liege ?= scope:recipient.capital_county.de_jure_liege }
+	OR = {
+		riseandfall_puppet_seize_liege_land_in_actor_sphere = yes
+		riseandfall_puppet_seize_liege_land_can_rank_actor = yes
+	}
+}
+
+# Title scope: the county belongs under a title the puppet master already holds.
+riseandfall_puppet_seize_liege_land_in_actor_sphere = {
+	OR = {
+		de_jure_liege ?= { holder = scope:actor }
+		de_jure_liege.de_jure_liege ?= { holder = scope:actor }
+		de_jure_liege.de_jure_liege.de_jure_liege ?= { holder = scope:actor }
+		de_jure_liege.de_jure_liege.de_jure_liege.de_jure_liege ?= { holder = scope:actor }
+	}
+}
+
+# Title scope: the county bundle can give the puppet master a higher primary rank.
+riseandfall_puppet_seize_liege_land_can_rank_actor = {
+	OR = {
+		scope:actor = { NOT = { exists = primary_title } }
+		AND = {
+			de_jure_liege ?= { holder = scope:recipient }
+			scope:recipient = { primary_title.tier > tier_duchy }
+			scope:actor = {
+				OR = {
+					NOT = { exists = primary_title }
+					AND = {
+						exists = primary_title
+						primary_title.tier < tier_duchy
+					}
+				}
+			}
+		}
+		AND = {
+			de_jure_liege.de_jure_liege ?= { holder = scope:recipient }
+			scope:recipient = { primary_title.tier > tier_kingdom }
+			scope:actor = {
+				OR = {
+					NOT = { exists = primary_title }
+					AND = {
+						exists = primary_title
+						primary_title.tier < tier_kingdom
+					}
+				}
+			}
+		}
+		AND = {
+			de_jure_liege.de_jure_liege.de_jure_liege ?= { holder = scope:recipient }
+			scope:recipient = { primary_title.tier > tier_empire }
+			scope:actor = {
+				OR = {
+					NOT = { exists = primary_title }
+					AND = {
+						exists = primary_title
+						primary_title.tier < tier_empire
+					}
+				}
+			}
+		}
+	}
+}
+
+# Character scope: the puppet liege has at least one county the active puppet master may seize.
+riseandfall_puppet_master_has_seizable_liege_land = {
+	custom_tooltip = {
+		text = riseandfall_puppet_master_has_seizable_liege_land
+		scope:recipient = {
+			OR = {
+				any_held_title = {
+					tier = tier_county
+					riseandfall_puppet_seize_liege_land_eligible_county = yes
+				}
+				any_held_title = {
+					tier = tier_duchy
+					NOT = { this ?= scope:recipient.capital_county.de_jure_liege }
+					NOT = { this ?= scope:recipient.primary_title }
+					scope:recipient = { primary_title.tier > tier_duchy }
+					scope:actor = {
+						AND = {
+							exists = primary_title
+							primary_title.tier < tier_duchy
+						}
+					}
+				}
+				any_held_title = {
+					tier = tier_kingdom
+					NOT = { this ?= scope:recipient.capital_county.de_jure_liege.de_jure_liege }
+					NOT = { this ?= scope:recipient.primary_title }
+					scope:recipient = { primary_title.tier > tier_kingdom }
+					scope:actor = {
+						AND = {
+							exists = primary_title
+							primary_title.tier < tier_kingdom
+						}
+					}
+				}
+				any_held_title = {
+					tier = tier_empire
+					NOT = { this ?= scope:recipient.capital_county.de_jure_liege.de_jure_liege.de_jure_liege }
+					NOT = { this ?= scope:recipient.primary_title }
+					scope:recipient = { primary_title.tier > tier_empire }
+					scope:actor = {
+						AND = {
+							exists = primary_title
+							primary_title.tier < tier_empire
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
 # Liege has poor or worse health
 # UI labels health as 'Poor' for any value < fine_health (3); poor_health (1) is the dying threshold.
 # Must be called from within a scope:recipient = { } block
