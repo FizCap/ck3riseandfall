@@ -5615,7 +5615,9 @@ types CharacterWindow
 		}
 
 		divider_light = {
-			visible = "[And( And( Character.HasLandedTitles, NotEqualTo_int32( Character.GetPrimaryTitle.GetTierFrame, '(int32)2' ) ), Character.MakeScope.Var('riseandfall_realm_stability_score').IsSet )]"
+			datacontext = "[AccessGameRules.AccessNamedGameRule( 'riseandfall_enable_realm_stability' ).GetSetting]"
+			# Keep the divider hidden whenever the stability widget itself is hidden.
+			visible = "[And( And( And( Character.HasLandedTitles, NotEqualTo_int32( Character.GetPrimaryTitle.GetTierFrame, '(int32)2' ) ), And( Not( Character.GetGovernment.IsType( 'landless_adventurer_government' ) ), Not( GameRuleSetting.HasFlag( 'riseandfall_realm_stability_disabled' ) ) ) ), Character.MakeScope.Var('riseandfall_realm_stability_score').IsSet )]"
 			layoutpolicy_vertical = expanding
 		}
 

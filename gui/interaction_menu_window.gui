@@ -89,8 +89,8 @@ window = {
 
 						vbox = {
 							datacontext = "[AccessGameRules.AccessNamedGameRule( 'riseandfall_enable_interaction_stability' ).GetSetting]"
-							# Show only when the current setting does NOT have the disabled flag
-							visible = "[Not( GameRuleSetting.HasFlag( 'riseandfall_interaction_stability_disabled' ) )]"
+							# Match the character-window stability visibility so non-realm characters do not show stale values.
+							visible = "[And( Not( GameRuleSetting.HasFlag( 'riseandfall_interaction_stability_disabled' ) ), And( And( And( Character.HasLandedTitles, NotEqualTo_int32( Character.GetPrimaryTitle.GetTierFrame, '(int32)2' ) ), Not( Character.GetGovernment.IsType( 'landless_adventurer_government' ) ) ), Character.MakeScope.Var('riseandfall_realm_stability_score').IsSet ) )]"
 							tooltip = "REALM_STABILITY_TOOLTIP"
 							using = tooltip_ne
 							spacing = -3
@@ -112,8 +112,8 @@ window = {
 
 						vbox = {
 							datacontext = "[AccessGameRules.AccessNamedGameRule( 'riseandfall_enable_interaction_stability' ).GetSetting]"
-							# Show only when the current setting does NOT have the disabled flag
-							visible = "[Not( GameRuleSetting.HasFlag( 'riseandfall_interaction_stability_disabled' ) )]"
+							# Match the character-window adventurer visibility so only eligible claimants show a chance.
+							visible = "[And( Not( GameRuleSetting.HasFlag( 'riseandfall_interaction_stability_disabled' ) ), And( Character.MakeScope.Var('rf_disqualify').IsSet, Not(EqualTo_CFixedPoint(Character.MakeScope.Var('rf_disqualify').GetValue, '(CFixedPoint)1')) ) )]"
 							tooltipwidget = {
 								adventurer_chance_tooltip = {}
 							}

@@ -9,7 +9,8 @@ types CharacterWindow
 	type RUI_Ch_RIFA_type_01 = vbox {
 		name = "adventurer_chance"
 		spacing = -3
-		visible = "[AccessGameRules.AccessNamedGameRule('riseandfall_enable_adventurer').GetSetting]"
+		# Match the vanilla character-window placement: only eligible claimants show adventurer chance.
+		visible = "[And( Character.MakeScope.Var('rf_disqualify').IsSet, Not(EqualTo_CFixedPoint(Character.MakeScope.Var('rf_disqualify').GetValue, '(CFixedPoint)1')) )]"
 
 		icon = {
 			name = "adventurer_icon"
@@ -33,7 +34,9 @@ types CharacterWindow
 	type RUI_Ch_RIFA_type_02 = vbox {
 		name = "stability"
 		spacing = -2
-		visible = "[AccessGameRules.AccessNamedGameRule('riseandfall_enable_realm_stability').GetSetting]"
+		datacontext = "[AccessGameRules.AccessNamedGameRule('riseandfall_enable_realm_stability').GetSetting]"
+		# Match the main character-window stability visibility so landless/baron-tier characters stay clean.
+		visible = "[And( And( And( Character.HasLandedTitles, NotEqualTo_int32( Character.GetPrimaryTitle.GetTierFrame, '(int32)2' ) ), And( Not( Character.GetGovernment.IsType( 'landless_adventurer_government' ) ), Not( GameRuleSetting.HasFlag( 'riseandfall_realm_stability_disabled' ) ) ) ), Character.MakeScope.Var('riseandfall_realm_stability_score').IsSet )]"
 		tooltipwidget = {
 			stability_hud_tooltip = {}
 		}
