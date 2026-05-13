@@ -1,4 +1,4 @@
-######################################################
+﻿######################################################
 ################# CHARACTER WINDOW ###################
 ######################################################
 
@@ -1161,7 +1161,10 @@ window = {
 						}
 
 						vbox = {
-							tooltip = "ADVENTURER_CHANCE_TOOLTIP"
+							tooltipwidget = {
+								adventurer_chance_tooltip = {}
+							}
+							using = tooltip_ne
 							using = Animation_Character_Window_Refresh
 							spacing = -3
 							visible = "[And( Character.MakeScope.Var('rf_disqualify').IsSet, Not(EqualTo_CFixedPoint(Character.MakeScope.Var('rf_disqualify').GetValue, '(CFixedPoint)1')) ) ]"
