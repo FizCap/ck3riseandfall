@@ -7,7 +7,7 @@
 	decision_group_type = riseandfall
 
 	is_shown = {
-		riseandfall_can_browse_diadochi_targets_trigger = yes
+		riseandfall_can_see_diadochi_browser_trigger = yes
 	}
 
 	is_valid = {

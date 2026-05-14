@@ -20,12 +20,22 @@ riseandfall_story_world_climate_se = {
     set_global_variable = { name = riseandfall_story_world_pressure value = 0 }
     set_global_variable = { name = riseandfall_story_world_climate value = 0 }
     set_global_variable = { name = riseandfall_world_total value = 0 }
+    set_global_variable = { name = riseandfall_world_total_development value = 0 }
 
     every_independent_ruler = {
         limit = { is_landed = yes }
         change_global_variable = { name = riseandfall_world_total add = realm_size }
+        save_scope_as = rf_story_development_ruler
+        set_variable = { name = riseandfall_rs_total_development value = 0 }
+        every_realm_county = {
+            scope:rf_story_development_ruler = {
+                change_variable = { name = riseandfall_rs_total_development add = prev.development_level }
+            }
+        }
+        change_global_variable = { name = riseandfall_world_total_development add = var:riseandfall_rs_total_development }
     }
     if = { limit = { global_var:riseandfall_world_total < 1 } set_global_variable = { name = riseandfall_world_total value = 1 } }
+    if = { limit = { global_var:riseandfall_world_total_development < 1 } set_global_variable = { name = riseandfall_world_total_development value = 1 } }
 
     every_independent_ruler = {
         limit = {
@@ -78,21 +88,30 @@ riseandfall_story_world_climate_se = {
 
         set_variable = { name = tmp_story_world_total value = global_var:riseandfall_world_total }
         if = { limit = { var:tmp_story_world_total < 1 } set_variable = { name = tmp_story_world_total value = 1 } }
+        set_variable = { name = tmp_story_world_development_total value = global_var:riseandfall_world_total_development }
+        if = { limit = { var:tmp_story_world_development_total < 1 } set_variable = { name = tmp_story_world_development_total value = 1 } }
         set_variable = { name = tmp_story_realm_pct value = realm_size }
         change_variable = { name = tmp_story_realm_pct multiply = 100 }
         change_variable = { name = tmp_story_realm_pct divide = var:tmp_story_world_total }
         round_variable = { name = tmp_story_realm_pct nearest = 1 }
+        set_variable = { name = tmp_story_development_pct value = var:riseandfall_rs_total_development }
+        change_variable = { name = tmp_story_development_pct multiply = 100 }
+        change_variable = { name = tmp_story_development_pct divide = var:tmp_story_world_development_total }
+        round_variable = { name = tmp_story_development_pct nearest = 1 }
         if = {
             limit = {
                 OR = {
                     var:tmp_story_realm_pct >= 8
+                    var:tmp_story_development_pct >= 8
                     primary_title.tier >= tier_hegemony
                 }
             }
             change_global_variable = { name = riseandfall_story_world_blob_count add = 1 }
         }
         remove_variable = tmp_story_world_total
+        remove_variable = tmp_story_world_development_total
         remove_variable = tmp_story_realm_pct
+        remove_variable = tmp_story_development_pct
         remove_variable = tmp_story_low_threshold
         remove_variable = tmp_story_crisis_threshold
         remove_variable = tmp_story_stable_threshold
@@ -172,9 +191,11 @@ riseandfall_clear_story_director_vars_se = {
     remove_variable = riseandfall_story_rival_count
     remove_variable = riseandfall_story_strongest_rival_pct
     remove_variable = riseandfall_story_external_rival_relief
+    remove_variable = riseandfall_story_strength_baseline
     remove_variable = riseandfall_story_collapse_gain_last
     remove_variable = riseandfall_story_no_rival_years
     remove_variable = riseandfall_story_no_rival_pressure
+    remove_variable = riseandfall_rs_development_pct
 }
 
 riseandfall_apply_successor_realm_grace_se = {
@@ -346,16 +367,46 @@ riseandfall_apply_dynamic_story_pressure_se = {
         # Use share of tracked world realm size instead of raw realm_size. Raw size varies too much between total conversion mods.
         set_variable = { name = tmp_story_world_total value = global_var:riseandfall_world_total }
         if = { limit = { var:tmp_story_world_total < 1 } set_variable = { name = tmp_story_world_total value = 1 } }
+        set_variable = { name = tmp_story_world_development_total value = global_var:riseandfall_world_total_development }
+        if = { limit = { var:tmp_story_world_development_total < 1 } set_variable = { name = tmp_story_world_development_total value = 1 } }
         set_variable = { name = tmp_story_realm_pct value = realm_size }
         change_variable = { name = tmp_story_realm_pct multiply = 100 }
         change_variable = { name = tmp_story_realm_pct divide = var:tmp_story_world_total }
         round_variable = { name = tmp_story_realm_pct nearest = 1 }
+        if = {
+            limit = { NOT = { has_variable = riseandfall_rs_total_development } }
+            set_variable = { name = riseandfall_rs_total_development value = 0 }
+            save_scope_as = ruler
+            every_realm_county = {
+                scope:ruler = {
+                    change_variable = { name = riseandfall_rs_total_development add = prev.development_level }
+                }
+            }
+        }
+        set_variable = { name = tmp_story_development_pct value = var:riseandfall_rs_total_development }
+        change_variable = { name = tmp_story_development_pct multiply = 100 }
+        change_variable = { name = tmp_story_development_pct divide = var:tmp_story_world_development_total }
+        round_variable = { name = tmp_story_development_pct nearest = 1 }
+        set_variable = { name = riseandfall_rs_development_pct value = var:tmp_story_development_pct }
         set_variable = { name = tmp_story_stress_score value = 0 }
         set_variable = { name = tmp_story_blob_score value = 0 }
         # Rival strength is dynamic: measure the strongest nearby non-allied
-        # kingdom+ realm as a percent of this ruler's max military strength.
-        # A 35% rival is a minor threat; a 100% rival is a true peer.
+        # kingdom+ realm as a percent of this ruler's integrated strength. During
+        # civil wars, use the last non-civil-war baseline so rebel vassals do not
+        # make the empire look artificially balanced against outside rivals.
         set_variable = { name = tmp_story_ruler_strength value = max_military_strength }
+        if = {
+            limit = { is_in_civil_war = no }
+            set_variable = { name = riseandfall_story_strength_baseline value = var:tmp_story_ruler_strength }
+        }
+        else_if = {
+            limit = { NOT = { has_variable = riseandfall_story_strength_baseline } }
+            set_variable = { name = riseandfall_story_strength_baseline value = var:tmp_story_ruler_strength }
+        }
+        else_if = {
+            limit = { var:riseandfall_story_strength_baseline > var:tmp_story_ruler_strength }
+            set_variable = { name = tmp_story_ruler_strength value = var:riseandfall_story_strength_baseline }
+        }
         if = { limit = { var:tmp_story_ruler_strength < 1 } set_variable = { name = tmp_story_ruler_strength value = 1 } }
         save_scope_as = ruler
 
@@ -403,25 +454,37 @@ riseandfall_apply_dynamic_story_pressure_se = {
         change_variable = { name = riseandfall_story_external_rival_relief divide = 20 }
         clamp_variable = { name = riseandfall_story_external_rival_relief min = 0 max = 7.5 }
 
-        # Story roles are recalculated each pass:
+        # Story roles are selected as candidates each pass, then held for a short
+        # arc so rulers do not bounce between Rival, Wildcard, and Background
+        # every year. Successor grace and active collapse buildup can still force
+        # immediate role changes because they represent explicit story state.
         # 1 anchor, 2 rival, 3 declining power, 4 wildcard, 5 background.
         # Declining power is based on realm scale and stability. External rivals
         # no longer hard-block it; they dynamically reduce collapse buildup later.
-        set_variable = { name = riseandfall_story_role value = 5 }
+        set_variable = { name = tmp_story_candidate_role value = 5 }
+        if = {
+            limit = { has_variable = riseandfall_story_role }
+            set_variable = { name = tmp_story_previous_role value = var:riseandfall_story_role }
+        }
+        else = {
+            set_variable = { name = tmp_story_previous_role value = 0 }
+        }
         if = {
             limit = { has_variable = riseandfall_story_successor_grace }
-            set_variable = { name = riseandfall_story_role value = 5 }
+            set_variable = { name = tmp_story_candidate_role value = 5 }
         }
         else_if = {
             limit = {
                 OR = {
                     global_var:riseandfall_story_world_pressure >= 1
                     var:tmp_story_realm_pct >= 8
+                    var:tmp_story_development_pct >= 8
                     AND = {
                         has_game_rule = riseandfall_dynamic_story_mode_forced
                         OR = {
                             primary_title.tier >= tier_hegemony
                             var:tmp_story_realm_pct >= 8
+                            var:tmp_story_development_pct >= 8
                             AND = {
                                 primary_title.tier >= tier_empire
                                 global_var:riseandfall_story_world_pressure >= 1
@@ -432,34 +495,56 @@ riseandfall_apply_dynamic_story_pressure_se = {
                 OR = {
                     primary_title.tier >= tier_empire
                     var:tmp_story_realm_pct >= 8
+                    var:tmp_story_development_pct >= 8
                 }
                 has_variable = riseandfall_realm_stability_score
                 var:riseandfall_realm_stability_score >= var:tmp_story_decline_threshold
             }
-            set_variable = { name = riseandfall_story_role value = 3 }
+            set_variable = { name = tmp_story_candidate_role value = 3 }
         }
         else_if = {
             limit = {
                 has_variable = riseandfall_realm_stability_score
                 var:riseandfall_realm_stability_score < var:tmp_story_low_threshold
             }
-            set_variable = { name = riseandfall_story_role value = 4 }
+            set_variable = { name = tmp_story_candidate_role value = 4 }
         }
         else_if = {
             limit = {
                 OR = {
                     primary_title.tier >= tier_empire
                     var:tmp_story_realm_pct >= 5
+                    var:tmp_story_development_pct >= 5
                 }
             }
-            set_variable = { name = riseandfall_story_role value = 2 }
+            set_variable = { name = tmp_story_candidate_role value = 2 }
         }
         else_if = {
             limit = {
                 has_variable = riseandfall_realm_stability_score
                 var:riseandfall_realm_stability_score < var:tmp_story_stable_threshold
             }
-            set_variable = { name = riseandfall_story_role value = 1 }
+            set_variable = { name = tmp_story_candidate_role value = 1 }
+        }
+
+        if = {
+            limit = {
+                has_variable = riseandfall_story_role
+                var:riseandfall_story_role_years < 5
+                NOT = { has_variable = riseandfall_story_successor_grace }
+                NOT = {
+                    AND = {
+                        has_variable = riseandfall_story_collapse_pressure
+                        var:tmp_story_candidate_role = 3
+                    }
+                }
+            }
+            set_variable = { name = tmp_story_candidate_role value = var:riseandfall_story_role }
+        }
+        set_variable = { name = riseandfall_story_role value = var:tmp_story_candidate_role }
+        if = {
+            limit = { NOT = { var:riseandfall_story_role = var:tmp_story_previous_role } }
+            set_variable = { name = riseandfall_story_role_years value = 0 }
         }
 
         if = {
@@ -506,6 +591,7 @@ riseandfall_apply_dynamic_story_pressure_se = {
                 OR = {
                     primary_title.tier >= tier_empire
                     var:tmp_story_realm_pct >= 5
+                    var:tmp_story_development_pct >= 5
                 }
             }
             if = { limit = { NOT = { has_variable = riseandfall_story_reign_tension } } set_variable = { name = riseandfall_story_reign_tension value = 0 } }
@@ -594,13 +680,18 @@ riseandfall_apply_dynamic_story_pressure_se = {
         if = { limit = { has_variable = riseandfall_story_no_succession_years var:riseandfall_story_no_succession_years >= 100 } change_variable = { name = tmp_story_stress_score add = 1 } }
         if = { limit = { has_variable = riseandfall_story_no_succession_years var:riseandfall_story_no_succession_years >= 200 } change_variable = { name = tmp_story_stress_score add = 1 } }
 
-        # Blob score gates harsh Story Mode pressure. It deliberately uses world share, title tier, peace, and succession age, not raw realm_size.
+        # Blob score gates harsh Story Mode pressure. Realm share is sprawl;
+        # development share is capacity and prize value. Dense powers count as
+        # major actors, but land still carries the stronger overstretch signal.
         if = { limit = { primary_title.tier >= tier_empire } change_variable = { name = tmp_story_blob_score add = 1 } }
         if = { limit = { primary_title.tier >= tier_hegemony } change_variable = { name = tmp_story_blob_score add = 2 } }
         if = { limit = { var:tmp_story_realm_pct >= 5 } change_variable = { name = tmp_story_blob_score add = 1 } }
         if = { limit = { var:tmp_story_realm_pct >= 8 } change_variable = { name = tmp_story_blob_score add = 2 } }
         if = { limit = { var:tmp_story_realm_pct >= 15 } change_variable = { name = tmp_story_blob_score add = 2 } }
         if = { limit = { var:tmp_story_realm_pct >= 25 } change_variable = { name = tmp_story_blob_score add = 2 } }
+        if = { limit = { var:tmp_story_development_pct >= 5 } change_variable = { name = tmp_story_blob_score add = 1 } }
+        if = { limit = { var:tmp_story_development_pct >= 8 } change_variable = { name = tmp_story_blob_score add = 1 } }
+        if = { limit = { var:tmp_story_development_pct >= 15 } change_variable = { name = tmp_story_blob_score add = 1 } }
         if = { limit = { global_var:riseandfall_story_world_pressure >= 2 } change_variable = { name = tmp_story_blob_score add = 1 } }
         if = { limit = { has_variable = riseandfall_realm_stability_score var:riseandfall_realm_stability_score >= 80 } change_variable = { name = tmp_story_blob_score add = 1 } }
         if = { limit = { has_variable = riseandfall_story_no_succession_years var:riseandfall_story_no_succession_years >= 100 } change_variable = { name = tmp_story_blob_score add = 1 } }
@@ -738,6 +829,8 @@ riseandfall_apply_dynamic_story_pressure_se = {
             if = { limit = { primary_title.tier >= tier_hegemony } change_variable = { name = tmp_story_collapse_gain add = 2 } }
             if = { limit = { var:tmp_story_realm_pct >= 10 } change_variable = { name = tmp_story_collapse_gain add = 1 } }
             if = { limit = { var:tmp_story_realm_pct >= 20 } change_variable = { name = tmp_story_collapse_gain add = 2 } }
+            if = { limit = { var:tmp_story_development_pct >= 10 } change_variable = { name = tmp_story_collapse_gain add = 1 } }
+            if = { limit = { var:tmp_story_development_pct >= 20 } change_variable = { name = tmp_story_collapse_gain add = 1 } }
             if = {
                 limit = { var:riseandfall_story_stagnation_pressure > 0 }
                 set_variable = { name = tmp_story_scaled_stagnation value = var:riseandfall_story_stagnation_pressure }
@@ -891,6 +984,20 @@ riseandfall_apply_dynamic_story_pressure_se = {
             else = { set_variable = { name = riseandfall_story_recovery_component value = 8 } }
         }
 
+        # Collapse targets should not receive Story Mode help from another
+        # director lane. Once buildup exists, or while the realm is explicitly a
+        # Declining Power, only the negative collapse pressure should apply.
+        if = {
+            limit = {
+                OR = {
+                    has_variable = riseandfall_story_collapse_pressure
+                    var:riseandfall_story_role = 3
+                }
+            }
+            set_variable = { name = riseandfall_story_protection value = 0 }
+            set_variable = { name = riseandfall_story_recovery_component value = 0 }
+        }
+
         set_variable = { name = riseandfall_rs_story_pressure_component value = 0 }
         change_variable = { name = riseandfall_rs_story_pressure_component add = var:riseandfall_story_protection }
         change_variable = { name = riseandfall_rs_story_pressure_component add = var:riseandfall_story_recovery_component }
@@ -906,7 +1013,9 @@ riseandfall_apply_dynamic_story_pressure_se = {
         clamp_variable = { name = riseandfall_rs_story_pressure_component min = -100 max = 35 }
 
         remove_variable = tmp_story_world_total
+        remove_variable = tmp_story_world_development_total
         remove_variable = tmp_story_realm_pct
+        remove_variable = tmp_story_development_pct
         remove_variable = tmp_story_stress_score
         remove_variable = tmp_story_blob_score
         remove_variable = tmp_story_ruler_strength
@@ -915,6 +1024,8 @@ riseandfall_apply_dynamic_story_pressure_se = {
         remove_variable = tmp_story_low_threshold
         remove_variable = tmp_story_stable_threshold
         remove_variable = tmp_story_decline_threshold
+        remove_variable = tmp_story_candidate_role
+        remove_variable = tmp_story_previous_role
         if = { limit = { has_variable = tmp_story_isolation_year_gain } remove_variable = tmp_story_isolation_year_gain }
         if = { limit = { has_variable = tmp_story_external_rival_relief_negative } remove_variable = tmp_story_external_rival_relief_negative }
         if = { limit = { has_variable = tmp_story_collapse_gain } remove_variable = tmp_story_collapse_gain }
@@ -922,5 +1033,8 @@ riseandfall_apply_dynamic_story_pressure_se = {
         if = { limit = { has_variable = tmp_story_scaled_vassal_pressure } remove_variable = tmp_story_scaled_vassal_pressure }
         if = { limit = { has_variable = tmp_story_scaled_rival_pressure } remove_variable = tmp_story_scaled_rival_pressure }
         remove_variable = tmp_story_last_succession_year
+    }
+    else = {
+        riseandfall_clear_story_director_vars_se = yes
     }
 }

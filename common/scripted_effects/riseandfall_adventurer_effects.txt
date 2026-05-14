@@ -586,17 +586,19 @@ riseandfall_adventurer_press_claims_se = {
                     }
                     NOT = {
                         scope:claim_target_title.holder = {
-                            is_member_of_confederation = root.confederation
+                            is_member_of_confederation = scope:independent_adventurer.confederation
                         }
                     }
                 }
                 scope:claim_target_title.holder = {
                     NOT = { government_has_flag = government_is_herder }
-                    NOT = { is_tributary_of_suzerain_or_above = root }
-                    NOT = { has_strong_hook = root }
+                    # This effect is also called from global scans with no event root,
+                    # so target relationship checks must use the saved adventurer scope.
+                    NOT = { is_tributary_of_suzerain_or_above = scope:independent_adventurer }
+                    NOT = { has_strong_hook = scope:independent_adventurer }
                     trigger_if = {
                         limit = { is_imprisoned = yes }
-                        imprisoner != root
+                        imprisoner != scope:independent_adventurer
                     }
                 }
             }
@@ -608,10 +610,10 @@ riseandfall_adventurer_press_claims_se = {
                     scope:target_title = scope:claim_target_title
                     scope:claimant = scope:independent_adventurer
                     scope:claim_target_title.holder = {
-                        current_military_strength < root.current_military_strength
+                        current_military_strength < scope:independent_adventurer.current_military_strength
                         OR = {
-                            gold < root.gold
-                            current_military_strength <= root.fifty_percent_of_current_military_strength
+                            gold < scope:independent_adventurer.gold
+                            current_military_strength <= scope:independent_adventurer.fifty_percent_of_current_military_strength
                         }
                     }
                 }

@@ -51,19 +51,18 @@ riseandfall_diadochi_wars_se = {
 				NOT = { scope:rf_diadochi_origin_title = { has_variable = rf_diadochi_war_cooldown } }
 			}
 
-			# Successors should still pressure their origin realm sometimes, but peers remain
-			# the default target so they do not ignore each other.
-			# Prioritize neighboring successor states first for more realistic conquest patterns.
+			# Successors prioritize reclaiming their primary origin title before they
+			# consider peer successor states from the same split.
 			if = {
 				limit = { var:rf_diadochi_is_successor = 1 }
-				riseandfall_diadochi_try_neighbor_peer_target_se = yes
+				riseandfall_diadochi_try_origin_target_se = yes
 				if = {
 					limit = { NOT = { exists = scope:rf_diadochi_target_ruler } }
-					riseandfall_diadochi_try_peer_target_se = yes
+					riseandfall_diadochi_try_neighbor_peer_target_se = yes
 				}
 				if = {
 					limit = { NOT = { exists = scope:rf_diadochi_target_ruler } }
-					riseandfall_diadochi_try_origin_target_se = yes
+					riseandfall_diadochi_try_peer_target_se = yes
 				}
 			}
 			else = {
@@ -240,6 +239,7 @@ riseandfall_diadochi_clear_browser_targets_se = {
 	# Error modes: none; safe to call before opening or after closing the browser event.
 	clear_saved_scope = rf_diadochi_origin_title
 	clear_saved_scope = rf_diadochi_browser_pending_title
+	clear_saved_scope = rf_diadochi_browser_attacker
 	clear_saved_scope = rf_diadochi_browser_target_ruler_1
 	clear_saved_scope = rf_diadochi_browser_target_title_1
 	clear_saved_scope = rf_diadochi_browser_target_ruler_2
@@ -256,6 +256,15 @@ riseandfall_diadochi_clear_browser_targets_se = {
 	clear_saved_scope = rf_diadochi_browser_target_title_7
 	clear_saved_scope = rf_diadochi_browser_target_ruler_8
 	clear_saved_scope = rf_diadochi_browser_target_title_8
+	clear_saved_scope = rf_diadochi_browser_target_ruler_9
+	clear_saved_scope = rf_diadochi_browser_target_title_9
+	clear_saved_scope = rf_diadochi_browser_target_ruler_10
+	clear_saved_scope = rf_diadochi_browser_target_title_10
+	clear_saved_scope = rf_diadochi_browser_target_ruler_11
+	clear_saved_scope = rf_diadochi_browser_target_title_11
+	clear_saved_scope = rf_diadochi_browser_target_ruler_12
+	clear_saved_scope = rf_diadochi_browser_target_title_12
+	remove_variable = rf_diadochi_browser_self_strength
 	remove_variable = rf_diadochi_browser_has_overflow
 }
 
@@ -263,7 +272,7 @@ riseandfall_diadochi_store_browser_target_se = {
 	# Inputs: root is the attacker, current scope is the defender, and
 	# scope:rf_diadochi_browser_pending_title is the legal CB target title.
 	# Outputs: stores the defender/title pair in the next free browser slot.
-	# Data shape: up to eight numbered saved scopes.
+	# Data shape: up to twelve numbered saved scopes.
 	# Error modes: duplicate defenders are ignored; overflow is tracked with a flag.
 	if = {
 		limit = {
@@ -300,48 +309,96 @@ riseandfall_diadochi_store_browser_target_se = {
 					exists = scope:rf_diadochi_browser_target_ruler_8
 					this = scope:rf_diadochi_browser_target_ruler_8
 				}
+				AND = {
+					exists = scope:rf_diadochi_browser_target_ruler_9
+					this = scope:rf_diadochi_browser_target_ruler_9
+				}
+				AND = {
+					exists = scope:rf_diadochi_browser_target_ruler_10
+					this = scope:rf_diadochi_browser_target_ruler_10
+				}
+				AND = {
+					exists = scope:rf_diadochi_browser_target_ruler_11
+					this = scope:rf_diadochi_browser_target_ruler_11
+				}
+				AND = {
+					exists = scope:rf_diadochi_browser_target_ruler_12
+					this = scope:rf_diadochi_browser_target_ruler_12
+				}
 			}
 		}
 	}
 	else_if = {
 		limit = { NOT = { exists = scope:rf_diadochi_browser_target_ruler_1 } }
+		set_variable = { name = rf_diadochi_browser_target_strength value = riseandfall_military_power_with_allies days = 1 }
 		save_scope_as = rf_diadochi_browser_target_ruler_1
 		scope:rf_diadochi_browser_pending_title = { save_scope_as = rf_diadochi_browser_target_title_1 }
 	}
 	else_if = {
 		limit = { NOT = { exists = scope:rf_diadochi_browser_target_ruler_2 } }
+		set_variable = { name = rf_diadochi_browser_target_strength value = riseandfall_military_power_with_allies days = 1 }
 		save_scope_as = rf_diadochi_browser_target_ruler_2
 		scope:rf_diadochi_browser_pending_title = { save_scope_as = rf_diadochi_browser_target_title_2 }
 	}
 	else_if = {
 		limit = { NOT = { exists = scope:rf_diadochi_browser_target_ruler_3 } }
+		set_variable = { name = rf_diadochi_browser_target_strength value = riseandfall_military_power_with_allies days = 1 }
 		save_scope_as = rf_diadochi_browser_target_ruler_3
 		scope:rf_diadochi_browser_pending_title = { save_scope_as = rf_diadochi_browser_target_title_3 }
 	}
 	else_if = {
 		limit = { NOT = { exists = scope:rf_diadochi_browser_target_ruler_4 } }
+		set_variable = { name = rf_diadochi_browser_target_strength value = riseandfall_military_power_with_allies days = 1 }
 		save_scope_as = rf_diadochi_browser_target_ruler_4
 		scope:rf_diadochi_browser_pending_title = { save_scope_as = rf_diadochi_browser_target_title_4 }
 	}
 	else_if = {
 		limit = { NOT = { exists = scope:rf_diadochi_browser_target_ruler_5 } }
+		set_variable = { name = rf_diadochi_browser_target_strength value = riseandfall_military_power_with_allies days = 1 }
 		save_scope_as = rf_diadochi_browser_target_ruler_5
 		scope:rf_diadochi_browser_pending_title = { save_scope_as = rf_diadochi_browser_target_title_5 }
 	}
 	else_if = {
 		limit = { NOT = { exists = scope:rf_diadochi_browser_target_ruler_6 } }
+		set_variable = { name = rf_diadochi_browser_target_strength value = riseandfall_military_power_with_allies days = 1 }
 		save_scope_as = rf_diadochi_browser_target_ruler_6
 		scope:rf_diadochi_browser_pending_title = { save_scope_as = rf_diadochi_browser_target_title_6 }
 	}
 	else_if = {
 		limit = { NOT = { exists = scope:rf_diadochi_browser_target_ruler_7 } }
+		set_variable = { name = rf_diadochi_browser_target_strength value = riseandfall_military_power_with_allies days = 1 }
 		save_scope_as = rf_diadochi_browser_target_ruler_7
 		scope:rf_diadochi_browser_pending_title = { save_scope_as = rf_diadochi_browser_target_title_7 }
 	}
 	else_if = {
 		limit = { NOT = { exists = scope:rf_diadochi_browser_target_ruler_8 } }
+		set_variable = { name = rf_diadochi_browser_target_strength value = riseandfall_military_power_with_allies days = 1 }
 		save_scope_as = rf_diadochi_browser_target_ruler_8
 		scope:rf_diadochi_browser_pending_title = { save_scope_as = rf_diadochi_browser_target_title_8 }
+	}
+	else_if = {
+		limit = { NOT = { exists = scope:rf_diadochi_browser_target_ruler_9 } }
+		set_variable = { name = rf_diadochi_browser_target_strength value = riseandfall_military_power_with_allies days = 1 }
+		save_scope_as = rf_diadochi_browser_target_ruler_9
+		scope:rf_diadochi_browser_pending_title = { save_scope_as = rf_diadochi_browser_target_title_9 }
+	}
+	else_if = {
+		limit = { NOT = { exists = scope:rf_diadochi_browser_target_ruler_10 } }
+		set_variable = { name = rf_diadochi_browser_target_strength value = riseandfall_military_power_with_allies days = 1 }
+		save_scope_as = rf_diadochi_browser_target_ruler_10
+		scope:rf_diadochi_browser_pending_title = { save_scope_as = rf_diadochi_browser_target_title_10 }
+	}
+	else_if = {
+		limit = { NOT = { exists = scope:rf_diadochi_browser_target_ruler_11 } }
+		set_variable = { name = rf_diadochi_browser_target_strength value = riseandfall_military_power_with_allies days = 1 }
+		save_scope_as = rf_diadochi_browser_target_ruler_11
+		scope:rf_diadochi_browser_pending_title = { save_scope_as = rf_diadochi_browser_target_title_11 }
+	}
+	else_if = {
+		limit = { NOT = { exists = scope:rf_diadochi_browser_target_ruler_12 } }
+		set_variable = { name = rf_diadochi_browser_target_strength value = riseandfall_military_power_with_allies days = 1 }
+		save_scope_as = rf_diadochi_browser_target_ruler_12
+		scope:rf_diadochi_browser_pending_title = { save_scope_as = rf_diadochi_browser_target_title_12 }
 	}
 	else = {
 		set_variable = { name = rf_diadochi_browser_has_overflow value = 1 }
@@ -350,10 +407,12 @@ riseandfall_diadochi_store_browser_target_se = {
 
 riseandfall_diadochi_prepare_browser_targets_se = {
 	# Inputs: root is the player ruler opening the Diadochi target browser.
-	# Outputs: stores up to eight legal defender/title pairs for the browser event.
+	# Outputs: stores up to twelve legal defender/title pairs for the browser event.
 	# Data shape: numbered saved scopes plus an overflow flag when more targets exist.
 	# Error modes: no legal targets available because of truces, alliances, ongoing wars, or CB/title rules.
 	riseandfall_diadochi_clear_browser_targets_se = yes
+	save_scope_as = rf_diadochi_browser_attacker
+	set_variable = { name = rf_diadochi_browser_self_strength value = riseandfall_military_power_with_allies days = 1 }
 
 	if = {
 		limit = {
@@ -368,6 +427,35 @@ riseandfall_diadochi_prepare_browser_targets_se = {
 		if = {
 			limit = { riseandfall_has_successor_primary_title_trigger = yes }
 			primary_title.var:rf_successor_root_origin_title = { save_scope_as = rf_diadochi_origin_title }
+
+			# Show the primary origin title first, then same-origin neighbors, then
+			# the remaining legal successor states.
+			if = {
+				limit = {
+					exists = scope:rf_diadochi_origin_title
+					scope:rf_diadochi_origin_title = { exists = holder }
+					scope:rf_diadochi_origin_title.holder = {
+						NOT = { this = root }
+						is_landed = yes
+						is_independent_ruler = yes
+						exists = primary_title
+						NOT = { has_truce = root }
+						NOT = { is_allied_to = root }
+						NOT = { is_at_war_with = root }
+						root = {
+							can_declare_war = {
+								defender = prev
+								casus_belli = riseandfall_diadochi_cb
+								target_titles = { scope:rf_diadochi_origin_title }
+							}
+						}
+					}
+				}
+				scope:rf_diadochi_origin_title.holder = {
+					scope:rf_diadochi_origin_title = { save_scope_as = rf_diadochi_browser_pending_title }
+					riseandfall_diadochi_store_browser_target_se = yes
+				}
+			}
 
 			every_neighboring_realm_owner = {
 				limit = {
@@ -409,33 +497,6 @@ riseandfall_diadochi_prepare_browser_targets_se = {
 				}
 				primary_title = { save_scope_as = rf_diadochi_browser_pending_title }
 				riseandfall_diadochi_store_browser_target_se = yes
-			}
-
-			if = {
-				limit = {
-					exists = scope:rf_diadochi_origin_title
-					scope:rf_diadochi_origin_title = { exists = holder }
-					scope:rf_diadochi_origin_title.holder = {
-						NOT = { this = root }
-						is_landed = yes
-						is_independent_ruler = yes
-						exists = primary_title
-						NOT = { has_truce = root }
-						NOT = { is_allied_to = root }
-						NOT = { is_at_war_with = root }
-						root = {
-							can_declare_war = {
-								defender = prev
-								casus_belli = riseandfall_diadochi_cb
-								target_titles = { scope:rf_diadochi_origin_title }
-							}
-						}
-					}
-				}
-				scope:rf_diadochi_origin_title.holder = {
-					scope:rf_diadochi_origin_title = { save_scope_as = rf_diadochi_browser_pending_title }
-					riseandfall_diadochi_store_browser_target_se = yes
-				}
 			}
 		}
 		else = {
@@ -575,13 +636,23 @@ riseandfall_diadochi_try_origin_target_se = {
 		limit = {
 			riseandfall_has_successor_primary_title_trigger = yes
 			exists = scope:rf_diadochi_origin_title
-			scope:rf_diadochi_origin_title = { exists = holder }
+			scope:rf_diadochi_origin_title = {
+				exists = holder
+				is_titular = no
+			}
 			scope:rf_diadochi_origin_title.holder = {
 				NOT = { this = root }
 				is_landed = yes
 				is_independent_ruler = yes
 				exists = primary_title
 				is_imprisoned = no
+				# Mirror the forced-war target strength gate before saving the
+				# origin title, so a too-strong origin realm falls through to peers.
+				current_military_strength < root.current_military_strength
+				OR = {
+					gold < root.gold
+					current_military_strength <= root.fifty_percent_of_current_military_strength
+				}
 			}
 			NOT = { is_at_war_with = scope:rf_diadochi_origin_title.holder }
 			can_attack_in_hierarchy = scope:rf_diadochi_origin_title.holder

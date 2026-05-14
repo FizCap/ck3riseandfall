@@ -47,6 +47,7 @@ riseandfall_calculate_realm_stability_se = {
     if = { limit = { NOT = { exists = global_var:riseandfall_ruler_count } } set_global_variable = { name = riseandfall_ruler_count value = 0 } }
     if = { limit = { NOT = { exists = global_var:riseandfall_avg_total } } set_global_variable = { name = riseandfall_avg_total value = 0 } }
     if = { limit = { NOT = { exists = global_var:riseandfall_world_total } } set_global_variable = { name = riseandfall_world_total value = 1 } }
+    if = { limit = { NOT = { exists = global_var:riseandfall_world_total_development } } set_global_variable = { name = riseandfall_world_total_development value = 1 } }
 
     if = {
         limit = {
@@ -65,10 +66,20 @@ riseandfall_calculate_realm_stability_se = {
     if = {
         limit = { NOT = { current_year = global_var:riseandfall_stat_avg_last_year } }
         set_global_variable = { name = riseandfall_world_total value = 0 }
+        set_global_variable = { name = riseandfall_world_total_development value = 0 }
         every_independent_ruler = {
             change_global_variable = { name = riseandfall_world_total add = realm_size }
+            save_scope_as = rf_development_ruler
+            set_variable = { name = riseandfall_rs_total_development value = 0 }
+            every_realm_county = {
+                scope:rf_development_ruler = {
+                    change_variable = { name = riseandfall_rs_total_development add = prev.development_level }
+                }
+            }
+            change_global_variable = { name = riseandfall_world_total_development add = var:riseandfall_rs_total_development }
         }
         if = { limit = { global_var:riseandfall_world_total < 1 } set_global_variable = { name = riseandfall_world_total value = 1 } }
+        if = { limit = { global_var:riseandfall_world_total_development < 1 } set_global_variable = { name = riseandfall_world_total_development value = 1 } }
         # if this is the very first time we've ever executed, recompute now
         if = { limit = { global_var:riseandfall_stat_avg_last_year = 0 }
             set_global_variable = { name = riseandfall_avg_diplomacy value = 0 }
@@ -472,6 +483,9 @@ riseandfall_calculate_realm_stability_se = {
     # 3.7) DYNAMIC REALM FACTORS
     # Story-mode pressure now feeds stability directly instead of producing fracture vars.
     set_variable = { name = riseandfall_rs_realm_size_component value = 0 }
+    set_variable = { name = riseandfall_rs_total_development value = 0 }
+    set_variable = { name = riseandfall_rs_average_development value = 0 }
+    set_variable = { name = riseandfall_rs_development_pct value = 0 }
     set_variable = { name = riseandfall_rs_culture_faith_component value = 0 }
     set_variable = { name = riseandfall_rs_epidemic_component value = 0 }
     set_variable = { name = riseandfall_rs_partition_component value = 0 }
@@ -490,6 +504,8 @@ riseandfall_calculate_realm_stability_se = {
         # Realm size now directly shifts stability instead of only increasing collapse pressure.
         set_variable = { name = tmp_story_world_total value = global_var:riseandfall_world_total }
         if = { limit = { var:tmp_story_world_total < 1 } set_variable = { name = tmp_story_world_total value = 1 } }
+        set_variable = { name = tmp_rs_world_development_total value = global_var:riseandfall_world_total_development }
+        if = { limit = { var:tmp_rs_world_development_total < 1 } set_variable = { name = tmp_rs_world_development_total value = 1 } }
 
         # Continuous proportional scaling: lose 1 stability for every 1% of the world controlled.
         # This keeps the penalty fully dynamic instead of using tiered thresholds.
@@ -501,6 +517,23 @@ riseandfall_calculate_realm_stability_se = {
         set_variable = { name = riseandfall_rs_realm_size_component value = var:tmp_rs_realm_pct }
         change_variable = { name = riseandfall_rs_realm_size_component multiply = -1 }
         clamp_variable = { name = riseandfall_rs_realm_size_component min = -15 max = 0 }
+
+        # Development is capacity and prize value for Story Mode, not a stability bonus.
+        # Keep the metrics available so collapse targeting can distinguish dense powers
+        # from large low-development frontier realms.
+        save_scope_as = ruler
+        every_realm_county = {
+            scope:ruler = {
+                change_variable = { name = riseandfall_rs_total_development add = prev.development_level }
+            }
+        }
+        set_variable = { name = riseandfall_rs_average_development value = var:riseandfall_rs_total_development }
+        if = { limit = { realm_size > 0 } change_variable = { name = riseandfall_rs_average_development divide = realm_size } }
+        round_variable = { name = riseandfall_rs_average_development nearest = 1 }
+        set_variable = { name = riseandfall_rs_development_pct value = var:riseandfall_rs_total_development }
+        change_variable = { name = riseandfall_rs_development_pct multiply = 100 }
+        change_variable = { name = riseandfall_rs_development_pct divide = var:tmp_rs_world_development_total }
+        round_variable = { name = riseandfall_rs_development_pct nearest = 1 }
 
         # Strong-vassal pressure is now a direct stability component from +10 to -30.
         # Allied vassals should bolster the liege's effective military strength and
@@ -576,6 +609,7 @@ riseandfall_calculate_realm_stability_se = {
         }
 
         remove_variable = tmp_story_world_total
+        remove_variable = tmp_rs_world_development_total
         remove_variable = tmp_rs_realm_pct
         remove_variable = tmp_story_strong_vassal_threshold
         remove_variable = tmp_story_strong_vassals
@@ -1660,6 +1694,9 @@ riseandfall_clear_unlanded_stability_vars_se = {
         remove_variable = riseandfall_rs_stats_component
         remove_variable = riseandfall_rs_vassals_component
         remove_variable = riseandfall_rs_realm_size_component
+        remove_variable = riseandfall_rs_total_development
+        remove_variable = riseandfall_rs_average_development
+        remove_variable = riseandfall_rs_development_pct
         remove_variable = riseandfall_rs_strong_vassal_component
         remove_variable = riseandfall_rs_culture_faith_component
         remove_variable = riseandfall_rs_epidemic_component

@@ -63,6 +63,27 @@ riseandfall_can_use_diadochi_cb_trigger = {
     riseandfall_has_successor_primary_title_trigger = yes
 }
 
+riseandfall_can_see_diadochi_browser_trigger = {
+    is_landed = yes
+    is_independent_ruler = yes
+    exists = primary_title
+    NOR = {
+        government_has_flag = government_is_landless_adventurer
+    }
+    OR = {
+        # Successor states can always see the browser once their primary title
+        # has split-origin metadata; stricter war checks only control validity.
+        riseandfall_has_successor_primary_title_trigger = yes
+        # The original realm can see the browser while it has any independent
+        # successor state pointing back to its primary title.
+        any_independent_ruler = {
+            NOT = { this = root }
+            riseandfall_has_successor_primary_title_trigger = yes
+            primary_title.var:rf_successor_root_origin_title = root.primary_title
+        }
+    }
+}
+
 riseandfall_can_browse_diadochi_targets_trigger = {
     is_landed = yes
     is_independent_ruler = yes

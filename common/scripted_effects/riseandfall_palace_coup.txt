@@ -1472,8 +1472,10 @@ riseandfall_palace_coup_root_flees_success = {
     capital_county.duchy = { save_scope_as = palace_coup_core_duchy }
     capital_county.kingdom = { save_scope_as = palace_coup_core_kingdom }
 
-    # Reserve one county on the deposed ruler so they remain landed through split resolve.
-    # Prefer any non-capital county; fallback to capital county if none exist.
+    # Reserve a non-capital county on the deposed ruler so they remain landed
+    # through split resolve. Do not reserve the capital itself: one-county
+    # realms must still transfer that county first so the challenger can hold
+    # the original primary title.
     scope:original_ruler = {
         random_held_title = {
             limit = {
@@ -1481,10 +1483,6 @@ riseandfall_palace_coup_root_flees_success = {
                 NOT = { this = scope:palace_coup_old_capital_county }
             }
             save_scope_as = palace_coup_original_reserve_county
-        }
-        if = {
-            limit = { NOT = { exists = scope:palace_coup_original_reserve_county } }
-            capital_county = { save_scope_as = palace_coup_original_reserve_county }
         }
     }
 
@@ -1572,7 +1570,13 @@ riseandfall_palace_coup_root_flees_success = {
     }
 
     resolve_title_and_vassal_change = scope:palace_coup_split_change
-    scope:palace_coup_challenger = { set_primary_title_to = scope:original_primary }
+    if = {
+        limit = {
+            exists = scope:original_primary
+            scope:original_primary = { holder = scope:palace_coup_challenger }
+        }
+        scope:palace_coup_challenger = { set_primary_title_to = scope:original_primary }
+    }
 
     # If the old ruler personally loses all land, take one county from the
     # challenger's new realm so they can anchor a breakaway state.
