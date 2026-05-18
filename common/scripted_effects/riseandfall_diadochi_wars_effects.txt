@@ -103,9 +103,6 @@ riseandfall_diadochi_wars_se = {
 						is_allied_in_war = scope:rf_diadochi_target_ruler
 					}
 					is_in_debt = no
-					NOT = {
-						exists = involved_activity
-					}
 					trigger_if = {
 						limit = {
 							culture = { has_cultural_parameter = cannot_attack_allies }

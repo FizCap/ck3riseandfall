@@ -70,6 +70,14 @@ riseandfall_sync_puppet_master_court_position = {
 					has_court_position = riseandfall_puppet_master_court_position
 				}
 				NOT = { scope:rf_current_puppet_master_holder ?= scope:rf_current_puppet_master_diarch }
+				# Landed or displaced diarchs can be valid regents but invalid
+				# court employees; skip the court-position write in that case.
+				scope:rf_current_puppet_master_diarch = {
+					would_be_valid_for_court_position = {
+						employer = scope:rf_puppet_master_liege
+						court_position = riseandfall_puppet_master_court_position
+					}
+				}
 			}
 			scope:rf_puppet_master_liege = {
 				replace_court_position = {
@@ -84,6 +92,10 @@ riseandfall_sync_puppet_master_court_position = {
 				NOT = { exists = scope:rf_current_puppet_master_holder }
 				scope:rf_current_puppet_master_diarch = {
 					NOT = { has_court_position = riseandfall_puppet_master_court_position }
+					would_be_valid_for_court_position = {
+						employer = scope:rf_puppet_master_liege
+						court_position = riseandfall_puppet_master_court_position
+					}
 				}
 			}
 			scope:rf_puppet_master_liege = {
@@ -126,16 +138,32 @@ riseandfall_claim_puppet_master_office_effect = {
 					type = riseandfall_puppet_master_court_position
 					save_scope_as = old_puppet_master
 				}
-				replace_court_position = {
-					recipient = scope:actor
-					holder = scope:old_puppet_master
-					court_position = riseandfall_puppet_master_court_position
+				if = {
+					limit = {
+						scope:actor = {
+							would_be_valid_for_court_position = {
+								employer = scope:recipient
+								court_position = riseandfall_puppet_master_court_position
+							}
+						}
+					}
+					replace_court_position = {
+						recipient = scope:actor
+						holder = scope:old_puppet_master
+						court_position = riseandfall_puppet_master_court_position
+					}
 				}
 			}
 			else = {
 				if = {
 					limit = {
-						scope:actor = { NOT = { has_court_position = riseandfall_puppet_master_court_position } }
+						scope:actor = {
+							NOT = { has_court_position = riseandfall_puppet_master_court_position }
+							would_be_valid_for_court_position = {
+								employer = scope:recipient
+								court_position = riseandfall_puppet_master_court_position
+							}
+						}
 					}
 					appoint_court_position = {
 						recipient = scope:actor

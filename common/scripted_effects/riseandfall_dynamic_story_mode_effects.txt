@@ -4,9 +4,8 @@
 
 riseandfall_story_world_climate_se = {
     # Yearly campaign read: this is the director's "table state" before individual
-    # rulers are scored. Only independent kingdom+ realms are tracked as major
-    # story actors; smaller realms still calculate stability, but they should not
-    # decide whether the whole world needs more danger or more recovery.
+    # rulers are scored. World climate is weighted by independent realm size, so
+    # tiny unstable realms do not outweigh the actual powers shaping the map.
     set_global_variable = { name = riseandfall_story_world_eligible_count value = 0 }
     set_global_variable = { name = riseandfall_story_world_stable_count value = 0 }
     set_global_variable = { name = riseandfall_story_world_unstable_count value = 0 }
@@ -40,9 +39,9 @@ riseandfall_story_world_climate_se = {
     every_independent_ruler = {
         limit = {
             is_landed = yes
-            primary_title.tier >= tier_kingdom
+            has_variable = riseandfall_realm_stability_score
         }
-        change_global_variable = { name = riseandfall_story_world_eligible_count add = 1 }
+        change_global_variable = { name = riseandfall_story_world_eligible_count add = realm_size }
 
         # Stability bands are tier-relative, matching the low-stability event
         # thresholds used elsewhere: kingdom 40, empire 45, hegemony 50. Larger
@@ -58,24 +57,21 @@ riseandfall_story_world_climate_se = {
 
         if = {
             limit = {
-                has_variable = riseandfall_realm_stability_score
                 var:riseandfall_realm_stability_score >= var:tmp_story_stable_threshold
             }
-            change_global_variable = { name = riseandfall_story_world_stable_count add = 1 }
+            change_global_variable = { name = riseandfall_story_world_stable_count add = realm_size }
         }
         if = {
             limit = {
-                has_variable = riseandfall_realm_stability_score
                 var:riseandfall_realm_stability_score < var:tmp_story_low_threshold
             }
-            change_global_variable = { name = riseandfall_story_world_unstable_count add = 1 }
+            change_global_variable = { name = riseandfall_story_world_unstable_count add = realm_size }
         }
         if = {
             limit = {
-                has_variable = riseandfall_realm_stability_score
                 var:riseandfall_realm_stability_score < var:tmp_story_crisis_threshold
             }
-            change_global_variable = { name = riseandfall_story_world_crisis_count add = 1 }
+            change_global_variable = { name = riseandfall_story_world_crisis_count add = realm_size }
         }
         if = {
             limit = { primary_title.tier >= tier_empire }
@@ -141,6 +137,16 @@ riseandfall_story_world_climate_se = {
     # complacent powers; widespread crisis asks for recovery so the map does not
     # become a uniform death spiral.
     if = {
+        limit = { global_var:riseandfall_story_world_crisis_pct >= 25 }
+        set_global_variable = { name = riseandfall_story_world_pressure value = -2 }
+        set_global_variable = { name = riseandfall_story_world_climate value = 4 }
+    }
+    else_if = {
+        limit = { global_var:riseandfall_story_world_unstable_pct >= 45 }
+        set_global_variable = { name = riseandfall_story_world_pressure value = -1 }
+        set_global_variable = { name = riseandfall_story_world_climate value = 3 }
+    }
+    else_if = {
         limit = {
             global_var:riseandfall_story_world_stable_pct >= 70
             NOT = { global_var:riseandfall_story_world_crisis_pct >= 10 }
@@ -152,16 +158,6 @@ riseandfall_story_world_climate_se = {
         limit = { global_var:riseandfall_story_world_stable_pct >= 55 }
         set_global_variable = { name = riseandfall_story_world_pressure value = 1 }
         set_global_variable = { name = riseandfall_story_world_climate value = 1 }
-    }
-    else_if = {
-        limit = { global_var:riseandfall_story_world_crisis_pct >= 25 }
-        set_global_variable = { name = riseandfall_story_world_pressure value = -2 }
-        set_global_variable = { name = riseandfall_story_world_climate value = 4 }
-    }
-    else_if = {
-        limit = { global_var:riseandfall_story_world_unstable_pct >= 45 }
-        set_global_variable = { name = riseandfall_story_world_pressure value = -1 }
-        set_global_variable = { name = riseandfall_story_world_climate value = 3 }
     }
     else = {
         set_global_variable = { name = riseandfall_story_world_climate value = 2 }
@@ -176,10 +172,8 @@ riseandfall_clear_story_director_vars_se = {
     remove_variable = riseandfall_story_role_years
     remove_variable = riseandfall_story_protection
     remove_variable = riseandfall_story_collapse_pressure
-    remove_variable = riseandfall_story_arc_cooldown
     remove_variable = riseandfall_story_world_climate
     remove_variable = riseandfall_story_blob_pressure
-    remove_variable = riseandfall_story_fatigue
     remove_variable = riseandfall_story_reign_tension
     remove_variable = riseandfall_story_stagnation_pressure
     remove_variable = riseandfall_story_ancient_regime
@@ -207,7 +201,7 @@ riseandfall_apply_successor_realm_grace_se = {
         set_variable = { name = riseandfall_story_successor_grace value = 45 }
         set_variable = { name = riseandfall_story_successor_grace_years value = 12 }
         set_variable = { name = riseandfall_story_successor_grace_decay value = 4 }
-        set_variable = { name = low_stability_cooldown value = yes years = 10 }
+        add_character_flag = { flag = rf_low_stability_cooldown years = 10 }
         add_character_flag = { flag = rf_story_successor_grace days = 4380 }
         if = {
             limit = {
@@ -359,7 +353,7 @@ riseandfall_apply_dynamic_story_pressure_se = {
     else_if = {
         limit = {
             is_independent_ruler = yes
-            primary_title.tier >= tier_kingdom
+            primary_title.tier >= tier_county
         }
         if = { limit = { NOT = { has_variable = riseandfall_story_role_years } } set_variable = { name = riseandfall_story_role_years value = 0 } }
         change_variable = { name = riseandfall_story_role_years add = 1 }

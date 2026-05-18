@@ -1,7 +1,7 @@
 ﻿##########################
 # Rise and Fall - Realm Split System
-# Kingdoms seed by duchy, empires by kingdom, and hegemonies by empire
-# unless the preferred tier has too few usable regions.
+# Realm splits seed by de jure duchy for every rank so successor states
+# stay compact before nearby unseeded duchies are assigned to stronger anchors.
 # The original ruler keeps their capital core and any territory outside the seeded regions.
 # Supports governments without powerful vassals (Celestial, Japanese, Administrative, Meritocratic, etc.)
 # All governments use county-tier or above
@@ -263,25 +263,10 @@ riseandfall_realm_split_se = {
             scope:original_ruler = { change_variable = { name = rf_usable_duchy_anchor_count add = 1 } }
         }
 
-        if = {
-            limit = {
-                primary_title.tier = tier_hegemony
-                has_variable = rf_usable_empire_anchor_count
-                var:rf_usable_empire_anchor_count >= 2
-            }
-            add_character_flag = rf_split_seed_by_empire
-        }
-        else_if = {
-            limit = {
-                primary_title.tier >= tier_empire
-                has_variable = rf_usable_kingdom_anchor_count
-                var:rf_usable_kingdom_anchor_count >= 2
-            }
-            add_character_flag = rf_split_seed_by_kingdom
-        }
-        else = {
-            add_character_flag = rf_split_seed_by_duchy
-        }
+        # Use duchy-scale anchors for all ranks. Empire and hegemony-tier
+        # de jure regions can be too large, especially in China, and produce
+        # successor states that swallow entire macro-regions.
+        add_character_flag = rf_split_seed_by_duchy
 
         if = {
             limit = {
@@ -929,23 +914,6 @@ riseandfall_realm_split_se = {
         clear_saved_scope = rf_active_seed
     }
 
-    # Dynamic sphere pass: remaining vassals choose the strongest plausible
-    # breakaway anchor, with de jure as a bonus rather than a hard border.
-    scope:original_ruler = {
-        every_vassal = {
-            limit = {
-                is_landed = yes
-                NOT = { has_character_flag = rf_breakaway_ruler }
-                NOT = { has_character_flag = rf_palace_coup_split_protected }
-                NOT = { has_variable = rf_my_breakaway }
-                primary_title.tier >= tier_county
-                NOT = { primary_title.tier >= tier_empire }
-                NOT = { capital_county.duchy = scope:rf_capital_duchy }
-            }
-            riseandfall_assign_vassal_to_best_breakaway_sphere_se = yes
-        }
-    }
-
     # Phase 3: unseeded regions are claimed by nearby strong seeds so the
     # successor map keeps de jure borders but varies in size.
     if = {
@@ -1219,7 +1187,24 @@ riseandfall_realm_split_se = {
         }
     }
 
-    # Phase 4: any leftover border marches outside clean kingdom blocks join the
+    # Dynamic sphere pass: after clean de jure blocks are handled, remaining
+    # loose vassals choose the strongest plausible nearby breakaway anchor.
+    scope:original_ruler = {
+        every_vassal = {
+            limit = {
+                is_landed = yes
+                NOT = { has_character_flag = rf_breakaway_ruler }
+                NOT = { has_character_flag = rf_palace_coup_split_protected }
+                NOT = { has_variable = rf_my_breakaway }
+                primary_title.tier >= tier_county
+                NOT = { primary_title.tier >= tier_empire }
+                NOT = { capital_county.duchy = scope:rf_capital_duchy }
+            }
+            riseandfall_assign_vassal_to_best_breakaway_sphere_se = yes
+        }
+    }
+
+    # Phase 4: any leftover border marches outside clean duchy blocks join the
     # nearest breakaway so the map does not leave many stray leftovers.
     scope:original_ruler = {
         every_vassal = {
@@ -1489,7 +1474,7 @@ riseandfall_execute_realm_split_se = {
     if = {
         limit = { exists = scope:new_realm_ruler }
         scope:new_realm_ruler = {
-            set_variable = { name = low_stability_cooldown value = yes years = 5 }
+            add_character_flag = { flag = rf_low_stability_cooldown years = 5 }
         }
     }
 
@@ -1670,14 +1655,9 @@ riseandfall_realm_split_migrate_successor_primary_title_se = {
             }
             set_variable = { name = rf_is_successor_split_title value = 1 years = 30 }
             set_variable = { name = rf_is_permanent_successor_split value = 1 }
-            if = {
-                limit = { scope:rf_successor_old_primary_title = { has_variable = rf_successor_permanent_realm_size } }
-                set_variable = { name = rf_successor_permanent_realm_size value = scope:rf_successor_old_primary_title.var:rf_successor_permanent_realm_size }
-            }
-            else_if = {
-                limit = { NOT = { has_variable = rf_successor_permanent_realm_size } }
-                set_variable = { name = rf_successor_permanent_realm_size value = root.realm_size }
-            }
+            # Some legacy successor titles carry the marker without a valid
+            # numeric snapshot; rebuild the permanent baseline from the ruler.
+            set_variable = { name = rf_successor_permanent_realm_size value = root.realm_size }
         }
 
         every_held_title = {
@@ -2086,7 +2066,9 @@ riseandfall_split_title_monitor_cleanup_se = {
                 }
                 set_variable = { name = rf_is_successor_split_title value = 1 years = 30 }
                 set_variable = { name = rf_is_permanent_successor_split value = 1 }
-                set_variable = { name = rf_successor_permanent_realm_size value = scope:rf_split_title.var:rf_successor_permanent_realm_size }
+                # Rebuilt replacement titles get a fresh numeric baseline in
+                # case the old title only had a stale/empty legacy marker.
+                set_variable = { name = rf_successor_permanent_realm_size value = scope:rf_ruler.realm_size }
             }
             scope:rf_split_title = {
                 remove_variable = rf_is_successor_split_title
@@ -2116,31 +2098,28 @@ riseandfall_split_title_monitor_cleanup_se = {
             destroy_title = scope:rf_split_title
         }
         else = {
-            # Compute current realm size and compare to the stored snapshot on the title.
+            # Compute current realm size from a fresh numeric value; legacy
+            # titles may have an empty snapshot variable that cannot be read.
             set_variable = { name = rf_current_realm_size value = realm_size }
+            set_variable = { name = rf_snapshot value = realm_size }
             if = {
                 limit = {
-                    primary_title = {
-                        has_variable = rf_successor_permanent_realm_size
-                    }
+                    has_variable = rf_current_realm_size
+                    has_variable = rf_snapshot
                 }
-                set_variable = { name = rf_snapshot value = primary_title.var:rf_successor_permanent_realm_size }
-            }
-            else = {
-                set_variable = { name = rf_snapshot value = var:rf_current_realm_size }
-            }
-            change_variable = { name = rf_snapshot multiply = 0.25 }
-            if = {
-                limit = {
-                    var:rf_current_realm_size <= var:rf_snapshot
-                    # The under-25% collapse check only destroys old successor titular titles
-                    # after their initial 50-year origin grace marker has expired.
-                    primary_title = { NOT = { has_variable = rf_successor_origin_title } }
-                }
-                primary_title = { save_scope_as = rf_split_title }
+                change_variable = { name = rf_snapshot multiply = 0.25 }
                 if = {
-                    limit = { scope:rf_split_title = { is_titular = yes } }
-                    destroy_title = scope:rf_split_title
+                    limit = {
+                        var:rf_current_realm_size <= var:rf_snapshot
+                        # The under-25% collapse check only destroys old successor titular titles
+                        # after their initial 50-year origin grace marker has expired.
+                        primary_title = { NOT = { has_variable = rf_successor_origin_title } }
+                    }
+                    primary_title = { save_scope_as = rf_split_title }
+                    if = {
+                        limit = { scope:rf_split_title = { is_titular = yes } }
+                        destroy_title = scope:rf_split_title
+                    }
                 }
             }
             remove_variable = rf_current_realm_size

@@ -26,23 +26,21 @@
     ignore_effect = change_title_holder
 
     valid_to_start = {
-        # Allow targeting the designated successor state title OR the unifying origin title
+        # The victory effect absorbs the defender's realm, so only show the
+        # defender's primary title as the selectable war target.
+        scope:target = scope:defender.primary_title
         scope:target = {
             tier = scope:defender.primary_title.tier
-            OR = {
-                # Target is an active successor state title
-                has_variable = rf_is_successor_split_title
-                
-                # Target is the origin title of the attacking successor state
-                AND = {
-                    scope:attacker.primary_title = { has_variable = rf_successor_root_origin_title }
-                    this = scope:attacker.primary_title.var:rf_successor_root_origin_title
-                }
-                
-                # Target is the origin title of the defending successor state (if origin attacks successor)
-                AND = {
-                    scope:defender.primary_title = { has_variable = rf_successor_root_origin_title }
-                    this = scope:defender.primary_title.var:rf_successor_root_origin_title
+        }
+        # `max_ai_diplo_distance_to_title` only limits normal AI CB consideration.
+        # Diadochi wars are prepared by scripted effects, so enforce the intended
+        # 150 map-pixel AI range here where `can_declare_war` also sees it.
+        trigger_if = {
+            limit = { scope:attacker = { is_ai = yes } }
+            scope:attacker = {
+                realm_to_title_distance_squared = {
+                    target = scope:target
+                    value <= 22500
                 }
             }
         }
@@ -224,6 +222,52 @@
             }
             scope:attacker = { destroy_title = scope:rf_defender_split_title }
         }
+        if = {
+            limit = {
+                exists = scope:rf_attacker_old_split_title
+                scope:rf_attacker_old_split_title = {
+                    holder = scope:attacker
+                    has_variable = rf_is_successor_split_title
+                }
+                NOT = { scope:rf_attacker_old_split_title = scope:attacker.primary_title }
+                scope:attacker.primary_title = {
+                    is_titular = no
+                }
+            }
+            # Real conquered primary titles replace the attacker's temporary
+            # successor shell; migrate the split markers before removing it.
+            scope:attacker = {
+                set_variable = { name = tmp_successor_realm_size value = realm_size }
+            }
+            scope:attacker.primary_title = {
+                if = {
+                    limit = { scope:rf_attacker_old_split_title = { has_variable = rf_successor_origin_title } }
+                    set_variable = { name = rf_successor_origin_title value = scope:rf_attacker_old_split_title.var:rf_successor_origin_title years = 50 }
+                }
+                if = {
+                    limit = { scope:rf_attacker_old_split_title = { has_variable = rf_successor_root_origin_title } }
+                    set_variable = { name = rf_successor_root_origin_title value = scope:rf_attacker_old_split_title.var:rf_successor_root_origin_title years = 30 }
+                }
+                set_variable = { name = rf_is_successor_split_title value = 1 years = 30 }
+                set_variable = { name = rf_is_permanent_successor_split value = 1 }
+                if = {
+                    limit = { scope:rf_attacker_old_split_title = { has_variable = rf_successor_permanent_realm_size } }
+                    set_variable = { name = rf_successor_permanent_realm_size value = scope:rf_attacker_old_split_title.var:rf_successor_permanent_realm_size }
+                }
+                else = {
+                    set_variable = { name = rf_successor_permanent_realm_size value = scope:attacker.var:tmp_successor_realm_size }
+                }
+            }
+            scope:attacker = { remove_variable = tmp_successor_realm_size }
+            scope:rf_attacker_old_split_title = {
+                remove_variable = rf_is_successor_split_title
+                remove_variable = rf_successor_origin_title
+                remove_variable = rf_successor_root_origin_title
+                remove_variable = rf_is_permanent_successor_split
+                remove_variable = rf_successor_permanent_realm_size
+            }
+            scope:attacker = { destroy_title = scope:rf_attacker_old_split_title }
+        }
 
         scope:defender = { ep3_war_loss_adventurer_tt_effect = yes }
 
@@ -335,15 +379,17 @@
 
     interface_priority = 80
 
-    use_de_jure_wargoal_only = yes
-    # Successor wars target the defender's de jure realm title. The attacker
-    # should need broad occupation of that target, while the defender should
-    # gain ticking score for keeping most of the target unsieged.
-    attacker_wargoal_percentage = 0.8
-    defender_wargoal_percentage = 0.75
+    ticking_war_score_targets_entire_realm = yes
+    # Successor wars are displayed against the defender's primary title but
+    # resolve against the defender's realm, so ticking score should use the
+    # whole realm rather than a de jure slice of the selected title.
+    # Require a majority of the defender's realm before ticking warscore starts,
+    # leaving successor wars more room to be decided by battles and sieges.
+    attacker_wargoal_percentage = 0.51
+    defender_wargoal_percentage = 0.51
 
-    attacker_ticking_warscore_delay = { months = 12 }
-    defender_ticking_warscore_delay = { months = 12 }
+    attacker_ticking_warscore_delay = { months = 36 }
+    defender_ticking_warscore_delay = { months = 36 }
     attacker_ticking_warscore = 0.1
     defender_ticking_warscore = 0.1
 
@@ -362,7 +408,7 @@
     landless_attacker_needs_armies = no
     allow_hostages = yes
 
-    max_ai_diplo_distance_to_title = 300
+    max_ai_diplo_distance_to_title = 50
 
     ai_score_mult = {
         value = 1

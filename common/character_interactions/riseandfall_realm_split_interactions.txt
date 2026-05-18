@@ -324,7 +324,7 @@ riseandfall_surrender_to_successor_interaction = {
 	}
 
 	ai_will_do = {
-		base = -150
+		base = -100
 
 		modifier = {
 			scope:recipient = {
@@ -410,7 +410,33 @@ riseandfall_surrender_to_successor_interaction = {
 			}
 			add = 40
 		}
+		modifier = {
+			# Successors facing overwhelming force should look for terms instead of waiting for certain defeat.
+			scope:recipient = {
+				current_military_strength > {
+					value = scope:actor.current_military_strength
+					multiply = 5
+				}
+			}
+			add = 30
+		}
 		modifier = { scope:actor = { current_military_strength > scope:recipient.current_military_strength } add = -50 }
+		modifier = {
+			# Compare realm size against the recipient instead of using fixed county counts, so total-conversion maps scale cleanly.
+			scope:recipient = {
+				realm_size > scope:actor.realm_size
+			}
+			add = 15
+		}
+		modifier = {
+			scope:recipient = {
+				realm_size > {
+					value = scope:actor.realm_size
+					multiply = 3
+				}
+			}
+			add = 25
+		}
 		modifier = {
 			scope:recipient = {
 				has_variable = riseandfall_realm_stability_score

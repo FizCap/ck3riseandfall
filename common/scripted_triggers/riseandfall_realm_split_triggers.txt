@@ -266,6 +266,16 @@ riseandfall_can_switch_successor_sides_trigger = {
         primary_title.tier >= tier_county
         primary_title.tier < tier_hegemony
         NOT = { government_has_flag = government_is_landless_adventurer }
+        # Defection is a voluntary camp switch, so it cannot bypass a truce
+        # with the current liege or an active direct war against them.
+        custom_tooltip = {
+            text = riseandfall_switch_sides_no_truce_with_liege
+            NOT = { has_truce = liege }
+        }
+        custom_tooltip = {
+            text = riseandfall_switch_sides_not_at_war_with_liege
+            NOT = { is_at_war_with = liege }
+        }
     }
     scope:recipient = {
         is_landed = yes

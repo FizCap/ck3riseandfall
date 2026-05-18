@@ -190,6 +190,8 @@ realm_split.2001.a:0 "Treachery."
 riseandfall_switch_sides_interaction:0 "Defect/Switch Sides"
 riseandfall_switch_sides_interaction_desc:0 "Offer to abandon your current camp and join [recipient.GetShortUINamePossessiveNoTooltip] side in the successor struggle."
 riseandfall_switch_sides_interaction_notification:0 "[actor.GetShortUIName] seeks to defect from [actor.GetLiege.GetShortUIName] and join your side in the successor struggle."
+riseandfall_switch_sides_no_truce_with_liege:0 "You do not have a [truce|E] with your [liege|E]"
+riseandfall_switch_sides_not_at_war_with_liege:0 "You are not at [war|E] with your [liege|E]"
 
 riseandfall_surrender_to_successor_interaction:0 "Surrender Realm"
 riseandfall_surrender_to_successor_interaction_desc:0 "Offer to give up your successor crown and submit to [recipient.GetShortUINameNoTooltip] as a vassal."

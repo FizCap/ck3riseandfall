@@ -75,7 +75,7 @@ authority_collapse.1001 = {
             root = {
                 # Persist beyond the cooldown so a later yearly roll can escalate into total collapse.
                 set_variable = { name = riseandfall_recent_nationalist_revolt value = yes years = 10 }
-                set_variable = { name = low_stability_cooldown value = yes years = 5 }
+                add_character_flag = { flag = rf_low_stability_cooldown years = 5 }
 
                 # Apply the revolt modifier only for culture mismatches when the liege's culture is valid.
                 if = {
@@ -237,7 +237,7 @@ authority_collapse.1002 = {
             root = {
                 # Persist beyond the cooldown so a later yearly roll can escalate into total collapse.
                 set_variable = { name = riseandfall_recent_vassal_crisis value = yes years = 10 }
-                set_variable = { name = low_stability_cooldown value = yes years = 5 }
+                add_character_flag = { flag = rf_low_stability_cooldown years = 5 }
                 add_character_modifier = { modifier = riseandfall_vassal_authority_crisis years = 5 }
             }
         }
@@ -274,7 +274,7 @@ authority_collapse.1003 = {
                         years = 5
                     }
                 }
-                set_variable = { name = low_stability_cooldown value = yes years = 5 }
+                add_character_flag = { flag = rf_low_stability_cooldown years = 5 }
                 add_character_modifier = { modifier = riseandfall_authority_collapse_liege_debuff years = 5 }
                 if = {
                     limit = { treasury > 0 }

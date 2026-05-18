@@ -635,11 +635,11 @@ riseandfall_palace_coup_setup = {
     # ---------------------------------------------------------
     # COOLDOWNS
     # ---------------------------------------------------------
-    set_variable = { name = low_stability_cooldown value = yes years = 5 }
+    add_character_flag = { flag = rf_low_stability_cooldown years = 5 }
 
     if = {
         limit = { exists = scope:challenger }
-        scope:challenger = { set_variable = { name = low_stability_cooldown value = yes years = 5 } }
+        scope:challenger = { add_character_flag = { flag = rf_low_stability_cooldown years = 5 } }
     }
 }
 
@@ -1499,7 +1499,6 @@ riseandfall_palace_coup_root_flees_success = {
         limit = {
             exists = scope:palace_coup_old_capital_county
             NOT = { scope:palace_coup_old_capital_county = { holder = scope:palace_coup_challenger } }
-            NOT = { scope:palace_coup_old_capital_county ?= scope:palace_coup_original_reserve_county }
         }
         create_title_and_vassal_change = {
             type = conquest
@@ -1538,22 +1537,46 @@ riseandfall_palace_coup_root_flees_success = {
     # Loyalists are returned once the fleeing ruler has a valid successor realm;
     # only unprotected rejectors remain eligible for the follow-up split.
     scope:original_ruler = {
-        every_held_title = {
-            limit = {
-                NOT = { this = scope:original_primary }
-                NOT = { this = scope:palace_coup_old_capital_county }
-                NOT = { this ?= scope:palace_coup_original_reserve_county }
-                NOT = { is_head_of_faith = yes }
-                NOT = { is_noble_family_title = yes }
-                OR = {
-                    tier = tier_kingdom
-                    tier = tier_duchy
-                    tier = tier_county
+        if = {
+            limit = { exists = scope:palace_coup_original_reserve_county }
+            every_held_title = {
+                limit = {
+                    NOT = { this = scope:original_primary }
+                    NOT = { this = scope:palace_coup_old_capital_county }
+                    NOT = { this ?= scope:palace_coup_original_reserve_county }
+                    NOT = { is_head_of_faith = yes }
+                    NOT = { is_noble_family_title = yes }
+                    OR = {
+                        tier = tier_kingdom
+                        tier = tier_duchy
+                        tier = tier_county
+                    }
+                }
+                change_title_holder = {
+                    holder = scope:palace_coup_challenger
+                    change = scope:palace_coup_split_change
                 }
             }
-            change_title_holder = {
-                holder = scope:palace_coup_challenger
-                change = scope:palace_coup_split_change
+        }
+        else = {
+            # A ruler with only the capital personally held has no reserve scope;
+            # skip that comparison while transferring all non-capital titles.
+            every_held_title = {
+                limit = {
+                    NOT = { this = scope:original_primary }
+                    NOT = { this = scope:palace_coup_old_capital_county }
+                    NOT = { is_head_of_faith = yes }
+                    NOT = { is_noble_family_title = yes }
+                    OR = {
+                        tier = tier_kingdom
+                        tier = tier_duchy
+                        tier = tier_county
+                    }
+                }
+                change_title_holder = {
+                    holder = scope:palace_coup_challenger
+                    change = scope:palace_coup_split_change
+                }
             }
         }
         every_vassal = {
@@ -1591,6 +1614,10 @@ riseandfall_palace_coup_root_flees_success = {
                 limit = {
                     is_landed = yes
                     primary_title.tier >= tier_duchy
+                    any_held_title = {
+                        count >= 2
+                        tier = tier_county
+                    }
                     NOT = { capital_county.duchy = scope:palace_coup_core_duchy }
                 }
                 order_by = current_military_strength
@@ -1602,6 +1629,10 @@ riseandfall_palace_coup_root_flees_success = {
                 ordered_vassal = {
                     limit = {
                         is_landed = yes
+                        any_held_title = {
+                            count >= 2
+                            tier = tier_county
+                        }
                         NOT = { capital_county.duchy = scope:palace_coup_core_duchy }
                     }
                     order_by = current_military_strength
@@ -1613,7 +1644,13 @@ riseandfall_palace_coup_root_flees_success = {
             if = {
                 limit = { NOT = { exists = scope:palace_coup_land_donor } }
                 ordered_vassal = {
-                    limit = { is_landed = yes }
+                    limit = {
+                        is_landed = yes
+                        any_held_title = {
+                            count >= 2
+                            tier = tier_county
+                        }
+                    }
                     order_by = current_military_strength
                     max = 1
                     save_scope_as = palace_coup_land_donor

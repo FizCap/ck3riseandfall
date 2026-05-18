@@ -627,8 +627,8 @@ riseandfall_release_revolt_realms_se = {
             }
         }
         # Concession debuff removed per request; no temporary liege modifier applied here.
-        # Ensure the cooldown variable is set so a new revolt doesn't fire immediately
-        set_variable = { name = low_stability_cooldown value = yes years = 5 }
+        # Ensure the cooldown flag is set so a new revolt doesn't fire immediately.
+        add_character_flag = { flag = rf_low_stability_cooldown years = 5 }
         set_variable = { name = riseandfall_recent_nationalist_revolt value = yes years = 10 }
     }
 }

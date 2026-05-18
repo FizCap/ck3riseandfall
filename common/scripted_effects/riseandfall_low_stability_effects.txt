@@ -10,7 +10,7 @@ riseandfall_low_stability_roll_se = {
             # Ensure a default stability score exists so scripts don't error when it's missing
             if = { limit = { NOT = { has_variable = riseandfall_realm_stability_score } } set_variable = { name = riseandfall_realm_stability_score value = 50 } }
             if = {
-                limit = { NOT = { has_variable = low_stability_cooldown } }
+                limit = { NOT = { has_character_flag = rf_low_stability_cooldown } }
                 # Compute chance with a curved (approx power 1.5) formula based on highest held title tier.
                 # Thresholds: county = 30, duchy = 35, kingdom = 40, empire = 45, hegemony = 50.
                 # Approach: tmp_diff = max(0, threshold - stability_score)

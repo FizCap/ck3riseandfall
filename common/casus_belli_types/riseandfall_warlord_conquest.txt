@@ -23,14 +23,17 @@
     is_vassal_or_below_of = scope:attacker.liege
     NOT = { this = scope:attacker }
     }
-    target_titles = neighbor_land
+    target_titles = all
     target_title_tier = all  # Allow targeting any tier titles, including non-existent ones
-    target_de_jure_regions_above = yes
     ignore_effect = change_title_holder
 
     
 
     valid_to_start = {
+        # The victory effect takes the defender's realm title stack, so keep the
+        # declaration UI anchored to the defender's primary title instead of
+        # showing unrelated de jure regions as selectable war goals.
+        scope:target = scope:defender.primary_title
         scope:target = {
             tier = scope:defender.primary_title.tier
         }
@@ -408,16 +411,18 @@
 
     interface_priority = 79
 
-    use_de_jure_wargoal_only = yes
-    # Warlord conquests use the defender's de jure target title. The attacker
-    # should need broad occupation, while the defender gets ticking score for
-    # keeping most of the target unsieged.
-    attacker_wargoal_percentage = 0.8
-    defender_wargoal_percentage = 0.75
+    ticking_war_score_targets_entire_realm = yes
+    # Warlord conquests are displayed against the defender's primary title but
+    # resolve against the defender's realm, so ticking score should use the
+    # whole realm rather than a de jure slice of the selected title.
+    # Require a majority of the defender's realm before ticking warscore starts,
+    # leaving warlord conquests more room to be decided by battles and sieges.
+    attacker_wargoal_percentage = 0.51
+    defender_wargoal_percentage = 0.51
 
     # War score tuning — prioritize battles (cap battles contribution at 90)
-    attacker_ticking_warscore_delay = { months = 12 }    # Delay before ticking warscore increases for attacker
-    defender_ticking_warscore_delay = { months = 12 }    # Delay before ticking warscore increases for defender
+    attacker_ticking_warscore_delay = { months = 36 }    # Delay before ticking warscore increases for attacker
+    defender_ticking_warscore_delay = { months = 36 }    # Delay before ticking warscore increases for defender
     attacker_ticking_warscore = 0.1                       # Ticking warscore per day for attacker
     defender_ticking_warscore = 0.1                       # Ticking warscore per day for defender
 

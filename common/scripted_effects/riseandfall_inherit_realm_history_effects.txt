@@ -1,5 +1,5 @@
 ﻿########################################
-# Inherit realm history (civil war years, puppet regency years, war multiplier)
+# Inherit realm history (civil war years and puppet regency years)
 # Called on heir/new title holder when they inherit from a strictly higher-ranked
 # predecessor but they already had a stability score (we don't want to overwrite their
 # existing stability_score). This effect copies supplementary history to the heir.
@@ -15,9 +15,5 @@ riseandfall_inherit_realm_history_se = {
         
         else = { set_variable = { name = riseandfall_puppet_regency_years value = 0 } }
 
-        # Copy the war multiplier; clamp to sane bounds
-        if = { limit = { scope:predecessor = { has_variable = riseandfall_realm_stability_war_multiplier } } set_variable = { name = riseandfall_realm_stability_war_multiplier value = scope:predecessor.var:riseandfall_realm_stability_war_multiplier } }
-        
-        else = { set_variable = { name = riseandfall_realm_stability_war_multiplier value = 100 } }
     }
 }

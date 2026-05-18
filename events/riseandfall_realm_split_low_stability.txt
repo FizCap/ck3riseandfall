@@ -135,7 +135,7 @@ realm_split.1001 = {
         }
         
         # Set cooldown
-        set_variable = { name = low_stability_cooldown value = yes years = 5 }
+        add_character_flag = { flag = rf_low_stability_cooldown years = 5 }
         
         ai_chance = {
             base = 100

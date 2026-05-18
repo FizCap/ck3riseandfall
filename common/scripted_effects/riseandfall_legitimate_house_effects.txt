@@ -1,0 +1,403 @@
+﻿# Rise and Fall - Legitimate Houses
+# Stores independent-realm dynastic legitimacy on titles so primary-title switching
+# cannot reset the Realm Stability penalty.
+
+riseandfall_clear_legitimate_house_title_vars_se = {
+    remove_variable = riseandfall_lh_legitimate_house
+    remove_variable = riseandfall_lh_legitimate_predecessor
+    remove_variable = riseandfall_lh_current_house
+    remove_variable = riseandfall_lh_current_holder
+    remove_variable = riseandfall_lh_current_house_start_year
+    remove_variable = riseandfall_lh_current_house_score
+}
+
+riseandfall_legitimate_house_title_maintenance_se = {
+    # Root scope: title. Only duchy+ titles directly held by independent,
+    # non-administrative rulers keep legitimate-house data. Japanese Ritsuryo
+    # also opts out because it uses administrative appointment logic.
+    if = {
+        limit = {
+            tier >= tier_duchy
+            exists = holder
+            holder = {
+                is_independent_ruler = yes
+                NOT = { government_has_flag = government_is_administrative }
+                NOT = { has_government = japan_administrative_government }
+                exists = house
+            }
+        }
+
+        save_scope_as = rf_lh_title
+
+        if = {
+            limit = { NOT = { has_variable = riseandfall_lh_legitimate_house } }
+            set_variable = { name = riseandfall_lh_legitimate_house value = holder.house }
+            set_variable = { name = riseandfall_lh_legitimate_predecessor value = holder }
+            set_variable = { name = riseandfall_lh_current_house_score value = 100 }
+        }
+
+        if = {
+            limit = {
+                OR = {
+                    NOT = { has_variable = riseandfall_lh_current_house }
+                    NOT = { var:riseandfall_lh_current_house ?= holder.house }
+                }
+            }
+            set_variable = { name = tmp_lh_previous_house_score value = 0 }
+            set_variable = { name = tmp_lh_same_holder_house_change value = 0 }
+            if = {
+                limit = { has_variable = riseandfall_lh_current_house_score }
+                set_variable = { name = tmp_lh_previous_house_score value = var:riseandfall_lh_current_house_score }
+            }
+            if = {
+                limit = {
+                    OR = {
+                        AND = {
+                            has_variable = riseandfall_lh_current_holder
+                            var:riseandfall_lh_current_holder ?= holder
+                        }
+                        AND = {
+                            has_variable = riseandfall_lh_legitimate_predecessor
+                            var:riseandfall_lh_legitimate_predecessor ?= holder
+                        }
+                    }
+                }
+                set_variable = { name = tmp_lh_same_holder_house_change value = 1 }
+            }
+
+            set_variable = { name = riseandfall_lh_current_house value = holder.house }
+            set_variable = { name = riseandfall_lh_current_house_start_year value = current_year }
+            set_variable = { name = riseandfall_lh_current_house_score value = 0 }
+
+            # If the same ruler creates a cadet branch, preserve their title
+            # acceptance instead of treating the new house as an outside takeover.
+            if = {
+                limit = { var:tmp_lh_same_holder_house_change = 1 }
+                set_variable = { name = riseandfall_lh_current_house_score value = var:tmp_lh_previous_house_score }
+                clamp_variable = { name = riseandfall_lh_current_house_score min = 0 max = 100 }
+                if = {
+                    limit = { var:riseandfall_lh_current_house_score >= 100 }
+                    set_variable = { name = riseandfall_lh_legitimate_house value = holder.house }
+                    set_variable = { name = riseandfall_lh_legitimate_predecessor value = holder }
+                }
+            }
+            else = {
+                # Different rulers' houses begin at 0 legitimacy, then receive
+                # starting credit for dynastic continuity or visible ties to the
+                # accepted line.
+                if = {
+                    limit = { var:riseandfall_lh_legitimate_house ?= holder.house }
+                    set_variable = { name = riseandfall_lh_current_house_score value = 100 }
+                }
+                else = {
+                    if = {
+                        limit = {
+                            has_variable = riseandfall_lh_legitimate_house
+                            holder = { exists = house }
+                        }
+                        var:riseandfall_lh_legitimate_house = {
+                            house_dynasty = { save_scope_as = rf_lh_legitimate_dynasty }
+                        }
+                        if = {
+                            limit = {
+                                holder.house = {
+                                    house_dynasty = scope:rf_lh_legitimate_dynasty
+                                }
+                            }
+                            change_variable = { name = riseandfall_lh_current_house_score add = 25 }
+                        }
+                        clear_saved_scope = rf_lh_legitimate_dynasty
+                    }
+                    if = {
+                        limit = {
+                            holder = {
+                                any_spouse = {
+                                    exists = house
+                                    house ?= scope:rf_lh_title.var:riseandfall_lh_legitimate_house
+                                }
+                            }
+                        }
+                        change_variable = { name = riseandfall_lh_current_house_score add = 10 }
+                    }
+                    if = {
+                        limit = {
+                            holder = {
+                                any_close_or_extended_family_member = {
+                                    exists = house
+                                    house ?= scope:rf_lh_title.var:riseandfall_lh_legitimate_house
+                                }
+                            }
+                        }
+                        change_variable = { name = riseandfall_lh_current_house_score add = 15 }
+                    }
+                    if = {
+                        limit = { has_variable = riseandfall_lh_legitimate_predecessor }
+                        var:riseandfall_lh_legitimate_predecessor = { save_scope_as = rf_lh_predecessor }
+                        if = {
+                            limit = { holder = { is_extended_family_of = scope:rf_lh_predecessor } }
+                            change_variable = { name = riseandfall_lh_current_house_score add = 15 }
+                        }
+                        if = {
+                            limit = { holder = { is_close_family_of = scope:rf_lh_predecessor } }
+                            change_variable = { name = riseandfall_lh_current_house_score add = 25 }
+                        }
+                        clear_saved_scope = rf_lh_predecessor
+                    }
+                    clamp_variable = { name = riseandfall_lh_current_house_score min = 0 max = 99 }
+                }
+            }
+
+            remove_variable = tmp_lh_previous_house_score
+            remove_variable = tmp_lh_same_holder_house_change
+        }
+
+        if = {
+            limit = { NOT = { has_variable = riseandfall_lh_current_house_score } }
+            set_variable = { name = riseandfall_lh_current_house_score value = 0 }
+        }
+
+        # Each yearly maintenance tick moves a different ruling house toward
+        # acceptance. Cadet houses and rulers with personal ties to the accepted
+        # line integrate faster than unrelated conquerors.
+        if = {
+            limit = {
+                NOT = { var:riseandfall_lh_legitimate_house ?= holder.house }
+                var:riseandfall_lh_current_house_score < 100
+            }
+            set_variable = { name = tmp_lh_yearly_gain value = 4 }
+            var:riseandfall_lh_legitimate_house = {
+                house_dynasty = { save_scope_as = rf_lh_legitimate_dynasty }
+            }
+            if = {
+                limit = {
+                    holder.house = {
+                        house_dynasty = scope:rf_lh_legitimate_dynasty
+                    }
+                }
+                change_variable = { name = tmp_lh_yearly_gain add = 2 }
+            }
+            clear_saved_scope = rf_lh_legitimate_dynasty
+            if = {
+                limit = {
+                    holder = {
+                        any_spouse = {
+                            exists = house
+                            house ?= scope:rf_lh_title.var:riseandfall_lh_legitimate_house
+                        }
+                    }
+                }
+                change_variable = { name = tmp_lh_yearly_gain add = 1 }
+            }
+            if = {
+                limit = {
+                    holder = {
+                        any_close_or_extended_family_member = {
+                            exists = house
+                            house ?= scope:rf_lh_title.var:riseandfall_lh_legitimate_house
+                        }
+                    }
+                }
+                change_variable = { name = tmp_lh_yearly_gain add = 1 }
+            }
+            if = {
+                limit = { has_variable = riseandfall_lh_legitimate_predecessor }
+                var:riseandfall_lh_legitimate_predecessor = { save_scope_as = rf_lh_predecessor }
+                if = {
+                    limit = { holder = { is_extended_family_of = scope:rf_lh_predecessor } }
+                    change_variable = { name = tmp_lh_yearly_gain add = 1 }
+                }
+                if = {
+                    limit = { holder = { is_close_family_of = scope:rf_lh_predecessor } }
+                    change_variable = { name = tmp_lh_yearly_gain add = 2 }
+                }
+                clear_saved_scope = rf_lh_predecessor
+            }
+
+            change_variable = { name = riseandfall_lh_current_house_score add = var:tmp_lh_yearly_gain }
+            clamp_variable = { name = riseandfall_lh_current_house_score min = 0 max = 100 }
+
+            if = {
+                limit = { var:riseandfall_lh_current_house_score >= 100 }
+                set_variable = { name = riseandfall_lh_legitimate_house value = holder.house }
+                set_variable = { name = riseandfall_lh_legitimate_predecessor value = holder }
+                set_variable = { name = riseandfall_lh_current_house value = holder.house }
+                set_variable = { name = riseandfall_lh_current_house_start_year value = current_year }
+                set_variable = { name = riseandfall_lh_current_house_score value = 100 }
+            }
+            remove_variable = tmp_lh_yearly_gain
+        }
+
+        set_variable = { name = riseandfall_lh_current_holder value = holder }
+        clear_saved_scope = rf_lh_title
+    }
+    else = {
+        riseandfall_clear_legitimate_house_title_vars_se = yes
+    }
+}
+
+riseandfall_legitimate_house_ruler_maintenance_se = {
+    # Root scope: character. Maintain all held duchy+ titles so secondary
+    # crowns keep their own history even while they are not primary.
+    if = {
+        limit = { has_game_rule = riseandfall_legitimate_houses_enabled }
+        every_held_title = {
+            limit = { tier >= tier_duchy }
+            riseandfall_legitimate_house_title_maintenance_se = yes
+        }
+    }
+    else = {
+        every_held_title = {
+            limit = { tier >= tier_duchy }
+            riseandfall_clear_legitimate_house_title_vars_se = yes
+        }
+    }
+}
+
+riseandfall_calculate_legitimate_house_component_se = {
+    # Root scope: character. Computes a visible Realm Stability component from
+    # the current primary title only.
+    save_scope_as = rf_lh_ruler
+    set_variable = { name = riseandfall_rs_legitimate_house_component value = 0 }
+    set_variable = { name = riseandfall_lh_status_display value = 0 }
+    set_variable = { name = riseandfall_lh_years_ruled_display value = 0 }
+    set_variable = { name = riseandfall_lh_score_display value = 0 }
+    set_variable = { name = riseandfall_lh_relation_display value = 0 }
+
+    if = {
+        limit = {
+            has_game_rule = riseandfall_legitimate_houses_enabled
+            is_independent_ruler = yes
+            NOT = { government_has_flag = government_is_administrative }
+            NOT = { has_government = japan_administrative_government }
+            exists = house
+            exists = primary_title
+            primary_title = {
+                tier >= tier_duchy
+                has_variable = riseandfall_lh_legitimate_house
+            }
+        }
+
+        primary_title = { save_scope_as = rf_lh_primary_title }
+        set_variable = { name = riseandfall_lh_status_display value = 1 }
+        set_variable = { name = riseandfall_lh_relation_display value = 7 }
+        set_variable = { name = riseandfall_lh_score_display value = 100 }
+
+        if = {
+            limit = { scope:rf_lh_primary_title = { has_variable = riseandfall_lh_current_house_start_year } }
+            set_variable = { name = riseandfall_lh_years_ruled_display value = current_year }
+            change_variable = { name = riseandfall_lh_years_ruled_display subtract = scope:rf_lh_primary_title.var:riseandfall_lh_current_house_start_year }
+            clamp_variable = { name = riseandfall_lh_years_ruled_display min = 0 max = 30 }
+        }
+
+        if = {
+            limit = {
+                scope:rf_lh_primary_title = {
+                    NOT = { var:riseandfall_lh_legitimate_house ?= scope:rf_lh_ruler.house }
+                }
+            }
+
+            set_variable = { name = riseandfall_lh_status_display value = 2 }
+            set_variable = { name = riseandfall_lh_relation_display value = 0 }
+            if = {
+                limit = { scope:rf_lh_primary_title = { has_variable = riseandfall_lh_current_house_score } }
+                set_variable = { name = riseandfall_lh_score_display value = scope:rf_lh_primary_title.var:riseandfall_lh_current_house_score }
+            }
+            clamp_variable = { name = riseandfall_lh_score_display min = 0 max = 99 }
+
+            # The score is the source of truth: 0 means a full penalty, while
+            # 100 means the new house has been accepted for this title.
+            set_variable = { name = riseandfall_rs_legitimate_house_component value = var:riseandfall_lh_score_display }
+            change_variable = { name = riseandfall_rs_legitimate_house_component multiply = 15 }
+            change_variable = { name = riseandfall_rs_legitimate_house_component divide = 100 }
+            change_variable = { name = riseandfall_rs_legitimate_house_component subtract = 15 }
+            round_variable = { name = riseandfall_rs_legitimate_house_component nearest = 1 }
+            clamp_variable = { name = riseandfall_rs_legitimate_house_component min = -15 max = 0 }
+
+            scope:rf_lh_primary_title.var:riseandfall_lh_legitimate_house = {
+                house_dynasty = { save_scope_as = rf_lh_legitimate_dynasty }
+            }
+            if = {
+                limit = {
+                    scope:rf_lh_ruler.house = {
+                        house_dynasty = scope:rf_lh_legitimate_dynasty
+                    }
+                }
+                set_variable = { name = riseandfall_lh_relation_display value = 9 }
+            }
+            clear_saved_scope = rf_lh_legitimate_dynasty
+            if = {
+                limit = {
+                    scope:rf_lh_ruler = {
+                        any_spouse = {
+                            exists = house
+                            house ?= scope:rf_lh_primary_title.var:riseandfall_lh_legitimate_house
+                        }
+                    }
+                }
+                set_variable = { name = riseandfall_lh_relation_display value = 1 }
+            }
+            if = {
+                limit = {
+                    scope:rf_lh_ruler = {
+                        any_close_or_extended_family_member = {
+                            exists = house
+                            house ?= scope:rf_lh_primary_title.var:riseandfall_lh_legitimate_house
+                        }
+                    }
+                }
+                set_variable = { name = riseandfall_lh_relation_display value = 3 }
+            }
+
+            # The predecessor is only a display helper; the title's legitimate
+            # house remains the source of truth for the actual penalty.
+            if = {
+                limit = { scope:rf_lh_primary_title = { has_variable = riseandfall_lh_legitimate_predecessor } }
+                scope:rf_lh_primary_title.var:riseandfall_lh_legitimate_predecessor = { save_scope_as = rf_lh_predecessor }
+
+                if = {
+                    limit = {
+                        scope:rf_lh_ruler = {
+                            any_spouse = { is_sibling_of = scope:rf_lh_predecessor }
+                        }
+                    }
+                    set_variable = { name = riseandfall_lh_relation_display value = 8 }
+                }
+                if = {
+                    limit = { scope:rf_lh_ruler = { is_extended_family_of = scope:rf_lh_predecessor } }
+                    set_variable = { name = riseandfall_lh_relation_display value = 3 }
+                }
+                if = {
+                    limit = { scope:rf_lh_ruler = { is_cousin_of = scope:rf_lh_predecessor } }
+                    set_variable = { name = riseandfall_lh_relation_display value = 2 }
+                }
+                if = {
+                    limit = { scope:rf_lh_ruler = { is_close_family_of = scope:rf_lh_predecessor } }
+                    set_variable = { name = riseandfall_lh_relation_display value = 4 }
+                }
+                if = {
+                    limit = { scope:rf_lh_ruler = { is_sibling_of = scope:rf_lh_predecessor } }
+                    set_variable = { name = riseandfall_lh_relation_display value = 5 }
+                }
+                if = {
+                    limit = {
+                        OR = {
+                            scope:rf_lh_ruler = { is_parent_of = scope:rf_lh_predecessor }
+                            scope:rf_lh_predecessor = { is_parent_of = scope:rf_lh_ruler }
+                            scope:rf_lh_ruler = { is_grandparent_of = scope:rf_lh_predecessor }
+                            scope:rf_lh_predecessor = { is_grandparent_of = scope:rf_lh_ruler }
+                            scope:rf_lh_ruler = { is_grandchild_of = scope:rf_lh_predecessor }
+                            scope:rf_lh_predecessor = { is_grandchild_of = scope:rf_lh_ruler }
+                        }
+                    }
+                    set_variable = { name = riseandfall_lh_relation_display value = 6 }
+                }
+
+                clear_saved_scope = rf_lh_predecessor
+            }
+
+        }
+        clear_saved_scope = rf_lh_primary_title
+    }
+
+    clear_saved_scope = rf_lh_ruler
+}

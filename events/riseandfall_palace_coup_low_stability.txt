@@ -209,6 +209,8 @@ palace_coup.1002 = {
 		custom_tooltip = palace_coup.1002.rebellion.tooltip
 		trigger = {
 			exists = scope:challenger
+			# One-county realms cannot split into a retreat state, so they must submit.
+			realm_size > 1
 		}
 		hidden_effect = { riseandfall_palace_coup_start_rebellion = yes }
 

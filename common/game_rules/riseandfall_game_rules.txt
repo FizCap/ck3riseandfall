@@ -108,6 +108,24 @@ riseandfall_enable_realm_stability = {
     }
 }
 
+riseandfall_legitimate_houses = {
+
+    categories = {
+        riseandfall
+    }
+
+    # Default: enabled. Independent duchy+ titles track their accepted ruling
+    # house and can penalize Realm Stability when held by a new house.
+    default = riseandfall_legitimate_houses_enabled
+
+    riseandfall_legitimate_houses_enabled = {
+    }
+
+    riseandfall_legitimate_houses_disabled = {
+        flag = riseandfall_legitimate_houses_disabled
+    }
+}
+
 riseandfall_realm_stability_difficulty_target = {
 
     categories = {

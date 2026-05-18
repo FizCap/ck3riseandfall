@@ -355,7 +355,7 @@
                 }
             }
             # Set low stability cooldown for 5 years after winning
-            set_variable = { name = low_stability_cooldown value = yes days = 1825 }
+            add_character_flag = { flag = rf_low_stability_cooldown days = 1825 }
         }
 
         scope:attacker = { show_pow_release_message_effect = yes }
@@ -674,12 +674,12 @@
     should_show_war_goal_subview = yes
 
     use_de_jure_wargoal_only = yes
-    # Claim wars target the defender's de jure title. The attacker should need
-    # broad occupation, while the defender gets ticking score for holding it.
-    attacker_wargoal_percentage = 0.8
-    defender_wargoal_percentage = 0.75
-    attacker_ticking_warscore_delay = { months = 24 }    # Increase delay before ticking War Score starts
-    defender_ticking_warscore_delay = { months = 24 }
+    # Require a majority of the target before ticking warscore starts, and give
+    # adventurer claim wars more time to resolve through battles and sieges.
+    attacker_wargoal_percentage = 0.51
+    defender_wargoal_percentage = 0.51
+    attacker_ticking_warscore_delay = { months = 36 }    # Delay ticking War Score for three years
+    defender_ticking_warscore_delay = { months = 36 }
     attacker_ticking_warscore = 0.2                     # Increase daily ticking War Score
     defender_ticking_warscore = 0.2
     attacker_score_from_battles_scale = 40

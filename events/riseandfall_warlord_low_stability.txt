@@ -20,7 +20,7 @@ warlord.1001 = {
         hidden_effect = {
             riseandfall_warlord_notify_vassals = yes
             # Set low stability cooldown on the liege when this event fires
-            set_variable = { name = low_stability_cooldown value = yes years = 5 }
+            add_character_flag = { flag = rf_low_stability_cooldown years = 5 }
         }
     }
 }
