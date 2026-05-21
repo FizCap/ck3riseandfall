@@ -1907,6 +1907,17 @@ riseandfall_realm_split_surrender_to_recipient_se = {
         remove_character_flag = rf_successor_state_ruler
         remove_variable = rf_successor_origin_title
         remove_variable = rf_successor_root_origin_title
+        # Surrender ends this ruler's successor-state status. The demotion
+        # helper may copy split metadata onto a lower replacement title so the
+        # actor can remain landed; clear it before the yearly monitor can
+        # rebuild that title into a fresh independent successor realm.
+        every_held_title = {
+            remove_variable = rf_is_successor_split_title
+            remove_variable = rf_successor_origin_title
+            remove_variable = rf_successor_root_origin_title
+            remove_variable = rf_is_permanent_successor_split
+            remove_variable = rf_successor_permanent_realm_size
+        }
     }
     if = {
         limit = { scope:rf_submitted_split_title = { exists = holder } }

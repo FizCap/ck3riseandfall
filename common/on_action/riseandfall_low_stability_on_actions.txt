@@ -42,8 +42,41 @@ on_imprison = {
     }
 }
 
+on_death = {
+    on_actions = {
+        riseandfall_mark_puppet_succession_on_death
+    }
+}
+
+# Puppet Master resync: diarchy changes are rare and can leave the court
+# position out of step with the active puppet master until the pulse fallback.
+on_entered_diarchy = {
+    on_actions = {
+        riseandfall_check_puppet_regency
+    }
+}
+
+on_left_diarchy = {
+    on_actions = {
+        riseandfall_check_puppet_regency
+    }
+}
+
+on_diarch_change = {
+    on_actions = {
+        riseandfall_check_puppet_regency
+    }
+}
+
+on_diarch_designation = {
+    on_actions = {
+        riseandfall_check_puppet_regency
+    }
+}
+
 on_title_gain = {
     on_actions = {
+        riseandfall_check_puppet_regency
         riseandfall_warlord_title_cleanup
         riseandfall_successor_primary_title_sync
     }
@@ -51,6 +84,8 @@ on_title_gain = {
 
 on_title_gain_inheritance = {
     on_actions = {
+        riseandfall_resolve_puppet_succession_on_inheritance
+        riseandfall_check_puppet_regency
         riseandfall_warlord_title_cleanup
         riseandfall_successor_primary_title_sync
     }
@@ -95,6 +130,104 @@ riseandfall_check_puppet_regency = {
     }
     effect = {
         riseandfall_check_puppet_regency_end = yes
+    }
+}
+
+riseandfall_mark_puppet_succession_on_death = {
+    trigger = {
+        has_game_rule = riseandfall_low_stability_events_enabled
+        is_independent_ruler = yes
+        has_diarchy_type = puppet_regency
+        has_active_diarchy = yes
+    }
+    effect = {
+        # Death fires before inheritance has fully settled; mark the likely heir
+        # and resolve the puppet succession after title inheritance.
+        clear_saved_scope = rf_dying_puppet_master
+        if = {
+            limit = { exists = diarch }
+            diarch = { save_scope_as = rf_dying_puppet_master }
+        }
+        if = {
+            limit = {
+                exists = primary_heir
+                primary_heir = { is_alive = yes }
+            }
+            primary_heir = {
+                riseandfall_clear_puppet_succession_pending_se = yes
+                add_character_flag = { flag = rf_puppet_succession_pending days = 30 }
+                set_variable = { name = rf_puppet_succession_predecessor value = root }
+                if = {
+                    limit = { exists = scope:rf_dying_puppet_master }
+                    set_variable = { name = rf_puppet_succession_diarch value = scope:rf_dying_puppet_master }
+                }
+                if = {
+                    limit = { root = { has_variable = riseandfall_puppet_regency_years } }
+                    set_variable = { name = rf_puppet_succession_years value = root.var:riseandfall_puppet_regency_years }
+                }
+                if = { limit = { is_landed = yes } add_character_flag = { flag = rf_puppet_succession_heir_was_landed days = 30 } }
+                if = { limit = { root = { government_allows = administrative } } add_character_flag = { flag = rf_puppet_succession_predecessor_admin days = 30 } }
+            }
+        }
+        else_if = {
+            limit = {
+                exists = player_heir
+                player_heir = { is_alive = yes }
+            }
+            player_heir = {
+                riseandfall_clear_puppet_succession_pending_se = yes
+                add_character_flag = { flag = rf_puppet_succession_pending days = 30 }
+                set_variable = { name = rf_puppet_succession_predecessor value = root }
+                if = {
+                    limit = { exists = scope:rf_dying_puppet_master }
+                    set_variable = { name = rf_puppet_succession_diarch value = scope:rf_dying_puppet_master }
+                }
+                if = {
+                    limit = { root = { has_variable = riseandfall_puppet_regency_years } }
+                    set_variable = { name = rf_puppet_succession_years value = root.var:riseandfall_puppet_regency_years }
+                }
+                if = { limit = { is_landed = yes } add_character_flag = { flag = rf_puppet_succession_heir_was_landed days = 30 } }
+                if = { limit = { root = { government_allows = administrative } } add_character_flag = { flag = rf_puppet_succession_predecessor_admin days = 30 } }
+            }
+        }
+        clear_saved_scope = rf_dying_puppet_master
+    }
+}
+
+riseandfall_resolve_puppet_succession_on_inheritance = {
+    trigger = {
+        has_game_rule = riseandfall_low_stability_events_enabled
+        has_character_flag = rf_puppet_succession_pending
+        has_variable = rf_puppet_succession_predecessor
+        exists = scope:previous_holder
+        var:rf_puppet_succession_predecessor ?= scope:previous_holder
+        is_landed = yes
+        is_independent_ruler = yes
+        NOT = { has_character_flag = rf_puppet_succession_event_queued }
+    }
+    effect = {
+        if = {
+            limit = {
+                has_active_diarchy = yes
+                NOT = { has_diarchy_type = puppet_regency }
+            }
+            riseandfall_clear_puppet_succession_pending_se = yes
+        }
+        else_if = {
+            limit = {
+                OR = {
+                    has_character_flag = rf_puppet_succession_heir_was_landed
+                    has_character_flag = rf_puppet_succession_predecessor_admin
+                    government_allows = administrative
+                }
+            }
+            add_character_flag = { flag = rf_puppet_succession_event_queued days = 30 }
+            trigger_event = { id = riseandfall_puppet_master.110 delayed = yes }
+        }
+        else = {
+            riseandfall_accept_puppet_succession_status_quo_se = yes
+            riseandfall_clear_puppet_succession_pending_se = yes
+        }
     }
 }
 
@@ -159,6 +292,9 @@ riseandfall_warlord_imprisoned = {
 # On_actions for puppet masters (diarchs): AI-only unlanded diarchs should be given spouses by their liege's court.
 # We iterate each ruler with a puppet_regency diarchy and pick any courtier who is that ruler's diarch, then call the marriage scripted effects.
 riseandfall_marry_male_puppet_master_target = {
+    trigger = {
+        has_game_rule = riseandfall_low_stability_events_enabled
+    }
     effect = {
         every_ruler = {
             limit = { has_diarchy_type = puppet_regency }
@@ -184,6 +320,9 @@ riseandfall_marry_male_puppet_master_target = {
 }
 
 riseandfall_marry_female_puppet_master_target = {
+    trigger = {
+        has_game_rule = riseandfall_low_stability_events_enabled
+    }
     effect = {
         every_independent_ruler = {
             limit = { has_diarchy_type = puppet_regency }

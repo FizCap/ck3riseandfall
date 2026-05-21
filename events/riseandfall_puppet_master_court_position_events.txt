@@ -18,3 +18,93 @@ riseandfall_puppet_master.100 = {
 		}
 	}
 }
+
+# Puppet succession crisis: an established heir decides whether to accept the
+# inherited puppet master's status quo or resist and trigger a wider crisis.
+riseandfall_puppet_master.110 = {
+	type = character_event
+	title = riseandfall_puppet_master.110.t
+	desc = riseandfall_puppet_master.110.desc
+	theme = court
+
+	trigger = {
+		has_character_flag = rf_puppet_succession_pending
+		has_variable = rf_puppet_succession_predecessor
+		is_landed = yes
+		is_independent_ruler = yes
+	}
+
+	immediate = {
+		if = {
+			limit = { has_variable = rf_puppet_succession_predecessor }
+			var:rf_puppet_succession_predecessor = { save_scope_as = rf_puppet_succession_predecessor }
+		}
+		if = {
+			limit = { has_variable = rf_puppet_succession_diarch }
+			var:rf_puppet_succession_diarch = { save_scope_as = rf_succession_puppet_master }
+		}
+	}
+
+	left_portrait = {
+		character = root
+	}
+
+	option = {
+		name = riseandfall_puppet_master.110.a
+		custom_tooltip = riseandfall_puppet_master.110.a.tooltip
+		hidden_effect = {
+			riseandfall_accept_puppet_succession_status_quo_se = yes
+			riseandfall_clear_puppet_succession_pending_se = yes
+		}
+
+		ai_chance = {
+			base = 60
+			modifier = { add = 45 root = { has_trait = craven } }
+			modifier = { add = 35 root = { has_trait = content } }
+			modifier = { add = 25 root = { has_trait = trusting } }
+			modifier = { add = 25 root = { is_adult = no } }
+			modifier = { add = 20 root = { has_variable = riseandfall_realm_stability_score var:riseandfall_realm_stability_score >= 60 } }
+			modifier = { add = -45 root = { has_trait = ambitious } }
+			modifier = { add = -35 root = { has_trait = brave } }
+			modifier = { add = -30 root = { has_trait = vengeful } }
+			modifier = { add = -20 root = { realm_size >= 20 } }
+			modifier = {
+				add = -25
+				exists = scope:rf_succession_puppet_master
+				root.current_military_strength > scope:rf_succession_puppet_master.current_military_strength
+			}
+		}
+	}
+
+	option = {
+		name = riseandfall_puppet_master.110.b
+		custom_tooltip = riseandfall_puppet_master.110.b.tooltip
+		trigger = {
+			realm_size > 1
+			exists = scope:rf_succession_puppet_master
+			scope:rf_succession_puppet_master = { is_alive = yes }
+		}
+		hidden_effect = {
+			riseandfall_resist_puppet_succession_status_quo_se = yes
+		}
+
+		ai_chance = {
+			base = 40
+			modifier = { add = 45 root = { has_trait = ambitious } }
+			modifier = { add = 35 root = { has_trait = brave } }
+			modifier = { add = 30 root = { has_trait = vengeful } }
+			modifier = { add = 20 root = { has_trait = arrogant } }
+			modifier = { add = 20 root = { realm_size >= 20 } }
+			modifier = {
+				add = 25
+				exists = scope:rf_succession_puppet_master
+				root.current_military_strength > scope:rf_succession_puppet_master.current_military_strength
+			}
+			modifier = { add = -45 root = { has_trait = craven } }
+			modifier = { add = -35 root = { has_trait = content } }
+			modifier = { add = -25 root = { has_trait = trusting } }
+			modifier = { add = -25 root = { is_adult = no } }
+			modifier = { add = -20 root = { has_variable = riseandfall_realm_stability_score var:riseandfall_realm_stability_score >= 60 } }
+		}
+	}
+}

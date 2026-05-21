@@ -8,6 +8,14 @@
   riseandfall_puppet_master_court_position:0 "Puppet Master"
   riseandfall_puppet_master_court_position_desc:0 "A shadow regent imposed through a Puppet Regency. This office is assigned automatically by script and receives 5% of the liege's monthly revenue."
 
+  # Puppet succession crisis
+  riseandfall_puppet_master.110.t:0 "A Crown Already Controlled"
+  riseandfall_puppet_master.110.desc:0 "The realm you have inherited is not ruled from the throne alone. Its central authority, treasury, and capital household remain bound to the old Puppet Master. Their agents expect you to preserve the arrangement: wear the crown, accept their command over the machinery of state, and avoid a war for the heart of the realm.\n\nYou can submit to this inherited order, or you can reject it and rally your own lands against the capital. If you resist, the Puppet Master will keep the capital and the old center of power while civil war spreads outward."
+  riseandfall_puppet_master.110.a:0 "Accept the Puppet Master's authority."
+  riseandfall_puppet_master.110.a.tooltip:0 "The Puppet Regency continues under your rule, with the existing Puppet Master preserved if possible."
+  riseandfall_puppet_master.110.b:0 "Overthrow the Puppet Master."
+  riseandfall_puppet_master.110.b.tooltip:0 "You reject the Puppet Master's authority. The Puppet Master keeps the capital and the realm may split into open conflict."
+
   # Steal Gold
   riseandfall_steal_gold_interaction:0 "Steal Gold"
   riseandfall_steal_gold_interaction_desc:0 "Steal a portion of your liege's gold, transferring it to your treasury and draining puppet stability mana. This action has a 1-year cooldown."

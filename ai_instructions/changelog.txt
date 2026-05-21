@@ -1,35 +1,9 @@
-﻿CK3: Rise and Fall - 1.0.0
-
-Dynamic Story Mode
-- Changed world climate scoring to weight stable, unstable, and crisis realms by realm size instead of ruler count, so small realms have less impact and huge empires better define the global story state.
-- Fixed Dynamic Story Mode so independent counts and dukes receive story roles and stability pressure instead of only kingdom-tier and higher rulers.
-- Updated world climate timing and priority so Story Mode reads freshly calculated stability scores and treats widespread crisis or instability before peacefulness.
+﻿CK3: Rise and Fall - 1.0.1
 
 Bug Fixes
-- Updated Warlord Conquest and Successor War declarations to display the defender's primary title as the war target while still transferring the intended realm on victory.
-- Delayed ticking warscore in Adventurer Claim, Successor, and Warlord Conquest wars to three years and required majority target control before ticking begins.
-- Blocked successor-side defections while the defector has a truce with their liege or is directly at war with them.
-- Fixed realm split successor title cleanup and palace coup retreat transfers so legacy titles and one-county edge cases no longer spam unset variable/scope script errors.
-- Fixed Puppet Master court position sync so invalid or displaced diarchs no longer trigger court-position appointment script errors.
-- Fixed successor title monitor cleanup so rebuilt successor titles no longer read an unset root scope during yearly maintenance.
-
-Realm Stability
-- Tightened the Story Mode section of the Realm Stability tooltip so ordinary Director Notes no longer leave a large empty gap or require scrolling.
-- Changed low stability cooldown tracking from timed variables to character flags, reducing variable log noise while preserving event cooldown behavior.
-- Fixed the Realm Stability tooltip so long Story Mode Director Notes lists reserve enough space and no longer overlap the Ruler section.
-- Removed Legitimate Houses tracking and penalties from Ritsuryo-style Japanese administrative realms.
-- Changed realm split seeding to use de jure duchies for all ruler ranks, producing smaller and cleaner successor states from hegemonies and empires.
-- Cleaned up obsolete Realm Stability variables so legacy tooltip, story mode, inheritance, and house-legitimacy state no longer linger on rulers.
-- Fixed tiny decayed succession shock values showing as a confusing `-0` in the Realm Stability tooltip.
-- Added a Legitimate Houses game rule that lets independent duchy-tier and higher titles track accepted ruling houses and apply Realm Stability pressure to newer dynasties until their rule becomes accepted.
-- Reworked House Legitimacy into a 0-100 acceptance score, with cadet branches and relatives of the accepted line receiving faster acceptance and same-ruler cadet branches preserving their existing acceptance.
-- Hid House Legitimacy details for disabled, administrative, and otherwise ineligible rulers, and expanded the tooltip with title status, relationship, and naturalization progress.
-- Updated the House Legitimacy tooltip styling and icon, and added the accepted legitimate house name to the display.
-- Fixed the House Legitimacy tooltip so the legitimate house name is read directly from the primary title record.
-- Moved House Legitimacy into its own Realm Stability tooltip panel.
-
-Diadochi Wars
-- Reduced AI Diadochi war target distance and enforced the range in declaration validation so scripted successor wars focus more on nearby realms while still allowing limited island reach.
-- Fixed Successor War victories so taking over a real non-titular primary title retires the winner's old titular realm split title.
-- Allowed AI Diadochi war declarations while rulers are involved in activities.
-- Increased AI successor surrender willingness so smaller, badly outmatched breakaway realms are more likely to submit instead of holding out indefinitely.
+- Fixed surrendered Realm Split successor rulers recreating an independent split realm at the yearly title monitor after their successor crown was destroyed.
+- Fixed forced abdication for administrative rulers so abdicated noble family title holders become vassals of the new ruler instead of remaining independent.
+- Fixed Puppet Master recovery so a puppet master who inherits land or otherwise becomes invalid is replaced immediately, or the stale puppet regency ends cleanly if no replacement exists.
+- Added a Puppet Master succession crisis where landed or administrative heirs can accept the inherited regency or resist and trigger a wider realm conflict.
+- Preserved landed vassal puppet masters as active diarchs during resync instead of replacing them with a courtier.
+- Updated the Puppet Master succession crisis text so resisting clearly means the Puppet Master keeps the capital while civil war spreads through the realm.

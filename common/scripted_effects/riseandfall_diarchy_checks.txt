@@ -15,7 +15,179 @@
             end_diarchy = yes
         }
 
+        # If the active puppet master became unable to serve this ruler, replace
+        # them before syncing the position. Landed vassals may remain diarchs.
+        riseandfall_recover_invalid_puppet_master_se = yes
+
         # Script-driven court position assignment/cleanup.
         riseandfall_sync_puppet_master_court_position = yes
+    }
+}
+
+riseandfall_recover_invalid_puppet_master_se = {
+    if = {
+        limit = {
+            has_diarchy_type = puppet_regency
+            has_active_diarchy = yes
+            OR = {
+                NOT = { exists = diarch }
+                diarch = {
+                    OR = {
+                        is_alive = no
+                        AND = {
+                            is_ruler = yes
+                            NOT = { is_vassal_of = root }
+                        }
+                        is_imprisoned = yes
+                        is_adult = no
+                        is_incapable = yes
+                    }
+                }
+            }
+        }
+        save_scope_as = rf_puppet_liege
+        clear_saved_scope = rf_replacement_puppet_master
+
+        # Prefer a valid adult courtier so the Puppet Master office remains visible.
+        ordered_courtier = {
+            limit = {
+                is_alive = yes
+                is_adult = yes
+                is_imprisoned = no
+                is_incapable = no
+                OR = {
+                    is_ruler = no
+                    is_vassal_of = scope:rf_puppet_liege
+                }
+            }
+            order_by = {
+                add = intrigue
+                add = diplomacy
+                add = stewardship
+                add = martial
+                add = learning
+            }
+            max = 1
+            save_scope_as = rf_replacement_puppet_master
+        }
+
+        if = {
+            limit = { exists = scope:rf_replacement_puppet_master }
+            set_diarch = scope:rf_replacement_puppet_master
+            set_diarchy_type = puppet_regency
+            set_diarchy_swing = 90
+        }
+        else = {
+            # No valid office holder exists; end the stale puppet regency rather
+            # than leaving a hidden or unusable puppet master behind.
+            end_diarchy = yes
+        }
+
+        clear_saved_scope = rf_replacement_puppet_master
+        clear_saved_scope = rf_puppet_liege
+    }
+}
+
+riseandfall_clear_puppet_succession_pending_se = {
+    remove_character_flag = rf_puppet_succession_pending
+    remove_character_flag = rf_puppet_succession_heir_was_landed
+    remove_character_flag = rf_puppet_succession_predecessor_admin
+    remove_character_flag = rf_puppet_succession_event_queued
+    remove_variable = rf_puppet_succession_predecessor
+    remove_variable = rf_puppet_succession_diarch
+    remove_variable = rf_puppet_succession_years
+}
+
+riseandfall_accept_puppet_succession_status_quo_se = {
+    save_scope_as = rf_puppet_successor
+    clear_saved_scope = rf_succession_puppet_master
+
+    if = {
+        limit = { has_variable = rf_puppet_succession_diarch }
+        var:rf_puppet_succession_diarch = { save_scope_as = rf_succession_puppet_master }
+    }
+
+    if = {
+        limit = {
+            exists = scope:rf_succession_puppet_master
+            scope:rf_succession_puppet_master = {
+                is_alive = yes
+                is_adult = yes
+                is_imprisoned = no
+                is_incapable = no
+                OR = {
+                    is_ruler = no
+                    is_vassal_of = scope:rf_puppet_successor
+                }
+            }
+        }
+        if = {
+            limit = { NOT = { has_active_diarchy = yes } }
+            try_start_diarchy = puppet_regency
+        }
+        if = {
+            limit = { has_active_diarchy = yes }
+            scope:rf_succession_puppet_master = {
+                if = {
+                    limit = {
+                        is_ruler = no
+                        NOT = { employer = scope:rf_puppet_successor }
+                    }
+                    set_employer = scope:rf_puppet_successor
+                }
+            }
+            set_diarch = scope:rf_succession_puppet_master
+            set_diarchy_type = puppet_regency
+            set_diarchy_swing = 90
+        }
+    }
+    else = {
+        # If the old puppet master cannot serve the new ruler, let the diarchy
+        # system find a valid replacement or end cleanly.
+        if = {
+            limit = { NOT = { has_active_diarchy = yes } }
+            try_start_diarchy = puppet_regency
+        }
+        if = {
+            limit = { has_active_diarchy = yes }
+            set_diarchy_type = puppet_regency
+            set_diarchy_swing = 90
+            riseandfall_recover_invalid_puppet_master_se = yes
+        }
+    }
+
+    if = {
+        limit = { has_variable = rf_puppet_succession_years }
+        set_variable = { name = riseandfall_puppet_regency_years value = var:rf_puppet_succession_years }
+    }
+
+    riseandfall_sync_puppet_master_court_position = yes
+    clear_saved_scope = rf_succession_puppet_master
+    clear_saved_scope = rf_puppet_successor
+}
+
+riseandfall_resist_puppet_succession_status_quo_se = {
+    if = {
+        limit = {
+            has_variable = rf_puppet_succession_diarch
+            realm_size > 1
+        }
+        var:rf_puppet_succession_diarch = { save_scope_as = challenger }
+        if = {
+            limit = {
+                exists = scope:challenger
+                scope:challenger = { is_alive = yes }
+            }
+            riseandfall_clear_puppet_succession_pending_se = yes
+            riseandfall_palace_coup_start_rebellion = yes
+        }
+        else = {
+            riseandfall_accept_puppet_succession_status_quo_se = yes
+            riseandfall_clear_puppet_succession_pending_se = yes
+        }
+    }
+    else = {
+        riseandfall_accept_puppet_succession_status_quo_se = yes
+        riseandfall_clear_puppet_succession_pending_se = yes
     }
 }

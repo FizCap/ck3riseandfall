@@ -89,6 +89,32 @@ riseandfall_sync_puppet_master_court_position = {
 		}
 		else_if = {
 			limit = {
+				exists = scope:rf_current_puppet_master_holder
+				scope:rf_current_puppet_master_holder = {
+					has_court_position = riseandfall_puppet_master_court_position
+				}
+				NOT = { scope:rf_current_puppet_master_holder ?= scope:rf_current_puppet_master_diarch }
+				scope:rf_current_puppet_master_diarch = {
+					NOT = {
+						would_be_valid_for_court_position = {
+							employer = scope:rf_puppet_master_liege
+							court_position = riseandfall_puppet_master_court_position
+						}
+					}
+				}
+			}
+			# A landed vassal can remain the actual puppet-regency diarch even
+			# when they cannot be shown as a court-position employee. Remove any
+			# stale office holder so the UI does not name the wrong puppet master.
+			scope:rf_puppet_master_liege = {
+				revoke_court_position = {
+					recipient = scope:rf_current_puppet_master_holder
+					court_position = riseandfall_puppet_master_court_position
+				}
+			}
+		}
+		else_if = {
+			limit = {
 				NOT = { exists = scope:rf_current_puppet_master_holder }
 				scope:rf_current_puppet_master_diarch = {
 					NOT = { has_court_position = riseandfall_puppet_master_court_position }
@@ -932,6 +958,38 @@ riseandfall_force_abdicate_effect = {
 					change = scope:change
 					take_baronies = no
 					government_base = scope:recipient
+				}
+			}
+			every_vassal = {
+				limit = {
+					liege = scope:recipient
+					NOT = { this = scope:chosen_successor }
+				}
+				# Move the old ruler's direct vassals with the abdicated realm.
+				# Otherwise they can remain attached to the abdicated
+				# administrative family title holder after the family is
+				# vassalized under the new ruler.
+				change_liege = {
+					liege = scope:chosen_successor
+					change = scope:change
+				}
+			}
+			if = {
+				limit = {
+					is_landed = yes
+					is_independent_ruler = yes
+					any_held_title = { is_noble_family_title = yes }
+					scope:chosen_successor = {
+						is_landed = yes
+					}
+				}
+				# Administrative abdication leaves the old ruler with their
+				# noble family title. Queue vassalization in the same batch as
+				# the realm transfer so the engine never resolves an
+				# independent, landless administrative ruler between steps.
+				change_liege = {
+					liege = scope:chosen_successor
+					change = scope:change
 				}
 			}
 			resolve_title_and_vassal_change = scope:change
