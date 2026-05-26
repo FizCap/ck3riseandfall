@@ -1955,9 +1955,43 @@ riseandfall_split_title_monitor_cleanup_se = {
     save_scope_as = rf_ruler
     capital_barony = { save_scope_as = rf_base_capital_barony }
 
+<<<<<<< Updated upstream
     # Only operate on primary titles that were flagged as permanent split successors.
     if = {
         limit = {
+=======
+    # Successor split tracking is only valid for independent successor realms.
+    # Vassalized titular split crowns can be safely destroyed; de jure titles
+    # like Georgia should survive and only lose their successor-state markers.
+    if = {
+        limit = { is_independent_ruler = no }
+        every_held_title = {
+            limit = { has_variable = rf_is_permanent_successor_split }
+            save_scope_as = rf_vassal_split_title
+            if = {
+                limit = { is_titular = no }
+                remove_variable = rf_is_successor_split_title
+                remove_variable = rf_successor_origin_title
+                remove_variable = rf_successor_root_origin_title
+                remove_variable = rf_is_permanent_successor_split
+                remove_variable = rf_successor_permanent_realm_size
+            }
+            else = {
+                scope:rf_ruler = {
+                    if = {
+                        limit = { exists = scope:rf_vassal_split_title }
+                        destroy_title = scope:rf_vassal_split_title
+                    }
+                }
+            }
+        }
+    }
+
+    # Only operate on independent primary titles that were flagged as permanent split successors.
+    if = {
+        limit = {
+            is_independent_ruler = yes
+>>>>>>> Stashed changes
             primary_title = {
                 has_variable = rf_is_permanent_successor_split
                 has_variable = rf_successor_permanent_realm_size
@@ -2101,6 +2135,7 @@ riseandfall_split_title_monitor_cleanup_se = {
             }
         }
 
+<<<<<<< Updated upstream
         if = {
             limit = {
                 is_independent_ruler = no
@@ -2136,6 +2171,34 @@ riseandfall_split_title_monitor_cleanup_se = {
             remove_variable = rf_current_realm_size
             remove_variable = rf_snapshot
         }
+=======
+        # Compute current realm size from a fresh numeric value; legacy
+        # titles may have an empty snapshot variable that cannot be read.
+        set_variable = { name = rf_current_realm_size value = realm_size }
+        set_variable = { name = rf_snapshot value = realm_size }
+        if = {
+            limit = {
+                has_variable = rf_current_realm_size
+                has_variable = rf_snapshot
+            }
+            change_variable = { name = rf_snapshot multiply = 0.25 }
+            if = {
+                limit = {
+                    var:rf_current_realm_size <= var:rf_snapshot
+                    # The under-25% collapse check only destroys old successor titular titles
+                    # after their initial 50-year origin grace marker has expired.
+                    primary_title = { NOT = { has_variable = rf_successor_origin_title } }
+                }
+                primary_title = { save_scope_as = rf_split_title }
+                if = {
+                    limit = { scope:rf_split_title = { is_titular = yes } }
+                    destroy_title = scope:rf_split_title
+                }
+            }
+        }
+        remove_variable = rf_current_realm_size
+        remove_variable = rf_snapshot
+>>>>>>> Stashed changes
         clear_saved_scope = rf_replacement_split_title
     }
 }

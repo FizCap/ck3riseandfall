@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 ﻿CK3: Rise and Fall - 1.0.1
 
 Bug Fixes
@@ -7,3 +8,9 @@ Bug Fixes
 - Added a Puppet Master succession crisis where landed or administrative heirs can accept the inherited regency or resist and trigger a wider realm conflict.
 - Preserved landed vassal puppet masters as active diarchs during resync instead of replacing them with a courtier.
 - Updated the Puppet Master succession crisis text so resisting clearly means the Puppet Master keeps the capital while civil war spreads through the realm.
+=======
+﻿CK3: Rise and Fall - 1.0.2
+
+Bug Fixes
+- Fixed vassalized Realm Split successor titles keeping successor tracking, while preserving de jure titles.
+>>>>>>> Stashed changes
