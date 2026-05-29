@@ -1,4 +1,4 @@
-﻿CK3: Rise and Fall - 1.0.2
+﻿CK3: Rise and Fall - 1.0.3
 
-Bug Fixes
-- Fixed vassalized Realm Split successor titles keeping successor tracking, while preserving de jure titles.
+UI
+- Added x10 and x50 men-at-arms size increase and decrease buttons to the regiment management window, with tooltips that clarify batched costs.

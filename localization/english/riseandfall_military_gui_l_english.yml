@@ -1,0 +1,5 @@
+﻿l_english:
+ RISEANDFALL_MAA_INCREASE_X10_TOOLTIP:0 "Increase this regiment up to 10 times. The game charges the normal Increase Size cost for each successful step, so the total cost is up to 10x the listed one-step cost."
+ RISEANDFALL_MAA_INCREASE_X50_TOOLTIP:0 "Increase this regiment up to 50 times. The game charges the normal Increase Size cost for each successful step, so the total cost is up to 50x the listed one-step cost."
+ RISEANDFALL_MAA_DECREASE_X10_TOOLTIP:0 "Decrease this regiment up to 10 times. The game applies the normal Decrease Size effect for each successful step."
+ RISEANDFALL_MAA_DECREASE_X50_TOOLTIP:0 "Decrease this regiment up to 50 times. The game applies the normal Decrease Size effect for each successful step."
