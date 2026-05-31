@@ -1,4 +1,4 @@
-﻿CK3: Rise and Fall - 1.0.3
+﻿CK3: Rise and Fall - 1.0.4
 
-UI
-- Added x10 and x50 men-at-arms size increase and decrease buttons to the regiment management window, with tooltips that clarify batched costs.
+Puppet Master
+- Prevented puppet masters who cannot marry from overthrowing their liege and taking power.

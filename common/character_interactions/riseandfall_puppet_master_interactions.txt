@@ -571,7 +571,12 @@ riseandfall_overthrow_liege_interaction = {
 	# Gate on stability < 30
 	is_valid_showing_failures_only = {
 		# Only allow the active diarch to perform this
-		scope:actor = { is_diarch_of_target = scope:recipient }
+		scope:actor = {
+			is_diarch_of_target = scope:recipient
+			# Characters barred from marriage cannot be legitimate power-seizing puppet masters.
+			NOT = { has_trait_with_flag = can_not_marry }
+			can_marry_trigger = yes
+		}
 		scope:recipient = {
 			is_independent_ruler = yes
 		}
