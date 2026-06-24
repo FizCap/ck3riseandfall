@@ -1,4 +1,5 @@
-﻿CK3: Rise and Fall - 1.0.4
+﻿CK3: Rise and Fall - 1.0.5
 
-Puppet Master
-- Prevented puppet masters who cannot marry from overthrowing their liege and taking power.
+UI
+- Removed the redundant Dynasty label from the accepted house name in the Realm Stability House Legitimacy panel.
+- Added the modcon loading screen for the upcoming mod con event, if you do not like the loading screen you  can disable it with the modcon adblock mod (https://steamcommunity.com/sharedfiles/filedetails/?id=3215122062)

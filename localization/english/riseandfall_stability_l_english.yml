@@ -169,7 +169,7 @@
  REALM_STABILITY_TT_LEGITIMATE_HOUSE_R:0 "[Select_CString( LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_legitimate_house_component').GetValue, '(CFixedPoint)0' ), '#color_red ', '' )][Character.MakeScope.Var('riseandfall_rs_legitimate_house_component').GetValue|0]#!"
  REALM_STABILITY_TT_LEGITIMATE_HOUSE_HEADER:0 "House Legitimacy"
  REALM_STABILITY_TT_LEGITIMATE_HOUSE_NAME_L:0 "Legitimate House"
- REALM_STABILITY_TT_LEGITIMATE_HOUSE_NAME_R:0 "#high [Character.GetPrimaryTitle.MakeScope.Var('riseandfall_lh_legitimate_house').House.GetBaseName] Dynasty#!"
+ REALM_STABILITY_TT_LEGITIMATE_HOUSE_NAME_R:0 "#high [Character.GetPrimaryTitle.MakeScope.Var('riseandfall_lh_legitimate_house').House.GetBaseName]#!"
  REALM_STABILITY_TT_LEGITIMATE_HOUSE_STATUS_L:0 "Title status"
  REALM_STABILITY_TT_LEGITIMATE_HOUSE_STATUS_R:0 "[Select_CString( EqualTo_CFixedPoint( Character.MakeScope.Var('riseandfall_lh_status_display').GetValue, '(CFixedPoint)2' ), '#color_red Disputed#!', '#color_green Accepted#!' )]"
  REALM_STABILITY_TT_LEGITIMATE_HOUSE_EFFECT_L:0 "[Select_CString( LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_rs_legitimate_house_component').GetValue, '(CFixedPoint)0' ), '@change_down_bad_1! #color_red Stability effect', 'Stability effect' )]"
