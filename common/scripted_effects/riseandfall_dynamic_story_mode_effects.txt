@@ -160,6 +160,7 @@ riseandfall_story_world_climate_se = {
         set_global_variable = { name = riseandfall_story_world_climate value = 1 }
     }
     else = {
+        set_global_variable = { name = riseandfall_story_world_pressure value = 0 }
         set_global_variable = { name = riseandfall_story_world_climate value = 2 }
     }
 }
@@ -327,6 +328,17 @@ riseandfall_apply_dynamic_story_pressure_se = {
     set_variable = { name = riseandfall_story_external_rival_relief value = 0 }
     set_variable = { name = riseandfall_story_collapse_gain_last value = 0 }
     set_variable = { name = riseandfall_story_no_rival_pressure value = 0 }
+
+    # Title-gain refreshes can run at game start before the yearly world pass
+    # seeds Story Mode globals. Neutral pressure keeps those early reads safe.
+    if = {
+        limit = { NOT = { exists = global_var:riseandfall_story_world_pressure } }
+        set_global_variable = { name = riseandfall_story_world_pressure value = 0 }
+    }
+    if = {
+        limit = { NOT = { exists = global_var:riseandfall_story_world_climate } }
+        set_global_variable = { name = riseandfall_story_world_climate value = 2 }
+    }
 
     if = {
         limit = { exists = global_var:riseandfall_story_world_climate }

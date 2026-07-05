@@ -1769,7 +1769,13 @@ riseandfall_realm_split_lower_actor_primary_below_recipient_se = {
                 set_variable = { name = rf_is_successor_split_title value = 1 years = 30 }
                 set_variable = { name = rf_is_permanent_successor_split value = 1 }
             }
-            set_primary_title_to = scope:rf_absorbed_replacement_title
+            # CK3 does not allow lowering a ruler's primary title while they
+            # still hold a higher primary. If the replacement is lower rank,
+            # let the submitted/destroyed successor crown force recalculation.
+            if = {
+                limit = { scope:rf_absorbed_replacement_title.tier >= primary_title.tier }
+                set_primary_title_to = scope:rf_absorbed_replacement_title
+            }
             scope:rf_absorbed_split_title = {
                 remove_variable = rf_is_successor_split_title
                 remove_variable = rf_successor_origin_title

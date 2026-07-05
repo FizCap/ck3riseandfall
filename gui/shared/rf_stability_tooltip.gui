@@ -492,9 +492,9 @@ types RiseAndFallStabilityTooltipTypes
 					}
 				}
 
-				widget = {
+				vbox = {
 					visible = "[Or( Or( Or( GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_reign_tension').GetValue, '(CFixedPoint)0' ), GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_stagnation_pressure').GetValue, '(CFixedPoint)0' ) ), Or( GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_ancient_regime').GetValue, '(CFixedPoint)0' ), GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_complacent_vassals').GetValue, '(CFixedPoint)0' ) ) ), Or( Or( Or( GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_complacent_vassal_pressure').GetValue, '(CFixedPoint)0' ), GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_no_rival_pressure').GetValue, '(CFixedPoint)0' ) ), Or( GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_collapse_pressure').GetValue, '(CFixedPoint)0' ), GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_strongest_rival_pct').GetValue, '(CFixedPoint)0' ) ) ), Or( GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_external_rival_relief').GetValue, '(CFixedPoint)0' ), Or( GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_collapse_gain_last').GetValue, '(CFixedPoint)0' ), LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_collapse_gain_last').GetValue, '(CFixedPoint)0' ) ) ) ) )]"
-					size = { 500 238 }
+					layoutpolicy_horizontal = expanding
 					tooltip = "REALM_STABILITY_TT_STORY_MODE_TOOLTIP"
 					using = tooltip_ne
 					background = { using = Background_Area_Dark }
@@ -522,7 +522,7 @@ types RiseAndFallStabilityTooltipTypes
 							layoutpolicy_horizontal = expanding
 							spacing = 16
 							widget = {
-								size = { 150 56 }
+								size = { 150 34 }
 								tooltip = "REALM_STABILITY_TT_STORY_ROLE_TOOLTIP"
 								using = tooltip_ne
 								vbox = {
@@ -543,7 +543,7 @@ types RiseAndFallStabilityTooltipTypes
 								}
 							}
 							widget = {
-								size = { 150 56 }
+								size = { 150 34 }
 								tooltip = "REALM_STABILITY_TT_WORLD_CLIMATE_TOOLTIP"
 								using = tooltip_ne
 								vbox = {
@@ -564,7 +564,7 @@ types RiseAndFallStabilityTooltipTypes
 								}
 							}
 							widget = {
-								size = { 150 56 }
+								size = { 150 34 }
 								tooltip = "REALM_STABILITY_TT_DYNAMIC_STORY_TOOLTIP"
 								using = tooltip_ne
 								vbox = {
@@ -588,7 +588,7 @@ types RiseAndFallStabilityTooltipTypes
 						vbox = {
 							visible = "[Or( Or( Or( GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_reign_tension').GetValue, '(CFixedPoint)0' ), GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_stagnation_pressure').GetValue, '(CFixedPoint)0' ) ), Or( GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_ancient_regime').GetValue, '(CFixedPoint)0' ), GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_complacent_vassals').GetValue, '(CFixedPoint)0' ) ) ), Or( Or( Or( GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_complacent_vassal_pressure').GetValue, '(CFixedPoint)0' ), GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_no_rival_pressure').GetValue, '(CFixedPoint)0' ) ), Or( GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_collapse_pressure').GetValue, '(CFixedPoint)0' ), GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_strongest_rival_pct').GetValue, '(CFixedPoint)0' ) ) ), Or( GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_external_rival_relief').GetValue, '(CFixedPoint)0' ), Or( GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_collapse_gain_last').GetValue, '(CFixedPoint)0' ), LessThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_collapse_gain_last').GetValue, '(CFixedPoint)0' ) ) ) ) )]"
 							layoutpolicy_horizontal = expanding
-							spacing = 2
+							spacing = 1
 							# Keep Director Notes inline so players can read all active story pressures without scrolling.
 							hbox = {
 								layoutpolicy_horizontal = expanding
@@ -604,8 +604,8 @@ types RiseAndFallStabilityTooltipTypes
 							}
 							vbox = {
 								layoutpolicy_horizontal = expanding
-								margin = { 50 0 }
-								spacing = 2
+								margin = { 24 0 }
+								spacing = 0
 								hbox = {
 									visible = "[GreaterThan_CFixedPoint( Character.MakeScope.Var('riseandfall_story_reign_tension').GetValue, '(CFixedPoint)0' )]"
 									layoutpolicy_horizontal = expanding

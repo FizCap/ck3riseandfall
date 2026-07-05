@@ -150,6 +150,7 @@ riseandfall_on_title_gain_inheritance = {
             limit = {
                 NOT = { has_variable = riseandfall_realm_stability_score }
                 holds_landed_title = yes
+                is_independent_ruler = yes
                 exists = scope:previous_holder
                 scope:previous_holder = { has_variable = riseandfall_realm_stability_score }
                 # Only inherit when the previous holder is higher or equal-ranked than the inheritor.
@@ -170,6 +171,7 @@ riseandfall_on_title_gain_inheritance = {
             limit = {
                 has_variable = riseandfall_realm_stability_score
                 holds_landed_title = yes
+                is_independent_ruler = yes
                 exists = scope:previous_holder
                 scope:previous_holder = { has_variable = riseandfall_realm_stability_score }
                 NOT = { var:riseandfall_rs_last_stability_merge_predecessor ?= scope:previous_holder }
@@ -201,6 +203,7 @@ riseandfall_on_title_gain_inheritance = {
             limit = {
                 NOT = { has_variable = riseandfall_realm_stability_score }
                 holds_landed_title = yes
+                is_independent_ruler = yes
             }
             # No previous holder data or rank check failed; initialize fresh calculation
             riseandfall_calculate_realm_stability_se = yes
@@ -220,6 +223,7 @@ riseandfall_on_title_gain_realm_stability_refresh = {
             limit = {
                 NOT = { has_variable = riseandfall_realm_stability_score }
                 holds_landed_title = yes
+                is_independent_ruler = yes
             }
             riseandfall_calculate_realm_stability_se = yes
         }
@@ -287,7 +291,7 @@ riseandfall_yearly_realm_stability = {
         has_game_rule = riseandfall_realm_stability_enabled
     }
     effect = {
-        every_ruler = {
+        every_independent_ruler = {
             limit = {
                 is_landed = yes
                 primary_title.tier >= tier_county
@@ -366,8 +370,8 @@ riseandfall_war_won_defender = {
 riseandfall_clear_unlanded_realm_stability = {
     trigger = { has_game_rule = riseandfall_realm_stability_enabled }
     effect = {
-        # Clear realm stability variables & modifiers on unlanded characters yearly to
-        # fix stale state for characters who lost their lands.
+        # Clear realm stability variables and modifiers on non-independent characters
+        # yearly to fix stale state after land or vassalage changes.
         riseandfall_clear_unlanded_stability_vars_se = yes
     }
 }

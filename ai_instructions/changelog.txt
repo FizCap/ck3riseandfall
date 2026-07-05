@@ -1,5 +1,11 @@
-﻿CK3: Rise and Fall - 1.0.5
+﻿CK3: Rise and Fall - 1.0.6
 
-UI
-- Removed the redundant Dynasty label from the accepted house name in the Realm Stability House Legitimacy panel.
-- Added the modcon loading screen for the upcoming mod con event, if you do not like the loading screen you  can disable it with the modcon adblock mod (https://steamcommunity.com/sharedfiles/filedetails/?id=3215122062)
+Bug Fixes
+- Restricted Realm Stability to independent rulers and cleared stale vassal stability data during yearly maintenance.
+- Fixed a Dynamic Story Mode startup script error when title-gain stability refreshes ran before the first world pressure pass.
+- Fixed a Realm Splits surrender error when a successor ruler kept a higher-tier primary title while being demoted to a lower replacement title.
+- Fixed the Realm Stability tooltip's Story Mode director notes overflowing outside their panel.
+
+Balance
+- Reduced the Diadochi war attacker occupation threshold needed for ticking war score from 51% to 15% of the defender's realm and slowed Diadochi ticking war score.
+- Rebalanced Diadochi wars against huge realms so a small beachhead can contest passive defender ticking and occupation progress is worth more war score.

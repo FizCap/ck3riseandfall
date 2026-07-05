@@ -383,18 +383,19 @@
     # Successor wars are displayed against the defender's primary title but
     # resolve against the defender's realm, so ticking score should use the
     # whole realm rather than a de jure slice of the selected title.
-    # Require a majority of the defender's realm before ticking warscore starts,
-    # leaving successor wars more room to be decided by battles and sieges.
-    attacker_wargoal_percentage = 0.51
-    defender_wargoal_percentage = 0.51
+    # Successor wars can span huge conversion-map realms. A small beachhead
+    # should be enough to contest passive defender ticking, while defenders
+    # still need near-total control to win by simply denying the invasion.
+    attacker_wargoal_percentage = 0.01
+    defender_wargoal_percentage = 0.95
 
     attacker_ticking_warscore_delay = { months = 36 }
     defender_ticking_warscore_delay = { months = 36 }
-    attacker_ticking_warscore = 0.1
-    defender_ticking_warscore = 0.1
+    attacker_ticking_warscore = 0.03
+    defender_ticking_warscore = 0.03
 
-    attacker_score_from_occupation_scale = 25
-    defender_score_from_occupation_scale = 25
+    attacker_score_from_occupation_scale = 50
+    defender_score_from_occupation_scale = 50
     attacker_score_from_battles_scale = 100
     defender_score_from_battles_scale = 100
 

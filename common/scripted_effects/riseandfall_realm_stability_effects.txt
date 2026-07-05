@@ -1662,12 +1662,9 @@ riseandfall_war_loss_se = {
 }
 
 
-# Clear stability variables and modifiers on characters who are unlanded. This helps
-# remove stale data from characters who lost their lands and prevents stray modifiers
-# and variables from lingering on unlanded characters.
-riseandfall_clear_unlanded_stability_vars_se = {
-    every_living_character = {
-        limit = { is_landed = no }
+# Clear realm stability state from the current character scope. Used when a ruler
+# loses independent status so vassals cannot keep a stale stability system.
+riseandfall_clear_current_stability_vars_se = {
         # Remove recorded variables if present — removing a non-existent var is safe
         remove_variable = riseandfall_realm_stability_score
         remove_variable = riseandfall_realm_stability_target
@@ -1832,5 +1829,18 @@ riseandfall_clear_unlanded_stability_vars_se = {
         remove_character_modifier = riseandfall_stability_98
         remove_character_modifier = riseandfall_stability_99
         remove_character_modifier = riseandfall_stability_100
+}
+
+# Clear stability variables and modifiers on characters who should not run realm
+# stability. This removes stale data from unlanded characters and landed vassals.
+riseandfall_clear_unlanded_stability_vars_se = {
+    every_living_character = {
+        limit = {
+            OR = {
+                is_landed = no
+                is_independent_ruler = no
+            }
+        }
+        riseandfall_clear_current_stability_vars_se = yes
     }
 }
