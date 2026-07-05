@@ -56,10 +56,14 @@ agot_mw_start_mw_base_trigger = {
 
 	# This prevents mw to start when an empire tier ruler is temporarily independent or in general when the target realm is not de jure independent
 	# technically the code allows a mega war to start when neither attacker and defender are de jure independent, causing shenaigans! --> this block fixes that
-	OR = {
-		scope:t_attacker = { agot_is_independent_ruler = yes }
-		scope:t_defender = { agot_is_independent_ruler = yes }
+	scope:t_attacker = {
+		OR = { # attacker must either be real independent or defender must be top liege
+			agot_is_independent_ruler = yes			# inter-realm war
+			top_liege ?= scope:t_defender			# intra-realm war
+			var:agot_pwl_direct ?= scope:t_defender	# intra-realm war
+		}
 	}
+	scope:t_defender = { agot_is_independent_ruler = yes } # defender must always be real indpendent
 }
 
 agot_mw_start_regular_mw_trigger = {
@@ -72,12 +76,13 @@ agot_mw_start_regular_mw_trigger = {
 		agot_mw_start_mw_base_trigger = yes
 		NOT = { agot_mw_start_lite_mw_trigger = { ATTACKER = scope:t_attacker DEFENDER = scope:t_defender } } # we want mw lite to be checked first!
 
-		# Mega Wars should only trigger if an empire title is a major participant; trigger by on_action "on_war_started"
+		# Mega Wars should only trigger if at least a kingdom title is a major participant; trigger by on_action "on_war_started"
 		OR = {
 			AND = { # in general we don't want laamps and nomads to do mws
 				NOR = {
 					$ATTACKER$ = {
 						AND = {
+							# Rise and Fall-created adventurers may use AGOT Mega Wars only when the compatibility rule is enabled.
 							has_government = landless_adventurer_government
 							NOT = {
 								AND = {
@@ -89,6 +94,7 @@ agot_mw_start_regular_mw_trigger = {
 					}
 					$ATTACKER$ = {
 						AND = {
+							# Legacy Rise and Fall adventurer flag fallback for characters without the title marker.
 							has_character_flag = riseandfall_newadventurer
 							NOT = { has_game_rule = riseandfall_adventurer_mega_wars_enabled }
 						}
@@ -101,7 +107,10 @@ agot_mw_start_regular_mw_trigger = {
 						$DEFENDER$ = {
 							OR = {
 								AND = {
-									top_liege = $ATTACKER$
+									OR = {
+										top_liege = $ATTACKER$
+										var:agot_pwl_direct ?= $ATTACKER$
+									}
 									highest_held_title_tier > tier_duchy # Kingdoms and Empires
 								}
 								agot_mw_has_claimant_trigger = { CLAIMANT = $DEFENDER$ HOLDER = $ATTACKER$ }
@@ -112,7 +121,10 @@ agot_mw_start_regular_mw_trigger = {
 						$ATTACKER$ = {
 							OR = {
 								AND = {
-									top_liege = $DEFENDER$
+									OR = {
+										top_liege = $DEFENDER$
+										var:agot_pwl_direct ?= $DEFENDER$
+									}
 									highest_held_title_tier > tier_duchy # Kingdoms and Empires
 								}
 								agot_mw_has_claimant_trigger = { CLAIMANT = $ATTACKER$ HOLDER = $DEFENDER$ }
@@ -121,13 +133,15 @@ agot_mw_start_regular_mw_trigger = {
 						}
 						$DEFENDER$.highest_held_title_tier > tier_kingdom # Empires and Hegemonies
 					}
-					$ATTACKER$.var:agot_allow_mw ?= flag:regular # used to allow MW for tyranny wars; mw lite should already be triggered since we have a lower threshold
 				}
 			}
 			AND = { # only for external wars we allow nomads and laamps where attacker is outside of the realm
 				agot_mw_is_external_war_trigger = yes
 				$DEFENDER$.highest_held_title_tier > tier_kingdom # Empires and Hegemonies
 			}
+			# used to allow MW for tyranny wars; mw lite should already be triggered since we have a lower threshold
+			scope:mw_demand_decline_bypass ?= flag:yes # this one is for display only
+			$ATTACKER$.var:agot_allow_mw ?= flag:yes # this one is the actual variable set
 		}
 	}
 }
@@ -139,27 +153,6 @@ agot_mw_start_lite_mw_trigger = {
 	$ATTACKER$ = { save_temporary_scope_as = t_attacker }
 	$DEFENDER$ = { save_temporary_scope_as = t_defender }
 	agot_mw_start_mw_base_trigger = yes
-	NOT = {
-		OR = {
-			scope:t_attacker = {
-				AND = {
-					has_government = landless_adventurer_government
-					NOT = {
-						AND = {
-							has_game_rule = riseandfall_adventurer_mega_wars_enabled
-							primary_title = { has_variable = riseandfall_created_adventurer_title }
-						}
-					}
-				}
-			}
-			scope:t_attacker = {
-				AND = {
-					has_character_flag = riseandfall_newadventurer
-					NOT = { has_game_rule = riseandfall_adventurer_mega_wars_enabled }
-				}
-			}
-		}
-	}
 
 	scope:t_attacker = {
 		OR = { # only inside of defender's realm! --> external wars do not trigger mw lite  This ensures that it is an internal conflict only
@@ -169,29 +162,75 @@ agot_mw_start_lite_mw_trigger = {
 	}
 	#### Hard checks end
 
-	OR = {
-		#scope:t_defender.var:agot_allow_mw ?= flag:lite # Think carefully... # Uncomment if set somewhere in code
-		scope:t_defender = {
-			trigger_if = { # Default mw type for admin governments
-				limit = { has_government = administrative_government }
-
-				scope:t_defender = { NOT = { has_government = landless_adventurer_government } } # We do not want laamps to do it; nomad attacker is fine, though.
-
-				highest_held_title_tier > tier_duchy
-				has_government = administrative_government
-				realm_size >= 30
-			}
-			trigger_else = { # everyone else uses these triggers
-				scope:t_defender = { NOT = { has_government = landless_adventurer_government } } # We do not want laamps to do it; nomad attacker is fine, though.
-
-				realm_size < 150								# all realms with at least 150 size may trigger regular mw
-				OR = {
-					AND = { # lower rank but bigger realm
-						realm_size >= 35						# minimum realm size
-						highest_held_title_tier > tier_duchy	# must be at least kingdom rank
-					}
-					# Put new triggers here, if you want :)
+	scope:t_defender = {
+		trigger_if = { # Default mw type for admin governments
+			limit = {
+				NOR = { # we only want the minimum requirement if we do not bypass additional triggers; else we run into issues distinguishing me lite from regular
+					# used to allow MW for tyranny wars; mw lite should already be triggered since we have a lower threshold
+					exists = scope:mw_demand_decline_bypass # this one is for display only
+					exists = scope:t_attacker.var:agot_allow_mw # this one is the actual variable set
 				}
+				has_government = administrative_government
+			}
+
+			scope:t_attacker = {
+				NOT = {
+					OR = {
+						AND = {
+							# Rise and Fall-created adventurers may use AGOT Mega Wars only when the compatibility rule is enabled.
+							has_government = landless_adventurer_government
+							NOT = {
+								AND = {
+									has_game_rule = riseandfall_adventurer_mega_wars_enabled
+									primary_title = { has_variable = riseandfall_created_adventurer_title }
+								}
+							}
+						}
+						AND = {
+							# Legacy Rise and Fall adventurer flag fallback for characters without the title marker.
+							has_character_flag = riseandfall_newadventurer
+							NOT = { has_game_rule = riseandfall_adventurer_mega_wars_enabled }
+						}
+					}
+				}
+			} # We do not want laamps to do it; nomad attacker is fine, though.
+
+			highest_held_title_tier > tier_duchy
+			realm_size >= 30
+		}
+		trigger_else = { # everyone else uses these triggers
+			scope:t_attacker = {
+				NOT = {
+					OR = {
+						AND = {
+							# Rise and Fall-created adventurers may use AGOT Mega Wars only when the compatibility rule is enabled.
+							has_government = landless_adventurer_government
+							NOT = {
+								AND = {
+									has_game_rule = riseandfall_adventurer_mega_wars_enabled
+									primary_title = { has_variable = riseandfall_created_adventurer_title }
+								}
+							}
+						}
+						AND = {
+							# Legacy Rise and Fall adventurer flag fallback for characters without the title marker.
+							has_character_flag = riseandfall_newadventurer
+							NOT = { has_game_rule = riseandfall_adventurer_mega_wars_enabled }
+						}
+					}
+				}
+			} # We do not want laamps to do it; nomad attacker is fine, though.
+
+			realm_size < 150								# all realms with at least 150 size may trigger regular mw
+			OR = {
+				AND = { # lower rank but bigger realm
+					realm_size >= 35						# minimum realm size
+					highest_held_title_tier > tier_duchy	# must be at least kingdom rank
+				}
+				# used to allow MW for tyranny wars; mw lite should already be triggered since we have a lower threshold
+				exists = scope:mw_demand_decline_bypass	# this one is for display only
+				exists = scope:t_attacker.var:agot_allow_mw	# this one is the actual variable set
+				# Put new triggers here, if you want :)
 			}
 		}
 	}
@@ -253,13 +292,6 @@ agot_mw_rebel_may_vassalize_trigger = {
 	# is disabled on default
 	OR = {
 		always = no #AGOT TODO add entries once they exist
-	}
-}
-
-agot_mw_is_valid_to_happen_tyranny_war = {
-	scope:actor = {
-		highest_held_title_tier > tier_kingdom # Empires and Hegemonies
-		agot_is_independent_ruler = yes
 	}
 }
 
@@ -428,7 +460,7 @@ agot_mw_show_stance_trigger = {
 					scope:mw_rebel_story.var:mw_war_cb ?= flag:independence_war
 					OR = {
 						scope:mw_rebel_leader.liege ?= scope:mw_ruler_scope
-						scope:mw_rebel_leader.var:pre_war_liege ?= scope:mw_ruler_scope
+						scope:mw_rebel_leader.var:agot_pwl_direct ?= scope:mw_ruler_scope
 					}
 				}
 			}
@@ -895,15 +927,6 @@ agot_mw_chars_on_opposite_sides = {
 	}
 }
 
-agot_char_is_in_targets_realm_trigger = {
-	OR = {
-		$CHAR$.var:pre_war_liege ?= $LIEGE$ # is pre_war_liege LIEGE?
-		$CHAR$.top_liege ?= $LIEGE$ # is pre_war_liege's liege LIEGE?
-		$CHAR$.var:pre_war_liege.top_liege ?= $LIEGE$ # is pre_war_liege's liege LIEGE?
-		$CHAR$.var:pre_war_liege.var:pre_war_liege ?= $LIEGE$ # is pre_war_liege's pre_war_liege LIEGE?
-	}
-}
-
 agot_mw_war_valid_during_megawar = {
 	trigger_if = {
 		limit = {
@@ -913,7 +936,7 @@ agot_mw_war_valid_during_megawar = {
 		}
 		NOT = {
 			scope:defender = {
-				has_variable = pre_war_liege
+				has_variable = agot_pwl_direct
 			}
 		}
 	}
@@ -921,11 +944,11 @@ agot_mw_war_valid_during_megawar = {
 		limit = {
 			scope:attacker = {
 				is_alive = yes
-				has_variable = pre_war_liege
+				has_variable = agot_pwl_direct
 			}
-			exists = scope:attacker.var:pre_war_liege
+			exists = scope:attacker.var:agot_pwl_direct
 		}
-		scope:defender != scope:attacker.var:pre_war_liege
+		scope:defender != scope:attacker.var:agot_pwl_direct
 	}
 }
 
@@ -1049,11 +1072,11 @@ mw_on_action_is_rebel_leader_trigger = {
 	}
 }
 
-mw_on_action_pre_war_liege_trigger = {
+mw_on_action_pwl_variables_trigger = {
 	scope:new_holder = {
 		NOR = {
 			agot_is_dummy_character = yes # Char may not be a dummy char
-			#has_variable = pre_war_liege # Else we already have a pre war liege, don't fuck around!
+			#has_variable = agot_pwl_direct # Else we already have a pre war liege, don't fuck around!
 		}
 		trigger_if = { # if the char is a rebel leader we only want him to update, if he ranks up; this generally happens if he wins a war
 			limit = { agot_mw_rebel_leader_trigger = yes }
@@ -1063,7 +1086,7 @@ mw_on_action_pre_war_liege_trigger = {
 			}
 		}
 		trigger_else = {
-			NOT = { has_variable = pre_war_liege } # Else we already have a pre war liege, don't fuck around!
+			NOT = { has_variable = agot_pwl_direct } # Else we already have a pre war liege, don't fuck around!
 		}
 	}
 	trigger_if = { # If char is already landed, we want to exclude any char that is not part of the mw
@@ -1079,17 +1102,17 @@ mw_on_action_pre_war_liege_trigger = {
 		}
 	}
 	OR = {
-		exists = scope:previous_holder.var:pre_war_liege
+		exists = scope:previous_holder.var:agot_pwl_direct
 		any_ruler = {
-			exists = var:pre_war_liege
-			var:pre_war_liege = scope:previous_holder
+			exists = var:agot_pwl_direct
+			var:agot_pwl_direct = scope:previous_holder
 			highest_held_title_tier < scope:title.tier
 		}
 	}
 }
 
-mw_on_action_remove_pre_war_liege_trigger = {
-	has_variable = pre_war_liege
+mw_on_action_remove_pwl_variables_trigger = {
+	has_variable = agot_pwl_direct
 	trigger_if = {
 		limit = {
 			OR = {
@@ -1108,18 +1131,18 @@ mw_on_action_remove_pre_war_liege_trigger = {
 			has_title = title:k_the_wall
 			AND = {
 				highest_held_title_tier > tier_kingdom # Empires and Hegemonies
-				scope:old_holder = { # if pre_war_liege would be of same or lower rank of you after war concludes (usually empire tier title of yours gets destroyed) then we do not rebuild and remove the variable
+				scope:old_holder = { # if agot_pwl_direct would be of same or lower rank of you after war concludes (usually empire tier title of yours gets destroyed) then we do not rebuild and remove the variable
 					any_held_title = {
 						NOT = { this = scope:title }
 						save_temporary_scope_as = t_scope
-						var:pre_war_liege ?= {
+						var:agot_pwl_direct ?= {
 							any_held_title = {
 								tier > scope:t_scope
 							}
 						}
 					}
 				}
-				NOT = { scope:old_holder = { is_at_war_with = var:pre_war_liege } }
+				NOT = { scope:old_holder = { is_at_war_with = var:agot_pwl_direct } }
 			}
 		}
 	}
@@ -1483,7 +1506,7 @@ agot_mw_penalty_wall_trigger = {
 	custom_tooltip = {
 		text = AGOT_MW_TRAITORS_CAN_SEND_TO_WALL_TT
 		exists = title:k_the_wall.holder
-		agot_valid_potential_nw_member = yes
+		$TARGET$ = { agot_valid_potential_nw_member = yes }
 	}
 }
 
