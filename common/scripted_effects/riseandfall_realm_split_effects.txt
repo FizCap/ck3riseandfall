@@ -1677,6 +1677,7 @@ riseandfall_realm_split_migrate_successor_primary_title_se = {
 riseandfall_realm_split_lower_actor_primary_below_recipient_se = {
     clear_saved_scope = rf_absorbed_split_title
     clear_saved_scope = rf_absorbed_replacement_title
+    clear_variable_list = rf_absorbed_surrender_vassals
 
     if = {
         limit = {
@@ -1690,6 +1691,9 @@ riseandfall_realm_split_lower_actor_primary_below_recipient_se = {
             primary_title.tier >= scope:recipient.primary_title.tier
         }
         primary_title = { save_scope_as = rf_absorbed_split_title }
+        # Preserve the recipient's current successor crown before a real
+        # equal-rank crown is handed upward and made their new primary title.
+        scope:recipient.primary_title = { save_temporary_scope_as = rf_recipient_old_primary }
 
         # Demotion needs a real lower title to preserve the actor as a landed
         # vassal after their successor crown is destroyed or handed upward.
@@ -1793,6 +1797,14 @@ riseandfall_realm_split_lower_actor_primary_below_recipient_se = {
                     save_scope_as = rf_absorbed_title_change
                     add_claim_on_loss = no
                 }
+                # Snapshot the direct vassals while they still belong to the
+                # submitting ruler. The title transfer temporarily releases
+                # them, so they must be restored from stable character scopes.
+                hidden_effect = {
+                    every_vassal = {
+                        add_to_list = rf_absorbed_surrender_vassals
+                    }
+                }
                 scope:rf_absorbed_split_title = {
                     change_title_holder = {
                         holder = scope:recipient
@@ -1807,11 +1819,87 @@ riseandfall_realm_split_lower_actor_primary_below_recipient_se = {
                         set_primary_title_to = scope:rf_absorbed_split_title
                     }
                 }
+                # The recipient now holds the surrendered crown and has the
+                # correct rank to receive every ruler released by the handoff.
+                hidden_effect = {
+                    create_title_and_vassal_change = {
+                        type = granted
+                        save_scope_as = rf_absorbed_vassal_change
+                        add_claim_on_loss = no
+                    }
+                    every_in_list = {
+                        list = rf_absorbed_surrender_vassals
+                        change_liege = {
+                            liege = scope:recipient
+                            change = scope:rf_absorbed_vassal_change
+                        }
+                    }
+                    resolve_title_and_vassal_change = scope:rf_absorbed_vassal_change
+                    clear_variable_list = rf_absorbed_surrender_vassals
+                }
+                # The transferred title had its old holder's markers cleared
+                # above. Reapply the receiving successor state's lineage so it
+                # retains Diadochi CB, surrender, and defection access.
+                scope:recipient.primary_title = {
+                    if = {
+                        limit = { scope:rf_recipient_old_primary = { has_variable = rf_successor_origin_title } }
+                        set_variable = { name = rf_successor_origin_title value = scope:rf_recipient_old_primary.var:rf_successor_origin_title years = 50 }
+                    }
+                    if = {
+                        limit = { scope:rf_recipient_old_primary = { has_variable = rf_successor_root_origin_title } }
+                        set_variable = { name = rf_successor_root_origin_title value = scope:rf_recipient_old_primary.var:rf_successor_root_origin_title years = 30 }
+                    }
+                    set_variable = { name = rf_is_successor_split_title value = 1 years = 30 }
+                    set_variable = { name = rf_is_permanent_successor_split value = 1 }
+                    if = {
+                        limit = { scope:rf_recipient_old_primary = { has_variable = rf_successor_permanent_realm_size } }
+                        set_variable = { name = rf_successor_permanent_realm_size value = scope:rf_recipient_old_primary.var:rf_successor_permanent_realm_size }
+                    }
+                    else = {
+                        set_variable = { name = rf_successor_permanent_realm_size value = scope:recipient.realm_size }
+                    }
+                }
+                # A real same-rank crown now carries the successor state. Retire
+                # the recipient's obsolete dynamic shell after its lineage has
+                # been migrated, while preserving any old de jure crown.
+                if = {
+                    limit = {
+                        exists = scope:rf_recipient_old_primary
+                        scope:rf_recipient_old_primary = {
+                            holder = scope:recipient
+                            is_titular = yes
+                        }
+                        NOT = { scope:rf_recipient_old_primary = scope:recipient.primary_title }
+                    }
+                    scope:recipient = { destroy_title = scope:rf_recipient_old_primary }
+                }
             }
             else = {
                 # Titular successor shells have no de jure land to preserve, so
-                # they are simply removed once the actor has a real title below.
+                # save their vassals before removing the crown; title destruction
+                # otherwise releases those rulers as independent realms.
+                hidden_effect = {
+                    every_vassal = {
+                        add_to_list = rf_absorbed_surrender_vassals
+                    }
+                }
                 destroy_title = scope:rf_absorbed_split_title
+                hidden_effect = {
+                    create_title_and_vassal_change = {
+                        type = granted
+                        save_scope_as = rf_absorbed_vassal_change
+                        add_claim_on_loss = no
+                    }
+                    every_in_list = {
+                        list = rf_absorbed_surrender_vassals
+                        change_liege = {
+                            liege = scope:recipient
+                            change = scope:rf_absorbed_vassal_change
+                        }
+                    }
+                    resolve_title_and_vassal_change = scope:rf_absorbed_vassal_change
+                    clear_variable_list = rf_absorbed_surrender_vassals
+                }
             }
         }
     }
@@ -1820,10 +1908,6 @@ riseandfall_realm_split_lower_actor_primary_below_recipient_se = {
 riseandfall_realm_split_defect_to_recipient_se = {
     scope:actor.liege = { save_temporary_scope_as = rf_former_split_liege }
     scope:actor.primary_title = { save_temporary_scope_as = rf_incoming_split_title }
-
-    scope:actor = {
-        set_variable = { name = rf_split_defection_cooldown value = yes years = 10 }
-    }
 
     scope:rf_former_split_liege = {
         add_opinion = {
@@ -1873,6 +1957,9 @@ riseandfall_realm_split_defect_to_recipient_se = {
 riseandfall_realm_split_surrender_to_recipient_se = {
     scope:actor.primary_title = { save_temporary_scope_as = rf_submitted_split_title }
     scope:rf_submitted_split_title = { save_temporary_scope_as = rf_incoming_split_title }
+    # Retain the recipient's successor crown as the metadata source if accepting
+    # this surrender promotes a real empire or hegemony title to primary.
+    scope:recipient.primary_title = { save_temporary_scope_as = rf_recipient_old_primary }
 
     scope:actor = {
         if = {
@@ -1902,6 +1989,28 @@ riseandfall_realm_split_surrender_to_recipient_se = {
         }
         resolve_title_and_vassal_change = scope:rf_split_submission_title_change
         scope:recipient = { set_primary_title_to = scope:rf_submitted_split_title }
+        # Move Baghdad's successor metadata directly onto the promoted Spanish
+        # crown. This interaction changes the recipient's primary title before
+        # cleanup, so the generic recipient-scope sync cannot safely infer it.
+        scope:recipient.primary_title = {
+            if = {
+                limit = { scope:rf_recipient_old_primary = { has_variable = rf_successor_origin_title } }
+                set_variable = { name = rf_successor_origin_title value = scope:rf_recipient_old_primary.var:rf_successor_origin_title years = 50 }
+            }
+            if = {
+                limit = { scope:rf_recipient_old_primary = { has_variable = rf_successor_root_origin_title } }
+                set_variable = { name = rf_successor_root_origin_title value = scope:rf_recipient_old_primary.var:rf_successor_root_origin_title years = 30 }
+            }
+            set_variable = { name = rf_is_successor_split_title value = 1 years = 30 }
+            set_variable = { name = rf_is_permanent_successor_split value = 1 }
+            if = {
+                limit = { scope:rf_recipient_old_primary = { has_variable = rf_successor_permanent_realm_size } }
+                set_variable = { name = rf_successor_permanent_realm_size value = scope:rf_recipient_old_primary.var:rf_successor_permanent_realm_size }
+            }
+            else = {
+                set_variable = { name = rf_successor_permanent_realm_size value = scope:recipient.realm_size }
+            }
+        }
     }
     else = {
         # Surrender drops a titular successor crown when needed; it never
@@ -1926,7 +2035,12 @@ riseandfall_realm_split_surrender_to_recipient_se = {
         }
     }
     if = {
-        limit = { scope:rf_submitted_split_title = { exists = holder } }
+        limit = {
+            scope:rf_submitted_split_title = { exists = holder }
+            # The recipient must keep metadata when this de jure title was
+            # promoted to their primary title by the surrender above.
+            NOT = { scope:rf_submitted_split_title = scope:recipient.primary_title }
+        }
         scope:rf_submitted_split_title = {
             remove_variable = rf_is_successor_split_title
             remove_variable = rf_successor_origin_title

@@ -1,5 +1,7 @@
 ﻿riseandfall_browse_diadochi_targets = {
-	picture = { reference = "gfx/interface/illustrations/event_scenes/mpo_warrior_steppe_camp.dds" }
+	# Use a verified base-game warfare illustration; the former multiplayer scene
+	# is not present in every supported install and generated a repeated VFS error.
+	picture = { reference = "gfx/interface/illustrations/decisions/decision_siege_warfare.dds" }
 	sort_order = 37
 	ai_check_interval = 0
 	desc = riseandfall_browse_diadochi_targets_desc
@@ -15,6 +17,8 @@
 	}
 
 	effect = {
+		# Page zero is rebuilt from current legal targets each time the browser opens.
+		set_variable = { name = rf_diadochi_browser_page value = 0 }
 		riseandfall_diadochi_prepare_browser_targets_se = yes
 		if = {
 			limit = { exists = scope:rf_diadochi_browser_target_ruler_1 }
@@ -22,6 +26,8 @@
 		}
 		else = {
 			riseandfall_diadochi_clear_browser_targets_se = yes
+			# Always give the player feedback when every target is currently blocked.
+			trigger_event = riseandfall_diadochi_browser.0004
 		}
 	}
 

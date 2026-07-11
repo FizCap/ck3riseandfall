@@ -155,6 +155,19 @@
 			add = -50
 		}
 		modifier = {
+			# Detached vassals seek a successor whose realm can reconnect them to government.
+			scope:actor = {
+				capital_county = {
+					NOT = {
+						is_connected_to = {
+							target = scope:actor.liege.capital_county
+						}
+					}
+				}
+			}
+			add = 50
+		}
+		modifier = {
 			scope:actor = {
 				capital_county.kingdom = scope:recipient.capital_county.kingdom
 			}
@@ -254,13 +267,19 @@ riseandfall_surrender_to_successor_interaction = {
 
 	is_valid_showing_failures_only = {
 		riseandfall_can_surrender_successor_realm_trigger = yes
+		# A realm already committed to a war cannot change allegiance through surrender.
+		scope:actor = { is_at_war = no }
 	}
 
 	auto_accept = no
 
 	on_accept = {
 		if = {
-			limit = { riseandfall_can_surrender_successor_realm_trigger = yes }
+			limit = {
+				riseandfall_can_surrender_successor_realm_trigger = yes
+				# Recheck after the reply delay in case the submitting ruler entered a war.
+				scope:actor = { is_at_war = no }
+			}
 			riseandfall_realm_split_surrender_to_recipient_se = yes
 		}
 	}

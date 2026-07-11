@@ -1,0 +1,148 @@
+﻿namespace = riseandfall_low_stability_manager
+
+# Overview: each event appears once with its current global frequency setting.
+# Manager navigation is immediate so changing screens never advances one game day.
+riseandfall_low_stability_manager.0001 = {
+	type = character_event
+	title = riseandfall_low_stability_manager.0001.t
+	desc = riseandfall_low_stability_manager.0001.desc
+	theme = realm
+
+	left_portrait = {
+		character = root
+		animation = personality_bold
+	}
+
+	option = {
+		name = riseandfall_low_stability_manager.0001.warlord
+		custom_tooltip = riseandfall_low_stability_manager.0001.event.tt
+		hidden_effect = {
+			set_variable = { name = rf_low_stability_manager_category value = 1 }
+			trigger_event = riseandfall_low_stability_manager.0002
+		}
+	}
+
+	option = {
+		name = riseandfall_low_stability_manager.0001.palace_coup
+		custom_tooltip = riseandfall_low_stability_manager.0001.event.tt
+		hidden_effect = {
+			set_variable = { name = rf_low_stability_manager_category value = 2 }
+			trigger_event = riseandfall_low_stability_manager.0002
+		}
+	}
+
+	option = {
+		name = riseandfall_low_stability_manager.0001.realm_split
+		custom_tooltip = riseandfall_low_stability_manager.0001.event.tt
+		hidden_effect = {
+			set_variable = { name = rf_low_stability_manager_category value = 3 }
+			trigger_event = riseandfall_low_stability_manager.0002
+		}
+	}
+
+	option = {
+		name = riseandfall_low_stability_manager.0001.nationalist_revolt
+		custom_tooltip = riseandfall_low_stability_manager.0001.event.tt
+		hidden_effect = {
+			set_variable = { name = rf_low_stability_manager_category value = 4 }
+			trigger_event = riseandfall_low_stability_manager.0002
+		}
+	}
+
+	option = {
+		name = riseandfall_low_stability_manager.0001.vassal_crisis
+		custom_tooltip = riseandfall_low_stability_manager.0001.event.tt
+		hidden_effect = {
+			set_variable = { name = rf_low_stability_manager_category value = 5 }
+			trigger_event = riseandfall_low_stability_manager.0002
+		}
+	}
+
+	option = {
+		name = riseandfall_low_stability_manager.0001.authority_collapse
+		custom_tooltip = riseandfall_low_stability_manager.0001.event.tt
+		hidden_effect = {
+			set_variable = { name = rf_low_stability_manager_category value = 6 }
+			trigger_event = riseandfall_low_stability_manager.0002
+		}
+	}
+
+	option = {
+		name = riseandfall_low_stability_manager.0001.coalition
+		custom_tooltip = riseandfall_low_stability_manager.0001.event.tt
+		hidden_effect = {
+			set_variable = { name = rf_low_stability_manager_category value = 7 }
+			trigger_event = riseandfall_low_stability_manager.0002
+		}
+	}
+
+	option = {
+		name = riseandfall_low_stability_manager.0001.close
+		hidden_effect = { remove_variable = rf_low_stability_manager_category }
+	}
+}
+
+# Detail: one reusable screen applies the selected frequency and returns to the overview.
+riseandfall_low_stability_manager.0002 = {
+	type = character_event
+	title = riseandfall_low_stability_manager.0002.t
+	desc = riseandfall_low_stability_manager.0002.desc
+	theme = realm
+
+	trigger = {
+		has_variable = rf_low_stability_manager_category
+		var:rf_low_stability_manager_category >= 1
+		var:rf_low_stability_manager_category <= 7
+	}
+
+	left_portrait = {
+		character = root
+		animation = personality_bold
+	}
+
+	option = {
+		name = riseandfall_low_stability_manager.0002.high
+		custom_tooltip = riseandfall_low_stability_manager.0002.high.tt
+		hidden_effect = {
+			riseandfall_apply_selected_low_stability_setting_se = { SETTING = high }
+			trigger_event = riseandfall_low_stability_manager.0001
+		}
+	}
+
+	option = {
+		name = riseandfall_low_stability_manager.0002.standard
+		custom_tooltip = riseandfall_low_stability_manager.0002.standard.tt
+		hidden_effect = {
+			riseandfall_apply_selected_low_stability_setting_se = { SETTING = standard }
+			trigger_event = riseandfall_low_stability_manager.0001
+		}
+	}
+
+	option = {
+		name = riseandfall_low_stability_manager.0002.low
+		custom_tooltip = riseandfall_low_stability_manager.0002.low.tt
+		hidden_effect = {
+			riseandfall_apply_selected_low_stability_setting_se = { SETTING = low }
+			trigger_event = riseandfall_low_stability_manager.0001
+		}
+	}
+
+	option = {
+		name = riseandfall_low_stability_manager.0002.off
+		custom_tooltip = riseandfall_low_stability_manager.0002.off.tt
+		hidden_effect = {
+			riseandfall_apply_selected_low_stability_setting_se = { SETTING = off }
+			trigger_event = riseandfall_low_stability_manager.0001
+		}
+	}
+
+	option = {
+		name = riseandfall_low_stability_manager.0002.back
+		hidden_effect = {
+			trigger_event = riseandfall_low_stability_manager.0001
+		}
+	}
+
+	# The selected category is needed only while this detail event is open.
+	after = { remove_variable = rf_low_stability_manager_category }
+}

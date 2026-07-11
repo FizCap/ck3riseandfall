@@ -156,3 +156,65 @@
             base = 0
         }
     }
+
+    # Developer debug decision: turn one random claimant to this ruler's primary title into a legitimist adventurer.
+    riseandfall_debug_create_random_legitimist_claimant = {
+        picture = {
+            reference = "gfx/interface/illustrations/decisions/decision_misc.dds"
+        }
+        sort_order = 103
+        ai_check_interval = 0
+        desc = riseandfall_debug_create_random_legitimist_claimant_desc
+        selection_tooltip = riseandfall_debug_create_random_legitimist_claimant_tooltip
+        decision_group_type = admin
+
+        is_shown = {
+            debug_only = yes
+            is_ai = no
+            is_landed = yes
+            exists = primary_title
+        }
+
+        is_valid = {
+            is_alive = yes
+            primary_title = {
+                any_claimant = {
+                    explicit = all
+                    is_alive = yes
+                    age >= 16
+                    is_landed = no
+                    NOT = { has_government = landless_adventurer_government }
+                    NOT = { has_character_flag = riseandfall_newadventurer }
+                    NOT = { has_trait_with_flag = can_not_marry }
+                }
+            }
+        }
+
+        effect = {
+            save_scope_as = independent_ruler
+            primary_title = {
+                save_scope_as = claim_target_title
+                random_claimant = {
+                    explicit = all
+                    limit = {
+                        is_alive = yes
+                        age >= 16
+                        is_landed = no
+                        NOT = { has_government = landless_adventurer_government }
+                        NOT = { has_character_flag = riseandfall_newadventurer }
+                        NOT = { has_trait_with_flag = can_not_marry }
+                    }
+                    # Reuse the normal legitimist setup so this creates exactly
+                    # one claimant camp and its initial host army.
+                    riseandfall_do_create_adventurer_se = yes
+                }
+            }
+        }
+
+        ai_potential = {
+        }
+
+        ai_will_do = {
+            base = 0
+        }
+    }

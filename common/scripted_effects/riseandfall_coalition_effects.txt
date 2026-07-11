@@ -1,0 +1,695 @@
+﻿# Rise and Fall - Coalition low-stability effects
+
+riseandfall_coalition_clear_invitee_state_se = {
+    remove_character_flag = rf_coalition_invitation_pending
+    remove_character_flag = rf_coalition_vassal_invitation_pending
+    remove_character_flag = rf_coalition_accepted
+    remove_character_flag = rf_coalition_vassal_accepted
+    remove_character_flag = rf_coalition_final_participant
+    remove_character_flag = rf_coalition_vassal_final_participant
+    remove_variable = rf_coalition_target
+}
+
+# Remove all reachable invitation records belonging to this target. Timed
+# variables provide a final safety net if an invitee stops being independent.
+riseandfall_coalition_clear_assembly_state_se = {
+    save_scope_as = coalition_target
+    every_independent_ruler = {
+        limit = { var:rf_coalition_target ?= scope:coalition_target }
+        riseandfall_coalition_clear_invitee_state_se = yes
+    }
+    every_vassal = {
+        limit = { var:rf_coalition_target ?= scope:coalition_target }
+        riseandfall_coalition_clear_invitee_state_se = yes
+    }
+    remove_character_flag = rf_coalition_formation_active
+    remove_variable = rf_coalition_participant_count
+    remove_variable = rf_coalition_leader_power
+    remove_variable = rf_coalition_target_power
+}
+
+# Run before a yearly roll so interrupted formations and terminal-war states do
+# not permanently suppress this incident.
+riseandfall_coalition_clear_stale_target_state_se = {
+    if = {
+        limit = {
+            has_character_flag = rf_coalition_formation_active
+            NOT = {
+                OR = {
+                    any_independent_ruler = {
+                        var:rf_coalition_target ?= root
+                        OR = {
+                            has_character_flag = rf_coalition_invitation_pending
+                            has_character_flag = rf_coalition_accepted
+                        }
+                    }
+                    any_vassal = {
+                        var:rf_coalition_target ?= root
+                        OR = {
+                            has_character_flag = rf_coalition_vassal_invitation_pending
+                            has_character_flag = rf_coalition_vassal_accepted
+                        }
+                    }
+                }
+            }
+        }
+        remove_character_flag = rf_coalition_formation_active
+    }
+    if = {
+        limit = {
+            has_character_flag = rf_coalition_under_attack
+            NOT = { riseandfall_coalition_target_has_active_war_trigger = yes }
+        }
+        remove_character_flag = rf_coalition_under_attack
+    }
+}
+
+riseandfall_coalition_record_vassal_acceptance_se = {
+    if = {
+        limit = { has_variable = rf_coalition_target }
+        var:rf_coalition_target = { save_scope_as = coalition_target }
+    }
+    remove_character_flag = rf_coalition_vassal_invitation_pending
+    add_character_flag = { flag = rf_coalition_vassal_accepted days = 60 }
+    if = {
+        limit = {
+            is_ai = no
+            exists = scope:coalition_target
+        }
+        scope:coalition_target = { riseandfall_coalition_continue_player_invitations_se = yes }
+    }
+}
+
+riseandfall_coalition_record_vassal_decline_se = {
+    if = {
+        limit = { has_variable = rf_coalition_target }
+        var:rf_coalition_target = { save_scope_as = coalition_target }
+    }
+    riseandfall_coalition_clear_invitee_state_se = yes
+    if = {
+        limit = {
+            is_ai = no
+            exists = scope:coalition_target
+        }
+        scope:coalition_target = { riseandfall_coalition_continue_player_invitations_se = yes }
+    }
+}
+
+riseandfall_coalition_record_acceptance_se = {
+    if = {
+        limit = { has_variable = rf_coalition_target }
+        var:rf_coalition_target = { save_scope_as = coalition_target }
+    }
+    remove_character_flag = rf_coalition_invitation_pending
+    add_character_flag = { flag = rf_coalition_accepted days = 60 }
+
+    # AI replies are resolved inside the preparation loop. Human replies advance
+    # the serialized queue so multiplayer choices cannot race final assembly.
+    if = {
+        limit = {
+            is_ai = no
+            exists = scope:coalition_target
+        }
+        scope:coalition_target = { riseandfall_coalition_continue_player_invitations_se = yes }
+    }
+}
+
+riseandfall_coalition_record_decline_se = {
+    if = {
+        limit = { has_variable = rf_coalition_target }
+        var:rf_coalition_target = { save_scope_as = coalition_target }
+    }
+    riseandfall_coalition_clear_invitee_state_se = yes
+    if = {
+        limit = {
+            is_ai = no
+            exists = scope:coalition_target
+        }
+        scope:coalition_target = { riseandfall_coalition_continue_player_invitations_se = yes }
+    }
+}
+
+# AI invitations must resolve inside the invitation loop. Sending an AI event
+# can defer its option until after assembly finalizes, leaving no acceptors.
+riseandfall_coalition_resolve_ai_invitation_se = {
+    if = {
+        limit = { has_variable = rf_coalition_target }
+        var:rf_coalition_target = { save_scope_as = coalition_target }
+    }
+    if = {
+        limit = { riseandfall_coalition_invitee_can_join_trigger = yes }
+        random_list = {
+            50 = {
+                modifier = { has_relation_nemesis = scope:coalition_target add = 50 }
+                modifier = { has_relation_rival = scope:coalition_target add = 30 }
+                modifier = { opinion = { target = scope:coalition_target value <= -25 } add = 25 }
+                modifier = {
+                    riseandfall_military_power_with_allies >= scope:coalition_target.riseandfall_military_power_with_allies
+                    add = 25
+                }
+                modifier = { has_trait = ambitious add = 15 }
+                modifier = { has_trait = brave add = 15 }
+                modifier = { has_trait = vengeful add = 15 }
+                modifier = { has_relation_best_friend = scope:coalition_target add = -50 }
+                modifier = { has_relation_friend = scope:coalition_target add = -30 }
+                modifier = { opinion = { target = scope:coalition_target value >= 25 } add = -25 }
+                modifier = { military_power < scope:coalition_target.military_power add = -25 }
+                modifier = { has_trait = craven add = -30 }
+                modifier = { has_trait = content add = -20 }
+                modifier = { has_trait = compassionate add = -20 }
+                riseandfall_coalition_record_acceptance_se = yes
+            }
+            50 = {
+                modifier = { has_relation_best_friend = scope:coalition_target add = 50 }
+                modifier = { has_relation_friend = scope:coalition_target add = 30 }
+                modifier = { opinion = { target = scope:coalition_target value >= 25 } add = 25 }
+                modifier = { has_trait = craven add = 30 }
+                modifier = { has_trait = content add = 20 }
+                modifier = { has_trait = compassionate add = 20 }
+                riseandfall_coalition_record_decline_se = yes
+            }
+        }
+    }
+    else = {
+        riseandfall_coalition_record_decline_se = yes
+    }
+}
+
+# Internal AI rebels use the same weighted-choice structure as foreign rulers,
+# but their opinion of the liege, personal relationships, traits, and place in
+# the realm drive the decision more strongly than foreign power comparisons.
+riseandfall_coalition_resolve_ai_vassal_invitation_se = {
+    save_scope_as = coalition_vassal_invitee
+    if = {
+        limit = { has_variable = rf_coalition_target }
+        var:rf_coalition_target = { save_scope_as = coalition_target }
+    }
+    if = {
+        limit = { riseandfall_coalition_vassal_can_join_trigger = yes }
+        random_list = {
+            35 = {
+                # Personal hostility and weak loyalty are the strongest reasons
+                # to risk rebellion for the Coalition's independence promise.
+                modifier = { has_relation_nemesis = scope:coalition_target add = 80 }
+                modifier = { has_relation_rival = scope:coalition_target add = 50 }
+                modifier = { has_relation_potential_rival = scope:coalition_target add = 20 }
+                modifier = { opinion = { target = scope:coalition_target value <= -50 } add = 60 }
+                modifier = { opinion = { target = scope:coalition_target value <= -25 } add = 30 }
+                modifier = { has_trait = disloyal add = 60 }
+
+                # Powerful, established vassals have more to gain and are more
+                # capable of surviving as independent rulers after victory.
+                modifier = { is_powerful_vassal = yes add = 25 }
+                modifier = { military_power >= scope:coalition_target.military_power add = 40 }
+                modifier = {
+                    military_power >= {
+                        value = scope:coalition_target.military_power
+                        multiply = 0.5
+                    }
+                    add = 30
+                }
+                modifier = {
+                    military_power >= {
+                        value = scope:coalition_target.military_power
+                        multiply = 0.25
+                    }
+                    add = 15
+                }
+                modifier = { realm_size >= 20 add = 20 }
+                modifier = { realm_size < 5 add = -15 }
+                modifier = { is_adult = no add = -25 }
+
+                # Ambitious, bold, deceitful, and vengeful personalities are
+                # comfortable exploiting a foreign-backed break with their liege.
+                modifier = { has_trait = ambitious add = 25 }
+                modifier = { has_trait = brave add = 15 }
+                modifier = { has_trait = vengeful add = 20 }
+                modifier = { has_trait = deceitful add = 15 }
+                modifier = { has_trait = arbitrary add = 10 }
+                modifier = { has_trait = fickle add = 15 }
+                modifier = { has_trait = paranoid add = 10 }
+                modifier = { has_trait = arrogant add = 10 }
+                modifier = { ai_boldness > medium_positive_ai_value add = 20 }
+                modifier = { ai_vengefulness > medium_positive_ai_value add = 20 }
+                modifier = { ai_greed > medium_positive_ai_value add = 10 }
+                modifier = { ai_honor < medium_negative_ai_value add = 15 }
+
+                # Cultural or religious separation makes permanent independence
+                # more attractive than remaining inside the target's realm.
+                modifier = { NOT = { has_same_culture_as = scope:coalition_target } add = 15 }
+                modifier = { NOT = { faith = scope:coalition_target.faith } add = 15 }
+
+                # Close personal, familial, and principled ties strongly resist
+                # the opportunity even when independence would be profitable.
+                modifier = { has_relation_best_friend = scope:coalition_target add = -100 }
+                modifier = { has_relation_friend = scope:coalition_target add = -60 }
+                modifier = { is_close_family_of = scope:coalition_target add = -60 }
+                # A claimant wants the crown preserved for themselves, whereas
+                # Coalition victory would destroy it after the liege abdicates.
+                modifier = { has_claim_on = scope:coalition_target.primary_title add = -30 }
+                modifier = {
+                    has_dynasty = yes
+                    scope:coalition_target = { has_dynasty = yes }
+                    dynasty = scope:coalition_target.dynasty
+                    add = -30
+                }
+                modifier = { opinion = { target = scope:coalition_target value >= 50 } add = -60 }
+                modifier = { opinion = { target = scope:coalition_target value >= 25 } add = -30 }
+                modifier = { has_trait = content add = -40 }
+                modifier = { has_trait = craven add = -30 }
+                modifier = { has_trait = compassionate add = -20 }
+                modifier = { has_trait = loyal add = -80 }
+                modifier = { has_trait = honest add = -20 }
+                modifier = { has_trait = just add = -15 }
+                modifier = { has_trait = trusting add = -15 }
+                modifier = { has_trait = humble add = -10 }
+                modifier = { ai_honor > medium_positive_ai_value add = -20 }
+                modifier = { ai_boldness < medium_negative_ai_value add = -20 }
+                modifier = {
+                    scope:coalition_target = {
+                        has_dread_level_towards = { target = scope:coalition_vassal_invitee level = 1 }
+                    }
+                    add = -15
+                }
+                modifier = {
+                    scope:coalition_target = {
+                        has_dread_level_towards = { target = scope:coalition_vassal_invitee level = 2 }
+                    }
+                    add = -15
+                }
+                riseandfall_coalition_record_vassal_acceptance_se = yes
+            }
+            65 = {
+                # Loyalty is the default; strong bonds and fear of the liege
+                # reinforce refusal while hostile motives weigh against it.
+                modifier = { has_relation_best_friend = scope:coalition_target add = 100 }
+                modifier = { has_relation_friend = scope:coalition_target add = 60 }
+                modifier = { is_close_family_of = scope:coalition_target add = 60 }
+                modifier = { has_claim_on = scope:coalition_target.primary_title add = 30 }
+                modifier = {
+                    has_dynasty = yes
+                    scope:coalition_target = { has_dynasty = yes }
+                    dynasty = scope:coalition_target.dynasty
+                    add = 30
+                }
+                modifier = { opinion = { target = scope:coalition_target value >= 50 } add = 60 }
+                modifier = { opinion = { target = scope:coalition_target value >= 25 } add = 30 }
+                modifier = { has_trait = content add = 40 }
+                modifier = { has_trait = craven add = 30 }
+                modifier = { has_trait = compassionate add = 20 }
+                modifier = { has_trait = loyal add = 80 }
+                modifier = { has_trait = honest add = 20 }
+                modifier = { has_trait = just add = 15 }
+                modifier = { has_trait = trusting add = 15 }
+                modifier = { has_trait = humble add = 10 }
+                modifier = { ai_honor > medium_positive_ai_value add = 20 }
+                modifier = { ai_boldness < medium_negative_ai_value add = 20 }
+                modifier = { realm_size < 5 add = 15 }
+                modifier = { is_adult = no add = 25 }
+                modifier = {
+                    scope:coalition_target = {
+                        has_dread_level_towards = { target = scope:coalition_vassal_invitee level = 1 }
+                    }
+                    add = 15
+                }
+                modifier = {
+                    scope:coalition_target = {
+                        has_dread_level_towards = { target = scope:coalition_vassal_invitee level = 2 }
+                    }
+                    add = 15
+                }
+                modifier = { has_relation_nemesis = scope:coalition_target add = -80 }
+                modifier = { has_relation_rival = scope:coalition_target add = -50 }
+                modifier = { opinion = { target = scope:coalition_target value <= -50 } add = -60 }
+                modifier = { has_trait = disloyal add = -60 }
+                modifier = { has_trait = ambitious add = -25 }
+                modifier = { has_trait = vengeful add = -20 }
+                riseandfall_coalition_record_vassal_decline_se = yes
+            }
+        }
+    }
+    else = {
+        riseandfall_coalition_record_vassal_decline_se = yes
+    }
+}
+
+riseandfall_coalition_continue_player_invitations_se = {
+    save_scope_as = coalition_target
+    clear_saved_scope = coalition_next_player
+    ordered_independent_ruler = {
+        limit = {
+            is_ai = no
+            has_character_flag = rf_coalition_invitation_pending
+            var:rf_coalition_target ?= scope:coalition_target
+        }
+        order_by = military_power
+        max = 1
+        save_scope_as = coalition_next_player
+    }
+    if = {
+        limit = {
+            exists = scope:coalition_next_player
+            scope:coalition_next_player = {
+                has_character_flag = rf_coalition_invitation_pending
+                var:rf_coalition_target ?= scope:coalition_target
+            }
+        }
+        scope:coalition_next_player = {
+            trigger_event = { id = coalition.1002 delayed = yes }
+        }
+    }
+    else = {
+        clear_saved_scope = coalition_next_vassal_player
+        ordered_vassal = {
+            limit = {
+                is_ai = no
+                has_character_flag = rf_coalition_vassal_invitation_pending
+                var:rf_coalition_target ?= scope:coalition_target
+            }
+            order_by = military_power
+            max = 1
+            save_scope_as = coalition_next_vassal_player
+        }
+        if = {
+            limit = { exists = scope:coalition_next_vassal_player }
+            scope:coalition_next_vassal_player = {
+                trigger_event = { id = coalition.1003 delayed = yes }
+            }
+        }
+        else = {
+            riseandfall_coalition_finalize_assembly_se = yes
+        }
+    }
+}
+
+# Invite all independent realms in range. Hard-blocked rulers still receive the
+# event and its explicit refusal reason; only overlapping pending invitations are skipped.
+riseandfall_coalition_prepare_invitations_se = {
+    save_scope_as = coalition_target
+    if = {
+        limit = {
+            riseandfall_coalition_target_core_valid_trigger = yes
+            has_character_flag = rf_coalition_formation_active
+            NOT = { riseandfall_coalition_target_has_active_war_trigger = yes }
+        }
+        every_independent_ruler = {
+            limit = {
+                NOT = { this = scope:coalition_target }
+                is_alive = yes
+                is_landed = yes
+                exists = primary_title
+                in_diplomatic_range = scope:coalition_target
+                NOT = { has_variable = rf_coalition_target }
+            }
+            set_variable = { name = rf_coalition_target value = scope:coalition_target days = 60 }
+            add_character_flag = { flag = rf_coalition_invitation_pending days = 60 }
+            if = {
+                limit = { is_ai = yes }
+                riseandfall_coalition_resolve_ai_invitation_se = yes
+            }
+        }
+
+        # Direct vassals are offered independence in return for joining the
+        # Coalition's attacker side; nested vassals remain with their direct liege.
+        every_vassal = {
+            limit = {
+                is_alive = yes
+                is_landed = yes
+                exists = primary_title
+                highest_held_title_tier >= tier_county
+                NOT = { has_variable = rf_coalition_target }
+            }
+            set_variable = { name = rf_coalition_target value = scope:coalition_target days = 60 }
+            add_character_flag = { flag = rf_coalition_vassal_invitation_pending days = 60 }
+            if = {
+                limit = { is_ai = yes }
+                riseandfall_coalition_resolve_ai_vassal_invitation_se = yes
+            }
+        }
+
+        if = {
+            limit = {
+                OR = {
+                    any_independent_ruler = {
+                        is_ai = no
+                        has_character_flag = rf_coalition_invitation_pending
+                        var:rf_coalition_target ?= scope:coalition_target
+                    }
+                    any_vassal = {
+                        is_ai = no
+                        has_character_flag = rf_coalition_vassal_invitation_pending
+                        var:rf_coalition_target ?= scope:coalition_target
+                    }
+                }
+            }
+            riseandfall_coalition_continue_player_invitations_se = yes
+        }
+        else = {
+            riseandfall_coalition_finalize_assembly_se = yes
+        }
+    }
+    else = {
+        # Explain eligibility loss before the fallback selector replaces Coalition.
+        trigger_event = { id = coalition.1106 delayed = yes }
+    }
+}
+
+# Clean the abandoned assembly first, then reuse the normal weighted selector
+# while a short-lived flag makes Coalition itself impossible to draw again.
+riseandfall_coalition_fail_and_reroll_se = {
+    save_scope_as = coalition_target
+    riseandfall_coalition_clear_assembly_state_se = yes
+    if = {
+        limit = { riseandfall_coalition_can_fallback_reroll_trigger = yes }
+        add_character_flag = { flag = rf_coalition_fallback_reroll days = 1 }
+        riseandfall_low_stability_random_event = yes
+        remove_character_flag = rf_coalition_fallback_reroll
+    }
+}
+
+riseandfall_coalition_finalize_assembly_se = {
+    save_scope_as = coalition_target
+
+    # Drop acceptances that became illegal while player replies were pending.
+    every_independent_ruler = {
+        limit = {
+            has_character_flag = rf_coalition_accepted
+            var:rf_coalition_target ?= scope:coalition_target
+            NOT = { riseandfall_coalition_invitee_can_join_trigger = yes }
+        }
+        riseandfall_coalition_clear_invitee_state_se = yes
+    }
+    every_vassal = {
+        limit = {
+            has_character_flag = rf_coalition_vassal_accepted
+            var:rf_coalition_target ?= scope:coalition_target
+            NOT = { riseandfall_coalition_vassal_can_join_trigger = yes }
+        }
+        riseandfall_coalition_clear_invitee_state_se = yes
+    }
+
+    clear_saved_scope = coalition_leader
+    ordered_independent_ruler = {
+        limit = {
+            has_character_flag = rf_coalition_accepted
+            var:rf_coalition_target ?= scope:coalition_target
+            riseandfall_coalition_invitee_can_join_trigger = yes
+        }
+        # Leadership is deliberately raw military_power, not current/max troops
+        # and not the ally-inclusive value used by the launch gate.
+        order_by = military_power
+        max = 1
+        save_scope_as = coalition_leader
+    }
+
+    if = {
+        limit = {
+            riseandfall_coalition_target_core_valid_trigger = yes
+            has_character_flag = rf_coalition_formation_active
+            exists = scope:coalition_leader
+        }
+        set_variable = { name = rf_coalition_participant_count value = 0 }
+        every_independent_ruler = {
+            limit = {
+                has_character_flag = rf_coalition_accepted
+                var:rf_coalition_target ?= scope:coalition_target
+                riseandfall_coalition_invitee_can_join_trigger = yes
+                NOT = { is_at_war_with = scope:coalition_leader }
+            }
+            add_character_flag = { flag = rf_coalition_final_participant days = 5 }
+            scope:coalition_target = {
+                change_variable = { name = rf_coalition_participant_count add = 1 }
+            }
+        }
+        every_vassal = {
+            limit = {
+                has_character_flag = rf_coalition_vassal_accepted
+                var:rf_coalition_target ?= scope:coalition_target
+                riseandfall_coalition_vassal_can_join_trigger = yes
+                NOT = { is_at_war_with = scope:coalition_leader }
+            }
+            add_character_flag = { flag = rf_coalition_vassal_final_participant days = 5 }
+            scope:coalition_target = {
+                change_variable = { name = rf_coalition_participant_count add = 1 }
+            }
+        }
+
+        set_variable = {
+            name = rf_coalition_leader_power
+            value = scope:coalition_leader.riseandfall_military_power_with_allies
+        }
+        set_variable = {
+            name = rf_coalition_target_power
+            value = riseandfall_military_power_with_allies
+        }
+
+        # Each internal rebel adds their full raw military_power to the
+        # attackers. The target's ally-inclusive power remains unchanged.
+        every_vassal = {
+            limit = {
+                has_character_flag = rf_coalition_vassal_final_participant
+                var:rf_coalition_target ?= scope:coalition_target
+            }
+            save_scope_value_as = {
+                name = coalition_rebel_power
+                value = military_power
+            }
+            scope:coalition_target = {
+                change_variable = { name = rf_coalition_leader_power add = scope:coalition_rebel_power }
+            }
+        }
+        primary_title = { save_scope_as = coalition_target_title }
+
+        if = {
+            limit = {
+                var:rf_coalition_participant_count >= 2
+                var:rf_coalition_leader_power >= var:rf_coalition_target_power
+                NOT = { riseandfall_coalition_target_has_active_war_trigger = yes }
+                scope:coalition_leader = {
+                    has_character_flag = rf_coalition_final_participant
+                }
+            }
+
+            # Keep the accepted direct vassals saved across start_war. They stay
+            # subjects until victory, but will be called to the attacker side.
+            every_vassal = {
+                limit = {
+                    has_character_flag = rf_coalition_vassal_final_participant
+                    var:rf_coalition_target ?= scope:coalition_target
+                    riseandfall_coalition_vassal_can_join_trigger = yes
+                }
+                add_to_list = rf_coalition_internal_rebels
+            }
+
+            scope:coalition_leader = {
+                start_war = {
+                    casus_belli = riseandfall_coalition_cb
+                    target = scope:coalition_target
+                    target_title = scope:coalition_target_title
+                }
+            }
+
+            clear_saved_scope = coalition_war
+            scope:coalition_leader = {
+                random_character_war = {
+                    limit = {
+                        using_cb = riseandfall_coalition_cb
+                        is_defender = scope:coalition_target
+                    }
+                    save_scope_as = coalition_war
+                }
+            }
+
+            if = {
+                limit = { exists = scope:coalition_war }
+                every_independent_ruler = {
+                    limit = {
+                        has_character_flag = rf_coalition_final_participant
+                        var:rf_coalition_target ?= scope:coalition_target
+                        NOT = { this = scope:coalition_leader }
+                    }
+                    save_scope_as = coalition_joiner
+                    # Formal allies may have entered automatically when start_war
+                    # ran. Only add rulers who are not already war participants.
+                    if = {
+                        limit = { NOT = { is_participant_in_war = scope:coalition_war } }
+                        scope:coalition_war = { add_attacker = scope:coalition_joiner }
+                    }
+                }
+                every_in_list = {
+                    list = rf_coalition_internal_rebels
+                    limit = {
+                        is_alive = yes
+                        is_landed = yes
+                        has_character_flag = rf_coalition_vassal_final_participant
+                        var:rf_coalition_target ?= scope:coalition_target
+                        is_vassal_of = scope:coalition_target
+                    }
+                    save_scope_as = coalition_vassal_joiner
+                    if = {
+                        limit = { NOT = { is_participant_in_war = scope:coalition_war } }
+                        # set_called_to is the engine marker used by More
+                        # Interactive Vassals before adding a subject against
+                        # their liege; without it add_attacker silently fails.
+                        scope:coalition_war = {
+                            hidden_effect = { set_called_to = scope:coalition_vassal_joiner }
+                            add_attacker = scope:coalition_vassal_joiner
+                        }
+                        if = {
+                            limit = { is_attacker_in_war = scope:coalition_war }
+                            add_character_flag = rf_coalition_independence_promised
+                            debug_log = "RF Coalition: rebel vassal remained a subject and was called to the Coalition attacker side."
+                        }
+                        else = {
+                            debug_log = "RF Coalition: set_called_to and add_attacker ran, but the rebel vassal did not enter the attacker side."
+                        }
+                    }
+                }
+                add_character_flag = rf_coalition_under_attack
+                add_character_flag = { flag = rf_low_stability_cooldown years = 5 }
+                riseandfall_coalition_clear_assembly_state_se = yes
+                debug_log = "RF Coalition: scripted Coalition war started successfully."
+            }
+            else = {
+                debug_log = "RF Coalition: start_war ran, but no Coalition war could be found on the selected leader."
+                trigger_event = { id = coalition.1105 delayed = yes }
+            }
+        }
+        else = {
+            if = {
+                limit = { var:rf_coalition_participant_count < 2 }
+                debug_log = "RF Coalition: final gate failed because fewer than two legal attackers remained."
+                trigger_event = { id = coalition.1101 delayed = yes }
+            }
+            else_if = {
+                limit = { var:rf_coalition_leader_power < var:rf_coalition_target_power }
+                debug_log = "RF Coalition: final gate failed because the leader network was weaker than the target network."
+                trigger_event = { id = coalition.1102 delayed = yes }
+            }
+            else_if = {
+                limit = { riseandfall_coalition_target_has_active_war_trigger = yes }
+                debug_log = "RF Coalition: final gate failed because a Coalition war already targeted this ruler."
+                trigger_event = { id = coalition.1104 delayed = yes }
+            }
+            else_if = {
+                limit = { scope:coalition_leader = { NOT = { has_character_flag = rf_coalition_final_participant } } }
+                debug_log = "RF Coalition: final gate failed because the selected leader was removed from the final participant set."
+                trigger_event = { id = coalition.1103 delayed = yes }
+            }
+            else = {
+                debug_log = "RF Coalition: final gate failed for an unclassified reason."
+                trigger_event = { id = coalition.1107 delayed = yes }
+            }
+        }
+    }
+    else = {
+        debug_log = "RF Coalition: assembly had no valid leader or the target became invalid before finalization."
+        if = {
+            limit = { NOT = { exists = scope:coalition_leader } }
+            trigger_event = { id = coalition.1103 delayed = yes }
+        }
+        else = {
+            trigger_event = { id = coalition.1106 delayed = yes }
+        }
+    }
+}

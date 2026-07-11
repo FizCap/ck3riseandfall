@@ -1,0 +1,206 @@
+﻿# Rise and Fall - Coalition War
+
+riseandfall_coalition_cb = {
+    icon = invasion_cb
+    group = event
+
+    combine_into_one = yes
+    should_show_war_goal_subview = yes
+    mutually_exclusive_titles = { always = yes }
+
+    # This CB is started only by the Coalition assembly effect. Match vanilla
+    # event-war CBs so ordinary declaration rules cannot reject start_war.
+    allowed_for_character = {}
+    allowed_for_character_display_regardless = {}
+    allowed_against_character = {}
+
+    target_titles = all
+    target_title_tier = all
+    ignore_effect = change_title_holder
+
+    # A realm-dismantling Coalition must end decisively, matching the mod's
+    # adventurer invasion wars: only enforce demands or surrender are offered.
+    white_peace_possible = no
+
+    valid_to_start = { always = no }
+
+    # Runtime validity is controlled by the war itself after scripted creation.
+    should_invalidate = { always = no }
+
+    on_invalidated_desc = { desc = RISEANDFALL_COALITION_ON_INVALIDATED_DESC }
+    on_invalidated = {
+        scope:defender = { remove_character_flag = rf_coalition_under_attack }
+        scope:war = {
+            every_war_attacker = {
+                remove_character_flag = rf_coalition_independence_promised
+            }
+        }
+    }
+
+    cost = {
+        piety = { value = 0 }
+        prestige = { value = 0 }
+    }
+
+    on_declaration = {
+        on_declared_war = yes
+        scope:defender = {
+            remove_character_flag = rf_coalition_formation_active
+            add_character_flag = rf_coalition_under_attack
+        }
+    }
+
+    on_victory_desc = { desc = RISEANDFALL_COALITION_ON_VICTORY_DESC }
+    on_white_peace_desc = { desc = WHITE_PEACE_DISABLED }
+    on_defeat_desc = { desc = RISEANDFALL_COALITION_ON_DEFEAT_DESC }
+
+    on_victory = {
+        scope:attacker = { show_pow_release_message_effect = yes }
+        add_legitimacy_attacker_victory_effect = yes
+        scope:attacker = { accolade_attacker_war_end_glory_gain_med_effect = yes }
+
+        # Capture the original crown tier before deposition changes the holder's
+        # primary title. Destruction runs only after vanilla succession resolves.
+        scope:defender = {
+            every_held_title = {
+                limit = { tier = scope:defender.primary_title.tier }
+                add_to_list = rf_coalition_titles_to_destroy
+            }
+            remove_character_flag = rf_coalition_under_attack
+            depose_effect = { DEPOSER = scope:attacker }
+        }
+
+        every_in_list = {
+            list = rf_coalition_titles_to_destroy
+            scope:attacker = { destroy_title = prev }
+        }
+
+        # Internal rebels remain vassals during the war and receive the promised
+        # independence only on victory; foreign attackers lack the promise flag.
+        if = {
+            limit = {
+                scope:war = {
+                    any_war_attacker = {
+                        has_character_flag = rf_coalition_independence_promised
+                    }
+                }
+            }
+            create_title_and_vassal_change = {
+                type = independency
+                save_scope_as = rf_coalition_independence_change
+                add_claim_on_loss = yes
+            }
+            scope:war = {
+                every_war_attacker = {
+                    limit = { has_character_flag = rf_coalition_independence_promised }
+                    if = {
+                        limit = {
+                            is_alive = yes
+                            is_landed = yes
+                            is_independent_ruler = no
+                        }
+                        becomes_independent = { change = scope:rf_coalition_independence_change }
+                    }
+                    remove_character_flag = rf_coalition_independence_promised
+                }
+            }
+            resolve_title_and_vassal_change = scope:rf_coalition_independence_change
+        }
+
+        add_truce_attacker_victory_effect = yes
+        laamp_as_mercenary_payout_tooltip_effect = yes
+    }
+
+    on_white_peace = {
+        scope:attacker = { show_pow_release_message_effect = yes }
+        scope:defender = {
+            remove_character_flag = rf_coalition_under_attack
+            accolade_defender_war_end_glory_gain_low_effect = yes
+        }
+        scope:war = {
+            every_war_attacker = {
+                remove_character_flag = rf_coalition_independence_promised
+            }
+        }
+        add_truce_white_peace_effect = yes
+        laamp_as_mercenary_payout_tooltip_effect = yes
+    }
+
+    on_defeat = {
+        scope:attacker = { show_pow_release_message_effect = yes }
+        add_legitimacy_attacker_defeat_effect = yes
+        scope:defender = {
+            remove_character_flag = rf_coalition_under_attack
+            accolade_defender_war_end_glory_gain_high_effect = yes
+        }
+
+        # Only the target's own direct vassals carry this promise flag. Mirror
+        # vanilla faction-revolt punishment, then grant a second independent
+        # revocation reason so two titles can be revoked without tyranny.
+        scope:war = {
+            every_war_attacker = {
+                if = {
+                    limit = {
+                        has_character_flag = rf_coalition_independence_promised
+                        is_alive = yes
+                        is_landed = yes
+                        exists = liege
+                        liege = scope:defender
+                    }
+                    if = {
+                        limit = { is_imprisoned = no }
+                        hard_imprison_character_effect = {
+                            TARGET = this
+                            IMPRISONER = scope:defender
+                        }
+                    }
+                    scope:defender = {
+                        add_opinion = {
+                            target = prev
+                            modifier = vassal_lost_faction_revolt_war
+                        }
+                        add_opinion = {
+                            target = prev
+                            modifier = riseandfall_coalition_second_revoke_reason
+                        }
+                    }
+                    add_faction_cooldown_effect = { YEARS = faction_war_defeat_cooldown }
+                }
+                remove_character_flag = rf_coalition_independence_promised
+            }
+        }
+        add_truce_attacker_defeat_effect = yes
+        laamp_as_mercenary_payout_tooltip_effect = yes
+    }
+
+    transfer_behavior = transfer
+    on_primary_attacker_death = inherit
+    on_primary_defender_death = inherit
+    attacker_allies_inherit = yes
+    defender_allies_inherit = yes
+
+    war_name = "RISEANDFALL_COALITION_WAR_NAME"
+    war_name_base = "RISEANDFALL_COALITION_WAR_NAME_BASE"
+    cb_name = "RISEANDFALL_COALITION_CB_NAME"
+
+    interface_priority = 80
+    ticking_war_score_targets_entire_realm = yes
+    attacker_wargoal_percentage = 0.50
+    defender_wargoal_percentage = 0.50
+    attacker_ticking_warscore_delay = { months = 24 }
+    defender_ticking_warscore_delay = { months = 24 }
+    attacker_ticking_warscore = 0.03
+    defender_ticking_warscore = 0.03
+    attacker_score_from_battles_scale = 100
+    defender_score_from_battles_scale = 100
+    max_attacker_score_from_battles = 100
+    max_defender_score_from_battles = 100
+    max_attacker_score_from_occupation = 100
+    max_defender_score_from_occupation = 100
+    full_occupation_by_defender_gives_victory = yes
+    full_occupation_by_attacker_gives_victory = yes
+    landless_attacker_needs_armies = no
+    allow_hostages = yes
+
+    ai_score_mult = { value = 0 }
+}

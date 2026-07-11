@@ -1,0 +1,113 @@
+﻿# Rise and Fall - Coalition low-stability triggers
+
+# True while this ruler is the defender in an already active Coalition war.
+riseandfall_coalition_target_has_active_war_trigger = {
+    any_character_war = {
+        using_cb = riseandfall_coalition_cb
+        is_defender = prev
+    }
+}
+
+# Realm Stability stores the ruler's rounded share of world realm size as a
+# negative component: controlling 5% of the world produces -5. Coalition is
+# reserved for rulers at that threshold or larger.
+riseandfall_coalition_target_controls_five_percent_world_trigger = {
+    has_variable = riseandfall_rs_realm_size_component
+    NOT = { var:riseandfall_rs_realm_size_component >= -4 }
+}
+
+# Stable target requirements shared by selection, preparation, and final assembly.
+riseandfall_coalition_target_core_valid_trigger = {
+    is_alive = yes
+    is_landed = yes
+    is_independent_ruler = yes
+    exists = primary_title
+    exists = primary_heir
+    riseandfall_coalition_target_controls_five_percent_world_trigger = yes
+    NOT = { exists = global_var:riseandfall_low_stability_event_coalition_disabled }
+    NOT = { has_character_flag = rf_coalition_under_attack }
+    NOT = { has_character_flag = rf_coalition_fallback_reroll }
+    NOT = { riseandfall_coalition_target_has_active_war_trigger = yes }
+}
+
+# A ruler who could give the Coalition at least one legal attacker slot.
+riseandfall_coalition_potential_invitee_trigger = {
+    NOT = { this = root }
+    is_alive = yes
+    is_landed = yes
+    is_independent_ruler = yes
+    exists = primary_title
+    in_diplomatic_range = root
+    is_at_war = no
+    NOT = { is_allied_to = root }
+    NOT = { has_truce = root }
+    NOT = { has_variable = rf_coalition_target }
+    NOR = {
+        government_has_flag = government_is_landless_adventurer
+    }
+}
+
+# Selector-facing availability. Requiring two legal invitees avoids warning the
+# target when a true multi-realm coalition cannot possibly be assembled.
+riseandfall_low_stability_coalition_available_trigger = {
+    NOT = { exists = global_var:riseandfall_low_stability_event_coalition_disabled }
+    riseandfall_coalition_target_core_valid_trigger = yes
+    NOT = { has_character_flag = rf_coalition_formation_active }
+    any_independent_ruler = {
+        count >= 2
+        riseandfall_coalition_potential_invitee_trigger = yes
+    }
+}
+
+# Invitation-time legality. The target is saved on the invitee so tooltip and
+# event option evaluation never dereference a missing transient scope.
+riseandfall_coalition_invitee_can_join_trigger = {
+    has_variable = rf_coalition_target
+    var:rf_coalition_target ?= scope:coalition_target
+    is_alive = yes
+    is_landed = yes
+    is_independent_ruler = yes
+    exists = primary_title
+    is_at_war = no
+    NOT = { is_allied_to = scope:coalition_target }
+    NOT = { has_truce = scope:coalition_target }
+    scope:coalition_target = {
+        riseandfall_coalition_target_core_valid_trigger = yes
+        has_character_flag = rf_coalition_formation_active
+    }
+}
+
+# Direct vassals may join the external Coalition as internal rebels. They must
+# still serve the target when the invitation resolves, and existing wars or a
+# personal alliance with their liege make rebellion unavailable.
+riseandfall_coalition_vassal_can_join_trigger = {
+    has_variable = rf_coalition_target
+    var:rf_coalition_target ?= scope:coalition_target
+    is_alive = yes
+    is_landed = yes
+    is_independent_ruler = no
+    exists = primary_title
+    highest_held_title_tier >= tier_county
+    is_at_war = no
+    NOT = { is_allied_to = scope:coalition_target }
+    # This is the engine's direct-vassal check. It excludes the target's
+    # subvassals and every ruler belonging to another realm.
+    is_vassal_of = scope:coalition_target
+    NOR = {
+        government_has_flag = government_is_landless_adventurer
+    }
+    scope:coalition_target = {
+        riseandfall_coalition_target_core_valid_trigger = yes
+        has_character_flag = rf_coalition_formation_active
+    }
+}
+
+# A failed assembly may reroll another low-stability incident only while the
+# original ruler remains a valid recipient and is not already under Coalition attack.
+riseandfall_coalition_can_fallback_reroll_trigger = {
+    is_alive = yes
+    is_landed = yes
+    is_independent_ruler = yes
+    NOT = { riseandfall_coalition_target_has_active_war_trigger = yes }
+    NOT = { has_character_flag = rf_coalition_under_attack }
+}

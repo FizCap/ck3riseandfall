@@ -13,7 +13,7 @@ warlord_loyalty_opinion:0 "Loyal Vassal."
 
 
  # Low stability event localization
-warlord.1001.t:0 "The Realm Trembles"
+warlord.1001.t:0 "Warlords Rising"
 warlord.1001.d:0 "Whispers of rebellion poison the halls of power. Ambitious warlords marshal men and steel in the shadows, their banners rising like storm clouds — the realm risks being sundered unless you seize the reins of fate."
 warlord.1001.a:0 "Summon the council — confront the threat"
 warlord.1001.picture:0 "gfx/interface/portraits/medium/portrait_generic_m.tga"

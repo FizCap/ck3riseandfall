@@ -533,8 +533,12 @@ riseandfall_ai_create_titles_se = {
 riseandfall_ai_create_titles_advanced_se = {
     # Advanced mode keeps title creation tied to realm structure.
     # Same-tier creation is only allowed when replacing a titular primary title.
-    # Emperor-rank rulers do not create the kingdom containing their capital, and
-    # newly created kingdoms are granted immediately to a suitable local vassal.
+    # Emperor-rank rulers do not create the kingdom containing their capital.
+    # They only create and grant kingdoms after exceeding their vassal limit by
+    # at least three, because kingdom vassals substantially reduce crown income
+    # and levies compared with direct duke-level vassals.
+    # Rank-up and titular-primary replacement paths above remain available;
+    # this restriction applies only to pressure-driven kingdom handouts.
     every_ruler = {
         limit = {
             is_ai = yes
@@ -789,6 +793,19 @@ riseandfall_ai_create_titles_advanced_se = {
                         NOT = { scope:acting_ruler.primary_title = { is_titular = yes } }
                     }
                 }
+                # Formalize a regional kingdom only when it represents an
+                # external de jure region or a majority culturally/religiously
+                # foreign region. Integrated heartland duchies stay direct.
+                OR = {
+                    NOT = { target_is_de_jure_liege_or_above = scope:acting_ruler.primary_title }
+                    any_de_jure_county = {
+                        percent >= 0.5
+                        OR = {
+                            NOT = { culture = scope:acting_ruler.culture }
+                            NOT = { faith = scope:acting_ruler.faith }
+                        }
+                    }
+                }
                 any_dejure_vassal_title_holder = {
                     is_landed = yes
                     highest_held_title_tier >= tier_county
@@ -813,29 +830,7 @@ riseandfall_ai_create_titles_advanced_se = {
                         scope:acting_ruler = { government_has_flag = government_is_theocracy }
                     }
                 }
-                OR = {
-                    scope:acting_ruler = { vassal_limit_available < -2 }
-                    scope:acting_ruler = { vassal_limit_percentage >= 0.95 }
-                    AND = {
-                        scope:acting_ruler = { vassal_limit_available < 0 }
-                        NOT = { is_neighbor_to_realm = scope:acting_ruler }
-                        any_dejure_vassal_title_holder = {
-                            any_liege_or_above = { this = scope:acting_ruler }
-                            opinion = { target = scope:acting_ruler value <= -50 }
-                        }
-                    }
-                    AND = {
-                        scope:acting_ruler = {
-                            vassal_limit_available < 1
-                            has_variable = riseandfall_realm_stability_score
-                            NOT = { var:riseandfall_realm_stability_score >= 30 }
-                        }
-                        any_dejure_vassal_title_holder = {
-                            any_liege_or_above = { this = scope:acting_ruler }
-                            opinion = { target = scope:acting_ruler value <= -75 }
-                        }
-                    }
-                }
+                scope:acting_ruler = { vassal_limit_available < -2 }
             }
             save_scope_as = target_title
 

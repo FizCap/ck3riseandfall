@@ -1,0 +1,60 @@
+﻿##############################################
+# Low Stability Event Manager
+# Applies one setting without changing the existing random-selection model.
+##############################################
+
+riseandfall_set_low_stability_event_high_se = {
+	remove_global_variable = riseandfall_low_stability_event_$EVENT$_low
+	remove_global_variable = riseandfall_low_stability_event_$EVENT$_disabled
+	set_global_variable = { name = riseandfall_low_stability_event_$EVENT$_high value = yes }
+}
+
+riseandfall_set_low_stability_event_standard_se = {
+	remove_global_variable = riseandfall_low_stability_event_$EVENT$_high
+	remove_global_variable = riseandfall_low_stability_event_$EVENT$_low
+	remove_global_variable = riseandfall_low_stability_event_$EVENT$_disabled
+}
+
+riseandfall_set_low_stability_event_low_se = {
+	remove_global_variable = riseandfall_low_stability_event_$EVENT$_high
+	remove_global_variable = riseandfall_low_stability_event_$EVENT$_disabled
+	set_global_variable = { name = riseandfall_low_stability_event_$EVENT$_low value = yes }
+}
+
+riseandfall_set_low_stability_event_off_se = {
+	remove_global_variable = riseandfall_low_stability_event_$EVENT$_high
+	remove_global_variable = riseandfall_low_stability_event_$EVENT$_low
+	set_global_variable = { name = riseandfall_low_stability_event_$EVENT$_disabled value = yes }
+}
+
+riseandfall_apply_selected_low_stability_setting_se = {
+	# The category numbers are local UI state; the global variables remain save-compatible.
+	if = {
+		limit = { var:rf_low_stability_manager_category = 1 }
+		riseandfall_set_low_stability_event_$SETTING$_se = { EVENT = warlord }
+	}
+	else_if = {
+		limit = { var:rf_low_stability_manager_category = 2 }
+		riseandfall_set_low_stability_event_$SETTING$_se = { EVENT = palace_coup }
+	}
+	else_if = {
+		limit = { var:rf_low_stability_manager_category = 3 }
+		riseandfall_set_low_stability_event_$SETTING$_se = { EVENT = realm_split }
+	}
+	else_if = {
+		limit = { var:rf_low_stability_manager_category = 4 }
+		riseandfall_set_low_stability_event_$SETTING$_se = { EVENT = nationalist_revolt }
+	}
+	else_if = {
+		limit = { var:rf_low_stability_manager_category = 5 }
+		riseandfall_set_low_stability_event_$SETTING$_se = { EVENT = vassal_crisis }
+	}
+	else_if = {
+		limit = { var:rf_low_stability_manager_category = 6 }
+		riseandfall_set_low_stability_event_$SETTING$_se = { EVENT = authority_collapse }
+	}
+	else_if = {
+		limit = { var:rf_low_stability_manager_category = 7 }
+		riseandfall_set_low_stability_event_$SETTING$_se = { EVENT = coalition }
+	}
+}

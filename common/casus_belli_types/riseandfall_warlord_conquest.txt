@@ -125,16 +125,34 @@
         #EP2 accolade glory gain for winning against higher ranked enemy
         scope:attacker = { accolade_attacker_war_end_glory_gain_low_effect = yes }
 
+        # Celestial warlords erase a defeated peer's crown, but never a crown
+        # that outranked them when the war ended.
+        if = {
+            limit = {
+                scope:attacker = {
+                    has_government = celestial_government
+                    exists = primary_title
+                }
+                scope:defender = {
+                    exists = primary_title
+                    primary_title.tier = scope:attacker.primary_title.tier
+                }
+            }
+            scope:defender.primary_title = {
+                save_scope_as = riseandfall_warlord_celestial_destroy_title
+            }
+        }
+
         scope:defender = {
             every_vassal = {
                 add_to_list = riseandfall_warlord_former_defender_vassals
             }
         }
 
-        # Transfer the contested realm title first. Administrative governments
-        # then take the defender's full landed title stack because governorship
-        # appointment logic can leave counties detached; non-admin wars only
-        # take the defender's primary-tier realm titles.
+        # Transfer the contested realm title first. Celestial and other
+        # administrative governments then take the defender's full personal
+        # title stack so governorship logic cannot leave counties detached;
+        # non-admin wars only take the defender's primary-tier realm titles.
         create_title_and_vassal_change = {
             type = conquest
             save_scope_as = title_change
@@ -159,6 +177,7 @@
         if = {
             limit = {
                 OR = {
+                    scope:attacker = { has_government = celestial_government }
                     scope:attacker = { government_allows = administrative }
                     scope:defender = { government_allows = administrative }
                     scope:attacker.top_liege = { government_allows = administrative }
@@ -251,6 +270,20 @@
         }
 
         resolve_title_and_vassal_change = scope:vassal_change
+
+        # Destroy the peer crown only after its personal counties and former
+        # vassals have both been attached to the celestial victor.
+        if = {
+            limit = {
+                exists = scope:riseandfall_warlord_celestial_destroy_title
+                scope:riseandfall_warlord_celestial_destroy_title = {
+                    holder = scope:attacker
+                }
+            }
+            scope:attacker = {
+                destroy_title = scope:riseandfall_warlord_celestial_destroy_title
+            }
+        }
 
         # EP3 Laamp possibility warning
         scope:defender = { ep3_war_loss_adventurer_tt_effect = yes }
@@ -415,28 +448,26 @@
     # Warlord conquests are displayed against the defender's primary title but
     # resolve against the defender's realm, so ticking score should use the
     # whole realm rather than a de jure slice of the selected title.
-    # Require a majority of the defender's realm before ticking warscore starts,
-    # leaving warlord conquests more room to be decided by battles and sieges.
-    attacker_wargoal_percentage = 0.51
-    defender_wargoal_percentage = 0.51
+    # Warlord realm-takeover wars can cover sprawling vassal realms. Match the
+    # Diadochi profile so a foothold contests passive ticking, while defenders
+    # need near-total control to win by denial alone.
+    attacker_wargoal_percentage = 0.01
+    defender_wargoal_percentage = 0.95
 
-    # War score tuning — prioritize battles (cap battles contribution at 90)
-    attacker_ticking_warscore_delay = { months = 36 }    # Delay before ticking warscore increases for attacker
-    defender_ticking_warscore_delay = { months = 36 }    # Delay before ticking warscore increases for defender
-    attacker_ticking_warscore = 0.1                       # Ticking warscore per day for attacker
-    defender_ticking_warscore = 0.1                       # Ticking warscore per day for defender
+    attacker_ticking_warscore_delay = { months = 36 }
+    defender_ticking_warscore_delay = { months = 36 }
+    attacker_ticking_warscore = 0.03
+    defender_ticking_warscore = 0.03
 
-    # Scales — increase reward from battles and occupation
-    attacker_score_from_occupation_scale = 35
-    defender_score_from_occupation_scale = 30
-    attacker_score_from_battles_scale = 120
-    defender_score_from_battles_scale = 110
+    attacker_score_from_occupation_scale = 50
+    defender_score_from_occupation_scale = 50
+    attacker_score_from_battles_scale = 100
+    defender_score_from_battles_scale = 100
 
-    # Hard caps — battles can contribute more, occupation is more valuable too
-    max_attacker_score_from_battles = 100
-    max_defender_score_from_battles = 100
-    max_attacker_score_from_occupation = 120
-    max_defender_score_from_occupation = 110
+    max_attacker_score_from_battles = 90
+    max_defender_score_from_battles = 90
+    max_attacker_score_from_occupation = 100
+    max_defender_score_from_occupation = 100
 
     # Keep the vanilla/intent behavior flags
     full_occupation_by_defender_gives_victory = yes

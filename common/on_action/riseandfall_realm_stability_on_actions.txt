@@ -4,16 +4,18 @@
 
 yearly_global_pulse = {
     on_actions = {
-        riseandfall_yearly_realm_stability
         riseandfall_story_world_climate
+        # Establish this year's campaign state before individual realms react to it.
+        riseandfall_yearly_realm_stability
         riseandfall_clear_unlanded_realm_stability
     }
 }
 
 on_game_start_after_lobby = {
     on_actions = {
-        riseandfall_yearly_realm_stability
         riseandfall_story_world_climate
+        # Seed the director before initial stability calculations assign roles.
+        riseandfall_yearly_realm_stability
         riseandfall_low_stability_grace_period
         riseandfall_clear_unlanded_realm_stability
     }
@@ -50,6 +52,15 @@ on_title_gain = {
     on_actions = {
         riseandfall_on_title_gain_realm_stability_refresh
         riseandfall_peasant_realm_cleanup_on_structure_change
+    }
+}
+
+# Vanilla supplies root as the former holder and scope:landed_title as the
+# title being destroyed. Clear the title-bound campaign ledger before a later
+# recreation of the same title can inherit an obsolete collapse arc.
+on_title_destroyed = {
+    on_actions = {
+        riseandfall_clear_destroyed_title_story_collapse
     }
 }
 
@@ -226,6 +237,47 @@ riseandfall_on_title_gain_realm_stability_refresh = {
                 is_independent_ruler = yes
             }
             riseandfall_calculate_realm_stability_se = yes
+        }
+        else_if = {
+            limit = {
+                has_variable = riseandfall_realm_stability_score
+                holds_landed_title = yes
+                is_independent_ruler = yes
+                exists = scope:title
+                has_primary_title = scope:title
+                primary_title = { has_variable = riseandfall_story_title_collapse_pressure }
+            }
+            # A new ruler who takes the central title reloads its campaign state
+            # immediately instead of waiting for the next yearly pulse.
+            riseandfall_calculate_realm_stability_se = yes
+        }
+    }
+}
+
+riseandfall_clear_destroyed_title_story_collapse = {
+    trigger = {
+        OR = {
+            scope:landed_title = { has_variable = riseandfall_story_title_collapse_pressure }
+            AND = {
+                has_variable = riseandfall_story_collapse_pressure
+                has_primary_title = scope:landed_title
+            }
+        }
+    }
+    effect = {
+        if = {
+            limit = { scope:landed_title = { has_variable = riseandfall_story_title_collapse_pressure } }
+            scope:landed_title = { remove_variable = riseandfall_story_title_collapse_pressure }
+        }
+        # Do not erase a ruler's active arc when an unrelated spare title dies.
+        # The character meter belongs to this destroyed title only if it was primary.
+        if = {
+            limit = { has_primary_title = scope:landed_title }
+            remove_variable = riseandfall_story_collapse_pressure
+            remove_variable = riseandfall_story_arc
+            remove_variable = riseandfall_story_arc_phase
+            remove_variable = riseandfall_story_collapse_gain_last
+            remove_character_flag = rf_story_decline_target
         }
     }
 }

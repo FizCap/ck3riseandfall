@@ -1,0 +1,397 @@
+﻿namespace = coalition
+
+# The unstable ruler learns that foreign courts are openly discussing intervention.
+coalition.1001 = {
+    type = character_event
+    title = coalition.1001.t
+    desc = coalition.1001.d
+    theme = war
+
+    trigger = {
+        riseandfall_low_stability_coalition_available_trigger = yes
+    }
+
+    immediate = {
+        # Lock only this target while invitations are collected. The cooldown is
+        # intentionally delayed until a war actually starts or a fallback event fires.
+        add_character_flag = { flag = rf_coalition_formation_active days = 60 }
+    }
+
+    left_portrait = {
+        character = root
+        animation = stress
+    }
+
+    option = {
+        name = coalition.1001.a
+        riseandfall_coalition_prepare_invitations_se = yes
+        ai_chance = { base = 100 }
+    }
+}
+
+# Every independent ruler in diplomatic range is asked to join. Ineligible
+# rulers see the concrete diplomatic reason that prevents participation.
+coalition.1002 = {
+    type = character_event
+    title = coalition.1002.t
+    desc = coalition.1002.d
+    theme = war
+
+    trigger = {
+        has_character_flag = rf_coalition_invitation_pending
+        has_variable = rf_coalition_target
+    }
+
+    immediate = {
+        if = {
+            limit = { has_variable = rf_coalition_target }
+            var:rf_coalition_target = { save_scope_as = coalition_target }
+        }
+    }
+
+    left_portrait = {
+        character = root
+        animation = personality_bold
+    }
+    right_portrait = {
+        character = scope:coalition_target
+        animation = stress
+    }
+
+    option = {
+        name = coalition.1002.a
+        trigger = { riseandfall_coalition_invitee_can_join_trigger = yes }
+        custom_tooltip = coalition.1002.a.tt
+        riseandfall_coalition_record_acceptance_se = yes
+        ai_chance = {
+            base = 50
+            modifier = {
+                add = 50
+                has_relation_nemesis = scope:coalition_target
+            }
+            modifier = {
+                add = 30
+                has_relation_rival = scope:coalition_target
+            }
+            modifier = {
+                add = 25
+                opinion = { target = scope:coalition_target value <= -25 }
+            }
+            modifier = {
+                add = 25
+                riseandfall_military_power_with_allies >= scope:coalition_target.riseandfall_military_power_with_allies
+            }
+            modifier = { add = 15 has_trait = ambitious }
+            modifier = { add = 15 has_trait = brave }
+            modifier = { add = 15 has_trait = vengeful }
+            modifier = {
+                add = -50
+                has_relation_best_friend = scope:coalition_target
+            }
+            modifier = {
+                add = -30
+                has_relation_friend = scope:coalition_target
+            }
+            modifier = {
+                add = -25
+                opinion = { target = scope:coalition_target value >= 25 }
+            }
+            modifier = {
+                add = -25
+                military_power < scope:coalition_target.military_power
+            }
+            modifier = { add = -30 has_trait = craven }
+            modifier = { add = -20 has_trait = content }
+            modifier = { add = -20 has_trait = compassionate }
+        }
+    }
+
+    option = {
+        name = coalition.1002.b
+        trigger = { riseandfall_coalition_invitee_can_join_trigger = yes }
+        riseandfall_coalition_record_decline_se = yes
+        ai_chance = {
+            base = 50
+            modifier = {
+                add = 50
+                has_relation_best_friend = scope:coalition_target
+            }
+            modifier = {
+                add = 30
+                has_relation_friend = scope:coalition_target
+            }
+            modifier = {
+                add = 25
+                opinion = { target = scope:coalition_target value >= 25 }
+            }
+            modifier = { add = 30 has_trait = craven }
+            modifier = { add = 20 has_trait = content }
+            modifier = { add = 20 has_trait = compassionate }
+        }
+    }
+
+    option = {
+        name = coalition.1002.c.war
+        trigger = { is_at_war = yes }
+        riseandfall_coalition_record_decline_se = yes
+        ai_chance = { base = 100 }
+    }
+    option = {
+        name = coalition.1002.c.alliance
+        trigger = {
+            is_at_war = no
+            is_allied_to = scope:coalition_target
+        }
+        riseandfall_coalition_record_decline_se = yes
+        ai_chance = { base = 100 }
+    }
+    option = {
+        name = coalition.1002.c.truce
+        trigger = {
+            is_at_war = no
+            NOT = { is_allied_to = scope:coalition_target }
+            has_truce = scope:coalition_target
+        }
+        riseandfall_coalition_record_decline_se = yes
+        ai_chance = { base = 100 }
+    }
+    option = {
+        name = coalition.1002.c.invalid
+        trigger = {
+            NOT = { riseandfall_coalition_invitee_can_join_trigger = yes }
+            is_at_war = no
+            NOT = { is_allied_to = scope:coalition_target }
+            NOT = { has_truce = scope:coalition_target }
+        }
+        riseandfall_coalition_record_decline_se = yes
+        ai_chance = { base = 100 }
+    }
+}
+
+# Direct vassals may revolt beside the foreign Coalition in exchange for
+# independence, but remain subjects if the attackers do not win.
+coalition.1003 = {
+    type = character_event
+    title = coalition.1003.t
+    desc = coalition.1003.d
+    theme = war
+
+    trigger = {
+        has_character_flag = rf_coalition_vassal_invitation_pending
+        has_variable = rf_coalition_target
+    }
+
+    immediate = {
+        if = {
+            limit = { has_variable = rf_coalition_target }
+            var:rf_coalition_target = { save_scope_as = coalition_target }
+        }
+    }
+
+    left_portrait = {
+        character = root
+        animation = personality_bold
+    }
+    right_portrait = {
+        character = scope:coalition_target
+        animation = stress
+    }
+
+    option = {
+        name = coalition.1003.a
+        trigger = { riseandfall_coalition_vassal_can_join_trigger = yes }
+        custom_tooltip = coalition.1003.a.tt
+        riseandfall_coalition_record_vassal_acceptance_se = yes
+        ai_chance = { base = 100 }
+    }
+    option = {
+        name = coalition.1003.b
+        trigger = { riseandfall_coalition_vassal_can_join_trigger = yes }
+        riseandfall_coalition_record_vassal_decline_se = yes
+        ai_chance = { base = 100 }
+    }
+    option = {
+        name = coalition.1003.c.war
+        trigger = { is_at_war = yes }
+        riseandfall_coalition_record_vassal_decline_se = yes
+        ai_chance = { base = 100 }
+    }
+    option = {
+        name = coalition.1003.c.alliance
+        trigger = {
+            is_at_war = no
+            is_allied_to = scope:coalition_target
+        }
+        riseandfall_coalition_record_vassal_decline_se = yes
+        ai_chance = { base = 100 }
+    }
+    option = {
+        name = coalition.1003.c.invalid
+        trigger = {
+            NOT = { riseandfall_coalition_vassal_can_join_trigger = yes }
+            is_at_war = no
+            NOT = { is_allied_to = scope:coalition_target }
+        }
+        riseandfall_coalition_record_vassal_decline_se = yes
+        ai_chance = { base = 100 }
+    }
+}
+
+# Coalition failure notices run before cleanup so their descriptions can expose
+# the exact participant and power values that caused the fallback reroll.
+coalition.1101 = {
+    type = character_event
+    title = coalition.1101.t
+    desc = coalition.1101.d
+    theme = war
+
+    trigger = {
+        is_alive = yes
+        is_landed = yes
+        is_independent_ruler = yes
+        has_character_flag = rf_coalition_formation_active
+        has_variable = rf_coalition_participant_count
+    }
+    on_trigger_fail = { riseandfall_coalition_clear_assembly_state_se = yes }
+
+    option = {
+        name = coalition.failure.a
+        custom_tooltip = coalition.failure.a.tt
+        hidden_effect = { riseandfall_coalition_fail_and_reroll_se = yes }
+        ai_chance = { base = 100 }
+    }
+}
+
+coalition.1102 = {
+    type = character_event
+    title = coalition.1102.t
+    desc = coalition.1102.d
+    theme = war
+
+    trigger = {
+        is_alive = yes
+        is_landed = yes
+        is_independent_ruler = yes
+        has_character_flag = rf_coalition_formation_active
+        has_variable = rf_coalition_leader_power
+        has_variable = rf_coalition_target_power
+    }
+    on_trigger_fail = { riseandfall_coalition_clear_assembly_state_se = yes }
+
+    option = {
+        name = coalition.failure.a
+        custom_tooltip = coalition.failure.a.tt
+        hidden_effect = { riseandfall_coalition_fail_and_reroll_se = yes }
+        ai_chance = { base = 100 }
+    }
+}
+
+coalition.1103 = {
+    type = character_event
+    title = coalition.1103.t
+    desc = coalition.1103.d
+    theme = war
+
+    trigger = {
+        is_alive = yes
+        is_landed = yes
+        is_independent_ruler = yes
+        has_character_flag = rf_coalition_formation_active
+    }
+    on_trigger_fail = { riseandfall_coalition_clear_assembly_state_se = yes }
+
+    option = {
+        name = coalition.failure.a
+        custom_tooltip = coalition.failure.a.tt
+        hidden_effect = { riseandfall_coalition_fail_and_reroll_se = yes }
+        ai_chance = { base = 100 }
+    }
+}
+
+coalition.1104 = {
+    type = character_event
+    title = coalition.1104.t
+    desc = coalition.1104.d
+    theme = war
+
+    trigger = {
+        is_alive = yes
+        is_landed = yes
+        is_independent_ruler = yes
+        has_character_flag = rf_coalition_formation_active
+    }
+    on_trigger_fail = { riseandfall_coalition_clear_assembly_state_se = yes }
+
+    option = {
+        name = coalition.failure.a
+        custom_tooltip = coalition.failure.a.tt
+        hidden_effect = { riseandfall_coalition_fail_and_reroll_se = yes }
+        ai_chance = { base = 100 }
+    }
+}
+
+coalition.1105 = {
+    type = character_event
+    title = coalition.1105.t
+    desc = coalition.1105.d
+    theme = war
+
+    trigger = {
+        is_alive = yes
+        is_landed = yes
+        is_independent_ruler = yes
+        has_character_flag = rf_coalition_formation_active
+    }
+    on_trigger_fail = { riseandfall_coalition_clear_assembly_state_se = yes }
+
+    option = {
+        name = coalition.failure.a
+        custom_tooltip = coalition.failure.a.tt
+        hidden_effect = { riseandfall_coalition_fail_and_reroll_se = yes }
+        ai_chance = { base = 100 }
+    }
+}
+
+coalition.1106 = {
+    type = character_event
+    title = coalition.1106.t
+    desc = coalition.1106.d
+    theme = war
+
+    trigger = {
+        is_alive = yes
+        is_landed = yes
+        is_independent_ruler = yes
+        has_character_flag = rf_coalition_formation_active
+    }
+    on_trigger_fail = { riseandfall_coalition_clear_assembly_state_se = yes }
+
+    option = {
+        name = coalition.failure.a
+        custom_tooltip = coalition.failure.a.tt
+        hidden_effect = { riseandfall_coalition_fail_and_reroll_se = yes }
+        ai_chance = { base = 100 }
+    }
+}
+
+coalition.1107 = {
+    type = character_event
+    title = coalition.1107.t
+    desc = coalition.1107.d
+    theme = war
+
+    trigger = {
+        is_alive = yes
+        is_landed = yes
+        is_independent_ruler = yes
+        has_character_flag = rf_coalition_formation_active
+    }
+    on_trigger_fail = { riseandfall_coalition_clear_assembly_state_se = yes }
+
+    option = {
+        name = coalition.failure.a
+        custom_tooltip = coalition.failure.a.tt
+        hidden_effect = { riseandfall_coalition_fail_and_reroll_se = yes }
+        ai_chance = { base = 100 }
+    }
+}

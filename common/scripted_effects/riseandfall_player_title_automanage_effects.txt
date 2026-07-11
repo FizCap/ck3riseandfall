@@ -264,12 +264,16 @@ riseandfall_warlord_create_realm_titles_se = {
     }
 }
 
-# Player: auto-grant duchy titles to de jure vassals (uses AI handout logic adapted)
+# Player: auto-grant duchy titles to de jure vassals (uses Advanced AI recipient logic).
 riseandfall_player_grant_duchies_se = {
     # Expects to be called in a ruler scope (the caller should iterate every_ruler is_ai = no).
     save_scope_as = actor
+    # The shared Advanced AI score value reads this scope for opinion, culture,
+    # faith, and dynasty comparisons; for manual grants it is the player ruler.
+    save_scope_as = emperor
 
-    if = { limit = { is_landed = yes }
+    # Do not grant duchies at the actor's own rank: recipients would leave the realm.
+    if = { limit = { is_landed = yes primary_title.tier > tier_duchy }
 
         # Iterate de-jure duchies in the realm
         every_realm_de_jure_duchy = {
@@ -284,10 +288,39 @@ riseandfall_player_grant_duchies_se = {
                     limit = { NOT = { scope:target_title = { any_de_jure_county = { this = scope:actor.capital_province.county } } } }
 
                     scope:target_title = {
-                                        random_dejure_vassal_title_holder = {
-                                            limit = { any_liege_or_above = { this = scope:actor } NOT = { this = scope:actor } highest_held_title_tier >= tier_county }
-                                            save_scope_as = chosen_vassal
-                                        }
+                        # Match Advanced AI: choose the safest, best-qualified
+                        # county vassal instead of a random de jure holder.
+                        ordered_dejure_vassal_title_holder = {
+                            limit = {
+                                is_landed = yes
+                                highest_held_title_tier >= tier_county
+                                highest_held_title_tier < tier_duchy
+                                any_liege_or_above = { this = scope:actor }
+                                NOT = { this = scope:actor }
+                                is_adult = yes
+                                is_imprisoned = no
+                                NOT = { has_trait = incapable }
+                                NOT = { has_trait = infirm }
+                                NOT = { has_trait = warlord }
+                                NOT = { has_trait = disloyal }
+                                NOT = { is_at_war_with = scope:actor }
+                                NOT = { has_relation_rival = scope:actor }
+                                OR = {
+                                    opinion = { target = scope:actor value >= -20 }
+                                    has_trait = loyal
+                                    has_trait = trusting
+                                    has_trait = content
+                                }
+                                OR = {
+                                    NOT = { government_has_flag = government_is_theocracy }
+                                    scope:actor = { government_has_flag = government_is_theocracy }
+                                }
+                            }
+                            order_by = riseandfall_ai_advanced_title_grant_score_value
+                            max = 1
+                            check_range_bounds = no
+                            save_scope_as = chosen_vassal
+                        }
                     }
 
                     if = {
@@ -335,8 +368,11 @@ riseandfall_player_grant_duchies_se = {
 riseandfall_player_grant_kingdoms_se = {
     # Expects to be called in a ruler scope (the caller should iterate every_ruler is_ai = no).
     save_scope_as = actor
+    # The shared Advanced AI score value reads this scope for recipient ranking.
+    save_scope_as = emperor
 
-    if = { limit = { is_landed = yes }
+    # Do not grant kingdoms at the actor's own rank: recipients would leave the realm.
+    if = { limit = { is_landed = yes primary_title.tier > tier_kingdom }
 
         every_realm_de_jure_kingdom = {
             limit = { exists = this holder = scope:actor }
@@ -352,26 +388,37 @@ riseandfall_player_grant_kingdoms_se = {
                     }
 
                     scope:target_title = {
-                        # Prefer dukes first, then counts, then kings for player auto-granting of kingdoms.
-                        random_dejure_vassal_title_holder = {
-                            limit = { is_landed = yes any_liege_or_above = { this = scope:actor } NOT = { this = scope:actor } highest_held_title_tier >= tier_duchy }
+                        # Match Advanced AI: rank all safe de jure vassals by
+                        # loyalty, character traits, realm fit, and diplomacy.
+                        ordered_dejure_vassal_title_holder = {
+                            limit = {
+                                is_landed = yes
+                                highest_held_title_tier >= tier_county
+                                any_liege_or_above = { this = scope:actor }
+                                NOT = { this = scope:actor }
+                                is_adult = yes
+                                is_imprisoned = no
+                                NOT = { has_trait = incapable }
+                                NOT = { has_trait = infirm }
+                                NOT = { has_trait = warlord }
+                                NOT = { has_trait = disloyal }
+                                NOT = { is_at_war_with = scope:actor }
+                                NOT = { has_relation_rival = scope:actor }
+                                OR = {
+                                    opinion = { target = scope:actor value >= -20 }
+                                    has_trait = loyal
+                                    has_trait = trusting
+                                    has_trait = content
+                                }
+                                OR = {
+                                    NOT = { government_has_flag = government_is_theocracy }
+                                    scope:actor = { government_has_flag = government_is_theocracy }
+                                }
+                            }
+                            order_by = riseandfall_ai_advanced_title_grant_score_value
+                            max = 1
+                            check_range_bounds = no
                             save_scope_as = chosen_vassal
-                        }
-
-                        if = {
-                            limit = { NOT = { exists = scope:chosen_vassal } }
-                            random_dejure_vassal_title_holder = {
-                                limit = { is_landed = yes any_liege_or_above = { this = scope:actor } NOT = { this = scope:actor } highest_held_title_tier >= tier_county }
-                                save_scope_as = chosen_vassal
-                            }
-                        }
-
-                        if = {
-                            limit = { NOT = { exists = scope:chosen_vassal } }
-                            random_dejure_vassal_title_holder = {
-                                limit = { is_landed = yes any_liege_or_above = { this = scope:actor } NOT = { this = scope:actor } highest_held_title_tier >= tier_kingdom }
-                                save_scope_as = chosen_vassal
-                            }
                         }
                     }
 
@@ -408,6 +455,140 @@ riseandfall_player_grant_kingdoms_se = {
                                         change_title_holder_include_vassals = { holder = scope:chosen_vassal change = scope:duchy_change take_baronies = no }
                                         resolve_title_and_vassal_change = scope:duchy_change
                                     }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+# Player: grant empire titles only from a hegemony-tier primary title, so the
+# recipient remains a vassal. Uses the same qualified de jure recipient logic
+# as manual duchy and kingdom grants.
+riseandfall_player_grant_empires_se = {
+    save_scope_as = actor
+    # The shared Advanced AI score value reads this scope for recipient ranking.
+    save_scope_as = emperor
+
+    if = {
+        limit = {
+            is_landed = yes
+            primary_title.tier > tier_empire
+        }
+
+        every_realm_de_jure_empire = {
+            limit = {
+                exists = this
+                holder = scope:actor
+            }
+            save_scope_as = target_title
+
+            if = {
+                limit = {
+                    scope:target_title = {
+                        holder = scope:actor
+                        # Never grant a same-rank title: it creates independence.
+                        tier < scope:actor.primary_title.tier
+                    }
+                }
+
+                # Keep the empire containing the ruler's capital and the
+                # de jure empire of the primary title under the player.
+                if = {
+                    limit = {
+                        NOT = { scope:actor = { primary_title = { de_jure_liege = scope:target_title } } }
+                        NOT = { scope:target_title = { any_de_jure_county = { this = scope:actor.capital_province.county } } }
+                    }
+
+                    # Clear this per empire so a recipient from an earlier
+                    # iteration cannot be reused when this empire has none.
+                    clear_saved_scope = chosen_vassal
+                    scope:target_title = {
+                        ordered_dejure_vassal_title_holder = {
+                            limit = {
+                                is_landed = yes
+                                highest_held_title_tier >= tier_county
+                                any_liege_or_above = { this = scope:actor }
+                                NOT = { this = scope:actor }
+                                is_adult = yes
+                                is_imprisoned = no
+                                NOT = { has_trait = incapable }
+                                NOT = { has_trait = infirm }
+                                NOT = { has_trait = warlord }
+                                NOT = { has_trait = disloyal }
+                                NOT = { is_at_war_with = scope:actor }
+                                NOT = { has_relation_rival = scope:actor }
+                                OR = {
+                                    opinion = { target = scope:actor value >= -20 }
+                                    has_trait = loyal
+                                    has_trait = trusting
+                                    has_trait = content
+                                }
+                                OR = {
+                                    NOT = { government_has_flag = government_is_theocracy }
+                                    scope:actor = { government_has_flag = government_is_theocracy }
+                                }
+                            }
+                            order_by = riseandfall_ai_advanced_title_grant_score_value
+                            max = 1
+                            check_range_bounds = no
+                            save_scope_as = chosen_vassal
+                        }
+                    }
+
+                    if = {
+                        limit = {
+                            exists = scope:chosen_vassal
+                            scope:chosen_vassal = { any_liege_or_above = { this = scope:actor } }
+                            scope:target_title = {
+                                any_dejure_vassal_title_holder = { this = scope:chosen_vassal }
+                            }
+                            OR = {
+                                NOT = { scope:chosen_vassal = { government_has_flag = government_is_theocracy } }
+                                scope:actor = { government_has_flag = government_is_theocracy }
+                            }
+                        }
+
+                        # Respect player title-level giveaway blocks.
+                        if = {
+                            limit = { NOT = { scope:target_title = { has_variable = Riseandfall_giveaway_blocked } } }
+                            scope:chosen_vassal = {
+                                hidden_effect = {
+                                    add_opinion = {
+                                        target = scope:actor
+                                        modifier = received_title_empire
+                                    }
+                                }
+                            }
+                            create_title_and_vassal_change = { type = granted save_scope_as = change }
+                            scope:target_title = {
+                                change_title_holder_include_vassals = {
+                                    holder = scope:chosen_vassal
+                                    change = scope:change
+                                    take_baronies = no
+                                }
+                            }
+                            resolve_title_and_vassal_change = scope:change
+
+                            # Consolidate personally held de jure kingdoms under
+                            # the new empire holder without disturbing other rulers.
+                            scope:target_title = {
+                                every_direct_de_jure_vassal_title = {
+                                    limit = {
+                                        tier = tier_kingdom
+                                        holder = scope:actor
+                                        NOT = { holder = scope:chosen_vassal }
+                                    }
+                                    create_title_and_vassal_change = { type = granted save_scope_as = kingdom_change }
+                                    change_title_holder_include_vassals = {
+                                        holder = scope:chosen_vassal
+                                        change = scope:kingdom_change
+                                        take_baronies = no
+                                    }
+                                    resolve_title_and_vassal_change = scope:kingdom_change
+                                }
                             }
                         }
                     }

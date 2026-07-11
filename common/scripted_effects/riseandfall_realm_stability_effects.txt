@@ -850,6 +850,8 @@ riseandfall_calculate_realm_stability_se = {
     if = { limit = { NOT = { has_variable = riseandfall_rs_legitimate_house_component } } set_variable = { name = riseandfall_rs_legitimate_house_component value = 0 } }
     if = { limit = { NOT = { has_variable = riseandfall_rs_story_pressure_component } } set_variable = { name = riseandfall_rs_story_pressure_component value = 0 } }
     if = { limit = { NOT = { has_variable = riseandfall_story_protection } } set_variable = { name = riseandfall_story_protection value = 0 } }
+    if = { limit = { NOT = { has_variable = riseandfall_story_blob_pressure_base } } set_variable = { name = riseandfall_story_blob_pressure_base value = 0 } }
+    if = { limit = { NOT = { has_variable = riseandfall_story_blob_pressure_scaled } } set_variable = { name = riseandfall_story_blob_pressure_scaled value = 0 } }
     if = { limit = { NOT = { has_variable = riseandfall_story_blob_pressure } } set_variable = { name = riseandfall_story_blob_pressure value = 0 } }
     # Start from 50 as the equilibrium midpoint; components shift toward 0 or 100
     set_variable = { name = tmp_target_score value = 50 }
@@ -1690,6 +1692,8 @@ riseandfall_clear_current_stability_vars_se = {
         remove_variable = riseandfall_story_successor_grace_years
         remove_variable = riseandfall_story_successor_grace_decay
         remove_variable = riseandfall_story_world_climate
+        remove_variable = riseandfall_story_blob_pressure_base
+        remove_variable = riseandfall_story_blob_pressure_scaled
         remove_variable = riseandfall_story_blob_pressure
         remove_variable = riseandfall_story_reign_tension
         remove_variable = riseandfall_story_stagnation_pressure
@@ -1703,8 +1707,8 @@ riseandfall_clear_current_stability_vars_se = {
         remove_variable = riseandfall_story_strongest_rival_pct
         remove_variable = riseandfall_story_external_rival_relief
         remove_variable = riseandfall_story_collapse_gain_last
-        remove_variable = riseandfall_story_no_rival_years
-        remove_variable = riseandfall_story_no_rival_pressure
+        remove_variable = riseandfall_story_arc
+        remove_variable = riseandfall_story_arc_phase
         remove_variable = riseandfall_rs_strong_vassal_count
         remove_variable = riseandfall_rs_foreign_culture_county_pct
         remove_variable = riseandfall_rs_foreign_faith_county_pct
@@ -1714,6 +1718,7 @@ riseandfall_clear_current_stability_vars_se = {
             limit = { has_character_flag = rf_rs_use_diarch_stats }
             remove_character_flag = rf_rs_use_diarch_stats
         }
+        remove_character_flag = rf_story_decline_target
         remove_variable = riseandfall_puppet_regency_years
         remove_variable = riseandfall_rs_civil_war_years
         remove_variable = riseandfall_realm_stability_civil_war_penalty

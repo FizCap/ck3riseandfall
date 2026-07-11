@@ -1,0 +1,71 @@
+﻿##############################################
+# Colored frequency labels for the event-manager overview.
+##############################################
+
+RFGetLowStabilityWarlordStatus = {
+	type = character
+	text = { trigger = { exists = global_var:riseandfall_low_stability_event_warlord_disabled } localization_key = rf_low_stability_status_off }
+	text = { trigger = { exists = global_var:riseandfall_low_stability_event_warlord_high } localization_key = rf_low_stability_status_high }
+	text = { trigger = { exists = global_var:riseandfall_low_stability_event_warlord_low } localization_key = rf_low_stability_status_low }
+	text = { localization_key = rf_low_stability_status_standard fallback = yes }
+}
+
+RFGetLowStabilityPalaceCoupStatus = {
+	type = character
+	text = { trigger = { exists = global_var:riseandfall_low_stability_event_palace_coup_disabled } localization_key = rf_low_stability_status_off }
+	text = { trigger = { exists = global_var:riseandfall_low_stability_event_palace_coup_high } localization_key = rf_low_stability_status_high }
+	text = { trigger = { exists = global_var:riseandfall_low_stability_event_palace_coup_low } localization_key = rf_low_stability_status_low }
+	text = { localization_key = rf_low_stability_status_standard fallback = yes }
+}
+
+RFGetLowStabilityRealmSplitStatus = {
+	type = character
+	text = { trigger = { exists = global_var:riseandfall_low_stability_event_realm_split_disabled } localization_key = rf_low_stability_status_off }
+	text = { trigger = { exists = global_var:riseandfall_low_stability_event_realm_split_high } localization_key = rf_low_stability_status_high }
+	text = { trigger = { exists = global_var:riseandfall_low_stability_event_realm_split_low } localization_key = rf_low_stability_status_low }
+	text = { localization_key = rf_low_stability_status_standard fallback = yes }
+}
+
+RFGetLowStabilityNationalistRevoltStatus = {
+	type = character
+	text = { trigger = { exists = global_var:riseandfall_low_stability_event_nationalist_revolt_disabled } localization_key = rf_low_stability_status_off }
+	text = { trigger = { exists = global_var:riseandfall_low_stability_event_nationalist_revolt_high } localization_key = rf_low_stability_status_high }
+	text = { trigger = { exists = global_var:riseandfall_low_stability_event_nationalist_revolt_low } localization_key = rf_low_stability_status_low }
+	text = { localization_key = rf_low_stability_status_standard fallback = yes }
+}
+
+RFGetLowStabilityVassalCrisisStatus = {
+	type = character
+	text = { trigger = { exists = global_var:riseandfall_low_stability_event_vassal_crisis_disabled } localization_key = rf_low_stability_status_off }
+	text = { trigger = { exists = global_var:riseandfall_low_stability_event_vassal_crisis_high } localization_key = rf_low_stability_status_high }
+	text = { trigger = { exists = global_var:riseandfall_low_stability_event_vassal_crisis_low } localization_key = rf_low_stability_status_low }
+	text = { localization_key = rf_low_stability_status_standard fallback = yes }
+}
+
+RFGetLowStabilityAuthorityCollapseStatus = {
+	type = character
+	text = { trigger = { exists = global_var:riseandfall_low_stability_event_authority_collapse_disabled } localization_key = rf_low_stability_status_off }
+	text = { trigger = { exists = global_var:riseandfall_low_stability_event_authority_collapse_high } localization_key = rf_low_stability_status_high }
+	text = { trigger = { exists = global_var:riseandfall_low_stability_event_authority_collapse_low } localization_key = rf_low_stability_status_low }
+	text = { localization_key = rf_low_stability_status_standard fallback = yes }
+}
+
+RFGetLowStabilityCoalitionStatus = {
+	type = character
+	text = { trigger = { exists = global_var:riseandfall_low_stability_event_coalition_disabled } localization_key = rf_low_stability_status_off }
+	text = { trigger = { exists = global_var:riseandfall_low_stability_event_coalition_high } localization_key = rf_low_stability_status_high }
+	text = { trigger = { exists = global_var:riseandfall_low_stability_event_coalition_low } localization_key = rf_low_stability_status_low }
+	text = { localization_key = rf_low_stability_status_standard fallback = yes }
+}
+
+RFGetLowStabilitySelectedEventName = {
+	type = character
+	text = { trigger = { var:rf_low_stability_manager_category = 1 } localization_key = rf_low_stability_event_name_warlord }
+	text = { trigger = { var:rf_low_stability_manager_category = 2 } localization_key = rf_low_stability_event_name_palace_coup }
+	text = { trigger = { var:rf_low_stability_manager_category = 3 } localization_key = rf_low_stability_event_name_realm_split }
+	text = { trigger = { var:rf_low_stability_manager_category = 4 } localization_key = rf_low_stability_event_name_nationalist_revolt }
+	text = { trigger = { var:rf_low_stability_manager_category = 5 } localization_key = rf_low_stability_event_name_vassal_crisis }
+	text = { trigger = { var:rf_low_stability_manager_category = 6 } localization_key = rf_low_stability_event_name_authority_collapse }
+	text = { trigger = { var:rf_low_stability_manager_category = 7 } localization_key = rf_low_stability_event_name_coalition }
+	text = { localization_key = riseandfall_low_stability_event_manager fallback = yes }
+}

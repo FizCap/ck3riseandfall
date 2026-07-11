@@ -78,6 +78,20 @@
         add_legitimacy_attacker_victory_effect = yes
         scope:attacker = { accolade_attacker_war_end_glory_gain_low_effect = yes }
 
+        # A defeated successor is taken captive by the ruler who reunified their realm.
+        scope:attacker = {
+            if = {
+                limit = {
+                    scope:defender = { is_alive = yes }
+                    NOT = { scope:defender = { is_imprisoned = yes } }
+                }
+                imprison = {
+                    target = scope:defender
+                    type = dungeon
+                }
+            }
+        }
+
         create_title_and_vassal_change = {
             type = conquest
             save_scope_as = change
@@ -102,9 +116,11 @@
                     limit = {
                         primary_title = {
                             has_variable = rf_is_successor_split_title
-                            is_titular = yes
                         }
                     }
+                    # Keep a successor metadata source even when its old crown
+                    # is de jure. Winning a real empire title can replace that
+                    # primary title before the normal title-gain sync runs.
                     primary_title = { save_scope_as = rf_attacker_old_split_title }
                 }
             }
@@ -209,7 +225,10 @@
                     remove_variable = rf_is_permanent_successor_split
                     remove_variable = rf_successor_permanent_realm_size
                 }
-                scope:attacker = { destroy_title = scope:rf_attacker_old_split_title }
+                if = {
+                    limit = { scope:rf_attacker_old_split_title = { is_titular = yes } }
+                    scope:attacker = { destroy_title = scope:rf_attacker_old_split_title }
+                }
             }
         }
         # Otherwise destroy the defender's titular split title now that all
@@ -266,7 +285,10 @@
                 remove_variable = rf_is_permanent_successor_split
                 remove_variable = rf_successor_permanent_realm_size
             }
-            scope:attacker = { destroy_title = scope:rf_attacker_old_split_title }
+            if = {
+                limit = { scope:rf_attacker_old_split_title = { is_titular = yes } }
+                scope:attacker = { destroy_title = scope:rf_attacker_old_split_title }
+            }
         }
 
         scope:defender = { ep3_war_loss_adventurer_tt_effect = yes }

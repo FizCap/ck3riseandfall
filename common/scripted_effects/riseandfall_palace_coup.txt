@@ -28,6 +28,17 @@ riseandfall_palace_coup_score_challenger_candidate = {
         remove_variable = tmp_candidate_stat_edge
     }
 
+    # Mirror vanilla diarch coup willingness: ambition and disloyalty invite treason,
+    # while contentment and loyalty can outweigh raw ability in the choice of leader.
+    if = { limit = { has_trait = disloyal } change_variable = { name = candidate_total add = 50 } }
+    if = { limit = { has_trait = ambitious } change_variable = { name = candidate_total add = 50 } }
+    if = { limit = { has_trait = arbitrary } change_variable = { name = candidate_total add = 30 } }
+    if = { limit = { has_trait = fickle } change_variable = { name = candidate_total add = 10 } }
+    if = { limit = { has_trait = stubborn } change_variable = { name = candidate_total add = -10 } }
+    if = { limit = { has_trait = just } change_variable = { name = candidate_total add = -30 } }
+    if = { limit = { has_trait = content } change_variable = { name = candidate_total add = -50 } }
+    if = { limit = { has_trait = loyal } change_variable = { name = candidate_total add = -50 } }
+
     # Real institutional power makes outsider challengers much more plausible.
     if = {
         limit = { is_councillor_of = scope:event_root }

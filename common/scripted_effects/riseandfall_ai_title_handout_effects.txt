@@ -375,8 +375,10 @@ riseandfall_ai_advanced_destroy_unwanted_titles_se = {
 
 riseandfall_ai_advanced_title_handout_se = {
     # Advanced mode: king-rank rulers relieve pressure with duchies first.
-    # Emperor/hegemony rulers grant one pressure-driven kingdom when useful, then
-    # destroy leftover non-primary kingdom/empire/hegemony titles so AI cannot hoard them.
+    # Emperor/hegemony rulers only grant a kingdom after exceeding their vassal
+    # limit by at least three; the tax and levy loss makes this a last resort.
+    # Leftover non-primary kingdom/empire/hegemony titles are then destroyed so
+    # AI cannot hoard them.
     save_scope_as = emperor
 
     if = {
@@ -518,29 +520,7 @@ riseandfall_ai_advanced_title_handout_se = {
                         scope:emperor = { government_has_flag = government_is_theocracy }
                     }
                 }
-                OR = {
-                    scope:emperor = { vassal_limit_available < -1 }
-                    scope:emperor = { vassal_limit_percentage >= 0.95 }
-                    AND = {
-                        scope:emperor = { vassal_limit_available < 1 }
-                        NOT = { is_neighbor_to_realm = scope:emperor }
-                        any_dejure_vassal_title_holder = {
-                            any_liege_or_above = { this = scope:emperor }
-                            opinion = { target = scope:emperor value <= -50 }
-                        }
-                    }
-                    AND = {
-                        scope:emperor = {
-                            vassal_limit_available < 2
-                            has_variable = riseandfall_realm_stability_score
-                            NOT = { var:riseandfall_realm_stability_score >= 30 }
-                        }
-                        any_dejure_vassal_title_holder = {
-                            any_liege_or_above = { this = scope:emperor }
-                            opinion = { target = scope:emperor value <= -75 }
-                        }
-                    }
-                }
+                scope:emperor = { vassal_limit_available < -2 }
             }
             save_scope_as = target_title
 
@@ -617,14 +597,20 @@ riseandfall_ai_advanced_title_handout_se = {
 
 ############################################################
 # Rise and Fall: Grant counties scripted effect
-# Grants actor-owned de jure counties to newly created characters
-# created with the liege's culture and faith, excluding counties
-# that belong to the de jure kingdom containing the liege's capital.
+# Grants actor-owned de jure counties to suitable courtiers, preferring the
+# county's culture and faith, and generates a matching character only when no
+# eligible courtier is available. Excludes counties in the AI liege's capital kingdom.
 ############################################################
 
 riseandfall_grant_counties_se = {
     # Expecting root scope to be the liege (ruler) who clicked the decision.
     save_scope_as = liege
+    # Use a courtier-safe version of the Advanced AI trait and loyalty score.
+    save_scope_as = emperor
+
+    # County rulers cannot safely create a subordinate county vassal.
+    if = {
+        limit = { is_landed = yes primary_title.tier >= tier_duchy }
 
     # Save the de jure kingdom that contains the liege's capital province
     scope:liege = {
@@ -673,24 +659,99 @@ riseandfall_grant_counties_se = {
                     }
                     save_scope_as = target_county
 
-                    # For each eligible county, create a new landed character of the liege's culture & faith
+                    # Prefer a qualified local courtier from the liege's own court.
+                    # The Advanced AI-equivalent courtier score promotes
+                    # loyal, trusting, content, humble, patient, just, and honest
+                    # recipients while penalizing dangerous personality traits.
+                    # Clear this per county so a prior recipient cannot be reused.
+                    clear_saved_scope = county_grant_recipient
                     scope:liege = {
-                        create_character = {
-                            culture = scope:liege.culture
-                            faith = scope:liege.faith
-                            age = { 18 35 }
-                            gender = male
-                            employer = scope:liege
-                            save_scope_as = created_vassal
+                        ordered_courtier = {
+                            limit = {
+                                is_alive = yes
+                                is_adult = yes
+                                is_ruler = no
+                                is_imprisoned = no
+                                is_incapable = no
+                                NOT = { has_trait = warlord }
+                                NOT = { has_trait = disloyal }
+                                culture = scope:target_county.culture
+                                faith = scope:target_county.faith
+                            }
+                            order_by = riseandfall_county_grant_courtier_score_value
+                            max = 1
+                            check_range_bounds = no
+                            save_scope_as = county_grant_recipient
                         }
                     }
 
-                    # Grant the county to the created character
+                    # If the ruler has no local candidate, borrow a matching
+                    # courtier from a random vassal court that has one.
+                    if = {
+                        limit = { NOT = { exists = scope:county_grant_recipient } }
+                        scope:liege = {
+                            random_vassal_or_below = {
+                                limit = {
+                                    is_landed = yes
+                                    any_courtier = {
+                                        is_alive = yes
+                                        is_adult = yes
+                                        is_ruler = no
+                                        is_imprisoned = no
+                                        is_incapable = no
+                                        NOT = { has_trait = warlord }
+                                        NOT = { has_trait = disloyal }
+                                        culture = scope:target_county.culture
+                                        faith = scope:target_county.faith
+                                    }
+                                }
+                                ordered_courtier = {
+                                    limit = {
+                                        is_alive = yes
+                                        is_adult = yes
+                                        is_ruler = no
+                                        is_imprisoned = no
+                                        is_incapable = no
+                                        NOT = { has_trait = warlord }
+                                        NOT = { has_trait = disloyal }
+                                        culture = scope:target_county.culture
+                                        faith = scope:target_county.faith
+                                    }
+                                    order_by = riseandfall_county_grant_courtier_score_value
+                                    max = 1
+                                    check_range_bounds = no
+                                    save_scope_as = county_grant_recipient
+                                }
+                            }
+                        }
+                    }
+
+                    # No matching courtier exists anywhere in the realm: create
+                    # a local-culture, local-faith adult in the liege's court.
+                    if = {
+                        limit = { NOT = { exists = scope:county_grant_recipient } }
+                        scope:liege = {
+                            create_character = {
+                                location = scope:target_county.title_province
+                                culture = scope:target_county.culture
+                                faith = scope:target_county.faith
+                                age = { 18 35 }
+                                gender = male
+                                employer = scope:liege
+                                save_scope_as = county_grant_recipient
+                            }
+                        }
+                    }
+
+                    # Grant the county to the selected or generated recipient.
                     # Skip granting if the target county/title has the giveaway-block variable AND the liege is a human player.
                     scope:target_county = {
                         if = {
-                            limit = { NOT = { AND = { has_variable = Riseandfall_giveaway_blocked scope:liege = { is_ai = no } } } }
-                            scope:created_vassal = {
+                            limit = {
+                                exists = scope:county_grant_recipient
+                                NOT = { AND = { has_variable = Riseandfall_giveaway_blocked scope:liege = { is_ai = no } } }
+                            }
+                            scope:county_grant_recipient = {
                                 hidden_effect = {
                                     add_opinion = {
                                         target = scope:liege
@@ -699,7 +760,7 @@ riseandfall_grant_counties_se = {
                                 }
                             }
                             create_title_and_vassal_change = { type = granted save_scope_as = change }
-                            change_title_holder_include_vassals = { holder = scope:created_vassal change = scope:change take_baronies = no }
+                            change_title_holder_include_vassals = { holder = scope:county_grant_recipient change = scope:change take_baronies = no }
                             resolve_title_and_vassal_change = scope:change
                             # Notify the liege with the county name granted (post-action popup)
                             scope:liege = {
@@ -707,7 +768,7 @@ riseandfall_grant_counties_se = {
                                     type = send_interface_message_good
                                     title = riseandfall_grant_county_popup_title
                                     custom_tooltip = { text = riseandfall_grant_county_popup_desc subject = scope:target_county }
-                                    left_icon = scope:created_vassal
+                                    left_icon = scope:county_grant_recipient
                                 }
                             }
                         }
@@ -715,5 +776,6 @@ riseandfall_grant_counties_se = {
                 }
             }
         }
+    }
     }
 }

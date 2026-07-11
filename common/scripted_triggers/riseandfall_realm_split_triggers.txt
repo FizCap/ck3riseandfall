@@ -52,7 +52,11 @@ riseandfall_can_realm_split_trigger = {
 # Successor-state helper triggers (Diadochi wars)
 
 riseandfall_has_successor_primary_title_trigger = {
+    # This helper is also called while scanning all independent rulers; exclude
+    # landless rulers before entering primary_title so those scans stay quiet.
+    is_landed = yes
     is_independent_ruler = yes
+    exists = primary_title
     primary_title = {
         has_variable = rf_is_successor_split_title
         has_variable = rf_successor_root_origin_title
@@ -79,7 +83,8 @@ riseandfall_can_see_diadochi_browser_trigger = {
         any_independent_ruler = {
             NOT = { this = root }
             riseandfall_has_successor_primary_title_trigger = yes
-            primary_title.var:rf_successor_root_origin_title = root.primary_title
+            # Unrelated rulers may not have this scope while tooltips are built.
+            primary_title.var:rf_successor_root_origin_title ?= root.primary_title
         }
     }
 }
@@ -91,60 +96,19 @@ riseandfall_can_browse_diadochi_targets_trigger = {
     NOR = {
         government_has_flag = government_is_landless_adventurer
     }
+    # Decision tooltips evaluate every candidate aggressively. The browser
+    # preparation effect performs can_declare_war with saved, typed scopes,
+    # so this only establishes that the ruler belongs to a successor conflict.
     OR = {
-        any_neighboring_realm_owner = {
-            NOT = { this = root }
-            is_landed = yes
-            is_independent_ruler = yes
-            exists = primary_title
-            NOT = { has_truce = root }
-            NOT = { is_allied_to = root }
-            NOT = { is_at_war_with = root }
-            root = {
-                can_declare_war = {
-                    defender = prev
-                    casus_belli = riseandfall_diadochi_cb
-                    target_titles = { prev.primary_title }
-                }
-            }
-        }
+        riseandfall_has_successor_primary_title_trigger = yes
         any_independent_ruler = {
             NOT = { this = root }
             is_landed = yes
             is_independent_ruler = yes
             exists = primary_title
-            NOT = { has_truce = root }
-            NOT = { is_allied_to = root }
-            NOT = { is_at_war_with = root }
-            root = {
-                can_declare_war = {
-                    defender = prev
-                    casus_belli = riseandfall_diadochi_cb
-                    target_titles = { prev.primary_title }
-                }
-            }
-        }
-        AND = {
             riseandfall_has_successor_primary_title_trigger = yes
-            primary_title.var:rf_successor_root_origin_title = {
-                exists = holder
-                holder = {
-                    NOT = { this = root }
-                    is_landed = yes
-                    is_independent_ruler = yes
-                    exists = primary_title
-                    NOT = { has_truce = root }
-                    NOT = { is_allied_to = root }
-                    NOT = { is_at_war_with = root }
-                    root = {
-                        can_declare_war = {
-                            defender = prev
-                            casus_belli = riseandfall_diadochi_cb
-                            target_titles = { root.primary_title.var:rf_successor_root_origin_title }
-                        }
-                    }
-                }
-            }
+            # Keep the broad validity scan safe for rulers without origin data.
+            primary_title.var:rf_successor_root_origin_title ?= root.primary_title
         }
     }
 }

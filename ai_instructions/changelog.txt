@@ -1,11 +1,54 @@
-﻿CK3: Rise and Fall - 1.0.6
+﻿CK3: Rise and Fall - 1.1.0
 
-Bug Fixes
-- Restricted Realm Stability to independent rulers and cleared stale vassal stability data during yearly maintenance.
-- Fixed a Dynamic Story Mode startup script error when title-gain stability refreshes ran before the first world pressure pass.
-- Fixed a Realm Splits surrender error when a successor ruler kept a higher-tier primary title while being demoted to a lower replacement title.
-- Fixed the Realm Stability tooltip's Story Mode director notes overflowing outside their panel.
+Realm Stability
+- Rebuilt the Low Stability Event Manager as a compact event browser available to landed and landless players, showing every event's colored current frequency and returning immediately to the overview after each change.
+- Replaced Dynamic and Forced Story Mode choices with clear Accelerated and Long Campaign collapse paces targeting roughly 50-100 years and 200-300 years respectively.
+- Spread annual low-stability incident rolls across random days of the year instead of resolving every realm's roll at the start of the year.
+- Added Coalition crises for sprawling low-stability realms, allowing nearby independent rulers to unite behind their strongest military power and launch a realm-dismantling war.
+- Made failed Coalitions reroll into another valid low-stability incident, while preventing duplicate Coalition formations and wars against the same target.
+- Fixed Coalition assembly resolving before AI invitation responses, made Coalition wars use vanilla's forced event-war declaration pattern, and added clear event and option explanations for every failed assembly gate.
+- Required Coalition targets to control at least 5% of the world, using Realm Stability's existing realm-size component.
+- Allowed the Coalition to recruit the target's direct vassals with a promise of independence on victory, adding their military power to the attackers when evaluating whether the war can launch.
+- Made vassals judge Coalition invitations through their opinion and relationship with the liege, loyalty and personality, family and cultural ties, political power, claims, and fear of the liege.
+- Fixed Coalition rebel-vassal independence using the wrong CB scope, and prevented already-added Coalition attackers from being added to the war twice.
+- Made accepted rebel vassals remain subjects while fighting their liege by using CK3's call-to-arms marker before adding them to the Coalition attacker side; they become independent only after victory.
+- Disabled white peace in Coalition wars, requiring either the Coalition to enforce its demands or surrender.
+- Made victorious Coalition targets imprison their participating rebel vassals and gain two tyranny-free title revocations against each of them.
+- Fixed Total Authority Collapse repeatedly logging unset-variable errors while draining a ruler's treasury and gold.
+- Made Palace Coups favor ambitious, disloyal, arbitrary, and fickle challengers over content, loyal, just, or stubborn candidates.
 
-Balance
-- Reduced the Diadochi war attacker occupation threshold needed for ticking war score from 51% to 15% of the defender's realm and slowed Diadochi ticking war score.
-- Rebalanced Diadochi wars against huge realms so a small beachhead can contest passive defender ticking and occupation progress is worth more war score.
+Successor Wars
+- Made AI vassals more willing to defect to a successor when their capital is disconnected from their liege's capital.
+- Prevented rulers at war from using Surrender to Successor, including if they enter a war while a surrender request is awaiting a reply.
+- Rebuilt the Successor War target browser with unlimited seven-target pages sorted from weakest to strongest military power, with immediate Previous and More navigation.
+- Fixed Successor War target-browser tooltip errors, landless-ruler script errors, a missing-art warning, and silent empty results.
+- Removed an obsolete unused successor-defection cooldown state.
+- Fixed forced AI Successor Wars failing when their prepared target scopes were unavailable during final war evaluation.
+- Made victorious Successor War rulers imprison the defeated defender.
+- Made AI Successor Wars target adjacent same-origin realms before distant original titles.
+- Preserved Successor War mechanics when a successor victory promoted a de jure empire or kingdom title.
+- Preserved Successor War mechanics when the Surrender to Successor interaction promoted a de jure empire or hegemony title.
+- Made titular and non-titular Successor Realm surrenders transfer the submitting realm's vassals to the receiving ruler.
+- Removed obsolete titular successor crowns after a surrendered de jure crown became the receiving ruler's new successor title.
+
+AI Title Creation
+- Made Advanced AI kingdom creation and handouts a last resort, requiring the ruler to exceed the vassal limit by at least three before consolidating vassals under a kingdom.
+- Made Advanced AI kingdom creation favour foreign or non-integrated regional kingdoms, while preserving rank-up and titular-primary replacement behavior.
+
+Title Automation
+- Improved title granting with Advanced AI recipient logic, choosing qualified vassals by character traits, opinion, culture, faith, dynasty, and diplomacy instead of random recipients.
+- Made county grants available to duke-tier rulers or higher, preferring loyal, qualified same-culture, same-faith courtiers from the ruler's court or vassal courts before generating a new local ruler.
+- Added a hegemony-only Grant Empires decision that safely consolidates eligible de jure empires under qualified vassals.
+
+Adventurers
+- Added a debug decision that creates one random legitimist claimant with an initial host army for testing.
+
+Warlord
+- Fixed eligible landed vassal successors not inheriting the Warlord trait after their predecessor died.
+- Made AI vassals always choose and continue the Warlord path until Warlord AI weighting is reworked.
+- Rebalanced Warlord Conquest warscore pacing to match Diadochi realm-takeover wars, making footholds matter while preventing passive defender ticking from deciding large wars too easily.
+- Renamed the opening Warlord event title to "Warlords Rising."
+- Made Celestial Warlord Conquest victors take the defeated ruler's personal counties and vassals before destroying a same-rank primary title, while preserving titles that began above the victor's rank.
+
+Modcon
+- Removed the modcon loading screen.

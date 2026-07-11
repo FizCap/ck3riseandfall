@@ -72,15 +72,59 @@ riseandfall_ai_advanced_title_grant_score_value = {
     add = diplomacy
 }
 
+# Courtier-safe counterpart to the Advanced AI title-recipient score. Courtiers
+# have no primary title, so this intentionally keeps the shared loyalty, trait,
+# culture, faith, dynasty, and diplomacy priorities while omitting title checks.
+riseandfall_county_grant_courtier_score_value = {
+    value = 0
+
+    # Personal loyalty to the granting ruler matters more than raw aptitude.
+    if = { limit = { opinion = { target = scope:emperor value >= 60 } } add = 80 }
+    else_if = { limit = { opinion = { target = scope:emperor value >= 40 } } add = 55 }
+    else_if = { limit = { opinion = { target = scope:emperor value >= 20 } } add = 30 }
+    else_if = { limit = { opinion = { target = scope:emperor value >= 0 } } add = 10 }
+    if = { limit = { opinion = { target = scope:emperor value <= -50 } } add = -120 }
+    else_if = { limit = { opinion = { target = scope:emperor value <= -20 } } add = -60 }
+
+    if = { limit = { has_trait = loyal } add = 80 }
+    if = { limit = { has_trait = trusting } add = 45 }
+    if = { limit = { has_trait = content } add = 45 }
+    if = { limit = { has_trait = humble } add = 25 }
+    if = { limit = { has_trait = patient } add = 15 }
+    if = { limit = { has_trait = just } add = 15 }
+    if = { limit = { has_trait = honest } add = 10 }
+
+    if = { limit = { has_trait = warlord } add = -250 }
+    if = { limit = { has_trait = disloyal } add = -175 }
+    if = { limit = { has_trait = ambitious } add = -45 }
+    if = { limit = { has_trait = arrogant } add = -35 }
+    if = { limit = { has_trait = arbitrary } add = -25 }
+    if = { limit = { has_trait = greedy } add = -20 }
+    if = { limit = { has_trait = fickle } add = -20 }
+    if = { limit = { has_trait = paranoid } add = -15 }
+
+    if = { limit = { has_same_culture_as = scope:emperor } add = 15 }
+    if = { limit = { faith = scope:emperor.faith } add = 15 }
+    if = {
+        limit = {
+            has_dynasty = yes
+            scope:emperor = { has_dynasty = yes }
+            dynasty = scope:emperor.dynasty
+        }
+        add = 20
+    }
+
+    add = diplomacy
+}
+
 riseandfall_ai_advanced_kingdom_pressure_value = {
     # Title-scoped value. Expects scope:emperor to be the AI ruler considering
     # whether this kingdom should be created or handed out.
     value = 0
 
+    # Kingdoms are a last-resort consolidation tool: only evaluate their
+    # priority once the emperor is at least three vassals above the limit.
     if = { limit = { scope:emperor = { vassal_limit_available < -2 } } add = 300 }
-    else_if = { limit = { scope:emperor = { vassal_limit_available < -1 } } add = 220 }
-    else_if = { limit = { scope:emperor = { vassal_limit_percentage >= 0.95 } } add = 200 }
-    else_if = { limit = { scope:emperor = { vassal_limit_available < 1 } } add = 90 }
 
     if = {
         limit = {

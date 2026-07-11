@@ -9,17 +9,25 @@ riseandfall_story_world_climate_se = {
     set_global_variable = { name = riseandfall_story_world_eligible_count value = 0 }
     set_global_variable = { name = riseandfall_story_world_stable_count value = 0 }
     set_global_variable = { name = riseandfall_story_world_unstable_count value = 0 }
+    set_global_variable = { name = riseandfall_story_world_risky_count value = 0 }
     set_global_variable = { name = riseandfall_story_world_crisis_count value = 0 }
     set_global_variable = { name = riseandfall_story_world_empire_count value = 0 }
     set_global_variable = { name = riseandfall_story_world_hegemony_count value = 0 }
     set_global_variable = { name = riseandfall_story_world_blob_count value = 0 }
     set_global_variable = { name = riseandfall_story_world_stable_pct value = 0 }
     set_global_variable = { name = riseandfall_story_world_unstable_pct value = 0 }
+    set_global_variable = { name = riseandfall_story_world_risky_pct value = 0 }
     set_global_variable = { name = riseandfall_story_world_crisis_pct value = 0 }
+    set_global_variable = { name = riseandfall_story_target_unstable_pct value = 10 }
     set_global_variable = { name = riseandfall_story_world_pressure value = 0 }
     set_global_variable = { name = riseandfall_story_world_climate value = 0 }
     set_global_variable = { name = riseandfall_world_total value = 0 }
     set_global_variable = { name = riseandfall_world_total_development value = 0 }
+
+    if = {
+        limit = { has_game_rule = riseandfall_dynamic_story_mode_forced }
+        set_global_variable = { name = riseandfall_story_target_unstable_pct value = 30 }
+    }
 
     every_independent_ruler = {
         limit = { is_landed = yes }
@@ -43,17 +51,37 @@ riseandfall_story_world_climate_se = {
         }
         change_global_variable = { name = riseandfall_story_world_eligible_count add = realm_size }
 
-        # Stability bands are tier-relative, matching the low-stability event
-        # thresholds used elsewhere: kingdom 40, empire 45, hegemony 50. Larger
-        # realms need more cohesion to count as truly safe, and can be in trouble
-        # before a flat kingdom threshold would notice.
-        set_variable = { name = tmp_story_low_threshold value = 40 }
-        if = { limit = { primary_title.tier >= tier_empire } set_variable = { name = tmp_story_low_threshold value = 45 } }
-        if = { limit = { primary_title.tier >= tier_hegemony } set_variable = { name = tmp_story_low_threshold value = 50 } }
+        # Stability bands mirror the low-stability event curve. The risk estimate
+        # is local to Story Mode so the world read does not depend on stale tooltip vars.
+        set_variable = { name = tmp_story_low_threshold value = 30 }
+        if = { limit = { highest_held_title_tier >= tier_duchy } set_variable = { name = tmp_story_low_threshold value = 35 } }
+        if = { limit = { highest_held_title_tier >= tier_kingdom } set_variable = { name = tmp_story_low_threshold value = 40 } }
+        if = { limit = { highest_held_title_tier >= tier_empire } set_variable = { name = tmp_story_low_threshold value = 45 } }
+        if = { limit = { highest_held_title_tier >= tier_hegemony } set_variable = { name = tmp_story_low_threshold value = 50 } }
         set_variable = { name = tmp_story_crisis_threshold value = var:tmp_story_low_threshold }
         change_variable = { name = tmp_story_crisis_threshold add = -15 }
         set_variable = { name = tmp_story_stable_threshold value = var:tmp_story_low_threshold }
         change_variable = { name = tmp_story_stable_threshold add = 30 }
+        set_variable = { name = tmp_story_low_event_diff value = var:tmp_story_low_threshold }
+        set_variable = { name = tmp_story_current_stability value = var:riseandfall_realm_stability_score }
+        change_variable = { name = tmp_story_current_stability multiply = -1 }
+        change_variable = { name = tmp_story_low_event_diff add = var:tmp_story_current_stability }
+        clamp_variable = { name = tmp_story_low_event_diff min = 0 max = 50 }
+        set_variable = { name = tmp_story_low_event_chance value = 0 }
+        if = {
+            limit = { var:riseandfall_realm_stability_score > var:tmp_story_low_threshold }
+            set_variable = { name = tmp_story_low_event_chance value = 0 }
+        }
+        else = {
+            set_variable = { name = tmp_story_low_event_sq value = var:tmp_story_low_event_diff }
+            change_variable = { name = tmp_story_low_event_sq multiply = var:tmp_story_low_event_diff }
+            set_variable = { name = tmp_story_low_event_chance value = var:tmp_story_low_event_sq }
+            change_variable = { name = tmp_story_low_event_chance multiply = 100 }
+            change_variable = { name = tmp_story_low_event_chance divide = var:tmp_story_low_threshold }
+            change_variable = { name = tmp_story_low_event_chance divide = var:tmp_story_low_threshold }
+            if = { limit = { AND = { var:tmp_story_low_event_diff > 0 var:tmp_story_low_event_chance < 1 } } set_variable = { name = tmp_story_low_event_chance value = 1 } }
+        }
+        clamp_variable = { name = tmp_story_low_event_chance min = 0 max = 100 }
 
         if = {
             limit = {
@@ -66,6 +94,15 @@ riseandfall_story_world_climate_se = {
                 var:riseandfall_realm_stability_score < var:tmp_story_low_threshold
             }
             change_global_variable = { name = riseandfall_story_world_unstable_count add = realm_size }
+        }
+        if = {
+            limit = {
+                OR = {
+                    var:riseandfall_realm_stability_score < var:tmp_story_low_threshold
+                    var:tmp_story_low_event_chance > 0
+                }
+            }
+            change_global_variable = { name = riseandfall_story_world_risky_count add = realm_size }
         }
         if = {
             limit = {
@@ -111,6 +148,10 @@ riseandfall_story_world_climate_se = {
         remove_variable = tmp_story_low_threshold
         remove_variable = tmp_story_crisis_threshold
         remove_variable = tmp_story_stable_threshold
+        remove_variable = tmp_story_low_event_diff
+        remove_variable = tmp_story_current_stability
+        remove_variable = tmp_story_low_event_chance
+        if = { limit = { has_variable = tmp_story_low_event_sq } remove_variable = tmp_story_low_event_sq }
     }
 
     # Convert counts into percentages. These globals are intentionally exposed as
@@ -127,41 +168,114 @@ riseandfall_story_world_climate_se = {
         change_global_variable = { name = riseandfall_story_world_unstable_pct divide = global_var:riseandfall_story_world_eligible_count }
         round_global_variable = { name = riseandfall_story_world_unstable_pct nearest = 1 }
 
+        set_global_variable = { name = riseandfall_story_world_risky_pct value = global_var:riseandfall_story_world_risky_count }
+        change_global_variable = { name = riseandfall_story_world_risky_pct multiply = 100 }
+        change_global_variable = { name = riseandfall_story_world_risky_pct divide = global_var:riseandfall_story_world_eligible_count }
+        round_global_variable = { name = riseandfall_story_world_risky_pct nearest = 1 }
+
         set_global_variable = { name = riseandfall_story_world_crisis_pct value = global_var:riseandfall_story_world_crisis_count }
         change_global_variable = { name = riseandfall_story_world_crisis_pct multiply = 100 }
         change_global_variable = { name = riseandfall_story_world_crisis_pct divide = global_var:riseandfall_story_world_eligible_count }
         round_global_variable = { name = riseandfall_story_world_crisis_pct nearest = 1 }
     }
 
-    # World pressure nudges the director: high stability asks for new stress on
-    # complacent powers; widespread crisis asks for recovery so the map does not
-    # become a uniform death spiral.
+    # World pressure nudges the director toward the active rule target:
+    # Long Campaign wants about 10% risky realm-size, Accelerated wants about 30%.
+    # Widespread crisis still asks for recovery so the map does not become a uniform death spiral.
     if = {
         limit = { global_var:riseandfall_story_world_crisis_pct >= 25 }
         set_global_variable = { name = riseandfall_story_world_pressure value = -2 }
         set_global_variable = { name = riseandfall_story_world_climate value = 4 }
     }
     else_if = {
-        limit = { global_var:riseandfall_story_world_unstable_pct >= 45 }
+        limit = {
+            OR = {
+                AND = {
+                    has_game_rule = riseandfall_dynamic_story_mode_dynamic
+                    global_var:riseandfall_story_world_risky_pct >= 10
+                }
+                AND = {
+                    has_game_rule = riseandfall_dynamic_story_mode_forced
+                    global_var:riseandfall_story_world_risky_pct >= 30
+                }
+            }
+        }
         set_global_variable = { name = riseandfall_story_world_pressure value = -1 }
         set_global_variable = { name = riseandfall_story_world_climate value = 3 }
     }
     else_if = {
         limit = {
-            global_var:riseandfall_story_world_stable_pct >= 70
+            OR = {
+                AND = {
+                    has_game_rule = riseandfall_dynamic_story_mode_dynamic
+                    global_var:riseandfall_story_world_risky_pct < 10
+                }
+                AND = {
+                    has_game_rule = riseandfall_dynamic_story_mode_forced
+                    global_var:riseandfall_story_world_risky_pct < 30
+                }
+            }
+            OR = {
+                global_var:riseandfall_story_world_stable_pct >= 60
+                global_var:riseandfall_story_world_blob_count >= 2
+            }
             NOT = { global_var:riseandfall_story_world_crisis_pct >= 10 }
         }
         set_global_variable = { name = riseandfall_story_world_pressure value = 2 }
         set_global_variable = { name = riseandfall_story_world_climate value = 1 }
     }
     else_if = {
-        limit = { global_var:riseandfall_story_world_stable_pct >= 55 }
+        limit = {
+            OR = {
+                AND = {
+                    has_game_rule = riseandfall_dynamic_story_mode_dynamic
+                    global_var:riseandfall_story_world_risky_pct < 10
+                }
+                AND = {
+                    has_game_rule = riseandfall_dynamic_story_mode_forced
+                    global_var:riseandfall_story_world_risky_pct < 30
+                }
+            }
+        }
         set_global_variable = { name = riseandfall_story_world_pressure value = 1 }
         set_global_variable = { name = riseandfall_story_world_climate value = 1 }
     }
     else = {
         set_global_variable = { name = riseandfall_story_world_pressure value = 0 }
         set_global_variable = { name = riseandfall_story_world_climate value = 2 }
+    }
+
+    # Collapse arcs are tracked per major realm. Existing buildup always stays
+    # active, while a peaceful world can begin new arcs for every stable hegemon
+    # whose strongest nearby non-allied rival is below the intended 75% check.
+    every_independent_ruler = {
+        remove_character_flag = rf_story_decline_target
+        if = {
+            limit = {
+                OR = {
+                    has_variable = riseandfall_story_collapse_pressure
+                    primary_title = { has_variable = riseandfall_story_title_collapse_pressure }
+                }
+            }
+            add_character_flag = { flag = rf_story_decline_target days = 370 }
+        }
+    }
+    if = {
+        limit = { global_var:riseandfall_story_world_pressure >= 1 }
+        every_independent_ruler = {
+            limit = {
+                is_landed = yes
+                has_variable = riseandfall_realm_stability_score
+                var:riseandfall_realm_stability_score >= 60
+                OR = {
+                    primary_title.tier >= tier_empire
+                    realm_size >= 30
+                }
+                has_variable = riseandfall_story_strongest_rival_pct
+                var:riseandfall_story_strongest_rival_pct < 75
+            }
+            add_character_flag = { flag = rf_story_decline_target days = 370 }
+        }
     }
 }
 
@@ -174,6 +288,8 @@ riseandfall_clear_story_director_vars_se = {
     remove_variable = riseandfall_story_protection
     remove_variable = riseandfall_story_collapse_pressure
     remove_variable = riseandfall_story_world_climate
+    remove_variable = riseandfall_story_blob_pressure_base
+    remove_variable = riseandfall_story_blob_pressure_scaled
     remove_variable = riseandfall_story_blob_pressure
     remove_variable = riseandfall_story_reign_tension
     remove_variable = riseandfall_story_stagnation_pressure
@@ -188,9 +304,52 @@ riseandfall_clear_story_director_vars_se = {
     remove_variable = riseandfall_story_external_rival_relief
     remove_variable = riseandfall_story_strength_baseline
     remove_variable = riseandfall_story_collapse_gain_last
-    remove_variable = riseandfall_story_no_rival_years
-    remove_variable = riseandfall_story_no_rival_pressure
+    remove_variable = riseandfall_story_arc
+    remove_variable = riseandfall_story_arc_phase
     remove_variable = riseandfall_rs_development_pct
+    remove_character_flag = rf_story_decline_target
+}
+
+# Collapse buildup belongs to the central title as well as its current holder.
+# This preserves an active campaign through ordinary succession and through a
+# vassal or claimant taking the primary title from the old ruler.
+riseandfall_restore_story_collapse_from_primary_title_se = {
+    if = {
+        limit = {
+            exists = primary_title
+            primary_title = { has_variable = riseandfall_story_title_collapse_pressure }
+        }
+        primary_title = { save_scope_as = rf_story_collapse_title }
+        if = {
+            limit = { NOT = { has_variable = riseandfall_story_collapse_pressure } }
+            set_variable = { name = riseandfall_story_collapse_pressure value = scope:rf_story_collapse_title.var:riseandfall_story_title_collapse_pressure }
+        }
+        else_if = {
+            limit = { var:riseandfall_story_collapse_pressure < scope:rf_story_collapse_title.var:riseandfall_story_title_collapse_pressure }
+            set_variable = { name = riseandfall_story_collapse_pressure value = scope:rf_story_collapse_title.var:riseandfall_story_title_collapse_pressure }
+        }
+        clear_saved_scope = rf_story_collapse_title
+    }
+}
+
+riseandfall_store_story_collapse_on_primary_title_se = {
+    if = {
+        limit = { exists = primary_title }
+        save_scope_as = rf_story_collapse_ruler
+        primary_title = { save_scope_as = rf_story_collapse_title }
+        if = {
+            limit = { has_variable = riseandfall_story_collapse_pressure }
+            scope:rf_story_collapse_title = {
+                set_variable = { name = riseandfall_story_title_collapse_pressure value = scope:rf_story_collapse_ruler.var:riseandfall_story_collapse_pressure }
+            }
+        }
+        else_if = {
+            limit = { scope:rf_story_collapse_title = { has_variable = riseandfall_story_title_collapse_pressure } }
+            scope:rf_story_collapse_title = { remove_variable = riseandfall_story_title_collapse_pressure }
+        }
+        clear_saved_scope = rf_story_collapse_title
+        clear_saved_scope = rf_story_collapse_ruler
+    }
 }
 
 riseandfall_apply_successor_realm_grace_se = {
@@ -291,16 +450,14 @@ riseandfall_inherit_story_collapse_buildup_se = {
             set_variable = { name = riseandfall_story_collapse_pressure value = scope:predecessor.var:riseandfall_story_collapse_pressure }
             clamp_variable = { name = riseandfall_story_collapse_pressure min = 0 max = 100 }
         }
+        # Preserve the last peacetime military reading if succession occurs
+        # during a war, when live army strength is temporarily distorted.
         if = {
             limit = {
-                scope:predecessor = { has_variable = riseandfall_story_no_rival_years }
-                OR = {
-                    NOT = { has_variable = riseandfall_story_no_rival_years }
-                    var:riseandfall_story_no_rival_years < scope:predecessor.var:riseandfall_story_no_rival_years
-                }
+                is_at_war = yes
+                scope:predecessor = { has_variable = riseandfall_story_strength_baseline }
             }
-            set_variable = { name = riseandfall_story_no_rival_years value = scope:predecessor.var:riseandfall_story_no_rival_years }
-            clamp_variable = { name = riseandfall_story_no_rival_years min = 0 max = 100 }
+            set_variable = { name = riseandfall_story_strength_baseline value = scope:predecessor.var:riseandfall_story_strength_baseline }
         }
         if = {
             limit = { has_variable = riseandfall_story_collapse_pressure }
@@ -317,6 +474,8 @@ riseandfall_apply_dynamic_story_pressure_se = {
     set_variable = { name = riseandfall_rs_story_pressure_component value = 0 }
     set_variable = { name = riseandfall_story_recovery_component value = 0 }
     set_variable = { name = riseandfall_story_protection value = 0 }
+    set_variable = { name = riseandfall_story_blob_pressure_base value = 0 }
+    set_variable = { name = riseandfall_story_blob_pressure_scaled value = 0 }
     set_variable = { name = riseandfall_story_blob_pressure value = 0 }
     set_variable = { name = riseandfall_story_stagnation_pressure value = 0 }
     set_variable = { name = riseandfall_story_ancient_regime value = 0 }
@@ -327,7 +486,13 @@ riseandfall_apply_dynamic_story_pressure_se = {
     set_variable = { name = riseandfall_story_strongest_rival_pct value = 0 }
     set_variable = { name = riseandfall_story_external_rival_relief value = 0 }
     set_variable = { name = riseandfall_story_collapse_gain_last value = 0 }
-    set_variable = { name = riseandfall_story_no_rival_pressure value = 0 }
+    set_variable = { name = riseandfall_story_arc value = 0 }
+    set_variable = { name = riseandfall_story_arc_phase value = 0 }
+
+    # One-time compatibility cleanup for saves from the retired Legacy
+    # Isolation system. Rival danger is now entirely a live yearly comparison.
+    remove_variable = riseandfall_story_no_rival_years
+    remove_variable = riseandfall_story_no_rival_pressure
 
     # Title-gain refreshes can run at game start before the yearly world pass
     # seeds Story Mode globals. Neutral pressure keeps those early reads safe.
@@ -338,6 +503,11 @@ riseandfall_apply_dynamic_story_pressure_se = {
     if = {
         limit = { NOT = { exists = global_var:riseandfall_story_world_climate } }
         set_global_variable = { name = riseandfall_story_world_climate value = 2 }
+    }
+    if = {
+        # Fresh-lobby title gains can score rulers before the first world-climate pass.
+        limit = { NOT = { exists = global_var:riseandfall_story_world_risky_pct } }
+        set_global_variable = { name = riseandfall_story_world_risky_pct value = 0 }
     }
 
     if = {
@@ -367,6 +537,8 @@ riseandfall_apply_dynamic_story_pressure_se = {
             is_independent_ruler = yes
             primary_title.tier >= tier_county
         }
+        # Restore title-bound pressure before assigning this ruler's campaign role.
+        riseandfall_restore_story_collapse_from_primary_title_se = yes
         if = { limit = { NOT = { has_variable = riseandfall_story_role_years } } set_variable = { name = riseandfall_story_role_years value = 0 } }
         change_variable = { name = riseandfall_story_role_years add = 1 }
 
@@ -396,13 +568,27 @@ riseandfall_apply_dynamic_story_pressure_se = {
         set_variable = { name = riseandfall_rs_development_pct value = var:tmp_story_development_pct }
         set_variable = { name = tmp_story_stress_score value = 0 }
         set_variable = { name = tmp_story_blob_score value = 0 }
-        # Rival strength is dynamic: measure the strongest nearby non-allied
-        # kingdom+ realm as a percent of this ruler's integrated strength. During
-        # civil wars, use the last non-civil-war baseline so rebel vassals do not
-        # make the empire look artificially balanced against outside rivals.
+        set_variable = { name = tmp_story_below_unstable_target value = 0 }
+        if = {
+            limit = {
+                has_game_rule = riseandfall_dynamic_story_mode_dynamic
+                global_var:riseandfall_story_world_risky_pct < 10
+            }
+            set_variable = { name = tmp_story_below_unstable_target value = 1 }
+        }
+        else_if = {
+            limit = {
+                has_game_rule = riseandfall_dynamic_story_mode_forced
+                global_var:riseandfall_story_world_risky_pct < 30
+            }
+            set_variable = { name = tmp_story_below_unstable_target value = 1 }
+        }
+        # Measure the strongest nearby non-allied kingdom+ realm against this
+        # ruler's last peacetime strength. Wars temporarily distort live army
+        # totals, so the baseline updates only while the ruler is at peace.
         set_variable = { name = tmp_story_ruler_strength value = max_military_strength }
         if = {
-            limit = { is_in_civil_war = no }
+            limit = { is_at_war = no }
             set_variable = { name = riseandfall_story_strength_baseline value = var:tmp_story_ruler_strength }
         }
         else_if = {
@@ -410,7 +596,7 @@ riseandfall_apply_dynamic_story_pressure_se = {
             set_variable = { name = riseandfall_story_strength_baseline value = var:tmp_story_ruler_strength }
         }
         else_if = {
-            limit = { var:riseandfall_story_strength_baseline > var:tmp_story_ruler_strength }
+            limit = { is_at_war = yes }
             set_variable = { name = tmp_story_ruler_strength value = var:riseandfall_story_strength_baseline }
         }
         if = { limit = { var:tmp_story_ruler_strength < 1 } set_variable = { name = tmp_story_ruler_strength value = 1 } }
@@ -441,6 +627,17 @@ riseandfall_apply_dynamic_story_pressure_se = {
             scope:ruler = {
                 change_variable = { name = riseandfall_story_rival_count add = 1 }
                 set_variable = { name = tmp_story_candidate_rival_strength value = scope:story_rival_candidate.max_military_strength }
+                # Apply the rival's own frozen peacetime baseline as well, so a
+                # war on either side cannot skew the relative-strength reading.
+                if = {
+                    limit = {
+                        scope:story_rival_candidate = {
+                            is_at_war = yes
+                            has_variable = riseandfall_story_strength_baseline
+                        }
+                    }
+                    set_variable = { name = tmp_story_candidate_rival_strength value = scope:story_rival_candidate.var:riseandfall_story_strength_baseline }
+                }
                 set_variable = { name = tmp_story_candidate_rival_pct value = var:tmp_story_candidate_rival_strength }
                 change_variable = { name = tmp_story_candidate_rival_pct multiply = 100 }
                 change_variable = { name = tmp_story_candidate_rival_pct divide = var:tmp_story_ruler_strength }
@@ -460,14 +657,23 @@ riseandfall_apply_dynamic_story_pressure_se = {
         change_variable = { name = riseandfall_story_external_rival_relief divide = 20 }
         clamp_variable = { name = riseandfall_story_external_rival_relief min = 0 max = 7.5 }
 
-        # Story roles are selected as candidates each pass, then held for a short
-        # arc so rulers do not bounce between Rival, Wildcard, and Background
-        # every year. Successor grace and active collapse buildup can still force
-        # immediate role changes because they represent explicit story state.
-        # 1 anchor, 2 rival, 3 declining power, 4 wildcard, 5 background.
-        # Declining power is based on realm scale and stability. External rivals
-        # no longer hard-block it; they dynamically reduce collapse buildup later.
+        # Story Mode has three deliberate lanes: Declining Powers, nearby
+        # Counterweights, and general crisis recovery. Old Anchor and Wildcard
+        # labels were generic stability subsidies, so they are retired instead of
+        # pretending to be distinct campaign roles. 2 counterweight, 3 declining,
+        # 5 background.
         set_variable = { name = tmp_story_candidate_role value = 5 }
+        set_variable = { name = tmp_story_declining_neighbor value = 0 }
+        every_neighboring_and_across_water_top_liege_realm_owner = {
+            limit = {
+                is_landed = yes
+                primary_title.tier >= tier_kingdom
+                NOT = { this = scope:ruler }
+                NOT = { is_allied_to = scope:ruler }
+                has_character_flag = rf_story_decline_target
+            }
+            scope:ruler = { set_variable = { name = tmp_story_declining_neighbor value = 1 } }
+        }
         if = {
             limit = { has_variable = riseandfall_story_role }
             set_variable = { name = tmp_story_previous_role value = var:riseandfall_story_role }
@@ -481,62 +687,34 @@ riseandfall_apply_dynamic_story_pressure_se = {
         }
         else_if = {
             limit = {
-                OR = {
-                    global_var:riseandfall_story_world_pressure >= 1
-                    var:tmp_story_realm_pct >= 8
-                    var:tmp_story_development_pct >= 8
-                    AND = {
-                        has_game_rule = riseandfall_dynamic_story_mode_forced
-                        OR = {
-                            primary_title.tier >= tier_hegemony
-                            var:tmp_story_realm_pct >= 8
-                            var:tmp_story_development_pct >= 8
-                            AND = {
-                                primary_title.tier >= tier_empire
-                                global_var:riseandfall_story_world_pressure >= 1
-                            }
-                        }
-                    }
-                }
-                OR = {
-                    primary_title.tier >= tier_empire
-                    var:tmp_story_realm_pct >= 8
-                    var:tmp_story_development_pct >= 8
-                }
-                has_variable = riseandfall_realm_stability_score
-                var:riseandfall_realm_stability_score >= var:tmp_story_decline_threshold
+                has_character_flag = rf_story_decline_target
             }
             set_variable = { name = tmp_story_candidate_role value = 3 }
         }
         else_if = {
             limit = {
                 has_variable = riseandfall_realm_stability_score
-                var:riseandfall_realm_stability_score < var:tmp_story_low_threshold
-            }
-            set_variable = { name = tmp_story_candidate_role value = 4 }
-        }
-        else_if = {
-            limit = {
-                OR = {
-                    primary_title.tier >= tier_empire
-                    var:tmp_story_realm_pct >= 5
-                    var:tmp_story_development_pct >= 5
-                }
+                var:tmp_story_declining_neighbor = 1
+                primary_title.tier >= tier_kingdom
+                NOT = { var:riseandfall_realm_stability_score >= 70 }
             }
             set_variable = { name = tmp_story_candidate_role value = 2 }
-        }
-        else_if = {
-            limit = {
-                has_variable = riseandfall_realm_stability_score
-                var:riseandfall_realm_stability_score < var:tmp_story_stable_threshold
-            }
-            set_variable = { name = tmp_story_candidate_role value = 1 }
         }
 
         if = {
             limit = {
                 has_variable = riseandfall_story_role
                 var:riseandfall_story_role_years < 5
+                OR = {
+                    AND = {
+                        var:riseandfall_story_role = 2
+                        var:tmp_story_declining_neighbor = 1
+                    }
+                    AND = {
+                        var:riseandfall_story_role = 3
+                        has_character_flag = rf_story_decline_target
+                    }
+                }
                 NOT = { has_variable = riseandfall_story_successor_grace }
                 NOT = {
                     AND = {
@@ -554,26 +732,51 @@ riseandfall_apply_dynamic_story_pressure_se = {
         }
 
         if = {
-            limit = { var:riseandfall_story_role = 1 }
-            if = { limit = { has_variable = riseandfall_realm_stability_score NOT = { var:riseandfall_realm_stability_score >= 35 } } set_variable = { name = riseandfall_story_protection value = 35 } }
-            else_if = { limit = { has_variable = riseandfall_realm_stability_score NOT = { var:riseandfall_realm_stability_score >= 55 } } set_variable = { name = riseandfall_story_protection value = 25 } }
-            else_if = { limit = { has_variable = riseandfall_realm_stability_score NOT = { var:riseandfall_realm_stability_score >= 70 } } set_variable = { name = riseandfall_story_protection value = 12 } }
-            else = { set_variable = { name = riseandfall_story_protection value = 4 } }
-        }
-        else_if = {
             limit = { var:riseandfall_story_role = 2 }
-            if = { limit = { has_variable = riseandfall_realm_stability_score NOT = { var:riseandfall_realm_stability_score >= 30 } } set_variable = { name = riseandfall_story_protection value = 28 } }
-            else_if = { limit = { has_variable = riseandfall_realm_stability_score NOT = { var:riseandfall_realm_stability_score >= 50 } } set_variable = { name = riseandfall_story_protection value = 18 } }
-            else_if = { limit = { has_variable = riseandfall_realm_stability_score NOT = { var:riseandfall_realm_stability_score >= 65 } } set_variable = { name = riseandfall_story_protection value = 8 } }
+            # A Counterweight receives enough support to remain relevant, but not
+            # enough to replace normal realm stability or crisis recovery.
+            if = { limit = { has_variable = riseandfall_realm_stability_score NOT = { var:riseandfall_realm_stability_score >= 35 } } set_variable = { name = riseandfall_story_protection value = 20 } }
+            else_if = { limit = { has_variable = riseandfall_realm_stability_score NOT = { var:riseandfall_realm_stability_score >= 55 } } set_variable = { name = riseandfall_story_protection value = 12 } }
+            else_if = { limit = { has_variable = riseandfall_realm_stability_score NOT = { var:riseandfall_realm_stability_score >= 70 } } set_variable = { name = riseandfall_story_protection value = 5 } }
             else = { set_variable = { name = riseandfall_story_protection value = 2 } }
         }
-        else_if = {
-            limit = {
-                var:riseandfall_story_role = 4
-                has_variable = riseandfall_realm_stability_score
-                NOT = { var:riseandfall_realm_stability_score >= 25 }
+
+        # Give the selected Declining Power a cause before applying pressure.
+        # 1 = noble challenge, 2 = identity revolt, 3 = succession fracture,
+        # 4 = imperial fragmentation. The low-stability selector consumes this
+        # only once the buildup reaches the crisis phases below.
+        if = {
+            limit = { has_character_flag = rf_story_decline_target }
+            set_variable = { name = riseandfall_story_arc value = 4 }
+            if = {
+                limit = {
+                    has_variable = riseandfall_rs_culture_faith_component
+                    NOT = { var:riseandfall_rs_culture_faith_component >= -14 }
+                }
+                set_variable = { name = riseandfall_story_arc value = 2 }
             }
-            set_variable = { name = riseandfall_story_protection value = 20 }
+            else_if = {
+                limit = {
+                    OR = {
+                        AND = {
+                            has_variable = riseandfall_rs_strong_vassal_component
+                            NOT = { var:riseandfall_rs_strong_vassal_component >= -9 }
+                        }
+                        AND = {
+                            has_variable = riseandfall_rs_vassals_component
+                            NOT = { var:riseandfall_rs_vassals_component >= -14 }
+                        }
+                    }
+                }
+                set_variable = { name = riseandfall_story_arc value = 1 }
+            }
+            else_if = {
+                limit = {
+                    has_variable = riseandfall_rs_succession_component
+                    NOT = { var:riseandfall_rs_succession_component >= -9 }
+                }
+                set_variable = { name = riseandfall_story_arc value = 3 }
+            }
         }
 
         if = {
@@ -699,47 +902,22 @@ riseandfall_apply_dynamic_story_pressure_se = {
         if = { limit = { var:tmp_story_development_pct >= 8 } change_variable = { name = tmp_story_blob_score add = 1 } }
         if = { limit = { var:tmp_story_development_pct >= 15 } change_variable = { name = tmp_story_blob_score add = 1 } }
         if = { limit = { global_var:riseandfall_story_world_pressure >= 2 } change_variable = { name = tmp_story_blob_score add = 1 } }
+        if = {
+            limit = {
+                var:tmp_story_below_unstable_target = 1
+                OR = {
+                    primary_title.tier >= tier_empire
+                    var:tmp_story_realm_pct >= 5
+                    var:tmp_story_development_pct >= 5
+                }
+            }
+            change_variable = { name = tmp_story_blob_score add = 1 }
+            if = { limit = { has_game_rule = riseandfall_dynamic_story_mode_forced } change_variable = { name = tmp_story_blob_score add = 1 } }
+        }
         if = { limit = { has_variable = riseandfall_realm_stability_score var:riseandfall_realm_stability_score >= 80 } change_variable = { name = tmp_story_blob_score add = 1 } }
         if = { limit = { has_variable = riseandfall_story_no_succession_years var:riseandfall_story_no_succession_years >= 100 } change_variable = { name = tmp_story_blob_score add = 1 } }
         if = { limit = { has_variable = riseandfall_story_no_succession_years var:riseandfall_story_no_succession_years >= 200 } change_variable = { name = tmp_story_blob_score add = 1 } }
 
-        # No-rival pressure models complacency. It scales from the strongest
-        # nearby rival: below 60% military strength is not enough to stop
-        # isolation, but even minor threats still reduce collapse gain later.
-        if = {
-            limit = {
-                var:tmp_story_blob_score >= 3
-                has_variable = riseandfall_realm_stability_score
-                var:riseandfall_realm_stability_score >= 70
-                var:riseandfall_story_strongest_rival_pct < 60
-                NOT = { has_variable = riseandfall_story_successor_grace }
-            }
-            if = { limit = { NOT = { has_variable = riseandfall_story_no_rival_years } } set_variable = { name = riseandfall_story_no_rival_years value = 0 } }
-            set_variable = { name = tmp_story_isolation_year_gain value = 1 }
-            if = { limit = { var:riseandfall_story_strongest_rival_pct < 40 } change_variable = { name = tmp_story_isolation_year_gain add = 1 } }
-            if = { limit = { var:riseandfall_story_strongest_rival_pct < 20 } change_variable = { name = tmp_story_isolation_year_gain add = 1 } }
-            change_variable = { name = riseandfall_story_no_rival_years add = var:tmp_story_isolation_year_gain }
-            if = { limit = { has_game_rule = riseandfall_dynamic_story_mode_forced } change_variable = { name = riseandfall_story_no_rival_years add = 1 } }
-            clamp_variable = { name = riseandfall_story_no_rival_years min = 0 max = 100 }
-        }
-        else_if = {
-            limit = { has_variable = riseandfall_story_no_rival_years }
-            change_variable = { name = riseandfall_story_no_rival_years add = -2 }
-            if = { limit = { NOT = { var:riseandfall_story_no_rival_years > 0 } } remove_variable = riseandfall_story_no_rival_years }
-        }
-        if = {
-            limit = {
-                has_variable = riseandfall_story_no_rival_years
-                var:riseandfall_story_no_rival_years >= 3
-            }
-            set_variable = { name = riseandfall_story_no_rival_pressure value = var:riseandfall_story_no_rival_years }
-            change_variable = { name = riseandfall_story_no_rival_pressure divide = 3 }
-            if = { limit = { var:tmp_story_blob_score >= 5 } change_variable = { name = riseandfall_story_no_rival_pressure add = 1 } }
-            if = { limit = { var:tmp_story_blob_score >= 8 } change_variable = { name = riseandfall_story_no_rival_pressure add = 2 } }
-            if = { limit = { global_var:riseandfall_story_world_pressure >= 2 } change_variable = { name = riseandfall_story_no_rival_pressure add = 1 } }
-            if = { limit = { has_game_rule = riseandfall_dynamic_story_mode_forced } change_variable = { name = riseandfall_story_no_rival_pressure add = 2 } }
-            clamp_variable = { name = riseandfall_story_no_rival_pressure min = 0 max = 20 }
-        }
         # Powerful non-allied vassals become a separate internal pressure source in old or oversized realms.
         if = {
             limit = {
@@ -820,10 +998,13 @@ riseandfall_apply_dynamic_story_pressure_se = {
             clamp_variable = { name = riseandfall_story_stagnation_pressure min = 0 max = 30 }
         }
 
-        # Collapse pressure is an internal 0..100 meter. Yearly gain is capped so even Forced needs several years to peak.
+        # Collapse pressure is an internal 0..100 meter. Accelerated preserves
+        # the existing aggressive curve; Long Campaign targets a 200-300 year
+        # path to full buildup while a realm remains a valid collapse target.
         if = {
             limit = {
                 var:riseandfall_story_role = 3
+                has_character_flag = rf_story_decline_target
                 NOT = { has_variable = riseandfall_story_successor_grace }
                 var:tmp_story_blob_score >= 2
             }
@@ -832,6 +1013,7 @@ riseandfall_apply_dynamic_story_pressure_se = {
             if = { limit = { var:tmp_story_blob_score >= 4 } change_variable = { name = tmp_story_collapse_gain add = 1 } }
             if = { limit = { var:tmp_story_blob_score >= 7 } change_variable = { name = tmp_story_collapse_gain add = 1 } }
             if = { limit = { global_var:riseandfall_story_world_pressure >= 2 } change_variable = { name = tmp_story_collapse_gain add = 1 } }
+            if = { limit = { var:tmp_story_below_unstable_target = 1 } change_variable = { name = tmp_story_collapse_gain add = 1 } }
             if = { limit = { primary_title.tier >= tier_hegemony } change_variable = { name = tmp_story_collapse_gain add = 2 } }
             if = { limit = { var:tmp_story_realm_pct >= 10 } change_variable = { name = tmp_story_collapse_gain add = 1 } }
             if = { limit = { var:tmp_story_realm_pct >= 20 } change_variable = { name = tmp_story_collapse_gain add = 2 } }
@@ -849,12 +1031,6 @@ riseandfall_apply_dynamic_story_pressure_se = {
                 change_variable = { name = tmp_story_scaled_vassal_pressure divide = 3 }
                 change_variable = { name = tmp_story_collapse_gain add = var:tmp_story_scaled_vassal_pressure }
             }
-            if = {
-                limit = { var:riseandfall_story_no_rival_pressure > 0 }
-                set_variable = { name = tmp_story_scaled_rival_pressure value = var:riseandfall_story_no_rival_pressure }
-                change_variable = { name = tmp_story_scaled_rival_pressure divide = 3 }
-                change_variable = { name = tmp_story_collapse_gain add = var:tmp_story_scaled_rival_pressure }
-            }
             if = { limit = { has_game_rule = riseandfall_dynamic_story_mode_forced } change_variable = { name = tmp_story_collapse_gain add = 2 } }
             if = {
                 limit = {
@@ -869,18 +1045,34 @@ riseandfall_apply_dynamic_story_pressure_se = {
                 change_variable = { name = tmp_story_external_rival_relief_negative multiply = -1 }
                 change_variable = { name = tmp_story_collapse_gain add = var:tmp_story_external_rival_relief_negative }
             }
-            # Dynamic is the lighter campaign-director mode: it lets collapse
-            # pressure build, but caps yearly acceleration so blobs usually need
-            # sustained isolation/complacency before visible instability appears.
-            # Forced is the hard-DM mode: it adds extra yearly gain and allows a
-            # higher cap so oversized realms decay much faster once they qualify.
+            # Long Campaign gains 0.35-0.5 per qualifying year, reaching full
+            # buildup in roughly 200-300 years. Accelerated keeps the former
+            # Forced curve for a much shorter campaign arc.
+            if = {
+                limit = {
+                    has_game_rule = riseandfall_dynamic_story_mode_dynamic
+                    var:riseandfall_story_strongest_rival_pct < 75
+                    var:tmp_story_collapse_gain > 0
+                    var:tmp_story_collapse_gain < 0.35
+                }
+                set_variable = { name = tmp_story_collapse_gain value = 0.35 }
+            }
+            else_if = {
+                limit = {
+                    has_game_rule = riseandfall_dynamic_story_mode_forced
+                    var:riseandfall_story_strongest_rival_pct < 75
+                    var:tmp_story_collapse_gain > 0
+                    var:tmp_story_collapse_gain < 2
+                }
+                set_variable = { name = tmp_story_collapse_gain value = 2 }
+            }
             if = {
                 limit = { has_game_rule = riseandfall_dynamic_story_mode_dynamic }
-                clamp_variable = { name = tmp_story_collapse_gain min = 0 max = 8 }
+                clamp_variable = { name = tmp_story_collapse_gain min = -0.25 max = 0.5 }
             }
             else_if = {
                 limit = { has_game_rule = riseandfall_dynamic_story_mode_forced }
-                clamp_variable = { name = tmp_story_collapse_gain min = 0 max = 14 }
+                clamp_variable = { name = tmp_story_collapse_gain min = -1 max = 3 }
             }
             # Store the net yearly meter change for the GUI. The director-note
             # rows show raw warning scores, but this value is what actually gets
@@ -894,16 +1086,15 @@ riseandfall_apply_dynamic_story_pressure_se = {
                 OR = {
                     var:riseandfall_story_stagnation_pressure > 0
                     var:riseandfall_story_complacent_vassal_pressure > 0
-                    var:riseandfall_story_no_rival_pressure > 0
                 }
                 OR = {
-                    var:riseandfall_story_strongest_rival_pct < 60
-                    var:riseandfall_story_no_rival_pressure > 0
+                    var:riseandfall_story_strongest_rival_pct < 75
                     AND = {
                         var:riseandfall_story_complacent_vassal_pressure > 4
                         var:riseandfall_story_stagnation_pressure > 4
                     }
                 }
+                has_character_flag = rf_story_decline_target
                 NOT = { has_variable = riseandfall_story_successor_grace }
                 var:tmp_story_blob_score >= 2
             }
@@ -921,12 +1112,6 @@ riseandfall_apply_dynamic_story_pressure_se = {
                 change_variable = { name = tmp_story_scaled_vassal_pressure divide = 4 }
                 change_variable = { name = tmp_story_collapse_gain add = var:tmp_story_scaled_vassal_pressure }
             }
-            if = {
-                limit = { var:riseandfall_story_no_rival_pressure > 0 }
-                set_variable = { name = tmp_story_scaled_rival_pressure value = var:riseandfall_story_no_rival_pressure }
-                change_variable = { name = tmp_story_scaled_rival_pressure divide = 4 }
-                change_variable = { name = tmp_story_collapse_gain add = var:tmp_story_scaled_rival_pressure }
-            }
             if = { limit = { has_game_rule = riseandfall_dynamic_story_mode_forced } change_variable = { name = tmp_story_collapse_gain add = 1 } }
             if = {
                 limit = { var:riseandfall_story_external_rival_relief > 0 }
@@ -934,23 +1119,42 @@ riseandfall_apply_dynamic_story_pressure_se = {
                 change_variable = { name = tmp_story_external_rival_relief_negative multiply = -1 }
                 change_variable = { name = tmp_story_collapse_gain add = var:tmp_story_external_rival_relief_negative }
             }
+            # Preserve the former Forced branch's indirect-pressure floor.
             if = {
                 limit = {
-                    var:riseandfall_story_strongest_rival_pct < 60
+                    has_game_rule = riseandfall_dynamic_story_mode_forced
+                    var:riseandfall_story_strongest_rival_pct < 75
                     var:tmp_story_collapse_gain < 1
                 }
                 set_variable = { name = tmp_story_collapse_gain value = 1 }
             }
-            # Same split as above, but for softer indirect pressure from old
-            # reigns, bored vassals, and lack of rivals. Forced mode lets these
-            # background tensions become collapse pressure more quickly.
+            # Same timeline split as above, but this indirect-pressure branch
+            # remains softer than a fully selected Declining Power arc.
+            if = {
+                limit = {
+                    has_game_rule = riseandfall_dynamic_story_mode_dynamic
+                    var:riseandfall_story_strongest_rival_pct < 75
+                    var:tmp_story_collapse_gain > 0
+                    var:tmp_story_collapse_gain < 0.35
+                }
+                set_variable = { name = tmp_story_collapse_gain value = 0.35 }
+            }
+            else_if = {
+                limit = {
+                    has_game_rule = riseandfall_dynamic_story_mode_forced
+                    var:riseandfall_story_strongest_rival_pct < 75
+                    var:tmp_story_collapse_gain > 0
+                    var:tmp_story_collapse_gain < 1.5
+                }
+                set_variable = { name = tmp_story_collapse_gain value = 1.5 }
+            }
             if = {
                 limit = { has_game_rule = riseandfall_dynamic_story_mode_dynamic }
-                clamp_variable = { name = tmp_story_collapse_gain min = 0 max = 5 }
+                clamp_variable = { name = tmp_story_collapse_gain min = -0.25 max = 0.5 }
             }
             else_if = {
                 limit = { has_game_rule = riseandfall_dynamic_story_mode_forced }
-                clamp_variable = { name = tmp_story_collapse_gain min = 0 max = 8 }
+                clamp_variable = { name = tmp_story_collapse_gain min = -1 max = 2.5 }
             }
             # Store the softer indirect-pressure gain separately so the GUI can
             # explain why raw warnings like vassal ambition do not add 1:1.
@@ -960,24 +1164,64 @@ riseandfall_apply_dynamic_story_pressure_se = {
         }
         else_if = {
             limit = { has_variable = riseandfall_story_collapse_pressure }
-            set_variable = { name = riseandfall_story_collapse_gain_last value = -3 }
-            change_variable = { name = riseandfall_story_collapse_pressure add = -3 }
+            # Collapse buildup is institutional complacency, not a battlefield
+            # morale value. Let it bleed off slowly so temporary army losses or
+            # short-lived threats do not immediately reset the director's story.
+            set_variable = { name = riseandfall_story_collapse_gain_last value = -1 }
+            change_variable = { name = riseandfall_story_collapse_pressure add = -1 }
             if = { limit = { NOT = { var:riseandfall_story_collapse_pressure > 0 } } remove_variable = riseandfall_story_collapse_pressure }
         }
 
-        # Convert internal collapse pressure into the visible stability penalty:
-        # Dynamic: pressure 100 => -20. This is a narrative nudge: enough to make
-        # a complacent blob vulnerable, but not usually enough to delete it alone.
-        # Forced: pressure 100 => -100. This is an overt collapse lever for games
-        # where the director should reliably break stagnant superstates.
+        # Convert internal collapse pressure into the visible stability penalty.
+        # Long Campaign maps its slow buildup one-for-one; Accelerated keeps the
+        # former Forced base penalty and one-for-one scaling.
         if = {
-            limit = { has_variable = riseandfall_story_collapse_pressure }
-            set_variable = { name = riseandfall_story_blob_pressure value = var:riseandfall_story_collapse_pressure }
-            change_variable = { name = riseandfall_story_blob_pressure divide = 5 }
-            change_variable = { name = riseandfall_story_blob_pressure multiply = -1 }
-            if = { limit = { has_game_rule = riseandfall_dynamic_story_mode_forced } change_variable = { name = riseandfall_story_blob_pressure multiply = 5 } }
+            limit = {
+                has_character_flag = rf_story_decline_target
+                has_variable = riseandfall_story_collapse_pressure
+            }
+            if = {
+                limit = { has_game_rule = riseandfall_dynamic_story_mode_dynamic }
+                set_variable = { name = riseandfall_story_blob_pressure_base value = 0 }
+                set_variable = { name = riseandfall_story_blob_pressure_scaled value = var:riseandfall_story_collapse_pressure }
+                change_variable = { name = riseandfall_story_blob_pressure_scaled multiply = -1 }
+                set_variable = { name = riseandfall_story_blob_pressure value = var:riseandfall_story_blob_pressure_base }
+                change_variable = { name = riseandfall_story_blob_pressure add = var:riseandfall_story_blob_pressure_scaled }
+                clamp_variable = { name = riseandfall_story_blob_pressure min = -100 max = 0 }
+            }
+            else_if = {
+                limit = { has_game_rule = riseandfall_dynamic_story_mode_forced }
+                set_variable = { name = riseandfall_story_blob_pressure_base value = -10 }
+                set_variable = { name = riseandfall_story_blob_pressure_scaled value = var:riseandfall_story_collapse_pressure }
+                change_variable = { name = riseandfall_story_blob_pressure_scaled multiply = -1 }
+                set_variable = { name = riseandfall_story_blob_pressure value = var:riseandfall_story_blob_pressure_base }
+                change_variable = { name = riseandfall_story_blob_pressure add = var:riseandfall_story_blob_pressure_scaled }
+                # Accelerated is an explicit campaign-collapse setting, so a fully
+                # built collapse arc may apply the complete -100 Story Mode pressure.
+                clamp_variable = { name = riseandfall_story_blob_pressure min = -100 max = 0 }
+            }
+            else = {
+                set_variable = { name = riseandfall_story_blob_pressure value = 0 }
+            }
             clamp_variable = { name = riseandfall_story_blob_pressure min = -100 max = 0 }
         }
+
+        # Expose a simple three-act structure for the event selector. Early
+        # buildup only changes stability; crisis and fracture phases steer the
+        # normal low-stability roll toward the arc's credible event type.
+        if = {
+            limit = {
+                has_character_flag = rf_story_decline_target
+                has_variable = riseandfall_story_collapse_pressure
+            }
+            set_variable = { name = riseandfall_story_arc_phase value = 1 }
+            if = { limit = { var:riseandfall_story_collapse_pressure >= 25 } set_variable = { name = riseandfall_story_arc_phase value = 2 } }
+            if = { limit = { var:riseandfall_story_collapse_pressure >= 55 } set_variable = { name = riseandfall_story_arc_phase value = 3 } }
+        }
+
+        # Write the final yearly meter to the title after every change. The title
+        # is the durable campaign anchor when the ruler dies or is overthrown.
+        riseandfall_store_story_collapse_on_primary_title_se = yes
 
         if = {
             limit = {
@@ -1024,6 +1268,7 @@ riseandfall_apply_dynamic_story_pressure_se = {
         remove_variable = tmp_story_development_pct
         remove_variable = tmp_story_stress_score
         remove_variable = tmp_story_blob_score
+        remove_variable = tmp_story_below_unstable_target
         remove_variable = tmp_story_ruler_strength
         if = { limit = { has_variable = tmp_story_candidate_rival_strength } remove_variable = tmp_story_candidate_rival_strength }
         if = { limit = { has_variable = tmp_story_candidate_rival_pct } remove_variable = tmp_story_candidate_rival_pct }
@@ -1032,12 +1277,11 @@ riseandfall_apply_dynamic_story_pressure_se = {
         remove_variable = tmp_story_decline_threshold
         remove_variable = tmp_story_candidate_role
         remove_variable = tmp_story_previous_role
-        if = { limit = { has_variable = tmp_story_isolation_year_gain } remove_variable = tmp_story_isolation_year_gain }
+        remove_variable = tmp_story_declining_neighbor
         if = { limit = { has_variable = tmp_story_external_rival_relief_negative } remove_variable = tmp_story_external_rival_relief_negative }
         if = { limit = { has_variable = tmp_story_collapse_gain } remove_variable = tmp_story_collapse_gain }
         if = { limit = { has_variable = tmp_story_scaled_stagnation } remove_variable = tmp_story_scaled_stagnation }
         if = { limit = { has_variable = tmp_story_scaled_vassal_pressure } remove_variable = tmp_story_scaled_vassal_pressure }
-        if = { limit = { has_variable = tmp_story_scaled_rival_pressure } remove_variable = tmp_story_scaled_rival_pressure }
         remove_variable = tmp_story_last_succession_year
     }
     else = {

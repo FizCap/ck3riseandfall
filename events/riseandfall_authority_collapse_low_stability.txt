@@ -278,19 +278,21 @@ authority_collapse.1003 = {
                 add_character_modifier = { modifier = riseandfall_authority_collapse_liege_debuff years = 5 }
                 if = {
                     limit = { treasury > 0 }
-                    set_variable = { name = authority_collapse_treasury_loss value = treasury }
-                    change_variable = { name = authority_collapse_treasury_loss multiply = 0.95 }
-                    round_variable = { name = authority_collapse_treasury_loss nearest = 1 }
-                    remove_treasury = { value = var:authority_collapse_treasury_loss }
-                    remove_variable = authority_collapse_treasury_loss
+                    # Calculate the percentage inline so tooltip rebuilding cannot read a removed temporary variable.
+                    remove_treasury = {
+                        value = {
+                            value = treasury
+                            multiply = 0.95
+                        }
+                    }
                 }
                 if = {
                     limit = { gold > 1 }
-                    set_variable = { name = authority_collapse_gold_loss value = gold }
-                    change_variable = { name = authority_collapse_gold_loss multiply = 0.95 }
-                    round_variable = { name = authority_collapse_gold_loss nearest = 1 }
-                    remove_short_term_gold = var:authority_collapse_gold_loss
-                    remove_variable = authority_collapse_gold_loss
+                    # Use the same direct calculation for personal gold to avoid an unset-variable tooltip error.
+                    remove_short_term_gold = {
+                        value = gold
+                        multiply = 0.95
+                    }
                 }
             }
         }

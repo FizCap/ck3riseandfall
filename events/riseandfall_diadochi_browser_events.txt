@@ -1,5 +1,23 @@
 ﻿namespace = riseandfall_diadochi_browser
 
+# The decision can remain available to successor-conflict rulers while truces,
+# alliances, or other declaration rules temporarily leave the list empty.
+riseandfall_diadochi_browser.0004 = {
+	type = character_event
+	title = riseandfall_diadochi_browser.0001.t
+	desc = riseandfall_diadochi_browser.0001.desc_none
+	theme = war
+
+	left_portrait = {
+		character = root
+		animation = personality_bold
+	}
+
+	option = { name = riseandfall_diadochi_browser.0001.b }
+
+	after = { remove_variable = rf_diadochi_browser_page }
+}
+
 riseandfall_diadochi_browser.0001 = {
 	type = character_event
 	title = riseandfall_diadochi_browser.0001.t
@@ -9,10 +27,6 @@ riseandfall_diadochi_browser.0001 = {
 	left_portrait = {
 		character = root
 		animation = personality_bold
-	}
-
-	immediate = {
-		riseandfall_diadochi_prepare_browser_targets_se = yes
 	}
 
 	# Target options are informational: they save the selected realm and open a
@@ -108,78 +122,36 @@ riseandfall_diadochi_browser.0001 = {
 		}
 	}
 
+	# Keep the main event within the fixed event-window height.
 	option = {
-		name = riseandfall_diadochi_browser.0001.a_8
-		trigger = { exists = scope:rf_diadochi_browser_target_ruler_8 }
-		custom_tooltip = riseandfall_diadochi_browser.0001.a_8.tt
+		name = riseandfall_diadochi_browser.0003.previous_page
+		trigger = { var:rf_diadochi_browser_page > 0 }
 		hidden_effect = {
-			scope:rf_diadochi_browser_target_ruler_8 = { save_scope_as = rf_diadochi_browser_selected_ruler }
-			scope:rf_diadochi_browser_target_title_8 = { save_scope_as = rf_diadochi_browser_selected_title }
-			set_variable = { name = rf_diadochi_browser_self_strength value = riseandfall_military_power_with_allies }
-			set_variable = { name = rf_diadochi_browser_target_strength value = scope:rf_diadochi_browser_target_ruler_8.riseandfall_military_power_with_allies }
-			trigger_event = { id = riseandfall_diadochi_browser.0002 delayed = yes }
+			change_variable = { name = rf_diadochi_browser_page add = -1 }
+			riseandfall_diadochi_prepare_browser_targets_se = yes
+			trigger_event = riseandfall_diadochi_browser.0001
 		}
 	}
 
 	option = {
-		name = riseandfall_diadochi_browser.0001.a_9
-		trigger = { exists = scope:rf_diadochi_browser_target_ruler_9 }
-		custom_tooltip = riseandfall_diadochi_browser.0001.a_9.tt
+		name = riseandfall_diadochi_browser.0001.next_page
+		trigger = { has_variable = rf_diadochi_browser_has_overflow }
+		# Paging is only navigation, so reopen the list immediately instead of
+		# waiting a game day as the detail-view transition does.
 		hidden_effect = {
-			scope:rf_diadochi_browser_target_ruler_9 = { save_scope_as = rf_diadochi_browser_selected_ruler }
-			scope:rf_diadochi_browser_target_title_9 = { save_scope_as = rf_diadochi_browser_selected_title }
-			set_variable = { name = rf_diadochi_browser_self_strength value = riseandfall_military_power_with_allies }
-			set_variable = { name = rf_diadochi_browser_target_strength value = scope:rf_diadochi_browser_target_ruler_9.riseandfall_military_power_with_allies }
-			trigger_event = { id = riseandfall_diadochi_browser.0002 delayed = yes }
-		}
-	}
-
-	option = {
-		name = riseandfall_diadochi_browser.0001.a_10
-		trigger = { exists = scope:rf_diadochi_browser_target_ruler_10 }
-		custom_tooltip = riseandfall_diadochi_browser.0001.a_10.tt
-		hidden_effect = {
-			scope:rf_diadochi_browser_target_ruler_10 = { save_scope_as = rf_diadochi_browser_selected_ruler }
-			scope:rf_diadochi_browser_target_title_10 = { save_scope_as = rf_diadochi_browser_selected_title }
-			set_variable = { name = rf_diadochi_browser_self_strength value = riseandfall_military_power_with_allies }
-			set_variable = { name = rf_diadochi_browser_target_strength value = scope:rf_diadochi_browser_target_ruler_10.riseandfall_military_power_with_allies }
-			trigger_event = { id = riseandfall_diadochi_browser.0002 delayed = yes }
-		}
-	}
-
-	option = {
-		name = riseandfall_diadochi_browser.0001.a_11
-		trigger = { exists = scope:rf_diadochi_browser_target_ruler_11 }
-		custom_tooltip = riseandfall_diadochi_browser.0001.a_11.tt
-		hidden_effect = {
-			scope:rf_diadochi_browser_target_ruler_11 = { save_scope_as = rf_diadochi_browser_selected_ruler }
-			scope:rf_diadochi_browser_target_title_11 = { save_scope_as = rf_diadochi_browser_selected_title }
-			set_variable = { name = rf_diadochi_browser_self_strength value = riseandfall_military_power_with_allies }
-			set_variable = { name = rf_diadochi_browser_target_strength value = scope:rf_diadochi_browser_target_ruler_11.riseandfall_military_power_with_allies }
-			trigger_event = { id = riseandfall_diadochi_browser.0002 delayed = yes }
-		}
-	}
-
-	option = {
-		name = riseandfall_diadochi_browser.0001.a_12
-		trigger = { exists = scope:rf_diadochi_browser_target_ruler_12 }
-		custom_tooltip = riseandfall_diadochi_browser.0001.a_12.tt
-		hidden_effect = {
-			scope:rf_diadochi_browser_target_ruler_12 = { save_scope_as = rf_diadochi_browser_selected_ruler }
-			scope:rf_diadochi_browser_target_title_12 = { save_scope_as = rf_diadochi_browser_selected_title }
-			set_variable = { name = rf_diadochi_browser_self_strength value = riseandfall_military_power_with_allies }
-			set_variable = { name = rf_diadochi_browser_target_strength value = scope:rf_diadochi_browser_target_ruler_12.riseandfall_military_power_with_allies }
-			trigger_event = { id = riseandfall_diadochi_browser.0002 delayed = yes }
+			change_variable = { name = rf_diadochi_browser_page add = 1 }
+			riseandfall_diadochi_prepare_browser_targets_se = yes
+			trigger_event = riseandfall_diadochi_browser.0001
 		}
 	}
 
 	option = {
 		name = riseandfall_diadochi_browser.0001.b
 		trigger = { always = yes }
-	}
-
-	after = {
-		riseandfall_diadochi_clear_browser_targets_se = yes
+		hidden_effect = {
+			riseandfall_diadochi_clear_browser_targets_se = yes
+			remove_variable = rf_diadochi_browser_page
+		}
 	}
 }
 
@@ -225,6 +197,11 @@ riseandfall_diadochi_browser.0002 = {
 
 	option = {
 		name = riseandfall_diadochi_browser.0002.b
+		# Closing from the detail page must also discard the list retained for paging.
+		hidden_effect = {
+			riseandfall_diadochi_clear_browser_targets_se = yes
+			remove_variable = rf_diadochi_browser_page
+		}
 	}
 
 	after = {

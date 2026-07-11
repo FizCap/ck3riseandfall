@@ -289,10 +289,12 @@ riseandfall_enable_dynamic_story_mode = {
         flag = riseandfall_dynamic_story_mode_off
     }
 
-    riseandfall_dynamic_story_mode_dynamic = {
+    # Keep the established setting IDs for save compatibility; the player-facing
+    # names describe the two collapse timelines.
+    riseandfall_dynamic_story_mode_forced = {
     }
 
-    riseandfall_dynamic_story_mode_forced = {
+    riseandfall_dynamic_story_mode_dynamic = {
     }
 }
 

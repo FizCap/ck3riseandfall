@@ -50,9 +50,14 @@ riseandfall_grant_duchies = {
     selection_tooltip = riseandfall_grant_duchies_tooltip
     decision_group_type = riseandfall
 
-    is_shown = { is_landed = yes NOT = { exists = global_var:riseandfall_hide_other_decisions } }
+    # Same-rank duchy grants create an independent ruler, so require a higher rank.
+    is_shown = {
+        is_landed = yes
+        primary_title.tier > tier_duchy
+        NOT = { exists = global_var:riseandfall_hide_other_decisions }
+    }
 
-    is_valid = { is_landed = yes }
+    is_valid = { is_landed = yes primary_title.tier > tier_duchy }
 
     # Manual grant: run the player duchy grant scripted effect immediately
     effect = { riseandfall_player_grant_duchies_se = yes }
@@ -70,9 +75,14 @@ riseandfall_grant_kingdoms = {
     selection_tooltip = riseandfall_grant_kingdoms_tooltip
     decision_group_type = riseandfall
 
-    is_shown = { is_landed = yes NOT = { exists = global_var:riseandfall_hide_other_decisions } }
+    # Same-rank kingdom grants create an independent ruler, so require a higher rank.
+    is_shown = {
+        is_landed = yes
+        primary_title.tier > tier_kingdom
+        NOT = { exists = global_var:riseandfall_hide_other_decisions }
+    }
 
-    is_valid = { is_landed = yes }
+    is_valid = { is_landed = yes primary_title.tier > tier_kingdom }
 
     # Manual grant: run the player kingdom grant scripted effect immediately
     effect = { riseandfall_player_grant_kingdoms_se = yes }
@@ -82,18 +92,49 @@ riseandfall_grant_kingdoms = {
 }
 
 
+riseandfall_grant_empires = {
+    picture = { reference = "gfx/interface/illustrations/decisions/decision_misc.dds" }
+    sort_order = 18
+    ai_check_interval = 0
+    desc = riseandfall_grant_empires_desc
+    selection_tooltip = riseandfall_grant_empires_tooltip
+    decision_group_type = riseandfall
+
+    # Empire grants are only safe for a hegemony-tier ruler; otherwise the
+    # empire recipient would become independent at the same rank.
+    is_shown = {
+        is_landed = yes
+        primary_title.tier > tier_empire
+        NOT = { exists = global_var:riseandfall_hide_other_decisions }
+    }
+
+    is_valid = { is_landed = yes primary_title.tier > tier_empire }
+
+    # Manual grant: run the player empire grant scripted effect immediately.
+    effect = { riseandfall_player_grant_empires_se = yes }
+
+    ai_potential = {}
+    ai_will_do = { base = 0 }
+}
+
+
 
 riseandfall_grant_counties = {
     picture = { reference = "gfx/interface/illustrations/decisions/decision_misc.dds" }
-    sort_order = 18
+    sort_order = 20
     ai_check_interval = 12
     desc = riseandfall_grant_counties_desc
     selection_tooltip = riseandfall_grant_counties_desc
     decision_group_type = riseandfall
 
-    is_shown = { is_landed = yes NOT = { exists = global_var:riseandfall_hide_other_decisions } }
+    # County rulers cannot safely create a subordinate county vassal.
+    is_shown = {
+        is_landed = yes
+        primary_title.tier >= tier_duchy
+        NOT = { exists = global_var:riseandfall_hide_other_decisions }
+    }
 
-    is_valid = { is_landed = yes }
+    is_valid = { is_landed = yes primary_title.tier >= tier_duchy }
 
     # Manual grant: run the counties grant scripted effect immediately
     effect = { riseandfall_grant_counties_se = yes }
@@ -109,7 +150,7 @@ riseandfall_grant_counties = {
 
 riseandfall_transfer_rightful_vassals = {
     picture = { reference = "gfx/interface/illustrations/decisions/decision_misc.dds" }
-    sort_order = 20
+    sort_order = 22
     ai_check_interval = 0
     desc = riseandfall_transfer_rightful_vassals_desc
     selection_tooltip = riseandfall_transfer_rightful_vassals_tooltip

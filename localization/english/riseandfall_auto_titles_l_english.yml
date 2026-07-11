@@ -10,17 +10,22 @@
  riseandfall_enable_auto_create_kingdoms_confirm:0 "Create Kingdoms"
 
 riseandfall_grant_duchies:0 "Grant Duchies"
-riseandfall_grant_duchies_desc:0 "Grant eligible duchy titles to de jure vassals now. You can enable or disable individual titles in the Title view menu."
-riseandfall_grant_duchies_tooltip:0 "Grant eligible duchies now. Use the Title view to toggle which titles are eligible."
+riseandfall_grant_duchies_desc:0 "Grant eligible duchy titles to de jure vassals now. Available only to rulers above duchy rank, so recipients remain vassals. You can enable or disable individual titles in the Title view menu."
+riseandfall_grant_duchies_tooltip:0 "Grant eligible duchies now. Requires a primary title above duchy rank. Use the Title view to toggle which titles are eligible."
 riseandfall_grant_duchies_confirm:0 "Grant Duchies"
 
 riseandfall_grant_kingdoms:0 "Grant Kingdoms"
-riseandfall_grant_kingdoms_desc:0 "Grant eligible kingdom titles to de jure vassals now. You can enable or disable individual titles in the Title view menu."
-riseandfall_grant_kingdoms_tooltip:0 "Grant eligible kingdoms now. Use the Title view to toggle which titles are eligible."
+riseandfall_grant_kingdoms_desc:0 "Grant eligible kingdom titles to de jure vassals now. Available only to rulers above kingdom rank, so recipients remain vassals. You can enable or disable individual titles in the Title view menu."
+riseandfall_grant_kingdoms_tooltip:0 "Grant eligible kingdoms now. Requires a primary title above kingdom rank. Use the Title view to toggle which titles are eligible."
 riseandfall_grant_kingdoms_confirm:0 "Grant Kingdoms"
+
+riseandfall_grant_empires:0 "Grant Empires"
+riseandfall_grant_empires_desc:0 "Grant eligible empire titles to qualified de jure vassals now. This decision is available only to hegemony-tier rulers, so granted empires remain vassal titles. You can enable or disable individual titles in the Title view menu."
+riseandfall_grant_empires_tooltip:0 "Grant eligible empires now. Your capital empire is retained, and each recipient is chosen from qualified de jure vassals."
+riseandfall_grant_empires_confirm:0 "Grant Empires"
  
 riseandfall_grant_counties:0 "Grant Surplus Counties"
-riseandfall_grant_counties_desc:0 "Create suitable vassals of your culture and faith and grant eligible surplus counties to them (excludes counties in the de jure kingdom containing your capital). You can enable or disable individual counties in the Title view menu."
+riseandfall_grant_counties_desc:0 "Create suitable vassals of your culture and faith and grant eligible surplus counties to them (excludes counties in the de jure kingdom containing your capital). Available only to duke-tier rulers or higher. You can enable or disable individual counties in the Title view menu."
 riseandfall_grant_counties_confirm:0 "Grant Surplus Counties"
 
 riseandfall_transfer_rightful_vassals:0 "Transfer Rightful Vassals"

@@ -1,6 +1,5 @@
 ﻿yearly_global_pulse = {
     on_actions = {
-        riseandfall_low_stability_roll
         riseandfall_check_puppet_regency
         riseandfall_warlord
         riseandfall_marry_male_puppet_master_target
@@ -32,6 +31,8 @@ riseandfall_puppet_master_quarterly_resync = {
 
 random_yearly_everyone_pulse = {
     on_actions = {
+        # Give each eligible realm its own incident day instead of clustering rolls on January 1.
+        riseandfall_low_stability_roll
         riseandfall_force_diadochi_wars
     }
 }
@@ -86,6 +87,7 @@ on_title_gain_inheritance = {
     on_actions = {
         riseandfall_resolve_puppet_succession_on_inheritance
         riseandfall_check_puppet_regency
+        riseandfall_inherit_warlord_trait_on_title_gain
         riseandfall_warlord_title_cleanup
         riseandfall_successor_primary_title_sync
     }
@@ -110,17 +112,15 @@ riseandfall_force_diadochi_wars = {
 riseandfall_low_stability_roll = {
     trigger = {
         has_game_rule = riseandfall_low_stability_events_enabled
+        is_landed = yes
+        is_independent_ruler = yes
+        # Low-stability incidents are reserved for duchy-tier realms and above.
+        primary_title.tier >= tier_duchy
     }
     effect = {
-        every_independent_ruler = {
-            limit = {
-                is_landed = yes
-                # Only rulers whose primary title is duchy or higher (duke+)
-                primary_title.tier >= tier_duchy
-            }
-            save_scope_as = ruler_low_stability
-            riseandfall_low_stability_roll_se = yes
-        }
+        # Root is the ruler supplied by random_yearly_everyone_pulse.
+        save_scope_as = ruler_low_stability
+        riseandfall_low_stability_roll_se = yes
     }
 }
 
@@ -264,6 +264,26 @@ riseandfall_warlord_title_cleanup = {
     }
     effect = {
         riseandfall_warlord_cleanup_se = yes
+    }
+}
+
+# Title inheritance runs after the successor has become landed.  Keep this
+# separate from Realm Stability inheritance: warlord succession must work even
+# when Realm Stability is disabled or the former holder has no stability score.
+riseandfall_inherit_warlord_trait_on_title_gain = {
+    trigger = {
+        has_game_rule = riseandfall_low_stability_events_enabled
+    }
+    effect = {
+        if = {
+            limit = {
+                exists = scope:previous_holder
+                scope:previous_holder = { has_trait = warlord }
+                is_landed = yes
+                is_independent_ruler = no
+            }
+            add_trait = warlord
+        }
     }
 }
 

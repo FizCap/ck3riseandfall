@@ -35,70 +35,12 @@ warlord.1002 = {
     left_portrait = liege
     right_portrait = root
 
-    immediate = {
-        save_opinion_value_as = { name = liege_opinion target = liege }
-    }
-
     option = {
         name = warlord.1002.a
         # Become a warlord: gain the 'warlord' trait and create a decision to raise faction/claim
         riseandfall_warlord_become_warlord = yes
-        ai_chance = {
-            base = 0
-            modifier = {
-                # only landed vassals consider rebellion
-                add = 100
-            }
-            modifier = {
-                # low crown authority makes vassals emboldened
-                add = 100
-                liege = {
-                    has_realm_law = crown_authority_0
-                }
-            }
-            modifier = {
-                add = { subtract = scope:liege_opinion }
-                always = yes
-            }
-            modifier = {
-                add = 40
-                has_trait = ambitious
-            }
-            modifier = {
-                add = 40
-                has_trait = vengeful
-            }
-            modifier = {
-                add = 20
-                has_trait = brave
-            }
-            modifier = {
-                add = 40
-                liege = {
-                    has_relation_rival = root
-                }
-            }
-            modifier = {
-                add = 40
-                has_trait = disloyal
-            }
-            modifier = {
-                add = 20
-                opinion = { target = liege value <= -20 }
-            }
-            modifier = {
-                add = -30
-                has_trait = loyal
-            }
-            modifier = {
-                add = -20
-                has_trait = craven
-            }
-            modifier = {
-                add = -20
-                has_trait = content
-            }
-        }
+        # Temporary behavior until the warlord AI is reworked: AI vassals always take the warlord path.
+        ai_chance = { base = 100 }
     }
 
     option = {
@@ -112,57 +54,7 @@ warlord.1002 = {
         }
         riseandfall_warlord_remain_loyal = yes
         # small positive opinion or stability bonus could be added by scripted effects
-        ai_chance = {
-            base = 0
-            modifier = {
-                add = scope:liege_opinion
-            }
-            modifier = {
-                # high crown authority encourages loyalty
-                add = 100
-                liege = {
-                    has_realm_law = crown_authority_2
-                }
-            }
-            modifier = {
-                add = 40
-                has_trait = loyal
-            }
-            modifier = {
-                add = 30
-                has_trait = patient
-            }
-            modifier = {
-                add = 30
-                has_trait = content
-            }
-            modifier = {
-                add = 20
-                has_trait = honest
-            }
-            modifier = {
-                add = 20
-                has_trait = just
-            }
-            modifier = {
-                add = -40
-                has_trait = vengeful
-            }
-            modifier = {
-                add = -30
-                has_trait = ambitious
-            }
-            modifier = {
-                add = -40
-                has_trait = disloyal
-            }
-            modifier = {
-                add = -40
-                liege = {
-                    has_relation_rival = root
-                }
-            }
-        }
+        ai_chance = { base = 0 }
     }
 }
 
@@ -176,110 +68,17 @@ warlord.1003 = {
     left_portrait = liege
     right_portrait = root
 
-    immediate = {
-        save_opinion_value_as = { name = liege_opinion target = liege }
-    }
-
     option = {
         name = warlord.1003.a
         # Continue as warlord: continually evaluate claims
         riseandfall_warlord_claim_liege_titles = yes
-        ai_chance = {
-            base = 0
-            modifier = {
-                add = 100
-            }
-            modifier = {
-                add = { subtract = scope:liege_opinion }
-                always = yes
-            }
-            modifier = {
-                add = 40
-                has_trait = ambitious
-            }
-            modifier = {
-                add = 40
-                has_trait = vengeful
-            }
-            modifier = {
-                add = 30
-                has_trait = brave
-            }
-            modifier = {
-                add = 40
-                has_trait = disloyal
-            }
-            modifier = {
-                add = 40
-                liege = {
-                    has_relation_rival = root
-                }
-            }
-            modifier = {
-                add = -30
-                has_trait = loyal
-            }
-            modifier = {
-                add = -20
-                has_trait = patient
-            }
-            modifier = {
-                add = -20
-                has_trait = content
-            }
-            modifier = {
-                add = -20
-                has_trait = honest
-            }
-        }
+        # Temporary behavior until the warlord AI is reworked: AI warlords always continue the path.
+        ai_chance = { base = 100 }
     }
     option = {
         name = warlord.1003.b
         # Abandon the warlord path: remove trait and claims
         riseandfall_warlord_abandon_path = yes
-        ai_chance = {
-            base = 0
-            modifier = {
-                add = scope:liege_opinion
-            }
-            modifier = {
-                add = 40
-                has_trait = loyal
-            }
-            modifier = {
-                add = 30
-                has_trait = patient
-            }
-            modifier = {
-                add = 30
-                has_trait = content
-            }
-            modifier = {
-                add = 20
-                has_trait = honest
-            }
-            modifier = {
-                add = 20
-                has_trait = just
-            }
-            modifier = {
-                add = -40
-                has_trait = vengeful
-            }
-            modifier = {
-                add = -30
-                has_trait = ambitious
-            }
-            modifier = {
-                add = -40
-                has_trait = disloyal
-            }
-            modifier = {
-                add = -40
-                liege = {
-                    has_relation_rival = root
-                }
-            }
-        }
+        ai_chance = { base = 0 }
     }
 }

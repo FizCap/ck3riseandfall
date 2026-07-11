@@ -37,4 +37,13 @@ riseandfall_split_defection_opinion = {
 	decaying = yes
 }
 
+# A separate revocation-reason source lets a victorious Coalition target
+# revoke a second title from each rebel after the vanilla revolt reason is used.
+riseandfall_coalition_second_revoke_reason = {
+	opinion = 0
+	years = 15
+	decaying = no
+	revoke_title_reason = yes
+}
+
 # Opinion penalty applied to each direct vassal when their liege suffers an authority collapse
