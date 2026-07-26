@@ -1,8 +1,7 @@
 ﻿# Rise and Fall - Warlord Scripted Effects
-# Contains scripted effects related to warlord events
 
-# Notify vassals to choose warlord path or remain loyal.
-# Only offer the choice to vassals who haven't already made it recently.
+# Send the first crisis invitation to direct vassals. Subsequent AI recruitment
+# is handled silently by the yearly crisis pulse so the player is not spammed.
 riseandfall_warlord_notify_vassals = {
     every_vassal = {
         limit = {
@@ -10,135 +9,197 @@ riseandfall_warlord_notify_vassals = {
             NOT = { has_trait = warlord }
             NOT = { has_character_flag = riseandfall_warlord_player_loyal }
             NOT = { has_variable = riseandfall_warlord_choice_made }
+            NOT = { has_variable = riseandfall_warlord_retired_cooldown }
         }
         trigger_event = { id = warlord.1002 }
     }
 }
 
-# Become a warlord: add trait, add liege opinion modifier, and give claims on liege's titles
+# Active warlords are regional challengers. They never receive claims on their liege.
 riseandfall_warlord_become_warlord = {
+    save_scope_as = rf_warlord_actor
     if = {
         limit = { is_landed = yes }
+        remove_character_flag = riseandfall_warlord_player_loyal
+        remove_variable = riseandfall_warlord_choice_made
         add_trait = warlord
     }
     if = {
         limit = { is_independent_ruler = no }
         liege = {
             add_opinion = {
-                target = root
+                target = scope:rf_warlord_actor
                 modifier = warlord_rebellion_opinion
             }
         }
     }
-    # Give claims on liege's highest titles immediately upon becoming a warlord
-    riseandfall_warlord_claim_liege_titles = yes
 }
 
-# Remain loyal: add loyalty opinion
 riseandfall_warlord_remain_loyal = {
+    save_scope_as = rf_warlord_actor
+    set_variable = { name = riseandfall_warlord_choice_made value = yes years = 5 }
     if = {
         limit = { is_independent_ruler = no }
         liege = {
             add_opinion = {
-                target = root
+                target = scope:rf_warlord_actor
                 modifier = warlord_loyalty_opinion
             }
         }
     }
 }
 
-# Claim liege's titles (for powerful vassals or when liege has no powerful vassals)
-riseandfall_warlord_claim_liege_titles = {
-    if = {
-        limit = { exists = liege }
-        # Save the vassal scope so it can be referenced from inside the liege scope
-        save_scope_as = rf_warlord_claimant
-        if = {
-            # Only grant claims if this vassal controls at least 20% of the liege's realm counties
-            limit = {
-                liege = {
-                    any_sub_realm_county = {
-                        percent >= 0.20
-                        OR = {
-                            holder = scope:rf_warlord_claimant
-                            holder = { target_is_liege_or_above = scope:rf_warlord_claimant }
-                        }
-                    }
-                }
-            }
-            liege = {
-                # Give claims only on the highest tier titles the liege holds
-                if = {
-                    limit = { any_held_title = { tier = tier_hegemony } }
-                    every_held_title = {
-                        limit = {
-                            tier = tier_hegemony
-                            NOT = { scope:rf_warlord_claimant = { has_claim_on = prev } }
-                        }
-                        scope:rf_warlord_claimant = { add_unpressed_claim = prev }
-                    }
-                }
-                else_if = {
-                    limit = { any_held_title = { tier = tier_empire } }
-                    every_held_title = {
-                        limit = {
-                            tier = tier_empire
-                            NOT = { scope:rf_warlord_claimant = { has_claim_on = prev } }
-                        }
-                        scope:rf_warlord_claimant = { add_unpressed_claim = prev }
-                    }
-                }
-                else_if = {
-                    limit = { any_held_title = { tier = tier_kingdom } }
-                    every_held_title = {
-                        limit = {
-                            tier = tier_kingdom
-                            NOT = { scope:rf_warlord_claimant = { has_claim_on = prev } }
-                        }
-                        scope:rf_warlord_claimant = { add_unpressed_claim = prev }
-                    }
-                }
-                else_if = {
-                    limit = { any_held_title = { tier = tier_duchy } }
-                    every_held_title = {
-                        limit = {
-                            tier = tier_duchy
-                            NOT = { scope:rf_warlord_claimant = { has_claim_on = prev } }
-                        }
-                        scope:rf_warlord_claimant = { add_unpressed_claim = prev }
-                    }
-                }
-                else = {
-                    every_held_title = {
-                        limit = {
-                            tier = tier_county
-                            NOT = { scope:rf_warlord_claimant = { has_claim_on = prev } }
-                        }
-                        scope:rf_warlord_claimant = { add_unpressed_claim = prev }
-                    }
-                }
-                        
-                add_opinion = {
-                    target = scope:rf_warlord_claimant
-                    modifier = warlord_rebellion_opinion
-                }
-            }
-        }
-    }
-}
-
-# Abandon warlord path: remove trait and claims
+# Retiring from the movement is personal and temporary. retiredwarlord is left
+# untouched because compatibility mods use it for independent former warlords.
 riseandfall_warlord_abandon_path = {
     remove_trait = warlord
-    # If this character had claims on their liege's titles, remove them
+    set_variable = { name = riseandfall_warlord_retired_cooldown value = yes years = 5 }
+}
+
+# Expected scope: independent liege. Count direct Warlord vassals and the
+# counties in their full subrealms, then store the percentage for this year's
+# recruitment and retirement evaluations.
+riseandfall_warlord_refresh_crisis_strength_se = {
+    set_variable = { name = rf_warlord_crisis_count value = 0 }
+    set_variable = { name = rf_warlord_crisis_territory value = 0 }
+    set_variable = { name = rf_warlord_crisis_realm_size value = realm_size }
     if = {
-        limit = { exists = liege }
-        save_scope_as = rf_warlord_claimant
-        liege = {
-            every_held_title = {
-                limit = { scope:rf_warlord_claimant = { has_claim_on = prev } }
-                scope:rf_warlord_claimant = { remove_claim = prev }
-            }
+        limit = { var:rf_warlord_crisis_realm_size < 1 }
+        set_variable = { name = rf_warlord_crisis_realm_size value = 1 }
+    }
+    save_scope_as = rf_warlord_crisis_liege
+    every_vassal = {
+        limit = {
+            is_landed = yes
+            has_trait = warlord
+        }
+        save_scope_as = rf_warlord_crisis_member
+        scope:rf_warlord_crisis_liege = {
+            change_variable = { name = rf_warlord_crisis_count add = 1 }
+            change_variable = { name = rf_warlord_crisis_territory add = scope:rf_warlord_crisis_member.sub_realm_size }
         }
     }
+    set_variable = { name = rf_warlord_crisis_territory_pct value = var:rf_warlord_crisis_territory }
+    change_variable = { name = rf_warlord_crisis_territory_pct multiply = 100 }
+    change_variable = { name = rf_warlord_crisis_territory_pct divide = var:rf_warlord_crisis_realm_size }
+    round_variable = { name = rf_warlord_crisis_territory_pct nearest = 1 }
+    clamp_variable = { name = rf_warlord_crisis_territory_pct min = 0 max = 100 }
+    remove_variable = rf_warlord_crisis_territory
+    remove_variable = rf_warlord_crisis_realm_size
+}
+
+# Expected scope: an AI direct vassal during its liege's active Warlord crisis.
+riseandfall_warlord_ai_join_crisis_se = {
+    # This effect is called from an on_action, where root is unset.
+    save_scope_as = rf_warlord_actor
+    set_variable = { name = rf_warlord_join_chance value = 5 }
+    liege = { save_scope_as = rf_warlord_crisis_liege }
+    liege = {
+        if = {
+            limit = { var:rf_warlord_crisis_territory_pct >= 35 }
+            scope:rf_warlord_actor = { change_variable = { name = rf_warlord_join_chance add = 55 } }
+        }
+        else_if = {
+            limit = { var:rf_warlord_crisis_territory_pct >= 20 }
+            scope:rf_warlord_actor = { change_variable = { name = rf_warlord_join_chance add = 30 } }
+        }
+        else_if = {
+            limit = { var:rf_warlord_crisis_territory_pct >= 10 }
+            scope:rf_warlord_actor = { change_variable = { name = rf_warlord_join_chance add = 10 } }
+        }
+        if = {
+            limit = { has_dread_level_towards = { target = scope:rf_warlord_actor level = 1 } }
+            scope:rf_warlord_actor = { change_variable = { name = rf_warlord_join_chance add = -15 } }
+        }
+        if = {
+            limit = { has_dread_level_towards = { target = scope:rf_warlord_actor level = 2 } }
+            scope:rf_warlord_actor = { change_variable = { name = rf_warlord_join_chance add = -20 } }
+        }
+    }
+    # A neighboring Warlord offers a practical local reason to join: protection
+    # and a potential alliance against the liege or other regional challengers.
+    if = {
+        limit = {
+            any_neighboring_realm_owner = {
+                NOT = { this = scope:rf_warlord_actor }
+                has_trait = warlord
+                target_is_liege_or_above = scope:rf_warlord_crisis_liege
+            }
+        }
+        change_variable = { name = rf_warlord_join_chance add = 20 }
+    }
+    if = { limit = { has_trait = ambitious } change_variable = { name = rf_warlord_join_chance add = 20 } }
+    if = { limit = { has_trait = disloyal } change_variable = { name = rf_warlord_join_chance add = 20 } }
+    if = { limit = { has_trait = vengeful } change_variable = { name = rf_warlord_join_chance add = 10 } }
+    if = { limit = { has_trait = content } change_variable = { name = rf_warlord_join_chance add = -25 } }
+    if = { limit = { has_trait = craven } change_variable = { name = rf_warlord_join_chance add = -20 } }
+    if = { limit = { ai_boldness > medium_positive_ai_value } change_variable = { name = rf_warlord_join_chance add = 15 } }
+    if = { limit = { ai_boldness < medium_negative_ai_value } change_variable = { name = rf_warlord_join_chance add = -15 } }
+    if = { limit = { opinion = { target = liege value <= -25 } } change_variable = { name = rf_warlord_join_chance add = 20 } }
+    if = { limit = { opinion = { target = liege value >= 25 } } change_variable = { name = rf_warlord_join_chance add = -20 } }
+    if = { limit = { military_power >= liege.military_power } change_variable = { name = rf_warlord_join_chance add = 10 } }
+    clamp_variable = { name = rf_warlord_join_chance min = 0 max = 95 }
+    random = {
+        chance = var:rf_warlord_join_chance
+        riseandfall_warlord_become_warlord = yes
+    }
+    remove_variable = rf_warlord_join_chance
+}
+
+# Expected scope: an AI Warlord direct vassal. A shrinking or weak movement
+# collapses quickly; a bloc controlling much of the realm can endure.
+riseandfall_warlord_ai_reconsider_se = {
+    # This effect is called from an on_action, where root is unset.
+    save_scope_as = rf_warlord_actor
+    set_variable = { name = rf_warlord_retire_chance value = 10 }
+    liege = {
+        if = {
+            limit = { var:rf_warlord_crisis_count <= 1 }
+            scope:rf_warlord_actor = { set_variable = { name = rf_warlord_retire_chance value = 70 } }
+        }
+        else_if = {
+            limit = { var:rf_warlord_crisis_count = 2 }
+            scope:rf_warlord_actor = { set_variable = { name = rf_warlord_retire_chance value = 45 } }
+        }
+        else_if = {
+            limit = { var:rf_warlord_crisis_count = 3 }
+            scope:rf_warlord_actor = { set_variable = { name = rf_warlord_retire_chance value = 25 } }
+        }
+        if = {
+            limit = { var:rf_warlord_crisis_territory_pct < 10 }
+            scope:rf_warlord_actor = { change_variable = { name = rf_warlord_retire_chance add = 20 } }
+        }
+        else_if = {
+            limit = { var:rf_warlord_crisis_territory_pct >= 35 }
+            scope:rf_warlord_actor = { change_variable = { name = rf_warlord_retire_chance add = -55 } }
+        }
+        else_if = {
+            limit = { var:rf_warlord_crisis_territory_pct >= 20 }
+            scope:rf_warlord_actor = { change_variable = { name = rf_warlord_retire_chance add = -30 } }
+        }
+        if = {
+            limit = { has_dread_level_towards = { target = scope:rf_warlord_actor level = 1 } }
+            scope:rf_warlord_actor = { change_variable = { name = rf_warlord_retire_chance add = 15 } }
+        }
+        if = {
+            limit = { has_dread_level_towards = { target = scope:rf_warlord_actor level = 2 } }
+            scope:rf_warlord_actor = { change_variable = { name = rf_warlord_retire_chance add = 20 } }
+        }
+    }
+    if = { limit = { has_trait = ambitious } change_variable = { name = rf_warlord_retire_chance add = -20 } }
+    if = { limit = { has_trait = disloyal } change_variable = { name = rf_warlord_retire_chance add = -15 } }
+    if = { limit = { has_trait = content } change_variable = { name = rf_warlord_retire_chance add = 25 } }
+    if = { limit = { has_trait = craven } change_variable = { name = rf_warlord_retire_chance add = 20 } }
+    if = { limit = { ai_boldness > medium_positive_ai_value } change_variable = { name = rf_warlord_retire_chance add = -15 } }
+    if = { limit = { ai_boldness < medium_negative_ai_value } change_variable = { name = rf_warlord_retire_chance add = 15 } }
+    if = { limit = { opinion = { target = liege value <= -25 } } change_variable = { name = rf_warlord_retire_chance add = -20 } }
+    if = { limit = { opinion = { target = liege value >= 25 } } change_variable = { name = rf_warlord_retire_chance add = 20 } }
+    if = { limit = { military_power >= liege.military_power } change_variable = { name = rf_warlord_retire_chance add = -10 } }
+    if = { limit = { military_power < liege.military_power } change_variable = { name = rf_warlord_retire_chance add = 10 } }
+    clamp_variable = { name = rf_warlord_retire_chance min = 0 max = 100 }
+    random = {
+        chance = var:rf_warlord_retire_chance
+        riseandfall_warlord_abandon_path = yes
+    }
+    remove_variable = rf_warlord_retire_chance
 }

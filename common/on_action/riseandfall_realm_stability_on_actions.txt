@@ -112,7 +112,6 @@ riseandfall_on_death_stability_inheritance = {
                     }
                     riseandfall_inherit_stability_score_se = yes
                 }
-                riseandfall_inherit_warlord_trait_se = yes
                 riseandfall_mark_story_succession_shock_se = yes
                 riseandfall_inherit_story_collapse_buildup_se = yes
                 riseandfall_mark_story_succession_year_se = yes
@@ -135,7 +134,6 @@ riseandfall_on_death_stability_inheritance = {
                     }
                     riseandfall_inherit_stability_score_se = yes
                 }
-                riseandfall_inherit_warlord_trait_se = yes
                 riseandfall_mark_story_succession_shock_se = yes
                 riseandfall_inherit_story_collapse_buildup_se = yes
                 riseandfall_mark_story_succession_year_se = yes
@@ -172,7 +170,6 @@ riseandfall_on_title_gain_inheritance = {
             # Inherit from the previous holder of this specific title
             scope:previous_holder = { save_scope_as = predecessor }
             riseandfall_inherit_stability_score_se = yes
-            riseandfall_inherit_warlord_trait_se = yes
             riseandfall_mark_story_succession_shock_se = yes
             riseandfall_inherit_story_collapse_buildup_se = yes
             riseandfall_mark_story_succession_year_se = yes
@@ -205,7 +202,6 @@ riseandfall_on_title_gain_inheritance = {
                 riseandfall_inherit_realm_history_se = yes
                 riseandfall_inherit_story_collapse_buildup_se = yes
             }
-            riseandfall_inherit_warlord_trait_se = yes
             riseandfall_mark_story_succession_shock_se = yes
             riseandfall_mark_story_succession_year_se = yes
             riseandfall_calculate_realm_stability_se = yes

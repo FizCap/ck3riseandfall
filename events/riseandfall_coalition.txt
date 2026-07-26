@@ -1,0 +1,50 @@
+﻿namespace = coalition
+
+# Main independent-Coalition feedback. Low-stability failures retain their
+# dedicated notices and reroll behavior in the low-stability event file.
+coalition.1108 = {
+    type = character_event
+    title = coalition.1108.t
+    desc = coalition.1108.d
+    theme = war
+
+    option = {
+        name = coalition.1108.a
+        ai_chance = { base = 100 }
+    }
+}
+
+# The interaction initiator reviews the actual committed roster before war.
+coalition.1109 = {
+    type = character_event
+    title = coalition.1109.t
+    desc = coalition.1109.d
+    theme = war
+
+    trigger = {
+        has_variable = rf_coalition_target
+        var:rf_coalition_target = {
+            has_character_flag = rf_coalition_interaction_formation
+            has_variable = rf_coalition_leader_power
+            has_variable = rf_coalition_target_power
+        }
+    }
+
+    immediate = { var:rf_coalition_target = { save_scope_as = coalition_target } }
+    left_portrait = { character = root animation = personality_bold }
+    right_portrait = { character = scope:coalition_target animation = stress }
+
+    option = {
+        name = coalition.1109.a
+        scope:coalition_target = {
+            add_character_flag = rf_coalition_declaration_confirmed
+            riseandfall_coalition_finalize_assembly_se = yes
+        }
+    }
+    option = {
+        name = coalition.1109.b
+        scope:coalition_target = {
+            riseandfall_coalition_cancel_interaction_assembly_se = yes
+        }
+    }
+}

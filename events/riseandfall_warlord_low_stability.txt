@@ -19,8 +19,10 @@ warlord.1001 = {
         }
         hidden_effect = {
             riseandfall_warlord_notify_vassals = yes
-            # Set low stability cooldown on the liege when this event fires
-            add_character_flag = { flag = rf_low_stability_cooldown years = 5 }
+            # The crisis is the only window in which new vassals can join.
+            add_character_flag = { flag = rf_warlord_crisis_active years = 5 }
+            # Set the title-based cooldown so it survives succession.
+            riseandfall_set_low_stability_cooldown_se = yes
         }
     }
 }
@@ -37,28 +39,36 @@ warlord.1002 = {
 
     option = {
         name = warlord.1002.a
-        # Become a warlord: gain the 'warlord' trait and create a decision to raise faction/claim
+        # Become a regional Warlord and join the internal power struggle.
         riseandfall_warlord_become_warlord = yes
-        # Temporary behavior until the warlord AI is reworked: AI vassals always take the warlord path.
-        ai_chance = { base = 100 }
+        ai_chance = {
+            # A Warlord crisis is a broad uprising; most AI vassals join unless
+            # their personality or loyalty gives them a clear reason not to.
+            base = 120
+            modifier = { has_trait = ambitious add = 25 }
+            modifier = { has_trait = disloyal add = 25 }
+            modifier = { has_trait = content add = -25 }
+            modifier = { has_trait = craven add = -20 }
+            modifier = { opinion = { target = liege value <= -25 } add = 25 }
+            modifier = { opinion = { target = liege value >= 25 } add = -20 }
+        }
     }
 
     option = {
         name = warlord.1002.b
-        # Remain loyal: record the choice so this event is not offered again soon
-        set_variable = { name = riseandfall_warlord_choice_made value = yes years = 3 }
+        # Remain loyal: prevent repeat offers during this and the next crisis.
         # For the player, also set the loyal flag so the path manager decision becomes available
         if = {
             limit = { is_ai = no }
             add_character_flag = riseandfall_warlord_player_loyal
         }
         riseandfall_warlord_remain_loyal = yes
-        # small positive opinion or stability bonus could be added by scripted effects
-        ai_chance = { base = 0 }
+        ai_chance = { base = 20 }
     }
 }
 
-# Warlord event: triggered for rulers with the warlord trait
+# Legacy player-facing Warlord choice. AI continuation and retirement are
+# calculated directly on the yearly pulse so percentage chances are exact.
 warlord.1003 = {
     type = character_event
     title = warlord.1003.t
@@ -70,14 +80,12 @@ warlord.1003 = {
 
     option = {
         name = warlord.1003.a
-        # Continue as warlord: continually evaluate claims
-        riseandfall_warlord_claim_liege_titles = yes
-        # Temporary behavior until the warlord AI is reworked: AI warlords always continue the path.
+        # Continue as a regional Warlord.
         ai_chance = { base = 100 }
     }
     option = {
         name = warlord.1003.b
-        # Abandon the warlord path: remove trait and claims
+        # Abandon the Warlord path.
         riseandfall_warlord_abandon_path = yes
         ai_chance = { base = 0 }
     }

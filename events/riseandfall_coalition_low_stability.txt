@@ -24,7 +24,7 @@ coalition.1001 = {
 
     option = {
         name = coalition.1001.a
-        riseandfall_coalition_prepare_invitations_se = yes
+        riseandfall_low_stability_coalition_prepare_se = yes
         ai_chance = { base = 100 }
     }
 }
@@ -252,12 +252,12 @@ coalition.1101 = {
         has_character_flag = rf_coalition_formation_active
         has_variable = rf_coalition_participant_count
     }
-    on_trigger_fail = { riseandfall_coalition_clear_assembly_state_se = yes }
+        on_trigger_fail = { riseandfall_low_stability_coalition_fail_and_reroll_se = yes }
 
     option = {
         name = coalition.failure.a
         custom_tooltip = coalition.failure.a.tt
-        hidden_effect = { riseandfall_coalition_fail_and_reroll_se = yes }
+        hidden_effect = { riseandfall_low_stability_coalition_fail_and_reroll_se = yes }
         ai_chance = { base = 100 }
     }
 }
@@ -281,7 +281,7 @@ coalition.1102 = {
     option = {
         name = coalition.failure.a
         custom_tooltip = coalition.failure.a.tt
-        hidden_effect = { riseandfall_coalition_fail_and_reroll_se = yes }
+        hidden_effect = { riseandfall_low_stability_coalition_fail_and_reroll_se = yes }
         ai_chance = { base = 100 }
     }
 }
@@ -303,7 +303,7 @@ coalition.1103 = {
     option = {
         name = coalition.failure.a
         custom_tooltip = coalition.failure.a.tt
-        hidden_effect = { riseandfall_coalition_fail_and_reroll_se = yes }
+        hidden_effect = { riseandfall_low_stability_coalition_fail_and_reroll_se = yes }
         ai_chance = { base = 100 }
     }
 }
@@ -325,7 +325,7 @@ coalition.1104 = {
     option = {
         name = coalition.failure.a
         custom_tooltip = coalition.failure.a.tt
-        hidden_effect = { riseandfall_coalition_fail_and_reroll_se = yes }
+        hidden_effect = { riseandfall_low_stability_coalition_fail_and_reroll_se = yes }
         ai_chance = { base = 100 }
     }
 }
@@ -347,7 +347,7 @@ coalition.1105 = {
     option = {
         name = coalition.failure.a
         custom_tooltip = coalition.failure.a.tt
-        hidden_effect = { riseandfall_coalition_fail_and_reroll_se = yes }
+        hidden_effect = { riseandfall_low_stability_coalition_fail_and_reroll_se = yes }
         ai_chance = { base = 100 }
     }
 }
@@ -369,7 +369,7 @@ coalition.1106 = {
     option = {
         name = coalition.failure.a
         custom_tooltip = coalition.failure.a.tt
-        hidden_effect = { riseandfall_coalition_fail_and_reroll_se = yes }
+        hidden_effect = { riseandfall_low_stability_coalition_fail_and_reroll_se = yes }
         ai_chance = { base = 100 }
     }
 }
@@ -391,7 +391,104 @@ coalition.1107 = {
     option = {
         name = coalition.failure.a
         custom_tooltip = coalition.failure.a.tt
-        hidden_effect = { riseandfall_coalition_fail_and_reroll_se = yes }
+        hidden_effect = { riseandfall_low_stability_coalition_fail_and_reroll_se = yes }
+        ai_chance = { base = 100 }
+    }
+}
+
+# Player attackers are reached by the same randomized queue as AI voters.
+coalition.1200 = {
+    type = character_event
+    hidden = yes
+    trigger = { has_variable = rf_coalition_vote_remaining }
+    immediate = {
+        if = {
+            limit = { has_character_flag = rf_coalition_vote_has_voters }
+            riseandfall_coalition_continue_victory_vote_se = yes
+        }
+        else = {
+            # An impossible zero-attacker victory cannot impose an unvoted
+            # punishment; only clear its temporary state.
+            riseandfall_coalition_clear_victory_vote_state_se = yes
+        }
+    }
+}
+
+coalition.1201 = {
+    type = character_event
+    title = coalition.1201.t
+    desc = coalition.1201.d
+    theme = war
+    trigger = {
+        has_character_flag = rf_coalition_vote_selecting
+        has_variable = rf_coalition_vote_target
+    }
+    immediate = { var:rf_coalition_vote_target = { save_scope_as = coalition_vote_target } }
+    left_portrait = { character = root animation = personality_bold }
+    right_portrait = { character = scope:coalition_vote_target animation = stress }
+    option = {
+        name = coalition.1201.a
+        custom_tooltip = coalition.1201.a.tt
+        riseandfall_coalition_cast_light_victory_vote_se = yes
+        ai_chance = { base = 25 }
+    }
+    option = {
+        name = coalition.1201.b
+        custom_tooltip = coalition.1201.b.tt
+        riseandfall_coalition_cast_medium_victory_vote_se = yes
+        ai_chance = { base = 55 }
+    }
+    option = {
+        name = coalition.1201.c
+        custom_tooltip = coalition.1201.c.tt
+        riseandfall_coalition_cast_heavy_victory_vote_se = yes
+        ai_chance = { base = 35 }
+    }
+}
+
+# The Coalition leader sees only punishments tied for first place.
+coalition.1202 = {
+    type = character_event
+    title = coalition.1202.t
+    desc = coalition.1202.d
+    theme = war
+    trigger = {
+        has_character_flag = rf_coalition_vote_tiebreak_pending
+        has_variable = rf_coalition_vote_target
+    }
+    immediate = { var:rf_coalition_vote_target = { save_scope_as = coalition_vote_target } }
+    left_portrait = { character = root animation = personality_bold }
+    right_portrait = { character = scope:coalition_vote_target animation = stress }
+    option = {
+        name = coalition.1202.a
+        trigger = { scope:coalition_vote_target = { has_character_flag = rf_coalition_vote_tie_light } }
+        riseandfall_coalition_choose_light_tiebreak_se = yes
+        ai_chance = { base = 25 modifier = { add = 35 has_trait = compassionate } }
+    }
+    option = {
+        name = coalition.1202.b
+        trigger = { scope:coalition_vote_target = { has_character_flag = rf_coalition_vote_tie_medium } }
+        riseandfall_coalition_choose_medium_tiebreak_se = yes
+        ai_chance = { base = 55 modifier = { add = 25 has_trait = just } }
+    }
+    option = {
+        name = coalition.1202.c
+        trigger = { scope:coalition_vote_target = { has_character_flag = rf_coalition_vote_tie_heavy } }
+        riseandfall_coalition_choose_heavy_tiebreak_se = yes
+        ai_chance = { base = 35 modifier = { add = 55 has_trait = ambitious } }
+    }
+}
+
+# Every human Coalition voter and the defeated human ruler receives this result.
+coalition.1203 = {
+    type = character_event
+    title = coalition.1203.t
+    desc = coalition.1203.d
+    theme = war
+    trigger = { has_variable = rf_coalition_vote_result_target }
+    option = {
+        name = coalition.1203.a
+        riseandfall_coalition_clear_victory_vote_result_se = yes
         ai_chance = { base = 100 }
     }
 }

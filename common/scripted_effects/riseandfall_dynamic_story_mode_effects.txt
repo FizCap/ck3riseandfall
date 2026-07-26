@@ -361,7 +361,7 @@ riseandfall_apply_successor_realm_grace_se = {
         set_variable = { name = riseandfall_story_successor_grace value = 45 }
         set_variable = { name = riseandfall_story_successor_grace_years value = 12 }
         set_variable = { name = riseandfall_story_successor_grace_decay value = 4 }
-        add_character_flag = { flag = rf_low_stability_cooldown years = 10 }
+        riseandfall_set_low_stability_cooldown_se = yes
         add_character_flag = { flag = rf_story_successor_grace days = 4380 }
         if = {
             limit = {

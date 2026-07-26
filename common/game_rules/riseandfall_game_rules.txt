@@ -298,6 +298,18 @@ riseandfall_enable_dynamic_story_mode = {
     }
 }
 
+# Experimental character-interaction Coalition route. The separate
+# low-stability Coalition incident remains governed by its own rule.
+riseandfall_independent_coalitions = {
+    categories = { riseandfall }
+    default = riseandfall_independent_coalitions_enabled
+
+    riseandfall_independent_coalitions_enabled = { }
+    riseandfall_independent_coalitions_disabled = {
+        flag = riseandfall_independent_coalitions_disabled
+    }
+}
+
 riseandfall_enable_interaction_stability = {
 
     categories = {

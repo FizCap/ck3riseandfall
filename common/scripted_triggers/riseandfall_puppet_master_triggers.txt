@@ -78,12 +78,18 @@ riseandfall_no_existing_hook = {
 
 # No low stability cooldown on actor
 riseandfall_no_low_stability_cooldown = {
-	# Actual condition: recipient has no low-stability cooldown flag.
-	scope:recipient = { NOT = { has_character_flag = rf_low_stability_cooldown } }
+	# Actual condition: recipient's primary title has no low-stability cooldown.
+	scope:recipient = {
+		exists = primary_title
+		primary_title = { NOT = { has_variable = rf_low_stability_cooldown } }
+	}
 	# Friendly failure text for low stability cooldown checks
 	custom_tooltip = {
 		text = riseandfall_no_low_stability_cooldown
-		scope:recipient = { NOT = { has_character_flag = rf_low_stability_cooldown } }
+		scope:recipient = {
+			exists = primary_title
+			primary_title = { NOT = { has_variable = rf_low_stability_cooldown } }
+		}
 	}
 }
 

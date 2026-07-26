@@ -1,0 +1,168 @@
+﻿# Keep Independent Coalition eligibility current even when Low Stability Events
+# are disabled. The interaction reads cached county totals in its tooltip.
+
+yearly_global_pulse = {
+    on_actions = {
+        riseandfall_refresh_independent_coalition_periphery
+    }
+}
+
+on_game_start_after_lobby = {
+    on_actions = {
+        riseandfall_initialize_independent_coalition_threat
+    }
+}
+
+on_title_gain = {
+    on_actions = {
+        riseandfall_refresh_independent_coalition_periphery_on_title_gain
+    }
+}
+
+on_title_gain_inheritance = {
+    on_actions = {
+        riseandfall_inherit_independent_coalition_threat
+    }
+}
+
+on_war_won_attacker = {
+    on_actions = {
+        riseandfall_record_coalition_vassalization_conquest
+    }
+}
+
+riseandfall_refresh_independent_coalition_periphery = {
+    trigger = { has_game_rule = riseandfall_independent_coalitions_enabled }
+    effect = {
+        every_ruler = {
+            limit = {
+                is_alive = yes
+                is_landed = yes
+                is_independent_ruler = yes
+                exists = primary_title
+            }
+            riseandfall_coalition_calculate_periphery_se = yes
+            riseandfall_coalition_update_threat_se = { APPLY_YEARLY = yes }
+        }
+    }
+}
+
+# New campaigns begin at zero threat. Subsequent yearly pulses are what make
+# expansion and prolonged hegemony accumulate into a Coalition crisis.
+riseandfall_initialize_independent_coalition_threat = {
+    trigger = { has_game_rule = riseandfall_independent_coalitions_enabled }
+    effect = {
+        every_ruler = {
+            limit = {
+                is_alive = yes
+                is_landed = yes
+                is_independent_ruler = yes
+                exists = primary_title
+            }
+            riseandfall_coalition_calculate_periphery_se = yes
+            riseandfall_coalition_update_threat_se = { APPLY_YEARLY = no }
+        }
+    }
+}
+
+# Coalition Threat represents fear of the expanding realm, not only its former
+# ruler. Carry the meter and any open crisis window with the inherited primary
+# crown; ordinary secondary-title inheritances must not overwrite another realm.
+riseandfall_inherit_independent_coalition_threat = {
+    trigger = {
+        has_game_rule = riseandfall_independent_coalitions_enabled
+        is_alive = yes
+        is_landed = yes
+        is_independent_ruler = yes
+        exists = scope:title
+        has_primary_title = scope:title
+        exists = scope:previous_holder
+        scope:previous_holder = { has_variable = rf_coalition_threat }
+    }
+    effect = {
+        set_variable = { name = rf_coalition_threat value = scope:previous_holder.var:rf_coalition_threat }
+        if = {
+            limit = { scope:previous_holder = { has_variable = rf_coalition_threat_window_years } }
+            set_variable = { name = rf_coalition_threat_window_years value = scope:previous_holder.var:rf_coalition_threat_window_years }
+        }
+        else = { remove_variable = rf_coalition_threat_window_years }
+    }
+}
+
+# Forced Vassalization and Subjugation use swear_fealty title history rather
+# than conquest history. Mark only offensive war acquisitions so peaceful
+# offers of vassalage do not create Coalition Threat.
+riseandfall_record_coalition_vassalization_conquest = {
+    trigger = {
+        has_game_rule = riseandfall_independent_coalitions_enabled
+        exists = scope:war
+        scope:war = {
+            OR = {
+                using_cb = vassalization_cb
+                using_cb = tribal_subjugation_cb
+            }
+        }
+        exists = scope:attacker
+        exists = scope:defender
+    }
+    effect = {
+        scope:attacker = { save_scope_as = rf_vassalization_conqueror }
+        scope:defender = { save_scope_as = rf_vassalization_defender }
+        if = {
+            limit = {
+                exists = scope:rf_vassalization_conqueror
+                exists = scope:rf_vassalization_defender
+                scope:rf_vassalization_defender = { is_landed = yes }
+            }
+            # The victory on_action may run immediately around the title-change
+            # resolution. The CB and attacker victory establish that this entire
+            # prewar defender subrealm is the territory being forcibly absorbed.
+            scope:rf_vassalization_defender = {
+                every_realm_county = {
+                    set_variable = {
+                        name = rf_coalition_vassalization_conquest
+                        value = 1
+                        years = 15
+                    }
+                }
+            }
+            scope:rf_vassalization_conqueror = {
+                if = {
+                    limit = {
+                        is_alive = yes
+                        is_landed = yes
+                        is_independent_ruler = yes
+                        exists = primary_title
+                    }
+                    riseandfall_coalition_calculate_periphery_se = yes
+                    riseandfall_coalition_update_threat_se = { APPLY_YEARLY = no }
+                }
+            }
+        }
+        clear_saved_scope = rf_vassalization_conqueror
+        clear_saved_scope = rf_vassalization_defender
+    }
+}
+
+# A conquest may change a large realm's percentage long before the next yearly
+# pulse. Refresh the new holder's top liege as soon as territory changes hands.
+riseandfall_refresh_independent_coalition_periphery_on_title_gain = {
+    trigger = {
+        has_game_rule = riseandfall_independent_coalitions_enabled
+        is_landed = yes
+    }
+    effect = {
+        top_liege = {
+            if = {
+                limit = {
+                    is_alive = yes
+                    is_landed = yes
+                    is_independent_ruler = yes
+                    exists = primary_title
+                }
+                riseandfall_coalition_calculate_periphery_se = yes
+                riseandfall_coalition_update_threat_se = { APPLY_YEARLY = no }
+            }
+        }
+    }
+}

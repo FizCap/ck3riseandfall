@@ -89,7 +89,7 @@ riseandfall_release_revolt_realms_se = {
         }
         add_county_modifier = {
             modifier = riseandfall_nationalist_revolt
-            years = 5
+            years = 10
         }
         set_variable = { name = rf_revolt_option_a_fallback value = 1 }
         remove_variable = rf_revolt_rebel_county
@@ -121,7 +121,7 @@ riseandfall_release_revolt_realms_se = {
         }
         add_county_modifier = {
             modifier = riseandfall_nationalist_revolt
-            years = 5
+            years = 10
         }
         set_variable = { name = rf_revolt_option_a_fallback value = 1 }
         remove_variable = rf_revolt_rebel_county
@@ -158,7 +158,7 @@ riseandfall_release_revolt_realms_se = {
             }
             add_county_modifier = {
                 modifier = riseandfall_nationalist_revolt
-                years = 5
+                years = 10
             }
             set_variable = { name = rf_revolt_option_a_fallback value = 1 }
             remove_variable = rf_revolt_rebel_county
@@ -184,7 +184,7 @@ riseandfall_release_revolt_realms_se = {
             }
             add_county_modifier = {
                 modifier = riseandfall_nationalist_revolt
-                years = 5
+            years = 10
             }
             set_variable = { name = rf_revolt_option_a_fallback value = 1 }
             remove_variable = rf_revolt_rebel_county
@@ -627,8 +627,9 @@ riseandfall_release_revolt_realms_se = {
             }
         }
         # Concession debuff removed per request; no temporary liege modifier applied here.
-        # Ensure the cooldown flag is set so a new revolt doesn't fire immediately.
-        add_character_flag = { flag = rf_low_stability_cooldown years = 5 }
-        set_variable = { name = riseandfall_recent_nationalist_revolt value = yes years = 10 }
+        # Ensure the title cooldown is set so a new revolt doesn't fire immediately.
+        riseandfall_set_low_stability_cooldown_se = yes
+        # Preserve the same three-cooldown escalation window as the suppress-revolt path.
+        set_variable = { name = riseandfall_recent_nationalist_revolt value = yes years = 30 }
     }
 }

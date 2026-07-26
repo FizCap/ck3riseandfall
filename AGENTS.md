@@ -1,138 +1,35 @@
-# Copilot Instructions for Rise and Fall (CK3)
+# Rise and Fall (CK3) Agent Instructions
 
-Purpose
-- Keep AI and human contributors productive and safe in this CK3 mod repo.
-- Use vanilla CK3 patterns and local `docs/*.log` as the source of truth for tokens, scopes, and effect signatures.
+## Repository
+- This is a Crusader Kings III mod source tree, not a package project. `descriptor.mod` is the launcher metadata; check its `version`, `supported_version`, and `remote_file_id` before compatibility or release work. Do not add a `path=` entry or edit the installed CK3 `game/` directory.
+- There is no package manifest, build/lint/typecheck configuration, CI workflow, or automated test suite in this repository. Do not invent package commands; static checks plus an in-game smoke test are the verification path.
+- Preserve UTF-8 with BOM for CK3 `.txt`, `.yml`, and `.gui` files. Keep IDs stable and prefix new IDs and keys by their feature subsystem.
 
-Quick Start
-- Open `descriptor.mod` and confirm metadata (`name`, `supported_version`, `remote_file_id`).
-- Read `docs/triggers.log`, `docs/effects.log`, `docs/event_scopes.log`, `docs/event_targets.log`, and `docs/on_actions.log` before adding new script patterns.
-- Search existing IDs and keys before adding new ones.
-- Never edit the global CK3 install `game/` folder. Make all changes in this mod repo.
+## Layout
+- `common/` contains definitions: `on_action/` hooks vanilla pulses and events, `scripted_effects/` and `scripted_triggers/` hold reusable logic, `script_values/` holds formulas, `game_rules/` holds toggles, and `decisions/` and `character_interactions/` are player/AI entry points.
+- `events/` contains event chains; `localization/english/` contains all UI-facing keys.
+- `gui/` contains vanilla overrides and widgets; `common/scripted_guis/` bridges GUI actions to scripted effects. Read `ai_instructions/ck3-gui-modding-instructions.txt` before GUI work.
+- Static modifiers belong in `common/modifiers/`; do not create or use a `common/static_modifiers/` folder.
 
-Repository Map
-- `common/on_action/`: pulse hooks and event/effect dispatch.
-- `common/scripted_effects/`: core game logic.
-- `common/scripted_triggers/`: reusable trigger logic.
-- `common/game_rules/`: mod toggles and difficulty options.
-- `common/modifiers/`: static modifiers.
-- `common/script_values/`: reusable numeric formulas.
-- `common/character_interactions/`, `common/decisions/`: player and AI entry points.
-- `events/`: event definitions (multiple namespaces used in this repo).
-- `localization/english/`: `l_english:` files for all UI-facing keys.
-- `docs/`: generated reference logs (authoritative for this local engine/mod surface).
+## Source Of Truth
+- Before using an unfamiliar CK3 token, check `docs/triggers.log`, `effects.log`, `event_scopes.log`, `event_targets.log`, or `on_actions.log`; GUI API tokens are in `docs/data_types*.txt`.
+- Treat `.github/prompt` notes and other prose as cheatsheets; when they conflict with generated docs or working vanilla examples, trust the latter. Use installed vanilla files for examples only, never edit them.
+- Search existing event IDs, script keys, and localization keys before adding new ones. Multiple files intentionally extend the same vanilla on_action; verify the hook name and expected scope in `docs/on_actions.log`.
 
-Encoding and File Hygiene
-- For CK3 content files (`.txt`, `.yml`, `.gui`), use UTF-8 with BOM.
-- Keep brace structure strict and readable.
-- Keep IDs stable once released unless migration is intentional.
-- When adding or changing CK3 script logic, add concise `#` comments that explain what the new block does and why it exists.
-  - Comment design intent, non-obvious scope changes, thresholds, weights, and math.
-  - Do not comment every line; prefer short section comments before meaningful logic blocks.
-  - Use CK3 `#` comments in `.txt` and `.gui` script files.
+## CK3 Scripting
+- Validate every scope hop. Guard optional scopes with `exists` and optional variables with `has_variable`; saved scopes must retain the character, title, or province type expected by later code.
+- Tooltip-evaluated triggers can read an unset `var:` even when placed beside `has_variable` in an `AND`. For optional object comparisons, use the repository's `var:name ?= scope:target` pattern rather than relying on short-circuiting.
+- `spawn_army.location` requires a province event target; use `capital_province`, not `capital_barony`, when spawning at a character's capital.
+- Keep on_action handlers small and dispatch to scripted effects with `effect = { ... }`. Gate game-rule mechanics with `has_game_rule`; define new rules in `common/game_rules/` with the `riseandfall` category.
+- Add concise `#` comments for non-obvious scope changes, thresholds, weights, or math. Keep braces and block structure strict.
 
-Current Project Conventions
-- IDs are namespaced by subsystem, not only one namespace.
-- Existing examples include `riseandfall_war_enhancement.*`, `realm_split.*`, `palace_coup.*`, and `riseandfall_diadochi_browser.*`.
-- Localization keys are mixed in style and both are valid in CK3:
-  - event-style: `.t`, `.d`, `.a`, `.b`, etc.
-  - descriptive-style: `.desc`
+## Localization And GUI
+- Every UI-facing key must exist under `l_english:`. Check dynamic localization methods against the actual scope type. For saved event scopes, use the working direct form `[saved_name.GetName]`; `scope:` is script syntax and can break event tooltips when copied into localization.
+- Match GUI `datacontext`, `datamodel`, and scripted GUI wrapper scopes exactly. Guard command buttons with `IsValidCommand` before `CreateCommandPopup` and guard list widgets against empty data.
+- A standalone custom `.gui` file does not automatically register a HUD or game-view key. Put custom HUD panels inside an already-loaded HUD widget, usually behind a `GetVariableSystem` state flag. Recheck vanilla overrides and block names after CK3 patches.
 
-CK3 Scripting Rules to Follow
-- Scope correctness is critical. Validate scope chains in `docs/event_scopes.log` before writing triggers/effects.
-- `var:` numeric comparisons are supported in CK3. They are used in vanilla and in this mod.
-- Still guard risky variable reads with `has_variable` when values may be unset (especially in tooltip-evaluated paths).
-- For object/scope variable comparisons in tooltip-evaluated triggers, prefer CK3's optional comparison form `var:some_scope_var ?= scope:target`.
-  - Do not rely on `AND = { has_variable = some_scope_var var:some_scope_var = scope:target }` to short-circuit; CK3 can still evaluate the unset `var:` read while building interaction tooltips.
-- `spawn_army` requires a province for `location`.
-  - Preferred pattern: `location = scope:some_character.capital_province`
-  - `name = <loc_key>` is optional but recommended for clarity.
-- For saved scopes, ensure saved type matches later usage (character vs title vs province).
-
-Modifiers and Placement
-- Put static modifiers in `common/modifiers/`.
-- Use `common/scripted_modifiers/` only when you intentionally need scripted modifiers.
-- Do not use `common/static_modifiers/` in CK3; this is not the standard folder in this project.
-
-On Action Patterns
-- Hook into vanilla on_actions from files under `common/on_action/`.
-- Use `effect = { your_scripted_effect = yes }` inside custom on_action entries.
-- It is normal for multiple files to extend the same top-level on_action (`yearly_global_pulse`, `on_death`, etc.).
-- Always confirm on_action names in `docs/on_actions.log` (for example `on_death`, `on_war_won_attacker`, `on_title_gain`, `on_title_gain_inheritance`).
-
-Game Rule Patterns
-- Define rules under `common/game_rules/`.
-- Use `categories = { riseandfall }` for mod grouping.
-- Use `default = ...` and option blocks with `flag = ...` and/or `apply_modifier = all:<modifier_key>` as needed.
-- Gate mechanics with `has_game_rule = <enabled_option>` in triggers where behavior should fully disable.
-
-Localization Rules
-- Every UI-facing key must exist in `localization/english/*.yml` under `l_english:`.
-- Validate dynamic scope text (`[scope.GetName]`, pronouns, title names, etc.) against real scope types.
-- In localization, saved event scopes use `[saved_scope_name.GetName]`, not `[scope:saved_scope_name.GetName]`.
-  - The `scope:` prefix is for script scope references; using it in loc can produce `Failed to find type 'scope:<name>'` errors and can break event option tooltips.
-- Missing keys show raw identifiers in game.
-
-Validation Workflow (before commit)
-1) Syntax and structure
-- Check brace balance and obvious parse errors.
-- Keep each file internally consistent in indentation and block closure.
-
-2) Duplicate ID scan
-- Events:
-  - `rg -n "^\s*[A-Za-z0-9_]+\.[0-9]+\s*=\s*\{" events`
-- Top-level script keys:
-  - `rg -n "^[A-Za-z0-9_.-]+\s*=\s*\{" common`
-- Investigate duplicates; some on_action top-level duplicates are intentional extensions.
-
-3) Localization coverage
-- Search for newly added keys and ensure matching entries exist.
-- Spot-check event titles/descriptions/options after edits.
-
-4) Token verification
-- If unsure a token exists, verify in both:
-  - vanilla game files: `C:\Program Files (x86)\Steam\steamapps\common\Crusader Kings III\game`
-  - local docs logs: `docs/*.log`
-- Prefer tokens that appear in docs with compatible scopes.
-
-5) In-game smoke test
-- Launch CK3 with the mod enabled.
-- Reproduce one minimal scenario per changed system (event trigger, interaction, modifier, on_action hook).
-
-Changelog Rules
-- When changing or adding mod files, also update `ai_instructions/changelog.txt` with a Steam Workshop-ready plaintext changelog entry.
-- Keep the format simple and matching existing Steam changelogs:
-  - First line: `CK3: Rise and Fall vX.Y.Z`
-  - Second line: `<Update Subtitle>`
-  - Blank line before each feature-area header.
-  - Feature-area headers use plain text, such as `Puppet Master`.
-  - Bullets use `- `, one player-facing change per line.
-- If the target version or update subtitle is unknown, add the entry under `CK3: Rise and Fall - Unreleased`.
-- Group bullets by feature area, such as Puppet Master, Realm Splits, Adventurer Claim War, UI, Localization, Balance, AI, or Bug Fixes.
-- Write concise player-facing bullets in past tense. Mention visible behavior, balance changes, AI changes, localization, compatibility, and important bug fixes.
-- Combine tiny internal edits into one clear bullet when they support the same user-facing change.
-- Do not list validation-only commands, whitespace-only edits, or purely mechanical file hygiene unless they matter to players or future maintainers.
-
-Minimal LLM Change Contract
-- Inputs: files touched, expected scope(s), and any new IDs/loc keys.
-- Outputs: behavior change, cross-file links updated, and Steam plaintext changelog entry added.
-- Success: no parse errors, valid scopes, loc keys present, and in-game repro works.
-- Failure modes: missing loc, bad scope chain, wrong target type, ID collisions.
-
-Known Helpful Patterns in This Repo
-- Use defensive `exists` and `has_variable` checks before dereferencing optional scopes.
-- For army spawn and travel to places, prefer province targets (`capital_province`) over title targets (`capital_barony`) when the effect expects a province.
-- Keep on_action handlers small and dispatch to scripted effects for maintainability.
-- For chained player-choice events, such as `palace_coup.1201`, guard the event with the pending flag and required variables so stale queued popups cannot display.
-- When an option clears variables/flags on the event receiver, re-save any scopes needed for follow-up effects before clearing them, and target the receiver explicitly with `root = { ... }`.
-- Before selecting the next player in a queue, clear stale saved scopes, verify the next target still has the pending flag, and prefer `trigger_event = { id = <event_id> delayed = yes }` so the current event closes before the next popup appears.
-
-What Not to Assume
-- Do not assume an on_action name from memory. Verify it in `docs/on_actions.log`.
-- Do not assume a token is valid because it existed in another mod.
-- Do not assume `descriptor.mod` contains a `path=` field in this repo; validate current file contents directly.
-
-When Asking for Help
-- Provide exact error lines from game logs.
-- Include file paths and line numbers changed.
-- Include a minimal repro case (who, when, and which action/event should fire).
+## Workflow
+- Before editing, search for collisions and inspect the relevant reference log. After editing, check braces, duplicate event/script IDs, localization coverage, and scope/target types.
+- For chained player-choice events, guard pending flags and required variables; save scopes before clearing receiver state, use `root = { ... }` when targeting that receiver, clear stale saved scopes, and trigger follow-up popups with `delayed = yes` after verifying the next target is still pending.
+- Launch CK3 with the mod enabled, reproduce one minimal path per changed mechanic or screen, and use the game logs as the failure report. There is no repo-local parser or test runner.
+- For CK3 behavior or UI changes, add a player-facing Steam Workshop entry to `ai_instructions/changelog.txt` using that file's existing version, header, and past-tense bullet format. Documentation-only changes do not need a changelog entry.

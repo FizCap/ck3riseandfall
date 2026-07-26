@@ -84,7 +84,7 @@ setting_riseandfall_ai_kingdom_creation_disabled_desc:0 "AI rulers will not auto
 setting_riseandfall_ai_kingdom_creation_enabled:0 "Basic"
 setting_riseandfall_ai_kingdom_creation_enabled_desc:0 "AI rulers use the current Rise and Fall title creation and kingdom handout behavior."
 setting_riseandfall_ai_kingdom_creation_advanced:0 "Advanced (Beta)"
-setting_riseandfall_ai_kingdom_creation_advanced_desc:0 "Slower, stricter AI title logic. Creates or grants kingdoms only as a last resort when severely over the vassal limit, preferring foreign or non-integrated regions; avoids mega-vassals and destroys spare high titles."
+setting_riseandfall_ai_kingdom_creation_advanced_desc:0 "Slower, stricter AI title logic. Creates or grants kingdoms only as a last resort when severely over the vassal limit, prefers foreign or non-integrated regions, avoids mega-vassals, and gradually destroys safe secondary crowns."
 
 
 # Interaction Stability (UI marker in interaction menu)
@@ -93,6 +93,13 @@ setting_riseandfall_interaction_stability_enabled:0 "Enabled"
 setting_riseandfall_interaction_stability_enabled_desc:0 "Will put stability and adventurer chance markers in the character interaction menu (recommended if other mods override these UI elements in the character screen)."
 setting_riseandfall_interaction_stability_disabled:0 "Disabled"
 setting_riseandfall_interaction_stability_disabled_desc:0 "Does not show stability or adventurer chance markers in the character interaction menu."
+
+# Independent Coalition rule
+rule_riseandfall_independent_coalitions:0 "Coalitions (Beta)"
+setting_riseandfall_independent_coalitions_enabled:0 "Enabled"
+setting_riseandfall_independent_coalitions_enabled_desc:0 "Independent rulers may start Coalitions against large, overextended realms through a character interaction. AI rulers may use the same interaction."
+setting_riseandfall_independent_coalitions_disabled:0 "Disabled"
+setting_riseandfall_independent_coalitions_disabled_desc:0 "Only the separate Low Stability Coalition incident may form Coalitions."
 
 # Low Stability Events rule
 rule_riseandfall_low_stability_events:0 "Low Stability Events"
@@ -146,10 +153,10 @@ setting_riseandfall_admin_score_nerf_disabled:0 "Disabled"
 setting_riseandfall_admin_score_nerf_disabled_desc:0 "Admin succession scoring is not modified by Rise and Fall."
 
 # Story Mode collapse pace rule
-rule_riseandfall_enable_dynamic_story_mode:0 "Story Mode Collapse Pace (BETA)"
+rule_riseandfall_enable_dynamic_story_mode:0 "Story Mode (BETA)"
 setting_riseandfall_dynamic_story_mode_off:0 "Off"
 setting_riseandfall_dynamic_story_mode_off_desc:0 "Story Mode is inactive."
 setting_riseandfall_dynamic_story_mode_forced:0 "Accelerated (50-100 Years)"
- setting_riseandfall_dynamic_story_mode_forced_desc:0 "Uses the existing high-impact collapse curve to try to break selected oversized, stable realms over roughly 50-100 years. The exact timing depends on the realm's strength, rivals, stability, and available crisis events."
+setting_riseandfall_dynamic_story_mode_forced_desc:0 "Uses the existing high-impact collapse curve to try to break selected oversized, stable realms over roughly 50-100 years. The exact timing depends on the realm's strength, rivals, stability, and available crisis events."
 setting_riseandfall_dynamic_story_mode_dynamic:0 "Long Campaign (200-300 Years)"
- setting_riseandfall_dynamic_story_mode_dynamic_desc:0 "Builds collapse pressure slowly to try to break selected oversized, stable realms over roughly 200-300 years. The exact timing depends on the realm's strength, rivals, stability, and available crisis events."
+setting_riseandfall_dynamic_story_mode_dynamic_desc:0 "Builds collapse pressure slowly to try to break selected oversized, stable realms over roughly 200-300 years. The exact timing depends on the realm's strength, rivals, stability, and available crisis events."

@@ -24,23 +24,27 @@
     NOT = { this = scope:attacker }
     }
     target_titles = all
-    target_title_tier = all  # Allow targeting any tier titles, including non-existent ones
+    target_title_tier = kingdom
+    target_de_jure_regions_above = yes
     ignore_effect = change_title_holder
 
     
 
     valid_to_start = {
-        # The victory effect takes the defender's realm title stack, so keep the
-        # declaration UI anchored to the defender's primary title instead of
-        # showing unrelated de jure regions as selectable war goals.
-        scope:target = scope:defender.primary_title
+        # Warlords no larger than their target use this one-kingdom skirmish.
+        # A larger Warlord uses the separate realm-absorption CB.
+        scope:attacker.sub_realm_size <= scope:defender.sub_realm_size
         scope:target = {
-            tier = scope:defender.primary_title.tier
-        }
-        scope:target = {
+            is_landless_type_title = no
             any_in_de_jure_hierarchy = {
                 tier = tier_county
                 neighboring_county_or_viking_conquest_trigger = { CHARACTER = root }
+                holder ?= {
+                    OR = {
+                        this = scope:defender
+                        is_vassal_or_below_of = scope:defender
+                    }
+                }
             }
         }
         scope:target = {
@@ -50,7 +54,7 @@
                 }
                 any_in_de_jure_hierarchy = {
                     continue = { tier > tier_county }
-                    count >= 2
+                    count >= 1
                     tier = tier_county
                     holder ?= {
                         OR = {
@@ -91,6 +95,8 @@
     on_invalidated_desc = msg_county_conquest_war_invalidated_message
 
     on_invalidated = {
+        scope:attacker = { remove_variable = rf_warlord_prewar_sub_realm_size }
+        scope:defender = { remove_variable = rf_warlord_prewar_sub_realm_size }
     }
 
     cost = {
@@ -104,17 +110,21 @@
 
     on_declaration = {
         on_declared_war = yes
-    }
-
-    on_victory_desc = {
-        first_valid = {
-            triggered_desc = {
-                trigger = { scope:attacker = { is_local_player = yes } }
-                desc = ducal_conquest_cb_victory_desc_attacker
+        scope:attacker = {
+            set_variable = {
+                name = rf_warlord_prewar_sub_realm_size
+                value = sub_realm_size
             }
-            desc = ducal_conquest_cb_victory_desc
+        }
+        scope:defender = {
+            set_variable = {
+                name = rf_warlord_prewar_sub_realm_size
+                value = sub_realm_size
+            }
         }
     }
+
+    on_victory_desc = { desc = RISEANDFALL_WARLORD_CONQUEST_ON_VICTORY_DESC }
 
     on_victory = {
         scope:attacker = { show_pow_release_message_effect = yes }
@@ -125,163 +135,28 @@
         #EP2 accolade glory gain for winning against higher ranked enemy
         scope:attacker = { accolade_attacker_war_end_glory_gain_low_effect = yes }
 
-        # Celestial warlords erase a defeated peer's crown, but never a crown
-        # that outranked them when the war ended.
-        if = {
-            limit = {
-                scope:attacker = {
-                    has_government = celestial_government
-                    exists = primary_title
-                }
-                scope:defender = {
-                    exists = primary_title
-                    primary_title.tier = scope:attacker.primary_title.tier
-                }
-            }
-            scope:defender.primary_title = {
-                save_scope_as = riseandfall_warlord_celestial_destroy_title
-            }
-        }
+        # The selected kingdom is resolved through vanilla's complete-subrealm
+        # transfer path. This keeps eligible vassals intact and does not use an
+        # occupation percentage to decide whether their realm changes sides.
+        riseandfall_apply_de_jure_war_goal_victory_se = yes
+        riseandfall_resolve_warlord_defeat_se = yes
 
-        scope:defender = {
-            every_vassal = {
-                add_to_list = riseandfall_warlord_former_defender_vassals
-            }
-        }
-
-        # Transfer the contested realm title first. Celestial and other
-        # administrative governments then take the defender's full personal
-        # title stack so governorship logic cannot leave counties detached;
-        # non-admin wars only take the defender's primary-tier realm titles.
-        create_title_and_vassal_change = {
-            type = conquest
-            save_scope_as = title_change
-            add_claim_on_loss = yes
-        }
-
-        every_in_list = {
-            list = target_titles
-            limit = {
-                holder = scope:defender
-                tier > tier_county
-            }
-            custom_tooltip = CONQUEST_CB_TITLE
-            add_to_list = riseandfall_warlord_taken_titles
-            change_title_holder = {
-                holder = scope:attacker
-                change = scope:title_change
-                take_baronies = no
-            }
-        }
-
-        if = {
-            limit = {
-                OR = {
-                    scope:attacker = { has_government = celestial_government }
-                    scope:attacker = { government_allows = administrative }
-                    scope:defender = { government_allows = administrative }
-                    scope:attacker.top_liege = { government_allows = administrative }
-                    scope:defender.top_liege = { government_allows = administrative }
-                }
-            }
-            scope:defender = {
-                every_held_title = {
-                    limit = {
-                        holder = scope:defender
-                        tier >= tier_county
-                        NOT = { is_in_list = riseandfall_warlord_taken_titles }
-                    }
-                    add_to_list = riseandfall_warlord_taken_titles
-                    change_title_holder = {
-                        holder = scope:attacker
-                        change = scope:title_change
-                        take_baronies = yes
-                    }
-                }
-            }
-        }
-        else = {
-            scope:defender = {
-                every_held_title = {
-                    limit = {
-                        holder = scope:defender
-                        tier = scope:defender.primary_title.tier
-                        tier > tier_county
-                        NOT = { is_in_list = riseandfall_warlord_taken_titles }
-                    }
-                    add_to_list = riseandfall_warlord_taken_titles
-                    change_title_holder = {
-                        holder = scope:attacker
-                        change = scope:title_change
-                        take_baronies = no
-                    }
-                }
-            }
-        }
-
-        resolve_title_and_vassal_change = scope:title_change
-
-        every_in_list = {
-            list = riseandfall_warlord_taken_titles
-            limit = {
-                holder = scope:attacker
-                tier > scope:attacker.primary_title.tier
-            }
-            scope:attacker = {
-                set_primary_title_to = prev
-            }
-        }
-
-        create_title_and_vassal_change = {
-            type = conquest
-            save_scope_as = vassal_change
-            add_claim_on_loss = no
-        }
-
-        scope:defender = {
-            if = {
+        scope:attacker = {
+            ordered_in_list = {
+                list = titles_taken
                 limit = {
-                    exists = primary_title
-                    exists = scope:attacker.primary_title
-                    primary_title.tier < scope:attacker.primary_title.tier
-                    NOT = { target_is_liege_or_above = scope:attacker }
-                }
-                change_liege = {
-                    liege = scope:attacker
-                    change = scope:vassal_change
-                }
-            }
-        }
-
-        every_in_list = {
-            list = riseandfall_warlord_former_defender_vassals
-            if = {
-                limit = {
-                    exists = primary_title
-                    exists = scope:attacker.primary_title
-                    primary_title.tier < scope:attacker.primary_title.tier
-                    NOT = { target_is_liege_or_above = scope:attacker }
-                }
-                change_liege = {
-                    liege = scope:attacker
-                    change = scope:vassal_change
-                }
-            }
-        }
-
-        resolve_title_and_vassal_change = scope:vassal_change
-
-        # Destroy the peer crown only after its personal counties and former
-        # vassals have both been attached to the celestial victor.
-        if = {
-            limit = {
-                exists = scope:riseandfall_warlord_celestial_destroy_title
-                scope:riseandfall_warlord_celestial_destroy_title = {
                     holder = scope:attacker
+                    tier > scope:attacker.primary_title.tier
                 }
+                order_by = tier
+                max = 1
+                save_temporary_scope_as = rf_warlord_highest_taken_title
             }
+        }
+        if = {
+            limit = { exists = scope:rf_warlord_highest_taken_title }
             scope:attacker = {
-                destroy_title = scope:riseandfall_warlord_celestial_destroy_title
+                set_primary_title_to = scope:rf_warlord_highest_taken_title
             }
         }
 
@@ -290,7 +165,11 @@
 
         # Prestige Progress for the Attacker (higher tier attacker gets more prestige)
         if = {
-            limit = { scope:attacker.primary_title.tier > scope:defender.primary_title.tier }
+            limit = {
+                scope:attacker = { exists = primary_title }
+                scope:defender = { exists = primary_title }
+                scope:attacker.primary_title.tier > scope:defender.primary_title.tier
+            }
             scope:attacker = {
                 add_prestige_experience = {
                     value = medium_prestige_value
@@ -318,11 +197,35 @@
         # Truce
         add_truce_attacker_victory_effect = yes
 
+        # A smaller Warlord victory gets only a one-year reprieve. Override the
+        # vanilla five-year truce after the standard victory effects run.
+        if = {
+            limit = {
+                scope:attacker = { has_variable = rf_warlord_prewar_sub_realm_size }
+                scope:defender = { has_variable = rf_warlord_prewar_sub_realm_size }
+                scope:attacker.var:rf_warlord_prewar_sub_realm_size < scope:defender.var:rf_warlord_prewar_sub_realm_size
+            }
+            scope:attacker = {
+                hidden_effect = {
+                    add_truce_one_way = {
+                        character = scope:defender
+                        days = 365
+                        override = yes
+                        war = root.war
+                        result = victory
+                    }
+                }
+            }
+        }
+
         # FP1: note the victory for future memorialisation via stele (if applicable).
         scope:attacker = { fp1_remember_recent_conquest_victory_effect = yes }
 
         # EP3: note gold gained from military assistance/join war contracts and their war contribution threshold
         laamp_as_mercenary_payout_tooltip_effect = yes
+
+        scope:attacker = { remove_variable = rf_warlord_prewar_sub_realm_size }
+        scope:defender = { remove_variable = rf_warlord_prewar_sub_realm_size }
     }
 
     on_white_peace_desc = {
@@ -362,6 +265,9 @@
 
         # EP3: note gold gained from military assistance/join war contracts and their war contribution threshold
         laamp_as_mercenary_payout_tooltip_effect = yes
+
+        scope:attacker = { remove_variable = rf_warlord_prewar_sub_realm_size }
+        scope:defender = { remove_variable = rf_warlord_prewar_sub_realm_size }
     }
 
     on_defeat_desc = {
@@ -428,6 +334,9 @@
 
         # EP3: note gold gained from military assistance/join war contracts and their war contribution threshold
         laamp_as_mercenary_payout_tooltip_effect = yes
+
+        scope:attacker = { remove_variable = rf_warlord_prewar_sub_realm_size }
+        scope:defender = { remove_variable = rf_warlord_prewar_sub_realm_size }
     }
 
     transfer_behavior = transfer
@@ -444,13 +353,10 @@
 
     interface_priority = 79
 
-    ticking_war_score_targets_entire_realm = yes
-    # Warlord conquests are displayed against the defender's primary title but
-    # resolve against the defender's realm, so ticking score should use the
-    # whole realm rather than a de jure slice of the selected title.
-    # Warlord realm-takeover wars can cover sprawling vassal realms. Match the
-    # Diadochi profile so a foothold contests passive ticking, while defenders
-    # need near-total control to win by denial alone.
+    use_de_jure_wargoal_only = yes
+    ticking_war_score_targets_entire_realm = no
+    # A foothold contests passive ticking, while defenders need near-total
+    # control of the selected kingdom to win by denial alone.
     attacker_wargoal_percentage = 0.01
     defender_wargoal_percentage = 0.95
 

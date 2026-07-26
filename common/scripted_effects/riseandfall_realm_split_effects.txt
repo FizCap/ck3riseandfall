@@ -1301,8 +1301,9 @@ riseandfall_realm_split_se = {
 riseandfall_execute_realm_split_se = {
     save_scope_as = new_realm_ruler
     
-    # Match the original ruler's rank for breakaway dynamic titles.
-    # Hegemony splits fall back to empire-tier dynamic titles.
+    # Match the original ruler's rank for breakaway dynamic titles. Hegemony
+    # successors use vanilla's dynamic-title flow, then receive empire-tier
+    # vassals through the normal assignment pass below.
     scope:new_realm_ruler = {
         save_scope_as = rf_breakaway_ruler
         capital_county = { save_scope_as = rf_base_county }
@@ -1310,10 +1311,27 @@ riseandfall_execute_realm_split_se = {
 
         if = {
             limit = {
-                OR = {
-                    scope:original_primary = { tier = tier_hegemony }
-                    scope:original_primary = { tier = tier_empire }
+                scope:original_primary = { tier = tier_hegemony }
+            }
+            if = {
+                limit = { highest_held_title_tier >= tier_hegemony }
+                primary_title = { save_scope_as = rf_new_title }
+            }
+            else = {
+                create_dynamic_title = {
+                    tier = hegemony
+                    name = RISEANDFALL_BREAKAWAY_NAME_CAPITAL
                 }
+                if = {
+                    limit = { exists = scope:new_title }
+                    add_character_flag = { flag = rf_created_breakaway_dynamic_title days = 7 }
+                    scope:new_title = { save_scope_as = rf_new_title }
+                }
+            }
+        }
+        else_if = {
+            limit = {
+                scope:original_primary = { tier = tier_empire }
             }
             if = {
                 limit = { highest_held_title_tier >= tier_empire }
@@ -1377,11 +1395,21 @@ riseandfall_execute_realm_split_se = {
         }
     }
 
+    # Keep the vanilla dynamic-hegemony presentation setup on newly created
+    # titles only; existing primary titles must not have their CoA regenerated.
     if = {
-        limit = { exists = scope:rf_new_title }
+        limit = {
+            exists = scope:rf_new_title
+            scope:new_realm_ruler = { has_character_flag = rf_created_breakaway_dynamic_title }
+        }
         scope:rf_new_title = {
             set_color_from_title = scope:rf_base_county
-            generate_coa = yes
+            if = {
+                limit = { tier = tier_hegemony }
+                set_can_be_named_after_dynasty = no
+                set_can_use_nomadic_naming = no
+                set_definitive_form = yes
+            }
         }
     }
     
@@ -1404,6 +1432,16 @@ riseandfall_execute_realm_split_se = {
             }
         }
         resolve_title_and_vassal_change = scope:rf_title_change
+    }
+
+    # Vanilla generates the CoA only after the dynamic title's holder change
+    # has resolved. This ordering is especially important for hegemonies.
+    if = {
+        limit = {
+            exists = scope:rf_new_title
+            scope:new_realm_ruler = { has_character_flag = rf_created_breakaway_dynamic_title }
+        }
+        scope:rf_new_title = { generate_coa = yes }
     }
 
     # CK3 may keep a reserve lower title as primary after title handoff; force the
@@ -1474,7 +1512,7 @@ riseandfall_execute_realm_split_se = {
     if = {
         limit = { exists = scope:new_realm_ruler }
         scope:new_realm_ruler = {
-            add_character_flag = { flag = rf_low_stability_cooldown years = 5 }
+            riseandfall_set_low_stability_cooldown_se = yes
         }
     }
 
@@ -1789,17 +1827,14 @@ riseandfall_realm_split_lower_actor_primary_below_recipient_se = {
             }
             if = {
                 limit = { scope:rf_absorbed_split_title = { is_titular = no } }
-                # Real equal-rank crowns are submitted to the new liege. This
-                # lets an empire-tier successor join another empire without
-                # creating a stronger dynamic title for the recipient.
+                # Preserve real de jure crowns by handing them to the recipient.
+                # This lets an equal-rank successor join another realm without
+                # leaving a duplicate titular primary title behind.
                 create_title_and_vassal_change = {
                     type = granted
                     save_scope_as = rf_absorbed_title_change
                     add_claim_on_loss = no
                 }
-                # Snapshot the direct vassals while they still belong to the
-                # submitting ruler. The title transfer temporarily releases
-                # them, so they must be restored from stable character scopes.
                 hidden_effect = {
                     every_vassal = {
                         add_to_list = rf_absorbed_surrender_vassals
@@ -1819,8 +1854,6 @@ riseandfall_realm_split_lower_actor_primary_below_recipient_se = {
                         set_primary_title_to = scope:rf_absorbed_split_title
                     }
                 }
-                # The recipient now holds the surrendered crown and has the
-                # correct rank to receive every ruler released by the handoff.
                 hidden_effect = {
                     create_title_and_vassal_change = {
                         type = granted
@@ -1837,9 +1870,8 @@ riseandfall_realm_split_lower_actor_primary_below_recipient_se = {
                     resolve_title_and_vassal_change = scope:rf_absorbed_vassal_change
                     clear_variable_list = rf_absorbed_surrender_vassals
                 }
-                # The transferred title had its old holder's markers cleared
-                # above. Reapply the receiving successor state's lineage so it
-                # retains Diadochi CB, surrender, and defection access.
+                # The receiving realm retains the successor-state lineage on
+                # its new real primary crown.
                 scope:recipient.primary_title = {
                     if = {
                         limit = { scope:rf_recipient_old_primary = { has_variable = rf_successor_origin_title } }
@@ -1859,25 +1891,14 @@ riseandfall_realm_split_lower_actor_primary_below_recipient_se = {
                         set_variable = { name = rf_successor_permanent_realm_size value = scope:recipient.realm_size }
                     }
                 }
-                # A real same-rank crown now carries the successor state. Retire
-                # the recipient's obsolete dynamic shell after its lineage has
-                # been migrated, while preserving any old de jure crown.
-                if = {
-                    limit = {
-                        exists = scope:rf_recipient_old_primary
-                        scope:rf_recipient_old_primary = {
-                            holder = scope:recipient
-                            is_titular = yes
-                        }
-                        NOT = { scope:rf_recipient_old_primary = scope:recipient.primary_title }
-                    }
-                    scope:recipient = { destroy_title = scope:rf_recipient_old_primary }
-                }
+                # After the real crown transfer, retire every eligible titular
+                # shell. The shared cleanup preserves all non-titular titles
+                # and protected special titles.
+                scope:recipient = { riseandfall_cleanup_titular_titles_se = yes }
             }
             else = {
-                # Titular successor shells have no de jure land to preserve, so
-                # save their vassals before removing the crown; title destruction
-                # otherwise releases those rulers as independent realms.
+                # Titular successor shells have no de jure land to preserve.
+                # Remove only the titular crown and restore its vassals.
                 hidden_effect = {
                     every_vassal = {
                         add_to_list = rf_absorbed_surrender_vassals
@@ -1955,6 +1976,7 @@ riseandfall_realm_split_defect_to_recipient_se = {
 }
 
 riseandfall_realm_split_surrender_to_recipient_se = {
+    clear_variable_list = rf_submitted_surrender_vassals
     scope:actor.primary_title = { save_temporary_scope_as = rf_submitted_split_title }
     scope:rf_submitted_split_title = { save_temporary_scope_as = rf_incoming_split_title }
     # Retain the recipient's successor crown as the metadata source if accepting
@@ -2013,8 +2035,8 @@ riseandfall_realm_split_surrender_to_recipient_se = {
         }
     }
     else = {
-        # Surrender drops a titular successor crown when needed; it never
-        # creates a dynamic promotion title for the recipient.
+        # Titular successor crowns are retired after surrender; non-titular
+        # crowns are retained through the helper's normal handoff.
         scope:actor = { riseandfall_realm_split_lower_actor_primary_below_recipient_se = yes }
     }
 

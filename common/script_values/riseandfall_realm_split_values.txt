@@ -3,3 +3,9 @@
     multiply = 0.25
     floor = yes
 }
+
+rf_20_percent_realm_size_value = {
+    value = sub_realm_size
+    multiply = 0.20
+    floor = yes
+}

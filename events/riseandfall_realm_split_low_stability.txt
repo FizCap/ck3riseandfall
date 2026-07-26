@@ -134,8 +134,8 @@ realm_split.1001 = {
             change_variable = { name = riseandfall_realm_stability_score add = 10 }
         }
         
-        # Set cooldown
-        add_character_flag = { flag = rf_low_stability_cooldown years = 5 }
+        # Set title-based cooldown so it survives succession.
+        riseandfall_set_low_stability_cooldown_se = yes
         
         ai_chance = {
             base = 100

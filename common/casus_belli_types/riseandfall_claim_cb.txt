@@ -354,8 +354,8 @@
                     }
                 }
             }
-            # Set low stability cooldown for 5 years after winning
-            add_character_flag = { flag = rf_low_stability_cooldown days = 1825 }
+            # Set the 15-year title-based low-stability cooldown after winning.
+            riseandfall_set_low_stability_cooldown_se = yes
         }
 
         scope:attacker = { show_pow_release_message_effect = yes }

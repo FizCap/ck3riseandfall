@@ -3,15 +3,31 @@
 # Runs once per ruler on that character's random yearly pulse and computes a tier-based curved chance from stability score.
 # If the random check succeeds, trigger an event (riseandfall.1001 - warlord).
 
+# Expected scope: landed ruler. Store the timer on the title so it survives succession.
+riseandfall_set_low_stability_cooldown_se = {
+    if = {
+        limit = { exists = primary_title }
+        primary_title = {
+            set_variable = { name = rf_low_stability_cooldown value = 1 years = 10 }
+        }
+    }
+}
+
 riseandfall_low_stability_roll_se = {
     # Perform computations inside the saved ruler scope so character variables resolve correctly.
         scope:ruler_low_stability = {
             # Repair interrupted Coalition state before evaluating this year's incident.
             riseandfall_coalition_clear_stale_target_state_se = yes
+            # Coalition pressure is territory-based and must be refreshed before
+            # selector-facing triggers inspect the stored percentage.
+            riseandfall_coalition_calculate_periphery_se = yes
             # Ensure a default stability score exists so scripts don't error when it's missing
             if = { limit = { NOT = { has_variable = riseandfall_realm_stability_score } } set_variable = { name = riseandfall_realm_stability_score value = 50 } }
             if = {
-                limit = { NOT = { has_character_flag = rf_low_stability_cooldown } }
+                limit = {
+                    exists = primary_title
+                    primary_title = { NOT = { has_variable = rf_low_stability_cooldown } }
+                }
                 # Compute chance with a curved (approx power 1.5) formula based on highest held title tier.
                 # Thresholds: county = 30, duchy = 35, kingdom = 40, empire = 45, hegemony = 50.
                 # Approach: tmp_diff = max(0, threshold - stability_score)

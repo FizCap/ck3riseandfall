@@ -88,7 +88,38 @@ riseandfall_diadochi_wars_se = {
 					is_at_war = no
 					NOT = { is_at_war_with = scope:rf_diadochi_target_ruler }
 					can_attack_in_hierarchy = scope:rf_diadochi_target_ruler
-					war_chest_gold >= war_chest_gold_maximum
+					# A rout should be exploited before the AI has accumulated a full
+					# eighteen-month reserve. Near-even successor wars still demand the
+					# normal war chest, while smaller advantages require a proportionate
+					# reserve so the AI does not start a costly marginal conflict broke.
+					OR = {
+						# At least twice the defender's strength: act immediately.
+						scope:rf_diadochi_target_ruler = {
+							current_military_strength <= root.fifty_percent_of_current_military_strength
+						}
+						# 1.33x to 2x stronger: keep one quarter of the normal reserve.
+						AND = {
+							scope:rf_diadochi_target_ruler = {
+								current_military_strength <= {
+									value = root.current_military_strength
+									multiply = 0.75
+								}
+							}
+							war_chest_gold >= quarter_ai_war_chest_gold_maximum
+						}
+						# 1.11x to 1.33x stronger: keep half the normal reserve.
+						AND = {
+							scope:rf_diadochi_target_ruler = {
+								current_military_strength <= {
+									value = root.current_military_strength
+									multiply = 0.90
+								}
+							}
+							war_chest_gold >= halved_ai_war_chest_gold_maximum
+						}
+						# A marginal advantage keeps the vanilla full-reserve requirement.
+						war_chest_gold >= war_chest_gold_maximum
+					}
 					trigger_if = {
 						limit = {
 							NOT = {
@@ -158,11 +189,6 @@ riseandfall_diadochi_wars_se = {
 							imprisoner != root
 						}
 					}
-					can_declare_war = {
-						defender = scope:rf_diadochi_target_ruler
-						casus_belli = riseandfall_diadochi_cb
-						target_titles = { scope:rf_diadochi_target_title }
-					}
 				}
 				# Saved scopes are not visible inside ai_start_best_war:is_valid.
 				# Persist the prepared typed targets on the AI ruler for that callback.
@@ -172,7 +198,7 @@ riseandfall_diadochi_wars_se = {
 				# but keep the selected target: recalculation otherwise replaces an
 				# adjacent peer with a distant origin title that scores more highly.
 				ai_start_best_war = {
-					cb = { riseandfall_diadochi_cb }
+					cb = { riseandfall_diadochi_cb riseandfall_diadochi_absorption_cb }
 					recalculate_cb_targets = yes
 					is_valid = {
 						exists = scope:target_character
@@ -182,30 +208,6 @@ riseandfall_diadochi_wars_se = {
 							has_variable = rf_diadochi_ai_target_title
 							var:rf_diadochi_ai_target_ruler ?= scope:target_character
 							var:rf_diadochi_ai_target_title ?= scope:target_title
-						}
-						OR = {
-							AND = {
-								root = {
-									riseandfall_has_successor_primary_title_trigger = yes
-									exists = primary_title
-									primary_title = { has_variable = rf_successor_root_origin_title }
-								}
-								OR = {
-									scope:target_title = root.primary_title.var:rf_successor_root_origin_title
-									AND = {
-										scope:target_title = { has_variable = rf_successor_root_origin_title }
-										scope:target_title.var:rf_successor_root_origin_title = root.primary_title.var:rf_successor_root_origin_title
-									}
-								}
-							}
-							AND = {
-								root = {
-									NOT = { riseandfall_has_successor_primary_title_trigger = yes }
-									exists = primary_title
-								}
-								scope:target_title = { has_variable = rf_successor_root_origin_title }
-								scope:target_title.var:rf_successor_root_origin_title = root.primary_title
-							}
 						}
 						scope:target_character = {
 							current_military_strength < root.current_military_strength
@@ -360,6 +362,32 @@ riseandfall_diadochi_store_browser_target_se = {
 	}
 }
 
+# Collect kingdom titles rather than a ruler's primary title. The CB's target
+# is a neighboring de-jure kingdom and successor rulers often hold a different
+# rank or no kingdom title at all.
+riseandfall_diadochi_store_browser_kingdoms_se = {
+	save_scope_as = rf_diadochi_browser_candidate_ruler
+	scope:rf_diadochi_browser_attacker = {
+		every_character_to_title_neighboring_kingdom = {
+			limit = {
+				any_de_jure_county = {
+					holder = {
+						OR = {
+							this = scope:rf_diadochi_browser_candidate_ruler
+							is_vassal_or_below_of = scope:rf_diadochi_browser_candidate_ruler
+						}
+					}
+				}
+			}
+			if = {
+				limit = { NOT = { is_in_list = rf_diadochi_browser_legal_titles } }
+				add_to_temporary_list = rf_diadochi_browser_legal_titles
+			}
+		}
+	}
+	clear_saved_scope = rf_diadochi_browser_candidate_ruler
+}
+
 riseandfall_diadochi_prepare_browser_targets_se = {
 	# Inputs: root is the player ruler opening the Diadochi target browser.
 	# Outputs: stores one seven-target page, sorted weakest to strongest.
@@ -387,8 +415,8 @@ riseandfall_diadochi_prepare_browser_targets_se = {
 			limit = { riseandfall_has_successor_primary_title_trigger = yes }
 			primary_title.var:rf_successor_root_origin_title = { save_scope_as = rf_diadochi_origin_title }
 
-			# Collect the origin title and all legal successor peers. The complete
-			# list is globally strength-sorted after collection.
+			# Collect the origin ruler and neighboring successor peers. The CB now
+			# accepts only neighboring kingdom targets, not arbitrary primary titles.
 			if = {
 				limit = {
 					exists = scope:rf_diadochi_origin_title
@@ -401,20 +429,10 @@ riseandfall_diadochi_prepare_browser_targets_se = {
 						NOT = { has_truce = root }
 						NOT = { is_allied_to = root }
 						NOT = { is_at_war_with = root }
-						root = {
-							can_declare_war = {
-								defender = prev
-								casus_belli = riseandfall_diadochi_cb
-								target_titles = { scope:rf_diadochi_origin_title }
-							}
-						}
 					}
 				}
 				scope:rf_diadochi_origin_title.holder = {
-					scope:rf_diadochi_origin_title = { save_scope_as = rf_diadochi_browser_pending_title }
-					scope:rf_diadochi_browser_pending_title = {
-						add_to_temporary_list = rf_diadochi_browser_legal_titles
-					}
+					riseandfall_diadochi_store_browser_kingdoms_se = yes
 				}
 			}
 
@@ -424,105 +442,32 @@ riseandfall_diadochi_prepare_browser_targets_se = {
 					is_landed = yes
 					is_independent_ruler = yes
 					exists = primary_title
+					riseandfall_has_successor_primary_title_trigger = yes
+					primary_title.var:rf_successor_root_origin_title = scope:rf_diadochi_origin_title
 					NOT = { has_truce = root }
 					NOT = { is_allied_to = root }
 					NOT = { is_at_war_with = root }
-					root = {
-						can_declare_war = {
-							defender = prev
-							casus_belli = riseandfall_diadochi_cb
-							target_titles = { prev.primary_title }
-						}
-					}
 				}
-				primary_title = {
-					save_scope_as = rf_diadochi_browser_pending_title
-					if = {
-						limit = { NOT = { is_in_list = rf_diadochi_browser_legal_titles } }
-						add_to_temporary_list = rf_diadochi_browser_legal_titles
-					}
-				}
-			}
-
-			every_independent_ruler = {
-				limit = {
-					NOT = { this = root }
-					is_landed = yes
-					is_independent_ruler = yes
-					exists = primary_title
-					NOT = { has_truce = root }
-					NOT = { is_allied_to = root }
-					NOT = { is_at_war_with = root }
-					root = {
-						can_declare_war = {
-							defender = prev
-							casus_belli = riseandfall_diadochi_cb
-							target_titles = { prev.primary_title }
-						}
-					}
-				}
-				primary_title = {
-					save_scope_as = rf_diadochi_browser_pending_title
-					if = {
-						limit = { NOT = { is_in_list = rf_diadochi_browser_legal_titles } }
-						add_to_temporary_list = rf_diadochi_browser_legal_titles
-					}
-				}
+				riseandfall_diadochi_store_browser_kingdoms_se = yes
 			}
 		}
 		else = {
-			primary_title = { save_scope_as = rf_diadochi_origin_title }
-
+			# Original realms use the same neighboring kingdom collector; the
+			# origin title itself is not a valid target unless it is a kingdom
+			# region bordering the attacker.
 			every_neighboring_realm_owner = {
 				limit = {
 					NOT = { this = root }
 					is_landed = yes
 					is_independent_ruler = yes
 					exists = primary_title
+					riseandfall_has_successor_primary_title_trigger = yes
+					primary_title.var:rf_successor_root_origin_title = root.primary_title
 					NOT = { has_truce = root }
 					NOT = { is_allied_to = root }
 					NOT = { is_at_war_with = root }
-					root = {
-						can_declare_war = {
-							defender = prev
-							casus_belli = riseandfall_diadochi_cb
-							target_titles = { prev.primary_title }
-						}
-					}
 				}
-				primary_title = {
-					save_scope_as = rf_diadochi_browser_pending_title
-					if = {
-						limit = { NOT = { is_in_list = rf_diadochi_browser_legal_titles } }
-						add_to_temporary_list = rf_diadochi_browser_legal_titles
-					}
-				}
-			}
-
-			every_independent_ruler = {
-				limit = {
-					NOT = { this = root }
-					is_landed = yes
-					is_independent_ruler = yes
-					exists = primary_title
-					NOT = { has_truce = root }
-					NOT = { is_allied_to = root }
-					NOT = { is_at_war_with = root }
-					root = {
-						can_declare_war = {
-							defender = prev
-							casus_belli = riseandfall_diadochi_cb
-							target_titles = { prev.primary_title }
-						}
-					}
-				}
-				primary_title = {
-					save_scope_as = rf_diadochi_browser_pending_title
-					if = {
-						limit = { NOT = { is_in_list = rf_diadochi_browser_legal_titles } }
-						add_to_temporary_list = rf_diadochi_browser_legal_titles
-					}
-				}
+				riseandfall_diadochi_store_browser_kingdoms_se = yes
 			}
 		}
 	}
@@ -564,6 +509,28 @@ riseandfall_diadochi_prepare_browser_targets_se = {
 	clear_saved_scope = rf_diadochi_origin_title
 }
 
+# Select a de-jure border kingdom containing defender-realm counties. Successor
+# states commonly do not hold the kingdom title itself, so title ownership must
+# never be used as the target filter.
+riseandfall_diadochi_save_ai_target_kingdom_se = {
+	clear_saved_scope = rf_diadochi_target_title
+	scope:rf_diadochi_attacker = {
+		random_character_to_title_neighboring_kingdom = {
+			limit = {
+				any_de_jure_county = {
+					holder = {
+						OR = {
+							this = scope:rf_diadochi_target_ruler
+							is_vassal_or_below_of = scope:rf_diadochi_target_ruler
+						}
+					}
+				}
+			}
+			save_scope_as = rf_diadochi_target_title
+		}
+	}
+}
+
 riseandfall_diadochi_try_peer_target_se = {
 	clear_saved_scope = rf_diadochi_target_ruler
 	clear_saved_scope = rf_diadochi_target_title
@@ -581,15 +548,25 @@ riseandfall_diadochi_try_peer_target_se = {
 				NOT = { is_at_war_with = prev }
 				can_attack_in_hierarchy = prev
 				has_any_display_cb_on = prev
-				can_declare_war = {
-					defender = prev
-					casus_belli = riseandfall_diadochi_cb
-					target_titles = { prev.primary_title }
-				}
 			}
 		}
 		save_scope_as = rf_diadochi_target_ruler
-		primary_title = { save_scope_as = rf_diadochi_target_title }
+		riseandfall_diadochi_save_ai_target_kingdom_se = yes
+		if = {
+			limit = { NOT = { exists = scope:rf_diadochi_target_title } }
+			clear_saved_scope = rf_diadochi_target_title
+			clear_saved_scope = rf_diadochi_target_ruler
+		}
+		else_if = {
+			limit = {
+						NOR = {
+							scope:rf_diadochi_attacker = { can_declare_war = { defender = scope:rf_diadochi_target_ruler casus_belli = riseandfall_diadochi_cb target_titles = { scope:rf_diadochi_target_title } } }
+							scope:rf_diadochi_attacker = { can_declare_war = { defender = scope:rf_diadochi_target_ruler casus_belli = riseandfall_diadochi_absorption_cb target_titles = { scope:rf_diadochi_target_title } } }
+						}
+			}
+			clear_saved_scope = rf_diadochi_target_title
+			clear_saved_scope = rf_diadochi_target_ruler
+		}
 	}
 }
 
@@ -611,11 +588,6 @@ riseandfall_diadochi_try_neighbor_peer_target_se = {
 					NOT = { is_at_war_with = prev }
 					can_attack_in_hierarchy = prev
 					has_any_display_cb_on = prev
-					can_declare_war = {
-						defender = prev
-						casus_belli = riseandfall_diadochi_cb
-						target_titles = { prev.primary_title }
-					}
 				}
 			}
 		}
@@ -632,15 +604,25 @@ riseandfall_diadochi_try_neighbor_peer_target_se = {
 					NOT = { is_at_war_with = prev }
 					can_attack_in_hierarchy = prev
 					has_any_display_cb_on = prev
-					can_declare_war = {
-						defender = prev
-						casus_belli = riseandfall_diadochi_cb
-						target_titles = { prev.primary_title }
-					}
 				}
 			}
 			save_scope_as = rf_diadochi_target_ruler
-			primary_title = { save_scope_as = rf_diadochi_target_title }
+			riseandfall_diadochi_save_ai_target_kingdom_se = yes
+			if = {
+				limit = { NOT = { exists = scope:rf_diadochi_target_title } }
+				clear_saved_scope = rf_diadochi_target_title
+				clear_saved_scope = rf_diadochi_target_ruler
+			}
+			else_if = {
+				limit = {
+						NOR = {
+							scope:rf_diadochi_attacker = { can_declare_war = { defender = scope:rf_diadochi_target_ruler casus_belli = riseandfall_diadochi_cb target_titles = { scope:rf_diadochi_target_title } } }
+							scope:rf_diadochi_attacker = { can_declare_war = { defender = scope:rf_diadochi_target_ruler casus_belli = riseandfall_diadochi_absorption_cb target_titles = { scope:rf_diadochi_target_title } } }
+						}
+				}
+				clear_saved_scope = rf_diadochi_target_title
+				clear_saved_scope = rf_diadochi_target_ruler
+			}
 		}
 	}
 }
@@ -671,14 +653,866 @@ riseandfall_diadochi_try_origin_target_se = {
 			NOT = { is_at_war_with = scope:rf_diadochi_origin_title.holder }
 			can_attack_in_hierarchy = scope:rf_diadochi_origin_title.holder
 			has_any_display_cb_on = scope:rf_diadochi_origin_title.holder
-			can_declare_war = {
-				defender = scope:rf_diadochi_origin_title.holder
-				casus_belli = riseandfall_diadochi_cb
-				target_titles = { scope:rf_diadochi_origin_title }
-			}
 		}
 		scope:rf_diadochi_origin_title.holder = { save_scope_as = rf_diadochi_target_ruler }
-		scope:rf_diadochi_origin_title = { save_scope_as = rf_diadochi_target_title }
+		scope:rf_diadochi_target_ruler = {
+			riseandfall_diadochi_save_ai_target_kingdom_se = yes
+		}
+		if = {
+			limit = { NOT = { exists = scope:rf_diadochi_target_title } }
+			clear_saved_scope = rf_diadochi_target_title
+			clear_saved_scope = rf_diadochi_target_ruler
+		}
+		else_if = {
+			limit = {
+						NOR = {
+							scope:rf_diadochi_attacker = { can_declare_war = { defender = scope:rf_diadochi_target_ruler casus_belli = riseandfall_diadochi_cb target_titles = { scope:rf_diadochi_target_title } } }
+							scope:rf_diadochi_attacker = { can_declare_war = { defender = scope:rf_diadochi_target_ruler casus_belli = riseandfall_diadochi_absorption_cb target_titles = { scope:rf_diadochi_target_title } } }
+						}
+			}
+			clear_saved_scope = rf_diadochi_target_title
+			clear_saved_scope = rf_diadochi_target_ruler
+		}
 	}
+}
+
+# Transfers only the declared de jure kingdom war goal through the same vanilla
+# title-and-vassal batching used by conquest CBs. This transfers a vassal branch
+# when its complete subrealm is inside the target; occupation percentage is not
+# part of the eligibility check.
+riseandfall_apply_de_jure_war_goal_victory_se = {
+	create_title_and_vassal_change = {
+		type = conquest
+		save_scope_as = rf_diadochi_kingdom_invasion_change
+		add_claim_on_loss = yes
+	}
+
+	every_in_list = {
+		list = target_titles
+		custom_tooltip = invasion_title_transfer_tt
+		custom_tooltip = invasion_title_transfer_2_tt
+		conquest_cb_title_transfer = {
+			RELIGIOUS_WAR = no
+		}
+	}
+
+	every_in_list = {
+		list = vassals_taken
+		change_liege = {
+			liege = scope:attacker
+			change = scope:rf_diadochi_kingdom_invasion_change
+		}
+	}
+
+	every_in_list = {
+		list = titles_taken
+		change_title_holder = {
+			holder = scope:attacker
+			change = scope:rf_diadochi_kingdom_invasion_change
+			take_baronies = yes
+		}
+	}
+
+	resolve_title_and_vassal_change = scope:rf_diadochi_kingdom_invasion_change
+}
+
+# A title transfer can still leave a ruler unlanded when the engine changes a
+# primary title during resolution. Give the loser one county from the winner's
+# resulting subrealm as a final safety net.
+riseandfall_handoff_defender_random_county_se = {
+	clear_saved_scope = rf_war_handoff_county
+
+	if = {
+		limit = { scope:defender = { is_landed = no } }
+		scope:attacker = {
+			random_sub_realm_county = {
+				limit = { NOT = { holder = scope:defender } }
+				save_scope_as = rf_war_handoff_county
+			}
+		}
+
+		if = {
+			limit = { exists = scope:rf_war_handoff_county }
+			create_title_and_vassal_change = {
+				type = conquest
+				save_scope_as = rf_war_handoff_change
+				add_claim_on_loss = yes
+			}
+			scope:rf_war_handoff_county = {
+				change_title_holder = {
+					holder = scope:defender
+					change = scope:rf_war_handoff_change
+					take_baronies = yes
+				}
+			}
+			resolve_title_and_vassal_change = scope:rf_war_handoff_change
+			clear_saved_scope = rf_war_handoff_county
+		}
+	}
+}
+
+# Shared vassalization handoff. Callers decide whether the war's political
+# outcome permits it; this effect only applies CK3's rank and existing-liege
+# safety checks and keeps the defender's remaining realm intact.
+riseandfall_vassalize_defeated_ruler_se = {
+	if = {
+		limit = {
+			scope:attacker = {
+				exists = primary_title
+			}
+			scope:defender = {
+				is_landed = yes
+				exists = primary_title
+				primary_title.tier < scope:attacker.primary_title.tier
+				NOT = { is_vassal_or_below_of = scope:attacker }
+			}
+		}
+		create_title_and_vassal_change = {
+			type = conquest
+			save_scope_as = rf_defeated_ruler_vassal_change
+			add_claim_on_loss = no
+		}
+		scope:defender = {
+			change_liege = {
+				liege = scope:attacker
+				change = scope:rf_defeated_ruler_vassal_change
+			}
+		}
+		resolve_title_and_vassal_change = scope:rf_defeated_ruler_vassal_change
+	}
+}
+
+# Full-realm victory used only by the larger-realm Diadochi and Warlord CBs.
+# This follows vanilla equal-rank subjugation: take the defender's peer-rank
+# title first, move its vassals, then attach the demoted ruler to the victor.
+riseandfall_absorb_defender_realm_se = {
+	create_title_and_vassal_change = {
+		type = swear_fealty
+		save_scope_as = rf_realm_absorption_change
+		add_claim_on_loss = no
+	}
+
+	if = {
+		limit = { scope:defender.primary_title.tier < scope:attacker.primary_title.tier }
+		scope:defender = {
+			change_liege = {
+				liege = scope:attacker
+				change = scope:rf_realm_absorption_change
+			}
+		}
+	}
+	else = {
+		scope:defender = {
+			every_held_title = {
+				if = {
+					limit = { tier = scope:defender.primary_title.tier }
+					change_title_holder = {
+						holder = scope:attacker
+						change = scope:rf_realm_absorption_change
+					}
+				}
+				else_if = {
+					limit = {
+						OR = {
+							NOT = { exists = scope:rf_realm_absorption_secondary_title }
+							tier > scope:rf_realm_absorption_secondary_title.tier
+						}
+					}
+					save_temporary_scope_as = rf_realm_absorption_secondary_title
+				}
+			}
+			if = {
+				limit = { exists = scope:rf_realm_absorption_secondary_title }
+				every_vassal = {
+					limit = {
+						primary_title.tier >= scope:rf_realm_absorption_secondary_title.tier
+						NOT = { primary_title.tier = tier_barony }
+					}
+					change_liege = {
+						liege = scope:attacker
+						change = scope:rf_realm_absorption_change
+					}
+				}
+			}
+			change_liege = {
+				liege = scope:attacker
+				change = scope:rf_realm_absorption_change
+			}
+		}
+	}
+
+	resolve_title_and_vassal_change = scope:rf_realm_absorption_change
+	# One-county rulers can become landless during equal-rank subjugation.
+	# Give them a county first, then repeat the normal rank-safe vassal handoff.
+	riseandfall_handoff_defender_random_county_se = yes
+	riseandfall_vassalize_defeated_ruler_se = yes
+}
+
+# Warlords do not use the vanilla landless-ruler county handoff. Conventional
+# governments keep any remaining realm and become vassals; administrative-style
+# governments instead surrender every title they personally hold, including
+# landless family titles that would otherwise keep them politically active.
+riseandfall_resolve_warlord_defeat_se = {
+	if = {
+		limit = {
+			scope:defender = {
+				OR = {
+					government_has_flag = government_is_administrative
+					government_allows = administrative
+					has_government = celestial_government
+					has_government = japan_administrative_government
+				}
+			}
+		}
+		create_title_and_vassal_change = {
+			type = conquest
+			save_scope_as = rf_warlord_administrative_defeat_change
+			# Each title taken below gives its former administrative holder a claim.
+			add_claim_on_loss = yes
+		}
+		scope:defender = {
+			every_held_title = {
+				change_title_holder = {
+					holder = scope:attacker
+					change = scope:rf_warlord_administrative_defeat_change
+					take_baronies = yes
+				}
+			}
+		}
+		resolve_title_and_vassal_change = scope:rf_warlord_administrative_defeat_change
+	}
+	else = {
+		# No county is granted if the defeated Warlord becomes landless.
+		# CK3's rank checks decide whether their remaining realm can be vassalized.
+		riseandfall_vassalize_defeated_ruler_se = yes
+	}
+}
+
+# Full-realm Warlord absorption uses the same equal-rank transfer ordering as
+# Diadochi absorption, but resolves the loser with Warlord-specific government
+# rules instead of granting a random county.
+riseandfall_absorb_warlord_defender_realm_se = {
+	create_title_and_vassal_change = {
+		type = swear_fealty
+		save_scope_as = rf_warlord_realm_absorption_change
+		add_claim_on_loss = no
+	}
+
+	if = {
+		limit = { scope:defender.primary_title.tier < scope:attacker.primary_title.tier }
+		scope:defender = {
+			change_liege = {
+				liege = scope:attacker
+				change = scope:rf_warlord_realm_absorption_change
+			}
+		}
+	}
+	else = {
+		scope:defender = {
+			every_held_title = {
+				if = {
+					limit = { tier = scope:defender.primary_title.tier }
+					change_title_holder = {
+						holder = scope:attacker
+						change = scope:rf_warlord_realm_absorption_change
+					}
+				}
+				else_if = {
+					limit = {
+						OR = {
+							NOT = { exists = scope:rf_warlord_absorption_secondary_title }
+							tier > scope:rf_warlord_absorption_secondary_title.tier
+						}
+					}
+					save_temporary_scope_as = rf_warlord_absorption_secondary_title
+				}
+			}
+			if = {
+				limit = { exists = scope:rf_warlord_absorption_secondary_title }
+				every_vassal = {
+					limit = {
+						primary_title.tier >= scope:rf_warlord_absorption_secondary_title.tier
+						NOT = { primary_title.tier = tier_barony }
+					}
+					change_liege = {
+						liege = scope:attacker
+						change = scope:rf_warlord_realm_absorption_change
+					}
+				}
+			}
+			change_liege = {
+				liege = scope:attacker
+				change = scope:rf_warlord_realm_absorption_change
+			}
+		}
+	}
+
+	resolve_title_and_vassal_change = scope:rf_warlord_realm_absorption_change
+	riseandfall_resolve_warlord_defeat_se = yes
+}
+
+# Move a defeated non-titular successor crown to the larger victor before the
+# political handoff. Destroying a ruler's current de-jure crown does not always
+# refresh their rank during the same resolution block; transferring it does,
+# so the following `change_liege` sees the defender's real lower title.
+riseandfall_demote_defeated_successor_se = {
+	if = {
+		limit = {
+			exists = scope:rf_defender_split_title
+			scope:rf_defender_split_title = {
+				has_variable = rf_is_successor_split_title
+				is_titular = no
+				holder = scope:defender
+			}
+		}
+		create_title_and_vassal_change = {
+			type = conquest
+			save_scope_as = rf_defeated_successor_demotion_change
+			add_claim_on_loss = yes
+		}
+		scope:rf_defender_split_title = {
+			change_title_holder = {
+				holder = scope:attacker
+				change = scope:rf_defeated_successor_demotion_change
+			}
+		}
+		resolve_title_and_vassal_change = scope:rf_defeated_successor_demotion_change
+	}
+}
+
+# Once the defender has been demoted and vassalized, remove their captured
+# non-titular successor crown. Never destroy the victor's primary title.
+riseandfall_destroy_absorbed_successor_crown_se = {
+	if = {
+		limit = {
+			exists = scope:rf_defender_split_title
+			scope:rf_defender_split_title = {
+				has_variable = rf_is_successor_split_title
+				is_titular = no
+				holder = scope:attacker
+			}
+			NOT = { scope:rf_defender_split_title = scope:attacker.primary_title }
+		}
+		scope:attacker = { destroy_title = scope:rf_defender_split_title }
+	}
+}
+
+# Applies the territory part of a Successor State War white-peace settlement.
+# Only the primary war leaders' occupations count: allies cannot decide borders.
+# Direct-vassal transfers keep each qualifying ruler's entire sub-realm intact.
+riseandfall_apply_dynamic_realm_status_quo_settlement_se = {
+	create_title_and_vassal_change = {
+		type = conquest
+		save_scope_as = rf_diadochi_status_quo_change
+		add_claim_on_loss = no
+	}
+
+	# Only counties personally held by a war leader can change hands directly.
+	scope:defender = {
+		every_held_title = {
+			limit = {
+				tier = tier_county
+				holder = scope:defender
+				county_controller = scope:attacker
+			}
+			change_title_holder = {
+				holder = scope:attacker
+				change = scope:rf_diadochi_status_quo_change
+				take_baronies = yes
+			}
+		}
+	}
+
+	scope:attacker = {
+		every_held_title = {
+			limit = {
+				tier = tier_county
+				holder = scope:attacker
+				county_controller = scope:defender
+			}
+			change_title_holder = {
+				holder = scope:defender
+				change = scope:rf_diadochi_status_quo_change
+				take_baronies = yes
+			}
+		}
+	}
+
+	# A qualifying direct vassal changes liege as one intact realm, including
+	# every sub-vassal. Do not inspect or transfer their individual counties.
+	scope:defender = {
+		every_vassal = {
+			limit = {
+				is_landed = yes
+				exists = primary_title
+				primary_title.tier < scope:attacker.primary_title.tier
+				any_sub_realm_county = {
+					count = all
+					county_controller = scope:attacker
+				}
+			}
+			change_liege = {
+				liege = scope:attacker
+				change = scope:rf_diadochi_status_quo_change
+			}
+		}
+	}
+
+	scope:attacker = {
+		every_vassal = {
+			limit = {
+				is_landed = yes
+				exists = primary_title
+				primary_title.tier < scope:defender.primary_title.tier
+				any_sub_realm_county = {
+					count = all
+					county_controller = scope:defender
+				}
+			}
+			change_liege = {
+				liege = scope:defender
+				change = scope:rf_diadochi_status_quo_change
+			}
+		}
+	}
+
+	resolve_title_and_vassal_change = scope:rf_diadochi_status_quo_change
+}
+
+# A vassal whose entire subrealm is occupied by the victor transfers
+# automatically. Equal-rank vassals cannot be legally transferred, so inspect
+# every lower-ranked vassal branch. `top_liege` prevents a child branch being
+# transferred after its parent has already changed sides.
+riseandfall_diadochi_apply_occupied_vassal_concessions_se = {
+	if = {
+		limit = {
+			scope:defender = {
+				any_vassal_or_below = {
+					is_landed = yes
+					exists = primary_title
+					primary_title.tier < scope:attacker.primary_title.tier
+					any_sub_realm_county = {
+						count = all
+						county_controller = scope:attacker
+					}
+				}
+			}
+		}
+		create_title_and_vassal_change = {
+			type = conquest
+			save_scope_as = rf_diadochi_occupied_concession_change
+			add_claim_on_loss = yes
+		}
+		scope:defender = {
+			every_vassal_or_below = {
+				limit = {
+					is_landed = yes
+					top_liege = scope:defender
+					exists = primary_title
+					primary_title.tier < scope:attacker.primary_title.tier
+					any_sub_realm_county = {
+						count = all
+						county_controller = scope:attacker
+					}
+				}
+				change_liege = {
+					liege = scope:attacker
+					change = scope:rf_diadochi_occupied_concession_change
+				}
+			}
+		}
+		resolve_title_and_vassal_change = scope:rf_diadochi_occupied_concession_change
+	}
+}
+
+# Once the declared kingdom and any fully occupied vassal branches have changed
+# sides, a larger successor absorbs the defeated successor as a vassal. Keep
+# this after the occupation transfers so their qualifying branches can still
+# become direct vassals of the victor. CK3 only permits vassalage when the
+# victor's primary title outranks the defeated ruler's primary title.
+riseandfall_diadochi_vassalize_defeated_successor_se = {
+	if = {
+		limit = {
+			 scope:attacker = {
+				exists = primary_title
+				realm_size > scope:defender.realm_size
+			}
+			scope:defender = {
+				is_landed = yes
+				exists = primary_title
+				primary_title.tier < scope:attacker.primary_title.tier
+				NOT = { is_vassal_or_below_of = scope:attacker }
+			}
+		}
+		create_title_and_vassal_change = {
+			type = conquest
+			save_scope_as = rf_diadochi_defeated_successor_vassal_change
+			add_claim_on_loss = no
+		}
+		scope:defender = {
+			change_liege = {
+				liege = scope:attacker
+				change = scope:rf_diadochi_defeated_successor_vassal_change
+			}
+		}
+		resolve_title_and_vassal_change = scope:rf_diadochi_defeated_successor_vassal_change
+	}
+}
+
+# The separate political-fragmentation roll considers every remaining eligible
+# vassal in the defeated realm, independent of occupation.
+riseandfall_diadochi_apply_vassal_concession_rolls_se = {
+	if = {
+		limit = {
+			scope:defender = {
+				any_vassal_or_below = {
+					is_landed = yes
+					exists = primary_title
+					primary_title.tier < scope:attacker.primary_title.tier
+				}
+			}
+		}
+		create_title_and_vassal_change = {
+			type = conquest
+			save_scope_as = rf_diadochi_random_concession_change
+			add_claim_on_loss = yes
+		}
+		scope:defender = {
+			every_vassal_or_below = {
+				limit = {
+					is_landed = yes
+					top_liege = scope:defender
+					exists = primary_title
+					primary_title.tier < scope:attacker.primary_title.tier
+				}
+				random = {
+					chance = 50
+					change_liege = {
+						liege = scope:attacker
+						change = scope:rf_diadochi_random_concession_change
+					}
+				}
+			}
+		}
+		resolve_title_and_vassal_change = scope:rf_diadochi_random_concession_change
+	}
+}
+
+# Defender-win mirror: full occupation is a guaranteed vassal transfer.
+riseandfall_diadochi_apply_defender_occupied_vassal_concessions_se = {
+	if = {
+		limit = {
+			scope:attacker = {
+				any_vassal_or_below = {
+					is_landed = yes
+					exists = primary_title
+					primary_title.tier < scope:defender.primary_title.tier
+					any_sub_realm_county = {
+						count = all
+						county_controller = scope:defender
+					}
+				}
+			}
+		}
+		create_title_and_vassal_change = {
+			type = conquest
+			save_scope_as = rf_diadochi_defender_occupied_concession_change
+			add_claim_on_loss = yes
+		}
+		scope:attacker = {
+			every_vassal_or_below = {
+				limit = {
+					is_landed = yes
+					top_liege = scope:attacker
+					exists = primary_title
+					primary_title.tier < scope:defender.primary_title.tier
+					any_sub_realm_county = {
+						count = all
+						county_controller = scope:defender
+					}
+				}
+				change_liege = {
+					liege = scope:defender
+					change = scope:rf_diadochi_defender_occupied_concession_change
+				}
+			}
+		}
+		resolve_title_and_vassal_change = scope:rf_diadochi_defender_occupied_concession_change
+	}
+}
+
+# Defender-win mirror: every remaining eligible attacker vassal independently
+# has a 50% chance to defect, regardless of occupation.
+riseandfall_diadochi_apply_defender_vassal_concession_rolls_se = {
+	if = {
+		limit = {
+			scope:attacker = {
+				any_vassal_or_below = {
+					is_landed = yes
+					exists = primary_title
+					primary_title.tier < scope:defender.primary_title.tier
+				}
+			}
+		}
+		create_title_and_vassal_change = {
+			type = conquest
+			save_scope_as = rf_diadochi_defender_random_concession_change
+			add_claim_on_loss = yes
+		}
+		scope:attacker = {
+			every_vassal_or_below = {
+				limit = {
+					is_landed = yes
+					top_liege = scope:attacker
+					exists = primary_title
+					primary_title.tier < scope:defender.primary_title.tier
+				}
+				random = {
+					chance = 50
+					change_liege = {
+						liege = scope:defender
+						change = scope:rf_diadochi_defender_random_concession_change
+					}
+				}
+			}
+		}
+		resolve_title_and_vassal_change = scope:rf_diadochi_defender_random_concession_change
+	}
+}
+
+# A larger defeated successor is cut down to the victor's pre-war size. The
+# concession budget is the defender's LIVE realm size after the de jure kingdom
+# prize was already transferred, minus the attacker's original realm size, so
+# kingdom counties are never double-counted: the defender loses the war-goal
+# kingdom plus whatever intact vassal territory across its remaining realm is
+# needed to end up at roughly the attacker's starting size. Only vassals
+# holding no counties in the war-goal kingdom qualify, and bordering, larger
+# branches are preferred to create a coherent frontier and limit overshoot.
+riseandfall_apply_successor_realm_balance_concession_se = {
+	if = {
+		limit = {
+			scope:attacker = { has_variable = rf_diadochi_pre_settlement_realm_size }
+			scope:defender = {
+				has_variable = rf_diadochi_pre_settlement_realm_size
+			}
+		}
+		scope:defender = {
+			set_variable = {
+				name = rf_diadochi_vassal_concession_remaining
+				value = realm_size
+			}
+			change_variable = {
+				name = rf_diadochi_vassal_concession_remaining
+				subtract = scope:attacker.var:rf_diadochi_pre_settlement_realm_size
+			}
+			clamp_variable = {
+				name = rf_diadochi_vassal_concession_remaining
+				min = 0
+				max = 1000000
+			}
+			ordered_vassal_or_below = {
+				limit = {
+					is_landed = yes
+					exists = primary_title
+					primary_title.tier < scope:attacker.primary_title.tier
+					# Only vassals outside the war-goal kingdom qualify; the
+					# kingdom's counties are the separate guaranteed prize.
+					NOT = {
+						any_held_title = {
+							title_tier = county
+							any_in_list = {
+								list = target_titles
+								is_de_jure_liege_or_above_target = prev
+							}
+						}
+					}
+				}
+				order_by = {
+					value = sub_realm_size
+					multiply = -1
+					if = {
+						limit = { primary_title = { is_neighbor_to_realm = scope:attacker } }
+						add = 100000
+					}
+				}
+				if = {
+					limit = {
+						top_liege = scope:defender
+						scope:defender = { var:rf_diadochi_vassal_concession_remaining > 0 }
+					}
+					save_temporary_scope_as = rf_diadochi_balance_candidate
+					set_variable = { name = rf_diadochi_balance_candidate_size value = sub_realm_size }
+					scope:defender = {
+						change_variable = {
+							name = rf_diadochi_vassal_concession_remaining
+							subtract = scope:rf_diadochi_balance_candidate.var:rf_diadochi_balance_candidate_size
+						}
+					}
+					create_title_and_vassal_change = {
+						type = conquest
+						save_scope_as = rf_diadochi_balance_concession_change
+						add_claim_on_loss = yes
+					}
+					change_liege = {
+						liege = scope:attacker
+						change = scope:rf_diadochi_balance_concession_change
+					}
+					resolve_title_and_vassal_change = scope:rf_diadochi_balance_concession_change
+					remove_variable = rf_diadochi_balance_candidate_size
+				}
+			}
+			remove_variable = rf_diadochi_vassal_concession_remaining
+		}
+	}
+	scope:attacker = { remove_variable = rf_diadochi_pre_settlement_realm_size }
+	scope:defender = { remove_variable = rf_diadochi_pre_settlement_realm_size }
+}
+
+# A successor victor receives unoccupied concessions when the defeated realm
+# is at least as large. Every eligible vassal then makes an independent 50%
+# defection roll, turning a short war into a real political fragmentation.
+riseandfall_apply_dynamic_realm_concession_se = {
+	if = {
+		limit = {
+			scope:attacker = { has_variable = rf_diadochi_prewar_realm_size }
+			scope:defender = {
+			has_variable = rf_diadochi_prewar_realm_size
+			var:rf_diadochi_prewar_realm_size >= scope:attacker.var:rf_diadochi_prewar_realm_size
+		}
+		}
+		riseandfall_diadochi_apply_vassal_concession_rolls_se = yes
+	}
+}
+
+# Mirror the size-balancing successor settlement after an attacker surrender.
+# Occupation changes resolve first, then the defeated attacker's intact vassal
+# branches are ceded until its live realm is cut down to the defender's
+# pre-war size. Only vassals holding no counties in the war-goal kingdom
+# qualify, so the loser is carved up outside the de jure objective.
+riseandfall_apply_successor_defender_realm_balance_concession_se = {
+	if = {
+		limit = {
+			scope:defender = { has_variable = rf_diadochi_pre_settlement_realm_size }
+			scope:attacker = {
+				has_variable = rf_diadochi_pre_settlement_realm_size
+			}
+		}
+		scope:attacker = {
+			set_variable = {
+				name = rf_diadochi_vassal_concession_remaining
+				value = realm_size
+			}
+			change_variable = {
+				name = rf_diadochi_vassal_concession_remaining
+				subtract = scope:defender.var:rf_diadochi_pre_settlement_realm_size
+			}
+			clamp_variable = {
+				name = rf_diadochi_vassal_concession_remaining
+				min = 0
+				max = 1000000
+			}
+			ordered_vassal_or_below = {
+				limit = {
+					is_landed = yes
+					exists = primary_title
+					primary_title.tier < scope:defender.primary_title.tier
+					# Only vassals outside the war-goal kingdom qualify; the
+					# kingdom's counties are the separate guaranteed prize.
+					NOT = {
+						any_held_title = {
+							title_tier = county
+							any_in_list = {
+								list = target_titles
+								is_de_jure_liege_or_above_target = prev
+							}
+						}
+					}
+				}
+				order_by = {
+					value = sub_realm_size
+					multiply = -1
+					if = {
+						limit = { primary_title = { is_neighbor_to_realm = scope:defender } }
+						add = 100000
+					}
+				}
+				if = {
+					limit = {
+						top_liege = scope:attacker
+						scope:attacker = { var:rf_diadochi_vassal_concession_remaining > 0 }
+					}
+					save_temporary_scope_as = rf_diadochi_defender_balance_candidate
+					set_variable = { name = rf_diadochi_balance_candidate_size value = sub_realm_size }
+					scope:attacker = {
+						change_variable = {
+							name = rf_diadochi_vassal_concession_remaining
+							subtract = scope:rf_diadochi_defender_balance_candidate.var:rf_diadochi_balance_candidate_size
+						}
+					}
+					create_title_and_vassal_change = {
+						type = conquest
+						save_scope_as = rf_diadochi_defender_balance_concession_change
+						add_claim_on_loss = yes
+					}
+					change_liege = {
+						liege = scope:defender
+						change = scope:rf_diadochi_defender_balance_concession_change
+					}
+					resolve_title_and_vassal_change = scope:rf_diadochi_defender_balance_concession_change
+					remove_variable = rf_diadochi_balance_candidate_size
+				}
+			}
+			remove_variable = rf_diadochi_vassal_concession_remaining
+		}
+	}
+	scope:attacker = { remove_variable = rf_diadochi_pre_settlement_realm_size }
+	scope:defender = { remove_variable = rf_diadochi_pre_settlement_realm_size }
+}
+
+# Applies the defender-only territory part of an attacker surrender in a
+# Successor State War. The defender cannot lose land through this outcome.
+riseandfall_diadochi_apply_defeat_status_quo_settlement_se = {
+	create_title_and_vassal_change = {
+		type = conquest
+		save_scope_as = rf_diadochi_defeat_status_quo_change
+		add_claim_on_loss = no
+	}
+
+	# Only personally held attacker counties can be transferred directly.
+	scope:attacker = {
+		every_held_title = {
+			limit = {
+				tier = tier_county
+				holder = scope:attacker
+				county_controller = scope:defender
+			}
+			change_title_holder = {
+				holder = scope:defender
+				change = scope:rf_diadochi_defeat_status_quo_change
+				take_baronies = yes
+			}
+		}
+	}
+
+	# A qualifying attacker vassal changes liege intact with every sub-vassal.
+	scope:attacker = {
+		every_vassal = {
+			limit = {
+				is_landed = yes
+				exists = primary_title
+				primary_title.tier < scope:defender.primary_title.tier
+				any_sub_realm_county = {
+					count = all
+					county_controller = scope:defender
+				}
+			}
+			change_liege = {
+				liege = scope:defender
+				change = scope:rf_diadochi_defeat_status_quo_change
+			}
+		}
+	}
+
+	resolve_title_and_vassal_change = scope:rf_diadochi_defeat_status_quo_change
 }
 

@@ -1,0 +1,56 @@
+﻿# Rise and Fall - Independent Coalitions (Beta)
+
+# Called on the selected target so shared invitation code keeps the target as
+# root. The initiator is committed immediately and therefore cannot decline
+# their own Coalition invitation.
+riseandfall_coalition_start_interaction_se = {
+    save_scope_as = coalition_target
+    riseandfall_coalition_calculate_periphery_se = yes
+    riseandfall_coalition_update_threat_se = { APPLY_YEARLY = no }
+    if = {
+        # Recheck the actor-relative threat gate after refreshing the county
+        # counters, so a stale interaction preview cannot start a Coalition.
+        limit = {
+            riseandfall_coalition_interaction_target_valid_trigger = yes
+            has_variable = rf_coalition_threat
+            var:rf_coalition_threat >= 100
+            riseandfall_coalition_target_controls_five_percent_world_trigger = yes
+            realm_size >= { value = $INITIATOR$.realm_size multiply = 2 }
+        }
+        set_variable = { name = rf_coalition_initiator value = $INITIATOR$ days = 60 }
+        add_character_flag = { flag = rf_coalition_interaction_formation days = 60 }
+        add_character_flag = { flag = rf_coalition_formation_active days = 60 }
+        # This temporary title variable becomes the requested failure-only
+        # cooldown unless the shared assembly creates a real Coalition war.
+        primary_title = {
+            set_variable = { name = rf_coalition_interaction_cooldown value = 1 years = 10 }
+        }
+        $INITIATOR$ = {
+            set_variable = { name = rf_coalition_target value = scope:coalition_target days = 60 }
+            add_character_flag = { flag = rf_coalition_accepted days = 60 }
+        }
+        riseandfall_coalition_prepare_invitations_se = yes
+    }
+}
+
+# Keep beta failures out of the low-stability reroll/event path. Human
+# initiators receive a concise notice; AI formations simply clean up while the
+# title-bound ten-year variable remains in place.
+riseandfall_coalition_signal_formation_failure_se = {
+    if = {
+        limit = { has_character_flag = rf_coalition_interaction_formation }
+        if = {
+            limit = { has_variable = rf_coalition_initiator }
+            var:rf_coalition_initiator = {
+                if = {
+                    limit = { is_ai = no }
+                    trigger_event = { id = coalition.1108 delayed = yes }
+                }
+            }
+        }
+        riseandfall_coalition_clear_assembly_state_se = yes
+    }
+    else = {
+        trigger_event = { id = $LOW_STABILITY_FAILURE_EVENT$ delayed = yes }
+    }
+}

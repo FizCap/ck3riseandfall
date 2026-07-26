@@ -3,6 +3,13 @@
         riseandfall_ai_create_titles
         riseandfall_ai_usurp_titles
         riseandfall_ai_title_handout
+    }
+}
+
+# Advanced title management can restructure a realm. Spread it across the year
+# instead of processing every AI realm together on the two-year anniversary.
+random_yearly_everyone_pulse = {
+    on_actions = {
         riseandfall_ai_advanced_create_titles
         riseandfall_ai_advanced_title_handout
     }
@@ -50,6 +57,10 @@ riseandfall_ai_advanced_create_titles = {
     trigger = {
         has_game_rule = riseandfall_ai_kingdom_creation_advanced
         years_from_game_start >= 2
+        is_alive = yes
+        is_ai = yes
+        is_landed = yes
+        exists = primary_title
     }
     effect = {
         riseandfall_ai_create_titles_advanced_se = yes
@@ -60,12 +71,13 @@ riseandfall_ai_advanced_title_handout = {
     trigger = {
         has_game_rule = riseandfall_ai_kingdom_creation_advanced
         years_from_game_start >= 2
+        is_alive = yes
+        is_ai = yes
+        is_landed = yes
+        exists = primary_title
     }
     effect = {
-        every_ruler = {
-            limit = { is_ai = yes }
-            riseandfall_ai_advanced_title_handout_se = yes
-        }
+        riseandfall_ai_advanced_title_handout_se = yes
     }
 }
 

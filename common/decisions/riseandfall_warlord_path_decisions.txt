@@ -35,7 +35,12 @@ riseandfall_warlord_path_manager = {
         item = {
             value = riseandfall_choose_warlord_rebel
             is_shown = { has_character_flag = riseandfall_warlord_player_loyal }
-            is_valid = { always = yes }
+            is_valid = {
+                exists = liege
+                liege = { has_character_flag = rf_warlord_crisis_active }
+                NOT = { has_variable = riseandfall_warlord_choice_made }
+                NOT = { has_variable = riseandfall_warlord_retired_cooldown }
+            }
             current_description = riseandfall_warlord_choice_currently_loyal
             localization = riseandfall_choose_warlord_rebel
             icon = "gfx/interface/illustrations/decisions/decision_misc.dds"

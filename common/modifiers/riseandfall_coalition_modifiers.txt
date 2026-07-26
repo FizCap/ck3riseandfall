@@ -1,0 +1,25 @@
+﻿# Rise and Fall - Coalition AI war deterrence
+
+riseandfall_coalition_ai_war_caution_low = {
+    icon = icon_riseandfall
+    ai_war_chance = -0.10
+    ai_war_cooldown = 0.10
+}
+
+riseandfall_coalition_ai_war_caution_medium = {
+    icon = icon_riseandfall
+    ai_war_chance = -0.25
+    ai_war_cooldown = 0.25
+}
+
+riseandfall_coalition_ai_war_caution_high = {
+    icon = icon_riseandfall
+    ai_war_chance = -0.50
+    ai_war_cooldown = 0.50
+}
+
+riseandfall_coalition_ai_war_caution_severe = {
+    icon = icon_riseandfall
+    ai_war_chance = -0.75
+    ai_war_cooldown = 0.75
+}

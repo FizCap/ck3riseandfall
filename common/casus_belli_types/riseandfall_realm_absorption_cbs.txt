@@ -1,0 +1,170 @@
+﻿# Larger-realm variants are deliberately separate CBs. Their outcome is a
+# vanilla-style full subjugation, never a kingdom-by-kingdom skirmish.
+riseandfall_diadochi_absorption_cb = {
+	icon = vassalization
+	group = conquest
+	combine_into_one = yes
+	should_show_war_goal_subview = yes
+	mutually_exclusive_titles = { always = yes }
+
+	allowed_for_character = {
+		is_independent_ruler = yes
+		NOR = { government_has_flag = government_is_landless_adventurer }
+	}
+	allowed_against_character = {
+		NOT = { this = scope:attacker }
+		is_independent_ruler = yes
+		riseandfall_is_diadochi_target_trigger = yes
+	}
+	target_titles = all
+	target_title_tier = kingdom
+	target_de_jure_regions_above = yes
+	ignore_effect = change_title_holder
+	valid_to_start = {
+		scope:attacker.realm_size > scope:defender.realm_size
+		scope:target = {
+			is_landless_type_title = no
+			any_in_de_jure_hierarchy = {
+				tier = tier_county
+				neighboring_county_or_viking_conquest_trigger = { CHARACTER = root }
+				holder ?= { OR = { this = scope:defender is_vassal_or_below_of = scope:defender } }
+			}
+		}
+	}
+	should_invalidate = { always = no }
+	on_invalidated_desc = msg_invalidate_war_title
+	cost = { piety = { value = 0 } prestige = { value = 0 } }
+	on_declaration = { on_declared_war = yes }
+	on_victory_desc = { desc = RISEANDFALL_DIADOCHI_ABSORPTION_ON_VICTORY_DESC }
+	on_white_peace_desc = { desc = RISEANDFALL_DIADOCHI_ON_WHITE_PEACE_DESC }
+	on_defeat_desc = { desc = RISEANDFALL_DIADOCHI_ON_DEFEAT_DESC }
+	on_victory = {
+		scope:attacker = { show_pow_release_message_effect = yes accolade_attacker_war_end_glory_gain_low_effect = yes }
+		add_legitimacy_attacker_victory_effect = yes
+		riseandfall_absorb_defender_realm_se = yes
+		scope:defender = { ep3_war_loss_adventurer_tt_effect = yes }
+		scope:attacker = { add_prestige_experience = { value = major_prestige_value } fp1_remember_recent_conquest_victory_effect = yes }
+		modify_allies_of_participants_fame_values = { WINNER = scope:attacker FAME_BASE = major_prestige_value IS_RELIGIOUS_WAR = no WINNER_ALLY_FAME_SCALE = 1 LOSER_ALLY_FAME_SCALE = 1 }
+		add_truce_attacker_victory_effect = yes
+		laamp_as_mercenary_payout_tooltip_effect = yes
+	}
+	on_white_peace = {
+		scope:attacker = { show_pow_release_message_effect = yes add_prestige = { value = minor_prestige_value multiply = -1.0 } }
+		scope:defender = { accolade_defender_war_end_glory_gain_low_effect = yes }
+		add_truce_white_peace_effect = yes
+		laamp_as_mercenary_payout_tooltip_effect = yes
+	}
+	on_defeat = {
+		scope:attacker = { show_pow_release_message_effect = yes pay_short_term_gold_reparations_effect = { GOLD_VALUE = 2 } add_prestige = { value = medium_prestige_value multiply = -1.0 } }
+		add_legitimacy_attacker_defeat_effect = yes
+		scope:defender = { accolade_defender_war_end_glory_gain_low_effect = yes add_prestige_war_defender_effect = { PRESTIGE_VALUE = medium_prestige_value } }
+		add_truce_attacker_defeat_effect = yes
+		laamp_as_mercenary_payout_tooltip_effect = yes
+	}
+	transfer_behavior = transfer
+	on_primary_attacker_death = inherit
+	on_primary_defender_death = inherit
+	attacker_allies_inherit = yes
+	defender_allies_inherit = yes
+	war_name = "RISEANDFALL_DIADOCHI_WAR_NAME"
+	war_name_base = "RISEANDFALL_DIADOCHI_WAR_NAME_BASE"
+	cb_name = "RISEANDFALL_DIADOCHI_CB_NAME"
+	interface_priority = 81
+	use_de_jure_wargoal_only = yes
+	ticking_war_score_targets_entire_realm = yes
+	attacker_wargoal_percentage = 0.01
+	defender_wargoal_percentage = 0.95
+	attacker_ticking_warscore_delay = { months = 36 }
+	defender_ticking_warscore_delay = { months = 36 }
+	attacker_ticking_warscore = 0.03
+	defender_ticking_warscore = 0.03
+	attacker_score_from_occupation_scale = 50
+	defender_score_from_occupation_scale = 50
+	attacker_score_from_battles_scale = 100
+	defender_score_from_battles_scale = 100
+	max_ai_diplo_distance_to_title = 50
+}
+
+warlord_absorption_cb = {
+	icon = vassalization
+	group = conquest
+	combine_into_one = yes
+	should_show_war_goal_subview = yes
+	mutually_exclusive_titles = { always = yes }
+	allowed_for_character = {
+		has_trait = warlord
+		is_independent_ruler = no
+		NOR = { government_has_flag = government_is_landless_adventurer government_has_flag = government_is_nomadic }
+	}
+	allowed_against_character = {
+		is_vassal_or_below_of = scope:attacker.liege
+		NOT = { this = scope:attacker }
+	}
+	target_titles = all
+	target_title_tier = kingdom
+	target_de_jure_regions_above = yes
+	ignore_effect = change_title_holder
+	valid_to_start = {
+		scope:attacker.sub_realm_size > scope:defender.sub_realm_size
+		scope:target = {
+			is_landless_type_title = no
+			any_in_de_jure_hierarchy = {
+				tier = tier_county
+				neighboring_county_or_viking_conquest_trigger = { CHARACTER = root }
+				holder ?= { OR = { this = scope:defender is_vassal_or_below_of = scope:defender } }
+			}
+		}
+	}
+	should_invalidate = { always = no }
+	on_invalidated_desc = msg_county_conquest_war_invalidated_message
+	cost = { piety = { value = 0 } prestige = { value = 0 } }
+	on_declaration = { on_declared_war = yes }
+	on_victory_desc = { desc = RISEANDFALL_WARLORD_ABSORPTION_ON_VICTORY_DESC }
+	on_white_peace_desc = { desc = ducal_conquest_cb_white_peace_desc }
+	on_defeat_desc = { desc = ducal_conquest_cb_defeat_desc }
+	on_victory = {
+		scope:attacker = { show_pow_release_message_effect = yes accolade_attacker_war_end_glory_gain_low_effect = yes }
+		add_legitimacy_attacker_victory_effect = yes
+		riseandfall_absorb_warlord_defender_realm_se = yes
+		scope:defender = { ep3_war_loss_adventurer_tt_effect = yes }
+		scope:attacker = { add_prestige_experience = { value = major_prestige_value } fp1_remember_recent_conquest_victory_effect = yes }
+		modify_allies_of_participants_fame_values = { WINNER = scope:attacker FAME_BASE = major_prestige_value IS_RELIGIOUS_WAR = no WINNER_ALLY_FAME_SCALE = 1 LOSER_ALLY_FAME_SCALE = 1 }
+		add_truce_attacker_victory_effect = yes
+		laamp_as_mercenary_payout_tooltip_effect = yes
+	}
+	on_white_peace = {
+		scope:attacker = { show_pow_release_message_effect = yes add_prestige = { value = minor_prestige_value multiply = -1.0 } }
+		scope:defender = { accolade_defender_war_end_glory_gain_low_effect = yes }
+		add_truce_white_peace_effect = yes
+		laamp_as_mercenary_payout_tooltip_effect = yes
+	}
+	on_defeat = {
+		scope:attacker = { show_pow_release_message_effect = yes pay_short_term_gold_reparations_effect = { GOLD_VALUE = 2 } add_prestige = { value = medium_prestige_value multiply = -1.0 } }
+		add_legitimacy_attacker_defeat_effect = yes
+		scope:defender = { accolade_defender_war_end_glory_gain_low_effect = yes add_prestige_war_defender_effect = { PRESTIGE_VALUE = medium_prestige_value } }
+		add_truce_attacker_defeat_effect = yes
+		laamp_as_mercenary_payout_tooltip_effect = yes
+	}
+	transfer_behavior = transfer
+	on_primary_attacker_death = inherit
+	on_primary_defender_death = inherit
+	attacker_allies_inherit = yes
+	defender_allies_inherit = yes
+	war_name = "WARLORD_CONQUEST_WAR_NAME"
+	war_name_base = "WARLORD_CONQUEST_WAR_NAME_BASE"
+	cb_name = "WARLORD_CONQUEST_CB_NAME"
+	interface_priority = 80
+	use_de_jure_wargoal_only = yes
+	ticking_war_score_targets_entire_realm = yes
+	attacker_wargoal_percentage = 0.01
+	defender_wargoal_percentage = 0.95
+	attacker_ticking_warscore_delay = { months = 36 }
+	defender_ticking_warscore_delay = { months = 36 }
+	attacker_ticking_warscore = 0.03
+	defender_ticking_warscore = 0.03
+	attacker_score_from_occupation_scale = 50
+	defender_score_from_occupation_scale = 50
+	attacker_score_from_battles_scale = 100
+	defender_score_from_battles_scale = 100
+	max_ai_diplo_distance_to_title = 1500
+}

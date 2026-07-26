@@ -1,0 +1,28 @@
+﻿# Rise and Fall - low-stability Coalition adapter triggers
+
+riseandfall_low_stability_coalition_target_valid_trigger = {
+    riseandfall_coalition_target_core_valid_trigger = yes
+    NOT = { exists = global_var:riseandfall_low_stability_event_coalition_disabled }
+    OR = {
+        has_character_flag = rf_coalition_formation_active
+        NOT = { primary_title = { has_variable = rf_coalition_cooldown } }
+    }
+    NOT = { has_character_flag = rf_coalition_fallback_reroll }
+}
+
+riseandfall_low_stability_coalition_available_trigger = {
+    riseandfall_low_stability_coalition_target_valid_trigger = yes
+    NOT = { has_character_flag = rf_coalition_formation_active }
+    any_independent_ruler = {
+        count >= 2
+        riseandfall_coalition_potential_invitee_trigger = yes
+    }
+}
+
+riseandfall_low_stability_coalition_can_fallback_reroll_trigger = {
+    is_alive = yes
+    is_landed = yes
+    is_independent_ruler = yes
+    NOT = { riseandfall_coalition_target_has_active_war_trigger = yes }
+    NOT = { has_character_flag = rf_coalition_under_attack }
+}

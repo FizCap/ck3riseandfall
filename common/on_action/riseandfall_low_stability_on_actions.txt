@@ -87,7 +87,6 @@ on_title_gain_inheritance = {
     on_actions = {
         riseandfall_resolve_puppet_succession_on_inheritance
         riseandfall_check_puppet_regency
-        riseandfall_inherit_warlord_trait_on_title_gain
         riseandfall_warlord_title_cleanup
         riseandfall_successor_primary_title_sync
     }
@@ -240,18 +239,36 @@ riseandfall_warlord = {
         # Cleanup: handle unlanded/independent warlords
         riseandfall_warlord_cleanup_se = yes
 
-        # Yearly reconsideration: fire warlord.1003 once per year for each AI warlord vassal
-        every_ruler = {
+        # Evaluate each independent realm once. The count and territory share
+        # cover direct Warlords and their full subrealms.
+        every_independent_ruler = {
             limit = {
-                is_ai = yes
-                is_independent_ruler = no
                 is_landed = yes
-                has_trait = warlord
-                NOT = { has_variable = riseandfall_warlord_reconsider_cooldown }
             }
-            # Set cooldown BEFORE firing so rapid re-calls cannot double-queue
-            set_variable = { name = riseandfall_warlord_reconsider_cooldown value = yes years = 1 }
-            trigger_event = { id = warlord.1003 }
+            riseandfall_warlord_refresh_crisis_strength_se = yes
+            every_vassal = {
+                limit = {
+                    is_ai = yes
+                    is_landed = yes
+                    has_trait = warlord
+                }
+                riseandfall_warlord_ai_reconsider_se = yes
+            }
+            # Only an active Warlord crisis attracts new followers. AI recruits
+            # are silent; the initial event is the player-facing invitation.
+            if = {
+                limit = { has_character_flag = rf_warlord_crisis_active }
+                every_vassal = {
+                    limit = {
+                        is_ai = yes
+                        is_landed = yes
+                        NOT = { has_trait = warlord }
+                        NOT = { has_variable = riseandfall_warlord_choice_made }
+                        NOT = { has_variable = riseandfall_warlord_retired_cooldown }
+                    }
+                    riseandfall_warlord_ai_join_crisis_se = yes
+                }
+            }
         }
     }
 }
@@ -264,26 +281,6 @@ riseandfall_warlord_title_cleanup = {
     }
     effect = {
         riseandfall_warlord_cleanup_se = yes
-    }
-}
-
-# Title inheritance runs after the successor has become landed.  Keep this
-# separate from Realm Stability inheritance: warlord succession must work even
-# when Realm Stability is disabled or the former holder has no stability score.
-riseandfall_inherit_warlord_trait_on_title_gain = {
-    trigger = {
-        has_game_rule = riseandfall_low_stability_events_enabled
-    }
-    effect = {
-        if = {
-            limit = {
-                exists = scope:previous_holder
-                scope:previous_holder = { has_trait = warlord }
-                is_landed = yes
-                is_independent_ruler = no
-            }
-            add_trait = warlord
-        }
     }
 }
 

@@ -316,13 +316,26 @@ riseandfall_ai_advanced_destroy_unwanted_titles_se = {
             is_landed = yes
             exists = primary_title
             primary_title.tier >= tier_kingdom
+            # Preserve all crowns under gavelkind/partition succession.
+            NOT = {
+                OR = {
+                    has_realm_law = confederate_partition_succession_law # gavelkind
+                    has_realm_law = partition_succession_law
+                    has_realm_law = high_partition_succession_law
+                }
+            }
         }
 
         # Do not try to demote empire-tier primary titles by swapping to a
         # kingdom/duchy/county primary. CK3 rejects lower-tier primary swaps,
         # so this cleanup only destroys extra non-primary titles below.
 
-        every_held_title = {
+        # Remove at most one crown per ruler per year. The old every_held_title
+        # pass destroyed all eligible crowns at once across the entire world.
+        ordered_held_title = {
+            order_by = tier
+            max = 1
+            check_range_bounds = no
             limit = {
                 OR = {
                     AND = {
@@ -331,16 +344,9 @@ riseandfall_ai_advanced_destroy_unwanted_titles_se = {
                     }
                     AND = {
                         tier = tier_empire
-                        OR = {
-                            scope:rf_advanced_cleanup_ruler = { primary_title.tier >= tier_empire }
-                            scope:rf_advanced_cleanup_ruler = {
-                                any_liege_or_above = {
-                                    is_ai = yes
-                                    primary_title.tier >= tier_hegemony
-                                    vassal_limit_available >= 4
-                                }
-                            }
-                        }
+                        # Never destroy an empire merely because its holder is
+                        # beneath a hegemon; that can restructure another realm.
+                        scope:rf_advanced_cleanup_ruler = { primary_title.tier >= tier_empire }
                     }
                     AND = {
                         tier = tier_hegemony
@@ -354,6 +360,10 @@ riseandfall_ai_advanced_destroy_unwanted_titles_se = {
                 NOT = { is_noble_family_title = yes }
                 NOT = { is_holy_order = yes }
                 NOT = { is_figurehead_title = yes }
+                # France and Aquitaine are deliberately kept together until
+                # the holder can take the unification decision.
+                NOT = { this = title:k_france }
+                NOT = { this = title:k_aquitaine }
             }
             save_scope_as = rf_advanced_unwanted_title
 
@@ -377,8 +387,8 @@ riseandfall_ai_advanced_title_handout_se = {
     # Advanced mode: king-rank rulers relieve pressure with duchies first.
     # Emperor/hegemony rulers only grant a kingdom after exceeding their vassal
     # limit by at least three; the tax and levy loss makes this a last resort.
-    # Leftover non-primary kingdom/empire/hegemony titles are then destroyed so
-    # AI cannot hoard them.
+    # Spare crowns are cleaned up gradually: the helper removes no more than
+    # one safe secondary crown during this ruler's distributed annual turn.
     save_scope_as = emperor
 
     if = {
@@ -732,7 +742,6 @@ riseandfall_grant_counties_se = {
                         limit = { NOT = { exists = scope:county_grant_recipient } }
                         scope:liege = {
                             create_character = {
-                                location = scope:target_county.title_province
                                 culture = scope:target_county.culture
                                 faith = scope:target_county.faith
                                 age = { 18 35 }

@@ -3,7 +3,7 @@
 ##############################################
 # authority_collapse.1001 — Nationalist / Religious Revolt
 # Fires when the realm has significant non-approved cultures or hostile faiths (30%+ foreign counties).
-# Applies a severe popular-opinion collapse to every non-approved county for 5 years.
+# Applies a severe popular-opinion collapse to every non-approved county for 10 years.
 # No development penalty — the people resist foreign rule, not progress itself.
 ##############################################
 authority_collapse.1001 = {
@@ -73,9 +73,10 @@ authority_collapse.1001 = {
         }
         hidden_effect = {
             root = {
-                # Persist beyond the cooldown so a later yearly roll can escalate into total collapse.
-                set_variable = { name = riseandfall_recent_nationalist_revolt value = yes years = 10 }
-                add_character_flag = { flag = rf_low_stability_cooldown years = 5 }
+                # Keep the escalation marker through three 10-year cooldown windows:
+                # the second crisis can fire after one cooldown, then Total Collapse after another.
+                set_variable = { name = riseandfall_recent_nationalist_revolt value = yes years = 30 }
+                riseandfall_set_low_stability_cooldown_se = yes
 
                 # Apply the revolt modifier only for culture mismatches when the liege's culture is valid.
                 if = {
@@ -96,7 +97,7 @@ authority_collapse.1001 = {
                         }
                         add_county_modifier = {
                             modifier = riseandfall_nationalist_revolt
-                            years = 5
+                            years = 10
                         }
                     }
                 }
@@ -120,7 +121,7 @@ authority_collapse.1001 = {
                         }
                         add_county_modifier = {
                             modifier = riseandfall_nationalist_revolt
-                            years = 5
+                            years = 10
                         }
                     }
                 }
@@ -235,10 +236,10 @@ authority_collapse.1002 = {
         ai_chance = { base = 100 }
         hidden_effect = {
             root = {
-                # Persist beyond the cooldown so a later yearly roll can escalate into total collapse.
-                set_variable = { name = riseandfall_recent_vassal_crisis value = yes years = 10 }
-                add_character_flag = { flag = rf_low_stability_cooldown years = 5 }
-                add_character_modifier = { modifier = riseandfall_vassal_authority_crisis years = 5 }
+                # Keep the escalation marker through three 10-year cooldown windows.
+                set_variable = { name = riseandfall_recent_vassal_crisis value = yes years = 30 }
+                riseandfall_set_low_stability_cooldown_se = yes
+                add_character_modifier = { modifier = riseandfall_vassal_authority_crisis years = 10 }
             }
         }
     }
@@ -246,8 +247,7 @@ authority_collapse.1002 = {
 
 ##############################################
 # authority_collapse.1003 — Total Collapse of Central Authority
-# Fires as an escalation when nationalist revolt or vassal crisis modifiers are already active,
-# OR as a general collapse fallback when neither specific crisis type applies.
+# Fires only after overlapping unresolved nationalist and vassal crises.
 # Applies the full authority collapse to all counties and drains the treasury.
 ##############################################
 authority_collapse.1003 = {
@@ -271,11 +271,11 @@ authority_collapse.1003 = {
                 every_realm_county = {
                     add_county_modifier = {
                         modifier = riseandfall_authority_collapse
-                        years = 5
+                        years = 10
                     }
                 }
-                add_character_flag = { flag = rf_low_stability_cooldown years = 5 }
-                add_character_modifier = { modifier = riseandfall_authority_collapse_liege_debuff years = 5 }
+                riseandfall_set_low_stability_cooldown_se = yes
+                add_character_modifier = { modifier = riseandfall_authority_collapse_liege_debuff years = 10 }
                 if = {
                     limit = { treasury > 0 }
                     # Calculate the percentage inline so tooltip rebuilding cannot read a removed temporary variable.

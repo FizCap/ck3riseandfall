@@ -1,0 +1,25 @@
+﻿# Rise and Fall - low-stability Coalition adapters
+
+riseandfall_low_stability_coalition_set_cooldown_se = {
+    if = {
+        limit = { exists = primary_title }
+        primary_title = { set_variable = { name = rf_coalition_cooldown value = 1 years = 15 } }
+    }
+}
+
+riseandfall_low_stability_coalition_prepare_se = {
+    riseandfall_low_stability_coalition_set_cooldown_se = yes
+    riseandfall_coalition_prepare_invitations_se = yes
+}
+
+# Clean the abandoned low-stability assembly, then let the normal selector
+# choose another valid crisis. The independent beta interaction never calls it.
+riseandfall_low_stability_coalition_fail_and_reroll_se = {
+    riseandfall_coalition_clear_assembly_state_se = yes
+    if = {
+        limit = { riseandfall_low_stability_coalition_can_fallback_reroll_trigger = yes }
+        add_character_flag = { flag = rf_coalition_fallback_reroll days = 1 }
+        riseandfall_low_stability_random_event = yes
+        remove_character_flag = rf_coalition_fallback_reroll
+    }
+}

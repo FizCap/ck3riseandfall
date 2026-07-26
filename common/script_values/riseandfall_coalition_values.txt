@@ -1,0 +1,4 @@
+﻿riseandfall_coalition_peripheral_kingdom_count_value = {
+    # Title-scoped count populated before Medium orders kingdom concessions.
+    value = var:rf_coalition_release_kingdom_count
+}

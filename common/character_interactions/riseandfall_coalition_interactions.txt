@@ -1,0 +1,108 @@
+﻿# Rise and Fall - Independent Coalitions (Beta)
+
+riseandfall_start_coalition_interaction = {
+    category = interaction_riseandfall
+    auto_accept = yes
+    icon = icon_riseandfall
+    desc = riseandfall_start_coalition_interaction_desc
+
+    is_shown = {
+        has_game_rule = riseandfall_independent_coalitions_enabled
+        has_game_rule = riseandfall_lite_mode_disabled
+        scope:actor = { is_alive = yes is_landed = yes is_independent_ruler = yes }
+        scope:recipient = { is_alive = yes is_landed = yes is_independent_ruler = yes this != scope:actor }
+    }
+
+    # Show the full eligibility checklist, matching the Fix Bordergore interaction.
+    # The failures-only variant hid all passing conditions and left an all-red tooltip.
+    is_valid = {
+        custom_tooltip = {
+            text = riseandfall_coalition.target_must_be_larger.tooltip
+            scope:actor = { realm_size < scope:recipient.realm_size }
+        }
+        custom_tooltip = {
+            text = riseandfall_coalition.target_in_diplomatic_range.tooltip
+            scope:actor = { in_diplomatic_range = scope:recipient }
+        }
+        custom_tooltip = {
+            text = riseandfall_coalition.actor_not_at_war.tooltip
+            scope:actor = { is_at_war = no }
+        }
+        custom_tooltip = {
+            text = riseandfall_coalition.actor_not_allied.tooltip
+            scope:actor = { NOT = { is_allied_to = scope:recipient } }
+        }
+        custom_tooltip = {
+            text = riseandfall_coalition.actor_no_truce.tooltip
+            scope:actor = { NOT = { has_truce = scope:recipient } }
+        }
+        custom_tooltip = {
+            text = riseandfall_coalition.target_independent.tooltip
+            scope:recipient = { is_independent_ruler = yes }
+        }
+        custom_tooltip = {
+            text = riseandfall_coalition.target_threat.tooltip
+            scope:recipient = { riseandfall_coalition_target_threat_valid_trigger = yes }
+        }
+        custom_tooltip = {
+            text = riseandfall_coalition.target_no_active_war.tooltip
+            scope:recipient = { NOT = { riseandfall_coalition_target_has_active_war_trigger = yes } }
+        }
+        custom_tooltip = {
+            text = riseandfall_coalition.target_not_forming.tooltip
+            scope:recipient = { NOT = { has_character_flag = rf_coalition_formation_active } }
+        }
+        custom_tooltip = {
+            text = riseandfall_coalition.target_no_beta_cooldown.tooltip
+            scope:recipient = { NOT = { primary_title = { has_variable = rf_coalition_interaction_cooldown } } }
+        }
+        custom_tooltip = {
+            text = riseandfall_coalition.target_no_postwar_cooldown.tooltip
+            scope:recipient = { NOT = { primary_title = { has_variable = rf_coalition_postwar_cooldown } } }
+        }
+    }
+
+    on_accept = {
+        # Periphery calculation uses short-lived global scratch values; hide it
+        # from interaction-tooltip simulation so preview evaluation cannot read
+        # the intentionally temporary values after cleanup.
+        hidden_effect = {
+            scope:recipient = {
+                riseandfall_coalition_start_interaction_se = { INITIATOR = scope:actor }
+            }
+        }
+    }
+
+    # The AI evaluates this interaction directly; no Coalition on_action exists.
+    ai_frequency = 12
+    ai_potential = {
+        is_alive = yes
+        is_landed = yes
+        is_independent_ruler = yes
+        has_game_rule = riseandfall_independent_coalitions_enabled
+        has_game_rule = riseandfall_lite_mode_disabled
+    }
+    ai_targets = { ai_recipients = neighboring_rulers max = 12 }
+    ai_will_do = {
+        base = -90
+        modifier = { scope:recipient = { realm_size >= 80 } add = 45 }
+        modifier = { scope:recipient = { realm_size >= 150 } add = 45 }
+        modifier = { scope:recipient = { var:rf_coalition_peripheral_pct >= 40 } add = 35 }
+        modifier = { scope:recipient = { var:rf_coalition_peripheral_pct >= 60 } add = 40 }
+        modifier = { scope:recipient = { military_power > scope:actor.military_power } add = 35 }
+        modifier = { scope:recipient = { military_power >= { value = scope:actor.military_power multiply = 2 } } add = 35 }
+        modifier = { scope:actor = { has_relation_nemesis = scope:recipient } add = 80 }
+        modifier = { scope:actor = { has_relation_rival = scope:recipient } add = 50 }
+        modifier = { scope:actor = { has_claim_on = scope:recipient.primary_title } add = 35 }
+        modifier = { scope:actor = { NOT = { has_same_culture_as = scope:recipient } } add = 15 }
+        modifier = { scope:actor = { NOT = { faith = scope:recipient.faith } } add = 15 }
+        modifier = { scope:actor = { has_trait = ambitious } add = 25 }
+        modifier = { scope:actor = { has_trait = brave } add = 20 }
+        modifier = { scope:actor = { has_trait = vengeful } add = 25 }
+        modifier = { scope:actor = { has_relation_best_friend = scope:recipient } add = -120 }
+        modifier = { scope:actor = { has_relation_friend = scope:recipient } add = -70 }
+        modifier = { scope:actor = { opinion = { target = scope:recipient value >= 25 } } add = -40 }
+        modifier = { scope:actor = { has_trait = content } add = -45 }
+        modifier = { scope:actor = { has_trait = craven } add = -50 }
+    }
+}

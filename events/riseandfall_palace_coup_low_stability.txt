@@ -148,10 +148,6 @@ palace_coup.1201 = {
 	option = {
 		name = palace_coup.1201.c
 		custom_tooltip = palace_coup.1201.c.tooltip
-		trigger = {
-			# Only a claimant can refuse both camps and establish a rival realm.
-			has_claim_on = scope:original_primary
-		}
 		hidden_effect = {
 			if = {
 				limit = { has_variable = rf_palace_coup_choice_ruler }
@@ -161,13 +157,148 @@ palace_coup.1201 = {
 				limit = { has_variable = rf_palace_coup_choice_challenger }
 				var:rf_palace_coup_choice_challenger = { save_scope_as = palace_coup_choice_challenger }
 			}
-			root = { riseandfall_palace_coup_mark_reject_se = yes }
-			if = {
-				limit = { exists = scope:palace_coup_choice_ruler }
-				scope:palace_coup_choice_ruler = { riseandfall_palace_coup_continue_player_choices = yes }
+			root = {
+				set_variable = { name = rf_palace_coup_claimant_page value = 0 }
+				riseandfall_palace_coup_prepare_claimant_browser_se = yes
+				trigger_event = { id = palace_coup.1202 delayed = yes }
 			}
 		}
 		ai_chance = { base = 0 }
+	}
+}
+
+# Paginated side list. The old ruler, coup leader, and every direct-vassal
+# title claimant appear together so the player can compare the full conflict.
+palace_coup.1202 = {
+	type = character_event
+	title = palace_coup.1202.t
+	desc = palace_coup.1202.d
+	theme = realm
+	trigger = {
+		has_character_flag = rf_palace_coup_pending_choice
+		has_variable = rf_palace_coup_choice_ruler
+		has_variable = rf_palace_coup_choice_challenger
+	}
+
+	option = {
+		name = palace_coup.1202.a_1
+		trigger = { exists = scope:palace_coup_claimant_target_1 }
+		hidden_effect = { scope:palace_coup_claimant_target_1 = { save_scope_as = palace_coup_selected_claimant } trigger_event = { id = palace_coup.1203 delayed = yes } }
+	}
+	option = {
+		name = palace_coup.1202.a_2
+		trigger = { exists = scope:palace_coup_claimant_target_2 }
+		hidden_effect = { scope:palace_coup_claimant_target_2 = { save_scope_as = palace_coup_selected_claimant } trigger_event = { id = palace_coup.1203 delayed = yes } }
+	}
+	option = {
+		name = palace_coup.1202.a_3
+		trigger = { exists = scope:palace_coup_claimant_target_3 }
+		hidden_effect = { scope:palace_coup_claimant_target_3 = { save_scope_as = palace_coup_selected_claimant } trigger_event = { id = palace_coup.1203 delayed = yes } }
+	}
+	option = {
+		name = palace_coup.1202.a_4
+		trigger = { exists = scope:palace_coup_claimant_target_4 }
+		hidden_effect = { scope:palace_coup_claimant_target_4 = { save_scope_as = palace_coup_selected_claimant } trigger_event = { id = palace_coup.1203 delayed = yes } }
+	}
+	option = {
+		name = palace_coup.1202.a_5
+		trigger = { exists = scope:palace_coup_claimant_target_5 }
+		hidden_effect = { scope:palace_coup_claimant_target_5 = { save_scope_as = palace_coup_selected_claimant } trigger_event = { id = palace_coup.1203 delayed = yes } }
+	}
+	option = {
+		name = palace_coup.1202.a_6
+		trigger = { exists = scope:palace_coup_claimant_target_6 }
+		hidden_effect = { scope:palace_coup_claimant_target_6 = { save_scope_as = palace_coup_selected_claimant } trigger_event = { id = palace_coup.1203 delayed = yes } }
+	}
+	option = {
+		name = palace_coup.1202.a_7
+		trigger = { exists = scope:palace_coup_claimant_target_7 }
+		hidden_effect = { scope:palace_coup_claimant_target_7 = { save_scope_as = palace_coup_selected_claimant } trigger_event = { id = palace_coup.1203 delayed = yes } }
+	}
+	option = {
+		name = palace_coup.1202.previous
+		trigger = { var:rf_palace_coup_claimant_page > 0 }
+		hidden_effect = { change_variable = { name = rf_palace_coup_claimant_page add = -1 } riseandfall_palace_coup_prepare_claimant_browser_se = yes trigger_event = palace_coup.1202 }
+	}
+	option = {
+		name = palace_coup.1202.next
+		trigger = { has_variable = rf_palace_coup_claimant_has_overflow }
+		hidden_effect = { change_variable = { name = rf_palace_coup_claimant_page add = 1 } riseandfall_palace_coup_prepare_claimant_browser_se = yes trigger_event = palace_coup.1202 }
+	}
+	option = {
+		name = palace_coup.1202.back
+		hidden_effect = { riseandfall_palace_coup_clear_claimant_browser_se = yes remove_variable = rf_palace_coup_claimant_page trigger_event = { id = palace_coup.1201 delayed = yes } }
+	}
+}
+
+palace_coup.1203 = {
+	type = character_event
+	title = palace_coup.1203.t
+	desc = palace_coup.1203.d
+	theme = realm
+	trigger = {
+		has_character_flag = rf_palace_coup_pending_choice
+		exists = scope:palace_coup_selected_claimant
+	}
+
+	left_portrait = { character = root }
+	right_portrait = { character = scope:palace_coup_selected_claimant }
+
+	option = {
+		name = palace_coup.1203.a
+		hidden_effect = {
+			root = { riseandfall_palace_coup_mark_selected_side_se = yes riseandfall_palace_coup_clear_claimant_browser_se = yes remove_variable = rf_palace_coup_claimant_page }
+			if = { limit = { exists = scope:palace_coup_choice_ruler } scope:palace_coup_choice_ruler = { riseandfall_palace_coup_continue_player_choices = yes } }
+		}
+	}
+	option = {
+		name = palace_coup.1203.b
+		hidden_effect = { clear_saved_scope = palace_coup_selected_claimant trigger_event = { id = palace_coup.1202 delayed = yes } }
+	}
+}
+
+# Claimants declare before the wider realm chooses sides. Only rulers choosing
+# the final option are included as contenders in the later support browser.
+palace_coup.1204 = {
+	type = character_event
+	title = palace_coup.1204.t
+	desc = palace_coup.1204.d
+	theme = realm
+	trigger = {
+		has_character_flag = rf_palace_coup_pending_claim_bid
+		has_variable = rf_palace_coup_choice_ruler
+		has_variable = rf_palace_coup_choice_challenger
+		has_claim_on = scope:original_primary
+	}
+
+	immediate = {
+		var:rf_palace_coup_choice_ruler = { save_scope_as = palace_coup_choice_ruler }
+		var:rf_palace_coup_choice_challenger = { save_scope_as = palace_coup_choice_challenger }
+	}
+
+	left_portrait = { character = scope:palace_coup_choice_ruler }
+	right_portrait = { character = root }
+
+	option = {
+		name = palace_coup.1204.a
+		hidden_effect = {
+			root = { riseandfall_palace_coup_mark_loyalist_se = yes }
+			scope:palace_coup_choice_ruler = { riseandfall_palace_coup_continue_claimant_bid_choices = yes }
+		}
+	}
+	option = {
+		name = palace_coup.1204.b
+		hidden_effect = {
+			root = { riseandfall_palace_coup_mark_coup_se = yes }
+			scope:palace_coup_choice_ruler = { riseandfall_palace_coup_continue_claimant_bid_choices = yes }
+		}
+	}
+	option = {
+		name = palace_coup.1204.c
+		hidden_effect = {
+			root = { riseandfall_palace_coup_mark_own_claimant_bid_se = yes }
+			scope:palace_coup_choice_ruler = { riseandfall_palace_coup_continue_claimant_bid_choices = yes }
+		}
 	}
 }
 
@@ -177,6 +308,21 @@ palace_coup.1002 = {
 	title = palace_coup.1002.t
 	desc = palace_coup.1002.d
 	theme = court
+
+	# These amounts must exist before CK3 builds either option's tooltip. The
+	# later escape effect only consumes them after the title handoff succeeds.
+	immediate = {
+		remove_variable = palace_coup_original_treasury
+		remove_variable = palace_coup_transfer_treasury
+		set_variable = { name = palace_coup_original_treasury value = 0 }
+		set_variable = { name = palace_coup_transfer_treasury value = 0 }
+		if = {
+			limit = { has_treasury = yes treasury > 1 }
+			set_variable = { name = palace_coup_original_treasury value = treasury }
+			set_variable = { name = palace_coup_transfer_treasury value = treasury }
+			change_variable = { name = palace_coup_transfer_treasury multiply = 0.5 }
+		}
+	}
 
 	left_portrait = {
 		character = root

@@ -69,3 +69,10 @@ RFGetLowStabilitySelectedEventName = {
 	text = { trigger = { var:rf_low_stability_manager_category = 7 } localization_key = rf_low_stability_event_name_coalition }
 	text = { localization_key = riseandfall_low_stability_event_manager fallback = yes }
 }
+
+RFGetCoalitionVoteResult = {
+	type = character
+	text = { trigger = { var:rf_coalition_vote_result_choice = 1 } localization_key = rf_coalition_vote_result_light }
+	text = { trigger = { var:rf_coalition_vote_result_choice = 2 } localization_key = rf_coalition_vote_result_medium }
+	text = { localization_key = rf_coalition_vote_result_heavy fallback = yes }
+}

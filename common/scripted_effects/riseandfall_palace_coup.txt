@@ -646,11 +646,11 @@ riseandfall_palace_coup_setup = {
     # ---------------------------------------------------------
     # COOLDOWNS
     # ---------------------------------------------------------
-    add_character_flag = { flag = rf_low_stability_cooldown years = 5 }
+    riseandfall_set_low_stability_cooldown_se = yes
 
     if = {
         limit = { exists = scope:challenger }
-        scope:challenger = { add_character_flag = { flag = rf_low_stability_cooldown years = 5 } }
+        scope:challenger = { riseandfall_set_low_stability_cooldown_se = yes }
     }
 }
 
@@ -714,6 +714,7 @@ riseandfall_palace_coup_clear_vassal_choice_se = {
     remove_character_flag = rf_palace_coup_neutral_seed
     remove_character_flag = rf_palace_coup_retreat_anchor
     remove_character_flag = rf_palace_coup_pending_choice
+    remove_character_flag = rf_palace_coup_pending_claim_bid
     remove_variable = rf_palace_coup_choice_ruler
     remove_variable = rf_palace_coup_choice_challenger
     remove_variable = rf_palace_coup_loyalist_score
@@ -736,6 +737,212 @@ riseandfall_palace_coup_mark_coup_se = {
 riseandfall_palace_coup_mark_reject_se = {
     riseandfall_palace_coup_clear_vassal_choice_se = yes
     add_character_flag = { flag = rf_palace_coup_neutral_rejector days = 30 }
+}
+
+# The selected claimant is a character scope saved by the player browser or
+# AI selector.  Keep it on the supporter until the post-coup title changes
+# have made the claimant's breakaway realm legal.
+riseandfall_palace_coup_mark_claimant_supporter_se = {
+    riseandfall_palace_coup_clear_vassal_choice_se = yes
+    if = {
+        limit = { exists = scope:palace_coup_selected_claimant }
+        set_variable = { name = rf_palace_coup_supported_claimant value = scope:palace_coup_selected_claimant }
+        scope:palace_coup_selected_claimant = {
+            add_character_flag = { flag = rf_palace_coup_claimant_bidder days = 30 }
+        }
+    }
+}
+
+# First phase: only a claimant may declare an independent bid. This flag is
+# the source of truth for the later supporter list; a legal claim alone does
+# not make a ruler a side in the civil war.
+riseandfall_palace_coup_mark_own_claimant_bid_se = {
+    riseandfall_palace_coup_clear_vassal_choice_se = yes
+    add_character_flag = { flag = rf_palace_coup_claimant_bidder days = 30 }
+}
+
+# Selected-side dispatcher for the player list: its first two entries are the
+# deposed ruler and coup leader, while every later entry is a title claimant.
+riseandfall_palace_coup_mark_selected_side_se = {
+    if = {
+        limit = { scope:palace_coup_selected_claimant = scope:palace_coup_choice_ruler }
+        riseandfall_palace_coup_mark_loyalist_se = yes
+    }
+    else_if = {
+        limit = { scope:palace_coup_selected_claimant = scope:palace_coup_choice_challenger }
+        riseandfall_palace_coup_mark_coup_se = yes
+    }
+    else = { riseandfall_palace_coup_mark_claimant_supporter_se = yes }
+}
+
+riseandfall_palace_coup_clear_claimant_browser_se = {
+    clear_saved_scope = palace_coup_claimant_target_1
+    clear_saved_scope = palace_coup_claimant_target_2
+    clear_saved_scope = palace_coup_claimant_target_3
+    clear_saved_scope = palace_coup_claimant_target_4
+    clear_saved_scope = palace_coup_claimant_target_5
+    clear_saved_scope = palace_coup_claimant_target_6
+    clear_saved_scope = palace_coup_claimant_target_7
+    clear_saved_scope = palace_coup_selected_claimant
+    remove_variable = rf_palace_coup_claimant_has_overflow
+}
+
+# Build one seven-side page from declared bidders. The deposed ruler and coup
+# leader always occupy the first two slots; legal claimants who backed either
+# established side are deliberately excluded from this later supporter list.
+riseandfall_palace_coup_prepare_claimant_browser_se = {
+    riseandfall_palace_coup_clear_claimant_browser_se = yes
+    if = {
+        limit = { NOT = { has_variable = rf_palace_coup_claimant_page } }
+        set_variable = { name = rf_palace_coup_claimant_page value = 0 }
+    }
+    set_variable = { name = rf_palace_coup_claimant_cursor value = 0 }
+    scope:palace_coup_choice_ruler = { save_scope_as = palace_coup_claimant_target_1 }
+    scope:palace_coup_choice_challenger = { save_scope_as = palace_coup_claimant_target_2 }
+    set_variable = { name = rf_palace_coup_claimant_page_start value = var:rf_palace_coup_claimant_page }
+    change_variable = { name = rf_palace_coup_claimant_page_start multiply = 5 }
+    set_variable = { name = rf_palace_coup_claimant_page_end value = var:rf_palace_coup_claimant_page_start }
+    change_variable = { name = rf_palace_coup_claimant_page_end add = 5 }
+    scope:palace_coup_choice_ruler = {
+        ordered_vassal = {
+            limit = {
+                is_landed = yes
+                liege = scope:palace_coup_choice_ruler
+                has_claim_on = scope:original_primary
+                has_character_flag = rf_palace_coup_claimant_bidder
+            }
+            order_by = current_military_strength
+            if = {
+                limit = {
+                    root = {
+                        var:rf_palace_coup_claimant_cursor >= var:rf_palace_coup_claimant_page_start
+                        var:rf_palace_coup_claimant_cursor < var:rf_palace_coup_claimant_page_end
+                    }
+                }
+                if = { limit = { NOT = { exists = scope:palace_coup_claimant_target_3 } } save_scope_as = palace_coup_claimant_target_3 }
+                else_if = { limit = { NOT = { exists = scope:palace_coup_claimant_target_4 } } save_scope_as = palace_coup_claimant_target_4 }
+                else_if = { limit = { NOT = { exists = scope:palace_coup_claimant_target_5 } } save_scope_as = palace_coup_claimant_target_5 }
+                else_if = { limit = { NOT = { exists = scope:palace_coup_claimant_target_6 } } save_scope_as = palace_coup_claimant_target_6 }
+                else_if = { limit = { NOT = { exists = scope:palace_coup_claimant_target_7 } } save_scope_as = palace_coup_claimant_target_7 }
+            }
+            else_if = {
+                limit = { root = { var:rf_palace_coup_claimant_cursor >= var:rf_palace_coup_claimant_page_end } }
+                root = { set_variable = { name = rf_palace_coup_claimant_has_overflow value = 1 } }
+            }
+            root = { change_variable = { name = rf_palace_coup_claimant_cursor add = 1 } }
+        }
+    }
+    remove_variable = rf_palace_coup_claimant_cursor
+    remove_variable = rf_palace_coup_claimant_page_start
+    remove_variable = rf_palace_coup_claimant_page_end
+}
+
+riseandfall_palace_coup_assign_ai_claimant_support_se = {
+    # A claimant backs their own bid. Other AI first seek a declared contender they are
+    # personally tied to, then fall back to the strongest credible claimant.
+    if = {
+        limit = { has_claim_on = scope:original_primary }
+        save_scope_as = palace_coup_selected_claimant
+    }
+    else = {
+        scope:original_ruler = {
+            ordered_vassal = {
+                limit = {
+                    is_landed = yes
+                    liege = scope:original_ruler
+                    has_claim_on = scope:original_primary
+                    has_character_flag = rf_palace_coup_claimant_bidder
+                    OR = {
+                        is_allied_to = root
+                        # Current scope is the claimant; reverse_opinion reads
+                        # the AI voter's opinion of that claimant.
+                        reverse_opinion = { target = root value >= 40 }
+                        AND = {
+                            has_dynasty = yes
+                            root = { has_dynasty = yes }
+                            dynasty = root.dynasty
+                        }
+                        AND = {
+                            has_same_culture_as = root
+                            faith = root.faith
+                        }
+                        capital_county.kingdom = root.capital_county.kingdom
+                    }
+                }
+                order_by = current_military_strength
+                max = 1
+                save_scope_as = palace_coup_selected_claimant
+            }
+            if = {
+                limit = { NOT = { exists = scope:palace_coup_selected_claimant } }
+                ordered_vassal = {
+                    limit = {
+                        is_landed = yes
+                        liege = scope:original_ruler
+                        has_claim_on = scope:original_primary
+                        has_character_flag = rf_palace_coup_claimant_bidder
+                    }
+                    order_by = current_military_strength
+                    max = 1
+                    save_scope_as = palace_coup_selected_claimant
+                }
+            }
+        }
+    }
+    if = {
+        limit = { exists = scope:palace_coup_selected_claimant }
+        riseandfall_palace_coup_mark_claimant_supporter_se = yes
+    }
+    else = { riseandfall_palace_coup_mark_coup_se = yes }
+}
+
+# A title claimant who breaks away is a true successor, not merely an
+# independent duke/count. Give the claimant a dynamic title at the rank of
+# the displaced primary title before their supporters are attached.
+riseandfall_palace_coup_create_claimant_successor_title_se = {
+    save_scope_as = palace_coup_claimant_ruler
+    capital_county = { save_scope_as = palace_coup_claimant_base_county }
+    capital_barony = { save_scope_as = palace_coup_claimant_base_capital }
+    if = {
+        limit = { scope:original_primary = { tier = tier_hegemony } }
+        create_dynamic_title = { tier = hegemony name = RISEANDFALL_BREAKAWAY_NAME_CAPITAL }
+    }
+    else_if = {
+        limit = { scope:original_primary = { tier = tier_empire } }
+        create_dynamic_title = { tier = empire name = RISEANDFALL_BREAKAWAY_NAME_CAPITAL }
+    }
+    else_if = {
+        limit = { scope:original_primary = { tier = tier_kingdom } }
+        create_dynamic_title = { tier = kingdom name = RISEANDFALL_BREAKAWAY_NAME_CAPITAL }
+    }
+    else_if = {
+        limit = { scope:original_primary = { tier = tier_duchy } }
+        create_dynamic_title = { tier = duchy name = RISEANDFALL_BREAKAWAY_NAME_CAPITAL }
+    }
+    if = {
+        limit = { exists = scope:new_title }
+        create_title_and_vassal_change = {
+            type = created
+            save_scope_as = palace_coup_claimant_title_change
+            add_claim_on_loss = no
+        }
+        scope:new_title = {
+            save_scope_as = palace_coup_claimant_successor_title
+            change_title_holder = {
+                holder = scope:palace_coup_claimant_ruler
+                change = scope:palace_coup_claimant_title_change
+            }
+            set_color_from_title = scope:palace_coup_claimant_base_county
+            set_can_be_named_after_dynasty = no
+        }
+        resolve_title_and_vassal_change = scope:palace_coup_claimant_title_change
+        scope:palace_coup_claimant_ruler = { set_primary_title_to = scope:palace_coup_claimant_successor_title }
+        scope:palace_coup_claimant_successor_title = { generate_coa = yes }
+    }
+    clear_saved_scope = palace_coup_claimant_ruler
+    clear_saved_scope = palace_coup_claimant_base_county
+    clear_saved_scope = palace_coup_claimant_base_capital
+    clear_saved_scope = palace_coup_claimant_successor_title
 }
 
 riseandfall_palace_coup_mark_neutral_seed_se = {
@@ -1182,11 +1389,22 @@ riseandfall_palace_coup_apply_ai_vassal_alignment_se = {
     set_variable = { name = rf_palace_coup_reject_score value = 0 }
     riseandfall_palace_coup_score_vassal_alignment_se = yes
 
-    # A separate successor state is reserved for a claimant to the displaced
-    # ruler's primary title. Non-claimants must align with either camp; a
-    # claimant's scored relationships still decide whether they use their bid.
+    # During the declaration phase only claimants are evaluated. During the
+    # support phase, non-claimants may choose a third side only after at least
+    # one claimant has actually declared a bid.
     if = {
-        limit = { NOT = { has_claim_on = scope:original_primary } }
+        limit = {
+            NOT = { has_claim_on = scope:original_primary }
+            scope:original_ruler = {
+                NOT = {
+                    any_vassal = {
+                        is_landed = yes
+                        liege = scope:original_ruler
+                        has_character_flag = rf_palace_coup_claimant_bidder
+                    }
+                }
+            }
+        }
         set_variable = { name = rf_palace_coup_reject_score value = -9999 }
     }
 
@@ -1220,7 +1438,7 @@ riseandfall_palace_coup_apply_ai_vassal_alignment_se = {
             riseandfall_palace_coup_mark_loyalist_se = yes
         }
         else = {
-            riseandfall_palace_coup_mark_reject_se = yes
+            riseandfall_palace_coup_assign_ai_claimant_support_se = yes
         }
         remove_variable = rf_palace_coup_loyalist_reject_margin
     }
@@ -1230,7 +1448,7 @@ riseandfall_palace_coup_apply_ai_vassal_alignment_se = {
         riseandfall_palace_coup_mark_coup_se = yes
     }
     else = {
-        riseandfall_palace_coup_mark_reject_se = yes
+        riseandfall_palace_coup_assign_ai_claimant_support_se = yes
     }
     
     remove_variable = rf_palace_coup_loyalist_margin
@@ -1268,6 +1486,64 @@ riseandfall_palace_coup_continue_player_choices = {
     }
 }
 
+# Phase one is limited to landed direct-vassal claimants. Their answer creates
+# the authoritative list of third-side contenders before anyone can support it.
+riseandfall_palace_coup_continue_claimant_bid_choices = {
+    save_scope_as = original_ruler
+    clear_saved_scope = palace_coup_next_claimant_bidder
+    ordered_vassal = {
+        limit = {
+            is_landed = yes
+            liege = scope:original_ruler
+            has_character_flag = rf_palace_coup_pending_claim_bid
+            is_ai = no
+        }
+        order_by = current_military_strength
+        max = 1
+        save_scope_as = palace_coup_next_claimant_bidder
+    }
+    if = {
+        limit = { exists = scope:palace_coup_next_claimant_bidder }
+        scope:palace_coup_next_claimant_bidder = { trigger_event = { id = palace_coup.1204 delayed = yes } }
+    }
+    else = { riseandfall_palace_coup_begin_supporter_choices = yes }
+}
+
+# Phase two offers every non-claimant direct vassal the established sides plus
+# only those claimants who actually declared a bid in phase one.
+riseandfall_palace_coup_begin_supporter_choices = {
+    save_scope_as = original_ruler
+    scope:original_ruler = {
+        every_vassal = {
+            limit = {
+                is_landed = yes
+                liege = scope:original_ruler
+                NOT = { this = scope:palace_coup_challenger }
+                NOT = { has_claim_on = scope:original_primary }
+            }
+            if = {
+                limit = { is_ai = no }
+                add_character_flag = { flag = rf_palace_coup_pending_choice days = 30 }
+                set_variable = { name = rf_palace_coup_choice_ruler value = scope:original_ruler }
+                set_variable = { name = rf_palace_coup_choice_challenger value = scope:palace_coup_challenger }
+            }
+            else = { riseandfall_palace_coup_apply_ai_vassal_alignment_se = yes }
+        }
+        if = {
+            limit = {
+                any_vassal = {
+                    is_landed = yes
+                    liege = scope:original_ruler
+                    has_character_flag = rf_palace_coup_pending_choice
+                    is_ai = no
+                }
+            }
+            riseandfall_palace_coup_continue_player_choices = yes
+        }
+        else = { riseandfall_palace_coup_root_flees_success = yes }
+    }
+}
+
 riseandfall_palace_coup_prepare_rebellion = {
     save_scope_as = original_ruler
     primary_title = { save_scope_as = original_primary }
@@ -1282,32 +1558,29 @@ riseandfall_palace_coup_prepare_rebellion = {
                 NOT = { this = scope:palace_coup_challenger }
             }
             riseandfall_palace_coup_clear_vassal_choice_se = yes
-
             if = {
-                limit = { is_ai = no }
-                add_character_flag = { flag = rf_palace_coup_pending_choice days = 30 }
-                set_variable = { name = rf_palace_coup_choice_ruler value = scope:original_ruler }
-                set_variable = { name = rf_palace_coup_choice_challenger value = scope:palace_coup_challenger }
-            }
-            else = {
-                riseandfall_palace_coup_apply_ai_vassal_alignment_se = yes
+                limit = { has_claim_on = scope:original_primary }
+                if = {
+                    limit = { is_ai = no }
+                    add_character_flag = { flag = rf_palace_coup_pending_claim_bid days = 30 }
+                    set_variable = { name = rf_palace_coup_choice_ruler value = scope:original_ruler }
+                    set_variable = { name = rf_palace_coup_choice_challenger value = scope:palace_coup_challenger }
+                }
+                else = { riseandfall_palace_coup_apply_ai_vassal_alignment_se = yes }
             }
         }
-
         if = {
             limit = {
                 any_vassal = {
                     is_landed = yes
                     liege = scope:original_ruler
-                    has_character_flag = rf_palace_coup_pending_choice
+                    has_character_flag = rf_palace_coup_pending_claim_bid
                     is_ai = no
                 }
             }
-            riseandfall_palace_coup_continue_player_choices = yes
+            riseandfall_palace_coup_continue_claimant_bid_choices = yes
         }
-        else = {
-            riseandfall_palace_coup_root_flees_success = yes
-        }
+        else = { riseandfall_palace_coup_begin_supporter_choices = yes }
     }
 }
 
@@ -1490,28 +1763,14 @@ riseandfall_palace_coup_root_flees_success = {
     # A newly-created successor title starts with an empty treasury. Reserve
     # the old treasury before title changes so the later 50/50 split survives.
     scope:original_ruler = {
-        remove_variable = palace_coup_original_treasury
         if = {
             limit = {
                 has_treasury = yes
                 treasury > 1
             }
-            set_variable = { name = palace_coup_original_treasury value = treasury }
-            remove_treasury = var:palace_coup_original_treasury
-        }
-    }
-
-    # Reserve a non-capital county on the deposed ruler so they remain landed
-    # through split resolve. Do not reserve the capital itself: one-county
-    # realms must still transfer that county first so the challenger can hold
-    # the original primary title.
-    scope:original_ruler = {
-        random_held_title = {
-            limit = {
-                tier = tier_county
-                NOT = { this = scope:palace_coup_old_capital_county }
-            }
-            save_scope_as = palace_coup_original_reserve_county
+            # The amount was stored in palace_coup.1002.immediate, before the
+            # option tooltip was built; only remove the live treasury here.
+            remove_treasury = treasury
         }
     }
 
@@ -1520,6 +1779,59 @@ riseandfall_palace_coup_root_flees_success = {
     if = {
         limit = { has_active_diarchy = yes }
         end_diarchy = yes
+    }
+
+    # Snapshot the exact government before a one-county ruler can become
+    # landless. CK3 otherwise defaults the replacement holding to feudal.
+    clear_saved_scope = palace_coup_original_government
+    scope:original_ruler.government_type = { save_scope_as = palace_coup_original_government }
+
+    # A one-county administrative ruler would otherwise become unlanded for
+    # one resolve while their capital changes hands, which strips government.
+    # Give them a county from a multi-county direct vassal before that handoff.
+    if = {
+        limit = {
+            scope:original_ruler = {
+                NOT = {
+                    any_held_title = {
+                        tier = tier_county
+                        NOT = { this = scope:palace_coup_old_capital_county }
+                    }
+                }
+            }
+        }
+        scope:original_ruler = {
+            ordered_vassal = {
+                limit = {
+                    is_landed = yes
+                    any_held_title = {
+                        count >= 2
+                        tier = tier_county
+                    }
+                }
+                order_by = current_military_strength
+                max = 1
+                save_scope_as = palace_coup_pre_capital_donor
+            }
+        }
+        if = {
+            limit = { exists = scope:palace_coup_pre_capital_donor }
+            create_title_and_vassal_change = {
+                type = conquest
+                save_scope_as = palace_coup_pre_capital_land_change
+                add_claim_on_loss = yes
+            }
+            scope:palace_coup_pre_capital_donor = {
+                capital_county = {
+                    change_title_holder = {
+                        holder = scope:original_ruler
+                        change = scope:palace_coup_pre_capital_land_change
+                    }
+                }
+            }
+            resolve_title_and_vassal_change = scope:palace_coup_pre_capital_land_change
+        }
+        clear_saved_scope = palace_coup_pre_capital_donor
     }
 
     # Transfer the capital county in its own resolved change first so the challenger
@@ -1559,55 +1871,12 @@ riseandfall_palace_coup_root_flees_success = {
         }
     }
 
-    # Transfer ALL same-rank (and subordinate) titles to the challenger.
-    # For empire/hegemony rulers: transfer all kingdom titles and below.
-    # For kingdom rulers: transfer all kingdom titles the ruler personally holds.
-    # All direct vassals move into the coup realm for a clean top-level resolve.
-    # Loyalists are returned once the fleeing ruler has a valid successor realm;
-    # only unprotected rejectors remain eligible for the follow-up split.
+    # The coup takes the throne and the old capital only. The fleeing ruler
+    # keeps every other personally held county/title, preventing administrative
+    # rulers from becoming briefly unlanded and losing their government.
+    # Direct vassals still move to the coup realm first; their recorded choices
+    # return them to the old ruler or claimant successor afterward.
     scope:original_ruler = {
-        if = {
-            limit = { exists = scope:palace_coup_original_reserve_county }
-            every_held_title = {
-                limit = {
-                    NOT = { this = scope:original_primary }
-                    NOT = { this = scope:palace_coup_old_capital_county }
-                    NOT = { this ?= scope:palace_coup_original_reserve_county }
-                    NOT = { is_head_of_faith = yes }
-                    NOT = { is_noble_family_title = yes }
-                    OR = {
-                        tier = tier_kingdom
-                        tier = tier_duchy
-                        tier = tier_county
-                    }
-                }
-                change_title_holder = {
-                    holder = scope:palace_coup_challenger
-                    change = scope:palace_coup_split_change
-                }
-            }
-        }
-        else = {
-            # A ruler with only the capital personally held has no reserve scope;
-            # skip that comparison while transferring all non-capital titles.
-            every_held_title = {
-                limit = {
-                    NOT = { this = scope:original_primary }
-                    NOT = { this = scope:palace_coup_old_capital_county }
-                    NOT = { is_head_of_faith = yes }
-                    NOT = { is_noble_family_title = yes }
-                    OR = {
-                        tier = tier_kingdom
-                        tier = tier_duchy
-                        tier = tier_county
-                    }
-                }
-                change_title_holder = {
-                    holder = scope:palace_coup_challenger
-                    change = scope:palace_coup_split_change
-                }
-            }
-        }
         every_vassal = {
             limit = {
                 is_landed = yes
@@ -1810,17 +2079,49 @@ riseandfall_palace_coup_root_flees_success = {
 
         clear_saved_scope = palace_coup_root_successor_title
 
-        # Match realm split: the fleeing ruler gets a newly-created dynamic title
+        # Match Realm Split: the fleeing ruler gets a newly-created dynamic title
         # at the origin title's rank before successor-state markers are applied.
-        # Hegemony origins fall back to empire-tier dynamic titles, matching
-        # riseandfall_execute_realm_split_se.
+        # Hegemony titles use vanilla's create -> resolve holder -> generate CoA
+        # order, which avoids the crash caused by an incomplete dynamic handoff.
         if = {
             limit = {
                 scope:original_ruler = { exists = capital_county }
-                OR = {
-                    scope:original_primary = { tier = tier_hegemony }
-                    scope:original_primary = { tier = tier_empire }
+                scope:original_primary = { tier = tier_hegemony }
+            }
+            scope:original_ruler = {
+                capital_county = { save_scope_as = rf_base_county }
+                capital_barony = { save_scope_as = rf_base_capital_barony }
+                create_dynamic_title = {
+                    tier = hegemony
+                    name = RISEANDFALL_BREAKAWAY_NAME_CAPITAL
                 }
+            }
+            if = {
+                limit = { exists = scope:new_title }
+                create_title_and_vassal_change = {
+                    type = created
+                    save_scope_as = palace_coup_title_change
+                    add_claim_on_loss = yes
+                }
+                scope:new_title = {
+                    save_scope_as = palace_coup_root_successor_title
+                    change_title_holder = {
+                        holder = scope:original_ruler
+                        change = scope:palace_coup_title_change
+                    }
+                    set_color_from_title = scope:rf_base_county
+                    set_can_be_named_after_dynasty = no
+                    set_can_use_nomadic_naming = no
+                    set_definitive_form = yes
+                }
+                resolve_title_and_vassal_change = scope:palace_coup_title_change
+                scope:palace_coup_root_successor_title = { generate_coa = yes }
+            }
+        }
+        else_if = {
+            limit = {
+                scope:original_ruler = { exists = capital_county }
+                scope:original_primary = { tier = tier_empire }
             }
             scope:original_ruler = {
                 capital_county = { save_scope_as = rf_base_county }
@@ -1844,9 +2145,9 @@ riseandfall_palace_coup_root_flees_success = {
                         change = scope:palace_coup_title_change
                     }
                     set_color_from_title = scope:rf_base_county
-                    generate_coa = yes
                 }
                 resolve_title_and_vassal_change = scope:palace_coup_title_change
+                scope:palace_coup_root_successor_title = { generate_coa = yes }
             }
         }
         else_if = {
@@ -1926,24 +2227,37 @@ riseandfall_palace_coup_root_flees_success = {
 
         # The fleeing ruler must use the newly-created origin-rank retreat title
         # as primary; otherwise a reserve county/duchy can become the successor
-        # title even though kingdom/empire origins require kingdom/empire heirs.
-        if = {
-            limit = { exists = scope:palace_coup_root_successor_title }
-            scope:original_ruler = {
-                set_primary_title_to = scope:palace_coup_root_successor_title
-            }
+        # title even though kingdom/empire/hegemony origins require same-rank heirs.
+    if = {
+        limit = { exists = scope:palace_coup_root_successor_title }
+        scope:original_ruler = {
+            set_primary_title_to = scope:palace_coup_root_successor_title
         }
+    }
 
-        # Palace Coup retreat is not a generic realm collapse. Only direct
-        # vassals who explicitly rejected both camps with a claim may form a
-        # third successor state; all other vassals stay with their chosen camp.
+    # Fallback for the rare no-donor case: once the old ruler is landed again,
+    # restore the exact government it had before briefly losing its final county.
+    scope:original_ruler = {
+        if = {
+            limit = {
+                is_landed = yes
+                exists = scope:palace_coup_original_government
+            }
+            change_government = scope:palace_coup_original_government
+        }
+    }
+    clear_saved_scope = palace_coup_original_government
+
+    # Claimants selected by at least one vassal now form their own bids.
+        # This deliberately runs after the coup's title handoff: all direct
+        # vassals are in one valid realm before each claimant breaks away.
         if = {
             limit = {
                 scope:palace_coup_challenger = {
                     any_vassal = {
                         is_landed = yes
                         liege = scope:palace_coup_challenger
-                        has_character_flag = rf_palace_coup_neutral_rejector
+                        has_character_flag = rf_palace_coup_claimant_bidder
                         has_claim_on = scope:original_primary
                         is_independent_ruler = no
                     }
@@ -1959,25 +2273,83 @@ riseandfall_palace_coup_root_flees_success = {
                     limit = {
                         is_landed = yes
                         liege = scope:palace_coup_challenger
-                        has_character_flag = rf_palace_coup_neutral_rejector
+                        has_character_flag = rf_palace_coup_claimant_bidder
                         has_claim_on = scope:original_primary
                         is_independent_ruler = no
                     }
                     becomes_independent = {
                         change = scope:palace_coup_claimant_breakaway_change
                     }
-                    remove_character_flag = rf_palace_coup_neutral_rejector
+                    add_to_temporary_list = palace_coup_claimant_bidders
+                    remove_character_flag = rf_palace_coup_claimant_bidder
                 }
             }
             resolve_title_and_vassal_change = scope:palace_coup_claimant_breakaway_change
+            every_in_list = {
+                list = palace_coup_claimant_bidders
+                riseandfall_palace_coup_create_claimant_successor_title_se = yes
+            }
         }
 
-        # Hegemony rulers cannot host empire-tier loyalists as direct vassals after
-        # the old ruler falls back to a normal empire title. Keep those rulers in the
-        # deposed camp as allied successor states instead.
+        # Give a claimant the direct-vassal supporters whose rank can legally
+        # sit beneath that claimant. Equal-rank supporters become independent
+        # allies instead, because CK3 cannot create same-rank vassalage.
+        scope:palace_coup_challenger = {
+            every_vassal = {
+                limit = {
+                    is_landed = yes
+                    liege = scope:palace_coup_challenger
+                    has_variable = rf_palace_coup_supported_claimant
+                }
+                var:rf_palace_coup_supported_claimant = { save_scope_as = palace_coup_supported_claimant }
+                if = {
+                    limit = {
+                        exists = scope:palace_coup_supported_claimant
+                        scope:palace_coup_supported_claimant = {
+                            is_alive = yes
+                            is_independent_ruler = yes
+                        }
+                        primary_title.tier < scope:palace_coup_supported_claimant.primary_title.tier
+                    }
+                    create_title_and_vassal_change = {
+                        type = conquest
+                        save_scope_as = palace_coup_claimant_support_change
+                        add_claim_on_loss = no
+                    }
+                    change_liege = {
+                        liege = scope:palace_coup_supported_claimant
+                        change = scope:palace_coup_claimant_support_change
+                    }
+                    resolve_title_and_vassal_change = scope:palace_coup_claimant_support_change
+                }
+                else_if = {
+                    limit = {
+                        exists = scope:palace_coup_supported_claimant
+                        scope:palace_coup_supported_claimant = { is_alive = yes is_independent_ruler = yes }
+                    }
+                    create_title_and_vassal_change = {
+                        type = independency
+                        save_scope_as = palace_coup_claimant_ally_change
+                        add_claim_on_loss = no
+                    }
+                    becomes_independent = { change = scope:palace_coup_claimant_ally_change }
+                    resolve_title_and_vassal_change = scope:palace_coup_claimant_ally_change
+                    if = {
+                        limit = { NOT = { is_allied_to = scope:palace_coup_supported_claimant } }
+                        create_alliance = scope:palace_coup_supported_claimant
+                    }
+                }
+                remove_variable = rf_palace_coup_supported_claimant
+                clear_saved_scope = palace_coup_supported_claimant
+            }
+        }
+
+        # Only the legacy empire-tier fallback cannot host empire-tier loyalists.
+        # A dynamic hegemony can receive them through the normal loyalist return.
         if = {
             limit = {
                 scope:original_primary = { tier = tier_hegemony }
+                scope:original_ruler = { primary_title.tier < tier_hegemony }
                 scope:palace_coup_challenger = {
                     any_vassal = {
                         is_landed = yes
@@ -2178,22 +2550,15 @@ riseandfall_palace_coup_root_flees_success = {
         }
         # Restore the treasury after successor-title creation, giving each side
         # the same half share as the personal-gold split above.
-        scope:original_ruler = {
-            if = {
-                limit = { has_variable = palace_coup_original_treasury }
-                set_variable = { name = palace_coup_transfer_treasury value = var:palace_coup_original_treasury }
-                change_variable = { name = palace_coup_transfer_treasury multiply = 0.5 }
-            }
-        }
         scope:challenger = {
             if = {
-                limit = { scope:original_ruler = { has_variable = palace_coup_transfer_treasury } }
+                limit = { scope:original_ruler = { var:palace_coup_transfer_treasury > 0 } }
                 add_treasury_or_gold = scope:original_ruler.var:palace_coup_transfer_treasury
             }
         }
         scope:original_ruler = {
             if = {
-                limit = { has_variable = palace_coup_transfer_treasury }
+                limit = { var:palace_coup_transfer_treasury > 0 }
                 add_treasury_or_gold = var:palace_coup_transfer_treasury
             }
             remove_variable = palace_coup_transfer_treasury

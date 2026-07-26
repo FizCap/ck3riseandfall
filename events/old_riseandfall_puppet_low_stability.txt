@@ -12,8 +12,8 @@ puppet.1001 = {
 
     right_portrait = root
     immediate = {
-        # Set low stability cooldown on the liege when this event fires
-    add_character_flag = { flag = rf_low_stability_cooldown years = 5 }
+        # Set the title-based low-stability cooldown when this event fires.
+    riseandfall_set_low_stability_cooldown_se = yes
         try_start_diarchy = regency
     }
 

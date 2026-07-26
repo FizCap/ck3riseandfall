@@ -1592,7 +1592,7 @@ riseandfall_merge_inherited_realm_stability_se = {
 
 riseandfall_low_stability_grace_period_se = {
     every_independent_ruler = {
-        add_character_flag = { flag = rf_low_stability_cooldown years = 5 }
+        riseandfall_set_low_stability_cooldown_se = yes
     }
 }
 

@@ -165,6 +165,142 @@ types RiseAndFallStabilityTooltipTypes
 					}
 				}
 
+				widget = {
+					visible = "[Character.MakeScope.Var('rf_coalition_threat').IsSet]"
+					size = { 500 210 }
+					tooltip = "REALM_STABILITY_TT_COALITION_THREAT_TOOLTIP"
+					using = tooltip_ne
+					background = { using = Background_Area_Dark }
+
+					progressbar_standard = {
+						visible = "[GreaterThanOrEqualTo_CFixedPoint( Character.MakeScope.Var('rf_coalition_threat').GetValue, '(CFixedPoint)100' )]"
+						parentanchor = hcenter|top
+						position = { 0 54 }
+						size = { 476 18 }
+						min = 0
+						max = 100
+						value = "[FixedPointToProgressbarValue( Divide_CFixedPoint( Character.MakeScope.Var('rf_coalition_threat').GetValue, '(CFixedPoint)100' ) )]"
+						blockoverride "progress_textures"
+						{
+							progresstexture = "gfx/interface/progressbars/progress_red.dds"
+							noprogresstexture = "gfx/interface/progressbars/progress_red_bg.dds"
+						}
+					}
+					progressbar_standard = {
+						visible = "[And( GreaterThanOrEqualTo_CFixedPoint( Character.MakeScope.Var('rf_coalition_threat').GetValue, '(CFixedPoint)50' ), LessThan_CFixedPoint( Character.MakeScope.Var('rf_coalition_threat').GetValue, '(CFixedPoint)100' ) )]"
+						parentanchor = hcenter|top
+						position = { 0 54 }
+						size = { 476 18 }
+						min = 0
+						max = 100
+						value = "[FixedPointToProgressbarValue( Divide_CFixedPoint( Character.MakeScope.Var('rf_coalition_threat').GetValue, '(CFixedPoint)100' ) )]"
+						blockoverride "progress_textures"
+						{
+							progresstexture = "gfx/interface/progressbars/progress_orange.dds"
+							noprogresstexture = "gfx/interface/progressbars/progress_orange_bg.dds"
+						}
+					}
+					progressbar_standard = {
+						visible = "[LessThan_CFixedPoint( Character.MakeScope.Var('rf_coalition_threat').GetValue, '(CFixedPoint)50' )]"
+						parentanchor = hcenter|top
+						position = { 0 54 }
+						size = { 476 18 }
+						min = 0
+						max = 100
+						value = "[FixedPointToProgressbarValue( Divide_CFixedPoint( Character.MakeScope.Var('rf_coalition_threat').GetValue, '(CFixedPoint)100' ) )]"
+						blockoverride "progress_textures"
+						{
+							progresstexture = "gfx/interface/progressbars/progress_green.dds"
+							noprogresstexture = "gfx/interface/progressbars/progress_green_bg.dds"
+						}
+					}
+					vbox = {
+						margin = { 12 8 }
+						spacing = 2
+						hbox = {
+							layoutpolicy_horizontal = expanding
+							icon = {
+								size = { 26 26 }
+								texture = "gfx/interface/icons/symbols/icon_warning.dds"
+							}
+							text_single = { text = "REALM_STABILITY_TT_COALITION_THREAT_HEADER" default_format = "#high" margin_left = 6 }
+							expand = { }
+							text_single = { text = "REALM_STABILITY_TT_COALITION_THREAT_VALUE" default_format = "#high" align = right|nobaseline }
+						}
+						# Keep the status below the meter instead of letting the absolute
+						# progressbar cover it.
+						widget = { size = { 1 38 } }
+						text_single = {
+							text = "REALM_STABILITY_TT_COALITION_THREAT_STATUS"
+							default_format = "#high"
+							align = hcenter|nobaseline
+							layoutpolicy_horizontal = expanding
+							max_width = 468
+							fontsize_min = 11
+						}
+						hbox = {
+							size = { 476 78 }
+							layoutpolicy_horizontal = expanding
+							spacing = 8
+							widget = {
+								size = { 234 78 }
+								background = { using = Background_Area_Dark }
+								vbox = {
+									margin = { 8 5 }
+									text_single = { text = "REALM_STABILITY_TT_COALITION_THREAT_EXPANSION_HEADER" default_format = "#high" align = hcenter|nobaseline layoutpolicy_horizontal = expanding }
+									hbox = {
+										layoutpolicy_horizontal = expanding
+										text_single = { text = "REALM_STABILITY_TT_COALITION_THREAT_RAPID_L" default_format = "#high" max_width = 132 fontsize_min = 11 }
+										expand = { }
+										text_single = { text = "REALM_STABILITY_TT_COALITION_THREAT_RAPID_R" default_format = "#high" align = right|nobaseline max_width = 72 fontsize_min = 11 }
+									}
+									hbox = {
+										layoutpolicy_horizontal = expanding
+										text_single = { text = "REALM_STABILITY_TT_COALITION_THREAT_PEACE_L" default_format = "#high" max_width = 132 fontsize_min = 11 }
+										expand = { }
+										text_single = { text = "REALM_STABILITY_TT_COALITION_THREAT_PEACE_R" default_format = "#high" align = right|nobaseline max_width = 72 fontsize_min = 11 }
+									}
+								}
+							}
+							widget = {
+								size = { 234 78 }
+								background = { using = Background_Area_Dark }
+								vbox = {
+									margin = { 8 5 }
+									text_single = { text = "REALM_STABILITY_TT_COALITION_THREAT_ALARM_HEADER" default_format = "#high" align = hcenter|nobaseline layoutpolicy_horizontal = expanding }
+									hbox = {
+										layoutpolicy_horizontal = expanding
+										text_single = { text = "REALM_STABILITY_TT_COALITION_THREAT_PERIPHERY_L" default_format = "#high" max_width = 132 fontsize_min = 11 }
+										expand = { }
+										text_single = { text = "REALM_STABILITY_TT_COALITION_THREAT_PERIPHERY_R" default_format = "#high" align = right|nobaseline max_width = 72 fontsize_min = 11 }
+									}
+									hbox = {
+										layoutpolicy_horizontal = expanding
+										text_single = { text = "REALM_STABILITY_TT_COALITION_THREAT_DOMINANCE_L" default_format = "#high" max_width = 132 fontsize_min = 11 }
+										expand = { }
+										text_single = { text = "REALM_STABILITY_TT_COALITION_THREAT_DOMINANCE_R" default_format = "#high" align = right|nobaseline max_width = 72 fontsize_min = 11 }
+									}
+									hbox = {
+										layoutpolicy_horizontal = expanding
+										text_single = { text = "REALM_STABILITY_TT_COALITION_THREAT_WORLD_L" default_format = "#high" max_width = 132 fontsize_min = 11 }
+										expand = { }
+										text_single = { text = "REALM_STABILITY_TT_COALITION_THREAT_WORLD_R" default_format = "#high" align = right|nobaseline max_width = 72 fontsize_min = 11 }
+									}
+								}
+							}
+						}
+						hbox = {
+							size = { 476 24 }
+							layoutpolicy_horizontal = expanding
+							margin = { 8 1 }
+							background = { using = Background_Area_Dark }
+							text_single = { text = "REALM_STABILITY_TT_COALITION_THREAT_ANNUAL" default_format = "#high" max_width = 180 fontsize_min = 11 }
+							expand = { }
+							text_single = { text = "REALM_STABILITY_TT_COALITION_THREAT_CHANGE" default_format = "#high" align = right|nobaseline max_width = 96 fontsize_min = 11 }
+						}
+					}
+				}
+
 				hbox = {
 					size = { 500 96 }
 					spacing = 16

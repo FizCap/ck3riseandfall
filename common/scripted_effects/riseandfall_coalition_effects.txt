@@ -1,5 +1,417 @@
 ﻿# Rise and Fall - Coalition low-stability effects
 
+# Count the defender's actual core and peripheral territory. The primary title
+# is the de-jure core; county ownership and vassal primary titles are irrelevant.
+riseandfall_coalition_calculate_periphery_se = {
+    remove_variable = rf_coalition_total_counties
+    remove_variable = rf_coalition_core_counties
+    remove_variable = rf_coalition_peripheral_counties
+    remove_variable = rf_coalition_peripheral_pct
+    remove_variable = rf_coalition_recent_conquest_counties
+    remove_variable = rf_coalition_recent_conquest_pct
+    # County iterators discard character event targets in this CK3 build.
+    # Use short-lived global scratch counters, then copy results back once the
+    # iterator returns to the owning ruler.
+    set_global_variable = { name = rf_coalition_calc_total value = 0 }
+    set_global_variable = { name = rf_coalition_calc_core value = 0 }
+    set_global_variable = { name = rf_coalition_calc_peripheral value = 0 }
+    set_global_variable = { name = rf_coalition_calc_recent_conquest value = 0 }
+    every_realm_county = {
+        set_variable = { name = rf_coalition_counted_realm_county value = 1 }
+        change_global_variable = { name = rf_coalition_calc_total add = 1 }
+        # Only war-driven title history represents territorial expansion. The
+        # longer counter lets an old hegemon qualify after its conquests stop.
+        if = {
+            limit = {
+                OR = {
+                    recent_history = { type = conquest years = 15 }
+                    recent_history = { type = conquest_holy_war years = 15 }
+                    recent_history = { type = conquest_claim years = 15 }
+                    recent_history = { type = conquest_populist years = 15 }
+                    has_variable = rf_coalition_vassalization_conquest
+                }
+            }
+            change_global_variable = { name = rf_coalition_calc_recent_conquest add = 1 }
+        }
+    }
+    # Only the snapshotted primary title's OWN de-jure county list is core.
+    # Do not use a liege-or-above comparison: it can make other crowns count
+    # as core through a wider hierarchy.
+    primary_title = {
+        every_de_jure_county = {
+            limit = { has_variable = rf_coalition_counted_realm_county }
+            remove_variable = rf_coalition_counted_realm_county
+            change_global_variable = { name = rf_coalition_calc_core add = 1 }
+        }
+    }
+    every_realm_county = {
+        limit = { has_variable = rf_coalition_counted_realm_county }
+        remove_variable = rf_coalition_counted_realm_county
+        change_global_variable = { name = rf_coalition_calc_peripheral add = 1 }
+    }
+    set_variable = { name = rf_coalition_total_counties value = global_var:rf_coalition_calc_total }
+    set_variable = { name = rf_coalition_core_counties value = global_var:rf_coalition_calc_core }
+    set_variable = { name = rf_coalition_peripheral_counties value = global_var:rf_coalition_calc_peripheral }
+    set_variable = { name = rf_coalition_recent_conquest_counties value = global_var:rf_coalition_calc_recent_conquest }
+    # This effect runs only for landed rulers, whose realm always contains at
+    # least one county. Avoid a global-variable comparison here: interaction
+    # tooltip evaluation validates the branch without executing the setup.
+    set_variable = { name = rf_coalition_peripheral_pct value = var:rf_coalition_peripheral_counties }
+    change_variable = { name = rf_coalition_peripheral_pct multiply = 100 }
+    change_variable = { name = rf_coalition_peripheral_pct divide = var:rf_coalition_total_counties }
+    round_variable = { name = rf_coalition_peripheral_pct nearest = 1 }
+    set_variable = { name = rf_coalition_recent_conquest_pct value = var:rf_coalition_recent_conquest_counties }
+    change_variable = { name = rf_coalition_recent_conquest_pct multiply = 100 }
+    change_variable = { name = rf_coalition_recent_conquest_pct divide = var:rf_coalition_total_counties }
+    round_variable = { name = rf_coalition_recent_conquest_pct nearest = 1 }
+    remove_global_variable = rf_coalition_calc_total
+    remove_global_variable = rf_coalition_calc_core
+    remove_global_variable = rf_coalition_calc_peripheral
+    remove_global_variable = rf_coalition_calc_recent_conquest
+}
+
+# Coalition Threat is an infamy-style ledger. Peace removes four points per
+# year, while lasting overextension, rapid conquest, global scale, and local
+# dominance add pressure. It never changes during a title-gain refresh.
+riseandfall_coalition_update_threat_se = {
+    save_scope_as = coalition_threat_target
+    set_variable = { name = rf_coalition_threat_decay value = -4 }
+    # External conditions are multipliers on actual conquest pressure, never
+    # passive sources of Threat. A large but peaceful empire must cool down.
+    set_variable = { name = rf_coalition_threat_periphery_gain value = 0 }
+    set_variable = { name = rf_coalition_threat_rapid_gain value = var:rf_coalition_recent_conquest_pct }
+    change_variable = { name = rf_coalition_threat_rapid_gain multiply = 0.5 }
+    round_variable = { name = rf_coalition_threat_rapid_gain nearest = 1 }
+    set_variable = { name = rf_coalition_threat_world_gain value = 0 }
+    # Regional powers can accumulate warning Threat before they become valid
+    # Coalition targets. The five-percent declaration floor remains unchanged,
+    # while the same expansion becomes more threatening as the realm grows.
+    set_variable = { name = rf_coalition_threat_realm_scale value = 0 }
+    if = {
+        limit = { has_variable = riseandfall_rs_realm_size_component }
+        set_variable = { name = rf_coalition_threat_world_share value = var:riseandfall_rs_realm_size_component }
+        change_variable = { name = rf_coalition_threat_world_share multiply = -1 }
+        if = { limit = { var:rf_coalition_threat_world_share >= 25 } set_variable = { name = rf_coalition_threat_realm_scale value = 1.25 } }
+        else_if = { limit = { var:rf_coalition_threat_world_share >= 15 } set_variable = { name = rf_coalition_threat_realm_scale value = 1 } }
+        else_if = { limit = { var:rf_coalition_threat_world_share >= 10 } set_variable = { name = rf_coalition_threat_realm_scale value = 0.75 } }
+        else_if = { limit = { var:rf_coalition_threat_world_share >= 5 } set_variable = { name = rf_coalition_threat_realm_scale value = 0.5 } }
+        else_if = { limit = { var:rf_coalition_threat_world_share >= 1 } set_variable = { name = rf_coalition_threat_realm_scale value = 0.25 } }
+        if = { limit = { var:rf_coalition_threat_world_share >= 25 } set_variable = { name = rf_coalition_threat_world_gain value = 20 } }
+        else_if = { limit = { var:rf_coalition_threat_world_share >= 15 } set_variable = { name = rf_coalition_threat_world_gain value = 10 } }
+        remove_variable = rf_coalition_threat_world_share
+    }
+    set_variable = { name = rf_coalition_threat_dominance_gain value = 0 }
+    clear_saved_scope = coalition_threat_neighbor
+    ordered_independent_ruler = {
+        limit = {
+            NOT = { this = scope:coalition_threat_target }
+            exists = primary_title
+            primary_title = { is_neighbor_to_realm = scope:coalition_threat_target }
+        }
+        order_by = realm_size
+        max = 1
+        save_scope_as = coalition_threat_neighbor
+    }
+    if = {
+        limit = { exists = scope:coalition_threat_neighbor }
+        set_variable = { name = rf_coalition_threat_largest_neighbor_size value = scope:coalition_threat_neighbor.realm_size }
+        if = { limit = { realm_size >= { value = var:rf_coalition_threat_largest_neighbor_size multiply = 5 } } set_variable = { name = rf_coalition_threat_dominance_gain value = 75 } }
+        else_if = { limit = { realm_size >= { value = var:rf_coalition_threat_largest_neighbor_size multiply = 3 } } set_variable = { name = rf_coalition_threat_dominance_gain value = 50 } }
+        else_if = { limit = { realm_size >= { value = var:rf_coalition_threat_largest_neighbor_size multiply = 2 } } set_variable = { name = rf_coalition_threat_dominance_gain value = 25 } }
+        remove_variable = rf_coalition_threat_largest_neighbor_size
+    }
+    clear_saved_scope = coalition_threat_neighbor
+    if = {
+        limit = { var:rf_coalition_peripheral_pct >= 25 }
+        set_variable = { name = rf_coalition_threat_periphery_gain value = var:rf_coalition_peripheral_pct }
+    }
+    # Convert the percentage-point factors into one combined multiplier. A
+    # conquest always starts the buildup; foreign land, global scale, and a
+    # frightened neighborhood decide how much that conquest matters.
+    set_variable = { name = rf_coalition_threat_conquest_multiplier value = 1 }
+    change_variable = { name = rf_coalition_threat_conquest_multiplier add = var:rf_coalition_threat_periphery_gain }
+    change_variable = { name = rf_coalition_threat_conquest_multiplier divide = 100 }
+    change_variable = { name = rf_coalition_threat_conquest_multiplier add = 1 }
+    set_variable = { name = rf_coalition_threat_conquest_dominance_multiplier value = var:rf_coalition_threat_dominance_gain }
+    change_variable = { name = rf_coalition_threat_conquest_dominance_multiplier divide = 100 }
+    change_variable = { name = rf_coalition_threat_conquest_multiplier add = var:rf_coalition_threat_conquest_dominance_multiplier }
+    set_variable = { name = rf_coalition_threat_conquest_world_multiplier value = var:rf_coalition_threat_world_gain }
+    change_variable = { name = rf_coalition_threat_conquest_world_multiplier divide = 100 }
+    change_variable = { name = rf_coalition_threat_conquest_multiplier add = var:rf_coalition_threat_conquest_world_multiplier }
+    change_variable = { name = rf_coalition_threat_rapid_gain multiply = var:rf_coalition_threat_realm_scale }
+    change_variable = { name = rf_coalition_threat_rapid_gain multiply = var:rf_coalition_threat_conquest_multiplier }
+    round_variable = { name = rf_coalition_threat_rapid_gain nearest = 1 }
+    set_variable = { name = rf_coalition_threat_yearly_change value = var:rf_coalition_threat_decay }
+    change_variable = { name = rf_coalition_threat_yearly_change add = var:rf_coalition_threat_rapid_gain }
+    if = {
+        limit = { $APPLY_YEARLY$ = yes }
+        if = {
+            limit = { has_variable = rf_coalition_threat_window_years }
+            # Reaching 100 opens a five-year Coalition window. The meter is
+            # held at 100 while foreign rulers decide whether to use it.
+            if = {
+                limit = { riseandfall_coalition_target_has_active_war_trigger = yes }
+                set_variable = { name = rf_coalition_threat value = 100 }
+                set_variable = { name = rf_coalition_threat_yearly_change value = 0 }
+            }
+            else = {
+                change_variable = { name = rf_coalition_threat_window_years subtract = 1 }
+                if = {
+                    limit = { var:rf_coalition_threat_window_years <= 0 }
+                    set_variable = { name = rf_coalition_threat value = 0 }
+                    set_variable = { name = rf_coalition_threat_yearly_change value = -100 }
+                    remove_variable = rf_coalition_threat_window_years
+                }
+                else = {
+                    set_variable = { name = rf_coalition_threat value = 100 }
+                    set_variable = { name = rf_coalition_threat_yearly_change value = 0 }
+                }
+            }
+        }
+        else = {
+            if = { limit = { NOT = { has_variable = rf_coalition_threat } } set_variable = { name = rf_coalition_threat value = 0 } }
+            change_variable = { name = rf_coalition_threat add = var:rf_coalition_threat_yearly_change }
+            clamp_variable = { name = rf_coalition_threat min = 0 max = 100 }
+            if = {
+                limit = {
+                    var:rf_coalition_threat >= 100
+                    NOT = { riseandfall_coalition_target_has_active_war_trigger = yes }
+                    NOT = { has_character_flag = rf_coalition_formation_active }
+                }
+                set_variable = { name = rf_coalition_threat_window_years value = 5 }
+            }
+        }
+    }
+    else_if = {
+        limit = { NOT = { has_variable = rf_coalition_threat } }
+        set_variable = { name = rf_coalition_threat value = 0 }
+    }
+    riseandfall_coalition_update_ai_war_deterrence_se = yes
+    clear_saved_scope = coalition_threat_target
+}
+
+# Threat changes how often an independent AI looks for ordinary offensive wars.
+# This uses the same global AI war controls as vanilla personality traits, so it
+# affects all normal CB selection without overriding the Declare War interaction.
+riseandfall_coalition_update_ai_war_deterrence_se = {
+    remove_character_modifier = riseandfall_coalition_ai_war_caution_low
+    remove_character_modifier = riseandfall_coalition_ai_war_caution_medium
+    remove_character_modifier = riseandfall_coalition_ai_war_caution_high
+    remove_character_modifier = riseandfall_coalition_ai_war_caution_severe
+    remove_variable = rf_coalition_ai_war_caution_score
+    if = {
+        limit = {
+            is_ai = yes
+            has_variable = rf_coalition_threat
+            var:rf_coalition_threat >= 1
+            NOR = {
+                has_trait = ambitious
+                has_trait = warlord
+            }
+        }
+        set_variable = { name = rf_coalition_ai_war_caution_score value = var:rf_coalition_threat }
+
+        # Bold and belligerent rulers discount the diplomatic danger.
+        if = { limit = { has_trait = brave } change_variable = { name = rf_coalition_ai_war_caution_score subtract = 15 } }
+        if = { limit = { has_trait = arrogant } change_variable = { name = rf_coalition_ai_war_caution_score subtract = 15 } }
+        if = { limit = { has_trait = wrathful } change_variable = { name = rf_coalition_ai_war_caution_score subtract = 10 } }
+        if = { limit = { has_trait = vengeful } change_variable = { name = rf_coalition_ai_war_caution_score subtract = 15 } }
+        if = { limit = { has_trait = greedy } change_variable = { name = rf_coalition_ai_war_caution_score subtract = 10 } }
+
+        # Cautious rulers react sooner and more strongly to likely containment.
+        if = { limit = { has_trait = content } change_variable = { name = rf_coalition_ai_war_caution_score add = 25 } }
+        if = { limit = { has_trait = craven } change_variable = { name = rf_coalition_ai_war_caution_score add = 25 } }
+        if = { limit = { has_trait = calm } change_variable = { name = rf_coalition_ai_war_caution_score add = 15 } }
+        if = { limit = { has_trait = patient } change_variable = { name = rf_coalition_ai_war_caution_score add = 15 } }
+        if = { limit = { has_trait = compassionate } change_variable = { name = rf_coalition_ai_war_caution_score add = 15 } }
+        if = { limit = { has_trait = just } change_variable = { name = rf_coalition_ai_war_caution_score add = 10 } }
+        clamp_variable = { name = rf_coalition_ai_war_caution_score min = 0 max = 100 }
+
+        if = {
+            limit = { var:rf_coalition_ai_war_caution_score >= 100 }
+            add_character_modifier = { modifier = riseandfall_coalition_ai_war_caution_severe }
+        }
+        else_if = {
+            limit = { var:rf_coalition_ai_war_caution_score >= 75 }
+            add_character_modifier = { modifier = riseandfall_coalition_ai_war_caution_high }
+        }
+        else_if = {
+            limit = { var:rf_coalition_ai_war_caution_score >= 50 }
+            add_character_modifier = { modifier = riseandfall_coalition_ai_war_caution_medium }
+        }
+        else_if = {
+            limit = { var:rf_coalition_ai_war_caution_score >= 25 }
+            add_character_modifier = { modifier = riseandfall_coalition_ai_war_caution_low }
+        }
+        remove_variable = rf_coalition_ai_war_caution_score
+    }
+}
+
+# An offensive Coalition war consumes the immediate crisis even if the target
+# remains threatening. The title-bound cooldown prevents serial containment
+# wars while recent conquest history is free to rebuild longer-term pressure.
+riseandfall_coalition_consume_threat_se = {
+    set_variable = { name = rf_coalition_threat value = 0 }
+    set_variable = { name = rf_coalition_threat_yearly_change value = 0 }
+    remove_variable = rf_coalition_threat_window_years
+    riseandfall_coalition_update_ai_war_deterrence_se = yes
+    if = {
+        limit = { has_variable = rf_coalition_core_title }
+        var:rf_coalition_core_title = {
+            set_variable = { name = rf_coalition_postwar_cooldown value = 1 years = $YEARS$ }
+        }
+    }
+    else_if = {
+        limit = { exists = primary_title }
+        primary_title = {
+            set_variable = { name = rf_coalition_postwar_cooldown value = 1 years = $YEARS$ }
+        }
+    }
+}
+
+# Mark each county outside the snapshotted exact primary-title core. This is
+# deliberately county-based: a core-primary vassal cannot shelter conquests.
+riseandfall_coalition_tag_periphery_se = {
+    every_realm_county = { set_variable = { name = rf_coalition_release_county value = 1 } }
+    var:rf_coalition_core_title = { save_scope_as = coalition_release_core }
+    scope:coalition_release_core = {
+        every_de_jure_county = {
+            limit = { has_variable = rf_coalition_release_county }
+            remove_variable = rf_coalition_release_county
+        }
+    }
+    clear_saved_scope = coalition_release_core
+}
+
+# Select every marked de-jure kingdom for a complete peripheral breakup.
+riseandfall_coalition_select_all_peripheral_kingdoms_se = {
+    every_realm_de_jure_kingdom = {
+        if = {
+            limit = { any_de_jure_county = { has_variable = rf_coalition_release_county } }
+            set_variable = { name = rf_coalition_release_kingdom_selected value = 1 }
+        }
+    }
+}
+
+# Release direct-vassal realms that are entirely outside the former primary
+# title's de-jure core. Their internal title structure remains intact; only
+# mixed realms and personally held outer land need the fallback shard ruler.
+riseandfall_coalition_release_whole_peripheral_vassals_se = {
+    # Do not reuse coalition_release_liege: the caller keeps that scope for
+    # fallback shard culture and faith after intact vassals have departed.
+    save_scope_as = coalition_existing_vassal_liege
+    every_vassal = {
+        limit = {
+            is_alive = yes
+            is_landed = yes
+            is_vassal_of = scope:coalition_existing_vassal_liege
+            NOT = { is_independent_ruler = yes }
+            OR = {
+                any_held_title = { tier = tier_county has_variable = rf_coalition_release_county }
+                any_sub_realm_county = { has_variable = rf_coalition_release_county }
+            }
+            # A vassal touching any unmarked core county remains in place, so
+            # only its peripheral counties are handled by the fallback below.
+            NOT = {
+                OR = {
+                    any_held_title = { tier = tier_county NOT = { has_variable = rf_coalition_release_county } }
+                    any_sub_realm_county = { NOT = { has_variable = rf_coalition_release_county } }
+                }
+            }
+        }
+        # `realm_county` follows the top liege, so clear only this vassal's
+        # personally held and subrealm counties before independence.
+        every_held_title = {
+            limit = { tier = tier_county }
+            remove_variable = rf_coalition_release_county
+        }
+        every_sub_realm_county = { remove_variable = rf_coalition_release_county }
+        create_title_and_vassal_change = {
+            type = independency
+            save_scope_as = coalition_release_vassal_independence
+            add_claim_on_loss = yes
+        }
+        becomes_independent = { change = scope:coalition_release_vassal_independence }
+        resolve_title_and_vassal_change = scope:coalition_release_vassal_independence
+    }
+    clear_saved_scope = coalition_existing_vassal_liege
+}
+
+# Detach remaining marked counties only from selected de-jure kingdoms. One
+# shard ruler is made per kingdom solely for personal or mixed-realm land that
+# cannot be released intact with an existing vassal ruler.
+riseandfall_coalition_release_selected_periphery_se = {
+    save_scope_as = coalition_release_liege
+    # Medium marks every peripheral county before choosing kingdoms. Unmark
+    # unselected kingdoms here so intact vassals outside the verdict cannot be
+    # released by the shared whole-vassal path. Heavy selects every kingdom.
+    every_realm_de_jure_kingdom = {
+        limit = { NOT = { has_variable = rf_coalition_release_kingdom_selected } }
+        every_de_jure_county = {
+            limit = { has_variable = rf_coalition_release_county }
+            remove_variable = rf_coalition_release_county
+        }
+    }
+    riseandfall_coalition_release_whole_peripheral_vassals_se = yes
+    every_realm_de_jure_kingdom = {
+        limit = { has_variable = rf_coalition_release_kingdom_selected }
+        save_scope_as = coalition_release_kingdom
+        random_de_jure_county = {
+            limit = { has_variable = rf_coalition_release_county }
+            save_scope_as = coalition_release_sample
+            create_character = {
+                location = scope:coalition_release_sample.title_province
+                template = populist_faction_leader_template
+                culture = scope:coalition_release_liege.culture
+                faith = scope:coalition_release_liege.faith
+                trait = populist_leader
+                gender_female_chance = 50
+                save_scope_as = coalition_release_seed
+            }
+            if = { limit = { scope:coalition_release_sample.culture ?= { always = yes } } scope:coalition_release_seed = { set_culture = scope:coalition_release_sample.culture } }
+            if = { limit = { scope:coalition_release_sample.faith ?= { always = yes } } scope:coalition_release_seed = { set_character_faith = scope:coalition_release_sample.faith } }
+            scope:coalition_release_kingdom = { set_variable = { name = rf_coalition_release_seed value = scope:coalition_release_seed } }
+        }
+        every_de_jure_county = {
+            limit = { has_variable = rf_coalition_release_county scope:coalition_release_kingdom = { has_variable = rf_coalition_release_seed } }
+            scope:coalition_release_kingdom.var:rf_coalition_release_seed = { save_scope_as = coalition_release_seed }
+            if = {
+                limit = { exists = holder NOT = { holder = scope:coalition_release_seed } }
+                create_title_and_vassal_change = { type = conquest_populist save_scope_as = coalition_release_change add_claim_on_loss = yes }
+                change_title_holder = { holder = scope:coalition_release_seed change = scope:coalition_release_change take_baronies = no }
+                resolve_title_and_vassal_change = scope:coalition_release_change
+            }
+            remove_variable = rf_coalition_release_county
+        }
+        if = {
+            limit = { scope:coalition_release_kingdom = { has_variable = rf_coalition_release_seed } }
+            scope:coalition_release_kingdom.var:rf_coalition_release_seed = {
+                if = {
+                    limit = { is_alive = yes is_landed = yes NOT = { is_independent_ruler = yes } }
+                    create_title_and_vassal_change = { type = independency save_scope_as = coalition_release_independence add_claim_on_loss = yes }
+                    becomes_independent = { change = scope:coalition_release_independence }
+                    resolve_title_and_vassal_change = scope:coalition_release_independence
+                }
+            }
+            scope:coalition_release_kingdom = { remove_variable = rf_coalition_release_seed }
+        }
+        remove_variable = rf_coalition_release_kingdom_selected
+        remove_variable = rf_coalition_release_kingdom_count
+        clear_saved_scope = coalition_release_seed
+        clear_saved_scope = coalition_release_sample
+        clear_saved_scope = coalition_release_kingdom
+    }
+    every_realm_county = { remove_variable = rf_coalition_release_county }
+    clear_saved_scope = coalition_release_liege
+}
+
+# Backward-compatible full-breakup wrapper used by Heavy punishment.
+riseandfall_coalition_release_periphery_se = {
+    riseandfall_coalition_tag_periphery_se = yes
+    riseandfall_coalition_select_all_peripheral_kingdoms_se = yes
+    riseandfall_coalition_release_selected_periphery_se = yes
+}
+
 riseandfall_coalition_clear_invitee_state_se = {
     remove_character_flag = rf_coalition_invitation_pending
     remove_character_flag = rf_coalition_vassal_invitation_pending
@@ -23,9 +435,29 @@ riseandfall_coalition_clear_assembly_state_se = {
         riseandfall_coalition_clear_invitee_state_se = yes
     }
     remove_character_flag = rf_coalition_formation_active
+    remove_character_flag = rf_coalition_interaction_formation
+    remove_character_flag = rf_coalition_declaration_confirmed
+    remove_variable = rf_coalition_initiator
     remove_variable = rf_coalition_participant_count
     remove_variable = rf_coalition_leader_power
     remove_variable = rf_coalition_target_power
+    remove_variable = rf_coalition_ai_declaration_threshold
+    # Once an assembly fails the snapshot is no longer needed. Keep it only
+    # after a successfully created war, where victory needs the original core.
+    if = {
+        limit = { NOT = { has_character_flag = rf_coalition_under_attack } }
+        remove_variable = rf_coalition_core_title
+    }
+}
+
+# A voluntary player or AI stand-down is not a failed formation, so it must
+# clear the beta cooldown that was reserved while invitations were pending.
+riseandfall_coalition_cancel_interaction_assembly_se = {
+    if = {
+        limit = { has_character_flag = rf_coalition_interaction_formation }
+        primary_title = { remove_variable = rf_coalition_interaction_cooldown }
+    }
+    riseandfall_coalition_clear_assembly_state_se = yes
 }
 
 # Run before a yearly roll so interrupted formations and terminal-war states do
@@ -142,6 +574,11 @@ riseandfall_coalition_resolve_ai_invitation_se = {
             50 = {
                 modifier = { has_relation_nemesis = scope:coalition_target add = 50 }
                 modifier = { has_relation_rival = scope:coalition_target add = 30 }
+                modifier = { character_is_realm_neighbor = scope:coalition_target add = 25 }
+                modifier = { has_claim_on = scope:coalition_target.primary_title add = 35 }
+                modifier = { has_de_jure_claim_on = scope:coalition_target add = 25 }
+                modifier = { NOT = { has_same_culture_as = scope:coalition_target } add = 10 }
+                modifier = { NOT = { faith = scope:coalition_target.faith } add = 10 }
                 modifier = { opinion = { target = scope:coalition_target value <= -25 } add = 25 }
                 modifier = {
                     riseandfall_military_power_with_allies >= scope:coalition_target.riseandfall_military_power_with_allies
@@ -162,6 +599,9 @@ riseandfall_coalition_resolve_ai_invitation_se = {
             50 = {
                 modifier = { has_relation_best_friend = scope:coalition_target add = 50 }
                 modifier = { has_relation_friend = scope:coalition_target add = 30 }
+                modifier = { character_is_realm_neighbor = scope:coalition_target add = -15 }
+                modifier = { has_claim_on = scope:coalition_target.primary_title add = -20 }
+                modifier = { has_de_jure_claim_on = scope:coalition_target add = -15 }
                 modifier = { opinion = { target = scope:coalition_target value >= 25 } add = 25 }
                 modifier = { has_trait = craven add = 30 }
                 modifier = { has_trait = content add = 20 }
@@ -388,19 +828,22 @@ riseandfall_coalition_prepare_invitations_se = {
     save_scope_as = coalition_target
     if = {
         limit = {
-            riseandfall_coalition_target_core_valid_trigger = yes
+            riseandfall_coalition_target_still_valid_trigger = yes
             has_character_flag = rf_coalition_formation_active
             NOT = { riseandfall_coalition_target_has_active_war_trigger = yes }
         }
-        every_independent_ruler = {
+        # Snapshot the exact de-jure core before invitations can change titles.
+        primary_title = { save_scope_as = coalition_target_core }
+        set_variable = { name = rf_coalition_core_title value = scope:coalition_target_core }
+        clear_saved_scope = coalition_target_core
+        # Every independent ruler in diplomatic range receives the call. Their
+        # border, claims, culture/faith, relations, and military outlook decide
+        # whether they accept; those historical factors never suppress invites.
+        ordered_independent_ruler = {
             limit = {
-                NOT = { this = scope:coalition_target }
-                is_alive = yes
-                is_landed = yes
-                exists = primary_title
-                in_diplomatic_range = scope:coalition_target
-                NOT = { has_variable = rf_coalition_target }
+                riseandfall_coalition_potential_invitee_trigger = yes
             }
+            order_by = military_power
             set_variable = { name = rf_coalition_target value = scope:coalition_target days = 60 }
             add_character_flag = { flag = rf_coalition_invitation_pending days = 60 }
             if = {
@@ -450,20 +893,7 @@ riseandfall_coalition_prepare_invitations_se = {
     }
     else = {
         # Explain eligibility loss before the fallback selector replaces Coalition.
-        trigger_event = { id = coalition.1106 delayed = yes }
-    }
-}
-
-# Clean the abandoned assembly first, then reuse the normal weighted selector
-# while a short-lived flag makes Coalition itself impossible to draw again.
-riseandfall_coalition_fail_and_reroll_se = {
-    save_scope_as = coalition_target
-    riseandfall_coalition_clear_assembly_state_se = yes
-    if = {
-        limit = { riseandfall_coalition_can_fallback_reroll_trigger = yes }
-        add_character_flag = { flag = rf_coalition_fallback_reroll days = 1 }
-        riseandfall_low_stability_random_event = yes
-        remove_character_flag = rf_coalition_fallback_reroll
+        riseandfall_coalition_signal_formation_failure_se = { LOW_STABILITY_FAILURE_EVENT = coalition.1106 }
     }
 }
 
@@ -504,7 +934,7 @@ riseandfall_coalition_finalize_assembly_se = {
 
     if = {
         limit = {
-            riseandfall_coalition_target_core_valid_trigger = yes
+            riseandfall_coalition_target_still_valid_trigger = yes
             has_character_flag = rf_coalition_formation_active
             exists = scope:coalition_leader
         }
@@ -543,8 +973,26 @@ riseandfall_coalition_finalize_assembly_se = {
             value = riseandfall_military_power_with_allies
         }
 
-        # Each internal rebel adds their full raw military_power to the
-        # attackers. The target's ally-inclusive power remains unchanged.
+        # The leader's allied strength omits independent Coalition members
+        # who are not already its allies, so add their committed troops too.
+        every_independent_ruler = {
+            limit = {
+                has_character_flag = rf_coalition_final_participant
+                var:rf_coalition_target ?= scope:coalition_target
+                NOT = { this = scope:coalition_leader }
+                NOT = { is_allied_to = scope:coalition_leader }
+            }
+            save_scope_value_as = {
+                name = coalition_member_power
+                value = military_power
+            }
+            scope:coalition_target = {
+                change_variable = { name = rf_coalition_leader_power add = scope:coalition_member_power }
+            }
+        }
+
+        # Internal rebels add their full raw military_power to the attackers.
+        # The target's ally-inclusive power remains unchanged.
         every_vassal = {
             limit = {
                 has_character_flag = rf_coalition_vassal_final_participant
@@ -558,127 +1006,163 @@ riseandfall_coalition_finalize_assembly_se = {
                 change_variable = { name = rf_coalition_leader_power add = scope:coalition_rebel_power }
             }
         }
-        primary_title = { save_scope_as = coalition_target_title }
-
         if = {
             limit = {
                 var:rf_coalition_participant_count >= 2
-                var:rf_coalition_leader_power >= var:rf_coalition_target_power
+                OR = {
+                    var:rf_coalition_leader_power >= var:rf_coalition_target_power
+                    AND = {
+                        has_character_flag = rf_coalition_interaction_formation
+                        has_variable = rf_coalition_initiator
+                        var:rf_coalition_initiator = { is_ai = no }
+                    }
+                }
                 NOT = { riseandfall_coalition_target_has_active_war_trigger = yes }
                 scope:coalition_leader = {
                     has_character_flag = rf_coalition_final_participant
                 }
             }
-
-            # Keep the accepted direct vassals saved across start_war. They stay
-            # subjects until victory, but will be called to the attacker side.
-            every_vassal = {
-                limit = {
-                    has_character_flag = rf_coalition_vassal_final_participant
-                    var:rf_coalition_target ?= scope:coalition_target
-                    riseandfall_coalition_vassal_can_join_trigger = yes
-                }
-                add_to_list = rf_coalition_internal_rebels
-            }
-
-            scope:coalition_leader = {
-                start_war = {
-                    casus_belli = riseandfall_coalition_cb
-                    target = scope:coalition_target
-                    target_title = scope:coalition_target_title
-                }
-            }
-
-            clear_saved_scope = coalition_war
-            scope:coalition_leader = {
-                random_character_war = {
-                    limit = {
-                        using_cb = riseandfall_coalition_cb
-                        is_defender = scope:coalition_target
-                    }
-                    save_scope_as = coalition_war
-                }
-            }
-
+            # A player who started this interaction decides after every reply
+            # is known, even when the final Coalition is outnumbered. AI uses
+            # its separate final-strength threshold below.
             if = {
-                limit = { exists = scope:coalition_war }
-                every_independent_ruler = {
-                    limit = {
-                        has_character_flag = rf_coalition_final_participant
-                        var:rf_coalition_target ?= scope:coalition_target
-                        NOT = { this = scope:coalition_leader }
-                    }
-                    save_scope_as = coalition_joiner
-                    # Formal allies may have entered automatically when start_war
-                    # ran. Only add rulers who are not already war participants.
-                    if = {
-                        limit = { NOT = { is_participant_in_war = scope:coalition_war } }
-                        scope:coalition_war = { add_attacker = scope:coalition_joiner }
-                    }
+                limit = {
+                    has_character_flag = rf_coalition_interaction_formation
+                    has_variable = rf_coalition_initiator
+                    var:rf_coalition_initiator = { is_ai = no }
+                    NOT = { has_character_flag = rf_coalition_declaration_confirmed }
                 }
-                every_in_list = {
-                    list = rf_coalition_internal_rebels
-                    limit = {
-                        is_alive = yes
-                        is_landed = yes
-                        has_character_flag = rf_coalition_vassal_final_participant
-                        var:rf_coalition_target ?= scope:coalition_target
-                        is_vassal_of = scope:coalition_target
-                    }
-                    save_scope_as = coalition_vassal_joiner
-                    if = {
-                        limit = { NOT = { is_participant_in_war = scope:coalition_war } }
-                        # set_called_to is the engine marker used by More
-                        # Interactive Vassals before adding a subject against
-                        # their liege; without it add_attacker silently fails.
-                        scope:coalition_war = {
-                            hidden_effect = { set_called_to = scope:coalition_vassal_joiner }
-                            add_attacker = scope:coalition_vassal_joiner
-                        }
-                        if = {
-                            limit = { is_attacker_in_war = scope:coalition_war }
-                            add_character_flag = rf_coalition_independence_promised
-                            debug_log = "RF Coalition: rebel vassal remained a subject and was called to the Coalition attacker side."
-                        }
-                        else = {
-                            debug_log = "RF Coalition: set_called_to and add_attacker ran, but the rebel vassal did not enter the attacker side."
-                        }
-                    }
+                var:rf_coalition_initiator = {
+                    trigger_event = { id = coalition.1109 delayed = yes }
                 }
-                add_character_flag = rf_coalition_under_attack
-                add_character_flag = { flag = rf_low_stability_cooldown years = 5 }
-                riseandfall_coalition_clear_assembly_state_se = yes
-                debug_log = "RF Coalition: scripted Coalition war started successfully."
             }
             else = {
-                debug_log = "RF Coalition: start_war ran, but no Coalition war could be found on the selected leader."
-                trigger_event = { id = coalition.1105 delayed = yes }
+                # AI initiators assess the final roster too, but only declare
+                # with a modest 15% strength advantage.
+                if = {
+                    limit = {
+                        has_character_flag = rf_coalition_interaction_formation
+                        has_variable = rf_coalition_initiator
+                        var:rf_coalition_initiator = { is_ai = yes }
+                    }
+                    set_variable = { name = rf_coalition_ai_declaration_threshold value = var:rf_coalition_target_power }
+                    change_variable = { name = rf_coalition_ai_declaration_threshold multiply = 1.15 }
+                }
+                if = {
+                    limit = {
+                        has_character_flag = rf_coalition_interaction_formation
+                        has_variable = rf_coalition_initiator
+                        var:rf_coalition_initiator = { is_ai = yes }
+                        var:rf_coalition_leader_power < var:rf_coalition_ai_declaration_threshold
+                    }
+                    debug_log = "RF Coalition: AI initiator stood down because the final Coalition advantage was below 15%."
+                    riseandfall_coalition_cancel_interaction_assembly_se = yes
+                }
+                else = {
+                    primary_title = { save_scope_as = coalition_target_title }
+                    # Keep the accepted direct vassals saved across start_war. They
+                    # stay subjects until victory, but join the attacker side.
+                    every_vassal = {
+                        limit = {
+                            has_character_flag = rf_coalition_vassal_final_participant
+                            var:rf_coalition_target ?= scope:coalition_target
+                            riseandfall_coalition_vassal_can_join_trigger = yes
+                        }
+                        add_to_list = rf_coalition_internal_rebels
+                    }
+                    scope:coalition_leader = {
+                        start_war = {
+                            casus_belli = riseandfall_coalition_cb
+                            target = scope:coalition_target
+                            target_title = scope:coalition_target_title
+                        }
+                    }
+                    clear_saved_scope = coalition_war
+                    scope:coalition_leader = {
+                        random_character_war = {
+                            limit = {
+                                using_cb = riseandfall_coalition_cb
+                                is_defender = scope:coalition_target
+                            }
+                            save_scope_as = coalition_war
+                        }
+                    }
+                    if = {
+                        limit = { exists = scope:coalition_war }
+                        every_independent_ruler = {
+                            limit = {
+                                has_character_flag = rf_coalition_final_participant
+                                var:rf_coalition_target ?= scope:coalition_target
+                                NOT = { this = scope:coalition_leader }
+                            }
+                            save_scope_as = coalition_joiner
+                            if = {
+                                limit = { NOT = { is_participant_in_war = scope:coalition_war } }
+                                scope:coalition_war = { add_attacker = scope:coalition_joiner }
+                            }
+                        }
+                        every_in_list = {
+                            list = rf_coalition_internal_rebels
+                            limit = {
+                                is_alive = yes
+                                is_landed = yes
+                                has_character_flag = rf_coalition_vassal_final_participant
+                                var:rf_coalition_target ?= scope:coalition_target
+                                is_vassal_of = scope:coalition_target
+                            }
+                            save_scope_as = coalition_vassal_joiner
+                            if = {
+                                limit = { NOT = { is_participant_in_war = scope:coalition_war } }
+                                scope:coalition_war = {
+                                    hidden_effect = { set_called_to = scope:coalition_vassal_joiner }
+                                    add_attacker = scope:coalition_vassal_joiner
+                                }
+                                if = {
+                                    limit = { is_attacker_in_war = scope:coalition_war }
+                                    add_character_flag = rf_coalition_independence_promised
+                                }
+                            }
+                        }
+                        add_character_flag = rf_coalition_under_attack
+                        if = {
+                            limit = { has_character_flag = rf_coalition_interaction_formation }
+                            primary_title = { remove_variable = rf_coalition_interaction_cooldown }
+                        }
+                        else = { riseandfall_set_low_stability_cooldown_se = yes }
+                        riseandfall_coalition_clear_assembly_state_se = yes
+                        debug_log = "RF Coalition: scripted Coalition war started successfully."
+                    }
+                    else = {
+                        debug_log = "RF Coalition: start_war ran, but no Coalition war could be found on the selected leader."
+                        riseandfall_coalition_signal_formation_failure_se = { LOW_STABILITY_FAILURE_EVENT = coalition.1105 }
+                    }
+                }
             }
         }
         else = {
             if = {
                 limit = { var:rf_coalition_participant_count < 2 }
                 debug_log = "RF Coalition: final gate failed because fewer than two legal attackers remained."
-                trigger_event = { id = coalition.1101 delayed = yes }
+                riseandfall_coalition_signal_formation_failure_se = { LOW_STABILITY_FAILURE_EVENT = coalition.1101 }
             }
             else_if = {
                 limit = { var:rf_coalition_leader_power < var:rf_coalition_target_power }
-                debug_log = "RF Coalition: final gate failed because the leader network was weaker than the target network."
-                trigger_event = { id = coalition.1102 delayed = yes }
+                debug_log = "RF Coalition: final gate failed because the Coalition was weaker than the target network."
+                riseandfall_coalition_signal_formation_failure_se = { LOW_STABILITY_FAILURE_EVENT = coalition.1102 }
             }
             else_if = {
                 limit = { riseandfall_coalition_target_has_active_war_trigger = yes }
                 debug_log = "RF Coalition: final gate failed because a Coalition war already targeted this ruler."
-                trigger_event = { id = coalition.1104 delayed = yes }
+                riseandfall_coalition_signal_formation_failure_se = { LOW_STABILITY_FAILURE_EVENT = coalition.1104 }
             }
             else_if = {
                 limit = { scope:coalition_leader = { NOT = { has_character_flag = rf_coalition_final_participant } } }
                 debug_log = "RF Coalition: final gate failed because the selected leader was removed from the final participant set."
-                trigger_event = { id = coalition.1103 delayed = yes }
+                riseandfall_coalition_signal_formation_failure_se = { LOW_STABILITY_FAILURE_EVENT = coalition.1103 }
             }
             else = {
                 debug_log = "RF Coalition: final gate failed for an unclassified reason."
-                trigger_event = { id = coalition.1107 delayed = yes }
+                riseandfall_coalition_signal_formation_failure_se = { LOW_STABILITY_FAILURE_EVENT = coalition.1107 }
             }
         }
     }
@@ -686,10 +1170,483 @@ riseandfall_coalition_finalize_assembly_se = {
         debug_log = "RF Coalition: assembly had no valid leader or the target became invalid before finalization."
         if = {
             limit = { NOT = { exists = scope:coalition_leader } }
-            trigger_event = { id = coalition.1103 delayed = yes }
+            riseandfall_coalition_signal_formation_failure_se = { LOW_STABILITY_FAILURE_EVENT = coalition.1103 }
         }
         else = {
-            trigger_event = { id = coalition.1106 delayed = yes }
+            riseandfall_coalition_signal_formation_failure_se = { LOW_STABILITY_FAILURE_EVENT = coalition.1106 }
         }
     }
+}
+
+# Coalition victory voting uses durable character variables rather than a
+# temporary list because player ballots may remain open across event frames.
+riseandfall_coalition_start_victory_vote_se = {
+    # Remove malformed state written by the first released ballot version. Its
+    # voter target could be a CB object, which must never reach a character
+    # comparison on a later Coalition victory.
+    riseandfall_coalition_clear_all_victory_vote_voters_se = yes
+    set_variable = { name = rf_coalition_vote_leader value = $COALITION_LEADER$ }
+    set_variable = { name = rf_coalition_vote_light value = 0 }
+    set_variable = { name = rf_coalition_vote_medium value = 0 }
+    set_variable = { name = rf_coalition_vote_heavy value = 0 }
+    set_variable = { name = rf_coalition_vote_remaining value = 0 }
+    set_variable = { name = rf_coalition_vote_members value = 0 }
+
+    $COALITION_WAR$ = {
+        every_war_attacker = {
+            limit = { is_alive = yes is_landed = yes }
+            # War iterators change root to the CB context, so always retain the
+            # explicit defender parameter as the durable ballot target.
+            set_variable = { name = rf_coalition_vote_target value = $COALITION_TARGET$ }
+            add_character_flag = rf_coalition_vote_pending
+            if = {
+                limit = { has_character_flag = rf_coalition_independence_promised }
+                add_character_flag = rf_coalition_vote_rebel
+            }
+            $COALITION_TARGET$ = {
+                add_character_flag = rf_coalition_vote_has_voters
+                change_variable = { name = rf_coalition_vote_remaining add = 1 }
+                change_variable = { name = rf_coalition_vote_members add = 1 }
+            }
+        }
+    }
+
+    # Do not read the newly created counter here: CK3 also evaluates CB effects
+    # for tooltips before preceding effects have initialized their variables.
+    # The hidden event begins immediately after victory; only later player-event
+    # handoffs are deferred so an open choice can close safely.
+    trigger_event = { id = coalition.1200 }
+}
+
+riseandfall_coalition_clear_all_victory_vote_voters_se = {
+    every_ruler = {
+        remove_character_flag = rf_coalition_vote_pending
+        remove_character_flag = rf_coalition_vote_selecting
+        remove_character_flag = rf_coalition_vote_tiebreak_pending
+        remove_character_flag = rf_coalition_vote_rebel
+        remove_variable = rf_coalition_vote_target
+        remove_variable = rf_coalition_vote_result_target
+        remove_variable = rf_coalition_vote_result_leader
+        remove_variable = rf_coalition_vote_result_light
+        remove_variable = rf_coalition_vote_result_medium
+        remove_variable = rf_coalition_vote_result_heavy
+        remove_variable = rf_coalition_vote_result_choice
+    }
+    remove_character_flag = rf_coalition_vote_has_voters
+}
+
+riseandfall_coalition_continue_victory_vote_se = {
+    save_scope_as = coalition_vote_target
+    if = {
+        limit = { var:rf_coalition_vote_remaining > 0 }
+        if = {
+            limit = {
+                any_ruler = {
+                    has_character_flag = rf_coalition_vote_pending
+                    var:rf_coalition_vote_target ?= scope:coalition_vote_target
+                }
+            }
+            # A fresh selection randomizes the queue but each marked attacker
+            # is removed before their vote is requested, so they vote once.
+            random_ruler = {
+                limit = {
+                    has_character_flag = rf_coalition_vote_pending
+                    var:rf_coalition_vote_target ?= scope:coalition_vote_target
+                }
+                remove_character_flag = rf_coalition_vote_pending
+                add_character_flag = rf_coalition_vote_selecting
+                if = {
+                    limit = { is_ai = yes }
+                    riseandfall_coalition_cast_ai_victory_vote_se = yes
+                }
+                else = { trigger_event = { id = coalition.1201 delayed = yes } }
+            }
+        }
+        else = {
+            # A queued ruler can die between ballots; never leave the war result
+            # waiting forever for a voter who no longer exists.
+            set_variable = { name = rf_coalition_vote_remaining value = 0 }
+            riseandfall_coalition_finish_victory_vote_se = yes
+        }
+    }
+    else = { riseandfall_coalition_finish_victory_vote_se = yes }
+}
+
+riseandfall_coalition_cast_light_victory_vote_se = {
+    var:rf_coalition_vote_target = { save_scope_as = coalition_vote_target }
+    remove_character_flag = rf_coalition_vote_selecting
+    scope:coalition_vote_target = {
+        change_variable = { name = rf_coalition_vote_light add = 1 }
+        change_variable = { name = rf_coalition_vote_remaining add = -1 }
+        riseandfall_coalition_continue_victory_vote_se = yes
+    }
+}
+
+riseandfall_coalition_cast_medium_victory_vote_se = {
+    var:rf_coalition_vote_target = { save_scope_as = coalition_vote_target }
+    remove_character_flag = rf_coalition_vote_selecting
+    scope:coalition_vote_target = {
+        change_variable = { name = rf_coalition_vote_medium add = 1 }
+        change_variable = { name = rf_coalition_vote_remaining add = -1 }
+        riseandfall_coalition_continue_victory_vote_se = yes
+    }
+}
+
+riseandfall_coalition_cast_heavy_victory_vote_se = {
+    var:rf_coalition_vote_target = { save_scope_as = coalition_vote_target }
+    remove_character_flag = rf_coalition_vote_selecting
+    scope:coalition_vote_target = {
+        change_variable = { name = rf_coalition_vote_heavy add = 1 }
+        change_variable = { name = rf_coalition_vote_remaining add = -1 }
+        riseandfall_coalition_continue_victory_vote_se = yes
+    }
+}
+
+riseandfall_coalition_cast_ai_victory_vote_se = {
+    var:rf_coalition_vote_target = { save_scope_as = coalition_vote_target }
+    # Medium is ordinary. Hostile/ambitious rulers escalate, while sympathetic
+    # or indebted rulers prefer immediate indemnity.
+    random_list = {
+        25 = {
+            modifier = { add = 35 has_trait = compassionate }
+            modifier = { add = 30 has_trait = content }
+            modifier = { add = 30 is_in_debt = yes }
+            modifier = { add = 35 has_relation_friend = scope:coalition_vote_target }
+            riseandfall_coalition_cast_light_victory_vote_se = yes
+        }
+        55 = {
+            modifier = { add = 25 has_trait = just }
+            modifier = { add = 20 opinion = { target = scope:coalition_vote_target value >= 25 } }
+            riseandfall_coalition_cast_medium_victory_vote_se = yes
+        }
+        35 = {
+            modifier = { add = 55 has_trait = ambitious }
+            modifier = { add = 55 has_trait = vengeful }
+            modifier = { add = 70 has_relation_nemesis = scope:coalition_vote_target }
+            modifier = { add = 40 has_relation_rival = scope:coalition_vote_target }
+            # A stronger target realm is a continuing threat worth dismantling.
+            modifier = { add = 25 military_power < scope:coalition_vote_target.military_power }
+            riseandfall_coalition_cast_heavy_victory_vote_se = yes
+        }
+    }
+}
+
+riseandfall_coalition_finish_victory_vote_se = {
+    remove_character_flag = rf_coalition_vote_tie_light
+    remove_character_flag = rf_coalition_vote_tie_medium
+    remove_character_flag = rf_coalition_vote_tie_heavy
+    set_variable = { name = rf_coalition_vote_tie_count value = 0 }
+
+    if = {
+        limit = { var:rf_coalition_vote_light >= var:rf_coalition_vote_medium var:rf_coalition_vote_light >= var:rf_coalition_vote_heavy }
+        add_character_flag = rf_coalition_vote_tie_light
+        change_variable = { name = rf_coalition_vote_tie_count add = 1 }
+    }
+    if = {
+        limit = { var:rf_coalition_vote_medium >= var:rf_coalition_vote_light var:rf_coalition_vote_medium >= var:rf_coalition_vote_heavy }
+        add_character_flag = rf_coalition_vote_tie_medium
+        change_variable = { name = rf_coalition_vote_tie_count add = 1 }
+    }
+    if = {
+        limit = { var:rf_coalition_vote_heavy >= var:rf_coalition_vote_light var:rf_coalition_vote_heavy >= var:rf_coalition_vote_medium }
+        add_character_flag = rf_coalition_vote_tie_heavy
+        change_variable = { name = rf_coalition_vote_tie_count add = 1 }
+    }
+
+    if = {
+        limit = { var:rf_coalition_vote_tie_count > 1 }
+        if = {
+            limit = {
+                has_variable = rf_coalition_vote_leader
+                var:rf_coalition_vote_leader = { is_alive = yes is_landed = yes }
+            }
+            var:rf_coalition_vote_leader = {
+                set_variable = { name = rf_coalition_vote_target value = root }
+                add_character_flag = rf_coalition_vote_tiebreak_pending
+                trigger_event = { id = coalition.1202 delayed = yes }
+            }
+        }
+        else = {
+            # No surviving leader can decide; medium preserves a meaningful but
+            # non-destructive punishment instead of stalling the victory.
+            set_variable = { name = rf_coalition_vote_result value = 2 }
+            riseandfall_coalition_resolve_victory_vote_se = yes
+        }
+    }
+    else_if = {
+        limit = { has_character_flag = rf_coalition_vote_tie_light }
+        set_variable = { name = rf_coalition_vote_result value = 1 }
+        riseandfall_coalition_resolve_victory_vote_se = yes
+    }
+    else_if = {
+        limit = { has_character_flag = rf_coalition_vote_tie_medium }
+        set_variable = { name = rf_coalition_vote_result value = 2 }
+        riseandfall_coalition_resolve_victory_vote_se = yes
+    }
+    else = {
+        set_variable = { name = rf_coalition_vote_result value = 3 }
+        riseandfall_coalition_resolve_victory_vote_se = yes
+    }
+}
+
+riseandfall_coalition_choose_light_tiebreak_se = {
+    var:rf_coalition_vote_target = { save_scope_as = coalition_vote_target }
+    remove_character_flag = rf_coalition_vote_tiebreak_pending
+    scope:coalition_vote_target = {
+        set_variable = { name = rf_coalition_vote_result value = 1 }
+        riseandfall_coalition_resolve_victory_vote_se = yes
+    }
+}
+
+riseandfall_coalition_choose_medium_tiebreak_se = {
+    var:rf_coalition_vote_target = { save_scope_as = coalition_vote_target }
+    remove_character_flag = rf_coalition_vote_tiebreak_pending
+    scope:coalition_vote_target = {
+        set_variable = { name = rf_coalition_vote_result value = 2 }
+        riseandfall_coalition_resolve_victory_vote_se = yes
+    }
+}
+
+riseandfall_coalition_choose_heavy_tiebreak_se = {
+    var:rf_coalition_vote_target = { save_scope_as = coalition_vote_target }
+    remove_character_flag = rf_coalition_vote_tiebreak_pending
+    scope:coalition_vote_target = {
+        set_variable = { name = rf_coalition_vote_result value = 3 }
+        riseandfall_coalition_resolve_victory_vote_se = yes
+    }
+}
+
+riseandfall_coalition_apply_victory_indemnity_se = {
+    save_scope_as = coalition_vote_target
+    # Three years of income is split among all ballot members. Use the native
+    # payer-to-recipient effect: add_gold cannot deduct a negative amount.
+    set_variable = { name = rf_coalition_vote_indemnity value = { value = yearly_character_income multiply = 3 } }
+    every_ruler = {
+        limit = { var:rf_coalition_vote_target ?= scope:coalition_vote_target }
+        save_scope_as = coalition_vote_recipient
+        scope:coalition_vote_target = {
+            pay_short_term_gold = {
+                target = scope:coalition_vote_recipient
+                gold = {
+                    value = var:rf_coalition_vote_indemnity
+                    divide = var:rf_coalition_vote_members
+                }
+            }
+        }
+    }
+}
+
+riseandfall_coalition_apply_medium_punishment_se = {
+    # Keep the crown and core intact. Rank peripheral kingdoms by the number
+    # of tagged counties they contain, then select the largest until at least
+    # half of the formation-time peripheral county total is conceded.
+    riseandfall_coalition_tag_periphery_se = yes
+    set_variable = { name = rf_coalition_medium_released_counties value = 0 }
+    # Keep the half threshold fractional. Since selected kingdom counts are
+    # whole counties, the loop necessarily rounds the final concession up.
+    set_variable = { name = rf_coalition_medium_target_counties value = { value = var:rf_coalition_peripheral_counties multiply = 50 divide = 100 } }
+    every_realm_de_jure_kingdom = {
+        save_scope_as = coalition_medium_count_kingdom
+        set_variable = { name = rf_coalition_release_kingdom_count value = 0 }
+        every_de_jure_county = {
+            if = {
+                limit = { has_variable = rf_coalition_release_county }
+                scope:coalition_medium_count_kingdom = { change_variable = { name = rf_coalition_release_kingdom_count add = 1 } }
+            }
+        }
+        clear_saved_scope = coalition_medium_count_kingdom
+    }
+    ordered_realm_de_jure_kingdom = {
+        order_by = riseandfall_coalition_peripheral_kingdom_count_value
+        limit = {
+            has_variable = rf_coalition_release_kingdom_count
+            var:rf_coalition_release_kingdom_count > 0
+            root = { var:rf_coalition_medium_released_counties < var:rf_coalition_medium_target_counties }
+        }
+        save_scope_as = coalition_medium_selected_kingdom
+        set_variable = { name = rf_coalition_release_kingdom_selected value = 1 }
+        root = { change_variable = { name = rf_coalition_medium_released_counties add = scope:coalition_medium_selected_kingdom.var:rf_coalition_release_kingdom_count } }
+        clear_saved_scope = coalition_medium_selected_kingdom
+    }
+    riseandfall_coalition_release_selected_periphery_se = yes
+    riseandfall_coalition_grant_victorious_rebel_independence_se = yes
+    every_realm_de_jure_kingdom = { remove_variable = rf_coalition_release_kingdom_count }
+    remove_variable = rf_coalition_medium_released_counties
+    remove_variable = rf_coalition_medium_target_counties
+}
+
+riseandfall_coalition_apply_heavy_punishment_se = {
+    # Capture the primary-title successor before deposition. The full county
+    # breakup happens first, so the successor inherits only the core and any
+    # unmarked personal titles rather than reabsorbing peripheral shards.
+    primary_title = { save_scope_as = coalition_heavy_primary_title }
+    scope:coalition_heavy_primary_title = {
+        every_title_heir = {
+            # Keep the first living successor in the title's succession order.
+            # `break` is not a supported CK3 scripted effect.
+            limit = { is_alive = yes NOT = { exists = scope:coalition_heavy_successor } }
+            save_scope_as = coalition_heavy_successor
+        }
+    }
+    riseandfall_coalition_release_periphery_se = yes
+    riseandfall_coalition_grant_victorious_rebel_independence_se = yes
+    var:rf_coalition_vote_leader = { save_scope_as = coalition_vote_leader }
+    depose_effect = { DEPOSER = scope:coalition_vote_leader }
+    # Deposition awards the crown through its normal succession. Move every
+    # remaining former personal title to that same snapshotted successor.
+    if = {
+        limit = { exists = scope:coalition_heavy_successor }
+        every_held_title = {
+            # County titles carry their baronies; attempting to transfer a
+            # capital barony directly aborts the remaining Heavy handoff.
+            limit = { tier >= tier_county }
+            scope:coalition_heavy_successor = {
+                create_title_and_vassal_change = {
+                    type = granted
+                    save_scope_as = coalition_heavy_title_change
+                    add_claim_on_loss = yes
+                }
+            }
+            change_title_holder_include_vassals = {
+                holder = scope:coalition_heavy_successor
+                change = scope:coalition_heavy_title_change
+                take_baronies = no
+            }
+            resolve_title_and_vassal_change = scope:coalition_heavy_title_change
+        }
+    }
+    clear_saved_scope = coalition_heavy_successor
+    clear_saved_scope = coalition_heavy_primary_title
+}
+
+# Only original internal attackers carry the ballot rebel marker. They are
+# released after the county split, allowing mixed holders to keep core land.
+riseandfall_coalition_grant_victorious_rebel_independence_se = {
+    save_scope_as = coalition_rebel_target
+    if = {
+        limit = {
+            any_ruler = {
+                has_character_flag = rf_coalition_vote_rebel
+                var:rf_coalition_vote_target ?= scope:coalition_rebel_target
+                is_alive = yes
+                is_landed = yes
+                is_independent_ruler = no
+            }
+        }
+        create_title_and_vassal_change = {
+            type = independency
+            save_scope_as = coalition_rebel_independence_change
+            add_claim_on_loss = yes
+        }
+        every_ruler = {
+            limit = {
+                has_character_flag = rf_coalition_vote_rebel
+                var:rf_coalition_vote_target ?= scope:coalition_rebel_target
+                is_alive = yes
+                is_landed = yes
+                is_independent_ruler = no
+            }
+            becomes_independent = { change = scope:coalition_rebel_independence_change }
+        }
+        resolve_title_and_vassal_change = scope:coalition_rebel_independence_change
+    }
+    every_ruler = {
+        limit = {
+            has_character_flag = rf_coalition_vote_rebel
+            var:rf_coalition_vote_target ?= scope:coalition_rebel_target
+        }
+        remove_character_flag = rf_coalition_independence_promised
+        remove_character_flag = rf_coalition_vote_rebel
+    }
+    clear_saved_scope = coalition_rebel_target
+}
+
+riseandfall_coalition_resolve_victory_vote_se = {
+    # A verdict ends the current crisis. Harsher settlements buy the successor
+    # and surviving core more time before another offensive Coalition can form.
+    if = {
+        limit = { var:rf_coalition_vote_result = 1 }
+        riseandfall_coalition_consume_threat_se = { YEARS = 10 }
+    }
+    else_if = {
+        limit = { var:rf_coalition_vote_result = 2 }
+        riseandfall_coalition_consume_threat_se = { YEARS = 15 }
+    }
+    else = { riseandfall_coalition_consume_threat_se = { YEARS = 20 } }
+    # Every Coalition verdict pays the same three-year indemnity to every
+    # ballot member; Medium and Heavy add their political punishment below.
+    riseandfall_coalition_apply_victory_indemnity_se = yes
+    if = {
+        limit = { var:rf_coalition_vote_result = 2 }
+        riseandfall_coalition_apply_medium_punishment_se = yes
+    }
+    else_if = {
+        limit = { var:rf_coalition_vote_result = 3 }
+        riseandfall_coalition_apply_heavy_punishment_se = yes
+    }
+    riseandfall_coalition_announce_victory_vote_se = yes
+    riseandfall_coalition_clear_victory_vote_state_se = yes
+}
+
+riseandfall_coalition_announce_victory_vote_se = {
+    save_scope_as = coalition_vote_target
+    every_ruler = {
+        limit = { is_ai = no var:rf_coalition_vote_target ?= scope:coalition_vote_target }
+        set_variable = { name = rf_coalition_vote_result_target value = scope:coalition_vote_target }
+        set_variable = { name = rf_coalition_vote_result_leader value = scope:coalition_vote_target.var:rf_coalition_vote_leader }
+        set_variable = { name = rf_coalition_vote_result_light value = scope:coalition_vote_target.var:rf_coalition_vote_light }
+        set_variable = { name = rf_coalition_vote_result_medium value = scope:coalition_vote_target.var:rf_coalition_vote_medium }
+        set_variable = { name = rf_coalition_vote_result_heavy value = scope:coalition_vote_target.var:rf_coalition_vote_heavy }
+        set_variable = { name = rf_coalition_vote_result_choice value = scope:coalition_vote_target.var:rf_coalition_vote_result }
+        trigger_event = { id = coalition.1203 delayed = yes }
+    }
+    if = {
+        limit = { is_ai = no }
+        set_variable = { name = rf_coalition_vote_result_target value = root }
+        set_variable = { name = rf_coalition_vote_result_leader value = var:rf_coalition_vote_leader }
+        set_variable = { name = rf_coalition_vote_result_light value = var:rf_coalition_vote_light }
+        set_variable = { name = rf_coalition_vote_result_medium value = var:rf_coalition_vote_medium }
+        set_variable = { name = rf_coalition_vote_result_heavy value = var:rf_coalition_vote_heavy }
+        set_variable = { name = rf_coalition_vote_result_choice value = var:rf_coalition_vote_result }
+        # The defeated player has no open ballot event, so show the verdict
+        # during the surrender resolution instead of waiting for the next tick.
+        trigger_event = { id = coalition.1203 }
+    }
+}
+
+riseandfall_coalition_clear_victory_vote_state_se = {
+    save_scope_as = coalition_vote_target
+    every_ruler = {
+        limit = { var:rf_coalition_vote_target ?= scope:coalition_vote_target }
+        remove_character_flag = rf_coalition_vote_pending
+        remove_character_flag = rf_coalition_vote_selecting
+        remove_character_flag = rf_coalition_vote_tiebreak_pending
+        remove_character_flag = rf_coalition_vote_rebel
+        remove_character_flag = rf_coalition_independence_promised
+        remove_variable = rf_coalition_vote_target
+    }
+    remove_character_flag = rf_coalition_under_attack
+    remove_variable = rf_coalition_core_title
+    remove_character_flag = rf_coalition_vote_has_voters
+    remove_character_flag = rf_coalition_vote_tie_light
+    remove_character_flag = rf_coalition_vote_tie_medium
+    remove_character_flag = rf_coalition_vote_tie_heavy
+    remove_variable = rf_coalition_vote_leader
+    remove_variable = rf_coalition_vote_light
+    remove_variable = rf_coalition_vote_medium
+    remove_variable = rf_coalition_vote_heavy
+    remove_variable = rf_coalition_vote_remaining
+    remove_variable = rf_coalition_vote_members
+    remove_variable = rf_coalition_vote_tie_count
+    remove_variable = rf_coalition_vote_result
+    remove_variable = rf_coalition_vote_indemnity
+}
+
+riseandfall_coalition_clear_victory_vote_result_se = {
+    remove_variable = rf_coalition_vote_result_target
+    remove_variable = rf_coalition_vote_result_leader
+    remove_variable = rf_coalition_vote_result_light
+    remove_variable = rf_coalition_vote_result_medium
+    remove_variable = rf_coalition_vote_result_heavy
+    remove_variable = rf_coalition_vote_result_choice
 }

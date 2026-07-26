@@ -192,10 +192,16 @@ riseandfall_war_enhancement_on_death = {
 				remove_from_list = riseandfall_war_enhancement_members
 			}
 		}
-		scope:riseandfall_war_enhancement_highest_title_man = {
-			trigger_event = {
-				id = riseandfall_war_enhancement.3
-				days = 1
+		# No eligible heir or family member was found, so no event recipient exists.
+		if = {
+			limit = {
+				exists = scope:riseandfall_war_enhancement_highest_title_man
+			}
+			scope:riseandfall_war_enhancement_highest_title_man = {
+				trigger_event = {
+					id = riseandfall_war_enhancement.3
+					days = 1
+				}
 			}
 		}
 		every_in_list = {

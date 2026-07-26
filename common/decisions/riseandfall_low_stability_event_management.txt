@@ -12,12 +12,12 @@ riseandfall_low_stability_event_manager = {
 	decision_group_type = riseandfall
 
 	is_shown = {
-		ai = no
+		is_ai = no
 		has_game_rule = riseandfall_low_stability_events_enabled
 		NOT = { exists = global_var:riseandfall_hide_other_decisions }
 	}
 
-	is_valid = { ai = no }
+	is_valid = { is_ai = no }
 
 	effect = {
 		# Discard a stale detail selection before rebuilding the overview.
