@@ -148,6 +148,10 @@ palace_coup.1201 = {
 	option = {
 		name = palace_coup.1201.c
 		custom_tooltip = palace_coup.1201.c.tooltip
+		trigger = {
+			# Only a claimant can refuse both camps and establish a rival realm.
+			has_claim_on = scope:original_primary
+		}
 		hidden_effect = {
 			if = {
 				limit = { has_variable = rf_palace_coup_choice_ruler }
