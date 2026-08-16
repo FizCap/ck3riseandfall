@@ -302,6 +302,9 @@ riseandfall_cleanup_titular_titles_se = {
 # as it is normally creatable. Both must be retained for their unification decision.
 riseandfall_ai_create_france_aquitaine_titles_se = {
     save_scope_as = rf_france_aquitaine_creator
+    # This helper runs inside world-wide ruler iterators. Do not inherit the
+    # generic target_title saved by a previous ruler or title-creation branch.
+    clear_saved_scope = rf_france_aquitaine_target_title
 
     ordered_alert_creatable_title = {
         order_by = tier
@@ -320,7 +323,7 @@ riseandfall_ai_create_france_aquitaine_titles_se = {
                 }
             }
         }
-        save_scope_as = target_title
+        save_scope_as = rf_france_aquitaine_target_title
         try_create_important_action = {
             important_action_type = action_can_create_title
             landed_title = this
@@ -328,19 +331,34 @@ riseandfall_ai_create_france_aquitaine_titles_se = {
     }
 
     if = {
-        limit = { exists = scope:target_title }
-        create_title_and_vassal_change = {
-            type = created
-            save_scope_as = title_change
-            add_claim_on_loss = no
-        }
-        scope:target_title = {
-            change_title_holder = {
-                holder = scope:rf_france_aquitaine_creator
-                change = scope:title_change
+        limit = {
+            exists = scope:rf_france_aquitaine_target_title
+            scope:rf_france_aquitaine_target_title = {
+                tier = tier_kingdom
+                OR = {
+                    AND = {
+                        this = title:k_france
+                        scope:rf_france_aquitaine_creator = { has_title = title:k_aquitaine }
+                    }
+                    AND = {
+                        this = title:k_aquitaine
+                        scope:rf_france_aquitaine_creator = { has_title = title:k_france }
+                    }
+                }
             }
         }
-        resolve_title_and_vassal_change = scope:title_change
+        create_title_and_vassal_change = {
+            type = created
+            save_scope_as = rf_france_aquitaine_title_change
+            add_claim_on_loss = no
+        }
+        scope:rf_france_aquitaine_target_title = {
+            change_title_holder = {
+                holder = scope:rf_france_aquitaine_creator
+                change = scope:rf_france_aquitaine_title_change
+            }
+        }
+        resolve_title_and_vassal_change = scope:rf_france_aquitaine_title_change
     }
 }
 
