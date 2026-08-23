@@ -16,7 +16,7 @@
 		scope:actor = {
 			is_ruler = yes
 			is_independent_ruler = no
-			has_trait = warlord
+			riseandfall_is_any_warlord_trigger = yes
 			is_landed = yes
 		}
 		scope:recipient = {
@@ -24,7 +24,7 @@
 			NOT = { is_allied_to = scope:actor }
 			is_ruler = yes
 			is_independent_ruler = no
-			has_trait = warlord
+			riseandfall_is_any_warlord_trigger = yes
 			is_landed = yes
 		}
 		# Require same direct liege for both parties
@@ -35,13 +35,13 @@
 		scope:actor = {
 			is_ruler = yes
 			is_independent_ruler = no
-			has_trait = warlord
+			riseandfall_is_any_warlord_trigger = yes
 			is_landed = yes
 		}
 		scope:recipient = {
 			is_ruler = yes
 			is_independent_ruler = no
-			has_trait = warlord
+			riseandfall_is_any_warlord_trigger = yes
 			is_landed = yes
 		}
 		# Require same direct liege for both parties
@@ -344,6 +344,23 @@
 		}
 	}
 	ai_accept = {
+		modifier = {
+			add = -1000
+			OR = {
+				AND = { scope:actor = { has_trait = loyalwarlord } scope:recipient = { has_trait = warlord } }
+				AND = { scope:actor = { has_trait = warlord } scope:recipient = { has_trait = loyalwarlord } }
+			}
+		}
+		modifier = {
+			add = 75
+			scope:actor = { has_trait = warlord }
+			scope:recipient = { has_trait = warlord }
+		}
+		modifier = {
+			add = 25
+			scope:actor = { has_trait = loyalwarlord }
+			scope:recipient = { has_trait = loyalwarlord }
+		}
 		base = 100
 
 		# Tier Difference 	(+/-)
@@ -1107,6 +1124,10 @@
 
 	ai_potential = {
 		is_at_war = no
+		OR = {
+			has_trait = warlord
+			has_trait = loyalwarlord
+		}
 	}
 
 	ai_targets = {
@@ -1130,6 +1151,23 @@
 
 	ai_will_do = {
 		base = 100
+		modifier = {
+			add = -1000
+			OR = {
+				AND = { scope:actor = { has_trait = loyalwarlord } scope:recipient = { has_trait = warlord } }
+				AND = { scope:actor = { has_trait = warlord } scope:recipient = { has_trait = loyalwarlord } }
+			}
+		}
+		modifier = {
+			add = 75
+			scope:actor = { has_trait = warlord }
+			scope:recipient = { has_trait = warlord }
+		}
+		modifier = {
+			add = 25
+			scope:actor = { has_trait = loyalwarlord }
+			scope:recipient = { has_trait = loyalwarlord }
+		}
 
 		# Mirror ai_accept so AI proposals follow the same score model shown to players.
 		# Tier Difference 	(+/-)

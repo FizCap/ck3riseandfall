@@ -268,18 +268,8 @@ riseandfall_realm_split_se = {
         # successor states that swallow entire macro-regions.
         add_character_flag = rf_split_seed_by_duchy
 
-        if = {
-            limit = {
-                any_vassal = {
-                    is_landed = yes
-                    has_trait = warlord
-                }
-            }
-            every_vassal = {
-                limit = { is_landed = yes }
-                remove_trait = warlord
-            }
-        }
+        # Fragmentation is the Warlord victory condition and closes the era.
+        riseandfall_warlord_end_era_realm_split_se = yes
 
         if = {
             limit = { realm_size >= 20 }
@@ -1532,17 +1522,17 @@ riseandfall_execute_realm_split_se = {
         scope:new_realm_ruler.primary_title = {
             # immediate origin (the title that was split)
             set_variable = { name = rf_successor_origin_title value = scope:original_primary years = 50 }
-            set_variable = { name = rf_is_successor_split_title value = 1 years = 30 }
+            set_variable = { name = rf_is_successor_split_title value = 1 years = 50 }
             # Permanent marker for this title indicating it's a split realm successor
             set_variable = { name = rf_is_permanent_successor_split value = 1 }
             # Propagate and/or set the root origin: if the original_primary was
             # itself a successor, inherit its root; otherwise use original_primary.
             if = {
                 limit = { scope:original_primary = { has_variable = rf_successor_root_origin_title } }
-                set_variable = { name = rf_successor_root_origin_title value = scope:original_primary.var:rf_successor_root_origin_title years = 30 }
+                set_variable = { name = rf_successor_root_origin_title value = scope:original_primary.var:rf_successor_root_origin_title years = 50 }
             }
             else = {
-                set_variable = { name = rf_successor_root_origin_title value = scope:original_primary years = 30 }
+                set_variable = { name = rf_successor_root_origin_title value = scope:original_primary years = 50 }
             }
             # Store the baseline realm size (number of counties) on the title permanently
             # Only set if the title doesn't already have a snapshot to avoid accidental overwrite
@@ -1603,14 +1593,14 @@ riseandfall_realm_split_sync_successor_primary_title_se = {
             }
             if = {
                 limit = { scope:recipient = { has_variable = rf_successor_root_origin_title } }
-                set_variable = { name = rf_successor_root_origin_title value = scope:recipient.var:rf_successor_root_origin_title years = 30 }
+                set_variable = { name = rf_successor_root_origin_title value = scope:recipient.var:rf_successor_root_origin_title years = 50 }
             }
             if = {
                 limit = {
                     NOT = { has_variable = rf_successor_root_origin_title }
                     scope:rf_recipient_old_primary = { has_variable = rf_successor_root_origin_title }
                 }
-                set_variable = { name = rf_successor_root_origin_title value = scope:rf_recipient_old_primary.var:rf_successor_root_origin_title years = 30 }
+                set_variable = { name = rf_successor_root_origin_title value = scope:rf_recipient_old_primary.var:rf_successor_root_origin_title years = 50 }
             }
             if = {
                 limit = {
@@ -1625,7 +1615,7 @@ riseandfall_realm_split_sync_successor_primary_title_se = {
                     exists = scope:rf_incoming_split_title
                     scope:rf_incoming_split_title = { has_variable = rf_successor_root_origin_title }
                 }
-                set_variable = { name = rf_successor_root_origin_title value = scope:rf_incoming_split_title.var:rf_successor_root_origin_title years = 30 }
+                set_variable = { name = rf_successor_root_origin_title value = scope:rf_incoming_split_title.var:rf_successor_root_origin_title years = 50 }
             }
             if = {
                 limit = {
@@ -1635,7 +1625,7 @@ riseandfall_realm_split_sync_successor_primary_title_se = {
                 }
                 set_variable = { name = rf_successor_origin_title value = scope:rf_incoming_split_title.var:rf_successor_origin_title years = 50 }
             }
-            set_variable = { name = rf_is_successor_split_title value = 1 years = 30 }
+            set_variable = { name = rf_is_successor_split_title value = 1 years = 50 }
             set_variable = { name = rf_is_permanent_successor_split value = 1 }
             if = {
                 limit = { scope:rf_recipient_old_primary = { has_variable = rf_successor_permanent_realm_size } }
@@ -1689,9 +1679,9 @@ riseandfall_realm_split_migrate_successor_primary_title_se = {
             }
             if = {
                 limit = { scope:rf_successor_old_primary_title = { has_variable = rf_successor_root_origin_title } }
-                set_variable = { name = rf_successor_root_origin_title value = scope:rf_successor_old_primary_title.var:rf_successor_root_origin_title years = 30 }
+                    set_variable = { name = rf_successor_root_origin_title value = scope:rf_successor_old_primary_title.var:rf_successor_root_origin_title years = 50 }
             }
-            set_variable = { name = rf_is_successor_split_title value = 1 years = 30 }
+                    set_variable = { name = rf_is_successor_split_title value = 1 years = 50 }
             set_variable = { name = rf_is_permanent_successor_split value = 1 }
             # Some legacy successor titles carry the marker without a valid
             # numeric snapshot; rebuild the permanent baseline from the ruler.
@@ -1798,7 +1788,7 @@ riseandfall_realm_split_lower_actor_primary_below_recipient_se = {
                 }
                 if = {
                     limit = { scope:rf_absorbed_split_title = { has_variable = rf_successor_root_origin_title } }
-                    set_variable = { name = rf_successor_root_origin_title value = scope:rf_absorbed_split_title.var:rf_successor_root_origin_title years = 30 }
+                    set_variable = { name = rf_successor_root_origin_title value = scope:rf_absorbed_split_title.var:rf_successor_root_origin_title years = 50 }
                 }
                 if = {
                     limit = { scope:rf_absorbed_split_title = { has_variable = rf_successor_permanent_realm_size } }
@@ -1808,7 +1798,7 @@ riseandfall_realm_split_lower_actor_primary_below_recipient_se = {
                     limit = { NOT = { has_variable = rf_successor_permanent_realm_size } }
                     set_variable = { name = rf_successor_permanent_realm_size value = root.realm_size }
                 }
-                set_variable = { name = rf_is_successor_split_title value = 1 years = 30 }
+                set_variable = { name = rf_is_successor_split_title value = 1 years = 50 }
                 set_variable = { name = rf_is_permanent_successor_split value = 1 }
             }
             # CK3 does not allow lowering a ruler's primary title while they
@@ -1879,9 +1869,9 @@ riseandfall_realm_split_lower_actor_primary_below_recipient_se = {
                     }
                     if = {
                         limit = { scope:rf_recipient_old_primary = { has_variable = rf_successor_root_origin_title } }
-                        set_variable = { name = rf_successor_root_origin_title value = scope:rf_recipient_old_primary.var:rf_successor_root_origin_title years = 30 }
+                        set_variable = { name = rf_successor_root_origin_title value = scope:rf_recipient_old_primary.var:rf_successor_root_origin_title years = 50 }
                     }
-                    set_variable = { name = rf_is_successor_split_title value = 1 years = 30 }
+                    set_variable = { name = rf_is_successor_split_title value = 1 years = 50 }
                     set_variable = { name = rf_is_permanent_successor_split value = 1 }
                     if = {
                         limit = { scope:rf_recipient_old_primary = { has_variable = rf_successor_permanent_realm_size } }
@@ -2021,9 +2011,9 @@ riseandfall_realm_split_surrender_to_recipient_se = {
             }
             if = {
                 limit = { scope:rf_recipient_old_primary = { has_variable = rf_successor_root_origin_title } }
-                set_variable = { name = rf_successor_root_origin_title value = scope:rf_recipient_old_primary.var:rf_successor_root_origin_title years = 30 }
+                set_variable = { name = rf_successor_root_origin_title value = scope:rf_recipient_old_primary.var:rf_successor_root_origin_title years = 50 }
             }
-            set_variable = { name = rf_is_successor_split_title value = 1 years = 30 }
+            set_variable = { name = rf_is_successor_split_title value = 1 years = 50 }
             set_variable = { name = rf_is_permanent_successor_split value = 1 }
             if = {
                 limit = { scope:rf_recipient_old_primary = { has_variable = rf_successor_permanent_realm_size } }
@@ -2243,9 +2233,9 @@ riseandfall_split_title_monitor_cleanup_se = {
                 }
                 if = {
                     limit = { scope:rf_split_title = { has_variable = rf_successor_root_origin_title } }
-                    set_variable = { name = rf_successor_root_origin_title value = scope:rf_split_title.var:rf_successor_root_origin_title years = 30 }
+                    set_variable = { name = rf_successor_root_origin_title value = scope:rf_split_title.var:rf_successor_root_origin_title years = 50 }
                 }
-                set_variable = { name = rf_is_successor_split_title value = 1 years = 30 }
+                set_variable = { name = rf_is_successor_split_title value = 1 years = 50 }
                 set_variable = { name = rf_is_permanent_successor_split value = 1 }
                 # Rebuilt replacement titles get a fresh numeric baseline in
                 # case the old title only had a stale/empty legacy marker.

@@ -12,6 +12,14 @@ riseandfall_low_stability_warlord_available_trigger = {
     }
 }
 
+# Character helper shared by both Warlord camps.
+riseandfall_is_any_warlord_trigger = {
+    OR = {
+        has_trait = warlord
+        has_trait = loyalwarlord
+    }
+}
+
 riseandfall_low_stability_palace_coup_available_trigger = {
     NOT = { exists = global_var:riseandfall_low_stability_event_palace_coup_disabled }
     NOT = { government_has_flag = government_is_theocracy }
@@ -51,7 +59,13 @@ riseandfall_low_stability_vassal_crisis_available_trigger = {
             NOT = { var:riseandfall_rs_vassals_component >= -14 }
         }
     }
-    NOT = { has_character_modifier = riseandfall_vassal_authority_crisis }
+    NOT = {
+        OR = {
+            has_character_modifier = riseandfall_vassal_crisis_full_concessions
+            has_character_modifier = riseandfall_vassal_crisis_limited_concessions
+            has_character_modifier = riseandfall_vassal_crisis_refusal
+        }
+    }
 }
 
 # Total Collapse is a two-strike finale. Active crisis modifiers cannot be used for escalation

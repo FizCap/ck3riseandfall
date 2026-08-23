@@ -902,7 +902,7 @@ riseandfall_palace_coup_assign_ai_claimant_support_se = {
 riseandfall_palace_coup_create_claimant_successor_title_se = {
     save_scope_as = palace_coup_claimant_ruler
     capital_county = { save_scope_as = palace_coup_claimant_base_county }
-    capital_barony = { save_scope_as = palace_coup_claimant_base_capital }
+    capital_barony = { save_scope_as = rf_base_capital_barony }
     if = {
         limit = { scope:original_primary = { tier = tier_hegemony } }
         create_dynamic_title = { tier = hegemony name = RISEANDFALL_BREAKAWAY_NAME_CAPITAL }
@@ -2486,15 +2486,15 @@ riseandfall_palace_coup_root_flees_success = {
         }
 
         scope:original_primary = {
-            set_variable = { name = rf_successor_origin_title value = scope:original_primary years = 30 }
+            set_variable = { name = rf_successor_origin_title value = scope:original_primary years = 50 }
             if = {
                 limit = { scope:original_primary = { has_variable = rf_successor_root_origin_title } }
-                set_variable = { name = rf_successor_root_origin_title value = scope:original_primary.var:rf_successor_root_origin_title years = 30 }
+                set_variable = { name = rf_successor_root_origin_title value = scope:original_primary.var:rf_successor_root_origin_title years = 50 }
             }
             else = {
-                set_variable = { name = rf_successor_root_origin_title value = scope:original_primary years = 30 }
+                set_variable = { name = rf_successor_root_origin_title value = scope:original_primary years = 50 }
             }
-            set_variable = { name = rf_is_successor_split_title value = 1 years = 30 }
+            set_variable = { name = rf_is_successor_split_title value = 1 years = 50 }
             set_variable = { name = rf_is_permanent_successor_split value = 1 }
             if = {
                 limit = { NOT = { has_variable = rf_successor_permanent_realm_size } }
@@ -2504,15 +2504,15 @@ riseandfall_palace_coup_root_flees_success = {
         if = {
             limit = { exists = scope:palace_coup_root_successor_title }
             scope:palace_coup_root_successor_title = {
-                set_variable = { name = rf_successor_origin_title value = scope:original_primary years = 30 }
+                set_variable = { name = rf_successor_origin_title value = scope:original_primary years = 50 }
                 if = {
                     limit = { scope:original_primary = { has_variable = rf_successor_root_origin_title } }
-                    set_variable = { name = rf_successor_root_origin_title value = scope:original_primary.var:rf_successor_root_origin_title years = 30 }
+                    set_variable = { name = rf_successor_root_origin_title value = scope:original_primary.var:rf_successor_root_origin_title years = 50 }
                 }
                 else = {
-                    set_variable = { name = rf_successor_root_origin_title value = scope:original_primary years = 30 }
+                    set_variable = { name = rf_successor_root_origin_title value = scope:original_primary years = 50 }
                 }
-                set_variable = { name = rf_is_successor_split_title value = 1 years = 30 }
+                set_variable = { name = rf_is_successor_split_title value = 1 years = 50 }
                 set_variable = { name = rf_is_permanent_successor_split value = 1 }
                 if = {
                     limit = { NOT = { has_variable = rf_successor_permanent_realm_size } }

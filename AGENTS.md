@@ -18,6 +18,7 @@
 
 ## CK3 Scripting
 - Validate every scope hop. Guard optional scopes with `exists` and optional variables with `has_variable`; saved scopes must retain the character, title, or province type expected by later code.
+- Interaction `ai_potential` blocks are evaluated with the interaction actor as the root scope only; `scope:actor`, `scope:recipient`, and other interaction event targets are unavailable there. Keep actor-only eligibility in `ai_potential` and put actor/recipient pair checks in `ai_will_do` or another block where both scopes are defined.
 - Tooltip-evaluated triggers can read an unset `var:` even when placed beside `has_variable` in an `AND`. For optional object comparisons, use the repository's `var:name ?= scope:target` pattern rather than relying on short-circuiting.
 - `spawn_army.location` requires a province event target; use `capital_province`, not `capital_barony`, when spawning at a character's capital.
 - Keep on_action handlers small and dispatch to scripted effects with `effect = { ... }`. Gate game-rule mechanics with `has_game_rule`; define new rules in `common/game_rules/` with the `riseandfall` category.
@@ -27,9 +28,11 @@
 - Every UI-facing key must exist under `l_english:`. Check dynamic localization methods against the actual scope type. For saved event scopes, use the working direct form `[saved_name.GetName]`; `scope:` is script syntax and can break event tooltips when copied into localization.
 - Match GUI `datacontext`, `datamodel`, and scripted GUI wrapper scopes exactly. Guard command buttons with `IsValidCommand` before `CreateCommandPopup` and guard list widgets against empty data.
 - A standalone custom `.gui` file does not automatically register a HUD or game-view key. Put custom HUD panels inside an already-loaded HUD widget, usually behind a `GetVariableSystem` state flag. Recheck vanilla overrides and block names after CK3 patches.
+- For custom content inside an existing vanilla window, override the GUI file that owns that window (often the complete vanilla window file) and insert the widget into its real tab/body block. A separate top-level `window` can parse successfully while never being instantiated by the existing game view. Preserve the vanilla window structure and types, then patch the copied override narrowly; for My Realm this means `gui/window_my_realm.gui`, not a detached companion window.
 
 ## Workflow
 - Before editing, search for collisions and inspect the relevant reference log. After editing, check braces, duplicate event/script IDs, localization coverage, and scope/target types.
 - For chained player-choice events, guard pending flags and required variables; save scopes before clearing receiver state, use `root = { ... }` when targeting that receiver, clear stale saved scopes, and trigger follow-up popups with `delayed = yes` after verifying the next target is still pending.
 - Launch CK3 with the mod enabled, reproduce one minimal path per changed mechanic or screen, and use the game logs as the failure report. There is no repo-local parser or test runner.
 - For CK3 behavior or UI changes, add a player-facing Steam Workshop entry to `ai_instructions/changelog.txt` using that file's existing version, header, and past-tense bullet format. Documentation-only changes do not need a changelog entry.
+- When a fix reveals a reusable CK3 scope, token, ordering, encoding, runtime, or validation rule that is not already documented here, add a concise durable instruction to the relevant section of this file in the same change. Keep these additions general enough to prevent the class of bug from recurring; do not record temporary symptoms or one-off implementation details.

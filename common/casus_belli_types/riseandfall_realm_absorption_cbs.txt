@@ -92,13 +92,19 @@ warlord_absorption_cb = {
 	should_show_war_goal_subview = yes
 	mutually_exclusive_titles = { always = yes }
 	allowed_for_character = {
-		has_trait = warlord
+		riseandfall_is_any_warlord_trigger = yes
 		is_independent_ruler = no
 		NOR = { government_has_flag = government_is_landless_adventurer government_has_flag = government_is_nomadic }
 	}
 	allowed_against_character = {
 		is_vassal_or_below_of = scope:attacker.liege
 		NOT = { this = scope:attacker }
+		NOT = {
+			AND = {
+				has_trait = loyalwarlord
+				scope:attacker = { has_trait = loyalwarlord }
+			}
+		}
 	}
 	target_titles = all
 	target_title_tier = kingdom

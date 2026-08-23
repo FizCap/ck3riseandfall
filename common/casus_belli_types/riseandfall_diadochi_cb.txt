@@ -202,7 +202,7 @@
                         years = 30
                     }
                 }
-                set_variable = { name = rf_is_successor_split_title value = 1 years = 30 }
+                set_variable = { name = rf_is_successor_split_title value = 1 years = 50 }
                 set_variable = { name = rf_is_permanent_successor_split value = 1 }
                 if = {
                     limit = { scope:rf_attacker_old_split_title = { has_variable = rf_successor_permanent_realm_size } }

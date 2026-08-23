@@ -18,12 +18,72 @@ warlord.1001 = {
             add_realm_law = crown_authority_0
         }
         hidden_effect = {
+            if = {
+                limit = { exists = primary_title }
+                primary_title = {
+                    set_variable = { name = rf_warlord_era_active value = 1 }
+                    # A new or renewed uprising must endure for a decade before
+                    # the Loyal Warlord majority can formally end the era.
+                    set_variable = { name = rf_warlord_loyal_victory_locked value = 1 years = 10 }
+                    set_variable = { name = rf_warlord_era_age_initialized value = 1 }
+                }
+            }
             riseandfall_warlord_notify_vassals = yes
-            # The crisis is the only window in which new vassals can join.
-            add_character_flag = { flag = rf_warlord_crisis_active years = 5 }
             # Set the title-based cooldown so it survives succession.
             riseandfall_set_low_stability_cooldown_se = yes
         }
+    }
+}
+
+# Liege-facing ending after the movement has been suppressed or disbanded.
+warlord.1010 = {
+    type = character_event
+    title = warlord.1010.t
+    desc = warlord.1010.d
+    theme = realm
+
+    left_portrait = {
+        character = root
+        animation = personality_bold
+    }
+
+    option = {
+        name = warlord.1010.a
+        ai_chance = { base = 100 }
+    }
+}
+
+# Liege-facing ending when the Crown and Loyal Warlords control 51% of the realm.
+warlord.1011 = {
+    type = character_event
+    title = warlord.1011.t
+    desc = warlord.1011.d
+    theme = realm
+
+    left_portrait = {
+        character = root
+        animation = personality_bold
+    }
+
+    option = {
+        name = warlord.1011.a
+        ai_chance = { base = 100 }
+    }
+}
+
+# Player Warlords receive explicit notice when the loyal bloc wins the era.
+warlord.1012 = {
+    type = character_event
+    title = warlord.1012.t
+    desc = warlord.1012.d
+    theme = realm
+
+    left_portrait = root
+    right_portrait = liege
+
+    option = {
+        name = warlord.1012.a
+        ai_chance = { base = 100 }
     }
 }
 
@@ -39,6 +99,7 @@ warlord.1002 = {
 
     option = {
         name = warlord.1002.a
+        remove_variable = riseandfall_warlord_invitation_pending
         # Become a regional Warlord and join the internal power struggle.
         riseandfall_warlord_become_warlord = yes
         ai_chance = {
@@ -56,14 +117,20 @@ warlord.1002 = {
 
     option = {
         name = warlord.1002.b
-        # Remain loyal: prevent repeat offers during this and the next crisis.
-        # For the player, also set the loyal flag so the path manager decision becomes available
-        if = {
-            limit = { is_ai = no }
-            add_character_flag = riseandfall_warlord_player_loyal
-        }
+        remove_variable = riseandfall_warlord_invitation_pending
+        # Join the Crown as a Loyal Warlord.
         riseandfall_warlord_remain_loyal = yes
-        ai_chance = { base = 20 }
+        ai_chance = {
+            base = 100
+            modifier = { has_trait = loyal add = 30 }
+            modifier = { has_trait = content add = 20 }
+            modifier = { has_trait = just add = 15 }
+            modifier = { has_trait = honest add = 10 }
+            modifier = { has_trait = ambitious add = -20 }
+            modifier = { has_trait = disloyal add = -30 }
+            modifier = { opinion = { target = liege value >= 25 } add = 25 }
+            modifier = { opinion = { target = liege value <= -25 } add = -25 }
+        }
     }
 }
 

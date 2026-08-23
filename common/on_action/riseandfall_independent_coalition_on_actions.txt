@@ -13,12 +13,6 @@ on_game_start_after_lobby = {
     }
 }
 
-on_title_gain = {
-    on_actions = {
-        riseandfall_refresh_independent_coalition_periphery_on_title_gain
-    }
-}
-
 on_title_gain_inheritance = {
     on_actions = {
         riseandfall_inherit_independent_coalition_threat
@@ -141,28 +135,5 @@ riseandfall_record_coalition_vassalization_conquest = {
         }
         clear_saved_scope = rf_vassalization_conqueror
         clear_saved_scope = rf_vassalization_defender
-    }
-}
-
-# A conquest may change a large realm's percentage long before the next yearly
-# pulse. Refresh the new holder's top liege as soon as territory changes hands.
-riseandfall_refresh_independent_coalition_periphery_on_title_gain = {
-    trigger = {
-        has_game_rule = riseandfall_independent_coalitions_enabled
-        is_landed = yes
-    }
-    effect = {
-        top_liege = {
-            if = {
-                limit = {
-                    is_alive = yes
-                    is_landed = yes
-                    is_independent_ruler = yes
-                    exists = primary_title
-                }
-                riseandfall_coalition_calculate_periphery_se = yes
-                riseandfall_coalition_update_threat_se = { APPLY_YEARLY = no }
-            }
-        }
     }
 }

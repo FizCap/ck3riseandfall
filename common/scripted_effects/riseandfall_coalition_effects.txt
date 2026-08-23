@@ -101,16 +101,21 @@ riseandfall_coalition_update_threat_se = {
         remove_variable = rf_coalition_threat_world_share
     }
     set_variable = { name = rf_coalition_threat_dominance_gain value = 0 }
+    # Neighbor dominance only modifies conquest pressure. Do not scan every
+    # independent realm for peaceful rulers or rulers with no recent conquest.
     clear_saved_scope = coalition_threat_neighbor
-    ordered_independent_ruler = {
-        limit = {
-            NOT = { this = scope:coalition_threat_target }
-            exists = primary_title
-            primary_title = { is_neighbor_to_realm = scope:coalition_threat_target }
+    if = {
+        limit = { var:rf_coalition_recent_conquest_pct > 0 }
+        ordered_independent_ruler = {
+            limit = {
+                NOT = { this = scope:coalition_threat_target }
+                exists = primary_title
+                primary_title = { is_neighbor_to_realm = scope:coalition_threat_target }
+            }
+            order_by = realm_size
+            max = 1
+            save_scope_as = coalition_threat_neighbor
         }
-        order_by = realm_size
-        max = 1
-        save_scope_as = coalition_threat_neighbor
     }
     if = {
         limit = { exists = scope:coalition_threat_neighbor }
@@ -206,7 +211,7 @@ riseandfall_coalition_update_ai_war_deterrence_se = {
             var:rf_coalition_threat >= 1
             NOR = {
                 has_trait = ambitious
-                has_trait = warlord
+                riseandfall_is_any_warlord_trigger = yes
             }
         }
         set_variable = { name = rf_coalition_ai_war_caution_score value = var:rf_coalition_threat }

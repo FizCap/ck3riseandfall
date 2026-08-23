@@ -1,5 +1,21 @@
-﻿CK3: Rise and Fall - 1.2.1
+﻿CK3: Rise and Fall - 1.2.2
 
-AI Title Management
-- Fixed the annual France-Aquitaine creation helper reusing another ruler's saved title target, which could transfer unrelated titles across the world and cascade into secondary-crown destruction on January 2.
-- Restored Advanced AI cleanup at the start of each year and allowed it to destroy every eligible unwanted secondary crown instead of only one per ruler.
+Adventurers
+- Made newly created adventurers copy the target ruler's exact Men-at-Arms regiment types at Martial- and RNG-scaled sizes, while retaining ruler-strength-scaled special levies, completed-siege reinforcements, and guaranteed onagers based on the target capital's fort level.
+- Added personality-driven invasion timing: craven adventurers wait for roughly a 3:1 advantage, patient and paranoid adventurers prefer safer wars, and brave, ambitious, wrathful, and impatient adventurers accept riskier claim wars.
+
+Warlords
+- Fixed Warlord Alliance AI potential checks using unavailable actor and recipient scopes.
+- Reworked the Vassal Authority Crisis into a realm-wide noble settlement with full concessions, limited concessions, and refusal outcomes, including visible tax, levy, opinion, and authority consequences.
+- Fixed Palace Coup successor titles using an unresolved dynamic-title capital-name scope.
+- Extended Palace Coup successor-state lineage to the intended 50-year duration, matching normal Realm Split successors.
+- Split Warlord Eras into Rebel and Loyal Warlord camps, with yearly personality-, opinion-, power-, and Realm Stability-driven allegiance changes.
+- Ended Warlord Eras when Realm Split fractured the old order, when no Warlords remained, or when the liege's personal counties and Loyal Warlord subrealms controlled at least 51% of the realm.
+- Fixed Realm Split successor realms incorrectly reusing the same capital-based name across multiple breakaways.
+- Required a Warlord Era to last at least ten years before a Loyal majority could end it, and gave every unaligned direct landed vassal the Rebel-or-Loyal Warlord choice on each yearly pulse while the era remained active.
+- Made land granted by the liege create Loyal Warlords during an active era, prevented Loyal Warlords from invading each other, and steered Warlord alliances toward members of the same camp.
+- Added distinct red Rebel Warlord and green Loyal Warlord trait icons, made the opposing camps dislike each other, and kept Rebel Warlords legally punishable through vanilla imprisonment logic.
+
+Independent Coalitions
+- Reduced Coalition background work by removing the all-purpose title-gain realm recalculation, retaining immediate reconciliation after relevant war victories and the normal yearly refresh.
+- Skipped the yearly neighboring-realm power scan when a ruler had no recent conquest pressure to amplify.

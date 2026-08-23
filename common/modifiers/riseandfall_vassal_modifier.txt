@@ -3,12 +3,31 @@
     icon = intrigue_positive
 }
 
-# Applied to a liege during a vassal authority crisis — nobility defies the crown.
-riseandfall_vassal_authority_crisis = {
-    vassal_levy_contribution_mult = -0.30
-    vassal_tax_mult = -0.30
-    vassal_opinion = -50
-    levy_size = -0.10
+# Applied when a liege grants every demand in a vassal authority settlement.
+riseandfall_vassal_crisis_full_concessions = {
+    vassal_levy_contribution_mult = -0.45
+    vassal_tax_mult = -0.45
+    vassal_opinion = 10
+    icon = intrigue_negative
+}
+
+# Applied when a liege grants only part of a vassal authority settlement.
+riseandfall_vassal_crisis_limited_concessions = {
+    vassal_levy_contribution_mult = -0.25
+    vassal_tax_mult = -0.25
+    vassal_opinion = -25
+    icon = intrigue_negative
+}
+
+# Applied when a liege refuses the vassal authority settlement.
+# The opinion shock naturally increases existing faction pressure without
+# creating a guaranteed war.
+riseandfall_vassal_crisis_refusal = {
+    vassal_levy_contribution_mult = -0.75
+    vassal_tax_mult = -0.75
+    vassal_opinion = -75
+    levy_size = -0.25
+    domain_tax_mult = -0.25
     icon = intrigue_negative
 }
 # Temporary debuff applied to lieges when authority collapses

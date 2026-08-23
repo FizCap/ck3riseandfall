@@ -219,7 +219,7 @@ riseandfall_warlord_create_realm_titles_se = {
     if = {
         limit = {
             is_landed = yes
-            has_trait = warlord
+            riseandfall_is_any_warlord_trigger = yes
         }
 
         # Duchies first (tier_duchy), then kingdoms, then empires.

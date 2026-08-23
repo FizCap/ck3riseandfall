@@ -1,15 +1,213 @@
 ﻿# Cleanup effect: enforce only basic Warlord trait consistency.
 riseandfall_warlord_cleanup_se = {
     every_ruler = {
-        limit = { is_landed = no has_trait = warlord }
-        remove_trait = warlord
+        limit = { is_landed = no riseandfall_is_any_warlord_trigger = yes }
+        if = { limit = { has_trait = warlord } remove_trait = warlord }
+        if = { limit = { has_trait = loyalwarlord } remove_trait = loyalwarlord }
     }
 
     # Independent Warlords cease to be part of a liege's internal crisis.
     # Do not add retiredwarlord: compatibility mods own that trait's lifecycle.
     every_independent_ruler = {
-        limit = { has_trait = warlord }
-        remove_trait = warlord
+        limit = { riseandfall_is_any_warlord_trigger = yes }
+        if = { limit = { has_trait = warlord } remove_trait = warlord }
+        if = { limit = { has_trait = loyalwarlord } remove_trait = loyalwarlord }
+    }
+}
+
+# Expected scope: independent liege. The marker lives on the primary title so
+# an unresolved Warlord Era survives succession.
+riseandfall_warlord_mark_era_active_se = {
+    if = {
+        limit = {
+            is_independent_ruler = yes
+            exists = primary_title
+            any_vassal = {
+                is_landed = yes
+                riseandfall_is_any_warlord_trigger = yes
+            }
+        }
+        primary_title = { save_scope_as = rf_warlord_era_primary_title }
+        every_held_title = {
+            limit = {
+                has_variable = rf_warlord_era_active
+                NOT = { this = scope:rf_warlord_era_primary_title }
+            }
+            remove_variable = rf_warlord_era_active
+            if = { limit = { has_variable = rf_warlord_loyal_victory_locked } remove_variable = rf_warlord_loyal_victory_locked }
+            if = { limit = { has_variable = rf_warlord_era_age_initialized } remove_variable = rf_warlord_era_age_initialized }
+        }
+        primary_title = {
+            if = {
+                limit = { NOT = { has_variable = rf_warlord_era_active } }
+                set_variable = { name = rf_warlord_era_active value = 1 }
+            }
+            # Existing saves have no age state. Start their ten-year minimum
+            # once, then retain the initialized marker after the lock expires.
+            if = {
+                limit = { NOT = { has_variable = rf_warlord_era_age_initialized } }
+                set_variable = { name = rf_warlord_loyal_victory_locked value = 1 years = 10 }
+                set_variable = { name = rf_warlord_era_age_initialized value = 1 }
+            }
+        }
+        clear_saved_scope = rf_warlord_era_primary_title
+    }
+}
+
+# Expected scope: active direct Warlord. Renewing a two-year reason annually
+# keeps the vanilla AI able to imprison or revoke without overriding its risk checks.
+riseandfall_warlord_renew_liege_reason_se = {
+    if = {
+        limit = {
+            has_trait = warlord
+            is_independent_ruler = no
+            exists = liege
+        }
+        save_scope_as = rf_warlord_reason_target
+        liege = {
+            remove_opinion = {
+                target = scope:rf_warlord_reason_target
+                modifier = warlord_rebellion_opinion
+            }
+            add_opinion = {
+                target = scope:rf_warlord_reason_target
+                modifier = warlord_rebellion_opinion
+            }
+        }
+    }
+}
+
+# Expected scope: independent liege whose Warlord Era has ended.
+riseandfall_warlord_clear_era_state_se = {
+    remove_character_flag = rf_warlord_crisis_active
+    remove_variable = rf_warlord_crisis_count
+    remove_variable = rf_warlord_crisis_territory_pct
+    remove_variable = rf_warlord_rebel_count
+    remove_variable = rf_warlord_loyal_count
+    remove_variable = rf_warlord_rebel_territory_pct
+    remove_variable = rf_warlord_loyal_territory_pct
+    every_held_title = {
+        if = { limit = { has_variable = rf_warlord_era_active } remove_variable = rf_warlord_era_active }
+        if = { limit = { has_variable = rf_warlord_loyal_victory_locked } remove_variable = rf_warlord_loyal_victory_locked }
+        if = { limit = { has_variable = rf_warlord_era_age_initialized } remove_variable = rf_warlord_era_age_initialized }
+    }
+    every_vassal = {
+        limit = { is_landed = yes }
+        remove_character_flag = riseandfall_warlord_player_loyal
+        remove_variable = riseandfall_warlord_invitation_pending
+    }
+}
+
+# Expected scope: independent liege. Only a tracked era can produce the ending event.
+riseandfall_warlord_end_era_suppressed_se = {
+    if = {
+        limit = {
+            exists = primary_title
+            is_at_war = no
+            primary_title = { has_variable = rf_warlord_era_active }
+        }
+        riseandfall_warlord_clear_era_state_se = yes
+        trigger_event = { id = warlord.1010 }
+    }
+}
+
+# Expected scope: independent liege. Called after individual Warlord removals.
+riseandfall_warlord_try_end_era_se = {
+    if = {
+        limit = {
+            exists = primary_title
+            is_at_war = no
+            primary_title = { has_variable = rf_warlord_era_active }
+            NOT = {
+                any_vassal = {
+                    is_landed = yes
+                    OR = {
+                        riseandfall_is_any_warlord_trigger = yes
+                        has_variable = riseandfall_warlord_invitation_pending
+                    }
+                }
+            }
+        }
+        riseandfall_warlord_end_era_suppressed_se = yes
+    }
+}
+
+# Expected scope: ruler being split. Fragmentation ends the era without showing
+# the suppression ending; the Realm Split event already provides that narrative.
+riseandfall_warlord_end_era_realm_split_se = {
+    save_scope_as = rf_warlord_era_liege
+    riseandfall_warlord_clear_era_state_se = yes
+    every_vassal = {
+        limit = { is_landed = yes }
+        save_scope_as = rf_warlord_era_vassal
+        scope:rf_warlord_era_liege = {
+            remove_opinion = {
+                target = scope:rf_warlord_era_vassal
+                modifier = warlord_rebellion_opinion
+            }
+        }
+        if = {
+            limit = { riseandfall_is_any_warlord_trigger = yes }
+            if = { limit = { has_trait = warlord } remove_trait = warlord }
+            if = { limit = { has_trait = loyalwarlord } remove_trait = loyalwarlord }
+            set_variable = { name = riseandfall_warlord_retired_cooldown value = yes years = 5 }
+        }
+    }
+    clear_saved_scope = rf_warlord_era_vassal
+}
+
+# Expected scope: independent liege. Loyal victory is checked on the annual
+# pulse after every AI alignment has been reconsidered.
+riseandfall_warlord_end_era_loyal_victory_se = {
+    if = {
+        limit = {
+            exists = primary_title
+            is_at_war = no
+            primary_title = { has_variable = rf_warlord_era_active }
+            primary_title = { has_variable = rf_warlord_era_age_initialized }
+            primary_title = { NOT = { has_variable = rf_warlord_loyal_victory_locked } }
+            has_variable = rf_warlord_loyal_territory_pct
+            var:rf_warlord_loyal_territory_pct >= 51
+        }
+        save_scope_as = rf_warlord_era_liege
+        every_vassal = {
+            limit = {
+                is_landed = yes
+                riseandfall_is_any_warlord_trigger = yes
+            }
+            if = {
+                limit = { is_ai = no }
+                trigger_event = { id = warlord.1012 }
+            }
+            save_scope_as = rf_warlord_era_vassal
+            scope:rf_warlord_era_liege = {
+                remove_opinion = {
+                    target = scope:rf_warlord_era_vassal
+                    modifier = warlord_rebellion_opinion
+                }
+            }
+            if = { limit = { has_trait = warlord } remove_trait = warlord }
+            if = { limit = { has_trait = loyalwarlord } remove_trait = loyalwarlord }
+            set_variable = { name = riseandfall_warlord_retired_cooldown value = yes years = 5 }
+        }
+        riseandfall_warlord_clear_era_state_se = yes
+        trigger_event = { id = warlord.1011 }
+        clear_saved_scope = rf_warlord_era_vassal
+    }
+}
+
+riseandfall_warlord_try_loyal_victory_se = {
+    if = {
+        limit = {
+            exists = primary_title
+            is_at_war = no
+            primary_title = { has_variable = rf_warlord_era_active }
+            primary_title = { has_variable = rf_warlord_era_age_initialized }
+            primary_title = { NOT = { has_variable = rf_warlord_loyal_victory_locked } }
+            has_variable = rf_warlord_loyal_territory_pct
+            var:rf_warlord_loyal_territory_pct >= 51
+        }
+        riseandfall_warlord_end_era_loyal_victory_se = yes
     }
 }
 

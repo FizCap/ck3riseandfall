@@ -224,6 +224,78 @@ riseandfall_marry_female_target_se = {
 
 
 ### Dedicated creation effect (guarded to avoid double-creation if multiple chances hit)
+# Spawn the original ruler-strength-scaled special levies plus guaranteed siege engines.
+# Permanent combat MaA are cloned separately from the target ruler's actual regiments.
+# Parameters: ARMY_SIZE (value), ARMY_NAME (localization key), LOCATION (province),
+# SIEGE_STACKS (onager stacks).
+riseandfall_spawn_adventurer_special_troops_se = {
+    if = {
+        limit = { exists = $LOCATION$ }
+        spawn_army = {
+            name = $ARMY_NAME$
+            levies = $ARMY_SIZE$
+            men_at_arms = { type = onager stacks = $SIEGE_STACKS$ }
+            war_keep_on_attacker_victory = no
+            inheritable = no
+            uses_supply = no
+            location = $LOCATION$
+        }
+    }
+}
+
+# Copy each target-ruler MaA regiment's exact type. The adventurer begins with
+# 35-75% of each target regiment; Martial above 10 adds up to 20 percentage
+# points, with a 95% ceiling so natural camp growth still matters.
+# Expects scope:rf_adventurer_target_ruler and scope:adventurer_child.
+riseandfall_clone_target_maa_for_adventurer_se = {
+    if = {
+        limit = {
+            exists = scope:rf_adventurer_target_ruler
+            exists = scope:adventurer_child
+        }
+        scope:rf_adventurer_target_ruler = {
+            every_maa_regiment = {
+                limit = { maa_size > 0 }
+                save_scope_as = rf_target_maa
+
+                scope:adventurer_child = {
+                    set_variable = { name = rf_cloned_maa_multiplier value = 0.35 }
+                    random_list = {
+                        10 = { }
+                        20 = { change_variable = { name = rf_cloned_maa_multiplier add = 0.1 } }
+                        30 = { change_variable = { name = rf_cloned_maa_multiplier add = 0.2 } }
+                        25 = { change_variable = { name = rf_cloned_maa_multiplier add = 0.3 } }
+                        15 = { change_variable = { name = rf_cloned_maa_multiplier add = 0.4 } }
+                    }
+
+                    set_variable = { name = rf_cloned_maa_martial_bonus value = martial }
+                    change_variable = { name = rf_cloned_maa_martial_bonus subtract = 10 }
+                    clamp_variable = { name = rf_cloned_maa_martial_bonus min = 0 max = 20 }
+                    change_variable = { name = rf_cloned_maa_martial_bonus multiply = 0.01 }
+                    change_variable = { name = rf_cloned_maa_multiplier add = var:rf_cloned_maa_martial_bonus }
+                    clamp_variable = { name = rf_cloned_maa_multiplier min = 0.35 max = 0.95 }
+
+                    set_variable = { name = rf_cloned_maa_size value = scope:rf_target_maa.maa_size }
+                    change_variable = { name = rf_cloned_maa_size multiply = var:rf_cloned_maa_multiplier }
+                    round_variable = { name = rf_cloned_maa_size nearest = 1 }
+                    clamp_variable = { name = rf_cloned_maa_size min = 1 max = 1000 }
+
+                    create_maa_regiment = {
+                        type_of = scope:rf_target_maa
+                        check_can_recruit = no
+                        size = var:rf_cloned_maa_size
+                    }
+
+                    remove_variable = rf_cloned_maa_size
+                    remove_variable = rf_cloned_maa_multiplier
+                    remove_variable = rf_cloned_maa_martial_bonus
+                }
+            }
+        }
+    }
+}
+
+
 riseandfall_do_create_adventurer_se = {
     # Ensure we haven't already made this character into an adventurer (guard against multiple triggers)
     if = {
@@ -342,6 +414,18 @@ riseandfall_do_create_adventurer_se = {
                 if = { limit = { exists = scope:claim_target_title } set_variable = { name = rf_adventurer_origin_claim_title value = scope:claim_target_title } }
             }
 
+            # Copy the actual target ruler's personal MaA roster. Using type_of
+            # preserves exact vanilla, AGOT, and other modded regiment types.
+            if = {
+                limit = { exists = scope:claim_target_title.holder }
+                scope:claim_target_title.holder = { save_scope_as = rf_adventurer_target_ruler }
+            }
+            else_if = {
+                limit = { exists = scope:independent_ruler }
+                scope:independent_ruler = { save_scope_as = rf_adventurer_target_ruler }
+            }
+            riseandfall_clone_target_maa_for_adventurer_se = yes
+
             # Determine base levies defensively: prefer claim holder, then independent_ruler, then a small default.
             if = {
                 limit = { exists = scope:claim_target_title.holder }
@@ -398,50 +482,58 @@ riseandfall_do_create_adventurer_se = {
             round_variable = { name = adventurer_respawn_army_size nearest = 1 }
             clamp_variable = { name = adventurer_respawn_army_size min = 1 max = 10000 }
 
+            # Give every adventurer one onager stack per fort level of the
+            # challenged ruler's capital. Preserve this value for later
+            # completed-siege reinforcement stacks.
+            set_variable = { name = adventurer_siege_engine_stacks value = 1 }
+            if = {
+                limit = { exists = scope:claim_target_title.holder.capital_province }
+                set_variable = {
+                    name = adventurer_siege_engine_stacks
+                    value = scope:claim_target_title.holder.capital_province.fort_level
+                }
+            }
+            else_if = {
+                limit = { exists = scope:independent_ruler.capital_province }
+                set_variable = {
+                    name = adventurer_siege_engine_stacks
+                    value = scope:independent_ruler.capital_province.fort_level
+                }
+            }
+            else_if = {
+                limit = { exists = scope:adventurer_child.capital_province }
+                set_variable = {
+                    name = adventurer_siege_engine_stacks
+                    value = scope:adventurer_child.capital_province.fort_level
+                }
+            }
+            round_variable = { name = adventurer_siege_engine_stacks nearest = 1 }
+            clamp_variable = { name = adventurer_siege_engine_stacks min = 1 max = 1000 }
+
             set_variable = { name = adventurer_max_cap value = var:adventurer_base_levies }
             change_variable = { name = adventurer_max_cap multiply = 6 }
 
             remove_variable = adventurer_base_levies
             remove_variable = adventurer_max_cap
 
-            # Spawn the adventurer host at the claim holder's capital if available,
-            # otherwise fall back to the independent_ruler's capital province.
-            # Spawn the adventurer host at the claim holder's capital if available,
-            # else use independent_ruler if present, else fall back to the adventurer's capital.
+            # Resolve the province once, then spawn the complete mixed special-troop host there.
             if = {
-                limit = { exists = scope:claim_target_title.holder }
-                # Only spawn if the holder has a valid capital province
-                if = { limit = { exists = scope:claim_target_title.holder.capital_province } }
-                else = { }
-                if = { limit = { exists = scope:claim_target_title.holder.capital_province } spawn_army = {
-                    name = riseandfall_adventurer_host_name
-                    levies = var:adventurer_army_size
-                    war_keep_on_attacker_victory = no
-                    inheritable = no
-                    uses_supply = no
-                    location = scope:claim_target_title.holder.capital_province
-                } }
+                limit = { exists = scope:claim_target_title.holder.capital_province }
+                scope:claim_target_title.holder.capital_province = { save_scope_as = rf_adventurer_spawn_location }
             }
             else_if = {
-                limit = { exists = scope:independent_ruler }
-                if = { limit = { exists = scope:independent_ruler.capital_province } spawn_army = {
-                    name = riseandfall_adventurer_host_name
-                    levies = var:adventurer_army_size
-                    war_keep_on_attacker_victory = no
-                    inheritable = no
-                    uses_supply = no
-                    location = scope:independent_ruler.capital_province
-                } }
+                limit = { exists = scope:independent_ruler.capital_province }
+                scope:independent_ruler.capital_province = { save_scope_as = rf_adventurer_spawn_location }
             }
-            else = {
-                if = { limit = { exists = scope:adventurer_child.capital_province } spawn_army = {
-                    name = riseandfall_adventurer_host_name
-                    levies = var:adventurer_army_size
-                    war_keep_on_attacker_victory = no
-                    inheritable = no
-                    uses_supply = no
-                    location = scope:adventurer_child.capital_province
-                } }
+            else_if = {
+                limit = { exists = scope:adventurer_child.capital_province }
+                scope:adventurer_child.capital_province = { save_scope_as = rf_adventurer_spawn_location }
+            }
+            riseandfall_spawn_adventurer_special_troops_se = {
+                ARMY_SIZE = var:adventurer_army_size
+                ARMY_NAME = riseandfall_adventurer_host_name
+                LOCATION = scope:rf_adventurer_spawn_location
+                SIEGE_STACKS = var:adventurer_siege_engine_stacks
             }
             remove_variable = adventurer_army_size
             remove_variable = adventurer_multiplier
@@ -602,6 +694,47 @@ riseandfall_adventurer_press_claims_se = {
                     }
                 }
             }
+            # Personality changes how much danger an adventurer will accept.
+            # The neutral baseline is half the adventurer's strength. Cautious
+            # personalities demand a larger host advantage, while aggressive
+            # personalities may gamble on a target that is merely outmatched.
+            scope:independent_adventurer = {
+                set_variable = {
+                    name = rf_adventurer_invasion_strength_threshold
+                    value = current_military_strength
+                }
+                change_variable = { name = rf_adventurer_invasion_strength_threshold multiply = 0.5 }
+
+                # Craven adventurers wait for a strong but achievable advantage (3:1).
+                if = {
+                    limit = { has_trait = craven }
+                    change_variable = { name = rf_adventurer_invasion_strength_threshold multiply = 0.6667 }
+                }
+                # Patient and paranoid adventurers prefer preparation and a safer
+                # campaign (roughly 2.7:1).
+                if = {
+                    limit = {
+                        OR = {
+                            has_trait = patient
+                            has_trait = paranoid
+                        }
+                    }
+                    change_variable = { name = rf_adventurer_invasion_strength_threshold multiply = 0.75 }
+                }
+                # Brave, ambitious, wrathful, and impatient adventurers are
+                # willing to turn a narrow advantage into a claim war (4:3).
+                if = {
+                    limit = {
+                        OR = {
+                            has_trait = brave
+                            has_trait = ambitious
+                            has_trait = wrathful
+                            has_trait = impatient
+                        }
+                    }
+                    change_variable = { name = rf_adventurer_invasion_strength_threshold multiply = 1.5 }
+                }
+            }
             ai_start_best_war = {
                 cb = { adventurer_claim_cb }
                 recalculate_cb_targets = yes
@@ -612,11 +745,28 @@ riseandfall_adventurer_press_claims_se = {
                     scope:claim_target_title.holder = {
                         current_military_strength < scope:independent_adventurer.current_military_strength
                         OR = {
-                            gold < scope:independent_adventurer.gold
-                            current_military_strength <= scope:independent_adventurer.fifty_percent_of_current_military_strength
+                            current_military_strength <= scope:independent_adventurer.var:rf_adventurer_invasion_strength_threshold
+                            AND = {
+                                # Cautious personalities do not use wealth as a
+                                # substitute for the overwhelming force they want.
+                                scope:independent_adventurer = {
+                                    NOR = {
+                                        has_trait = craven
+                                        has_trait = patient
+                                        has_trait = paranoid
+                                    }
+                                }
+                                OR = {
+                                    gold < scope:independent_adventurer.gold
+                                    current_military_strength <= scope:independent_adventurer.fifty_percent_of_current_military_strength
+                                }
+                            }
                         }
                     }
                 }
+            }
+            scope:independent_adventurer = {
+                remove_variable = rf_adventurer_invasion_strength_threshold
             }
         }
     }
@@ -792,33 +942,29 @@ riseandfall_yearly_adventurer_remove_variable_se = {
 
 
 ###############################
-# Rise and Fall: Siege effects
+# Rise and Fall: completed-siege reinforcement effects
 ###############################
 
-# Scripted effect called by on_siege_looting. Expects the following saved scopes:
-# - scope:rf_looted_county (province owner county)
-# - scope:rf_looted_barony (the specific barony looted)
-# - scope:rf_sieger (root, the sieging character)
-
-riseandfall_on_siege_looting_se = {
-    # If the sieger is a newly-created adventurer, spawn a respawn army
+# Called by on_siege_completion. Expects scope:rf_captured_barony and
+# scope:rf_sieger (the victorious occupant character).
+riseandfall_on_siege_completion_se = {
     scope:rf_sieger = {
         if = {
-            limit = { has_character_flag = riseandfall_newadventurer is_landed = no }
-            # Spawn the army at the looted barony's province if available.
-            # Use the adventurer's saved variable `adventurer_respawn_army_size` directly if present.
-            if = {
-                limit = { exists = scope:rf_looted_barony }
-                if = {
-                    limit = { scope:rf_sieger = { has_variable = adventurer_respawn_army_size } }
-                    spawn_army = {
-                        name = riseandfall_adventurer_respawn_army_name
-                        levies = scope:rf_sieger.var:adventurer_respawn_army_size
-                        location = scope:rf_looted_barony.title_province
-                        uses_supply = no
-                        inheritable = no
-                    }
-                }
+            limit = {
+                has_character_flag = riseandfall_newadventurer
+                is_landed = no
+                is_at_war = yes
+                has_variable = adventurer_respawn_army_size
+                has_variable = adventurer_siege_engine_stacks
+                exists = scope:rf_captured_barony.title_province
+            }
+            # Each completed siege recruits new special levies equal to 5% of
+            # this adventurer's original ruler-scaled host, plus siege engines.
+            riseandfall_spawn_adventurer_special_troops_se = {
+                ARMY_SIZE = var:adventurer_respawn_army_size
+                ARMY_NAME = riseandfall_adventurer_respawn_army_name
+                LOCATION = scope:rf_captured_barony.title_province
+                SIEGE_STACKS = var:adventurer_siege_engine_stacks
             }
         }
     }

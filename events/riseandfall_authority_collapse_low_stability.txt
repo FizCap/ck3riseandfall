@@ -219,7 +219,7 @@ authority_collapse.1001 = {
 ##############################################
 # authority_collapse.1002 — Vassal Authority Crisis
 # Fires when powerful vassals challenge the crown or overall vassal opinion is very low.
-# Applies a medium-severity liege debuff reducing vassal tax/levy contributions and opinion.
+# Presents a realm-wide settlement demanded by the nobility.
 # Homogeneous realms that collapse due to internal nobility defiance end up here.
 ##############################################
 authority_collapse.1002 = {
@@ -230,16 +230,69 @@ authority_collapse.1002 = {
 
     left_portrait = root
 
+    # Grant every demanded concession: the realm keeps its political peace, but
+    # the nobility receives lasting economic privileges for the settlement term.
     option = {
         name = authority_collapse.1002.a
-        custom_tooltip = authority_collapse.1002.tooltip
-        ai_chance = { base = 100 }
+        custom_tooltip = authority_collapse.1002.a.tooltip
+        ai_chance = {
+            base = 45
+            modifier = { add = 20 has_trait = content }
+            modifier = { add = 15 has_trait = just }
+            modifier = { add = -25 has_trait = ambitious }
+            modifier = { add = -20 has_trait = greedy }
+            modifier = { add = 15 is_at_war = yes }
+        }
         hidden_effect = {
             root = {
-                # Keep the escalation marker through three 10-year cooldown windows.
+                remove_variable = riseandfall_recent_vassal_crisis
+                riseandfall_set_low_stability_cooldown_se = yes
+                add_character_modifier = { modifier = riseandfall_vassal_crisis_full_concessions years = 10 }
+            }
+        }
+    }
+
+    # Grant only part of the demands: the immediate damage is smaller, but the
+    # unresolved settlement remains on the escalation track.
+    option = {
+        name = authority_collapse.1002.b
+        custom_tooltip = authority_collapse.1002.b.tooltip
+        ai_chance = {
+            base = 35
+            modifier = { add = 15 has_trait = content }
+            modifier = { add = 10 has_trait = just }
+            modifier = { add = -15 has_trait = ambitious }
+            modifier = { add = -10 has_trait = greedy }
+            modifier = { add = 10 is_at_war = yes }
+        }
+        hidden_effect = {
+            root = {
                 set_variable = { name = riseandfall_recent_vassal_crisis value = yes years = 30 }
                 riseandfall_set_low_stability_cooldown_se = yes
-                add_character_modifier = { modifier = riseandfall_vassal_authority_crisis years = 10 }
+                add_character_modifier = { modifier = riseandfall_vassal_crisis_limited_concessions years = 10 }
+            }
+        }
+    }
+
+    # Refuse the settlement: the crown keeps its formal position, but the
+    # nobility stops cooperating and the resulting authority shock is severe.
+    option = {
+        name = authority_collapse.1002.c
+        custom_tooltip = authority_collapse.1002.c.tooltip
+        ai_chance = {
+            base = 20
+            modifier = { add = 25 has_trait = ambitious }
+            modifier = { add = 20 has_trait = brave }
+            modifier = { add = 15 has_trait = wrathful }
+            modifier = { add = -20 has_trait = content }
+            modifier = { add = -15 has_trait = craven }
+            modifier = { add = -15 is_at_war = yes }
+        }
+        hidden_effect = {
+            root = {
+                set_variable = { name = riseandfall_recent_vassal_crisis value = yes years = 30 }
+                riseandfall_set_low_stability_cooldown_se = yes
+                add_character_modifier = { modifier = riseandfall_vassal_crisis_refusal years = 10 }
             }
         }
     }

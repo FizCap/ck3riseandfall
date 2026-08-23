@@ -10,7 +10,7 @@
 
     # Allow vassals with warlord trait to use this CB against other vassals
     allowed_for_character = {
-        has_trait = warlord
+        riseandfall_is_any_warlord_trigger = yes
         is_independent_ruler = no  # Must be a vassal
         NOR = {
             government_has_flag = government_is_landless_adventurer
@@ -22,6 +22,12 @@
     # Warlords can attack fellow vassals under the same liege
     is_vassal_or_below_of = scope:attacker.liege
     NOT = { this = scope:attacker }
+    NOT = {
+        AND = {
+            has_trait = loyalwarlord
+            scope:attacker = { has_trait = loyalwarlord }
+        }
+    }
     }
     target_titles = all
     target_title_tier = kingdom

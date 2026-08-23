@@ -2,7 +2,7 @@
 	opinion = -50
 	imprisonment_reason = yes
 	revoke_title_reason = yes
-	years = 1
+	years = 2
 	decaying = no
 }
 

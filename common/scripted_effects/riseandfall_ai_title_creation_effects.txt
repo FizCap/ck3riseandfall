@@ -36,7 +36,7 @@ riseandfall_destroy_same_tier_dynamic_titles_se = {
                     has_variable = rf_successor_root_origin_title
                 }
             }
-            set_variable = { name = rf_successor_root_origin_title value = scope:destroy_helper_root.var:rf_successor_root_origin_title years = 30 }
+            set_variable = { name = rf_successor_root_origin_title value = scope:destroy_helper_root.var:rf_successor_root_origin_title years = 50 }
         }
     }
     scope:destroy_helper_root = {
@@ -71,11 +71,11 @@ riseandfall_destroy_same_tier_dynamic_titles_se = {
                 }
                 if = {
                     limit = { scope:destroy_held_title = { has_variable = rf_successor_root_origin_title } }
-                    set_variable = { name = rf_successor_root_origin_title value = scope:destroy_held_title.var:rf_successor_root_origin_title years = 30 }
+                    set_variable = { name = rf_successor_root_origin_title value = scope:destroy_held_title.var:rf_successor_root_origin_title years = 50 }
                 }
                 if = {
                     limit = { scope:destroy_held_title = { has_variable = rf_is_successor_split_title } }
-                    set_variable = { name = rf_is_successor_split_title value = 1 years = 30 }
+                    set_variable = { name = rf_is_successor_split_title value = 1 years = 50 }
                 }
                 if = {
                     limit = { scope:destroy_held_title = { has_variable = rf_is_permanent_successor_split } }
@@ -151,11 +151,11 @@ riseandfall_cleanup_titular_titles_se = {
                 }
                 if = {
                     limit = { scope:titular_held = { has_variable = rf_successor_root_origin_title } }
-                    set_variable = { name = rf_successor_root_origin_title value = scope:titular_held.var:rf_successor_root_origin_title years = 30 }
+                    set_variable = { name = rf_successor_root_origin_title value = scope:titular_held.var:rf_successor_root_origin_title years = 50 }
                 }
                 if = {
                     limit = { scope:titular_held = { has_variable = rf_is_successor_split_title } }
-                    set_variable = { name = rf_is_successor_split_title value = 1 years = 30 }
+                    set_variable = { name = rf_is_successor_split_title value = 1 years = 50 }
                 }
                 if = {
                     limit = { scope:titular_held = { has_variable = rf_is_permanent_successor_split } }

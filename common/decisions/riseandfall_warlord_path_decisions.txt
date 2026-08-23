@@ -18,7 +18,7 @@ riseandfall_warlord_path_manager = {
         has_game_rule = riseandfall_low_stability_events_enabled
         OR = {
             has_trait = warlord
-            has_character_flag = riseandfall_warlord_player_loyal
+            has_trait = loyalwarlord
         }
     }
 
@@ -34,12 +34,11 @@ riseandfall_warlord_path_manager = {
 
         item = {
             value = riseandfall_choose_warlord_rebel
-            is_shown = { has_character_flag = riseandfall_warlord_player_loyal }
+            is_shown = { has_trait = loyalwarlord }
             is_valid = {
                 exists = liege
-                liege = { has_character_flag = rf_warlord_crisis_active }
-                NOT = { has_variable = riseandfall_warlord_choice_made }
-                NOT = { has_variable = riseandfall_warlord_retired_cooldown }
+                liege.primary_title = { has_variable = rf_warlord_era_active }
+                NOT = { has_variable = riseandfall_warlord_alignment_switch_cooldown }
             }
             current_description = riseandfall_warlord_choice_currently_loyal
             localization = riseandfall_choose_warlord_rebel
@@ -47,8 +46,12 @@ riseandfall_warlord_path_manager = {
         }
         item = {
             value = riseandfall_choose_warlord_loyal
-            is_shown = { NOT = { has_character_flag = riseandfall_warlord_player_loyal } }
-            is_valid = { always = yes }
+            is_shown = { has_trait = warlord }
+            is_valid = {
+                exists = liege
+                liege.primary_title = { has_variable = rf_warlord_era_active }
+                NOT = { has_variable = riseandfall_warlord_alignment_switch_cooldown }
+            }
             current_description = riseandfall_warlord_choice_currently_rebellious
             localization = riseandfall_choose_warlord_loyal
             icon = "gfx/interface/illustrations/decisions/decision_misc.dds"
@@ -61,12 +64,10 @@ riseandfall_warlord_path_manager = {
             custom_tooltip = riseandfall_warlord_path_manager_tooltip_tt
             if = {
                 limit = { scope:riseandfall_choose_warlord_loyal = yes }
-                add_character_flag = riseandfall_warlord_player_loyal
-                riseandfall_warlord_abandon_path = yes
+                riseandfall_warlord_become_loyal = yes
             }
             else_if = {
                 limit = { scope:riseandfall_choose_warlord_rebel = yes }
-                remove_character_flag = riseandfall_warlord_player_loyal
                 riseandfall_warlord_become_warlord = yes
             }
         }
@@ -86,7 +87,7 @@ riseandfall_warlord_create_realm_titles = {
 
     is_shown = {
         is_landed = yes
-        has_trait = warlord
+        riseandfall_is_any_warlord_trigger = yes
         has_game_rule = riseandfall_low_stability_events_enabled
         # Uses vanilla engine check: alert_creatable_title enforces the 51% de jure county threshold
         any_alert_creatable_title = {
@@ -100,7 +101,7 @@ riseandfall_warlord_create_realm_titles = {
 
     is_valid = {
         is_landed = yes
-        has_trait = warlord
+        riseandfall_is_any_warlord_trigger = yes
         # Uses vanilla engine check: alert_creatable_title enforces the 51% de jure county threshold
         any_alert_creatable_title = {
             OR = {
@@ -121,7 +122,7 @@ riseandfall_warlord_create_realm_titles = {
 
     ai_potential = {
         is_landed = yes
-        has_trait = warlord
+        riseandfall_is_any_warlord_trigger = yes
         has_game_rule = riseandfall_low_stability_events_enabled
         # Keep AI checks aligned with the actual title-creation gate so
         # warlords take this decision as soon as a valid title exists.

@@ -1732,6 +1732,9 @@ riseandfall_clear_current_stability_vars_se = {
         remove_variable = riseandfall_lh_score_display
         remove_variable = riseandfall_lh_status_display
         remove_variable = riseandfall_lh_relation_display
+        remove_character_modifier = riseandfall_vassal_crisis_full_concessions
+        remove_character_modifier = riseandfall_vassal_crisis_limited_concessions
+        remove_character_modifier = riseandfall_vassal_crisis_refusal
         # Remove any fine-grained stability modifiers (0..100)
         remove_character_modifier = riseandfall_stability_0
         remove_character_modifier = riseandfall_stability_1

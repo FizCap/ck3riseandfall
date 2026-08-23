@@ -78,6 +78,7 @@ on_diarch_designation = {
 on_title_gain = {
     on_actions = {
         riseandfall_check_puppet_regency
+        riseandfall_warlord_loyal_on_liege_grant
         riseandfall_warlord_title_cleanup
         riseandfall_successor_primary_title_sync
     }
@@ -246,30 +247,75 @@ riseandfall_warlord = {
                 is_landed = yes
             }
             riseandfall_warlord_refresh_crisis_strength_se = yes
+            if = {
+                limit = {
+                    any_vassal = {
+                        is_landed = yes
+                        riseandfall_is_any_warlord_trigger = yes
+                    }
+                }
+                # Repair older saves and renew the legal basis for vanilla AI suppression.
+                riseandfall_warlord_mark_era_active_se = yes
+                every_vassal = {
+                    limit = {
+                        is_landed = yes
+                        has_trait = warlord
+                    }
+                    riseandfall_warlord_renew_liege_reason_se = yes
+                }
+            }
+            # While the title marker exists, every direct landed vassal must
+            # choose either the Rebel or Loyal Warlord camp. This also catches
+            # newly granted, transferred, or otherwise newly arrived vassals.
+            if = {
+                limit = {
+                    exists = primary_title
+                    primary_title = { has_variable = rf_warlord_era_active }
+                }
+                primary_title = {
+                    if = {
+                        limit = { NOT = { has_variable = rf_warlord_era_age_initialized } }
+                        set_variable = { name = rf_warlord_loyal_victory_locked value = 1 years = 10 }
+                        set_variable = { name = rf_warlord_era_age_initialized value = 1 }
+                    }
+                }
+                riseandfall_warlord_notify_vassals = yes
+            }
             every_vassal = {
                 limit = {
                     is_ai = yes
                     is_landed = yes
-                    has_trait = warlord
+                    riseandfall_is_any_warlord_trigger = yes
                 }
                 riseandfall_warlord_ai_reconsider_se = yes
             }
-            # Only an active Warlord crisis attracts new followers. AI recruits
-            # are silent; the initial event is the player-facing invitation.
-            if = {
-                limit = { has_character_flag = rf_warlord_crisis_active }
-                every_vassal = {
-                    limit = {
-                        is_ai = yes
-                        is_landed = yes
-                        NOT = { has_trait = warlord }
-                        NOT = { has_variable = riseandfall_warlord_choice_made }
-                        NOT = { has_variable = riseandfall_warlord_retired_cooldown }
-                    }
-                    riseandfall_warlord_ai_join_crisis_se = yes
-                }
-            }
+            # Alignment changes can alter both sides' shares, so recalculate
+            # before checking the loyal 51% victory and the empty-era fallback.
+            riseandfall_warlord_refresh_crisis_strength_se = yes
+            riseandfall_warlord_try_loyal_victory_se = yes
+            riseandfall_warlord_try_end_era_se = yes
         }
+    }
+}
+
+# root = recipient, scope:title = gained title, scope:previous_holder = granter.
+# This only catches a real liege grant, not inheritance or conquest.
+riseandfall_warlord_loyal_on_liege_grant = {
+    trigger = {
+        has_game_rule = riseandfall_low_stability_events_enabled
+        is_landed = yes
+        is_independent_ruler = no
+        exists = scope:title
+        scope:title.tier >= tier_county
+        exists = scope:previous_holder
+        liege = scope:previous_holder
+        liege = {
+            exists = primary_title
+            primary_title = { has_variable = rf_warlord_era_active }
+        }
+    }
+    effect = {
+        riseandfall_warlord_become_loyal = yes
     }
 }
 
