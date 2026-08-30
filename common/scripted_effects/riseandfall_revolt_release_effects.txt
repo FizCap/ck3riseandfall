@@ -438,7 +438,8 @@ riseandfall_release_revolt_realms_se = {
             }
 
             add_character_flag = { flag = rf_revolt_made_independent days = 30 }
-            add_gold = 500
+            # Give the new peasant ruler a short window to establish the realm at no creation cost.
+            add_character_modifier = { modifier = riseandfall_peasant_revolt_title_creation_discount years = 2 }
 
             # Make independent first
             if = {

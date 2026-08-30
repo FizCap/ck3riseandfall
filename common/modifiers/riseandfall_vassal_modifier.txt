@@ -41,4 +41,10 @@ riseandfall_authority_collapse_liege_debuff = {
     vassal_opinion = -200
     icon = intrigue_negative
 }
+
+# Temporary establishment aid for peasant leaders released by a realm collapse.
+riseandfall_peasant_revolt_title_creation_discount = {
+    title_creation_cost_mult = -1
+    icon = stewardship_positive
+}
 # Applied to a ruler who chose to release rebel territories rather than fight

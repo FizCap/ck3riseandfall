@@ -109,7 +109,12 @@
             if = {
                 limit = {
                     exists = primary_title
-                    primary_title = { has_variable = rf_is_successor_split_title }
+                    primary_title = {
+                        OR = {
+                            has_variable = rf_is_successor_split_title
+                            is_titular = yes
+                        }
+                    }
                 }
                 primary_title = { save_scope_as = rf_attacker_old_split_title }
             }
@@ -119,17 +124,19 @@
         riseandfall_apply_de_jure_war_goal_victory_se = yes
         riseandfall_handoff_defender_random_county_se = yes
 
-        # A kingdom title received by a lower-rank attacker must become their
-        # primary title before successor metadata is synchronized.
+        # Inspect the winner's live titles after transfer instead of relying on
+        # `titles_taken`, which can omit the proper crown after invasion-style
+        # title-and-vassal resolution. A same-rank proper title must replace a
+        # titular successor primary before the obsolete crown can be destroyed.
         scope:attacker = {
-            ordered_in_list = {
-                list = titles_taken
+            ordered_held_title = {
                 limit = {
-                    holder = scope:attacker
-                    tier > scope:attacker.primary_title.tier
+                    is_titular = no
+                    tier >= scope:attacker.primary_title.tier
                 }
                 order_by = tier
                 max = 1
+                check_range_bounds = no
                 save_temporary_scope_as = rf_diadochi_highest_taken_title
             }
         }
@@ -147,9 +154,10 @@
                 exists = scope:rf_defender_split_title
                 scope:rf_defender_split_title = {
                     holder = scope:attacker
+                    is_titular = no
                     OR = {
                         this = scope:attacker.primary_title
-                        tier > scope:attacker.primary_title.tier
+                        tier >= scope:attacker.primary_title.tier
                     }
                 }
             }
@@ -225,16 +233,12 @@
                 remove_variable = rf_is_permanent_successor_split
                 remove_variable = rf_successor_permanent_realm_size
             }
-            if = {
-                limit = {
-                    scope:rf_attacker_old_split_title = {
-                        holder = scope:attacker
-                        is_titular = yes
-                    }
-                }
-                scope:attacker = { destroy_title = scope:rf_attacker_old_split_title }
-            }
         }
+
+        # Once a same-rank or higher proper crown becomes primary, retire every
+        # obsolete successor crown after the transfer. Saved attacker and
+        # defender crowns are included even after their markers were cleared.
+        riseandfall_retire_obsolete_successor_titles_after_victory_se = yes
 
         scope:defender = { ep3_war_loss_adventurer_tt_effect = yes }
 

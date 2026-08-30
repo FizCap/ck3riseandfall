@@ -1122,13 +1122,9 @@
 		}
 	}
 
-	ai_potential = {
-		is_at_war = no
-		OR = {
-			has_trait = warlord
-			has_trait = loyalwarlord
-		}
-	}
+        ai_potential = {
+                is_at_war = no
+        }
 
 	ai_targets = {
 		ai_recipients = neighboring_rulers

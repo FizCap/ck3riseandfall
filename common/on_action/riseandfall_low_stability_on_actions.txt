@@ -88,7 +88,9 @@ on_title_gain_inheritance = {
     on_actions = {
         riseandfall_resolve_puppet_succession_on_inheritance
         riseandfall_check_puppet_regency
+        riseandfall_warlord_inherit_vassal_trait
         riseandfall_warlord_title_cleanup
+        riseandfall_warlord_inherited_legacy
         riseandfall_successor_primary_title_sync
     }
 }
@@ -96,6 +98,38 @@ on_title_gain_inheritance = {
 on_title_lost = {
     on_actions = {
         riseandfall_warlord_title_cleanup
+    }
+}
+
+# Preserve an active Warlord vassal's alignment when their landed title passes
+# to an heir. Independent inherited realms are handled separately as legacy.
+riseandfall_warlord_inherit_vassal_trait = {
+    trigger = {
+        has_game_rule = riseandfall_low_stability_events_enabled
+        is_landed = yes
+        is_independent_ruler = no
+        exists = scope:previous_holder
+        scope:previous_holder = {
+            OR = {
+                has_trait = warlord
+                has_trait = loyalwarlord
+            }
+        }
+        exists = liege
+        liege = {
+            exists = primary_title
+            primary_title = { has_variable = rf_warlord_era_active }
+        }
+    }
+    effect = {
+        if = {
+            limit = { scope:previous_holder = { has_trait = loyalwarlord } }
+            riseandfall_warlord_become_loyal = yes
+        }
+        else_if = {
+            limit = { scope:previous_holder = { has_trait = warlord } }
+            riseandfall_warlord_become_warlord = yes
+        }
     }
 }
 
@@ -237,6 +271,28 @@ riseandfall_warlord = {
         has_game_rule = riseandfall_low_stability_events_enabled
     }
     effect = {
+        # Legacy banners expire independently of any active realm crisis.
+        every_ruler = {
+            limit = {
+                has_character_flag = rf_warlord_legacy
+                riseandfall_is_any_warlord_trigger = yes
+            }
+            if = {
+                limit = {
+                    NOT = { has_variable = rf_warlord_legacy_expiry }
+                    NOT = { has_variable = rf_warlord_legacy_expiry_initialized }
+                }
+                set_variable = { name = rf_warlord_legacy_expiry value = 1 years = 5 }
+                set_variable = { name = rf_warlord_legacy_expiry_initialized value = 1 }
+            }
+            else_if = {
+                limit = {
+                    has_variable = rf_warlord_legacy_expiry_initialized
+                    NOT = { has_variable = rf_warlord_legacy_expiry }
+                }
+                riseandfall_warlord_retire_legacy_se = yes
+            }
+        }
         # Cleanup: handle unlanded/independent warlords
         riseandfall_warlord_cleanup_se = yes
 
@@ -249,17 +305,21 @@ riseandfall_warlord = {
             riseandfall_warlord_refresh_crisis_strength_se = yes
             if = {
                 limit = {
+                    exists = primary_title
+                    primary_title = { has_variable = rf_warlord_era_active }
                     any_vassal = {
                         is_landed = yes
-                        riseandfall_is_any_warlord_trigger = yes
+                        riseandfall_is_active_warlord_trigger = yes
                     }
                 }
-                # Repair older saves and renew the legal basis for vanilla AI suppression.
+                # Keep an already tracked era normalized and renew the legal
+                # basis for vanilla AI suppression. Traits alone must never
+                # recreate an era after its title marker has been cleared.
                 riseandfall_warlord_mark_era_active_se = yes
                 every_vassal = {
                     limit = {
                         is_landed = yes
-                        has_trait = warlord
+                        riseandfall_is_active_warlord_trigger = yes
                     }
                     riseandfall_warlord_renew_liege_reason_se = yes
                 }
@@ -285,7 +345,7 @@ riseandfall_warlord = {
                 limit = {
                     is_ai = yes
                     is_landed = yes
-                    riseandfall_is_any_warlord_trigger = yes
+                    riseandfall_is_active_warlord_trigger = yes
                 }
                 riseandfall_warlord_ai_reconsider_se = yes
             }
@@ -327,6 +387,17 @@ riseandfall_warlord_title_cleanup = {
     }
     effect = {
         riseandfall_warlord_cleanup_se = yes
+    }
+}
+
+# An inherited active-era title becoming a secondary title carries its banners
+# as historical legacy, without activating a crisis in the new ruler's realm.
+riseandfall_warlord_inherited_legacy = {
+    trigger = {
+        has_game_rule = riseandfall_low_stability_events_enabled
+    }
+    effect = {
+        riseandfall_warlord_mark_inherited_legacy_se = yes
     }
 }
 

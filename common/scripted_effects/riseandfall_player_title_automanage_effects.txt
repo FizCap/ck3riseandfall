@@ -210,8 +210,9 @@ riseandfall_player_create_duchies_se = {
 }
 
 # Warlord: create every uncreated de jure duchy, kingdom, and empire where the
-# warlord holds 51%+ of de jure counties (vanilla requirement enforced via
-# alert_creatable_title). Duchies/kingdoms/empires are created in ascending
+# warlord holds a majority of the relevant de jure land. Warlord creation intentionally uses
+# the scripted path so government restrictions do not hide or block it.
+# Duchies/kingdoms/empires are created in ascending
 # tier order so duchy titles exist before kingdom titles are claimed.
 riseandfall_warlord_create_realm_titles_se = {
     save_scope_as = acting_warlord
@@ -223,11 +224,19 @@ riseandfall_warlord_create_realm_titles_se = {
         }
 
         # Duchies first (tier_duchy), then kingdoms, then empires.
-        # every_alert_creatable_title uses the same engine check as the
-        # vanilla title-creation UI: the warlord (or their realm) must hold
-        # at least 51% of the title's de jure counties.
-        every_alert_creatable_title = {
-            limit = { tier = tier_duchy }
+        every_realm_de_jure_duchy = {
+            limit = {
+                is_title_created = no
+                any_de_jure_county = {
+                    percent > 0.5
+                    holder = {
+                        OR = {
+                            this = scope:acting_warlord
+                            any_liege_or_above = { this = scope:acting_warlord }
+                        }
+                    }
+                }
+            }
             save_scope_as = target_title
 
             scope:acting_warlord = {
@@ -238,8 +247,19 @@ riseandfall_warlord_create_realm_titles_se = {
             }
         }
 
-        every_alert_creatable_title = {
-            limit = { tier = tier_kingdom }
+        every_realm_de_jure_kingdom = {
+            limit = {
+                is_title_created = no
+                any_de_jure_county = {
+                    percent > 0.5
+                    holder = {
+                        OR = {
+                            this = scope:acting_warlord
+                            any_liege_or_above = { this = scope:acting_warlord }
+                        }
+                    }
+                }
+            }
             save_scope_as = target_title
 
             scope:acting_warlord = {
@@ -250,8 +270,19 @@ riseandfall_warlord_create_realm_titles_se = {
             }
         }
 
-        every_alert_creatable_title = {
-            limit = { tier = tier_empire }
+        every_realm_de_jure_empire = {
+            limit = {
+                is_title_created = no
+                any_de_jure_county = {
+                    percent > 0.5
+                    holder = {
+                        OR = {
+                            this = scope:acting_warlord
+                            any_liege_or_above = { this = scope:acting_warlord }
+                        }
+                    }
+                }
+            }
             save_scope_as = target_title
 
             scope:acting_warlord = {

@@ -89,27 +89,15 @@ riseandfall_warlord_create_realm_titles = {
         is_landed = yes
         riseandfall_is_any_warlord_trigger = yes
         has_game_rule = riseandfall_low_stability_events_enabled
-        # Uses vanilla engine check: alert_creatable_title enforces the 51% de jure county threshold
-        any_alert_creatable_title = {
-            OR = {
-                tier = tier_duchy
-                tier = tier_kingdom
-                tier = tier_empire
-            }
-        }
+        # Warlords use a scripted creation path and therefore do not use the
+        # vanilla alert, which is blocked by some top-liege governments.
+        riseandfall_warlord_has_majority_creatable_title_trigger = yes
     }
 
     is_valid = {
         is_landed = yes
         riseandfall_is_any_warlord_trigger = yes
-        # Uses vanilla engine check: alert_creatable_title enforces the 51% de jure county threshold
-        any_alert_creatable_title = {
-            OR = {
-                tier = tier_duchy
-                tier = tier_kingdom
-                tier = tier_empire
-            }
-        }
+        riseandfall_warlord_has_majority_creatable_title_trigger = yes
     }
 
     should_create_alert = {
@@ -124,15 +112,7 @@ riseandfall_warlord_create_realm_titles = {
         is_landed = yes
         riseandfall_is_any_warlord_trigger = yes
         has_game_rule = riseandfall_low_stability_events_enabled
-        # Keep AI checks aligned with the actual title-creation gate so
-        # warlords take this decision as soon as a valid title exists.
-        any_alert_creatable_title = {
-            OR = {
-                tier = tier_duchy
-                tier = tier_kingdom
-                tier = tier_empire
-            }
-        }
+        riseandfall_warlord_has_majority_creatable_title_trigger = yes
     }
 
     ai_will_do = { base = 100 }

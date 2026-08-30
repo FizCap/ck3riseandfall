@@ -9,6 +9,8 @@ riseandfall_low_stability_warlord_available_trigger = {
         count >= 1
         is_landed = yes
         primary_title.tier >= tier_county
+        # A local Warlord Era cannot be rekindled solely by inherited legacy banners.
+        NOT = { has_character_flag = rf_warlord_legacy }
     }
 }
 
@@ -17,6 +19,56 @@ riseandfall_is_any_warlord_trigger = {
     OR = {
         has_trait = warlord
         has_trait = loyalwarlord
+    }
+}
+
+# Inherited Warlords can remain as historical legacy banners without activating
+# a new top-level realm crisis.
+riseandfall_is_active_warlord_trigger = {
+    riseandfall_is_any_warlord_trigger = yes
+    NOT = { has_character_flag = rf_warlord_legacy }
+}
+
+# A Warlord may forge an uncreated title only when their realm controls a
+# majority of its de-jure counties, matching the vanilla creation threshold.
+riseandfall_warlord_has_majority_creatable_title_trigger = {
+    OR = {
+        any_realm_de_jure_duchy = {
+            is_title_created = no
+            any_de_jure_county = {
+                percent > 0.5
+                holder = {
+                    OR = {
+                        this = root
+                        any_liege_or_above = { this = root }
+                    }
+                }
+            }
+        }
+        any_realm_de_jure_kingdom = {
+            is_title_created = no
+            any_de_jure_county = {
+                percent > 0.5
+                holder = {
+                    OR = {
+                        this = root
+                        any_liege_or_above = { this = root }
+                    }
+                }
+            }
+        }
+        any_realm_de_jure_empire = {
+            is_title_created = no
+            any_de_jure_county = {
+                percent > 0.5
+                holder = {
+                    OR = {
+                        this = root
+                        any_liege_or_above = { this = root }
+                    }
+                }
+            }
+        }
     }
 }
 

@@ -992,9 +992,59 @@ riseandfall_destroy_absorbed_successor_crown_se = {
 				holder = scope:attacker
 			}
 			NOT = { scope:rf_defender_split_title = scope:attacker.primary_title }
-		}
-		scope:attacker = { destroy_title = scope:rf_defender_split_title }
-	}
+                }
+                scope:attacker = { destroy_title = scope:rf_defender_split_title }
+        }
+}
+
+# Retire every obsolete successor crown once the winner has a proper primary
+# of equal or higher rank. Successor crowns may themselves be titular or
+# non-titular, so identity and successor markers are authoritative here.
+riseandfall_retire_obsolete_successor_titles_after_victory_se = {
+        if = {
+                limit = {
+                        scope:attacker = {
+                                exists = primary_title
+                                primary_title = { is_titular = no }
+                        }
+                }
+                scope:attacker = {
+                        if = {
+                                limit = {
+                                        exists = scope:rf_attacker_old_split_title
+                                        has_title = scope:rf_attacker_old_split_title
+                                        NOT = { has_primary_title = scope:rf_attacker_old_split_title }
+                                        primary_title.tier >= scope:rf_attacker_old_split_title.tier
+                                }
+                                destroy_title = scope:rf_attacker_old_split_title
+                        }
+                        if = {
+                                limit = {
+                                        exists = scope:rf_defender_split_title
+                                        has_title = scope:rf_defender_split_title
+                                        NOT = { has_primary_title = scope:rf_defender_split_title }
+                                        primary_title.tier >= scope:rf_defender_split_title.tier
+                                }
+                                destroy_title = scope:rf_defender_split_title
+                        }
+                        every_held_title = {
+                                limit = {
+                                        is_titular = yes
+                                        NOT = { this = scope:attacker.primary_title }
+                                        scope:attacker.primary_title.tier >= tier
+                                        NOT = { is_head_of_faith = yes }
+                                        NOT = { is_nomad_title = yes }
+                                        NOT = { is_noble_family_title = yes }
+                                        NOT = { is_holy_order = yes }
+                                        NOT = { is_figurehead_title = yes }
+                                }
+                                save_scope_as = rf_successor_title_to_retire
+                                scope:attacker = {
+                                        destroy_title = scope:rf_successor_title_to_retire
+                                }
+                        }
+                }
+        }
 }
 
 # Applies the territory part of a Successor State War white-peace settlement.

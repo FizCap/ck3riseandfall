@@ -34,12 +34,20 @@ warlord.1010.d:0 "The last warlord banners have been lowered. Through arrests, s
 warlord.1010.a:0 "The Warlord Era is over."
 
 warlord.1011.t:0 "The Loyal Banners Prevail"
-warlord.1011.d:0 "After a decade of rival banners, your personal domain and the lands held by Loyal Warlords now command a majority of the realm. Rebel standards are lowered as the Crown's coalition restores a stable order. The Warlord Era is over."
+warlord.1011.d:0 "After a decade of rival banners, your personal domain and the lands held by Loyal Warlords now command a majority of the realm. Rebel Warlords are laying down their arms and submitting to royal authority as the Crown's coalition restores order. The Warlord Era is over."
 warlord.1011.a:0 "The realm stands with the Crown."
 
 warlord.1012.t:0 "The Loyal Banners Prevail"
-warlord.1012.d:0 "[ROOT.Char.GetLiege.GetTitledFirstNamePossessive] personal domain and the Loyal Warlord bloc now control a majority of the realm. The competing banners are lowered and the Warlord Era comes to an end."
+warlord.1012.d:0 "[ROOT.Char.GetLiege.GetTitledFirstNamePossessive] personal domain and the Loyal Warlord bloc now control a majority of the realm. Rebel Warlords are laying down their arms and submitting to royal authority. The competing banners are lowered and the Warlord Era comes to an end."
 warlord.1012.a:0 "The Crown has won the struggle."
+
+warlord.1013.t:0 "The Legacy Banner Falls"
+warlord.1013.d:0 "Five years have passed since your Warlord banner followed its old realm into a new empire. The legacy has run its course, and you lay down the private armies and rival claims of that former age."
+warlord.1013.a:0 "The old order is laid to rest."
+
+warlord.1014.t:0 "A Legacy Warlord Retires"
+warlord.1014.d:0 "An inherited Warlord banner in your realm has finally run its five-year course. Its holder has retired the private armies and returned to ordinary vassal obligations."
+warlord.1014.a:0 "The legacy fades."
 
 riseandfall_warlord_path_manager:0 "Warlord Path Manager"
 riseandfall_warlord_path_manager_desc:0 "Choose whether to stand as a Rebel Warlord or a Loyal Warlord during the active era."
@@ -59,7 +67,9 @@ riseandfall_choose_warlord_rebel_tooltip:0 "Join the Rebel Warlord bloc while th
 riseandfall_warlord_create_realm_titles:0 "Forge Warlord Titles"
 riseandfall_warlord_create_realm_titles_desc:0 "Create every unclaimed de jure duchy, kingdom, and empire where you or your vassals hold land, bypassing court formalities that were never meant to restrain a warlord."
 riseandfall_warlord_create_realm_titles_tooltip:0 "Create all available warlord titles in your realm."
+riseandfall_warlord_has_majority_creatable_title_trigger:0 "You control a majority of the de jure counties for an uncreated title"
 riseandfall_warlord_create_realm_titles_confirm:0 "Forge Titles"
+riseandfall_warlord_child_succession_desc:0 "Direct child of the governor"
 
  # Adventurer localization
 adventurer.1001.t:0 "Horde of Adventurers"
@@ -262,6 +272,8 @@ riseandfall_nationalist_revolt:0 "Nationalist Revolt"
 riseandfall_nationalist_revolt_desc:0 "Local sentiment has turned against foreign rule: popular opinion has collapsed as the populace rejects outside authority and demands self-determination."
 riseandfall_authority_collapse_liege_debuff:0 "Authority Collapse"
 riseandfall_authority_collapse_liege_debuff_desc:0 "Your personal authority has crumbled: levies and vassal contributions are halved, armies may partially desert, taxes falter as corruption empties the treasury, and mercenaries become prohibitively expensive for the duration of the collapse."
+riseandfall_peasant_revolt_title_creation_discount:0 "Peasant Realm Establishment"
+riseandfall_peasant_revolt_title_creation_discount_desc:0 "The new realm can create titles without paying creation costs for two years."
 riseandfall_vassal_crisis_full_concessions:0 "Noble Privileges Granted"
 riseandfall_vassal_crisis_full_concessions_desc:0 "The crown has granted the nobility's full settlement: vassal tax and levy contributions are reduced, but the lords are temporarily satisfied."
 riseandfall_vassal_crisis_limited_concessions:0 "Uneasy Noble Settlement"

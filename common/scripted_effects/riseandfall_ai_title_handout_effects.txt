@@ -316,14 +316,6 @@ riseandfall_ai_advanced_destroy_unwanted_titles_se = {
             is_landed = yes
             exists = primary_title
             primary_title.tier >= tier_kingdom
-            # Preserve all crowns under gavelkind/partition succession.
-            NOT = {
-                OR = {
-                    has_realm_law = confederate_partition_succession_law # gavelkind
-                    has_realm_law = partition_succession_law
-                    has_realm_law = high_partition_succession_law
-                }
-            }
         }
 
         # Do not try to demote empire-tier primary titles by swapping to a
@@ -356,6 +348,21 @@ riseandfall_ai_advanced_destroy_unwanted_titles_se = {
                 NOT = { is_noble_family_title = yes }
                 NOT = { is_holy_order = yes }
                 NOT = { is_figurehead_title = yes }
+                # Partition rulers may retain ordinary secondary crowns for
+                # succession, but titular crowns have no de-jure inheritance
+                # role and should still be retired by advanced management.
+                OR = {
+                    is_titular = yes
+                    scope:rf_advanced_cleanup_ruler = {
+                        NOT = {
+                            OR = {
+                                has_realm_law = confederate_partition_succession_law # gavelkind
+                                has_realm_law = partition_succession_law
+                                has_realm_law = high_partition_succession_law
+                            }
+                        }
+                    }
+                }
                 # France and Aquitaine are deliberately kept together until
                 # the holder can take the unification decision.
                 NOT = { this = title:k_france }

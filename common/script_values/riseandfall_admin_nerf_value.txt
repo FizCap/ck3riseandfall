@@ -1,3 +1,6 @@
 ﻿riseandfall_admin_nerf_value = {
     value = var:riseandfall_admin_nerf
 }
+
+# Direct-child appointment advantage for Warlord-compatible governments.
+riseandfall_warlord_child_succession_value = 1337

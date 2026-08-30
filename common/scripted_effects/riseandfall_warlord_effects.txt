@@ -4,6 +4,9 @@ riseandfall_warlord_cleanup_se = {
         limit = { is_landed = no riseandfall_is_any_warlord_trigger = yes }
         if = { limit = { has_trait = warlord } remove_trait = warlord }
         if = { limit = { has_trait = loyalwarlord } remove_trait = loyalwarlord }
+        remove_character_flag = rf_warlord_legacy
+        remove_variable = rf_warlord_legacy_expiry
+        remove_variable = rf_warlord_legacy_expiry_initialized
     }
 
     # Independent Warlords cease to be part of a liege's internal crisis.
@@ -12,19 +15,95 @@ riseandfall_warlord_cleanup_se = {
         limit = { riseandfall_is_any_warlord_trigger = yes }
         if = { limit = { has_trait = warlord } remove_trait = warlord }
         if = { limit = { has_trait = loyalwarlord } remove_trait = loyalwarlord }
+        remove_character_flag = rf_warlord_legacy
+        remove_variable = rf_warlord_legacy_expiry
+        remove_variable = rf_warlord_legacy_expiry_initialized
     }
 }
 
-# Expected scope: independent liege. The marker lives on the primary title so
-# an unresolved Warlord Era survives succession.
+# Expected scope: new holder in on_title_gain_inheritance; scope:title is the
+# inherited title. A former local crisis remains a legacy banner when that
+# title becomes secondary to an already peaceful primary realm.
+riseandfall_warlord_mark_inherited_legacy_se = {
+    if = {
+        limit = {
+            is_independent_ruler = yes
+            exists = primary_title
+            exists = scope:title
+            scope:title = { has_variable = rf_warlord_era_active }
+            NOT = { primary_title = scope:title }
+            primary_title = { NOT = { has_variable = rf_warlord_era_active } }
+        }
+        scope:title = {
+            remove_variable = rf_warlord_era_active
+            remove_variable = rf_warlord_loyal_victory_locked
+            remove_variable = rf_warlord_era_age_initialized
+        }
+        every_vassal = {
+            limit = {
+                is_landed = yes
+                riseandfall_is_any_warlord_trigger = yes
+            }
+            add_character_flag = rf_warlord_legacy
+            set_variable = { name = rf_warlord_legacy_expiry value = 1 years = 5 }
+            set_variable = { name = rf_warlord_legacy_expiry_initialized value = 1 }
+            remove_variable = riseandfall_warlord_invitation_pending
+        }
+    }
+}
+
+# Expected scope: inherited legacy Warlord whose five-year banner has expired.
+# Legacy retirement is deliberately separate from active-era suppression.
+riseandfall_warlord_retire_legacy_se = {
+    save_scope_as = rf_legacy_retiring_warlord
+    if = {
+        limit = { exists = liege }
+        liege = { save_scope_as = rf_legacy_retiring_liege }
+    }
+    if = { limit = { has_trait = warlord } remove_trait = warlord }
+    if = { limit = { has_trait = loyalwarlord } remove_trait = loyalwarlord }
+    remove_character_flag = rf_warlord_legacy
+    remove_variable = rf_warlord_legacy_expiry
+    remove_variable = rf_warlord_legacy_expiry_initialized
+    remove_variable = riseandfall_warlord_invitation_pending
+    set_variable = { name = riseandfall_warlord_retired_cooldown value = yes years = 5 }
+    if = {
+        limit = { exists = scope:rf_legacy_retiring_liege }
+        scope:rf_legacy_retiring_liege = {
+            remove_opinion = {
+                target = scope:rf_legacy_retiring_warlord
+                modifier = warlord_rebellion_opinion
+            }
+            remove_opinion = {
+                target = scope:rf_legacy_retiring_warlord
+                modifier = warlord_loyalty_opinion
+            }
+            if = {
+                limit = { is_ai = no }
+                trigger_event = { id = warlord.1014 }
+            }
+        }
+    }
+    if = {
+        limit = { is_ai = no }
+        trigger_event = { id = warlord.1013 }
+    }
+    clear_saved_scope = rf_legacy_retiring_liege
+    clear_saved_scope = rf_legacy_retiring_warlord
+}
+
+# Expected scope: independent liege with an already tracked Warlord Era. The
+# marker lives on the primary title so an unresolved era survives succession;
+# this maintenance effect must never create a fresh era from character traits.
 riseandfall_warlord_mark_era_active_se = {
     if = {
         limit = {
             is_independent_ruler = yes
             exists = primary_title
+            primary_title = { has_variable = rf_warlord_era_active }
             any_vassal = {
                 is_landed = yes
-                riseandfall_is_any_warlord_trigger = yes
+                riseandfall_is_active_warlord_trigger = yes
             }
         }
         primary_title = { save_scope_as = rf_warlord_era_primary_title }
@@ -38,10 +117,6 @@ riseandfall_warlord_mark_era_active_se = {
             if = { limit = { has_variable = rf_warlord_era_age_initialized } remove_variable = rf_warlord_era_age_initialized }
         }
         primary_title = {
-            if = {
-                limit = { NOT = { has_variable = rf_warlord_era_active } }
-                set_variable = { name = rf_warlord_era_active value = 1 }
-            }
             # Existing saves have no age state. Start their ten-year minimum
             # once, then retain the initialized marker after the lock expires.
             if = {
@@ -122,7 +197,7 @@ riseandfall_warlord_try_end_era_se = {
                 any_vassal = {
                     is_landed = yes
                     OR = {
-                        riseandfall_is_any_warlord_trigger = yes
+                        riseandfall_is_active_warlord_trigger = yes
                         has_variable = riseandfall_warlord_invitation_pending
                     }
                 }
@@ -147,7 +222,7 @@ riseandfall_warlord_end_era_realm_split_se = {
             }
         }
         if = {
-            limit = { riseandfall_is_any_warlord_trigger = yes }
+            limit = { riseandfall_is_active_warlord_trigger = yes }
             if = { limit = { has_trait = warlord } remove_trait = warlord }
             if = { limit = { has_trait = loyalwarlord } remove_trait = loyalwarlord }
             set_variable = { name = riseandfall_warlord_retired_cooldown value = yes years = 5 }
@@ -173,7 +248,7 @@ riseandfall_warlord_end_era_loyal_victory_se = {
         every_vassal = {
             limit = {
                 is_landed = yes
-                riseandfall_is_any_warlord_trigger = yes
+                riseandfall_is_active_warlord_trigger = yes
             }
             if = {
                 limit = { is_ai = no }

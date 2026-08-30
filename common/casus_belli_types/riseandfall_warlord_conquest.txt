@@ -82,15 +82,20 @@
     }
 
     should_invalidate = {
-        NOT = {
-            any_in_list = {
-                list = target_titles
-                any_in_de_jure_hierarchy = {
-                    tier = tier_county
-                    holder = {
-                        OR = {
-                            this = scope:defender
-                            target_is_liege_or_above = scope:defender
+        OR = {
+            scope:attacker = {
+                NOT = { riseandfall_is_any_warlord_trigger = yes }
+            }
+            NOT = {
+                any_in_list = {
+                    list = target_titles
+                    any_in_de_jure_hierarchy = {
+                        tier = tier_county
+                        holder = {
+                            OR = {
+                                this = scope:defender
+                                target_is_liege_or_above = scope:defender
+                            }
                         }
                     }
                 }

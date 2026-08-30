@@ -121,7 +121,11 @@ warlord_absorption_cb = {
 			}
 		}
 	}
-	should_invalidate = { always = no }
+	should_invalidate = {
+		scope:attacker = {
+			NOT = { riseandfall_is_any_warlord_trigger = yes }
+		}
+	}
 	on_invalidated_desc = msg_county_conquest_war_invalidated_message
 	cost = { piety = { value = 0 } prestige = { value = 0 } }
 	on_declaration = { on_declared_war = yes }

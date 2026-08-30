@@ -87,6 +87,32 @@ warlord.1012 = {
     }
 }
 
+# Player-facing notice when an inherited legacy banner expires.
+warlord.1013 = {
+    type = character_event
+    title = warlord.1013.t
+    desc = warlord.1013.d
+    theme = realm
+    left_portrait = root
+    option = {
+        name = warlord.1013.a
+        ai_chance = { base = 100 }
+    }
+}
+
+# Player liege notice when one of their inherited legacy banners expires.
+warlord.1014 = {
+    type = character_event
+    title = warlord.1014.t
+    desc = warlord.1014.d
+    theme = realm
+    left_portrait = root
+    option = {
+        name = warlord.1014.a
+        ai_chance = { base = 100 }
+    }
+}
+
 # Vassal-facing decision: vassals may choose to become a warlord or remain loyal
 warlord.1002 = {
     type = character_event

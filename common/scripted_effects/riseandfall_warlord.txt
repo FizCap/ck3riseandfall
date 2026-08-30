@@ -20,6 +20,9 @@ riseandfall_warlord_become_warlord = {
     if = {
         limit = { is_landed = yes }
         remove_character_flag = riseandfall_warlord_player_loyal
+        remove_character_flag = rf_warlord_legacy
+        remove_variable = rf_warlord_legacy_expiry
+        remove_variable = rf_warlord_legacy_expiry_initialized
         remove_variable = riseandfall_warlord_choice_made
         if = { limit = { has_trait = loyalwarlord } remove_trait = loyalwarlord }
         add_trait = warlord
@@ -28,15 +31,6 @@ riseandfall_warlord_become_warlord = {
     if = {
         limit = { is_independent_ruler = no }
         liege = {
-            if = {
-                limit = { exists = primary_title }
-                primary_title = {
-                    if = {
-                        limit = { NOT = { has_variable = rf_warlord_era_active } }
-                        set_variable = { name = rf_warlord_era_active value = 1 }
-                    }
-                }
-            }
             add_opinion = {
                 target = scope:rf_warlord_actor
                 modifier = warlord_rebellion_opinion
@@ -59,6 +53,9 @@ riseandfall_warlord_become_loyal = {
     if = {
         limit = { is_landed = yes }
         remove_character_flag = riseandfall_warlord_player_loyal
+        remove_character_flag = rf_warlord_legacy
+        remove_variable = rf_warlord_legacy_expiry
+        remove_variable = rf_warlord_legacy_expiry_initialized
         if = { limit = { has_trait = warlord } remove_trait = warlord }
         add_trait = loyalwarlord
         set_variable = { name = riseandfall_warlord_alignment_switch_cooldown value = yes years = 1 }
@@ -66,15 +63,6 @@ riseandfall_warlord_become_loyal = {
     if = {
         limit = { is_independent_ruler = no }
         liege = {
-            if = {
-                limit = { exists = primary_title }
-                primary_title = {
-                    if = {
-                        limit = { NOT = { has_variable = rf_warlord_era_active } }
-                        set_variable = { name = rf_warlord_era_active value = 1 }
-                    }
-                }
-            }
             remove_opinion = {
                 target = scope:rf_warlord_actor
                 modifier = warlord_rebellion_opinion
@@ -105,6 +93,9 @@ riseandfall_warlord_abandon_path = {
     }
     if = { limit = { has_trait = warlord } remove_trait = warlord }
     if = { limit = { has_trait = loyalwarlord } remove_trait = loyalwarlord }
+    remove_character_flag = rf_warlord_legacy
+    remove_variable = rf_warlord_legacy_expiry
+    remove_variable = rf_warlord_legacy_expiry_initialized
     set_variable = { name = riseandfall_warlord_retired_cooldown value = yes years = 5 }
     if = {
         limit = { exists = scope:rf_warlord_retiring_liege }
@@ -143,7 +134,7 @@ riseandfall_warlord_refresh_crisis_strength_se = {
     every_vassal = {
         limit = {
             is_landed = yes
-            riseandfall_is_any_warlord_trigger = yes
+            riseandfall_is_active_warlord_trigger = yes
         }
         save_scope_as = rf_warlord_crisis_member
         scope:rf_warlord_crisis_liege = {

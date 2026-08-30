@@ -51,17 +51,6 @@ riseandfall_destroy_same_tier_dynamic_titles_se = {
                 NOT = { is_noble_family_title = yes }
                 NOT = { is_holy_order = yes }
                 NOT = { is_figurehead_title = yes }
-                # Preserve every crown under gavelkind/partition so succession
-                # can distribute it among eligible heirs.
-                NOT = {
-                    scope:destroy_helper_root = {
-                        OR = {
-                            has_realm_law = confederate_partition_succession_law # gavelkind
-                            has_realm_law = partition_succession_law
-                            has_realm_law = high_partition_succession_law
-                        }
-                    }
-                }
             }
             save_scope_as = destroy_held_title
             scope:target_title = {
@@ -117,16 +106,6 @@ riseandfall_cleanup_titular_titles_se = {
             NOT = { is_noble_family_title = yes }
             NOT = { is_holy_order = yes }
             NOT = { is_figurehead_title = yes }
-            # Do not consolidate AI crowns that partition succession may need.
-            scope:cleanup_ruler = {
-                NOT = {
-                    OR = {
-                        has_realm_law = confederate_partition_succession_law # gavelkind
-                        has_realm_law = partition_succession_law
-                        has_realm_law = high_partition_succession_law
-                    }
-                }
-            }
         }
         save_scope_as = titular_held
 

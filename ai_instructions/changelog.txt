@@ -1,21 +1,21 @@
-﻿CK3: Rise and Fall - 1.2.2
+﻿CK3: Rise and Fall - 1.2.3
 
-Adventurers
-- Made newly created adventurers copy the target ruler's exact Men-at-Arms regiment types at Martial- and RNG-scaled sizes, while retaining ruler-strength-scaled special levies, completed-siege reinforcements, and guaranteed onagers based on the target capital's fort level.
-- Added personality-driven invasion timing: craven adventurers wait for roughly a 3:1 advantage, patient and paranoid adventurers prefer safer wars, and brave, ambitious, wrathful, and impatient adventurers accept riskier claim wars.
+Successor State Wars
+- Preserved the winner's proper primary title after a transfer, then retired every ordinary secondary titular crown of equal or lower rank along with obsolete saved successor crowns.
+
+Advanced AI Title Management
+- Retired secondary titular titles for basic and advanced partition-succession AI rulers while preserving ordinary crowns for inheritance.
+
+Realm Stability
+- Replaced the 500 gold reward for peasant leaders in Total Collapse and Nationalist Revolt releases with a two-year full discount on title creation costs.
 
 Warlords
-- Fixed Warlord Alliance AI potential checks using unavailable actor and recipient scopes.
-- Reworked the Vassal Authority Crisis into a realm-wide noble settlement with full concessions, limited concessions, and refusal outcomes, including visible tax, levy, opinion, and authority consequences.
-- Fixed Palace Coup successor titles using an unresolved dynamic-title capital-name scope.
-- Extended Palace Coup successor-state lineage to the intended 50-year duration, matching normal Realm Split successors.
-- Split Warlord Eras into Rebel and Loyal Warlord camps, with yearly personality-, opinion-, power-, and Realm Stability-driven allegiance changes.
-- Ended Warlord Eras when Realm Split fractured the old order, when no Warlords remained, or when the liege's personal counties and Loyal Warlord subrealms controlled at least 51% of the realm.
-- Fixed Realm Split successor realms incorrectly reusing the same capital-based name across multiple breakaways.
-- Required a Warlord Era to last at least ten years before a Loyal majority could end it, and gave every unaligned direct landed vassal the Rebel-or-Loyal Warlord choice on each yearly pulse while the era remained active.
-- Made land granted by the liege create Loyal Warlords during an active era, prevented Loyal Warlords from invading each other, and steered Warlord alliances toward members of the same camp.
-- Added distinct red Rebel Warlord and green Loyal Warlord trait icons, made the opposing camps dislike each other, and kept Rebel Warlords legally punishable through vanilla imprisonment logic.
-
-Independent Coalitions
-- Reduced Coalition background work by removing the all-purpose title-gain realm recalculation, retaining immediate reconciliation after relevant war victories and the normal yearly refresh.
-- Skipped the yearly neighboring-realm power scan when a ruler had no recent conquest pressure to amplify.
+- Invalidated ongoing Warlord wars when the attacker no longer had a Warlord trait.
+- Prevented inherited or stale Warlord traits from restarting a Warlord Era after its title-level era state had ended.
+- Preserved Rebel or Loyal Warlord alignment when an active-era vassal title passes to an heir.
+- Added a decisive succession-score bonus for direct children of Warlord administrative, celestial, meritocratic, and Japanese administrative governors.
+- Restricted Forge Warlord Titles to uncreated titles whose de-jure counties are majority-controlled by the Warlord or their sub-vassals.
+- Prevented Forge Warlord Titles from creating unclaimed titles with no county controlled by the Warlord or their sub-vassals.
+- Granted Rebel and Loyal Warlords a full discount on title creation costs.
+- Automatically retired inherited legacy Warlords after five years while preserving their temporary regional behavior and keeping them outside the receiving realm's active crisis.
+- Kept Warlord banners inherited from a separate kingdom as legacy factions unless the receiving realm was already in an active Warlord Era, preventing a local crisis from spreading across an empire.
