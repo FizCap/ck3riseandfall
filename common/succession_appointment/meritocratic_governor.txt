@@ -1,7 +1,7 @@
 ﻿meritocratic_civic_governor = {
 	allow_same_tier_candidates = yes
 
-	level = merit
+	default_candidates = { holder_close_family landed_vassal holder_councilor holder_court_position }
 
 	candidate_score = {
 		value = {
@@ -396,6 +396,15 @@
 				}
 				add = { value = riseandfall_warlord_child_succession_value desc = riseandfall_warlord_child_succession_desc }
 			}
+			if = {
+				limit = {
+					scope:title.holder ?= {
+						is_close_family_of = root
+						riseandfall_is_any_warlord_trigger = yes
+					}
+				}
+				add = { value = 690 desc = riseandfall_warlord_relative_succession_desc }
+			}
 
 			# LOWBORN? EW no
 			if = {
@@ -659,7 +668,7 @@
 meritocratic_military_governor = {
 	allow_same_tier_candidates = yes
 
-	level = merit
+	default_candidates = { direct_landed_vassal holder_close_family }
 
 	candidate_score = {
 		value = {
@@ -1099,6 +1108,15 @@ meritocratic_military_governor = {
 			}
 
 			# RELATIONS
+			if = {
+				limit = {
+					scope:title.holder ?= {
+						is_close_family_of = root
+						riseandfall_is_any_warlord_trigger = yes
+					}
+				}
+				add = { value = 690 desc = riseandfall_warlord_relative_succession_desc }
+			}
 			if = { # Is child of holder
 				limit = {
 					scope:title.holder ?= { is_parent_of = root }

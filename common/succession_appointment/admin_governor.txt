@@ -501,6 +501,18 @@
 					desc = riseandfall_warlord_child_succession_desc
 				}
 			}
+			if = {
+				limit = {
+					scope:title.holder ?= {
+						is_close_family_of = root
+						riseandfall_is_any_warlord_trigger = yes
+					}
+				}
+				add = {
+					value = 690
+					desc = riseandfall_warlord_relative_succession_desc
+				}
+			}
 
 			# RANDOM ADMIN NERF SCORE (if assigned by scripted effect)
 			if = {

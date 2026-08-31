@@ -1,21 +1,14 @@
-﻿CK3: Rise and Fall - 1.2.3
+﻿CK3: Rise and Fall - 1.2.4
 
-Successor State Wars
-- Preserved the winner's proper primary title after a transfer, then retired every ordinary secondary titular crown of equal or lower rank along with obsolete saved successor crowns.
-
-Advanced AI Title Management
-- Retired secondary titular titles for basic and advanced partition-succession AI rulers while preserving ordinary crowns for inheritance.
+Coalition
+- Changed AI Coalition caution to react to net yearly Threat growth, while keeping accumulated Threat for Coalition eligibility and preserving severe caution during the active Coalition window.
+- Stopped Palace Coup and Realm Split title handoffs from being recorded as conquests and falsely inflating Coalition Threat.
 
 Realm Stability
-- Replaced the 500 gold reward for peasant leaders in Total Collapse and Nationalist Revolt releases with a two-year full discount on title creation costs.
+- Added tiered Cultural Cohesion: foreign cultures with 50-59% acceptance receive partial integration, 60-69% receive strong integration, and 70%+ are fully cohesive.
 
-Warlords
-- Invalidated ongoing Warlord wars when the attacker no longer had a Warlord trait.
-- Prevented inherited or stale Warlord traits from restarting a Warlord Era after its title-level era state had ended.
-- Preserved Rebel or Loyal Warlord alignment when an active-era vassal title passes to an heir.
-- Added a decisive succession-score bonus for direct children of Warlord administrative, celestial, meritocratic, and Japanese administrative governors.
-- Restricted Forge Warlord Titles to uncreated titles whose de-jure counties are majority-controlled by the Warlord or their sub-vassals.
-- Prevented Forge Warlord Titles from creating unclaimed titles with no county controlled by the Warlord or their sub-vassals.
-- Granted Rebel and Loyal Warlords a full discount on title creation costs.
-- Automatically retired inherited legacy Warlords after five years while preserving their temporary regional behavior and keeping them outside the receiving realm's active crisis.
-- Kept Warlord banners inherited from a separate kingdom as legacy factions unless the receiving realm was already in an active Warlord Era, preventing a local crisis from spreading across an empire.
+Administrative Appointments
+- Renamed the Warlord child appointment bonus to "Child of Warlord" and added a 690-point bonus for Warlord relatives.
+
+Warlord System
+- Removed liege dread as a factor in vassal loyalty and rebellion decisions.

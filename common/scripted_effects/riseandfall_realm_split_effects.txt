@@ -1444,8 +1444,10 @@ riseandfall_execute_realm_split_se = {
     }
     
     # Transfer assigned vassals
+    # This is an internal political handoff, not a military conquest. Using
+    # conquest here creates false recent-conquest history for Coalition Threat.
     create_title_and_vassal_change = {
-        type = conquest
+        type = granted
         save_scope_as = rf_vassal_change
         add_claim_on_loss = no
     }

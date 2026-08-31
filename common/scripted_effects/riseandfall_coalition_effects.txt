@@ -195,7 +195,12 @@ riseandfall_coalition_update_threat_se = {
     clear_saved_scope = coalition_threat_target
 }
 
-# Threat changes how often an independent AI looks for ordinary offensive wars.
+# Current threat growth changes how often an independent AI looks for ordinary
+# offensive wars. Accumulated Threat remains the Coalition eligibility meter;
+# this deterrence reacts to active expansion pressure instead of punishing a
+# ruler forever for old conquests. The five-year Coalition window is an
+# explicit exception: while it is open, ordinary offensive wars are severely
+# discouraged even if the annual calculation is being held at zero.
 # This uses the same global AI war controls as vanilla personality traits, so it
 # affects all normal CB selection without overriding the Declare War interaction.
 riseandfall_coalition_update_ai_war_deterrence_se = {
@@ -207,46 +212,63 @@ riseandfall_coalition_update_ai_war_deterrence_se = {
     if = {
         limit = {
             is_ai = yes
-            has_variable = rf_coalition_threat
-            var:rf_coalition_threat >= 1
             NOR = {
                 has_trait = ambitious
                 riseandfall_is_any_warlord_trigger = yes
             }
         }
-        set_variable = { name = rf_coalition_ai_war_caution_score value = var:rf_coalition_threat }
-
-        # Bold and belligerent rulers discount the diplomatic danger.
-        if = { limit = { has_trait = brave } change_variable = { name = rf_coalition_ai_war_caution_score subtract = 15 } }
-        if = { limit = { has_trait = arrogant } change_variable = { name = rf_coalition_ai_war_caution_score subtract = 15 } }
-        if = { limit = { has_trait = wrathful } change_variable = { name = rf_coalition_ai_war_caution_score subtract = 10 } }
-        if = { limit = { has_trait = vengeful } change_variable = { name = rf_coalition_ai_war_caution_score subtract = 15 } }
-        if = { limit = { has_trait = greedy } change_variable = { name = rf_coalition_ai_war_caution_score subtract = 10 } }
-
-        # Cautious rulers react sooner and more strongly to likely containment.
-        if = { limit = { has_trait = content } change_variable = { name = rf_coalition_ai_war_caution_score add = 25 } }
-        if = { limit = { has_trait = craven } change_variable = { name = rf_coalition_ai_war_caution_score add = 25 } }
-        if = { limit = { has_trait = calm } change_variable = { name = rf_coalition_ai_war_caution_score add = 15 } }
-        if = { limit = { has_trait = patient } change_variable = { name = rf_coalition_ai_war_caution_score add = 15 } }
-        if = { limit = { has_trait = compassionate } change_variable = { name = rf_coalition_ai_war_caution_score add = 15 } }
-        if = { limit = { has_trait = just } change_variable = { name = rf_coalition_ai_war_caution_score add = 10 } }
+        set_variable = { name = rf_coalition_ai_war_caution_score value = 0 }
+        if = {
+            limit = { has_variable = rf_coalition_threat_yearly_change }
+            # Annual net change is normally conquest pressure minus the
+            # peaceful decay. Scale it so 5/10/15/20 points of net growth
+            # correspond roughly to the four caution bands.
+            set_variable = { name = rf_coalition_ai_war_caution_score value = var:rf_coalition_threat_yearly_change }
+            change_variable = { name = rf_coalition_ai_war_caution_score multiply = 5 }
+        }
+        if = {
+            limit = { has_variable = rf_coalition_threat_window_years }
+            # The active Coalition window is an immediate crisis, not merely
+            # another annual growth value.
+            set_variable = { name = rf_coalition_ai_war_caution_score value = 100 }
+        }
         clamp_variable = { name = rf_coalition_ai_war_caution_score min = 0 max = 100 }
 
         if = {
-            limit = { var:rf_coalition_ai_war_caution_score >= 100 }
-            add_character_modifier = { modifier = riseandfall_coalition_ai_war_caution_severe }
-        }
-        else_if = {
-            limit = { var:rf_coalition_ai_war_caution_score >= 75 }
-            add_character_modifier = { modifier = riseandfall_coalition_ai_war_caution_high }
-        }
-        else_if = {
-            limit = { var:rf_coalition_ai_war_caution_score >= 50 }
-            add_character_modifier = { modifier = riseandfall_coalition_ai_war_caution_medium }
-        }
-        else_if = {
-            limit = { var:rf_coalition_ai_war_caution_score >= 25 }
-            add_character_modifier = { modifier = riseandfall_coalition_ai_war_caution_low }
+            limit = { var:rf_coalition_ai_war_caution_score > 0 }
+
+            # Bold and belligerent rulers discount the diplomatic danger.
+            if = { limit = { has_trait = brave } change_variable = { name = rf_coalition_ai_war_caution_score subtract = 15 } }
+            if = { limit = { has_trait = arrogant } change_variable = { name = rf_coalition_ai_war_caution_score subtract = 15 } }
+            if = { limit = { has_trait = wrathful } change_variable = { name = rf_coalition_ai_war_caution_score subtract = 10 } }
+            if = { limit = { has_trait = vengeful } change_variable = { name = rf_coalition_ai_war_caution_score subtract = 15 } }
+            if = { limit = { has_trait = greedy } change_variable = { name = rf_coalition_ai_war_caution_score subtract = 10 } }
+
+            # Cautious rulers react sooner and more strongly to likely containment.
+            if = { limit = { has_trait = content } change_variable = { name = rf_coalition_ai_war_caution_score add = 25 } }
+            if = { limit = { has_trait = craven } change_variable = { name = rf_coalition_ai_war_caution_score add = 25 } }
+            if = { limit = { has_trait = calm } change_variable = { name = rf_coalition_ai_war_caution_score add = 15 } }
+            if = { limit = { has_trait = patient } change_variable = { name = rf_coalition_ai_war_caution_score add = 15 } }
+            if = { limit = { has_trait = compassionate } change_variable = { name = rf_coalition_ai_war_caution_score add = 15 } }
+            if = { limit = { has_trait = just } change_variable = { name = rf_coalition_ai_war_caution_score add = 10 } }
+            clamp_variable = { name = rf_coalition_ai_war_caution_score min = 0 max = 100 }
+
+            if = {
+                limit = { var:rf_coalition_ai_war_caution_score >= 100 }
+                add_character_modifier = { modifier = riseandfall_coalition_ai_war_caution_severe }
+            }
+            else_if = {
+                limit = { var:rf_coalition_ai_war_caution_score >= 75 }
+                add_character_modifier = { modifier = riseandfall_coalition_ai_war_caution_high }
+            }
+            else_if = {
+                limit = { var:rf_coalition_ai_war_caution_score >= 50 }
+                add_character_modifier = { modifier = riseandfall_coalition_ai_war_caution_medium }
+            }
+            else_if = {
+                limit = { var:rf_coalition_ai_war_caution_score >= 25 }
+                add_character_modifier = { modifier = riseandfall_coalition_ai_war_caution_low }
+            }
         }
         remove_variable = rf_coalition_ai_war_caution_score
     }

@@ -1,6 +1,4 @@
 ﻿japanese_governor = {
-	allow_children = no
-
 	default_candidates = { holder_close_family landed_vassal holder_councilor holder_court_position }
 
 	candidate_score = {
@@ -308,6 +306,15 @@
 				}
 				add = { value = riseandfall_warlord_child_succession_value desc = riseandfall_warlord_child_succession_desc }
 			}
+			if = {
+				limit = {
+					scope:title.holder ?= {
+						is_close_family_of = root
+						riseandfall_is_any_warlord_trigger = yes
+					}
+				}
+				add = { value = 690 desc = riseandfall_warlord_relative_succession_desc }
+			}
 
 			# LOWBORN? EW no
 			if = {
@@ -614,8 +621,6 @@
 }
 
 japanese_military_governor = {
-	allow_children = no
-
 	default_candidates = { holder_close_family landed_vassal holder_councilor holder_court_position }
 
 	candidate_score = {
@@ -949,6 +954,15 @@ japanese_military_governor = {
 				}
 			}
 			# RELATIONS
+			if = {
+				limit = {
+					scope:title.holder ?= {
+						is_close_family_of = root
+						riseandfall_is_any_warlord_trigger = yes
+					}
+				}
+				add = { value = 690 desc = riseandfall_warlord_relative_succession_desc }
+			}
 			if = { # Is child of holder
 				limit = {
 					scope:title.holder ?= { is_parent_of = root }

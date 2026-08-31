@@ -207,14 +207,6 @@ riseandfall_warlord_ai_choose_alignment_se = {
             limit = { var:rf_warlord_rebel_territory_pct >= 35 }
             scope:rf_warlord_actor = { change_variable = { name = rf_warlord_loyal_chance add = -15 } }
         }
-        if = {
-            limit = { has_dread_level_towards = { target = scope:rf_warlord_actor level = 1 } }
-            scope:rf_warlord_actor = { change_variable = { name = rf_warlord_loyal_chance add = 10 } }
-        }
-        if = {
-            limit = { has_dread_level_towards = { target = scope:rf_warlord_actor level = 2 } }
-            scope:rf_warlord_actor = { change_variable = { name = rf_warlord_loyal_chance add = 20 } }
-        }
     }
     if = { limit = { opinion = { target = liege value >= 50 } } change_variable = { name = rf_warlord_loyal_chance add = 35 } }
     else_if = { limit = { opinion = { target = liege value >= 25 } } change_variable = { name = rf_warlord_loyal_chance add = 15 } }
@@ -262,14 +254,6 @@ riseandfall_warlord_ai_join_crisis_se = {
         else_if = {
             limit = { var:rf_warlord_crisis_territory_pct >= 10 }
             scope:rf_warlord_actor = { change_variable = { name = rf_warlord_join_chance add = 10 } }
-        }
-        if = {
-            limit = { has_dread_level_towards = { target = scope:rf_warlord_actor level = 1 } }
-            scope:rf_warlord_actor = { change_variable = { name = rf_warlord_join_chance add = -15 } }
-        }
-        if = {
-            limit = { has_dread_level_towards = { target = scope:rf_warlord_actor level = 2 } }
-            scope:rf_warlord_actor = { change_variable = { name = rf_warlord_join_chance add = -20 } }
         }
     }
     # A neighboring Warlord offers a practical local reason to join: protection

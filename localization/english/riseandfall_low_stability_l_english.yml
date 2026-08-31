@@ -69,7 +69,8 @@ riseandfall_warlord_create_realm_titles_desc:0 "Create every unclaimed de jure d
 riseandfall_warlord_create_realm_titles_tooltip:0 "Create all available warlord titles in your realm."
 riseandfall_warlord_has_majority_creatable_title_trigger:0 "You control a majority of the de jure counties for an uncreated title"
 riseandfall_warlord_create_realm_titles_confirm:0 "Forge Titles"
-riseandfall_warlord_child_succession_desc:0 "Direct child of the governor"
+riseandfall_warlord_child_succession_desc:0 "Child of Warlord"
+riseandfall_warlord_relative_succession_desc:0 "Relative of Warlord"
 
  # Adventurer localization
 adventurer.1001.t:0 "Horde of Adventurers"

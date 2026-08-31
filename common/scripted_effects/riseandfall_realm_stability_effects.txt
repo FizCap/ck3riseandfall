@@ -627,6 +627,7 @@ riseandfall_calculate_realm_stability_se = {
         }
         set_variable = { name = tmp_story_realm_counties value = 0 }
         set_variable = { name = tmp_story_foreign_culture_counties value = 0 }
+        set_variable = { name = tmp_story_culture_cohesion_weight value = 0 }
         set_variable = { name = tmp_story_foreign_faith_counties value = 0 }
         set_variable = { name = tmp_story_realm_provinces value = 0 }
         set_variable = { name = tmp_story_epidemic_provinces value = 0 }
@@ -659,6 +660,33 @@ riseandfall_calculate_realm_stability_se = {
             }
             else = {
                 scope:ruler = { change_variable = { name = tmp_story_foreign_culture_counties add = 1 } }
+                # Cultural acceptance tiers: 50-59% is partial integration,
+                # 60-69% is strong integration, and 70%+ is fully cohesive.
+                if = {
+                    limit = {
+                        culture = {
+                            cultural_acceptance = {
+                                target = scope:ruler.culture
+                                value >= 60
+                            }
+                        }
+                    }
+                    scope:ruler = { change_variable = { name = tmp_story_culture_cohesion_weight add = 33 } }
+                }
+                else_if = {
+                    limit = {
+                        culture = {
+                            cultural_acceptance = {
+                                target = scope:ruler.culture
+                                value >= 50
+                            }
+                        }
+                    }
+                    scope:ruler = { change_variable = { name = tmp_story_culture_cohesion_weight add = 66 } }
+                }
+                else = {
+                    scope:ruler = { change_variable = { name = tmp_story_culture_cohesion_weight add = 100 } }
+                }
             }
 
             if = {
@@ -710,6 +738,13 @@ riseandfall_calculate_realm_stability_se = {
             set_variable = { name = riseandfall_rs_foreign_culture_county_pct value = var:tmp_story_foreign_culture_county_pct }
             set_variable = { name = riseandfall_rs_foreign_faith_county_pct value = var:tmp_story_foreign_faith_county_pct }
 
+            # Weighted cultural non-cohesion is expressed as a percentage of
+            # the realm: 100 per fully unintegrated county, 66 or 33 for the
+            # two acceptance tiers above.
+            set_variable = { name = tmp_story_culture_cohesion_pct value = var:tmp_story_culture_cohesion_weight }
+            change_variable = { name = tmp_story_culture_cohesion_pct divide = var:tmp_story_realm_counties }
+            round_variable = { name = tmp_story_culture_cohesion_pct nearest = 1 }
+
             if = { limit = { var:tmp_story_realm_provinces < 1 } set_variable = { name = tmp_story_realm_provinces value = 1 } }
             set_variable = { name = tmp_story_epidemic_province_pct value = var:tmp_story_epidemic_provinces }
             change_variable = { name = tmp_story_epidemic_province_pct multiply = 100 }
@@ -725,12 +760,12 @@ riseandfall_calculate_realm_stability_se = {
             round_variable = { name = riseandfall_rs_epidemic_component nearest = 1 }
             clamp_variable = { name = riseandfall_rs_epidemic_component min = -40 max = 0 }
 
-            set_variable = { name = tmp_story_nonapproved_pct value = var:tmp_story_foreign_culture_county_pct }
+            set_variable = { name = tmp_story_nonapproved_pct value = var:tmp_story_culture_cohesion_pct }
             change_variable = { name = tmp_story_nonapproved_pct add = var:tmp_story_foreign_faith_county_pct }
             change_variable = { name = tmp_story_nonapproved_pct divide = 2 }
 
-            # Continuous homogeneity/diversity component: map 0-100% foreign -> +15..-30
-            # Homogeneous realms can now earn a stronger stability bonus while diversity penalties stay capped.
+            # Continuous cultural-cohesion component: map weighted non-cohesion -> +15..-30.
+            # Accepted foreign cultures contribute according to their integration tier.
             set_variable = { name = riseandfall_rs_culture_faith_component value = var:tmp_story_nonapproved_pct }
             change_variable = { name = riseandfall_rs_culture_faith_component multiply = -45 }
             change_variable = { name = riseandfall_rs_culture_faith_component divide = 100 }
@@ -741,6 +776,7 @@ riseandfall_calculate_realm_stability_se = {
 
         remove_variable = tmp_story_realm_counties
         remove_variable = tmp_story_foreign_culture_counties
+        remove_variable = tmp_story_culture_cohesion_weight
         remove_variable = tmp_story_foreign_faith_counties
         remove_variable = tmp_story_realm_provinces
         remove_variable = tmp_story_epidemic_provinces
@@ -748,6 +784,7 @@ riseandfall_calculate_realm_stability_se = {
         remove_variable = tmp_story_foreign_faith_county_pct
         remove_variable = tmp_story_epidemic_province_pct
         remove_variable = tmp_story_nonapproved_pct
+        remove_variable = tmp_story_culture_cohesion_pct
     }
 
     # Strong-vassal balance now drifts toward the actual realm state over five yearly pulses

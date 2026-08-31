@@ -1816,8 +1816,9 @@ riseandfall_palace_coup_root_flees_success = {
         }
         if = {
             limit = { exists = scope:palace_coup_pre_capital_donor }
+            # Internal coup transfers must not seed Coalition conquest history.
             create_title_and_vassal_change = {
-                type = conquest
+                type = granted
                 save_scope_as = palace_coup_pre_capital_land_change
                 add_claim_on_loss = yes
             }
@@ -1842,7 +1843,7 @@ riseandfall_palace_coup_root_flees_success = {
             NOT = { scope:palace_coup_old_capital_county = { holder = scope:palace_coup_challenger } }
         }
         create_title_and_vassal_change = {
-            type = conquest
+            type = granted
             save_scope_as = palace_coup_capital_change
             add_claim_on_loss = yes
         }
@@ -1859,7 +1860,7 @@ riseandfall_palace_coup_root_flees_success = {
     # original title plus the capital core, while the fleeing ruler keeps the
     # outer realm and forms the rival splinter state.
     create_title_and_vassal_change = {
-        type = conquest
+        type = granted
         save_scope_as = palace_coup_split_change
         add_claim_on_loss = yes
     }
@@ -1987,7 +1988,7 @@ riseandfall_palace_coup_root_flees_success = {
         if = {
             limit = { exists = scope:palace_coup_land_donor }
             create_title_and_vassal_change = {
-                type = conquest
+                type = granted
                 save_scope_as = palace_coup_land_change
                 add_claim_on_loss = yes
             }
@@ -2004,7 +2005,7 @@ riseandfall_palace_coup_root_flees_success = {
         else_if = {
             limit = { exists = scope:palace_coup_direct_donor_title }
             create_title_and_vassal_change = {
-                type = conquest
+                type = granted
                 save_scope_as = palace_coup_land_change
                 add_claim_on_loss = yes
             }
@@ -2032,7 +2033,7 @@ riseandfall_palace_coup_root_flees_success = {
                 }
             }
             create_title_and_vassal_change = {
-                type = conquest
+                type = granted
                 save_scope_as = palace_coup_direct_vassal_change
                 add_claim_on_loss = no
             }
@@ -2312,7 +2313,7 @@ riseandfall_palace_coup_root_flees_success = {
                         primary_title.tier < scope:palace_coup_supported_claimant.primary_title.tier
                     }
                     create_title_and_vassal_change = {
-                        type = conquest
+                        type = granted
                         save_scope_as = palace_coup_claimant_support_change
                         add_claim_on_loss = no
                     }
@@ -2410,7 +2411,7 @@ riseandfall_palace_coup_root_flees_success = {
                 }
             }
             create_title_and_vassal_change = {
-                type = conquest
+                type = granted
                 save_scope_as = palace_coup_loyalist_return_change
                 add_claim_on_loss = no
             }
