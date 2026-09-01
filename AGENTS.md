@@ -22,8 +22,11 @@
 - Tooltip-evaluated triggers can read an unset `var:` even when placed beside `has_variable` in an `AND`. For optional object comparisons, use the repository's `var:name ?= scope:target` pattern rather than relying on short-circuiting.
 - `spawn_army.location` requires a province event target; use `capital_province`, not `capital_barony`, when spawning at a character's capital.
 - Keep on_action handlers small and dispatch to scripted effects with `effect = { ... }`. Gate game-rule mechanics with `has_game_rule`; define new rules in `common/game_rules/` with the `riseandfall` category.
+- Yearly on-action loops such as `every_ruler` do not provide an implicit `root` scope; save the current character before entering a title or other nested scope when the effect must return to that character.
 - For mechanics with an explicit title-level active-state marker, treat that marker as authoritative. Succession, trait assignment, and maintenance may preserve marked state but must not recreate a cleared marker from stale character traits.
 - Feature-specific scripted-score bonuses must include the feature's current eligibility gate in every copied appointment or score definition; relationship and government checks alone are not sufficient.
+- Temporary realm succession laws must be applied to the ruler whose realm enters the relevant state, store the prior law on a persistent primary-title variable, and restore it only after the triggering state is absent.
+- Script-only laws must explicitly use `should_start_with = { always = no }`; omitting it can make the law win default-law selection even when `can_have` is false.
 - Add concise `#` comments for non-obvious scope changes, thresholds, weights, or math. Keep braces and block structure strict.
 
 ## Localization And GUI

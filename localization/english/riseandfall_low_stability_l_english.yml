@@ -10,6 +10,7 @@
 
  # Warlord localization
 warlord_loyalty_opinion:0 "Loyal Vassal."
+riseandfall_warlord_succession_law:0 "Warlord Family Succession"
 
 
  # Low stability event localization
@@ -50,8 +51,8 @@ warlord.1014.d:0 "An inherited Warlord banner in your realm has finally run its 
 warlord.1014.a:0 "The legacy fades."
 
 riseandfall_warlord_path_manager:0 "Warlord Path Manager"
-riseandfall_warlord_path_manager_desc:0 "Choose whether to stand as a Rebel Warlord or a Loyal Warlord during the active era."
-riseandfall_warlord_path_manager_tooltip:0 "Change allegiance once per year while the Warlord Era remains active. A Loyal majority cannot end the era during its first ten years."
+riseandfall_warlord_path_manager_desc:0 "Choose whether to stand as a Rebel Warlord or a Loyal Warlord."
+riseandfall_warlord_path_manager_tooltip:0 "Change allegiance once per year while you hold a Warlord mantle."
 riseandfall_warlord_path_manager_tooltip_tt:0 "Rebel Warlords seek power for themselves; Loyal Warlords defend the Crown and cannot invade one another."
 riseandfall_warlord_path_manager_confirm:0 "Toggle Warlord Path"
 riseandfall_choose_warlord_loyal_confirm:0 "Join the Loyal Bloc"

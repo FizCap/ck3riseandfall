@@ -138,6 +138,40 @@ warlord.1002 = {
             modifier = { has_trait = craven add = -20 }
             modifier = { opinion = { target = liege value <= -25 } add = 25 }
             modifier = { opinion = { target = liege value >= 25 } add = -20 }
+            modifier = {
+                military_power >= { value = liege.military_power multiply = 5 }
+                add = 65
+            }
+            modifier = {
+                military_power >= { value = liege.military_power multiply = 4 }
+                military_power < { value = liege.military_power multiply = 5 }
+                add = 55
+            }
+            modifier = {
+                military_power >= { value = liege.military_power multiply = 3 }
+                military_power < { value = liege.military_power multiply = 4 }
+                add = 45
+            }
+            modifier = {
+                military_power >= { value = liege.military_power multiply = 2.5 }
+                military_power < { value = liege.military_power multiply = 3 }
+                add = 40
+            }
+            modifier = {
+                military_power >= { value = liege.military_power multiply = 2 }
+                military_power < { value = liege.military_power multiply = 2.5 }
+                add = 35
+            }
+            modifier = {
+                military_power >= { value = liege.military_power multiply = 1.5 }
+                military_power < { value = liege.military_power multiply = 2 }
+                add = 25
+            }
+            modifier = {
+                military_power >= liege.military_power
+                military_power < { value = liege.military_power multiply = 1.5 }
+                add = 15
+            }
         }
     }
 
@@ -156,6 +190,44 @@ warlord.1002 = {
             modifier = { has_trait = disloyal add = -30 }
             modifier = { opinion = { target = liege value >= 25 } add = 25 }
             modifier = { opinion = { target = liege value <= -25 } add = -25 }
+            modifier = {
+                military_power >= { value = liege.military_power multiply = 5 }
+                add = -65
+            }
+            modifier = {
+                military_power >= { value = liege.military_power multiply = 4 }
+                military_power < { value = liege.military_power multiply = 5 }
+                add = -55
+            }
+            modifier = {
+                military_power >= { value = liege.military_power multiply = 3 }
+                military_power < { value = liege.military_power multiply = 4 }
+                add = -45
+            }
+            modifier = {
+                military_power >= { value = liege.military_power multiply = 2.5 }
+                military_power < { value = liege.military_power multiply = 3 }
+                add = -40
+            }
+            modifier = {
+                military_power >= { value = liege.military_power multiply = 2 }
+                military_power < { value = liege.military_power multiply = 2.5 }
+                add = -35
+            }
+            modifier = {
+                military_power >= { value = liege.military_power multiply = 1.5 }
+                military_power < { value = liege.military_power multiply = 2 }
+                add = -25
+            }
+            modifier = {
+                military_power >= liege.military_power
+                military_power < { value = liege.military_power multiply = 1.5 }
+                add = -15
+            }
+            modifier = {
+                military_power < liege.military_power
+                add = 10
+            }
         }
     }
 }

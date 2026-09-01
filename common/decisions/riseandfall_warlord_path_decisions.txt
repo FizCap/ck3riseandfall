@@ -24,52 +24,19 @@ riseandfall_warlord_path_manager = {
 
     is_valid = {
         is_landed = yes
-    }
-
-    widget = {
-        gui = "decision_view_widget_option_list_generic"
-        controller = decision_option_list_controller
-        decision_to_second_step_button = "CHOOSE_CHARACTER_ROLE_DECISION_NEXT_STEP_BUTTON"
-        show_from_start = yes
-
-        item = {
-            value = riseandfall_choose_warlord_rebel
-            is_shown = { has_trait = loyalwarlord }
-            is_valid = {
-                exists = liege
-                liege.primary_title = { has_variable = rf_warlord_era_active }
-                NOT = { has_variable = riseandfall_warlord_alignment_switch_cooldown }
-            }
-            current_description = riseandfall_warlord_choice_currently_loyal
-            localization = riseandfall_choose_warlord_rebel
-            icon = "gfx/interface/illustrations/decisions/decision_misc.dds"
-        }
-        item = {
-            value = riseandfall_choose_warlord_loyal
-            is_shown = { has_trait = warlord }
-            is_valid = {
-                exists = liege
-                liege.primary_title = { has_variable = rf_warlord_era_active }
-                NOT = { has_variable = riseandfall_warlord_alignment_switch_cooldown }
-            }
-            current_description = riseandfall_warlord_choice_currently_rebellious
-            localization = riseandfall_choose_warlord_loyal
-            icon = "gfx/interface/illustrations/decisions/decision_misc.dds"
-        }
+        exists = liege
+        NOT = { exists = var:riseandfall_warlord_alignment_switch_cooldown }
     }
 
     effect = {
         custom_tooltip = riseandfall_warlord_path_manager_tooltip_tt
-        hidden_effect = {
-            custom_tooltip = riseandfall_warlord_path_manager_tooltip_tt
-            if = {
-                limit = { scope:riseandfall_choose_warlord_loyal = yes }
-                riseandfall_warlord_become_loyal = yes
-            }
-            else_if = {
-                limit = { scope:riseandfall_choose_warlord_rebel = yes }
-                riseandfall_warlord_become_warlord = yes
-            }
+        if = {
+            limit = { has_trait = warlord }
+            riseandfall_warlord_become_loyal = yes
+        }
+        else_if = {
+            limit = { has_trait = loyalwarlord }
+            riseandfall_warlord_become_warlord = yes
         }
     }
 

@@ -41,6 +41,7 @@ riseandfall_warlord_become_warlord = {
             }
         }
     }
+    riseandfall_warlord_reconcile_succession_se = yes
 }
 
 riseandfall_warlord_remain_loyal = {
@@ -77,6 +78,7 @@ riseandfall_warlord_become_loyal = {
             }
         }
     }
+    riseandfall_warlord_reconcile_succession_se = yes
 }
 
 # Retiring from the movement is personal and temporary. retiredwarlord is left
@@ -107,6 +109,7 @@ riseandfall_warlord_abandon_path = {
             riseandfall_warlord_try_end_era_se = yes
         }
     }
+    riseandfall_warlord_reconcile_succession_se = yes
     clear_saved_scope = rf_warlord_retiring_liege
 }
 
@@ -222,7 +225,36 @@ riseandfall_warlord_ai_choose_alignment_se = {
     if = { limit = { has_trait = arbitrary } change_variable = { name = rf_warlord_loyal_chance add = -15 } }
     if = { limit = { has_trait = vengeful } change_variable = { name = rf_warlord_loyal_chance add = -10 } }
     if = { limit = { has_trait = deceitful } change_variable = { name = rf_warlord_loyal_chance add = -10 } }
-    if = { limit = { military_power >= liege.military_power } change_variable = { name = rf_warlord_loyal_chance add = -15 } }
+    # Strength creates a snowball: the closer a vassal is to parity, and the
+    # farther above the liege they rise, the less attractive loyalty becomes.
+    if = {
+        limit = { military_power >= { value = liege.military_power multiply = 5 } }
+        change_variable = { name = rf_warlord_loyal_chance add = -65 }
+    }
+    else_if = {
+        limit = { military_power >= { value = liege.military_power multiply = 4 } }
+        change_variable = { name = rf_warlord_loyal_chance add = -55 }
+    }
+    else_if = {
+        limit = { military_power >= { value = liege.military_power multiply = 3 } }
+        change_variable = { name = rf_warlord_loyal_chance add = -45 }
+    }
+    else_if = {
+        limit = { military_power >= { value = liege.military_power multiply = 2.5 } }
+        change_variable = { name = rf_warlord_loyal_chance add = -40 }
+    }
+    else_if = {
+        limit = { military_power >= { value = liege.military_power multiply = 2 } }
+        change_variable = { name = rf_warlord_loyal_chance add = -35 }
+    }
+    else_if = {
+        limit = { military_power >= { value = liege.military_power multiply = 1.5 } }
+        change_variable = { name = rf_warlord_loyal_chance add = -25 }
+    }
+    else_if = {
+        limit = { military_power >= liege.military_power }
+        change_variable = { name = rf_warlord_loyal_chance add = -15 }
+    }
     else = { change_variable = { name = rf_warlord_loyal_chance add = 10 } }
     clamp_variable = { name = rf_warlord_loyal_chance min = 5 max = 95 }
     random = {
@@ -277,7 +309,37 @@ riseandfall_warlord_ai_join_crisis_se = {
     if = { limit = { ai_boldness < medium_negative_ai_value } change_variable = { name = rf_warlord_join_chance add = -15 } }
     if = { limit = { opinion = { target = liege value <= -25 } } change_variable = { name = rf_warlord_join_chance add = 20 } }
     if = { limit = { opinion = { target = liege value >= 25 } } change_variable = { name = rf_warlord_join_chance add = -20 } }
-    if = { limit = { military_power >= liege.military_power } change_variable = { name = rf_warlord_join_chance add = 10 } }
+    if = {
+        limit = { military_power >= { value = liege.military_power multiply = 5 } }
+        change_variable = { name = rf_warlord_join_chance add = 60 }
+    }
+    else_if = {
+        limit = { military_power >= { value = liege.military_power multiply = 4 } }
+        change_variable = { name = rf_warlord_join_chance add = 50 }
+    }
+    else_if = {
+        limit = { military_power >= { value = liege.military_power multiply = 3 } }
+        change_variable = { name = rf_warlord_join_chance add = 40 }
+    }
+    else_if = {
+        limit = { military_power >= { value = liege.military_power multiply = 2.5 } }
+        change_variable = { name = rf_warlord_join_chance add = 32 }
+    }
+    else_if = {
+        limit = {
+            military_power >= { value = liege.military_power multiply = 2 }
+            military_power < { value = liege.military_power multiply = 2.5 }
+        }
+        change_variable = { name = rf_warlord_join_chance add = 25 }
+    }
+    else_if = {
+        limit = { military_power >= { value = liege.military_power multiply = 1.5 } }
+        change_variable = { name = rf_warlord_join_chance add = 18 }
+    }
+    else_if = {
+        limit = { military_power >= liege.military_power }
+        change_variable = { name = rf_warlord_join_chance add = 10 }
+    }
     clamp_variable = { name = rf_warlord_join_chance min = 0 max = 95 }
     random = {
         chance = var:rf_warlord_join_chance

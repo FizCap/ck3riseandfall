@@ -296,6 +296,16 @@ riseandfall_warlord = {
         # Cleanup: handle unlanded/independent warlords
         riseandfall_warlord_cleanup_se = yes
 
+        # Reconcile temporary family succession laws after deaths, title
+        # transfers, and other paths that can remove a Rebel Warlord.
+        every_ruler = {
+            limit = {
+                is_landed = yes
+                exists = primary_title
+            }
+            riseandfall_warlord_reconcile_succession_se = yes
+        }
+
         # Evaluate each independent realm once. The count and territory share
         # cover direct Warlords and their full subrealms.
         every_independent_ruler = {

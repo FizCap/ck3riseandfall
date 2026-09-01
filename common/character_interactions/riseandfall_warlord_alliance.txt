@@ -4,10 +4,10 @@
 	ai_max_reply_days = 9
 	icon = alliance
 
-	send_name = warlord_alliance_interaction
+	send_name = riseandfall_warlord_alliance_interaction
 
 	interface_priority = 60
-	desc = warlord_alliance_interaction_desc
+	desc = riseandfall_warlord_alliance_interaction_desc
 
 	greeting = positive
 	notification_text = NEGOTIATE_ALLIANCE_NOTIFICATION

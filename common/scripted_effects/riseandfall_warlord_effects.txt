@@ -21,6 +21,139 @@ riseandfall_warlord_cleanup_se = {
     }
 }
 
+# Expected scope: a ruler whose succession law should follow their Rebel
+# Warlord state. The prior vanilla law is stored on the primary title.
+riseandfall_warlord_reconcile_succession_se = {
+    # The yearly ruler loop has no implicit root scope; preserve the ruler
+    # before entering primary_title so law changes target the realm correctly.
+    save_scope_as = rf_warlord_succession_ruler
+    if = {
+        limit = {
+            exists = primary_title
+            has_realm_law = riseandfall_warlord_succession_law
+            OR = {
+                is_independent_ruler = yes
+                NOT = { has_trait = warlord }
+            }
+        }
+        primary_title = {
+            if = {
+                limit = { has_variable = rf_warlord_restore_japanese_civic }
+                scope:rf_warlord_succession_ruler = { add_realm_law_skip_effects = japanese_appointment_succession_law }
+                remove_variable = rf_warlord_restore_japanese_civic
+            }
+            else_if = {
+                limit = { has_variable = rf_warlord_restore_japanese_military }
+                scope:rf_warlord_succession_ruler = { add_realm_law_skip_effects = japanese_military_appointment_succession_law }
+                remove_variable = rf_warlord_restore_japanese_military
+            }
+            else_if = {
+                limit = { has_variable = rf_warlord_restore_meritocratic_civic }
+                scope:rf_warlord_succession_ruler = { add_realm_law_skip_effects = meritocratic_appointment_succession_law }
+                remove_variable = rf_warlord_restore_meritocratic_civic
+            }
+            else_if = {
+                limit = { has_variable = rf_warlord_restore_meritocratic_military }
+                scope:rf_warlord_succession_ruler = { add_realm_law_skip_effects = meritocratic_military_appointment_succession_law }
+                remove_variable = rf_warlord_restore_meritocratic_military
+            }
+            else_if = {
+                limit = { has_variable = rf_warlord_restore_celestial_civic }
+                scope:rf_warlord_succession_ruler = { add_realm_law_skip_effects = celestial_appointment_succession_law }
+                remove_variable = rf_warlord_restore_celestial_civic
+            }
+            else_if = {
+                limit = { has_variable = rf_warlord_restore_celestial_military }
+                scope:rf_warlord_succession_ruler = { add_realm_law_skip_effects = celestial_military_appointment_succession_law }
+                remove_variable = rf_warlord_restore_celestial_military
+            }
+            else = {
+                # Recover old saves where the temporary law exists without a
+                # saved marker by using the government's normal civic/military
+                # contract split.
+                scope:rf_warlord_succession_ruler = {
+                    if = {
+                        limit = {
+                            government_has_flag = government_is_japan_administrative
+                            vassal_contract_has_flag = japan_administrative_military_appointment
+                        }
+                        add_realm_law_skip_effects = japanese_military_appointment_succession_law
+                    }
+                    else_if = {
+                        limit = { government_has_flag = government_is_japan_administrative }
+                        add_realm_law_skip_effects = japanese_appointment_succession_law
+                    }
+                    else_if = {
+                        limit = {
+                            government_has_flag = government_is_meritocratic
+                            vassal_contract_has_flag = meritocratic_military_appointment
+                        }
+                        add_realm_law_skip_effects = meritocratic_military_appointment_succession_law
+                    }
+                    else_if = {
+                        limit = { government_has_flag = government_is_meritocratic }
+                        add_realm_law_skip_effects = meritocratic_appointment_succession_law
+                    }
+                    else_if = {
+                        limit = {
+                            government_has_flag = government_is_celestial
+                            vassal_contract_has_flag = celestial_military_appointment
+                        }
+                        add_realm_law_skip_effects = celestial_military_appointment_succession_law
+                    }
+                    else_if = {
+                        limit = { government_has_flag = government_is_celestial }
+                        add_realm_law_skip_effects = celestial_appointment_succession_law
+                    }
+                }
+            }
+        }
+    }
+    if = {
+        limit = {
+            exists = primary_title
+            is_independent_ruler = no
+            NOT = { has_realm_law = riseandfall_warlord_succession_law }
+            has_trait = warlord
+            OR = {
+                has_realm_law = japanese_appointment_succession_law
+                has_realm_law = japanese_military_appointment_succession_law
+                has_realm_law = meritocratic_appointment_succession_law
+                has_realm_law = meritocratic_military_appointment_succession_law
+                has_realm_law = celestial_appointment_succession_law
+                has_realm_law = celestial_military_appointment_succession_law
+            }
+        }
+        primary_title = {
+            if = {
+                limit = { scope:rf_warlord_succession_ruler = { has_realm_law = japanese_appointment_succession_law } }
+                set_variable = { name = rf_warlord_restore_japanese_civic value = yes }
+            }
+            else_if = {
+                limit = { scope:rf_warlord_succession_ruler = { has_realm_law = japanese_military_appointment_succession_law } }
+                set_variable = { name = rf_warlord_restore_japanese_military value = yes }
+            }
+            else_if = {
+                limit = { scope:rf_warlord_succession_ruler = { has_realm_law = meritocratic_appointment_succession_law } }
+                set_variable = { name = rf_warlord_restore_meritocratic_civic value = yes }
+            }
+            else_if = {
+                limit = { scope:rf_warlord_succession_ruler = { has_realm_law = meritocratic_military_appointment_succession_law } }
+                set_variable = { name = rf_warlord_restore_meritocratic_military value = yes }
+            }
+            else_if = {
+                limit = { scope:rf_warlord_succession_ruler = { has_realm_law = celestial_appointment_succession_law } }
+                set_variable = { name = rf_warlord_restore_celestial_civic value = yes }
+            }
+            else_if = {
+                limit = { scope:rf_warlord_succession_ruler = { has_realm_law = celestial_military_appointment_succession_law } }
+                set_variable = { name = rf_warlord_restore_celestial_military value = yes }
+            }
+        }
+        add_realm_law_skip_effects = riseandfall_warlord_succession_law
+    }
+}
+
 # Expected scope: new holder in on_title_gain_inheritance; scope:title is the
 # inherited title. A former local crisis remains a legacy banner when that
 # title becomes secondary to an already peaceful primary realm.
@@ -229,6 +362,7 @@ riseandfall_warlord_end_era_realm_split_se = {
         }
     }
     clear_saved_scope = rf_warlord_era_vassal
+    riseandfall_warlord_reconcile_succession_se = yes
 }
 
 # Expected scope: independent liege. Loyal victory is checked on the annual
@@ -266,6 +400,7 @@ riseandfall_warlord_end_era_loyal_victory_se = {
             set_variable = { name = riseandfall_warlord_retired_cooldown value = yes years = 5 }
         }
         riseandfall_warlord_clear_era_state_se = yes
+        riseandfall_warlord_reconcile_succession_se = yes
         trigger_event = { id = warlord.1011 }
         clear_saved_scope = rf_warlord_era_vassal
     }

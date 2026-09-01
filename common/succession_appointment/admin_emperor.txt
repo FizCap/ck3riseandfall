@@ -986,7 +986,7 @@
 				limit = {
 					is_child_of = scope:title.holder
 					scope:title.holder = {
-						riseandfall_is_any_warlord_trigger = yes
+						has_trait = warlord
 						OR = {
 							government_has_flag = government_is_administrative
 							government_has_flag = government_is_celestial
@@ -1004,7 +1004,7 @@
 				limit = {
 					scope:title.holder ?= {
 						is_close_family_of = root
-						riseandfall_is_any_warlord_trigger = yes
+						has_trait = warlord
 					}
 				}
 				add = {

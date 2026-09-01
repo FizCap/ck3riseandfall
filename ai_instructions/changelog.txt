@@ -1,14 +1,18 @@
-﻿CK3: Rise and Fall - 1.2.4
-
-Coalition
-- Changed AI Coalition caution to react to net yearly Threat growth, while keeping accumulated Threat for Coalition eligibility and preserving severe caution during the active Coalition window.
-- Stopped Palace Coup and Realm Split title handoffs from being recorded as conquests and falsely inflating Coalition Threat.
-
-Realm Stability
-- Added tiered Cultural Cohesion: foreign cultures with 50-59% acceptance receive partial integration, 60-69% receive strong integration, and 70%+ are fully cohesive.
-
-Administrative Appointments
-- Renamed the Warlord child appointment bonus to "Child of Warlord" and added a 690-point bonus for Warlord relatives.
+﻿CK3: Rise and Fall - 1.2.5
 
 Warlord System
-- Removed liege dread as a factor in vassal loyalty and rebellion decisions.
+- Made military strength relative to the liege progressively reduce loyalty and increase rebellion as a vassal becomes stronger.
+- Restricted Warlord succession bonuses to children and close family of Rebel Warlords; Loyal Warlords now use regular appointment succession scoring.
+- Limited Celestial Governor succession candidates to the holder's close family and removed the Japanese Regent, Meritocratic Regent, and Celestial Minister appointment definitions.
+- Added a temporary close-family succession law for Japanese, Meritocratic, and Celestial realms during Rebel Warlord crises, with automatic restoration of the prior vanilla law afterward.
+- Removed redundant Japanese, Meritocratic, and Celestial governor appointment overrides so those realms use the vanilla definitions outside Rebel Warlord crises.
+- Prevented the hidden Warlord succession law from being selected as the default succession law for supported administrative realms.
+- Restored the complete vanilla succession-law group while keeping the temporary Warlord law as a script-only addition, preventing normal administrative succession laws from becoming invalid.
+- Fixed Warlord succession restoration from yearly on-actions by preserving the ruler scope while changing laws through the primary title.
+- Added direct age scoring to the temporary Warlord appointment, giving candidates one point per year of age.
+- Prevented the temporary Warlord succession law from applying to independent rulers and forced independent realms back to their appropriate vanilla law.
+- Fixed the player Warlord Path decision options so Loyal and Rebel alignment changes can be selected during an active era.
+- Fixed the Warlord Path confirmation effect so the selected alignment is applied from the character's current Warlord trait.
+- Replaced the non-committing Warlord Path option widget with a normal executable toggle decision.
+- Fixed Warlord Path requirements using tooltip-safe variable existence checks so the decision can be confirmed.
+- Allowed the player Warlord Path toggle to work from the Warlord trait even when no Warlord Era marker was initialized.

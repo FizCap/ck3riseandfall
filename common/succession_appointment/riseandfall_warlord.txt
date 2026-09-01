@@ -1,0 +1,37 @@
+﻿riseandfall_warlord_family = {
+	# Rebel Warlord realms may only appoint a close family member of the holder.
+	default_candidates = { holder_close_family }
+	allow_same_tier_candidates = yes
+
+	candidate_score = {
+                value = {
+                        # Each year of age contributes one point.
+                        add = {
+                                value = age
+                                desc = age
+                        }
+
+                        # The Warlord's own children receive priority in their realm.
+			if = {
+				limit = { is_child_of = scope:title.holder }
+				add = {
+					value = riseandfall_warlord_child_succession_value
+					desc = riseandfall_warlord_child_succession_desc
+				}
+			}
+			# Close family receive a decisive Warlord succession bonus.
+			if = {
+				limit = {
+					scope:title.holder ?= {
+						is_close_family_of = root
+						has_trait = warlord
+					}
+				}
+				add = {
+					value = 690
+					desc = riseandfall_warlord_relative_succession_desc
+				}
+			}
+		}
+	}
+}
