@@ -239,7 +239,14 @@ riseandfall_spawn_adventurer_special_troops_se = {
             inheritable = no
             uses_supply = no
             location = $LOCATION$
+            save_scope_as = rf_new_adventurer_special_army
         }
+        # Keep a durable marker on this spawned army so post-victory decay does
+        # not affect the ruler's normal levies or men-at-arms.
+        scope:rf_new_adventurer_special_army = {
+            set_variable = { name = rf_adventurer_special_army value = 1 }
+        }
+        clear_saved_scope = rf_new_adventurer_special_army
     }
 }
 
@@ -941,6 +948,22 @@ riseandfall_yearly_adventurer_remove_variable_se = {
 }
 
 
+# Once a legitimist adventurer has taken land, its original spawned host
+# gradually dissolves. The army marker limits this to the special host stacks.
+riseandfall_decay_landed_adventurer_special_troops_se = {
+    if = {
+        limit = {
+            is_landed = yes
+            has_character_flag = riseandfall_adventurer
+        }
+        every_army = {
+            limit = { has_variable = rf_adventurer_special_army }
+            deplete_army_by_percentage = 0.10
+        }
+    }
+}
+
+
 ###############################
 # Rise and Fall: completed-siege reinforcement effects
 ###############################
@@ -957,6 +980,15 @@ riseandfall_on_siege_completion_se = {
                 has_variable = adventurer_respawn_army_size
                 has_variable = adventurer_siege_engine_stacks
                 exists = scope:rf_captured_barony.title_province
+            }
+            # Each completed siege also reinforces every damaged MaA regiment
+            # by 5% of its maximum size, capped by the regiment's max size.
+            every_maa_regiment = {
+                limit = { maa_current_troops_count < maa_max_troops_count }
+                change_maa_troops_count = {
+                    value = maa_max_troops_count
+                    multiply = 0.05
+                }
             }
             # Each completed siege recruits new special levies equal to 5% of
             # this adventurer's original ruler-scaled host, plus siege engines.

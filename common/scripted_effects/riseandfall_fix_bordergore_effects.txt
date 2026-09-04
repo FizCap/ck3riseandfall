@@ -14,6 +14,10 @@ riseandfall_fix_bordergore_se = {
     scope:actor = { save_scope_as = liege }
 
     # 1. Directly held counties by recipient that are outside ALL recipient de jure chains, but not already held by liege.
+    # Snapshot the titles before changing their holders. Resolving a title/vassal change fires
+    # on_vassal_change immediately; iterating a live held-title collection while that happens
+    # can invalidate the character context used by vanilla's primary_title trigger.
+    clear_variable_list = riseandfall_bordergore_direct_counties
     scope:recipient = {
         # Save recipient's capital's de jure kingdom
         capital_province = {
@@ -49,17 +53,24 @@ riseandfall_fix_bordergore_se = {
                     }
                 }
 
-                create_title_and_vassal_change = { type = granted save_scope_as = change }
-                change_title_holder_include_vassals = { holder = scope:liege change = scope:change take_baronies = no }
-                resolve_title_and_vassal_change = scope:change
-                scope:liege = { set_variable = { name = riseandfall_fix_bordergore_made_changes value = 1 } }
+                add_to_list = riseandfall_bordergore_direct_counties
             }
         }
     }
 
+    every_in_list = {
+        list = riseandfall_bordergore_direct_counties
+        create_title_and_vassal_change = { type = granted save_scope_as = change }
+        change_title_holder_include_vassals = { holder = scope:liege change = scope:change take_baronies = no }
+        resolve_title_and_vassal_change = scope:change
+        scope:liege = { set_variable = { name = riseandfall_fix_bordergore_made_changes value = 1 } }
+    }
+    clear_variable_list = riseandfall_bordergore_direct_counties
+
     # (duchy-transfer logic intentionally removed; only counties are transferred)
 
     # 2. Subrealm counties (held by recipient's vassals) outside recipient de jure chains.
+    clear_variable_list = riseandfall_bordergore_subrealm_counties
     scope:recipient = {
         every_sub_realm_county = {
             # Base filters: sub-realm county object exists, has de jure info, not liege/recipient capitals, not held by human
@@ -72,7 +83,13 @@ riseandfall_fix_bordergore_se = {
                 NOT = { this = scope:liege.capital_province.county }
                 NOT = { this = scope:recipient.capital_province.county }
             }
-            save_scope_as = target_county
+            add_to_list = riseandfall_bordergore_subrealm_counties
+        }
+    }
+
+    every_in_list = {
+        list = riseandfall_bordergore_subrealm_counties
+        save_scope_as = target_county
 
             # Transfer if none of the county's de jure chain owners are the recipient.
             if = {
@@ -93,8 +110,8 @@ riseandfall_fix_bordergore_se = {
                     scope:liege = { set_variable = { name = riseandfall_fix_bordergore_made_changes value = 1 } }
                 }
             }
-        }
     }
+    clear_variable_list = riseandfall_bordergore_subrealm_counties
 
     # 3. Aggregate notification.
     scope:liege = {

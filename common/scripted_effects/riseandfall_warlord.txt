@@ -211,10 +211,16 @@ riseandfall_warlord_ai_choose_alignment_se = {
             scope:rf_warlord_actor = { change_variable = { name = rf_warlord_loyal_chance add = -15 } }
         }
     }
-    if = { limit = { opinion = { target = liege value >= 50 } } change_variable = { name = rf_warlord_loyal_chance add = 35 } }
-    else_if = { limit = { opinion = { target = liege value >= 25 } } change_variable = { name = rf_warlord_loyal_chance add = 15 } }
-    if = { limit = { opinion = { target = liege value <= -50 } } change_variable = { name = rf_warlord_loyal_chance add = -30 } }
-    else_if = { limit = { opinion = { target = liege value <= -25 } } change_variable = { name = rf_warlord_loyal_chance add = -20 } }
+    # Personal hostility should dominate the alignment decision. Positive
+    # opinion is common late-game, so it provides only a small loyalty nudge;
+    # deep hostility makes loyalty extremely unlikely even for a cautious or
+    # otherwise traditionally loyal vassal.
+    if = { limit = { opinion = { target = liege value >= 75 } } change_variable = { name = rf_warlord_loyal_chance add = 15 } }
+    else_if = { limit = { opinion = { target = liege value >= 50 } } change_variable = { name = rf_warlord_loyal_chance add = 10 } }
+    else_if = { limit = { opinion = { target = liege value >= 25 } } change_variable = { name = rf_warlord_loyal_chance add = 5 } }
+    if = { limit = { opinion = { target = liege value <= -75 } } change_variable = { name = rf_warlord_loyal_chance add = -90 } }
+    else_if = { limit = { opinion = { target = liege value <= -50 } } change_variable = { name = rf_warlord_loyal_chance add = -55 } }
+    else_if = { limit = { opinion = { target = liege value <= -25 } } change_variable = { name = rf_warlord_loyal_chance add = -25 } }
     if = { limit = { has_trait = loyal } change_variable = { name = rf_warlord_loyal_chance add = 30 } }
     if = { limit = { has_trait = content } change_variable = { name = rf_warlord_loyal_chance add = 20 } }
     if = { limit = { has_trait = just } change_variable = { name = rf_warlord_loyal_chance add = 15 } }
@@ -307,8 +313,14 @@ riseandfall_warlord_ai_join_crisis_se = {
     if = { limit = { has_trait = craven } change_variable = { name = rf_warlord_join_chance add = -20 } }
     if = { limit = { ai_boldness > medium_positive_ai_value } change_variable = { name = rf_warlord_join_chance add = 15 } }
     if = { limit = { ai_boldness < medium_negative_ai_value } change_variable = { name = rf_warlord_join_chance add = -15 } }
-    if = { limit = { opinion = { target = liege value <= -25 } } change_variable = { name = rf_warlord_join_chance add = 20 } }
-    if = { limit = { opinion = { target = liege value >= 25 } } change_variable = { name = rf_warlord_join_chance add = -20 } }
+    # Hostility is a much stronger reason to enter the crisis than friendship
+    # is to remain outside it; high positive opinion is deliberately modest.
+    if = { limit = { opinion = { target = liege value <= -75 } } change_variable = { name = rf_warlord_join_chance add = 45 } }
+    else_if = { limit = { opinion = { target = liege value <= -50 } } change_variable = { name = rf_warlord_join_chance add = 35 } }
+    else_if = { limit = { opinion = { target = liege value <= -25 } } change_variable = { name = rf_warlord_join_chance add = 25 } }
+    if = { limit = { opinion = { target = liege value >= 75 } } change_variable = { name = rf_warlord_join_chance add = -10 } }
+    else_if = { limit = { opinion = { target = liege value >= 50 } } change_variable = { name = rf_warlord_join_chance add = -8 } }
+    else_if = { limit = { opinion = { target = liege value >= 25 } } change_variable = { name = rf_warlord_join_chance add = -5 } }
     if = {
         limit = { military_power >= { value = liege.military_power multiply = 5 } }
         change_variable = { name = rf_warlord_join_chance add = 60 }

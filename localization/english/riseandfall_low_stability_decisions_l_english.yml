@@ -216,6 +216,10 @@
  riseandfall_debug_create_random_legitimist_claimant_desc:0 "Choose one random unlanded claimant to your primary title, turn them into a legitimist adventurer, and spawn their initial host army."
  riseandfall_debug_create_random_legitimist_claimant_tooltip:0 "For debugging claimant legitimists and their first army."
  riseandfall_debug_create_random_legitimist_claimant_confirm:0 "Execute"
+ riseandfall_debug_set_coalition_threat_100:0 "Debug: set Coalition Threat to 100"
+ riseandfall_debug_set_coalition_threat_100_desc:0 "Set this ruler's Coalition Threat to 100 and open a five-year Coalition window for testing."
+ riseandfall_debug_set_coalition_threat_100_tooltip:0 "Sets Coalition Threat to 100."
+ riseandfall_debug_set_coalition_threat_100_confirm:0 "Set Threat to 100"
 
  # confirm strings for toggles
  riseandfall_low_stability_warlord_high_confirm:0 "Set High"

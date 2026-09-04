@@ -2,3 +2,58 @@
     # Title-scoped count populated before Medium orders kingdom concessions.
     value = var:rf_coalition_release_kingdom_count
 }
+
+# Tooltip-safe counterparts to temporary Coalition calculations. Scripted
+# values evaluate guarded operations in order, unlike effect-preview limits
+# that may inspect a later variable comparison before its setter has run.
+riseandfall_coalition_threat_world_share_value = {
+    value = 0
+    if = {
+        limit = { has_variable = riseandfall_rs_realm_size_component }
+        add = var:riseandfall_rs_realm_size_component
+    }
+    multiply = -1
+}
+
+riseandfall_coalition_largest_neighbor_size_value = {
+    value = 0
+    if = {
+        limit = { exists = scope:coalition_threat_neighbor }
+        add = scope:coalition_threat_neighbor.realm_size
+    }
+}
+
+riseandfall_coalition_ai_war_caution_base_value = {
+    value = 0
+    if = {
+        limit = { has_variable = rf_coalition_threat_yearly_change }
+        add = var:rf_coalition_threat_yearly_change
+        multiply = 5
+    }
+    if = {
+        limit = { has_variable = rf_coalition_threat_window_years }
+        value = 100
+    }
+    max = 100
+    min = 0
+}
+
+riseandfall_coalition_ai_war_caution_value = {
+    value = riseandfall_coalition_ai_war_caution_base_value
+    if = {
+        limit = { riseandfall_coalition_ai_war_caution_base_value > 0 }
+        if = { limit = { has_trait = brave } subtract = 15 }
+        if = { limit = { has_trait = arrogant } subtract = 15 }
+        if = { limit = { has_trait = wrathful } subtract = 10 }
+        if = { limit = { has_trait = vengeful } subtract = 15 }
+        if = { limit = { has_trait = greedy } subtract = 10 }
+        if = { limit = { has_trait = content } add = 25 }
+        if = { limit = { has_trait = craven } add = 25 }
+        if = { limit = { has_trait = calm } add = 15 }
+        if = { limit = { has_trait = patient } add = 15 }
+        if = { limit = { has_trait = compassionate } add = 15 }
+        if = { limit = { has_trait = just } add = 10 }
+    }
+    max = 100
+    min = 0
+}

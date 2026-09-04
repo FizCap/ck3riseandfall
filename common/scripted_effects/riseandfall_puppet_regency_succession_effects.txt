@@ -1,0 +1,255 @@
+﻿riseandfall_puppet_regency_reconcile_succession_se = {
+    save_scope_as = rf_puppet_succession_ruler
+
+    # Remove the temporary law when the realm is no longer an independent
+    # Puppet Regency. The old law is stored on the primary title.
+    if = {
+        limit = {
+            exists = primary_title
+            OR = {
+                has_realm_law = riseandfall_puppet_regency_partition_succession_law
+                has_realm_law = riseandfall_puppet_regency_single_heir_succession_law
+            }
+            NOT = {
+                AND = {
+                    is_independent_ruler = yes
+                    has_diarchy_type = puppet_regency
+                    has_active_diarchy = yes
+                }
+            }
+        }
+        primary_title = {
+            if = {
+                limit = { has_variable = rf_puppet_restore_confederate }
+                scope:rf_puppet_succession_ruler = { add_realm_law_skip_effects = confederate_partition_succession_law }
+                remove_variable = rf_puppet_restore_confederate
+            }
+            else_if = {
+                limit = { has_variable = rf_puppet_restore_partition }
+                scope:rf_puppet_succession_ruler = { add_realm_law_skip_effects = partition_succession_law }
+                remove_variable = rf_puppet_restore_partition
+            }
+            else_if = {
+                limit = { has_variable = rf_puppet_restore_high_partition }
+                scope:rf_puppet_succession_ruler = { add_realm_law_skip_effects = high_partition_succession_law }
+                remove_variable = rf_puppet_restore_high_partition
+            }
+            else_if = {
+                limit = { has_variable = rf_puppet_restore_single_heir }
+                scope:rf_puppet_succession_ruler = { add_realm_law_skip_effects = single_heir_succession_law }
+                remove_variable = rf_puppet_restore_single_heir
+            }
+            else_if = {
+                limit = { has_variable = rf_puppet_restore_single_heir_youngest }
+                scope:rf_puppet_succession_ruler = { add_realm_law_skip_effects = single_heir_succession_law_youngest }
+                remove_variable = rf_puppet_restore_single_heir_youngest
+            }
+            else_if = {
+                limit = { has_variable = rf_puppet_restore_dynasty_house }
+                scope:rf_puppet_succession_ruler = { add_realm_law_skip_effects = single_heir_dynasty_house }
+                remove_variable = rf_puppet_restore_dynasty_house
+            }
+            else_if = {
+                limit = { has_variable = rf_puppet_restore_appointment }
+                scope:rf_puppet_succession_ruler = { add_realm_law_skip_effects = appointment_succession_law }
+                remove_variable = rf_puppet_restore_appointment
+            }
+            else_if = {
+                limit = { has_variable = rf_puppet_restore_celestial }
+                scope:rf_puppet_succession_ruler = { add_realm_law_skip_effects = celestial_appointment_succession_law }
+                remove_variable = rf_puppet_restore_celestial
+            }
+            else_if = {
+                limit = { has_variable = rf_puppet_restore_celestial_military }
+                scope:rf_puppet_succession_ruler = { add_realm_law_skip_effects = celestial_military_appointment_succession_law }
+                remove_variable = rf_puppet_restore_celestial_military
+            }
+            else_if = {
+                limit = { has_variable = rf_puppet_restore_japanese }
+                scope:rf_puppet_succession_ruler = { add_realm_law_skip_effects = japanese_appointment_succession_law }
+                remove_variable = rf_puppet_restore_japanese
+            }
+            else_if = {
+                limit = { has_variable = rf_puppet_restore_japanese_military }
+                scope:rf_puppet_succession_ruler = { add_realm_law_skip_effects = japanese_military_appointment_succession_law }
+                remove_variable = rf_puppet_restore_japanese_military
+            }
+            else_if = {
+                limit = { has_variable = rf_puppet_restore_meritocratic }
+                scope:rf_puppet_succession_ruler = { add_realm_law_skip_effects = meritocratic_appointment_succession_law }
+                remove_variable = rf_puppet_restore_meritocratic
+            }
+            else_if = {
+                limit = { has_variable = rf_puppet_restore_meritocratic_military }
+                scope:rf_puppet_succession_ruler = { add_realm_law_skip_effects = meritocratic_military_appointment_succession_law }
+                remove_variable = rf_puppet_restore_meritocratic_military
+            }
+            else_if = {
+                limit = { has_variable = rf_puppet_restore_clan_antagonistic }
+                scope:rf_puppet_succession_ruler = { add_realm_law_skip_effects = clan_antagonistic_partition_succession_law }
+                remove_variable = rf_puppet_restore_clan_antagonistic
+            }
+            else_if = {
+                limit = { has_variable = rf_puppet_restore_clan_competitive }
+                scope:rf_puppet_succession_ruler = { add_realm_law_skip_effects = clan_competitive_partition_succession_law }
+                remove_variable = rf_puppet_restore_clan_competitive
+            }
+            else_if = {
+                limit = { has_variable = rf_puppet_restore_clan_impassive }
+                scope:rf_puppet_succession_ruler = { add_realm_law_skip_effects = clan_impassive_partition_succession_law }
+                remove_variable = rf_puppet_restore_clan_impassive
+            }
+            else_if = {
+                limit = { has_variable = rf_puppet_restore_clan_friendly }
+                scope:rf_puppet_succession_ruler = { add_realm_law_skip_effects = clan_friendly_partition_succession_law }
+                remove_variable = rf_puppet_restore_clan_friendly
+            }
+            else_if = {
+                limit = { has_variable = rf_puppet_restore_clan_harmonious }
+                scope:rf_puppet_succession_ruler = { add_realm_law_skip_effects = clan_harmonious_partition_succession_law }
+                remove_variable = rf_puppet_restore_clan_harmonious
+            }
+            else_if = {
+                limit = { has_variable = rf_puppet_restore_japanese_regency }
+                scope:rf_puppet_succession_ruler = { add_realm_law_skip_effects = japanese_regency_succession_law }
+                remove_variable = rf_puppet_restore_japanese_regency
+            }
+            else_if = {
+                limit = { has_variable = rf_puppet_restore_meritocratic_regency }
+                scope:rf_puppet_succession_ruler = { add_realm_law_skip_effects = meritocratic_regency_succession_law }
+                remove_variable = rf_puppet_restore_meritocratic_regency
+            }
+        }
+    }
+
+    # Enter the temporary law only for an independent ruler with an active
+    # Puppet Regency. A law already installed by this effect is left alone.
+    if = {
+        limit = {
+            exists = primary_title
+            is_independent_ruler = yes
+            has_diarchy_type = puppet_regency
+            has_active_diarchy = yes
+            NOT = {
+                OR = {
+                    has_realm_law = riseandfall_puppet_regency_partition_succession_law
+                    has_realm_law = riseandfall_puppet_regency_single_heir_succession_law
+                }
+            }
+            OR = {
+                has_realm_law = confederate_partition_succession_law
+                has_realm_law = partition_succession_law
+                has_realm_law = high_partition_succession_law
+                has_realm_law = single_heir_succession_law
+                has_realm_law = single_heir_succession_law_youngest
+                has_realm_law = single_heir_dynasty_house
+                has_realm_law = clan_antagonistic_partition_succession_law
+                has_realm_law = clan_competitive_partition_succession_law
+                has_realm_law = clan_impassive_partition_succession_law
+                has_realm_law = clan_friendly_partition_succession_law
+                has_realm_law = clan_harmonious_partition_succession_law
+            }
+        }
+        primary_title = {
+            if = {
+                limit = { scope:rf_puppet_succession_ruler = { has_realm_law = confederate_partition_succession_law } }
+                set_variable = { name = rf_puppet_restore_confederate value = yes }
+            }
+            else_if = {
+                limit = { scope:rf_puppet_succession_ruler = { has_realm_law = partition_succession_law } }
+                set_variable = { name = rf_puppet_restore_partition value = yes }
+            }
+            else_if = {
+                limit = { scope:rf_puppet_succession_ruler = { has_realm_law = high_partition_succession_law } }
+                set_variable = { name = rf_puppet_restore_high_partition value = yes }
+            }
+            else_if = {
+                limit = { scope:rf_puppet_succession_ruler = { has_realm_law = single_heir_succession_law } }
+                set_variable = { name = rf_puppet_restore_single_heir value = yes }
+            }
+            else_if = {
+                limit = { scope:rf_puppet_succession_ruler = { has_realm_law = single_heir_succession_law_youngest } }
+                set_variable = { name = rf_puppet_restore_single_heir_youngest value = yes }
+            }
+            else_if = {
+                limit = { scope:rf_puppet_succession_ruler = { has_realm_law = single_heir_dynasty_house } }
+                set_variable = { name = rf_puppet_restore_dynasty_house value = yes }
+            }
+            else_if = {
+                limit = { scope:rf_puppet_succession_ruler = { has_realm_law = appointment_succession_law } }
+                set_variable = { name = rf_puppet_restore_appointment value = yes }
+            }
+            else_if = {
+                limit = { scope:rf_puppet_succession_ruler = { has_realm_law = celestial_appointment_succession_law } }
+                set_variable = { name = rf_puppet_restore_celestial value = yes }
+            }
+            else_if = {
+                limit = { scope:rf_puppet_succession_ruler = { has_realm_law = celestial_military_appointment_succession_law } }
+                set_variable = { name = rf_puppet_restore_celestial_military value = yes }
+            }
+            else_if = {
+                limit = { scope:rf_puppet_succession_ruler = { has_realm_law = japanese_appointment_succession_law } }
+                set_variable = { name = rf_puppet_restore_japanese value = yes }
+            }
+            else_if = {
+                limit = { scope:rf_puppet_succession_ruler = { has_realm_law = japanese_military_appointment_succession_law } }
+                set_variable = { name = rf_puppet_restore_japanese_military value = yes }
+            }
+            else_if = {
+                limit = { scope:rf_puppet_succession_ruler = { has_realm_law = meritocratic_appointment_succession_law } }
+                set_variable = { name = rf_puppet_restore_meritocratic value = yes }
+            }
+            else_if = {
+                limit = { scope:rf_puppet_succession_ruler = { has_realm_law = meritocratic_military_appointment_succession_law } }
+                set_variable = { name = rf_puppet_restore_meritocratic_military value = yes }
+            }
+            else_if = {
+                limit = { scope:rf_puppet_succession_ruler = { has_realm_law = clan_antagonistic_partition_succession_law } }
+                set_variable = { name = rf_puppet_restore_clan_antagonistic value = yes }
+            }
+            else_if = {
+                limit = { scope:rf_puppet_succession_ruler = { has_realm_law = clan_competitive_partition_succession_law } }
+                set_variable = { name = rf_puppet_restore_clan_competitive value = yes }
+            }
+            else_if = {
+                limit = { scope:rf_puppet_succession_ruler = { has_realm_law = clan_impassive_partition_succession_law } }
+                set_variable = { name = rf_puppet_restore_clan_impassive value = yes }
+            }
+            else_if = {
+                limit = { scope:rf_puppet_succession_ruler = { has_realm_law = clan_friendly_partition_succession_law } }
+                set_variable = { name = rf_puppet_restore_clan_friendly value = yes }
+            }
+            else_if = {
+                limit = { scope:rf_puppet_succession_ruler = { has_realm_law = clan_harmonious_partition_succession_law } }
+                set_variable = { name = rf_puppet_restore_clan_harmonious value = yes }
+            }
+            else_if = {
+                limit = { scope:rf_puppet_succession_ruler = { has_realm_law = japanese_regency_succession_law } }
+                set_variable = { name = rf_puppet_restore_japanese_regency value = yes }
+            }
+            else_if = {
+                limit = { scope:rf_puppet_succession_ruler = { has_realm_law = meritocratic_regency_succession_law } }
+                set_variable = { name = rf_puppet_restore_meritocratic_regency value = yes }
+            }
+        }
+        if = {
+            limit = {
+                OR = {
+                    has_realm_law = confederate_partition_succession_law
+                    has_realm_law = partition_succession_law
+                    has_realm_law = high_partition_succession_law
+                    has_realm_law = clan_antagonistic_partition_succession_law
+                    has_realm_law = clan_competitive_partition_succession_law
+                    has_realm_law = clan_impassive_partition_succession_law
+                    has_realm_law = clan_friendly_partition_succession_law
+                    has_realm_law = clan_harmonious_partition_succession_law
+                }
+            }
+            add_realm_law_skip_effects = riseandfall_puppet_regency_partition_succession_law
+        }
+        else = {
+            add_realm_law_skip_effects = riseandfall_puppet_regency_single_heir_succession_law
+        }
+    }
+    clear_saved_scope = rf_puppet_succession_ruler
+}

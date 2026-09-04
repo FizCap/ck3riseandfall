@@ -1013,6 +1013,24 @@
 				}
 			}
 
+			# During an independent Puppet Regency, landed candidates must not
+			# compete with the unlanded court succession pool. Keep normal
+			# administrative appointment behavior outside Puppet Regency.
+			if = {
+				limit = {
+					is_landed = yes
+					scope:title.holder = {
+						is_independent_ruler = yes
+						has_diarchy_type = puppet_regency
+						has_active_diarchy = yes
+					}
+				}
+				subtract = {
+					value = 100000
+					desc = riseandfall_puppet_regency_landed_candidate_desc
+				}
+			}
+
 			# RANDOM ADMIN NERF SCORE (if assigned by scripted effect)
 			if = {
 				limit = { has_variable = riseandfall_admin_nerf }

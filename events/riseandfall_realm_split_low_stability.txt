@@ -127,6 +127,10 @@ realm_split.1001 = {
         
         # Execute the realm split
         riseandfall_realm_split_se = yes
+
+        # The realm has already lost land and vassals; release part of the
+        # accumulated Story Mode collapse pressure as a structural relief valve.
+        riseandfall_story_collapse_relief_se = yes
         
         # Stability improvement from reduced realm size
         if = {

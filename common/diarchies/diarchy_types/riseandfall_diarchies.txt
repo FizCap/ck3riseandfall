@@ -6,9 +6,9 @@ puppet_regency = {
 	# Handled via content - this is only for power sharing arrangements we want to start automatically.
 	start = { always = yes }
 
-	# Handled via content - this is only for power sharing arrangements we want to end automatically.
-	# End the diarchy when the liege is not a landed ruler anymore or is not independent.
-	end = { OR = { is_landed = no is_independent_ruler = no } }
+	# Puppet Regency is persistent content. It may only end through the mod's
+	# explicit removal effect, never through the vanilla automatic end check.
+	end = { always = no }
 
 	# Mandates
 	## Just the standard suite

@@ -66,6 +66,7 @@ riseandfall_coalition_cb = {
         # Medium, or Heavy. Internal rebels receive independence only in the
         # territorial Medium/Heavy outcomes.
         scope:defender = {
+            riseandfall_coalition_reset_threat_se = yes
             riseandfall_coalition_start_victory_vote_se = {
                 COALITION_LEADER = scope:attacker
                 COALITION_WAR = scope:war

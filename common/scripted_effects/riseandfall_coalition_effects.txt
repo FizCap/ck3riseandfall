@@ -89,16 +89,13 @@ riseandfall_coalition_update_threat_se = {
     set_variable = { name = rf_coalition_threat_realm_scale value = 0 }
     if = {
         limit = { has_variable = riseandfall_rs_realm_size_component }
-        set_variable = { name = rf_coalition_threat_world_share value = var:riseandfall_rs_realm_size_component }
-        change_variable = { name = rf_coalition_threat_world_share multiply = -1 }
-        if = { limit = { var:rf_coalition_threat_world_share >= 25 } set_variable = { name = rf_coalition_threat_realm_scale value = 1.25 } }
-        else_if = { limit = { var:rf_coalition_threat_world_share >= 15 } set_variable = { name = rf_coalition_threat_realm_scale value = 1 } }
-        else_if = { limit = { var:rf_coalition_threat_world_share >= 10 } set_variable = { name = rf_coalition_threat_realm_scale value = 0.75 } }
-        else_if = { limit = { var:rf_coalition_threat_world_share >= 5 } set_variable = { name = rf_coalition_threat_realm_scale value = 0.5 } }
-        else_if = { limit = { var:rf_coalition_threat_world_share >= 1 } set_variable = { name = rf_coalition_threat_realm_scale value = 0.25 } }
-        if = { limit = { var:rf_coalition_threat_world_share >= 25 } set_variable = { name = rf_coalition_threat_world_gain value = 20 } }
-        else_if = { limit = { var:rf_coalition_threat_world_share >= 15 } set_variable = { name = rf_coalition_threat_world_gain value = 10 } }
-        remove_variable = rf_coalition_threat_world_share
+        if = { limit = { riseandfall_coalition_threat_world_share_value >= 25 } set_variable = { name = rf_coalition_threat_realm_scale value = 1.25 } }
+        else_if = { limit = { riseandfall_coalition_threat_world_share_value >= 15 } set_variable = { name = rf_coalition_threat_realm_scale value = 1 } }
+        else_if = { limit = { riseandfall_coalition_threat_world_share_value >= 10 } set_variable = { name = rf_coalition_threat_realm_scale value = 0.75 } }
+        else_if = { limit = { riseandfall_coalition_threat_world_share_value >= 5 } set_variable = { name = rf_coalition_threat_realm_scale value = 0.5 } }
+        else_if = { limit = { riseandfall_coalition_threat_world_share_value >= 1 } set_variable = { name = rf_coalition_threat_realm_scale value = 0.25 } }
+        if = { limit = { riseandfall_coalition_threat_world_share_value >= 25 } set_variable = { name = rf_coalition_threat_world_gain value = 20 } }
+        else_if = { limit = { riseandfall_coalition_threat_world_share_value >= 15 } set_variable = { name = rf_coalition_threat_world_gain value = 10 } }
     }
     set_variable = { name = rf_coalition_threat_dominance_gain value = 0 }
     # Neighbor dominance only modifies conquest pressure. Do not scan every
@@ -119,11 +116,9 @@ riseandfall_coalition_update_threat_se = {
     }
     if = {
         limit = { exists = scope:coalition_threat_neighbor }
-        set_variable = { name = rf_coalition_threat_largest_neighbor_size value = scope:coalition_threat_neighbor.realm_size }
-        if = { limit = { realm_size >= { value = var:rf_coalition_threat_largest_neighbor_size multiply = 5 } } set_variable = { name = rf_coalition_threat_dominance_gain value = 75 } }
-        else_if = { limit = { realm_size >= { value = var:rf_coalition_threat_largest_neighbor_size multiply = 3 } } set_variable = { name = rf_coalition_threat_dominance_gain value = 50 } }
-        else_if = { limit = { realm_size >= { value = var:rf_coalition_threat_largest_neighbor_size multiply = 2 } } set_variable = { name = rf_coalition_threat_dominance_gain value = 25 } }
-        remove_variable = rf_coalition_threat_largest_neighbor_size
+        if = { limit = { realm_size >= { value = riseandfall_coalition_largest_neighbor_size_value multiply = 5 } } set_variable = { name = rf_coalition_threat_dominance_gain value = 75 } }
+        else_if = { limit = { realm_size >= { value = riseandfall_coalition_largest_neighbor_size_value multiply = 3 } } set_variable = { name = rf_coalition_threat_dominance_gain value = 50 } }
+        else_if = { limit = { realm_size >= { value = riseandfall_coalition_largest_neighbor_size_value multiply = 2 } } set_variable = { name = rf_coalition_threat_dominance_gain value = 25 } }
     }
     clear_saved_scope = coalition_threat_neighbor
     if = {
@@ -208,7 +203,6 @@ riseandfall_coalition_update_ai_war_deterrence_se = {
     remove_character_modifier = riseandfall_coalition_ai_war_caution_medium
     remove_character_modifier = riseandfall_coalition_ai_war_caution_high
     remove_character_modifier = riseandfall_coalition_ai_war_caution_severe
-    remove_variable = rf_coalition_ai_war_caution_score
     if = {
         limit = {
             is_ai = yes
@@ -217,71 +211,41 @@ riseandfall_coalition_update_ai_war_deterrence_se = {
                 riseandfall_is_any_warlord_trigger = yes
             }
         }
-        set_variable = { name = rf_coalition_ai_war_caution_score value = 0 }
+        # This guarded script value preserves the existing threat and
+        # personality weights without a tooltip-unsafe scratch variable.
         if = {
-            limit = { has_variable = rf_coalition_threat_yearly_change }
-            # Annual net change is normally conquest pressure minus the
-            # peaceful decay. Scale it so 5/10/15/20 points of net growth
-            # correspond roughly to the four caution bands.
-            set_variable = { name = rf_coalition_ai_war_caution_score value = var:rf_coalition_threat_yearly_change }
-            change_variable = { name = rf_coalition_ai_war_caution_score multiply = 5 }
+            limit = { riseandfall_coalition_ai_war_caution_value >= 100 }
+            add_character_modifier = { modifier = riseandfall_coalition_ai_war_caution_severe }
         }
-        if = {
-            limit = { has_variable = rf_coalition_threat_window_years }
-            # The active Coalition window is an immediate crisis, not merely
-            # another annual growth value.
-            set_variable = { name = rf_coalition_ai_war_caution_score value = 100 }
+        else_if = {
+            limit = { riseandfall_coalition_ai_war_caution_value >= 75 }
+            add_character_modifier = { modifier = riseandfall_coalition_ai_war_caution_high }
         }
-        clamp_variable = { name = rf_coalition_ai_war_caution_score min = 0 max = 100 }
-
-        if = {
-            limit = { var:rf_coalition_ai_war_caution_score > 0 }
-
-            # Bold and belligerent rulers discount the diplomatic danger.
-            if = { limit = { has_trait = brave } change_variable = { name = rf_coalition_ai_war_caution_score subtract = 15 } }
-            if = { limit = { has_trait = arrogant } change_variable = { name = rf_coalition_ai_war_caution_score subtract = 15 } }
-            if = { limit = { has_trait = wrathful } change_variable = { name = rf_coalition_ai_war_caution_score subtract = 10 } }
-            if = { limit = { has_trait = vengeful } change_variable = { name = rf_coalition_ai_war_caution_score subtract = 15 } }
-            if = { limit = { has_trait = greedy } change_variable = { name = rf_coalition_ai_war_caution_score subtract = 10 } }
-
-            # Cautious rulers react sooner and more strongly to likely containment.
-            if = { limit = { has_trait = content } change_variable = { name = rf_coalition_ai_war_caution_score add = 25 } }
-            if = { limit = { has_trait = craven } change_variable = { name = rf_coalition_ai_war_caution_score add = 25 } }
-            if = { limit = { has_trait = calm } change_variable = { name = rf_coalition_ai_war_caution_score add = 15 } }
-            if = { limit = { has_trait = patient } change_variable = { name = rf_coalition_ai_war_caution_score add = 15 } }
-            if = { limit = { has_trait = compassionate } change_variable = { name = rf_coalition_ai_war_caution_score add = 15 } }
-            if = { limit = { has_trait = just } change_variable = { name = rf_coalition_ai_war_caution_score add = 10 } }
-            clamp_variable = { name = rf_coalition_ai_war_caution_score min = 0 max = 100 }
-
-            if = {
-                limit = { var:rf_coalition_ai_war_caution_score >= 100 }
-                add_character_modifier = { modifier = riseandfall_coalition_ai_war_caution_severe }
-            }
-            else_if = {
-                limit = { var:rf_coalition_ai_war_caution_score >= 75 }
-                add_character_modifier = { modifier = riseandfall_coalition_ai_war_caution_high }
-            }
-            else_if = {
-                limit = { var:rf_coalition_ai_war_caution_score >= 50 }
-                add_character_modifier = { modifier = riseandfall_coalition_ai_war_caution_medium }
-            }
-            else_if = {
-                limit = { var:rf_coalition_ai_war_caution_score >= 25 }
-                add_character_modifier = { modifier = riseandfall_coalition_ai_war_caution_low }
-            }
+        else_if = {
+            limit = { riseandfall_coalition_ai_war_caution_value >= 50 }
+            add_character_modifier = { modifier = riseandfall_coalition_ai_war_caution_medium }
         }
-        remove_variable = rf_coalition_ai_war_caution_score
+        else_if = {
+            limit = { riseandfall_coalition_ai_war_caution_value >= 25 }
+            add_character_modifier = { modifier = riseandfall_coalition_ai_war_caution_low }
+        }
     }
+}
+
+# Clear the active Coalition crisis as soon as its war ends. The title-bound
+# cooldown is handled separately so the victory verdict can choose its duration.
+riseandfall_coalition_reset_threat_se = {
+    set_variable = { name = rf_coalition_threat value = 0 }
+    set_variable = { name = rf_coalition_threat_yearly_change value = 0 }
+    remove_variable = rf_coalition_threat_window_years
+    riseandfall_coalition_update_ai_war_deterrence_se = yes
 }
 
 # An offensive Coalition war consumes the immediate crisis even if the target
 # remains threatening. The title-bound cooldown prevents serial containment
 # wars while recent conquest history is free to rebuild longer-term pressure.
 riseandfall_coalition_consume_threat_se = {
-    set_variable = { name = rf_coalition_threat value = 0 }
-    set_variable = { name = rf_coalition_threat_yearly_change value = 0 }
-    remove_variable = rf_coalition_threat_window_years
-    riseandfall_coalition_update_ai_war_deterrence_se = yes
+    riseandfall_coalition_reset_threat_se = yes
     if = {
         limit = { has_variable = rf_coalition_core_title }
         var:rf_coalition_core_title = {
@@ -1238,11 +1202,10 @@ riseandfall_coalition_start_victory_vote_se = {
         }
     }
 
-    # Do not read the newly created counter here: CK3 also evaluates CB effects
-    # for tooltips before preceding effects have initialized their variables.
-    # The hidden event begins immediately after victory; only later player-event
-    # handoffs are deferred so an open choice can close safely.
-    trigger_event = { id = coalition.1200 }
+    # Start the hidden ballot after the setup effect returns, while retaining
+    # the target character as the event root.
+    trigger_event = { id = coalition.1200 delayed = yes }
+
 }
 
 riseandfall_coalition_clear_all_victory_vote_voters_se = {

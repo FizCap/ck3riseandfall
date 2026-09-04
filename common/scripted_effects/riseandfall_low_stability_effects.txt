@@ -16,6 +16,9 @@ riseandfall_set_low_stability_cooldown_se = {
 riseandfall_low_stability_roll_se = {
     # Perform computations inside the saved ruler scope so character variables resolve correctly.
         scope:ruler_low_stability = {
+            # Coalition availability enters an independent-ruler iterator, so
+            # preserve the incident ruler before that iterator changes scope.
+            save_scope_as = coalition_target
             # Repair interrupted Coalition state before evaluating this year's incident.
             riseandfall_coalition_clear_stale_target_state_se = yes
             # Coalition pressure is territory-based and must be refreshed before
@@ -137,6 +140,7 @@ riseandfall_low_stability_random_event = {
                     var:riseandfall_story_arc_phase >= 2
                     riseandfall_low_stability_vassal_crisis_available_trigger = yes
                 }
+                riseandfall_story_collapse_relief_se = yes
                 trigger_event = { id = authority_collapse.1002 }
             }
             900 = {
@@ -148,6 +152,7 @@ riseandfall_low_stability_random_event = {
                     var:riseandfall_story_arc_phase >= 2
                     riseandfall_low_stability_nationalist_revolt_available_trigger = yes
                 }
+                riseandfall_story_collapse_relief_se = yes
                 trigger_event = { id = authority_collapse.1001 }
             }
             1200 = {
@@ -169,6 +174,7 @@ riseandfall_low_stability_random_event = {
                     exists = global_var:riseandfall_low_stability_event_warlord_high
                     riseandfall_low_stability_warlord_available_trigger = yes
                 }
+                riseandfall_story_collapse_relief_se = yes
                 trigger_event = { id = warlord.1001 }
             }
             100 = {
@@ -177,6 +183,7 @@ riseandfall_low_stability_random_event = {
                     NOT = { exists = global_var:riseandfall_low_stability_event_warlord_low }
                     riseandfall_low_stability_warlord_available_trigger = yes
                 }
+                riseandfall_story_collapse_relief_se = yes
                 trigger_event = { id = warlord.1001 }
             }
             33 = {
@@ -184,6 +191,7 @@ riseandfall_low_stability_random_event = {
                     exists = global_var:riseandfall_low_stability_event_warlord_low
                     riseandfall_low_stability_warlord_available_trigger = yes
                 }
+                riseandfall_story_collapse_relief_se = yes
                 trigger_event = { id = warlord.1001 }
             }
             300 = {
@@ -235,6 +243,7 @@ riseandfall_low_stability_random_event = {
                     exists = global_var:riseandfall_low_stability_event_nationalist_revolt_high
                     riseandfall_low_stability_nationalist_revolt_available_trigger = yes
                 }
+                riseandfall_story_collapse_relief_se = yes
                 trigger_event = { id = authority_collapse.1001 }
             }
             100 = {
@@ -243,6 +252,7 @@ riseandfall_low_stability_random_event = {
                     NOT = { exists = global_var:riseandfall_low_stability_event_nationalist_revolt_low }
                     riseandfall_low_stability_nationalist_revolt_available_trigger = yes
                 }
+                riseandfall_story_collapse_relief_se = yes
                 trigger_event = { id = authority_collapse.1001 }
             }
             33 = {
@@ -250,6 +260,7 @@ riseandfall_low_stability_random_event = {
                     exists = global_var:riseandfall_low_stability_event_nationalist_revolt_low
                     riseandfall_low_stability_nationalist_revolt_available_trigger = yes
                 }
+                riseandfall_story_collapse_relief_se = yes
                 trigger_event = { id = authority_collapse.1001 }
             }
             300 = {
@@ -257,6 +268,7 @@ riseandfall_low_stability_random_event = {
                     exists = global_var:riseandfall_low_stability_event_vassal_crisis_high
                     riseandfall_low_stability_vassal_crisis_available_trigger = yes
                 }
+                riseandfall_story_collapse_relief_se = yes
                 trigger_event = { id = authority_collapse.1002 }
             }
             100 = {
@@ -265,6 +277,7 @@ riseandfall_low_stability_random_event = {
                     NOT = { exists = global_var:riseandfall_low_stability_event_vassal_crisis_low }
                     riseandfall_low_stability_vassal_crisis_available_trigger = yes
                 }
+                riseandfall_story_collapse_relief_se = yes
                 trigger_event = { id = authority_collapse.1002 }
             }
             33 = {
@@ -272,6 +285,7 @@ riseandfall_low_stability_random_event = {
                     exists = global_var:riseandfall_low_stability_event_vassal_crisis_low
                     riseandfall_low_stability_vassal_crisis_available_trigger = yes
                 }
+                riseandfall_story_collapse_relief_se = yes
                 trigger_event = { id = authority_collapse.1002 }
             }
             300 = {
@@ -279,6 +293,7 @@ riseandfall_low_stability_random_event = {
                     exists = global_var:riseandfall_low_stability_event_authority_collapse_high
                     riseandfall_low_stability_authority_collapse_available_trigger = yes
                 }
+                riseandfall_story_collapse_relief_se = yes
                 trigger_event = { id = authority_collapse.1003 }
             }
             100 = {
@@ -287,6 +302,7 @@ riseandfall_low_stability_random_event = {
                     NOT = { exists = global_var:riseandfall_low_stability_event_authority_collapse_low }
                     riseandfall_low_stability_authority_collapse_available_trigger = yes
                 }
+                riseandfall_story_collapse_relief_se = yes
                 trigger_event = { id = authority_collapse.1003 }
             }
             33 = {
@@ -294,6 +310,7 @@ riseandfall_low_stability_random_event = {
                     exists = global_var:riseandfall_low_stability_event_authority_collapse_low
                     riseandfall_low_stability_authority_collapse_available_trigger = yes
                 }
+                riseandfall_story_collapse_relief_se = yes
                 trigger_event = { id = authority_collapse.1003 }
             }
             300 = {
@@ -301,6 +318,7 @@ riseandfall_low_stability_random_event = {
                     exists = global_var:riseandfall_low_stability_event_coalition_high
                     riseandfall_low_stability_coalition_available_trigger = yes
                 }
+                riseandfall_story_collapse_relief_se = yes
                 trigger_event = { id = coalition.1001 }
             }
             100 = {
@@ -309,6 +327,7 @@ riseandfall_low_stability_random_event = {
                     NOT = { exists = global_var:riseandfall_low_stability_event_coalition_low }
                     riseandfall_low_stability_coalition_available_trigger = yes
                 }
+                riseandfall_story_collapse_relief_se = yes
                 trigger_event = { id = coalition.1001 }
             }
             33 = {
@@ -316,6 +335,7 @@ riseandfall_low_stability_random_event = {
                     exists = global_var:riseandfall_low_stability_event_coalition_low
                     riseandfall_low_stability_coalition_available_trigger = yes
                 }
+                riseandfall_story_collapse_relief_se = yes
                 trigger_event = { id = coalition.1001 }
             }
         }

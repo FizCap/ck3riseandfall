@@ -7,7 +7,7 @@
     ai_check_interval = 0
         desc = riseandfall_debug_reduce_stability_10_desc
         selection_tooltip = riseandfall_debug_reduce_stability_10_tooltip
-        decision_group_type = admin
+        decision_group_type = riseandfall
 
         is_shown = {
             always = no
@@ -53,7 +53,7 @@
     ai_check_interval = 0
         desc = riseandfall_debug_fire_low_stability_event_desc
         selection_tooltip = riseandfall_debug_fire_low_stability_event_tooltip
-        decision_group_type = admin
+        decision_group_type = riseandfall
 
         is_shown = {
             always = no
@@ -84,7 +84,7 @@
         ai_check_interval = 0
         desc = riseandfall_debug_force_liege_palace_coup_player_challenger_desc
         selection_tooltip = riseandfall_debug_force_liege_palace_coup_player_challenger_tooltip
-        decision_group_type = admin
+        decision_group_type = riseandfall
 
         is_shown = {
             debug_only = yes
@@ -166,7 +166,7 @@
         ai_check_interval = 0
         desc = riseandfall_debug_create_random_legitimist_claimant_desc
         selection_tooltip = riseandfall_debug_create_random_legitimist_claimant_tooltip
-        decision_group_type = admin
+        decision_group_type = riseandfall
 
         is_shown = {
             debug_only = yes
@@ -209,6 +209,41 @@
                     riseandfall_do_create_adventurer_se = yes
                 }
             }
+        }
+
+        ai_potential = {
+        }
+
+        ai_will_do = {
+            base = 0
+        }
+    }
+
+    # Developer debug decision: set this ruler's Coalition Threat to the maximum.
+    riseandfall_debug_set_coalition_threat_100 = {
+        picture = {
+            reference = "gfx/interface/illustrations/decisions/decision_misc.dds"
+        }
+        sort_order = 104
+        ai_check_interval = 0
+        desc = riseandfall_debug_set_coalition_threat_100_desc
+        selection_tooltip = riseandfall_debug_set_coalition_threat_100_tooltip
+        decision_group_type = riseandfall
+
+        is_shown = {
+            debug_only = yes
+            is_ai = no
+            is_landed = yes
+        }
+
+        is_valid = {
+            is_alive = yes
+        }
+
+        effect = {
+            set_variable = { name = rf_coalition_threat value = 100 }
+            set_variable = { name = rf_coalition_threat_window_years value = 5 }
+            set_variable = { name = rf_coalition_threat_yearly_change value = 0 }
         }
 
         ai_potential = {

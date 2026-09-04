@@ -352,6 +352,47 @@ riseandfall_store_story_collapse_on_primary_title_se = {
     }
 }
 
+# A low-stability incident or structural fracture releases part of the current
+# Story Mode collapse arc. Percentage relief scales naturally with severity and
+# cannot create negative pressure.
+riseandfall_story_collapse_relief_se = {
+    if = {
+        limit = {
+            OR = {
+                has_game_rule = riseandfall_dynamic_story_mode_dynamic
+                has_game_rule = riseandfall_dynamic_story_mode_forced
+            }
+        }
+        # A title transfer can leave the durable title copy as the only source.
+        riseandfall_restore_story_collapse_from_primary_title_se = yes
+        if = {
+            limit = { has_variable = riseandfall_story_collapse_pressure }
+            if = {
+                limit = { var:riseandfall_story_collapse_pressure <= 1 }
+                set_variable = { name = riseandfall_story_collapse_gain_last value = var:riseandfall_story_collapse_pressure }
+                change_variable = { name = riseandfall_story_collapse_gain_last multiply = -1 }
+                remove_variable = riseandfall_story_collapse_pressure
+            }
+            else = {
+                set_variable = { name = tmp_story_collapse_relief_pressure value = var:riseandfall_story_collapse_pressure }
+                change_variable = { name = tmp_story_collapse_relief_pressure multiply = 0.5 }
+                round_variable = { name = tmp_story_collapse_relief_pressure nearest = 1 }
+                clamp_variable = { name = tmp_story_collapse_relief_pressure min = 0 max = 100 }
+                set_variable = { name = riseandfall_story_collapse_gain_last value = var:riseandfall_story_collapse_pressure }
+                change_variable = { name = riseandfall_story_collapse_gain_last multiply = -1 }
+                change_variable = { name = riseandfall_story_collapse_gain_last add = var:tmp_story_collapse_relief_pressure }
+                set_variable = { name = riseandfall_story_collapse_pressure value = var:tmp_story_collapse_relief_pressure }
+                remove_variable = tmp_story_collapse_relief_pressure
+            }
+            if = {
+                limit = { NOT = { var:riseandfall_story_collapse_pressure > 0 } }
+                remove_variable = riseandfall_story_collapse_pressure
+            }
+        }
+        riseandfall_store_story_collapse_on_primary_title_se = yes
+    }
+}
+
 riseandfall_apply_successor_realm_grace_se = {
     # New regimes need breathing room after inheritance, palace coups, splits,
     # and other handoffs. Grace is visible stability support plus a cooldown so

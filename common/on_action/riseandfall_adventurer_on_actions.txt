@@ -7,6 +7,7 @@
         riseandfall_marry_female_target
         riseandfall_yearly_adventurer_cleanup_on_action
         riseandfall_yearly_adventurer_remove_variable
+        riseandfall_decay_landed_adventurer_special_troops
         riseandfall_apply_vassal_limit
         riseandfall_remove_vassal_limit
     }
@@ -57,6 +58,14 @@ riseandfall_yearly_adventurer_remove_variable = {
     effect = {
         every_ruler = {
             riseandfall_yearly_adventurer_remove_variable_se = yes
+        }
+    }
+}
+
+riseandfall_decay_landed_adventurer_special_troops = {
+    effect = {
+        every_ruler = {
+            riseandfall_decay_landed_adventurer_special_troops_se = yes
         }
     }
 }

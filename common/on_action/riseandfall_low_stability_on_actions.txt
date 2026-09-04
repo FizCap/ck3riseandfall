@@ -8,27 +8,6 @@
     }
 }
 
-# Quarterly fallback: re-sync puppet master court position for any liege whose position
-# is missing while a puppet_regency is still active. Ensures refill within 3 months
-# if the 1-day revoke event somehow fails.
-quarterly_playable_pulse = {
-    on_actions = {
-        riseandfall_puppet_master_quarterly_resync
-    }
-}
-
-riseandfall_puppet_master_quarterly_resync = {
-    trigger = {
-        has_game_rule = riseandfall_low_stability_events_enabled
-        has_diarchy_type = puppet_regency
-        has_active_diarchy = yes
-        NOT = { employs_court_position = riseandfall_puppet_master_court_position }
-    }
-    effect = {
-        riseandfall_sync_puppet_master_court_position = yes
-    }
-}
-
 random_yearly_everyone_pulse = {
     on_actions = {
         # Give each eligible realm its own incident day instead of clustering rolls on January 1.
@@ -77,10 +56,83 @@ on_diarch_designation = {
 
 on_title_gain = {
     on_actions = {
+        riseandfall_prepare_puppet_succession_on_title_gain
         riseandfall_check_puppet_regency
         riseandfall_warlord_loyal_on_liege_grant
         riseandfall_warlord_title_cleanup
         riseandfall_successor_primary_title_sync
+    }
+}
+
+# A claimant/pretender who wins a war can become the new independent holder
+# without using on_title_gain_inheritance. Queue the same Puppet Master choice
+# used for an inherited realm after the title transfer has settled.
+riseandfall_prepare_puppet_succession_on_title_gain = {
+    trigger = {
+        has_game_rule = riseandfall_low_stability_events_enabled
+        is_landed = yes
+        is_independent_ruler = yes
+        NOT = { has_character_flag = rf_puppet_succession_event_queued }
+        exists = scope:title
+        exists = scope:previous_holder
+        primary_title = {
+            this = scope:title
+        }
+        scope:previous_holder = {
+            is_independent_ruler = yes
+            OR = {
+                has_diarchy_type = puppet_regency
+                has_character_flag = rf_puppet_regency_persistent
+            }
+        }
+    }
+    effect = {
+        clear_saved_scope = rf_civil_war_puppet_master
+        scope:previous_holder = {
+            if = {
+                limit = {
+                    has_variable = rf_puppet_regency_diarch
+                }
+                var:rf_puppet_regency_diarch = {
+                    save_scope_as = rf_civil_war_puppet_master
+                }
+            }
+            if = {
+                limit = {
+                    NOT = { exists = scope:rf_civil_war_puppet_master }
+                    has_active_diarchy = yes
+                    exists = diarch
+                }
+                diarch = {
+                    save_scope_as = rf_civil_war_puppet_master
+                }
+            }
+        }
+        if = {
+            limit = {
+                exists = scope:rf_civil_war_puppet_master
+                scope:rf_civil_war_puppet_master = {
+                    is_alive = yes
+                    is_adult = yes
+                    is_imprisoned = no
+                    is_incapable = no
+                }
+            }
+            riseandfall_clear_puppet_succession_pending_se = yes
+            add_character_flag = { flag = rf_puppet_succession_pending days = 30 }
+            add_character_flag = { flag = rf_puppet_succession_event_queued days = 30 }
+            set_variable = { name = rf_puppet_succession_predecessor value = scope:previous_holder }
+            set_variable = { name = rf_puppet_succession_diarch value = scope:rf_civil_war_puppet_master }
+            if = {
+                limit = { scope:previous_holder = { has_variable = riseandfall_puppet_regency_years } }
+                set_variable = { name = rf_puppet_succession_years value = scope:previous_holder.var:riseandfall_puppet_regency_years }
+            }
+            trigger_event = {
+                id = riseandfall_puppet_master.110
+                days = 1
+            }
+        }
+        clear_saved_scope = rf_civil_war_puppet_master
     }
 }
 
@@ -164,6 +216,20 @@ riseandfall_check_puppet_regency = {
     }
     effect = {
         riseandfall_check_puppet_regency_end = yes
+        # Match the Warlord succession flow: reconcile on the actual ruler
+        # scope, not on the outer/global on-action scope.
+        every_ruler = {
+            limit = {
+                is_landed = yes
+                exists = primary_title
+                OR = {
+                    has_diarchy_type = puppet_regency
+                    has_realm_law = riseandfall_puppet_regency_partition_succession_law
+                    has_realm_law = riseandfall_puppet_regency_single_heir_succession_law
+                }
+            }
+            riseandfall_puppet_regency_reconcile_succession_se = yes
+        }
     }
 }
 

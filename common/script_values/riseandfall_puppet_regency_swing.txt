@@ -11,5 +11,30 @@
             value = 0
         }
     }
+    else_if = {
+        limit = { is_independent_ruler = no }
+        value = 0
+    }
+
+    # A stable realm no longer needs the Puppet Regency to keep the balance
+    # tilted toward the Puppet Master. Check the liege when this value is
+    # evaluated from the diarch scope, otherwise use the current ruler scope.
+    if = {
+        limit = {
+            exists = liege
+            liege = {
+                has_variable = riseandfall_realm_stability_score
+                var:riseandfall_realm_stability_score > 50
+            }
+        }
+        value = 0
+    }
+    else_if = {
+        limit = {
+            has_variable = riseandfall_realm_stability_score
+            var:riseandfall_realm_stability_score > 50
+        }
+        value = 0
+    }
 
 }

@@ -10,7 +10,7 @@
 
   # Puppet succession crisis
   riseandfall_puppet_master.110.t:0 "A Crown Already Controlled"
-  riseandfall_puppet_master.110.desc:0 "The realm you have inherited is not ruled from the throne alone. Its central authority, treasury, and capital household remain bound to the old Puppet Master. Their agents expect you to preserve the arrangement: wear the crown, accept their command over the machinery of state, and avoid a war for the heart of the realm.\n\nYou can submit to this inherited order, or you can reject it and rally your own lands against the capital. If you resist, the Puppet Master will keep the capital and the old center of power while civil war spreads outward."
+  riseandfall_puppet_master.110.desc:0 "The realm you have inherited or seized is not ruled from the throne alone. Its central authority, treasury, and capital household remain bound to the old Puppet Master. Their agents expect you to preserve the arrangement: wear the crown, accept their command over the machinery of state, and avoid a war for the heart of the realm.\n\nYou can submit to this order, or you can reject it and rally your own lands against the capital. If you resist, the Puppet Master will keep the capital and the old center of power while civil war spreads outward."
   riseandfall_puppet_master.110.a:0 "Accept the Puppet Master's authority."
   riseandfall_puppet_master.110.a.tooltip:0 "The Puppet Regency continues under your rule, with the existing Puppet Master preserved if possible."
   riseandfall_puppet_master.110.b:0 "Overthrow the Puppet Master."
@@ -69,16 +69,6 @@
   riseandfall_overthrow_liege_vassal_notification_title:0 "Liege Overthrown"
   riseandfall_overthrow_liege_vassal_notification_desc:0 "Your liege has been overthrown by their puppet master."
 
-  # Force Abdication (health-based)
-  riseandfall_force_abdicate_interaction:0 "Force Abdication"
-  riseandfall_force_abdicate_interaction_desc:0 "Force your liege to step down if their health is poor, transferring their titles to a chosen dynasty member (youngest unlanded child preferred)."
-  riseandfall_force_abdicate_interaction_notification_text:0 "You force [recipient.GetShortUIName] to abdicate in favor of a chosen successor."
-
-  riseandfall_force_abdicate_popup_title:0 "Liege Forced to Abdicate"
-  riseandfall_force_abdicate_popup_desc:0 "Your puppet master has forced you to abdicate due to poor health. Their chosen successor will inherit titles."
-  riseandfall_force_abdicate_vassal_notification_title:0 "Liege Abdication by Puppet Master"
-  riseandfall_force_abdicate_vassal_notification_desc:0 "Your liege has been forced to abdicate by their puppet master due to poor health."
-
   # Claim Puppet Master Office
   riseandfall_claim_puppet_master_office_interaction:0 "Claim Puppet Master Office"
   riseandfall_claim_puppet_master_office_interaction_desc:0 "Assume the official Puppet Master court position while your liege's puppet regency is active. This action is only available when you are not already the office holder."
@@ -91,8 +81,7 @@
 
   # Failure text for poor health check
   riseandfall_liege_has_poor_health:0 "Liege must have poor or worse health."
+  riseandfall_puppet_regency_landed_candidate_desc:0 "Landed candidates are barred during Puppet Regency."
   riseandfall_puppet_master_diarch_only:0 "You must be the active diarch of your liege."
-  # Failure text: only the active diarch may use Force Abdication
-  riseandfall_force_abdicate_diarch_only:0 "You must be the active diarch of your liege."
   riseandfall_claim_puppet_master_office_diarch_only:0 "You must be the active diarch of your liege."
   riseandfall_claim_puppet_master_office_not_hired:0 "You must not already hold the Puppet Master office."

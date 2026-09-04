@@ -76,21 +76,21 @@ riseandfall_score_breakaway_influence_for_vassal_se = {
                 scope:rf_candidate_breakaway = { has_variable = rf_seeded_empire }
                 capital_county.kingdom = { de_jure_liege = scope:rf_candidate_breakaway.var:rf_seeded_empire }
             }
-            change_variable = { name = rf_sphere_score add = 160 }
+            change_variable = { name = rf_sphere_score add = 35 }
         }
         if = {
             limit = {
                 scope:rf_candidate_breakaway = { has_variable = rf_seeded_kingdom }
                 capital_county.kingdom = scope:rf_candidate_breakaway.var:rf_seeded_kingdom
             }
-            change_variable = { name = rf_sphere_score add = 140 }
+            change_variable = { name = rf_sphere_score add = 30 }
         }
         if = {
             limit = {
                 scope:rf_candidate_breakaway = { has_variable = rf_seeded_duchy }
                 capital_county.duchy = scope:rf_candidate_breakaway.var:rf_seeded_duchy
             }
-            change_variable = { name = rf_sphere_score add = 120 }
+            change_variable = { name = rf_sphere_score add = 25 }
         }
         if = {
             limit = { scope:rf_candidate_breakaway.primary_title = { is_neighbor_to_realm = scope:rf_influence_vassal } }
@@ -99,6 +99,16 @@ riseandfall_score_breakaway_influence_for_vassal_se = {
         if = {
             limit = { primary_title = { is_neighbor_to_realm = scope:rf_candidate_breakaway } }
             change_variable = { name = rf_sphere_score add = 65 }
+        }
+        if = {
+            limit = {
+                NOT = { capital_county.kingdom = scope:rf_candidate_breakaway.capital_county.kingdom }
+                NOT = { scope:rf_candidate_breakaway.primary_title = { is_neighbor_to_realm = scope:rf_influence_vassal } }
+                NOT = { primary_title = { is_neighbor_to_realm = scope:rf_candidate_breakaway } }
+            }
+            # Keep distant candidates from creating enclaves when their only
+            # connection is a weak cultural or dynastic relationship.
+            change_variable = { name = rf_sphere_score add = -60 }
         }
         if = {
             limit = { is_allied_to = scope:rf_candidate_breakaway }
@@ -184,6 +194,94 @@ riseandfall_assign_vassal_to_best_breakaway_sphere_se = {
 
     remove_variable = rf_sphere_score
     remove_variable = rf_best_sphere_score
+}
+
+# Select anchors from the whole vassal pool instead of assigning one anchor to
+# each de jure region. Strength increases the chance of becoming an anchor,
+# but every eligible vassal can qualify, including multiple vassals in one
+# kingdom or duchy. The existing regional passes below are only a temporary
+# compatibility pass; their assignments are cleared before sphere allocation.
+riseandfall_select_dynamic_breakaway_anchors_se = {
+    scope:original_ruler = {
+        every_vassal = {
+            limit = {
+                is_landed = yes
+                NOT = { has_character_flag = rf_palace_coup_split_protected }
+                NOT = { has_character_flag = rf_forced_breakaway_seed }
+                primary_title.tier >= tier_county
+                NOT = { primary_title.tier >= tier_empire }
+                NOT = { capital_county.duchy = scope:rf_capital_duchy }
+            }
+            if = {
+                limit = {
+                    OR = {
+                        is_allied_to = scope:original_ruler
+                        opinion = { target = scope:original_ruler value >= 80 }
+                        has_claim_on = scope:original_primary
+                        dynasty = scope:original_ruler.dynasty
+                    }
+                }
+                random = {
+                    chance = 55
+                    riseandfall_mark_primary_breakaway_seed_se = yes
+                }
+            }
+            else_if = {
+                limit = {
+                    current_military_strength >= {
+                        value = scope:original_ruler.current_military_strength
+                        multiply = 0.25
+                    }
+                }
+                random = {
+                    chance = 70
+                    riseandfall_mark_primary_breakaway_seed_se = yes
+                }
+            }
+            else_if = {
+                limit = {
+                    current_military_strength >= {
+                        value = scope:original_ruler.current_military_strength
+                        multiply = 0.15
+                    }
+                }
+                random = {
+                    chance = 45
+                    riseandfall_mark_primary_breakaway_seed_se = yes
+                }
+            }
+            else_if = {
+                limit = {
+                    current_military_strength >= {
+                        value = scope:original_ruler.current_military_strength
+                        multiply = 0.08
+                    }
+                }
+                random = {
+                    chance = 25
+                    riseandfall_mark_secondary_breakaway_seed_se = yes
+                }
+            }
+            else_if = {
+                limit = {
+                    current_military_strength >= {
+                        value = scope:original_ruler.current_military_strength
+                        multiply = 0.04
+                    }
+                }
+                random = {
+                    chance = 12
+                    riseandfall_mark_secondary_breakaway_seed_se = yes
+                }
+            }
+            else = {
+                random = {
+                    chance = 4
+                    riseandfall_mark_secondary_breakaway_seed_se = yes
+                }
+            }
+        }
+    }
 }
 
 ##########################
@@ -767,7 +865,62 @@ riseandfall_realm_split_se = {
         }
     }
 
-    # Phase 2: seeded rulers keep their home region first.
+    # Replace the legacy de jure-region seed result with a global, scalable
+    # anchor pool. Forced Palace Coup/other explicit seeds are preserved; all
+    # ordinary vassals compete independently, so several anchors can emerge
+    # from one region and no region is guaranteed an anchor.
+    scope:original_ruler = {
+        set_variable = { name = rf_breakaway_seed_count value = 0 }
+        every_vassal = {
+            limit = { is_landed = yes }
+            remove_character_flag = rf_breakaway_ruler
+            remove_character_flag = rf_major_breakaway_seed
+            remove_character_flag = rf_secondary_breakaway_seed
+            remove_variable = rf_my_breakaway
+            remove_variable = rf_seeded_empire
+            remove_variable = rf_seeded_kingdom
+            remove_variable = rf_seeded_duchy
+            remove_variable = rf_primary_kingdom_seed
+        }
+        every_vassal = {
+            limit = {
+                is_landed = yes
+                has_character_flag = rf_forced_breakaway_seed
+                NOT = { has_character_flag = rf_palace_coup_split_protected }
+                primary_title.tier >= tier_county
+                NOT = { primary_title.tier >= tier_empire }
+            }
+            capital_county.kingdom = { save_scope_as = rf_seed_kingdom }
+            set_variable = { name = rf_seeded_kingdom value = scope:rf_seed_kingdom }
+            set_variable = { name = rf_seeded_duchy value = capital_county.duchy }
+            add_character_flag = { flag = rf_breakaway_ruler days = 30 }
+            scope:original_ruler = { change_variable = { name = rf_breakaway_seed_count add = 1 } }
+        }
+        riseandfall_select_dynamic_breakaway_anchors_se = yes
+        if = {
+            limit = { var:rf_breakaway_seed_count < 1 }
+            ordered_vassal = {
+                limit = {
+                    is_landed = yes
+                    NOT = { has_character_flag = rf_palace_coup_split_protected }
+                    primary_title.tier >= tier_county
+                    NOT = { primary_title.tier >= tier_empire }
+                    NOT = { capital_county.duchy = scope:rf_capital_duchy }
+                }
+                order_by = current_military_strength
+                max = 1
+                capital_county.kingdom = { save_scope_as = rf_seed_kingdom }
+                set_variable = { name = rf_seeded_kingdom value = scope:rf_seed_kingdom }
+                set_variable = { name = rf_seeded_duchy value = capital_county.duchy }
+                add_character_flag = { flag = rf_breakaway_ruler days = 30 }
+                change_variable = { name = rf_breakaway_seed_count add = 1 }
+            }
+        }
+    }
+
+    # Compatibility staging: the legacy regional assignments are rebuilt here
+    # only so older downstream logic remains intact until the global sphere
+    # pass below clears them.
     if = {
         limit = { scope:original_ruler = { has_character_flag = rf_split_seed_by_empire } }
         scope:original_ruler = {
@@ -904,8 +1057,7 @@ riseandfall_realm_split_se = {
         clear_saved_scope = rf_active_seed
     }
 
-    # Phase 3: unseeded regions are claimed by nearby strong seeds so the
-    # successor map keeps de jure borders but varies in size.
+    # Legacy regional staging; final ownership is assigned individually below.
     if = {
         limit = { scope:original_ruler = { has_character_flag = rf_split_seed_by_kingdom } }
         scope:original_ruler = {
@@ -1179,6 +1331,18 @@ riseandfall_realm_split_se = {
 
     # Dynamic sphere pass: after clean de jure blocks are handled, remaining
     # loose vassals choose the strongest plausible nearby breakaway anchor.
+    # Clear the legacy region-first assignments so every ordinary vassal is
+    # evaluated independently by the political/geographic scorer.
+    scope:original_ruler = {
+        every_vassal = {
+            limit = {
+                is_landed = yes
+                NOT = { has_character_flag = rf_breakaway_ruler }
+                NOT = { has_character_flag = rf_palace_coup_split_protected }
+            }
+            remove_variable = rf_my_breakaway
+        }
+    }
     scope:original_ruler = {
         every_vassal = {
             limit = {

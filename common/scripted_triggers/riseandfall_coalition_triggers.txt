@@ -1,10 +1,10 @@
 ﻿# Rise and Fall - Coalition low-stability triggers
 
-# True while this ruler is the defender in an already active Coalition war.
+# True while this ruler is involved in an already active Coalition war, either
+# as the target or as a Coalition attacker.
 riseandfall_coalition_target_has_active_war_trigger = {
     any_character_war = {
         using_cb = riseandfall_coalition_cb
-        is_defender = prev
     }
 }
 
@@ -66,9 +66,10 @@ riseandfall_coalition_target_still_valid_trigger = {
 
 # A ruler who could give the Coalition at least one legal attacker slot.
 riseandfall_coalition_potential_invitee_trigger = {
-    # This trigger runs inside an ordered ruler iterator, where root is not
-    # retained. The formation target is saved explicitly by the caller.
-    NOT = { this = scope:coalition_target }
+    # This trigger runs inside an ordered ruler iterator. A direct scope
+    # comparison is not valid CK3 syntax; this target relation excludes the
+    # saved target itself while retaining the independent-ruler candidate pool.
+    NOT = { target_is_same_character_or_above = { target = scope:coalition_target } }
     is_alive = yes
     is_landed = yes
     is_independent_ruler = yes

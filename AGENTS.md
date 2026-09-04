@@ -23,11 +23,17 @@
 - `spawn_army.location` requires a province event target; use `capital_province`, not `capital_barony`, when spawning at a character's capital.
 - Keep on_action handlers small and dispatch to scripted effects with `effect = { ... }`. Gate game-rule mechanics with `has_game_rule`; define new rules in `common/game_rules/` with the `riseandfall` category.
 - Yearly on-action loops such as `every_ruler` do not provide an implicit `root` scope; save the current character before entering a title or other nested scope when the effect must return to that character.
+- When a trigger enters a character iterator but must compare candidates with the original character, save that character before the iterator and use a documented target trigger; direct comparisons such as `this = scope:name` are invalid.
 - For mechanics with an explicit title-level active-state marker, treat that marker as authoritative. Succession, trait assignment, and maintenance may preserve marked state but must not recreate a cleared marker from stale character traits.
 - Feature-specific scripted-score bonuses must include the feature's current eligibility gate in every copied appointment or score definition; relationship and government checks alone are not sufficient.
 - Temporary realm succession laws must be applied to the ruler whose realm enters the relevant state, store the prior law on a persistent primary-title variable, and restore it only after the triggering state is absent.
 - Script-only laws must explicitly use `should_start_with = { always = no }`; omitting it can make the law win default-law selection even when `can_have` is false.
+- Temporary inheritance succession laws that must exclude landed candidates should use the native `exclude_rulers = yes` rule; a negative candidate score does not make a landed character ineligible.
+- Persistent diarchy states must use a dedicated marker and explicit removal effect; court-position synchronization and missing-candidate recovery may repair or defer the office, but must never end the diarchy implicitly.
 - Add concise `#` comments for non-obvious scope changes, thresholds, weights, or math. Keep braces and block structure strict.
+- When an effect resolves title or vassal changes inside a title/realm iterator, snapshot the target titles or counties into a list first and mutate them in a separate `every_in_list` pass; live collection mutation can invalidate vanilla on-action scopes.
+- When a Story Mode event causes real realm fragmentation, apply a bounded collapse-pressure relief after title/vassal transfers and resync the primary-title copy; structural weakening should reduce an arc without deleting it.
+- For standard realm splits, select successor anchors from the full eligible vassal pool and assign ordinary vassals individually through political/geographic influence; de-jure regions are soft cohesion and fallback aids, not mandatory anchor quotas.
 
 ## Localization And GUI
 - Every UI-facing key must exist under `l_english:`. Check dynamic localization methods against the actual scope type. For saved event scopes, use the working direct form `[saved_name.GetName]`; `scope:` is script syntax and can break event tooltips when copied into localization.

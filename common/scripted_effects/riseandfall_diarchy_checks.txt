@@ -1,27 +1,129 @@
 ﻿riseandfall_check_puppet_regency_end = {
-    every_ruler = {
-        limit = {
-            OR = {
-                has_diarchy_type = puppet_regency
-                employs_court_position = riseandfall_puppet_master_court_position
-            }
-        }
-        if = {
-            # Mirror the puppet_regency type's intended automatic end condition.
-            limit = {
-                has_diarchy_type = puppet_regency
-                OR = { is_landed = no is_independent_ruler = no }
-            }
-            end_diarchy = yes
-        }
+	every_ruler = {
+		limit = {
+			OR = {
+				has_diarchy_type = puppet_regency
+				has_character_flag = rf_puppet_regency_persistent
+				employs_court_position = riseandfall_puppet_master_court_position
+			}
+		}
+		riseandfall_recover_puppet_regency_se = yes
+		# The vanilla Discharge Entrenched Regent interaction marks the liege
+		# before deliberately ending the diarchy. Treat that as explicit removal.
+		if = {
+			limit = {
+				has_character_flag = rf_puppet_regency_persistent
+				NOT = { has_active_diarchy = yes }
+				has_character_flag = trying_to_dismiss_regent
+			}
+			remove_character_flag = rf_puppet_regency_persistent
+			remove_variable = rf_puppet_regency_diarch
+			riseandfall_puppet_regency_reconcile_succession_se = yes
+		}
+		if = {
+			limit = { has_diarchy_type = puppet_regency }
+			# If the active puppet master became unable to serve this ruler, replace
+			# them before syncing the position. Landed vassals may remain diarchs.
+			riseandfall_recover_invalid_puppet_master_se = yes
+			riseandfall_mark_puppet_regency_active_se = yes
+		}
+		# Script-driven court position assignment/cleanup. This also revokes a
+		# stale office after an explicit diarchy removal.
+		riseandfall_sync_puppet_master_court_position = yes
+	}
+}
 
-        # If the active puppet master became unable to serve this ruler, replace
-        # them before syncing the position. Landed vassals may remain diarchs.
-        riseandfall_recover_invalid_puppet_master_se = yes
+riseandfall_mark_puppet_regency_active_se = {
+	if = {
+		limit = {
+			has_diarchy_type = puppet_regency
+			has_active_diarchy = yes
+		}
+		add_character_flag = rf_puppet_regency_persistent
+		if = {
+			limit = { exists = diarch }
+			set_variable = { name = rf_puppet_regency_diarch value = diarch }
+		}
+	}
+}
 
-        # Script-driven court position assignment/cleanup.
-        riseandfall_sync_puppet_master_court_position = yes
-    }
+# Rebuild a Puppet Regency that disappeared without its persistent marker being
+# cleared. The marker is intentionally not removed when no candidate is found;
+# the next safety pulse can try again after the court changes.
+riseandfall_recover_puppet_regency_se = {
+	if = {
+		limit = {
+			has_character_flag = rf_puppet_regency_persistent
+			NOT = { has_active_diarchy = yes }
+			is_landed = yes
+			is_independent_ruler = yes
+		}
+		clear_saved_scope = rf_puppet_regency_recovery_diarch
+		if = {
+			limit = {
+				has_variable = rf_puppet_regency_diarch
+				var:rf_puppet_regency_diarch = {
+					is_alive = yes
+					is_adult = yes
+					is_imprisoned = no
+					is_incapable = no
+					OR = {
+						is_ruler = no
+						is_vassal_of = root
+					}
+				}
+			}
+			var:rf_puppet_regency_diarch = { save_scope_as = rf_puppet_regency_recovery_diarch }
+		}
+		if = {
+			limit = { NOT = { exists = scope:rf_puppet_regency_recovery_diarch } }
+			ordered_courtier = {
+				limit = {
+					is_alive = yes
+					is_adult = yes
+					is_imprisoned = no
+					is_incapable = no
+					OR = {
+						is_ruler = no
+						is_vassal_of = root
+					}
+				}
+				order_by = {
+					add = intrigue
+					add = diplomacy
+					add = stewardship
+					add = martial
+					add = learning
+				}
+				max = 1
+				save_scope_as = rf_puppet_regency_recovery_diarch
+			}
+		}
+		if = {
+			limit = { exists = scope:rf_puppet_regency_recovery_diarch }
+			try_start_diarchy = puppet_regency
+			if = {
+				limit = { has_active_diarchy = yes }
+				set_diarch = scope:rf_puppet_regency_recovery_diarch
+				set_diarchy_type = puppet_regency
+				set_diarchy_swing = 90
+				set_variable = { name = rf_puppet_regency_diarch value = scope:rf_puppet_regency_recovery_diarch }
+			}
+		}
+		clear_saved_scope = rf_puppet_regency_recovery_diarch
+	}
+}
+
+# Intentional removal path. Clear the marker before ending the diarchy so the
+# periodic recovery cannot recreate a deliberately removed Puppet Regency.
+riseandfall_end_puppet_regency_forcefully_se = {
+	if = {
+		limit = { has_diarchy_type = puppet_regency }
+		remove_character_flag = rf_puppet_regency_persistent
+		remove_variable = rf_puppet_regency_diarch
+		end_diarchy = yes
+		riseandfall_puppet_regency_reconcile_succession_se = yes
+	}
 }
 
 riseandfall_recover_invalid_puppet_master_se = {
@@ -76,11 +178,11 @@ riseandfall_recover_invalid_puppet_master_se = {
             set_diarch = scope:rf_replacement_puppet_master
             set_diarchy_type = puppet_regency
             set_diarchy_swing = 90
+            set_variable = { name = rf_puppet_regency_diarch value = scope:rf_replacement_puppet_master }
         }
         else = {
-            # No valid office holder exists; end the stale puppet regency rather
-            # than leaving a hidden or unusable puppet master behind.
-            end_diarchy = yes
+            # Keep the persistent diarchy alive and let the periodic recovery
+            # pass try again after the court has changed.
         }
 
         clear_saved_scope = rf_replacement_puppet_master
@@ -143,7 +245,7 @@ riseandfall_accept_puppet_succession_status_quo_se = {
     }
     else = {
         # If the old puppet master cannot serve the new ruler, let the diarchy
-        # system find a valid replacement or end cleanly.
+        # system find a valid replacement and keep the persistent state alive.
         if = {
             limit = { NOT = { has_active_diarchy = yes } }
             try_start_diarchy = puppet_regency
@@ -153,6 +255,15 @@ riseandfall_accept_puppet_succession_status_quo_se = {
             set_diarchy_type = puppet_regency
             set_diarchy_swing = 90
             riseandfall_recover_invalid_puppet_master_se = yes
+        }
+    }
+
+    if = {
+        limit = { has_active_diarchy = yes }
+        add_character_flag = rf_puppet_regency_persistent
+        if = {
+            limit = { exists = diarch }
+            set_variable = { name = rf_puppet_regency_diarch value = diarch }
         }
     }
 
