@@ -1,10 +1,10 @@
-﻿warlord_alliance_interaction = {
+﻿riseandfall_warlord_alliance_interaction = {
 	category = interaction_riseandfall
 	ai_min_reply_days = 4
 	ai_max_reply_days = 9
 	icon = alliance
 
-	send_name = riseandfall_warlord_alliance_interaction
+		send_name = riseandfall_warlord_alliance_interaction
 
 	interface_priority = 60
 	desc = riseandfall_warlord_alliance_interaction_desc

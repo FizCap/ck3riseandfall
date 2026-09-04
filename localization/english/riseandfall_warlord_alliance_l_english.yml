@@ -1,6 +1,6 @@
 ﻿l_english:
     # Warlord Alliance interaction localization
-    riseandfall_warlord_alliance_interaction: "Propose Warlord Alliance"
+    riseandfall_warlord_alliance_interaction:0 "Propose Warlord Alliance"
     riseandfall_warlord_alliance_interaction_desc: "Propose a formal pact of mutual support between two warlord rulers who share the same liege. If accepted, an alliance will be formed between the two rulers."
     # Optional short notification (if you want a custom one)
     riseandfall_warlord_alliance_notification: "%recipient% has been offered a warlord alliance by %actor%."
