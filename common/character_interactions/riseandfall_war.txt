@@ -149,7 +149,7 @@ declare_war_interaction = {
 			trigger_if = {
 				limit = {
 					NOT = { government_allows = administrative }
-					NOT = { has_trait = warlord }
+					NOT = { riseandfall_is_any_warlord_trigger = yes }
 					liege ?= {
 						has_realm_law_flag = vassal_all_wars_banned_permanent
 						this != scope:actor
@@ -171,7 +171,7 @@ declare_war_interaction = {
 							has_participant_group_parameter = dynastic_cycle_vassal_internal_wars_allowed
 						}
 					}
-					NOT = { has_trait = warlord }
+					NOT = { riseandfall_is_any_warlord_trigger = yes }
 				}
 				custom_tooltip = {
 					text = admin_cannot_declare_internal_wars
@@ -186,7 +186,7 @@ declare_war_interaction = {
 						this != scope:recipient.top_liege
 						has_realm_law_flag = admin_vassal_wars_restricted
 					}
-					NOT = { has_trait = warlord }
+					NOT = { riseandfall_is_any_warlord_trigger = yes }
 				}
 				custom_tooltip = {
 					text = admin_all_vassal_wars_banned
@@ -208,7 +208,7 @@ declare_war_interaction = {
 						has_realm_law_flag = admin_vassal_wars_permission_only
 						NOT = { has_realm_law_flag = admin_vassal_wars_banned }
 					}
-					NOT = { has_trait = warlord }
+					NOT = { riseandfall_is_any_warlord_trigger = yes }
 				}
 				custom_tooltip = {
 					text = admin_vassal_wars_permission_only_desc
@@ -226,7 +226,7 @@ declare_war_interaction = {
 						this != scope:recipient.top_liege
 						has_realm_law_flag = admin_vassal_wars_banned
 					}
-					NOT = { has_trait = warlord }
+					NOT = { riseandfall_is_any_warlord_trigger = yes }
 				}
 				custom_tooltip = {
 					text = admin_all_vassal_wars_banned
