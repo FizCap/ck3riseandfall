@@ -199,7 +199,6 @@ riseandfall_warlord_retire_legacy_se = {
     remove_variable = rf_warlord_legacy_expiry
     remove_variable = rf_warlord_legacy_expiry_initialized
     remove_variable = riseandfall_warlord_invitation_pending
-    set_variable = { name = riseandfall_warlord_retired_cooldown value = yes years = 5 }
     if = {
         limit = { exists = scope:rf_legacy_retiring_liege }
         scope:rf_legacy_retiring_liege = {
@@ -287,7 +286,6 @@ riseandfall_warlord_renew_liege_reason_se = {
 
 # Expected scope: independent liege whose Warlord Era has ended.
 riseandfall_warlord_clear_era_state_se = {
-    remove_character_flag = rf_warlord_crisis_active
     remove_variable = rf_warlord_crisis_count
     remove_variable = rf_warlord_crisis_territory_pct
     remove_variable = rf_warlord_rebel_count
@@ -301,7 +299,6 @@ riseandfall_warlord_clear_era_state_se = {
     }
     every_vassal = {
         limit = { is_landed = yes }
-        remove_character_flag = riseandfall_warlord_player_loyal
         remove_variable = riseandfall_warlord_invitation_pending
     }
 }
@@ -358,7 +355,6 @@ riseandfall_warlord_end_era_realm_split_se = {
             limit = { riseandfall_is_active_warlord_trigger = yes }
             if = { limit = { has_trait = warlord } remove_trait = warlord }
             if = { limit = { has_trait = loyalwarlord } remove_trait = loyalwarlord }
-            set_variable = { name = riseandfall_warlord_retired_cooldown value = yes years = 5 }
         }
     }
     clear_saved_scope = rf_warlord_era_vassal
@@ -397,7 +393,6 @@ riseandfall_warlord_end_era_loyal_victory_se = {
             }
             if = { limit = { has_trait = warlord } remove_trait = warlord }
             if = { limit = { has_trait = loyalwarlord } remove_trait = loyalwarlord }
-            set_variable = { name = riseandfall_warlord_retired_cooldown value = yes years = 5 }
         }
         riseandfall_warlord_clear_era_state_se = yes
         riseandfall_warlord_reconcile_succession_se = yes

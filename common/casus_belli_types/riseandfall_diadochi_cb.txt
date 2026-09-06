@@ -54,8 +54,14 @@
 
     on_invalidated_desc = msg_invalidate_war_title
     on_invalidated = {
-        scope:attacker = { remove_variable = rf_diadochi_prewar_realm_size }
-        scope:defender = { remove_variable = rf_diadochi_prewar_realm_size }
+        scope:attacker = {
+            remove_variable = rf_diadochi_prewar_realm_size
+            remove_variable = rf_diadochi_pre_settlement_realm_size
+        }
+        scope:defender = {
+            remove_variable = rf_diadochi_prewar_realm_size
+            remove_variable = rf_diadochi_pre_settlement_realm_size
+        }
     }
 
     cost = {
@@ -70,10 +76,18 @@
                 name = rf_diadochi_prewar_realm_size
                 value = realm_size
             }
+            set_variable = {
+                name = rf_diadochi_pre_settlement_realm_size
+                value = realm_size
+            }
         }
         scope:defender = {
             set_variable = {
                 name = rf_diadochi_prewar_realm_size
+                value = realm_size
+            }
+            set_variable = {
+                name = rf_diadochi_pre_settlement_realm_size
                 value = realm_size
             }
         }
@@ -297,8 +311,14 @@
         scope:attacker = { fp1_remember_recent_conquest_victory_effect = yes }
         laamp_as_mercenary_payout_tooltip_effect = yes
 
-        scope:attacker = { remove_variable = rf_diadochi_prewar_realm_size }
-        scope:defender = { remove_variable = rf_diadochi_prewar_realm_size }
+        scope:attacker = {
+            remove_variable = rf_diadochi_prewar_realm_size
+            remove_variable = rf_diadochi_pre_settlement_realm_size
+        }
+        scope:defender = {
+            remove_variable = rf_diadochi_prewar_realm_size
+            remove_variable = rf_diadochi_pre_settlement_realm_size
+        }
         clear_saved_scope = rf_defender_split_title
         clear_saved_scope = rf_attacker_old_split_title
     }
@@ -325,8 +345,14 @@
         add_truce_white_peace_effect = yes
         laamp_as_mercenary_payout_tooltip_effect = yes
 
-        scope:attacker = { remove_variable = rf_diadochi_prewar_realm_size }
-        scope:defender = { remove_variable = rf_diadochi_prewar_realm_size }
+        scope:attacker = {
+            remove_variable = rf_diadochi_prewar_realm_size
+            remove_variable = rf_diadochi_pre_settlement_realm_size
+        }
+        scope:defender = {
+            remove_variable = rf_diadochi_prewar_realm_size
+            remove_variable = rf_diadochi_pre_settlement_realm_size
+        }
     }
 
     on_defeat = {
@@ -368,8 +394,14 @@
 
         laamp_as_mercenary_payout_tooltip_effect = yes
 
-        scope:attacker = { remove_variable = rf_diadochi_prewar_realm_size }
-        scope:defender = { remove_variable = rf_diadochi_prewar_realm_size }
+        scope:attacker = {
+            remove_variable = rf_diadochi_prewar_realm_size
+            remove_variable = rf_diadochi_pre_settlement_realm_size
+        }
+        scope:defender = {
+            remove_variable = rf_diadochi_prewar_realm_size
+            remove_variable = rf_diadochi_pre_settlement_realm_size
+        }
     }
 
     transfer_behavior = transfer

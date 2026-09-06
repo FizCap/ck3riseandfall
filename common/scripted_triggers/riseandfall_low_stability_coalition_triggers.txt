@@ -16,6 +16,10 @@ riseandfall_low_stability_coalition_available_trigger = {
     any_independent_ruler = {
         count >= 2
         riseandfall_coalition_potential_invitee_trigger = yes
+        NOT = { target_is_same_character_or_above = root }
+        in_diplomatic_range = root
+        NOT = { is_allied_to = root }
+        NOT = { has_truce = root }
     }
 }
 

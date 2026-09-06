@@ -64,20 +64,15 @@ riseandfall_coalition_target_still_valid_trigger = {
     NOT = { riseandfall_coalition_target_has_active_war_trigger = yes }
 }
 
-# A ruler who could give the Coalition at least one legal attacker slot.
+# Target-independent requirements for a ruler who could occupy a Coalition
+# attacker slot. Cross-scope checks stay at each iterator call site because a
+# nested scripted trigger does not retain that caller's root scope.
 riseandfall_coalition_potential_invitee_trigger = {
-    # This trigger runs inside an ordered ruler iterator. A direct scope
-    # comparison is not valid CK3 syntax; this target relation excludes the
-    # saved target itself while retaining the independent-ruler candidate pool.
-    NOT = { target_is_same_character_or_above = { target = scope:coalition_target } }
     is_alive = yes
     is_landed = yes
     is_independent_ruler = yes
     exists = primary_title
-    in_diplomatic_range = scope:coalition_target
     is_at_war = no
-    NOT = { is_allied_to = scope:coalition_target }
-    NOT = { has_truce = scope:coalition_target }
     NOT = { has_variable = rf_coalition_target }
     NOR = {
         government_has_flag = government_is_landless_adventurer

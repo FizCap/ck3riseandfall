@@ -833,6 +833,10 @@ riseandfall_coalition_prepare_invitations_se = {
         ordered_independent_ruler = {
             limit = {
                 riseandfall_coalition_potential_invitee_trigger = yes
+                NOT = { target_is_same_character_or_above = scope:coalition_target }
+                in_diplomatic_range = scope:coalition_target
+                NOT = { is_allied_to = scope:coalition_target }
+                NOT = { has_truce = scope:coalition_target }
             }
             order_by = military_power
             set_variable = { name = rf_coalition_target value = scope:coalition_target days = 60 }
@@ -1268,7 +1272,9 @@ riseandfall_coalition_cast_light_victory_vote_se = {
     scope:coalition_vote_target = {
         change_variable = { name = rf_coalition_vote_light add = 1 }
         change_variable = { name = rf_coalition_vote_remaining add = -1 }
-        riseandfall_coalition_continue_victory_vote_se = yes
+        # Resume on a fresh event frame so a large AI Coalition cannot exhaust
+        # CK3's scripted-effect call depth before reaching its verdict.
+        trigger_event = { id = coalition.1200 delayed = yes }
     }
 }
 
@@ -1278,7 +1284,7 @@ riseandfall_coalition_cast_medium_victory_vote_se = {
     scope:coalition_vote_target = {
         change_variable = { name = rf_coalition_vote_medium add = 1 }
         change_variable = { name = rf_coalition_vote_remaining add = -1 }
-        riseandfall_coalition_continue_victory_vote_se = yes
+        trigger_event = { id = coalition.1200 delayed = yes }
     }
 }
 
@@ -1288,7 +1294,7 @@ riseandfall_coalition_cast_heavy_victory_vote_se = {
     scope:coalition_vote_target = {
         change_variable = { name = rf_coalition_vote_heavy add = 1 }
         change_variable = { name = rf_coalition_vote_remaining add = -1 }
-        riseandfall_coalition_continue_victory_vote_se = yes
+        trigger_event = { id = coalition.1200 delayed = yes }
     }
 }
 
@@ -1408,18 +1414,24 @@ riseandfall_coalition_choose_heavy_tiebreak_se = {
 
 riseandfall_coalition_apply_victory_indemnity_se = {
     save_scope_as = coalition_vote_target
-    # Three years of income is split among all ballot members. Use the native
-    # payer-to-recipient effect: add_gold cannot deduct a negative amount.
-    set_variable = { name = rf_coalition_vote_indemnity value = { value = yearly_character_income multiply = 3 } }
+    # Three years of positive income is split among all ballot members. Use
+    # explicit amounts because the treasury-income helper rejects negative net
+    # income rather than resolving a valid indemnity.
     every_ruler = {
         limit = { var:rf_coalition_vote_target ?= scope:coalition_vote_target }
         save_scope_as = coalition_vote_recipient
         scope:coalition_vote_target = {
-            pay_short_term_gold = {
-                target = scope:coalition_vote_recipient
-                gold = {
-                    value = var:rf_coalition_vote_indemnity
-                    divide = var:rf_coalition_vote_members
+            if = {
+                limit = { has_treasury = yes }
+                pay_short_term_treasury = {
+                    target = scope:coalition_vote_recipient
+                    treasury = riseandfall_coalition_indemnity_treasury_share_value
+                }
+            }
+            else = {
+                pay_short_term_gold = {
+                    target = scope:coalition_vote_recipient
+                    gold = riseandfall_coalition_indemnity_gold_share_value
                 }
             }
         }
@@ -1466,47 +1478,12 @@ riseandfall_coalition_apply_medium_punishment_se = {
 }
 
 riseandfall_coalition_apply_heavy_punishment_se = {
-    # Capture the primary-title successor before deposition. The full county
-    # breakup happens first, so the successor inherits only the core and any
-    # unmarked personal titles rather than reabsorbing peripheral shards.
-    primary_title = { save_scope_as = coalition_heavy_primary_title }
-    scope:coalition_heavy_primary_title = {
-        every_title_heir = {
-            # Keep the first living successor in the title's succession order.
-            # `break` is not a supported CK3 scripted effect.
-            limit = { is_alive = yes NOT = { exists = scope:coalition_heavy_successor } }
-            save_scope_as = coalition_heavy_successor
-        }
-    }
+    # Break up the periphery while the defeated ruler still owns the realm,
+    # then let vanilla deposition and succession handle every surviving title.
     riseandfall_coalition_release_periphery_se = yes
     riseandfall_coalition_grant_victorious_rebel_independence_se = yes
     var:rf_coalition_vote_leader = { save_scope_as = coalition_vote_leader }
     depose_effect = { DEPOSER = scope:coalition_vote_leader }
-    # Deposition awards the crown through its normal succession. Move every
-    # remaining former personal title to that same snapshotted successor.
-    if = {
-        limit = { exists = scope:coalition_heavy_successor }
-        every_held_title = {
-            # County titles carry their baronies; attempting to transfer a
-            # capital barony directly aborts the remaining Heavy handoff.
-            limit = { tier >= tier_county }
-            scope:coalition_heavy_successor = {
-                create_title_and_vassal_change = {
-                    type = granted
-                    save_scope_as = coalition_heavy_title_change
-                    add_claim_on_loss = yes
-                }
-            }
-            change_title_holder_include_vassals = {
-                holder = scope:coalition_heavy_successor
-                change = scope:coalition_heavy_title_change
-                take_baronies = no
-            }
-            resolve_title_and_vassal_change = scope:coalition_heavy_title_change
-        }
-    }
-    clear_saved_scope = coalition_heavy_successor
-    clear_saved_scope = coalition_heavy_primary_title
 }
 
 # Only original internal attackers carry the ballot rebel marker. They are
@@ -1552,6 +1529,17 @@ riseandfall_coalition_grant_victorious_rebel_independence_se = {
 }
 
 riseandfall_coalition_resolve_victory_vote_se = {
+    # The defeated player must see and acknowledge the selected tier before
+    # Medium concessions or Heavy deposition changes their realm/character.
+    riseandfall_coalition_announce_victory_vote_se = yes
+    if = {
+        limit = { is_ai = no }
+        add_character_flag = rf_coalition_verdict_pending
+    }
+    else = { riseandfall_coalition_apply_victory_verdict_se = yes }
+}
+
+riseandfall_coalition_apply_victory_verdict_se = {
     # A verdict ends the current crisis. Harsher settlements buy the successor
     # and surviving core more time before another offensive Coalition can form.
     if = {
@@ -1563,18 +1551,21 @@ riseandfall_coalition_resolve_victory_vote_se = {
         riseandfall_coalition_consume_threat_se = { YEARS = 15 }
     }
     else = { riseandfall_coalition_consume_threat_se = { YEARS = 20 } }
-    # Every Coalition verdict pays the same three-year indemnity to every
-    # ballot member; Medium and Heavy add their political punishment below.
-    riseandfall_coalition_apply_victory_indemnity_se = yes
     if = {
-        limit = { var:rf_coalition_vote_result = 2 }
-        riseandfall_coalition_apply_medium_punishment_se = yes
+        limit = { var:rf_coalition_vote_result = 1 }
+        riseandfall_coalition_apply_victory_indemnity_se = yes
     }
     else_if = {
-        limit = { var:rf_coalition_vote_result = 3 }
+        limit = { var:rf_coalition_vote_result = 2 }
+        riseandfall_coalition_apply_victory_indemnity_se = yes
+        riseandfall_coalition_apply_medium_punishment_se = yes
+    }
+    else = {
+        # Heavy pays first while the defeated ruler and all ballot scopes are
+        # intact; normal deposition and succession resolve afterward.
+        riseandfall_coalition_apply_victory_indemnity_se = yes
         riseandfall_coalition_apply_heavy_punishment_se = yes
     }
-    riseandfall_coalition_announce_victory_vote_se = yes
     riseandfall_coalition_clear_victory_vote_state_se = yes
 }
 
@@ -1598,9 +1589,7 @@ riseandfall_coalition_announce_victory_vote_se = {
         set_variable = { name = rf_coalition_vote_result_medium value = var:rf_coalition_vote_medium }
         set_variable = { name = rf_coalition_vote_result_heavy value = var:rf_coalition_vote_heavy }
         set_variable = { name = rf_coalition_vote_result_choice value = var:rf_coalition_vote_result }
-        # The defeated player has no open ballot event, so show the verdict
-        # during the surrender resolution instead of waiting for the next tick.
-        trigger_event = { id = coalition.1203 }
+        trigger_event = { id = coalition.1203 delayed = yes }
     }
 }
 
@@ -1618,6 +1607,7 @@ riseandfall_coalition_clear_victory_vote_state_se = {
     remove_character_flag = rf_coalition_under_attack
     remove_variable = rf_coalition_core_title
     remove_character_flag = rf_coalition_vote_has_voters
+    remove_character_flag = rf_coalition_verdict_pending
     remove_character_flag = rf_coalition_vote_tie_light
     remove_character_flag = rf_coalition_vote_tie_medium
     remove_character_flag = rf_coalition_vote_tie_heavy
@@ -1629,7 +1619,6 @@ riseandfall_coalition_clear_victory_vote_state_se = {
     remove_variable = rf_coalition_vote_members
     remove_variable = rf_coalition_vote_tie_count
     remove_variable = rf_coalition_vote_result
-    remove_variable = rf_coalition_vote_indemnity
 }
 
 riseandfall_coalition_clear_victory_vote_result_se = {

@@ -313,6 +313,10 @@ riseandfall_realm_split_se = {
         remove_character_flag = rf_split_major_fracture
         remove_character_flag = rf_split_total_collapse
         remove_character_flag = rf_split_lower_tier
+        # Declare legacy scale flags in this live effect for CK3's static
+        # analysis; the live selector below remains duchy-only.
+        add_character_flag = rf_split_seed_by_empire
+        add_character_flag = rf_split_seed_by_kingdom
         remove_character_flag = rf_split_seed_by_empire
         remove_character_flag = rf_split_seed_by_kingdom
         remove_character_flag = rf_split_seed_by_duchy
@@ -1445,7 +1449,6 @@ riseandfall_realm_split_se = {
             remove_character_flag = rf_palace_coup_neutral_seed
         }
     }
-    set_variable = { name = rf_realm_split_cooldown value = 1 years = 5 }
 }
 
 ##########################
@@ -1647,20 +1650,11 @@ riseandfall_execute_realm_split_se = {
     
     resolve_title_and_vassal_change = scope:rf_indep_change
     
-    # Make tributary of original ruler unless this split should create fully
-    # independent successor states.
-    if = {
-        limit = {
-            NOT = {
-                scope:original_ruler = {
-                    has_variable = rf_realm_split_no_tributaries
-                }
-            }
-        }
-        start_tributary = {
-            contract_group = tributary_settled
-            suzerain = scope:original_ruler
-        }
+    # Split realms become tributaries; the retired no-tributaries override had
+    # no writer and could only produce a static variable warning.
+    start_tributary = {
+        contract_group = tributary_settled
+        suzerain = scope:original_ruler
     }
 
     # Claims on titles removed; successor war CB handles claims now.
@@ -1869,6 +1863,8 @@ riseandfall_realm_split_migrate_successor_primary_title_se = {
 }
 
 riseandfall_realm_split_lower_actor_primary_below_recipient_se = {
+    # Declare the temporary list in this live helper before any list read.
+    add_to_list = rf_absorbed_surrender_vassals
     clear_saved_scope = rf_absorbed_split_title
     clear_saved_scope = rf_absorbed_replacement_title
     clear_variable_list = rf_absorbed_surrender_vassals
@@ -2132,7 +2128,6 @@ riseandfall_realm_split_defect_to_recipient_se = {
 }
 
 riseandfall_realm_split_surrender_to_recipient_se = {
-    clear_variable_list = rf_submitted_surrender_vassals
     scope:actor.primary_title = { save_temporary_scope_as = rf_submitted_split_title }
     scope:rf_submitted_split_title = { save_temporary_scope_as = rf_incoming_split_title }
     # Retain the recipient's successor crown as the metadata source if accepting

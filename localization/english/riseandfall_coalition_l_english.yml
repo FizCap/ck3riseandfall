@@ -78,7 +78,7 @@
  coalition.1201.b:0 "Medium punishment: demand peripheral concessions"
  coalition.1201.b.tt:0 "[coalition_vote_target.GetShortUIName] pays the Coalition indemnity. The largest peripheral de jure kingdoms are released until at least half of the original peripheral counties are gone; participating rebel vassals become independent."
  coalition.1201.c:0 "Heavy punishment: force abdication and breakup"
- coalition.1201.c.tt:0 "[coalition_vote_target.GetShortUIName] pays the Coalition indemnity, abdicates to the original primary-title successor, and every peripheral county is released. The original primary crown and exact de jure core survive."
+ coalition.1201.c.tt:0 "[coalition_vote_target.GetShortUIName] pays the Coalition indemnity first, releases every peripheral county, and then abdicates through normal succession. The original primary crown and exact de jure core survive."
 
  coalition.1202.t:0 "The Leader Must Decide"
  coalition.1202.d:0 "The Coalition's vote against [coalition_vote_target.GetTitledFirstName] is tied. As Coalition leader, you must select one of the tied punishments.\n\nLight: #V [coalition_vote_target.MakeScope.Var('rf_coalition_vote_light').GetValue|0]#!\nMedium: #V [coalition_vote_target.MakeScope.Var('rf_coalition_vote_medium').GetValue|0]#!\nHeavy: #V [coalition_vote_target.MakeScope.Var('rf_coalition_vote_heavy').GetValue|0]#!"

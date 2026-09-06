@@ -18,7 +18,6 @@ riseandfall_story_world_climate_se = {
     set_global_variable = { name = riseandfall_story_world_unstable_pct value = 0 }
     set_global_variable = { name = riseandfall_story_world_risky_pct value = 0 }
     set_global_variable = { name = riseandfall_story_world_crisis_pct value = 0 }
-    set_global_variable = { name = riseandfall_story_target_unstable_pct value = 10 }
     set_global_variable = { name = riseandfall_story_world_pressure value = 0 }
     set_global_variable = { name = riseandfall_story_world_climate value = 0 }
     set_global_variable = { name = riseandfall_world_total value = 0 }
@@ -26,7 +25,6 @@ riseandfall_story_world_climate_se = {
 
     if = {
         limit = { has_game_rule = riseandfall_dynamic_story_mode_forced }
-        set_global_variable = { name = riseandfall_story_target_unstable_pct value = 30 }
     }
 
     every_independent_ruler = {
@@ -532,8 +530,6 @@ riseandfall_apply_dynamic_story_pressure_se = {
 
     # One-time compatibility cleanup for saves from the retired Legacy
     # Isolation system. Rival danger is now entirely a live yearly comparison.
-    remove_variable = riseandfall_story_no_rival_years
-    remove_variable = riseandfall_story_no_rival_pressure
 
     # Title-gain refreshes can run at game start before the yearly world pass
     # seeds Story Mode globals. Neutral pressure keeps those early reads safe.

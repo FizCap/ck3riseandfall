@@ -86,7 +86,6 @@ warlord.1012 = {
         ai_chance = { base = 100 }
     }
 }
-
 # Player-facing notice when an inherited legacy banner expires.
 warlord.1013 = {
     type = character_event
@@ -229,29 +228,5 @@ warlord.1002 = {
                 add = 10
             }
         }
-    }
-}
-
-# Legacy player-facing Warlord choice. AI continuation and retirement are
-# calculated directly on the yearly pulse so percentage chances are exact.
-warlord.1003 = {
-    type = character_event
-    title = warlord.1003.t
-    desc = warlord.1003.d
-    theme = realm
-
-    left_portrait = liege
-    right_portrait = root
-
-    option = {
-        name = warlord.1003.a
-        # Continue as a regional Warlord.
-        ai_chance = { base = 100 }
-    }
-    option = {
-        name = warlord.1003.b
-        # Abandon the Warlord path.
-        riseandfall_warlord_abandon_path = yes
-        ai_chance = { base = 0 }
     }
 }

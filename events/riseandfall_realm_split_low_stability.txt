@@ -151,29 +151,6 @@ realm_split.1001 = {
     }
 }
 
-# Notification event for vassals who become independent through the split
-realm_split.1002 = {
-    type = character_event
-    title = realm_split.1002.t
-    desc = realm_split.1002.d
-    theme = realm
-    
-    left_portrait = {
-        character = root
-        animation = personality_bold
-    }
-    right_portrait = {
-        character = scope:former_liege
-        animation = stress
-    }
-    
-    option = {
-        name = realm_split.1002.a
-        
-        custom_tooltip = realm_split.1002.a.tt
-    }
-}
-
 realm_split.2001 = {
     type = character_event
     title = realm_split.2001.t

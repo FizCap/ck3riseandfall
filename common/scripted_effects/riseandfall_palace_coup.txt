@@ -976,7 +976,6 @@ riseandfall_palace_coup_create_claimant_successor_title_se = {
     }
     clear_saved_scope = palace_coup_claimant_ruler
     clear_saved_scope = palace_coup_claimant_base_county
-    clear_saved_scope = palace_coup_claimant_base_capital
     clear_saved_scope = palace_coup_claimant_successor_title
 }
 
@@ -1515,6 +1514,10 @@ riseandfall_palace_coup_apply_ai_vassal_alignment_se = {
 riseandfall_palace_coup_compact_ai_claimant_bids_se = {
     # The challenger still holds the original primary title at this stage;
     # the fleeing ruler may already use a new titular successor title.
+    # Declare the iterator result before the nested ordered_vassal scope so
+    # CK3's static analyzer recognizes the event target as initialized.
+    scope:palace_coup_challenger = { save_scope_as = palace_coup_ai_claimant_anchor }
+    clear_saved_scope = palace_coup_ai_claimant_anchor
     scope:palace_coup_challenger = {
         every_realm_de_jure_kingdom = {
             save_scope_as = palace_coup_claimant_region

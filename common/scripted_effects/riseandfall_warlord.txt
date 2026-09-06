@@ -19,7 +19,6 @@ riseandfall_warlord_become_warlord = {
     save_scope_as = rf_warlord_actor
     if = {
         limit = { is_landed = yes }
-        remove_character_flag = riseandfall_warlord_player_loyal
         remove_character_flag = rf_warlord_legacy
         remove_variable = rf_warlord_legacy_expiry
         remove_variable = rf_warlord_legacy_expiry_initialized
@@ -53,7 +52,6 @@ riseandfall_warlord_become_loyal = {
     save_scope_as = rf_warlord_actor
     if = {
         limit = { is_landed = yes }
-        remove_character_flag = riseandfall_warlord_player_loyal
         remove_character_flag = rf_warlord_legacy
         remove_variable = rf_warlord_legacy_expiry
         remove_variable = rf_warlord_legacy_expiry_initialized
@@ -98,7 +96,6 @@ riseandfall_warlord_abandon_path = {
     remove_character_flag = rf_warlord_legacy
     remove_variable = rf_warlord_legacy_expiry
     remove_variable = rf_warlord_legacy_expiry_initialized
-    set_variable = { name = riseandfall_warlord_retired_cooldown value = yes years = 5 }
     if = {
         limit = { exists = scope:rf_warlord_retiring_liege }
         scope:rf_warlord_retiring_liege = {

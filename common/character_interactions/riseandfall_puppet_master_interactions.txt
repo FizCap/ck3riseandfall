@@ -52,7 +52,7 @@ riseandfall_steal_gold_interaction = {
 		always = yes
 	}
 	# Allow AI to consider this interaction
-	ai_potential = { is_alive = yes }
+	ai_potential = { exists = this is_alive = yes }
 	# Immediate execution (hidden)
 	on_accept = {
 		custom_tooltip = { text = riseandfall_steal_gold_interaction_desc }
@@ -277,7 +277,7 @@ riseandfall_curry_favor_interaction = {
 	cooldown_against_recipient = { years = 1 }
 
 	# Allow AI to consider this interaction
-	ai_potential = { is_alive = yes }
+	ai_potential = { exists = this is_alive = yes }
 
 	ai_targets = {
 		ai_recipients = liege
@@ -480,7 +480,7 @@ riseandfall_seize_liege_land_interaction = {
 	cooldown = { years = 5 }
 	cooldown_against_recipient = { years = 5 }
 
-	ai_potential = { is_alive = yes }
+	ai_potential = { exists = this is_alive = yes }
 
 	ai_targets = {
 		ai_recipients = liege
@@ -616,7 +616,7 @@ riseandfall_overthrow_liege_interaction = {
 	cooldown_against_recipient = { years = 1 }
 
 	# Allow AI to consider this interaction
-	ai_potential = { is_alive = yes }
+	ai_potential = { exists = this is_alive = yes }
 
     ai_targets = {
 		ai_recipients = liege
@@ -770,7 +770,7 @@ riseandfall_claim_puppet_master_office_interaction = {
 
 	# How often AI considers this by top-title tier (months)
 	ai_frequency = 1
-	ai_potential = { is_alive = yes }
+	ai_potential = { exists = this is_alive = yes }
 	ai_targets = { ai_recipients = liege max = 1 }
 	ai_will_do = {
 		base = 100

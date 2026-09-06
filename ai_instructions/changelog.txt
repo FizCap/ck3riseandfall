@@ -1,46 +1,12 @@
-﻿CK3: Rise and Fall - 1.2.7
+﻿CK3: Rise and Fall - 1.2.8
+Puppet Master
+- Guarded AI interaction eligibility against missing character scopes so diarch rule checks no longer evaluate a dead or nonexistent character.
 
-Adventurer Invasion
-- Adventurer invasion armies now reinforce damaged men-at-arms regiments by 5% of each regiment's maximum size after completing a siege, alongside the existing special-troop reinforcement.
-- Special troops spawned for a legitimist adventurer now decay by 10% per year after the adventurer becomes landed, leaving the ruler's normal armies unaffected.
-
-Puppet Regency
-- Added separate script-only Puppet Regency partition and single-heir succession laws. Both exclude landed candidates while preserving the realm's original partition or unified succession branch, which is restored when the regency ends.
-- Removed the quarterly fallback that forcibly recreated a missing Puppet Master court position during a sync mismatch.
-- Removed the obsolete Force Abdication interaction and its localization.
-- Administrative Puppet Regency realms now retain their normal appointment succession while landed candidates receive a disqualifying score penalty in the Imperial appointment pool.
-- Puppet Regency is now persistent until explicit removal: court-position desyncs, landed puppet masters, title transfers, and temporary candidate loss no longer end the diarchy, and the stored puppet master can be restored by the safety sync.
-- Independent pretenders who seize a Puppet Regency realm now receive the same choice to submit to or overthrow the existing Puppet Master as inherited rulers.
-- Puppet Regency balance now returns to neutral when the realm's stability rises above 50.
-
-Realm Split
-- Reworked standard realm splits to select successor anchors from the full eligible vassal pool instead of guaranteeing one anchor per de jure region. Multiple anchors can now emerge within one region, while political ties, military strength, and adjacency shape each vassal's final alignment.
-
-Palace Coup
-- Improved palace-coup realm splits with soft de jure regional cohesion: AI vassals favor nearby successor blocs, isolated choices require stronger personal reasons, claimant support prioritizes local duchies and kingdoms, and neutral breakaways now select one rally point per region.
-- Compacted multiple AI claimant bids within the same de jure kingdom around the strongest claimant, reducing disconnected successor islands while preserving player-selected claimant bids.
-- Added contiguous retreat-state growth for large palace-coup realms: a fleeing ruler below 15% of the challenger's realm can absorb up to three adjacent outer vassal blocs without overriding player, claimant, or neutral-breakaway choices.
-
-Warlords
-- Rebalanced Warlord allegiance so strongly negative opinion of the liege weighs substantially more than positive opinion, making hostile Warlords much less likely to remain loyal while avoiding easy late-game +100 opinion loyalty swings.
-
-Bordergore
-- Fixed administrative bordergore transfers causing a vanilla `primary_title` context-switch error during vassal-change processing.
-
-
-Debug
-- Moved the Rise and Fall debug decisions into the Rise and Fall decision category.
-- Added a debug decision to set Coalition Threat to 100 for testing.
-
-
-Story Mode
-- Added percentage-based collapse-pressure relief after low-stability incidents, realm splits, and palace-coup outcomes so weakened realms recover without receiving negative pressure or a fixed-point reset.
-
+Diadochi wars
+- Fixed successor-state settlement snapshots and removed stale split, Story Mode, surrender, Warlord, Palace Coup, and low-stability event state that produced startup variable warnings.
 
 Coalitions
-- Fixed low-stability Coalition availability errors caused by an unset target scope and an invalid character-scope comparison during invitee selection.
-- Fixed Coalition Threat recalculation and surrender cleanup errors by replacing tooltip-unsafe temporary values with guarded calculations.
-- Coalition Threat now resets immediately when a Coalition war ends, including before the victory verdict is resolved.
-- Prevented rulers already involved in a Coalition war from being targeted by another Coalition.
-- Fixed the Coalition Threat status tooltip parser error.
-- Fixed Coalition victory ballots failing to launch reliably after defender surrender.
+- Fixed repeated Coalition invitation and indemnity scope errors, processed large AI ballots safely across event frames, showed defeated players the verdict before punishment, and made Heavy transfer a positive-clamped three years of gold or treasury income before handing abdication and surviving-title inheritance to normal succession.
+
+Bordergore
+- Fixed bordergore cleanup so wholly misplaced sub-vassal realms transfer intact to the top liege, while mixed realms surrender only their non-de-jure counties without creating new noble families.

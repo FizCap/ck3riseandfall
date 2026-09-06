@@ -3,6 +3,36 @@
     value = var:rf_coalition_release_kingdom_count
 }
 
+# Each ballot member receives an equal, positive-clamped fraction of three
+# years of the defeated ruler's applicable income.
+riseandfall_coalition_indemnity_gold_share_value = {
+    value = 0
+    if = {
+        limit = {
+            has_variable = rf_coalition_vote_members
+            var:rf_coalition_vote_members > 0
+        }
+        add = yearly_character_income
+        min = 0
+        multiply = 3
+        divide = var:rf_coalition_vote_members
+    }
+}
+
+riseandfall_coalition_indemnity_treasury_share_value = {
+    value = 0
+    if = {
+        limit = {
+            has_variable = rf_coalition_vote_members
+            var:rf_coalition_vote_members > 0
+        }
+        add = year_character_treasury_variable_income
+        min = 0
+        multiply = 3
+        divide = var:rf_coalition_vote_members
+    }
+}
+
 # Tooltip-safe counterparts to temporary Coalition calculations. Scripted
 # values evaluate guarded operations in order, unlike effect-preview limits
 # that may inspect a later variable comparison before its setter has run.

@@ -488,7 +488,17 @@ coalition.1203 = {
     trigger = { has_variable = rf_coalition_vote_result_target }
     option = {
         name = coalition.1203.a
-        riseandfall_coalition_clear_victory_vote_result_se = yes
+        # The description already presents the chosen tier and totals. Hide the
+        # settlement implementation so tooltip construction does not preview a
+        # global recipient loop without its runtime saved scopes.
+        hidden_effect = {
+            if = {
+                limit = { has_character_flag = rf_coalition_verdict_pending }
+                remove_character_flag = rf_coalition_verdict_pending
+                riseandfall_coalition_apply_victory_verdict_se = yes
+            }
+            riseandfall_coalition_clear_victory_vote_result_se = yes
+        }
         ai_chance = { base = 100 }
     }
 }
