@@ -22,10 +22,18 @@ riseandfall_coalition_target_threat_valid_trigger = {
     has_variable = rf_coalition_threat
     var:rf_coalition_threat >= 100
     riseandfall_coalition_target_controls_five_percent_world_trigger = yes
-    has_variable = rf_coalition_peripheral_pct
-    var:rf_coalition_peripheral_pct >= 25
-    has_variable = rf_coalition_core_counties
-    var:rf_coalition_core_counties > 0
+    OR = {
+        AND = {
+            var:rf_coalition_uses_dejure_core = 1
+            has_variable = rf_coalition_peripheral_pct
+            var:rf_coalition_peripheral_pct >= 25
+            has_variable = rf_coalition_core_counties
+            var:rf_coalition_core_counties > 0
+        }
+        # A ruler with no duchy-or-higher non-titular crown has no meaningful
+        # de-jure core, so world scale is the sole territorial gate.
+        var:rf_coalition_uses_dejure_core = 0
+    }
     realm_size >= { value = scope:actor.realm_size multiply = 2 }
 }
 
@@ -36,10 +44,16 @@ riseandfall_coalition_target_core_valid_trigger = {
     is_independent_ruler = yes
     exists = primary_title
     riseandfall_coalition_target_controls_five_percent_world_trigger = yes
-    has_variable = rf_coalition_peripheral_pct
-    var:rf_coalition_peripheral_pct >= 25
-    has_variable = rf_coalition_core_counties
-    var:rf_coalition_core_counties > 0
+    OR = {
+        AND = {
+            var:rf_coalition_uses_dejure_core = 1
+            has_variable = rf_coalition_peripheral_pct
+            var:rf_coalition_peripheral_pct >= 25
+            has_variable = rf_coalition_core_counties
+            var:rf_coalition_core_counties > 0
+        }
+        var:rf_coalition_uses_dejure_core = 0
+    }
     NOT = { primary_title = { has_variable = rf_coalition_postwar_cooldown } }
     NOT = { has_character_flag = rf_coalition_under_attack }
     NOT = { riseandfall_coalition_target_has_active_war_trigger = yes }

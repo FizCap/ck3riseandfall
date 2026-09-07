@@ -1,14 +1,20 @@
 ﻿# Rise and Fall - Coalition low-stability effects
 
-# Count the defender's actual core and peripheral territory. The primary title
-# is the de-jure core; county ownership and vassal primary titles are irrelevant.
+# Count the defender's actual core and peripheral territory. A normal primary
+# title is the de-jure core. For a titular primary, use the highest held
+# non-titular duchy-or-higher title; if none exists, retain the titular primary
+# as an empty fallback core and let the 5% world-control gate decide eligibility.
 riseandfall_coalition_calculate_periphery_se = {
+    save_scope_as = coalition_periphery_ruler
     remove_variable = rf_coalition_total_counties
     remove_variable = rf_coalition_core_counties
     remove_variable = rf_coalition_peripheral_counties
     remove_variable = rf_coalition_peripheral_pct
     remove_variable = rf_coalition_recent_conquest_counties
     remove_variable = rf_coalition_recent_conquest_pct
+    remove_variable = rf_coalition_core_title
+    remove_variable = rf_coalition_uses_dejure_core
+    clear_saved_scope = coalition_calculated_core
     # County iterators discard character event targets in this CK3 build.
     # Use short-lived global scratch counters, then copy results back once the
     # iterator returns to the owning ruler.
@@ -34,10 +40,64 @@ riseandfall_coalition_calculate_periphery_se = {
             change_global_variable = { name = rf_coalition_calc_recent_conquest add = 1 }
         }
     }
-    # Only the snapshotted primary title's OWN de-jure county list is core.
-    # Do not use a liege-or-above comparison: it can make other crowns count
-    # as core through a wider hierarchy.
-    primary_title = {
+    if = {
+        limit = {
+            primary_title = {
+                is_titular = no
+                tier >= tier_duchy
+            }
+        }
+        primary_title = { save_scope_as = coalition_calculated_core }
+    }
+    else = {
+        # Select the nearest useful de-jure crown by rank. Each pass is
+        # deliberately separate because held-title iterators are unordered.
+        every_held_title = {
+            limit = { tier = tier_hegemony is_titular = no }
+            save_scope_as = coalition_calculated_core
+        }
+        if = {
+            limit = { NOT = { exists = scope:coalition_calculated_core } }
+            every_held_title = {
+                limit = { tier = tier_empire is_titular = no }
+                save_scope_as = coalition_calculated_core
+            }
+        }
+        if = {
+            limit = { NOT = { exists = scope:coalition_calculated_core } }
+            every_held_title = {
+                limit = { tier = tier_kingdom is_titular = no }
+                save_scope_as = coalition_calculated_core
+            }
+        }
+        if = {
+            limit = { NOT = { exists = scope:coalition_calculated_core } }
+            every_held_title = {
+                limit = { tier = tier_duchy is_titular = no }
+                save_scope_as = coalition_calculated_core
+            }
+        }
+        if = {
+            limit = { NOT = { exists = scope:coalition_calculated_core } }
+            primary_title = { save_scope_as = coalition_calculated_core }
+        }
+    }
+    set_variable = {
+        name = rf_coalition_core_title
+        value = scope:coalition_calculated_core
+    }
+    set_variable = { name = rf_coalition_uses_dejure_core value = 0 }
+    scope:coalition_calculated_core = {
+        if = {
+            limit = { is_titular = no }
+            scope:coalition_periphery_ruler = {
+                set_variable = { name = rf_coalition_uses_dejure_core value = 1 }
+            }
+        }
+    }
+    # Only the selected core title's OWN de-jure county list is core. Do not
+    # use a liege-or-above comparison: it can make other crowns count as core.
+    var:rf_coalition_core_title = {
         every_de_jure_county = {
             limit = { has_variable = rf_coalition_counted_realm_county }
             remove_variable = rf_coalition_counted_realm_county
@@ -68,6 +128,8 @@ riseandfall_coalition_calculate_periphery_se = {
     remove_global_variable = rf_coalition_calc_core
     remove_global_variable = rf_coalition_calc_peripheral
     remove_global_variable = rf_coalition_calc_recent_conquest
+    clear_saved_scope = coalition_calculated_core
+    clear_saved_scope = coalition_periphery_ruler
 }
 
 # Coalition Threat is an infamy-style ledger. Peace removes four points per
@@ -823,8 +885,8 @@ riseandfall_coalition_prepare_invitations_se = {
             has_character_flag = rf_coalition_formation_active
             NOT = { riseandfall_coalition_target_has_active_war_trigger = yes }
         }
-        # Snapshot the exact de-jure core before invitations can change titles.
-        primary_title = { save_scope_as = coalition_target_core }
+        # Snapshot the selected de-jure core before invitations can change titles.
+        var:rf_coalition_core_title = { save_scope_as = coalition_target_core }
         set_variable = { name = rf_coalition_core_title value = scope:coalition_target_core }
         clear_saved_scope = coalition_target_core
         # Every independent ruler in diplomatic range receives the call. Their

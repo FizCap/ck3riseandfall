@@ -1,12 +1,10 @@
-﻿CK3: Rise and Fall - 1.2.8
-Puppet Master
-- Guarded AI interaction eligibility against missing character scopes so diarch rule checks no longer evaluate a dead or nonexistent character.
-
-Diadochi wars
-- Fixed successor-state settlement snapshots and removed stale split, Story Mode, surrender, Warlord, Palace Coup, and low-stability event state that produced startup variable warnings.
-
-Coalitions
-- Fixed repeated Coalition invitation and indemnity scope errors, processed large AI ballots safely across event frames, showed defeated players the verdict before punishment, and made Heavy transfer a positive-clamped three years of gold or treasury income before handing abdication and surviving-title inheritance to normal succession.
+﻿CK3: Rise and Fall - 1.2.9
 
 Bordergore
-- Fixed bordergore cleanup so wholly misplaced sub-vassal realms transfer intact to the top liege, while mixed realms surrender only their non-de-jure counties without creating new noble families.
+- Expanded bordergore cleanup to counts: subordinate realms outside the targeted vassal's primary region transfer intact, then surrender counties outside the transferred ruler's own primary region.
+
+Coalition
+- Updated Coalition core detection to use the highest held non-titular duchy-or-higher title when a primary title is titular, with a 5% world-control fallback when no such core exists.
+
+Debugging
+- Added debug decisions to create and clean up a temporary titular primary title one rank above the current title for Coalition punishment testing.

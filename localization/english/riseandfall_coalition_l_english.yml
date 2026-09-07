@@ -7,7 +7,7 @@
  riseandfall_coalition.actor_not_allied.tooltip:0 "You cannot start a Coalition against an ally."
  riseandfall_coalition.actor_no_truce.tooltip:0 "You cannot start a Coalition while you have a truce with the target."
  riseandfall_coalition.target_independent.tooltip:0 "The target must be an independent ruler."
- riseandfall_coalition.target_threat.tooltip:0 "The target must control at least 5% of world territory, have at least 25% of its counties outside its primary title's exact de jure core, have reached 100 Coalition Threat, and be at least twice the size of your realm. Threat rises from rapid conquest, foreign de jure territory, global scale, and dominance over neighboring rulers; peaceful years reduce it."
+ riseandfall_coalition.target_threat.tooltip:0 "The target must control at least 5% of world territory, have reached 100 Coalition Threat, and be at least twice the size of your realm. If the target has a non-titular duchy-or-higher core, at least 25% of its counties must lie outside that exact de jure core. Threat rises from rapid conquest, foreign de jure territory, global scale, and dominance over neighboring rulers; peaceful years reduce it."
  riseandfall_coalition.target_no_active_war.tooltip:0 "The target is already defending against a Coalition war."
  riseandfall_coalition.target_not_forming.tooltip:0 "The target is already gathering a Coalition."
  riseandfall_coalition.target_no_beta_cooldown.tooltip:0 "A Coalition recently failed against this primary title. It cannot be targeted by another Independent Coalition for ten years."

@@ -1,0 +1,7 @@
+﻿l_english:
+ riseandfall_debug_create_temporary_higher_title:0 "Create Temporary Higher Title"
+ riseandfall_debug_create_temporary_higher_title_desc:0 "Create a titular primary title one rank above your current primary title."
+ riseandfall_debug_create_temporary_higher_title_tooltip:0 "Creates a temporary higher-rank title for Coalition testing."
+ riseandfall_debug_remove_temporary_higher_title:0 "Remove Temporary Higher Title"
+ riseandfall_debug_remove_temporary_higher_title_desc:0 "Restore your original primary title and destroy the temporary higher title."
+ riseandfall_debug_remove_temporary_higher_title_tooltip:0 "Removes the temporary title created by the Coalition test debug."

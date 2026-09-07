@@ -13,23 +13,13 @@ riseandfall_fix_bordergore_se = {
 
     scope:actor = { save_scope_as = liege }
 
-    # 1. Directly held counties by recipient that are outside ALL recipient de jure chains, but not already held by liege.
+    # 1. Directly held counties outside the recipient's primary-title de-jure region.
     # Snapshot the titles before changing their holders. Resolving a title/vassal change fires
     # on_vassal_change immediately; iterating a live held-title collection while that happens
     # can invalidate the character context used by vanilla's primary_title trigger.
     scope:recipient = {
-        # Save recipient's capital's de jure kingdom
-        capital_province = {
-            county = {
-                de_jure_liege = {
-                    de_jure_liege = {
-                        save_scope_as = recipient_capital_dejure_kingdom
-                    }
-                }
-            }
-        }
         every_held_title = {
-            # Base filters: only counties directly held by the recipient, not already held by the liege
+            # A holder's primary title defines their core de-jure region.
             limit = {
                 tier = tier_county
                 exists = de_jure_liege
@@ -37,23 +27,9 @@ riseandfall_fix_bordergore_se = {
                 NOT = { holder = scope:liege }
                 # Do not take titles from human players
                 NOT = { holder = { is_ai = no } }
-                NOT = { scope:recipient = { highest_held_title_tier = tier_county } }  # Do not transfer direct counties from counts
+                riseandfall_county_is_outside_holder_primary_dejure_trigger = yes
             }
-
-            # Transfer if none of the county's de jure chain (duchy/kingdom/empire) is held by the recipient
-            if = {
-                limit = {
-                    AND = {
-                        NOT = { de_jure_liege = { holder = scope:recipient } }
-                        NOT = { de_jure_liege = { exists = de_jure_liege de_jure_liege = { holder = scope:recipient } } }
-                        NOT = { de_jure_liege = { exists = de_jure_liege de_jure_liege = { exists = de_jure_liege de_jure_liege = { holder = scope:recipient } } } }
-                        NOT = { de_jure_liege = { exists = de_jure_liege de_jure_liege = { exists = de_jure_liege de_jure_liege = { exists = de_jure_liege de_jure_liege = { holder = scope:recipient } } } } }
-                        NOT = { AND = { scope:recipient = { highest_held_title_tier = tier_county } exists = scope:recipient_capital_dejure_kingdom this = { de_jure_liege = { exists = de_jure_liege de_jure_liege = { this = scope:recipient_capital_dejure_kingdom } } } } }
-                    }
-                }
-
-                add_to_temporary_list = riseandfall_bordergore_direct_counties
-            }
+            add_to_temporary_list = riseandfall_bordergore_direct_counties
         }
     }
 
@@ -82,7 +58,7 @@ riseandfall_fix_bordergore_se = {
 
     # (duchy-transfer logic intentionally removed; only counties are transferred)
 
-    # 2. Subrealm counties (held by recipient's vassals) outside recipient de jure chains.
+    # 2. Subrealm counties outside the targeted vassal's primary-title de-jure region.
     scope:recipient = {
         every_sub_realm_county = {
             # Base filters: sub-realm county object exists, has de jure info, not liege/recipient capitals, not held by human
@@ -101,11 +77,7 @@ riseandfall_fix_bordergore_se = {
             if = {
                 limit = {
                     AND = {
-                        NOT = { de_jure_liege = { holder = scope:recipient } }
-                        NOT = { de_jure_liege = { exists = de_jure_liege de_jure_liege = { holder = scope:recipient } } }
-                        NOT = { de_jure_liege = { exists = de_jure_liege de_jure_liege = { exists = de_jure_liege de_jure_liege = { holder = scope:recipient } } } }
-                        NOT = { de_jure_liege = { exists = de_jure_liege de_jure_liege = { exists = de_jure_liege de_jure_liege = { exists = de_jure_liege de_jure_liege = { holder = scope:recipient } } } } }
-                        NOT = { AND = { scope:recipient = { highest_held_title_tier = tier_county } exists = scope:recipient_capital_dejure_kingdom de_jure_liege = { exists = de_jure_liege de_jure_liege = { this = scope:recipient_capital_dejure_kingdom } } } }
+                        riseandfall_county_is_outside_recipient_primary_dejure_trigger = yes
                         NOT = { AND = { has_variable = Riseandfall_giveaway_blocked scope:liege = { is_ai = no } } }
                     }
                 }
@@ -143,7 +115,26 @@ riseandfall_fix_bordergore_se = {
                 resolve_title_and_vassal_change = scope:change
                 scope:liege = { set_variable = { name = riseandfall_fix_bordergore_made_changes value = 1 } }
             }
-            # Mixed holders keep their valid counties and lose only the offending ones.
+            # After an intact ruler transfer, continue cleaning counties outside
+            # that ruler's own primary region while preserving at least one core county.
+            if = {
+                limit = {
+                    riseandfall_county_is_outside_holder_primary_dejure_trigger = yes
+                    holder = {
+                        liege = scope:liege
+                        any_held_title = {
+                            tier = tier_county
+                            riseandfall_county_is_within_holder_primary_dejure_trigger = yes
+                        }
+                    }
+                }
+                create_title_and_vassal_change = { type = granted save_scope_as = change }
+                scope:target_county = { change_title_holder_include_vassals = { holder = scope:liege change = scope:change take_baronies = no } }
+                resolve_title_and_vassal_change = scope:change
+                scope:liege = { set_variable = { name = riseandfall_fix_bordergore_made_changes value = 1 } }
+            }
+            # Mixed holders still under the target keep valid counties and lose
+            # only counties outside the target's primary region.
             else_if = {
                 limit = { holder = { liege != scope:liege } }
                 create_title_and_vassal_change = { type = granted save_scope_as = change }

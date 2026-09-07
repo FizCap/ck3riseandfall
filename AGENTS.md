@@ -36,6 +36,7 @@
 - When an effect resolves title or vassal changes inside a title/realm iterator, snapshot the target titles or counties into a list first and mutate them in a separate `every_in_list` pass; live collection mutation can invalidate vanilla on-action scopes.
 - After using vanilla `depose_effect`, let normal succession distribute the deposed ruler's surviving titles unless the mechanic explicitly requires a different holder; a second manual title-transfer pass can override or duplicate vanilla inheritance.
 - When every county held by an administrative sub-vassal is being reassigned, transfer the intact ruler to the destination liege instead of unlanding them; mixed holders can surrender only the offending counties.
+- Bordergore eligibility and execution must share their county triggers: direct holdings use the holder's primary de-jure region; subordinate holdings use the target's region, and intact transferred rulers then surrender counties outside their own region while retaining a core county.
 - When a Story Mode event causes real realm fragmentation, apply a bounded collapse-pressure relief after title/vassal transfers and resync the primary-title copy; structural weakening should reduce an arc without deleting it.
 - For standard realm splits, select successor anchors from the full eligible vassal pool and assign ordinary vassals individually through political/geographic influence; de-jure regions are soft cohesion and fallback aids, not mandatory anchor quotas.
 

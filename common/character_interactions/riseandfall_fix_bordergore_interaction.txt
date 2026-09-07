@@ -42,7 +42,7 @@
             NOT = { riseandfall_is_any_warlord_trigger = yes }  # Cannot use on warlords
             NOT = { is_at_war_with = scope:actor }
             liege = scope:actor
-            NOT = { highest_held_title_tier = tier_county }  # Counts are not eligible for bordergore fix
+            highest_held_title_tier >= tier_county
             OR = {
                 # Directly held counties by recipient that would be transferred
                 custom_tooltip = {
@@ -54,12 +54,7 @@
                         holder = scope:recipient
                         NOT = { holder = scope:recipient.liege }
                         NOT = { holder = { is_ai = no } }
-                        NOT = { scope:recipient = { highest_held_title_tier = tier_county } }  # Do not transfer direct counties from counts
-                        # Transfer only counties outside every de jure title chain held by the recipient.
-                        NOT = { de_jure_liege = { holder = scope:recipient } }
-                        NOT = { de_jure_liege = { exists = de_jure_liege de_jure_liege = { holder = scope:recipient } } }
-                        NOT = { de_jure_liege = { exists = de_jure_liege de_jure_liege = { exists = de_jure_liege de_jure_liege = { holder = scope:recipient } } } }
-                        NOT = { de_jure_liege = { exists = de_jure_liege de_jure_liege = { exists = de_jure_liege de_jure_liege = { exists = de_jure_liege de_jure_liege = { holder = scope:recipient } } } } }
+                        riseandfall_county_is_outside_holder_primary_dejure_trigger = yes
                     }
                 }
                 # Subrealm counties (held by the recipient's vassals) that would be transferred
@@ -74,10 +69,7 @@
                         NOT = { holder = scope:recipient }
                         NOT = { this = scope:recipient.liege.capital_province.county }
                         NOT = { this = scope:recipient.capital_province.county }
-                        NOT = { de_jure_liege = { holder = scope:recipient } }
-                        NOT = { de_jure_liege = { exists = de_jure_liege de_jure_liege = { holder = scope:recipient } } }
-                        NOT = { de_jure_liege = { exists = de_jure_liege de_jure_liege = { exists = de_jure_liege de_jure_liege = { holder = scope:recipient } } } }
-                        NOT = { de_jure_liege = { exists = de_jure_liege de_jure_liege = { exists = de_jure_liege de_jure_liege = { exists = de_jure_liege de_jure_liege = { holder = scope:recipient } } } } }
+                        riseandfall_county_is_outside_recipient_primary_dejure_trigger = yes
                         NOT = { AND = { has_variable = Riseandfall_giveaway_blocked scope:recipient.liege = { is_ai = no } } }
                     }
                 }

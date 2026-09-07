@@ -1,0 +1,118 @@
+﻿############################################################
+# Rise and Fall: Fix Bordergore scripted triggers
+############################################################
+
+# Current scope: county title.
+# A county primary title uses its de-jure duchy as the holder's core region.
+# Higher primary titles use their own de-jure region.
+riseandfall_county_is_within_holder_primary_dejure_trigger = {
+    tier = tier_county
+    exists = holder
+    holder = { exists = primary_title }
+    OR = {
+        # Always preserve the primary county itself, including rare titular counties.
+        this = holder.primary_title
+        AND = {
+            holder = {
+                primary_title.tier = tier_county
+                primary_title = { exists = de_jure_liege }
+            }
+            de_jure_liege = holder.primary_title.de_jure_liege
+        }
+        AND = {
+            holder = { primary_title.tier = tier_duchy }
+            de_jure_liege = holder.primary_title
+        }
+        AND = {
+            holder = { primary_title.tier = tier_kingdom }
+            de_jure_liege = {
+                exists = de_jure_liege
+                de_jure_liege = holder.primary_title
+            }
+        }
+        AND = {
+            holder = { primary_title.tier = tier_empire }
+            de_jure_liege = {
+                exists = de_jure_liege
+                de_jure_liege = {
+                    exists = de_jure_liege
+                    de_jure_liege = holder.primary_title
+                }
+            }
+        }
+        AND = {
+            holder = { primary_title.tier = tier_hegemony }
+            de_jure_liege = {
+                exists = de_jure_liege
+                de_jure_liege = {
+                    exists = de_jure_liege
+                    de_jure_liege = {
+                        exists = de_jure_liege
+                        de_jure_liege = holder.primary_title
+                    }
+                }
+            }
+        }
+    }
+}
+
+riseandfall_county_is_outside_holder_primary_dejure_trigger = {
+    NOT = { riseandfall_county_is_within_holder_primary_dejure_trigger = yes }
+}
+
+# Current scope: county title. Required saved interaction scope: scope:recipient.
+# Used for subordinate counties, which must fit the targeted vassal's core region
+# rather than the subordinate count's own primary county.
+riseandfall_county_is_within_recipient_primary_dejure_trigger = {
+    tier = tier_county
+    exists = scope:recipient
+    scope:recipient = { exists = primary_title }
+    OR = {
+        this = scope:recipient.primary_title
+        AND = {
+            scope:recipient = {
+                primary_title.tier = tier_county
+                primary_title = { exists = de_jure_liege }
+            }
+            de_jure_liege = scope:recipient.primary_title.de_jure_liege
+        }
+        AND = {
+            scope:recipient = { primary_title.tier = tier_duchy }
+            de_jure_liege = scope:recipient.primary_title
+        }
+        AND = {
+            scope:recipient = { primary_title.tier = tier_kingdom }
+            de_jure_liege = {
+                exists = de_jure_liege
+                de_jure_liege = scope:recipient.primary_title
+            }
+        }
+        AND = {
+            scope:recipient = { primary_title.tier = tier_empire }
+            de_jure_liege = {
+                exists = de_jure_liege
+                de_jure_liege = {
+                    exists = de_jure_liege
+                    de_jure_liege = scope:recipient.primary_title
+                }
+            }
+        }
+        AND = {
+            scope:recipient = { primary_title.tier = tier_hegemony }
+            de_jure_liege = {
+                exists = de_jure_liege
+                de_jure_liege = {
+                    exists = de_jure_liege
+                    de_jure_liege = {
+                        exists = de_jure_liege
+                        de_jure_liege = scope:recipient.primary_title
+                    }
+                }
+            }
+        }
+    }
+}
+
+riseandfall_county_is_outside_recipient_primary_dejure_trigger = {
+    NOT = { riseandfall_county_is_within_recipient_primary_dejure_trigger = yes }
+}
