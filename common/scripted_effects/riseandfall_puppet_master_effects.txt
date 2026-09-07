@@ -4,6 +4,20 @@
 
 # Keep the Puppet Master court position aligned to the active puppet-regency diarch.
 # Expected scope: root = liege
+riseandfall_queue_puppet_master_court_position_resync_se = {
+	# Court-position death cleanup can fire invalidated and vacated callbacks in
+	# the same transition. Coalesce them and wait until the old engine object is gone.
+	add_character_flag = { flag = rf_puppet_master_position_teardown days = 7 }
+	if = {
+		limit = { NOT = { has_character_flag = rf_puppet_master_resync_queued } }
+		add_character_flag = { flag = rf_puppet_master_resync_queued days = 7 }
+		trigger_event = {
+			id = riseandfall_puppet_master.100
+			days = 5
+		}
+	}
+}
+
 riseandfall_sync_puppet_master_court_position = {
         clear_saved_scope = rf_puppet_master_liege
         clear_saved_scope = rf_current_puppet_master_diarch
@@ -21,6 +35,10 @@ riseandfall_sync_puppet_master_court_position = {
                 if = {
                         limit = { exists = diarch }
                         set_variable = { name = rf_puppet_regency_diarch value = diarch }
+                }
+                if = {
+                        limit = { exists = diarchy_successor }
+                        set_variable = { name = rf_puppet_regency_successor value = diarchy_successor }
                 }
         }
 
@@ -47,6 +65,9 @@ riseandfall_sync_puppet_master_court_position = {
 	if = {
 		limit = {
 			exists = scope:rf_current_puppet_master_holder
+			scope:rf_puppet_master_liege = {
+				NOT = { has_character_flag = rf_puppet_master_position_teardown }
+			}
 			scope:rf_current_puppet_master_holder = {
 				has_court_position = riseandfall_puppet_master_court_position
 			}
@@ -80,6 +101,9 @@ riseandfall_sync_puppet_master_court_position = {
 		if = {
 			limit = {
 				exists = scope:rf_current_puppet_master_holder
+				scope:rf_puppet_master_liege = {
+					NOT = { has_character_flag = rf_puppet_master_position_teardown }
+				}
 				scope:rf_current_puppet_master_holder = {
 					has_court_position = riseandfall_puppet_master_court_position
 				}
@@ -104,6 +128,9 @@ riseandfall_sync_puppet_master_court_position = {
 		else_if = {
 			limit = {
 				exists = scope:rf_current_puppet_master_holder
+				scope:rf_puppet_master_liege = {
+					NOT = { has_character_flag = rf_puppet_master_position_teardown }
+				}
 				scope:rf_current_puppet_master_holder = {
 					has_court_position = riseandfall_puppet_master_court_position
 				}
@@ -130,11 +157,13 @@ riseandfall_sync_puppet_master_court_position = {
 		else_if = {
 			limit = {
 				NOT = { exists = scope:rf_current_puppet_master_holder }
-				scope:rf_current_puppet_master_diarch = {
-					NOT = { has_court_position = riseandfall_puppet_master_court_position }
-					would_be_valid_for_court_position = {
-						employer = scope:rf_puppet_master_liege
-						court_position = riseandfall_puppet_master_court_position
+				scope:rf_puppet_master_liege = {
+					NOT = { has_character_flag = rf_puppet_master_position_teardown }
+					# Vanilla's appointment guard also rejects a candidate who already
+					# holds this office, including during an engine teardown race.
+					can_appoint_char_to_court_position = {
+						COURT_POS = riseandfall_puppet_master_court_position
+						CHAR = scope:rf_current_puppet_master_diarch
 					}
 				}
 			}
@@ -197,12 +226,10 @@ riseandfall_claim_puppet_master_office_effect = {
 			else = {
 				if = {
 					limit = {
-						scope:actor = {
-							NOT = { has_court_position = riseandfall_puppet_master_court_position }
-							would_be_valid_for_court_position = {
-								employer = scope:recipient
-								court_position = riseandfall_puppet_master_court_position
-							}
+						NOT = { has_character_flag = rf_puppet_master_position_teardown }
+						can_appoint_char_to_court_position = {
+							COURT_POS = riseandfall_puppet_master_court_position
+							CHAR = scope:actor
 						}
 					}
 					appoint_court_position = {

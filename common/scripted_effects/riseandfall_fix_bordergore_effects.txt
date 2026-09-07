@@ -13,7 +13,7 @@ riseandfall_fix_bordergore_se = {
 
     scope:actor = { save_scope_as = liege }
 
-    # 1. Directly held counties outside the recipient's primary-title de-jure region.
+    # 1. Directly held counties outside the recipient's primary region and held de-jure titles.
     # Snapshot the titles before changing their holders. Resolving a title/vassal change fires
     # on_vassal_change immediately; iterating a live held-title collection while that happens
     # can invalidate the character context used by vanilla's primary_title trigger.
@@ -58,7 +58,7 @@ riseandfall_fix_bordergore_se = {
 
     # (duchy-transfer logic intentionally removed; only counties are transferred)
 
-    # 2. Subrealm counties outside the targeted vassal's primary-title de-jure region.
+    # 2. Subrealm counties outside the target's primary region and personally held de-jure titles.
     scope:recipient = {
         every_sub_realm_county = {
             # Base filters: sub-realm county object exists, has de jure info, not liege/recipient capitals, not held by human

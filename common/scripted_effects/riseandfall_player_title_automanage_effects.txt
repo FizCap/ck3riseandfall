@@ -179,6 +179,86 @@ riseandfall_player_transfer_rightful_vassals_se = {
     }
 }
 
+# Player: assign the best available guardian to every unguarded house child in
+# the ruler's court. The child remains in the current court; this only removes
+# the repetitive guardian-selection step.
+riseandfall_player_automate_house_child_guardians_se = {
+    save_scope_as = rf_guardian_actor
+
+    ordered_courtier = {
+        limit = {
+            is_adult = no
+            is_available_child_allow_travel = yes
+            num_of_relation_guardian = 0
+            exists = house
+            scope:rf_guardian_actor = { exists = house }
+            house = scope:rf_guardian_actor.house
+        }
+        order_by = riseandfall_guardian_child_priority_value
+        max = 99
+        check_range_bounds = no
+
+        save_scope_as = rf_guardian_child
+        clear_saved_scope = rf_guardian_candidate
+
+        # Ordered courtier scopes are deterministic and select the highest
+        # score, rather than making a weighted random choice.
+        scope:rf_guardian_actor = {
+            # Search the ruler's court explicitly; the current scope here is
+            # the child, whose own court scope may not expose the court pool.
+            ordered_courtier = {
+                limit = {
+                    is_physically_able_adult = yes
+                    is_imprisoned = no
+                    NOT = { has_trait = incapable }
+                    num_of_relation_ward < 2
+                }
+                order_by = riseandfall_guardian_candidate_score_value
+                max = 1
+                check_range_bounds = no
+                save_scope_as = rf_guardian_candidate
+            }
+        }
+
+        # A court with no eligible adult can still use the player ruler.
+        if = {
+            limit = {
+                NOT = { exists = scope:rf_guardian_candidate }
+                scope:rf_guardian_actor = {
+                    is_physically_able_adult = yes
+                    is_imprisoned = no
+                    NOT = { has_trait = incapable }
+                    num_of_relation_ward < 2
+                }
+            }
+            scope:rf_guardian_actor = { save_scope_as = rf_guardian_candidate }
+        }
+
+        if = {
+            limit = {
+                exists = scope:rf_guardian_candidate
+                scope:rf_guardian_candidate = {
+                    # A guardian may have at most two wards at once; retain
+                    # this final check after earlier children were assigned.
+                    num_of_relation_ward < 2
+                    NOT = { has_relation_ward = scope:rf_guardian_child }
+                }
+            }
+            scope:rf_guardian_candidate = { save_scope_as = guardian }
+            scope:rf_guardian_child = { save_scope_as = ward }
+            scope:rf_guardian_actor = { save_scope_as = ward_liege }
+            scope:rf_guardian_actor = { save_scope_as = guardian_liege }
+
+            # Use the vanilla relationship/opinion path. Because both parties
+            # are already in this court, no meaningful travel is introduced.
+            educate_child_event_effect = yes
+        }
+
+        clear_saved_scope = rf_guardian_candidate
+        clear_saved_scope = rf_guardian_child
+    }
+}
+
 # Player: auto-create duchies when the ruler/character has the toggle modifier
 riseandfall_player_create_duchies_se = {
     # Called for a specific ruler (the caller should iterate every_ruler is_ai = no).

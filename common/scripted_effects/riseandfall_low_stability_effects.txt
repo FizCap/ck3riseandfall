@@ -3,12 +3,15 @@
 # Runs once per ruler on that character's random yearly pulse and computes a tier-based curved chance from stability score.
 # If the random check succeeds, trigger an event (riseandfall.1001 - warlord).
 
-# Expected scope: landed ruler. Store the timer on the title so it survives succession.
+# Expected scope: landed ruler. Store the reduction on the title so it survives succession.
 riseandfall_set_low_stability_cooldown_se = {
     if = {
         limit = { exists = primary_title }
         primary_title = {
-            set_variable = { name = rf_low_stability_cooldown value = 1 years = 10 }
+            # A completed incident starts at 100% reduction. The yearly roll
+            # lowers this by 10 points, so the first following year has a 90%
+            # reduction and the tenth following year is fully recovered.
+            set_variable = { name = rf_low_stability_cooldown value = 100 }
         }
     }
 }
@@ -16,6 +19,22 @@ riseandfall_set_low_stability_cooldown_se = {
 riseandfall_low_stability_roll_se = {
     # Perform computations inside the saved ruler scope so character variables resolve correctly.
         scope:ruler_low_stability = {
+            # Recover 10 percentage points per year before calculating this
+            # year's chance. Remove the marker at zero so the cooldown expires.
+            if = {
+                limit = {
+                    exists = primary_title
+                    primary_title = { has_variable = rf_low_stability_cooldown }
+                }
+                primary_title = {
+                    change_variable = { name = rf_low_stability_cooldown add = -10 }
+                    clamp_variable = { name = rf_low_stability_cooldown min = 0 max = 100 }
+                    if = {
+                        limit = { var:rf_low_stability_cooldown <= 0 }
+                        remove_variable = rf_low_stability_cooldown
+                    }
+                }
+            }
             # Coalition availability enters an independent-ruler iterator, so
             # preserve the incident ruler before that iterator changes scope.
             save_scope_as = coalition_target
@@ -29,7 +48,6 @@ riseandfall_low_stability_roll_se = {
             if = {
                 limit = {
                     exists = primary_title
-                    primary_title = { NOT = { has_variable = rf_low_stability_cooldown } }
                 }
                 # Compute chance with a curved (approx power 1.5) formula based on highest held title tier.
                 # Thresholds: county = 30, duchy = 35, kingdom = 40, empire = 45, hegemony = 50.
@@ -78,6 +96,21 @@ riseandfall_low_stability_roll_se = {
                         var:riseandfall_realm_stability_score >= 20
                     }
                     change_variable = { name = tmp_chance divide = 2 }
+                }
+
+                # Scale the normal chance by the title's remaining recovery.
+                # A 90% cooldown reduction leaves 10% of the normal chance.
+                if = {
+                    limit = {
+                        exists = primary_title
+                        primary_title = { has_variable = rf_low_stability_cooldown }
+                    }
+                    set_variable = { name = tmp_cooldown_scale value = 100 }
+                    change_variable = { name = tmp_cooldown_scale add = primary_title.var:rf_low_stability_cooldown }
+                    change_variable = { name = tmp_cooldown_scale multiply = -1 }
+                    clamp_variable = { name = tmp_cooldown_scale min = 0 max = 100 }
+                    change_variable = { name = tmp_chance multiply = var:tmp_cooldown_scale }
+                    change_variable = { name = tmp_chance divide = 100 }
                 }
 
                 clamp_variable = { name = tmp_chance min = 0 max = 100 }

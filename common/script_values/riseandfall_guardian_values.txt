@@ -1,0 +1,94 @@
+﻿#################################################################################
+# Rise and Fall guardian automation scoring.
+# Evaluated on a potential guardian, with scope:rf_guardian_child saved by the
+# selecting effect. The focus skill is worth twice Learning, matching vanilla.
+#################################################################################
+
+riseandfall_guardian_candidate_score_value = {
+	value = 0
+
+	if = {
+		limit = { scope:rf_guardian_child = { has_focus = education_diplomacy } }
+		add = { value = diplomacy multiply = 2 }
+	}
+	else_if = {
+		limit = { scope:rf_guardian_child = { has_focus = education_martial } }
+		add = { value = martial multiply = 2 }
+	}
+	else_if = {
+		limit = { scope:rf_guardian_child = { has_focus = education_stewardship } }
+		add = { value = stewardship multiply = 2 }
+	}
+	else_if = {
+		limit = { scope:rf_guardian_child = { has_focus = education_intrigue } }
+		add = { value = intrigue multiply = 2 }
+	}
+	else_if = {
+		limit = { scope:rf_guardian_child = { has_focus = education_learning } }
+		add = { value = learning multiply = 2 }
+	}
+
+	add = learning
+
+	# Vanilla education intelligence bonuses converted to the same score scale.
+	if = {
+		limit = { has_trait = intellect_good_3 }
+		add = 37
+	}
+	else_if = {
+		limit = { has_trait = intellect_good_2 }
+		add = 25
+	}
+	else_if = {
+		limit = {
+			OR = {
+				has_trait = intellect_good_1
+				has_trait = shrewd
+			}
+		}
+		add = 12
+	}
+
+	# Personality goals are deliberately secondary to education quality.
+	if = { limit = { has_trait = diligent } add = 5 }
+	if = { limit = { has_trait = patient } add = 5 }
+	if = { limit = { has_trait = just } add = 5 }
+	if = { limit = { has_trait = temperate } add = 5 }
+	if = { limit = { has_trait = calm } add = 5 }
+	if = { limit = { has_trait = ambitious } add = 5 }
+	if = { limit = { has_trait = compassionate } add = 3 }
+	if = { limit = { has_trait = brave } add = 3 }
+	if = { limit = { has_trait = honest } add = 3 }
+	if = { limit = { has_trait = generous } add = 3 }
+	if = { limit = { has_trait = wrathful } add = 3 }
+	if = { limit = { has_trait = greedy } add = 2 }
+
+	if = { limit = { has_trait = lazy } add = -5 }
+	if = { limit = { has_trait = impatient } add = -5 }
+	if = { limit = { has_trait = arbitrary } add = -5 }
+	if = { limit = { has_trait = gluttonous } add = -5 }
+	if = { limit = { has_trait = callous } add = -3 }
+	if = { limit = { has_trait = craven } add = -3 }
+	if = { limit = { has_trait = deceitful } add = -3 }
+}
+
+riseandfall_guardian_child_priority_value = {
+	value = 0
+
+	# The primary heir is processed first so they receive first access to the
+	# strongest guardians before those guardians reach their two-ward limit.
+	if = {
+		limit = { is_primary_heir_of = root }
+		add = 1000000
+	}
+	else_if = {
+		limit = { is_player_heir_of = root }
+		add = 900000
+	}
+
+	# Other direct children of the ruler come before extended house members.
+	if = {
+		limit = { is_child_of = root }
+		add = 100000
+	}
+}

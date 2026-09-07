@@ -239,14 +239,7 @@ riseandfall_spawn_adventurer_special_troops_se = {
             inheritable = no
             uses_supply = no
             location = $LOCATION$
-            save_scope_as = rf_new_adventurer_special_army
         }
-        # Keep a durable marker on this spawned army so post-victory decay does
-        # not affect the ruler's normal levies or men-at-arms.
-        scope:rf_new_adventurer_special_army = {
-            set_variable = { name = rf_adventurer_special_army value = 1 }
-        }
-        clear_saved_scope = rf_new_adventurer_special_army
     }
 }
 
@@ -259,6 +252,11 @@ riseandfall_clone_target_maa_for_adventurer_se = {
         limit = {
             exists = scope:rf_adventurer_target_ruler
             exists = scope:adventurer_child
+        }
+        # Snapshot existing regiments so the newly created clone can be found
+        # without relying on an unsupported create_maa_regiment return scope.
+        scope:adventurer_child = {
+            every_maa_regiment = { add_to_list = rf_existing_adventurer_maa }
         }
         scope:rf_adventurer_target_ruler = {
             every_maa_regiment = {
@@ -287,12 +285,27 @@ riseandfall_clone_target_maa_for_adventurer_se = {
                     round_variable = { name = rf_cloned_maa_size nearest = 1 }
                     clamp_variable = { name = rf_cloned_maa_size min = 1 max = 1000 }
 
+                    # create_maa_regiment.size only accepts a literal integer.
+                    # Create one stack, then apply the remaining dynamic size.
+                    change_variable = { name = rf_cloned_maa_size subtract = 1 }
+                    save_scope_value_as = {
+                        name = rf_cloned_maa_size_change
+                        value = var:rf_cloned_maa_size
+                    }
+
                     create_maa_regiment = {
                         type_of = scope:rf_target_maa
                         check_can_recruit = no
-                        size = var:rf_cloned_maa_size
+                        size = 1
+                    }
+                    every_maa_regiment = {
+                        limit = { NOT = { is_in_list = rf_existing_adventurer_maa } }
+                        change_maa_regiment_size = scope:rf_cloned_maa_size_change
+                        change_maa_troops_count = maa_max_troops_count
+                        add_to_list = rf_existing_adventurer_maa
                     }
 
+                    clear_saved_scope = rf_cloned_maa_size_change
                     remove_variable = rf_cloned_maa_size
                     remove_variable = rf_cloned_maa_multiplier
                     remove_variable = rf_cloned_maa_martial_bonus
@@ -330,6 +343,18 @@ riseandfall_do_create_adventurer_se = {
                     exists = scope:claim_target_title.holder
                 }
                 scope:claim_target_title.holder = { save_scope_as = independent_ruler }
+            }
+
+            # Rise and Fall selection also accepts implicit heirs, but vanilla
+            # Legitimists can only retain their purpose with an explicit claim.
+            # Promote the prepared origin target and register it with vanilla.
+            if = {
+                limit = { exists = scope:claim_target_title }
+                if = {
+                    limit = { NOT = { has_strong_claim_on = scope:claim_target_title } }
+                    add_pressed_claim = scope:claim_target_title
+                }
+                set_variable = { name = legitimist_claimed_title value = scope:claim_target_title }
             }
 
             # Try to make Rise and Fall claimants legitimists. If that law cannot
@@ -603,6 +628,23 @@ riseandfall_adventurer_press_claims_se = {
             }
         }
 
+        # Repair existing generated camps whose implicit origin claim let the
+        # engine invalidate Legitimists and replace it with another purpose.
+        if = {
+            limit = { exists = scope:claim_target_title }
+            if = {
+                limit = { NOT = { has_strong_claim_on = scope:claim_target_title } }
+                add_pressed_claim = scope:claim_target_title
+            }
+            set_variable = { name = legitimist_claimed_title value = scope:claim_target_title }
+            if = {
+                limit = { NOT = { has_realm_law = camp_purpose_legitimists } }
+                add_realm_law_skip_effects = camp_purpose_legitimists
+                remove_camp_purpose_flavourisation_variables_effect = yes
+                set_variable = flavourise_camp_purpose_legitimists
+            }
+        }
+
         clear_saved_scope = rf_adventurer_staging_province
         if = {
             limit = {
@@ -645,7 +687,6 @@ riseandfall_adventurer_press_claims_se = {
                 exists = scope:claim_target_title.holder
                 is_at_war = no
                 NOT = { is_at_war_with = scope:claim_target_title.holder }
-                can_attack_in_hierarchy = scope:claim_target_title.holder
                 # Adventurer hosts are spawned for this invasion and may already
                 # be in target territory, so do not apply vanilla raised-army gates.
                 NOT = {
@@ -741,35 +782,17 @@ riseandfall_adventurer_press_claims_se = {
                     }
                     change_variable = { name = rf_adventurer_invasion_strength_threshold multiply = 1.5 }
                 }
+
             }
-            ai_start_best_war = {
-                cb = { adventurer_claim_cb }
-                recalculate_cb_targets = yes
-                is_valid = {
-                    scope:target_character = scope:claim_target_title.holder
-                    scope:target_title = scope:claim_target_title
-                    scope:claimant = scope:independent_adventurer
-                    scope:claim_target_title.holder = {
-                        current_military_strength < scope:independent_adventurer.current_military_strength
-                        OR = {
-                            current_military_strength <= scope:independent_adventurer.var:rf_adventurer_invasion_strength_threshold
-                            AND = {
-                                # Cautious personalities do not use wealth as a
-                                # substitute for the overwhelming force they want.
-                                scope:independent_adventurer = {
-                                    NOR = {
-                                        has_trait = craven
-                                        has_trait = patient
-                                        has_trait = paranoid
-                                    }
-                                }
-                                OR = {
-                                    gold < scope:independent_adventurer.gold
-                                    current_military_strength <= scope:independent_adventurer.fifty_percent_of_current_military_strength
-                                }
-                            }
-                        }
-                    }
+            # This path has one prepared origin target, so bypass AI war scoring
+            # and the broad can_declare_war gate. The explicit state checks above
+            # are the intended restrictions for this scripted invasion.
+            scope:independent_adventurer = {
+                start_war = {
+                    target = scope:claim_target_title.holder
+                    casus_belli = adventurer_claim_cb
+                    claimant = scope:independent_adventurer
+                    target_title = scope:claim_target_title
                 }
             }
             scope:independent_adventurer = {
@@ -945,22 +968,6 @@ riseandfall_yearly_adventurer_remove_variable_se = {
     remove_variable = intrigue_bonus
     remove_variable = rf_sex_penalty
     remove_variable = rf_disqualify
-}
-
-
-# Once a legitimist adventurer has taken land, its original spawned host
-# gradually dissolves. The army marker limits this to the special host stacks.
-riseandfall_decay_landed_adventurer_special_troops_se = {
-    if = {
-        limit = {
-            is_landed = yes
-            has_character_flag = riseandfall_adventurer
-        }
-        every_army = {
-            limit = { has_variable = rf_adventurer_special_army }
-            deplete_army_by_percentage = 0.10
-        }
-    }
 }
 
 

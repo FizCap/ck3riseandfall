@@ -354,7 +354,7 @@
                     }
                 }
             }
-            # Set the 15-year title-based low-stability cooldown after winning.
+            # Start gradual title-based low-stability chance recovery after winning.
             riseandfall_set_low_stability_cooldown_se = yes
         }
 

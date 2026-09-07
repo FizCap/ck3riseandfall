@@ -1627,13 +1627,6 @@ riseandfall_merge_inherited_realm_stability_se = {
 
 #External Scripts
 
-riseandfall_low_stability_grace_period_se = {
-    every_independent_ruler = {
-        riseandfall_set_low_stability_cooldown_se = yes
-    }
-}
-
-
 # Called on the war winner scope (character) to reduce the war penalty by -10
 riseandfall_war_victory_se = {
     # Defensive: only operate on living characters

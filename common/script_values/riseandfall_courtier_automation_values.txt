@@ -1,0 +1,103 @@
+﻿#################################################################################
+# Vanilla Invite to Court bribe value for diplomatic-range pool candidates.
+# The scripted effect supplies these dedicated scopes because there is no
+# interaction actor/recipient context during a decision or yearly pulse.
+#################################################################################
+
+riseandfall_courtier_automation_bribe_value = {
+    value = 50
+
+    if = {
+        limit = { scope:rf_courtier_automation_candidate.ai_greed > 0 }
+        add = {
+            value = scope:rf_courtier_automation_candidate.ai_greed
+            divide = 4
+        }
+    }
+
+    if = {
+        limit = {
+            scope:rf_courtier_automation_candidate = { is_playable_character = yes }
+            scope:rf_courtier_automation_candidate.primary_title.tier < tier_duchy
+        }
+        multiply = 2
+    }
+    else_if = {
+        limit = { scope:rf_courtier_automation_candidate.primary_title.tier >= tier_duchy }
+        multiply = 3
+    }
+
+    if = {
+        limit = {
+            scope:rf_courtier_automation_candidate = {
+                liege = scope:rf_courtier_automation_actor
+                is_theocratic_lessee = yes
+            }
+            scope:rf_courtier_automation_actor.primary_title.tier < tier_duchy
+        }
+        multiply = 2
+    }
+    else_if = {
+        limit = {
+            scope:rf_courtier_automation_candidate = {
+                liege = scope:rf_courtier_automation_actor
+                is_theocratic_lessee = yes
+            }
+            scope:rf_courtier_automation_actor.primary_title.tier >= tier_duchy
+        }
+        multiply = 3
+    }
+
+    if = {
+        limit = {
+            scope:rf_courtier_automation_actor = {
+                dynasty ?= { has_dynasty_perk = guile_legacy_2 }
+            }
+        }
+        multiply = 0.5
+    }
+
+    if = {
+        limit = {
+            scope:rf_courtier_automation_candidate = {
+                OR = {
+                    AND = { is_playable_character = yes government_has_flag = government_is_tribal }
+                    AND = { is_playable_character = no liege ?= { government_has_flag = government_is_tribal } }
+                    AND = { is_playable_character = no host ?= { government_has_flag = government_is_tribal } }
+                }
+            }
+        }
+        multiply = 0.25
+        min = 5
+    }
+
+    if = {
+        limit = { scope:rf_courtier_automation_actor = { has_character_modifier = imaginary_friend_mad_modifier } }
+        multiply = 0.5
+        min = 5
+    }
+}
+
+# Generic guardian recruitment quality. Assignment still uses the child's
+# education-specific score after the candidate reaches court.
+riseandfall_guardian_recruitment_score_value = {
+    value = learning
+    add = learning
+    add = diplomacy
+    add = martial
+    add = stewardship
+    add = intrigue
+
+    if = { limit = { has_trait = intellect_good_3 } add = 60 }
+    else_if = { limit = { has_trait = intellect_good_2 } add = 40 }
+    else_if = { limit = { has_trait = shrewd } add = 20 }
+
+    if = { limit = { has_trait = diligent } add = 15 }
+    if = { limit = { has_trait = ambitious } add = 10 }
+    if = { limit = { has_trait = brave } add = 8 }
+    if = { limit = { has_trait = wrathful } add = 5 }
+    if = { limit = { has_trait = patient } add = 5 }
+
+    if = { limit = { has_trait = lazy } add = -15 }
+    if = { limit = { has_trait = craven } add = -8 }
+}

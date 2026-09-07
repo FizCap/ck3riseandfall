@@ -4,12 +4,30 @@
 
 # Current scope: county title.
 # A county primary title uses its de-jure duchy as the holder's core region.
-# Higher primary titles use their own de-jure region.
+# Higher primary titles use their own de-jure region. Any title personally held
+# in the county's de-jure chain also makes that county valid territory.
 riseandfall_county_is_within_holder_primary_dejure_trigger = {
     tier = tier_county
     exists = holder
     holder = { exists = primary_title }
     OR = {
+        # Preserve counties beneath any de-jure title personally held by this holder.
+        AND = {
+            exists = de_jure_liege.holder
+            holder = de_jure_liege.holder
+        }
+        AND = {
+            exists = de_jure_liege.de_jure_liege.holder
+            holder = de_jure_liege.de_jure_liege.holder
+        }
+        AND = {
+            exists = de_jure_liege.de_jure_liege.de_jure_liege.holder
+            holder = de_jure_liege.de_jure_liege.de_jure_liege.holder
+        }
+        AND = {
+            exists = de_jure_liege.de_jure_liege.de_jure_liege.de_jure_liege.holder
+            holder = de_jure_liege.de_jure_liege.de_jure_liege.de_jure_liege.holder
+        }
         # Always preserve the primary county itself, including rare titular counties.
         this = holder.primary_title
         AND = {
@@ -61,13 +79,30 @@ riseandfall_county_is_outside_holder_primary_dejure_trigger = {
 }
 
 # Current scope: county title. Required saved interaction scope: scope:recipient.
-# Used for subordinate counties, which must fit the targeted vassal's core region
-# rather than the subordinate count's own primary county.
+# Used for subordinate counties, which must fit the targeted vassal's primary
+# region or descend from any de-jure title personally held by that vassal.
 riseandfall_county_is_within_recipient_primary_dejure_trigger = {
     tier = tier_county
     exists = scope:recipient
     scope:recipient = { exists = primary_title }
     OR = {
+        # Preserve vassal structures beneath every personally held de-jure title.
+        AND = {
+            exists = de_jure_liege.holder
+            de_jure_liege.holder = scope:recipient
+        }
+        AND = {
+            exists = de_jure_liege.de_jure_liege.holder
+            de_jure_liege.de_jure_liege.holder = scope:recipient
+        }
+        AND = {
+            exists = de_jure_liege.de_jure_liege.de_jure_liege.holder
+            de_jure_liege.de_jure_liege.de_jure_liege.holder = scope:recipient
+        }
+        AND = {
+            exists = de_jure_liege.de_jure_liege.de_jure_liege.de_jure_liege.holder
+            de_jure_liege.de_jure_liege.de_jure_liege.de_jure_liege.holder = scope:recipient
+        }
         this = scope:recipient.primary_title
         AND = {
             scope:recipient = {

@@ -8,3 +8,8 @@ riseandfall = {
     sort_order = 52
     gui_tags = { big_button }
 }
+
+courtier_automation = {
+    sort_order = 53
+    gui_tags = { big_button }
+}

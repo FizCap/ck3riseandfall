@@ -24,14 +24,21 @@
 		}
 	}
 
-	# Only visible while a puppet regency exists on the liege.
+	# Keep the office container present through the brief inactive/type-less gap
+	# while a dead Puppet Master is replaced. The persistent marker is cleared
+	# only when the puppet regency intentionally ends.
 	is_shown = {
-		has_diarchy_type = puppet_regency
+		OR = {
+			has_diarchy_type = puppet_regency
+			has_character_flag = rf_puppet_regency_persistent
+		}
 	}
 
 	valid_position = {
-		has_diarchy_type = puppet_regency
-		has_active_diarchy = yes
+		OR = {
+			has_diarchy_type = puppet_regency
+			has_character_flag = rf_puppet_regency_persistent
+		}
 	}
 
 	# This position is script-driven; only the active diarch is a valid candidate.
@@ -121,45 +128,30 @@
 		round = no
 	}
 
-	on_court_position_received = {
-		scope:liege = {
-			riseandfall_sync_puppet_master_court_position = yes
-		}
-	}
-
 	on_court_position_revoked = {
-		# Delay the resync on the liege so a fired Puppet Master is rehired after
-		# the revoke callback finishes, even when the diarch is landed/vassal.
+		# Revoked, invalidated, and vacated can overlap during teardown; queue one
+		# delayed resync instead of allowing each callback to recreate the office.
 		scope:liege = {
-			trigger_event = {
-				id = riseandfall_puppet_master.100
-				days = 1
-			}
+			riseandfall_queue_puppet_master_court_position_resync_se = yes
 		}
 	}
 
 	on_court_position_vacated = {
-		# Use delayed resync (same pattern as on_court_position_revoked) to avoid
-		# syncing during unstable title-batch transitions (e.g. palace coup / abdication).
 		scope:liege = {
-			trigger_event = {
-				id = riseandfall_puppet_master.100
-				days = 1
-			}
+			riseandfall_queue_puppet_master_court_position_resync_se = yes
 		}
 	}
 
 	on_court_position_invalidated = {
 		scope:liege = {
-			trigger_event = {
-				id = riseandfall_puppet_master.100
-				days = 1
-			}
+			riseandfall_queue_puppet_master_court_position_resync_se = yes
 		}
 	}
 
 	ai_position_score = {
-		value = 1000
+		# Script owns appointment. Keep this below the vanilla hire threshold so
+		# the automatic court-position AI cannot race the succession resync.
+		value = -1000
 	}
 
 	ai_candidate_score = {

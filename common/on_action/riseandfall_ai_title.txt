@@ -4,6 +4,7 @@
         riseandfall_ai_usurp_titles
         riseandfall_ai_title_handout
         riseandfall_ai_advanced_destroy_titles
+        riseandfall_player_guardian_automation_yearly
     }
 }
 
@@ -97,6 +98,22 @@ riseandfall_ai_advanced_title_handout = {
     }
     effect = {
         riseandfall_ai_advanced_title_handout_se = yes
+    }
+}
+
+riseandfall_player_guardian_automation_yearly = {
+    effect = {
+        every_ruler = {
+            limit = {
+                is_alive = yes
+                is_landed = yes
+                is_ai = no
+            }
+            if = {
+                limit = { has_character_flag = riseandfall_auto_house_child_guardians_enabled }
+                riseandfall_player_automate_house_child_guardians_se = yes
+            }
+        }
     }
 }
 

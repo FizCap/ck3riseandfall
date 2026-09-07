@@ -165,3 +165,163 @@ riseandfall_transfer_rightful_vassals = {
     ai_potential = {}
     ai_will_do = { base = 0 }
 }
+
+
+# Player: toggle guardian assignment for house children in the ruler's court.
+riseandfall_automate_house_child_guardians = {
+    picture = { reference = "gfx/interface/illustrations/decisions/decision_misc.dds" }
+    sort_order = 24
+    ai_check_interval = 0
+    desc = riseandfall_automate_house_child_guardians_desc
+    selection_tooltip = riseandfall_automate_house_child_guardians_tooltip
+    decision_group_type = courtier_automation
+
+    is_shown = {
+        is_landed = yes
+        NOT = { exists = global_var:riseandfall_hide_other_decisions }
+        exists = house
+        NOT = { has_character_flag = riseandfall_auto_house_child_guardians_enabled }
+    }
+
+    is_valid = { is_landed = yes }
+
+    effect = {
+        add_character_flag = { flag = riseandfall_auto_house_child_guardians_enabled }
+        # Give the player immediate feedback; future passes happen yearly.
+        riseandfall_player_automate_house_child_guardians_se = yes
+    }
+
+    ai_potential = {}
+    ai_will_do = { base = 0 }
+}
+
+riseandfall_disable_automate_house_child_guardians = {
+    picture = { reference = "gfx/interface/illustrations/decision_misc.dds" }
+    sort_order = 25
+    ai_check_interval = 0
+    desc = riseandfall_disable_automate_house_child_guardians_desc
+    selection_tooltip = riseandfall_disable_automate_house_child_guardians_tooltip
+    decision_group_type = courtier_automation
+
+    is_shown = {
+        is_landed = yes
+        NOT = { exists = global_var:riseandfall_hide_other_decisions }
+        exists = house
+        has_character_flag = riseandfall_auto_house_child_guardians_enabled
+    }
+
+    is_valid = { is_landed = yes }
+
+    effect = { remove_character_flag = riseandfall_auto_house_child_guardians_enabled }
+
+    ai_potential = {}
+    ai_will_do = { base = 0 }
+}
+
+riseandfall_enable_auto_invite_knights = {
+    picture = { reference = "gfx/interface/illustrations/decisions/decision_misc.dds" }
+    sort_order = 1
+    ai_check_interval = 0
+    desc = riseandfall_enable_auto_invite_knights_desc
+    selection_tooltip = riseandfall_enable_auto_invite_knights_tooltip
+    decision_group_type = courtier_automation
+
+    is_shown = {
+        is_landed = yes
+        NOT = { exists = global_var:riseandfall_hide_other_decisions }
+    }
+    is_valid = { is_landed = yes }
+    effect = { riseandfall_player_smart_invite_free_knight_se = yes }
+    ai_potential = {}
+    ai_will_do = { base = 0 }
+}
+
+riseandfall_disable_auto_invite_knights = {
+    picture = { reference = "gfx/interface/illustrations/decisions/decision_misc.dds" }
+    sort_order = 2
+    ai_check_interval = 0
+    desc = riseandfall_disable_auto_invite_knights_desc
+    selection_tooltip = riseandfall_disable_auto_invite_knights_tooltip
+    decision_group_type = courtier_automation
+
+    is_shown = {
+        is_landed = yes
+        NOT = { exists = global_var:riseandfall_hide_other_decisions }
+    }
+    is_valid = { is_landed = yes }
+    effect = { riseandfall_player_smart_invite_paid_knight_se = yes }
+    ai_potential = {}
+    ai_will_do = { base = 0 }
+}
+
+riseandfall_invite_best_free_courtier = {
+    picture = { reference = "gfx/interface/illustrations/decisions/decision_misc.dds" }
+    sort_order = 3
+    ai_check_interval = 0
+    desc = riseandfall_invite_best_free_courtier_desc
+    selection_tooltip = riseandfall_invite_best_free_courtier_tooltip
+    decision_group_type = courtier_automation
+
+    is_shown = {
+        is_landed = yes
+        NOT = { exists = global_var:riseandfall_hide_other_decisions }
+    }
+    is_valid = { is_landed = yes }
+    effect = { riseandfall_player_invite_best_free_courtier_se = yes }
+    ai_potential = {}
+    ai_will_do = { base = 0 }
+}
+
+riseandfall_recruit_best_paid_courtier = {
+    picture = { reference = "gfx/interface/illustrations/decisions/decision_misc.dds" }
+    sort_order = 4
+    ai_check_interval = 0
+    desc = riseandfall_recruit_best_paid_courtier_desc
+    selection_tooltip = riseandfall_recruit_best_paid_courtier_tooltip
+    decision_group_type = courtier_automation
+
+    is_shown = {
+        is_landed = yes
+        NOT = { exists = global_var:riseandfall_hide_other_decisions }
+    }
+    is_valid = { is_landed = yes }
+    effect = { riseandfall_player_recruit_best_paid_courtier_se = yes }
+    ai_potential = {}
+    ai_will_do = { base = 0 }
+}
+
+riseandfall_enable_auto_invite_guardians = {
+    picture = { reference = "gfx/interface/illustrations/decisions/decision_misc.dds" }
+    sort_order = 5
+    ai_check_interval = 0
+    desc = riseandfall_enable_auto_invite_guardians_desc
+    selection_tooltip = riseandfall_enable_auto_invite_guardians_tooltip
+    decision_group_type = courtier_automation
+
+    is_shown = {
+        is_landed = yes
+        NOT = { exists = global_var:riseandfall_hide_other_decisions }
+    }
+    is_valid = { is_landed = yes }
+    effect = { riseandfall_player_smart_invite_free_guardian_se = yes }
+    ai_potential = {}
+    ai_will_do = { base = 0 }
+}
+
+riseandfall_disable_auto_invite_guardians = {
+    picture = { reference = "gfx/interface/illustrations/decisions/decision_misc.dds" }
+    sort_order = 6
+    ai_check_interval = 0
+    desc = riseandfall_disable_auto_invite_guardians_desc
+    selection_tooltip = riseandfall_disable_auto_invite_guardians_tooltip
+    decision_group_type = courtier_automation
+
+    is_shown = {
+        is_landed = yes
+        NOT = { exists = global_var:riseandfall_hide_other_decisions }
+    }
+    is_valid = { is_landed = yes }
+    effect = { riseandfall_player_smart_invite_paid_guardian_se = yes }
+    ai_potential = {}
+    ai_will_do = { base = 0 }
+}

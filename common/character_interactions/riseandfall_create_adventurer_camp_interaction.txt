@@ -33,6 +33,7 @@
     }
 
     # Do not let AI perform this
+    ai_frequency = 0
     ai_potential = { always = no }
     ai_min_reply_days = 0
     ai_max_reply_days = 0

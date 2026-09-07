@@ -24,7 +24,19 @@ on_imprison = {
 
 on_death = {
     on_actions = {
+        riseandfall_preserve_puppet_master_successor_on_death
         riseandfall_mark_puppet_succession_on_death
+    }
+}
+
+# Preserve the ruler's native diarchy successor before a dead Puppet Master is
+# removed and the diarchy temporarily becomes inactive.
+riseandfall_preserve_puppet_master_successor_on_death = {
+    trigger = {
+        has_game_rule = riseandfall_low_stability_events_enabled
+    }
+    effect = {
+        riseandfall_preserve_puppet_master_successor_on_death_se = yes
     }
 }
 
@@ -32,32 +44,32 @@ on_death = {
 # position out of step with the active puppet master until the pulse fallback.
 on_entered_diarchy = {
     on_actions = {
-        riseandfall_check_puppet_regency
+        riseandfall_check_current_puppet_regency
     }
 }
 
 on_left_diarchy = {
     on_actions = {
-        riseandfall_check_puppet_regency
+        riseandfall_check_current_puppet_regency
     }
 }
 
 on_diarch_change = {
     on_actions = {
-        riseandfall_check_puppet_regency
+        riseandfall_check_current_puppet_regency
     }
 }
 
 on_diarch_designation = {
     on_actions = {
-        riseandfall_check_puppet_regency
+        riseandfall_check_current_puppet_regency
     }
 }
 
 on_title_gain = {
     on_actions = {
         riseandfall_prepare_puppet_succession_on_title_gain
-        riseandfall_check_puppet_regency
+        riseandfall_check_current_puppet_regency
         riseandfall_warlord_loyal_on_liege_grant
         riseandfall_warlord_title_cleanup
         riseandfall_successor_primary_title_sync
@@ -139,7 +151,7 @@ riseandfall_prepare_puppet_succession_on_title_gain = {
 on_title_gain_inheritance = {
     on_actions = {
         riseandfall_resolve_puppet_succession_on_inheritance
-        riseandfall_check_puppet_regency
+        riseandfall_check_current_puppet_regency
         riseandfall_warlord_inherit_vassal_trait
         riseandfall_warlord_title_cleanup
         riseandfall_warlord_inherited_legacy
@@ -219,6 +231,34 @@ riseandfall_check_puppet_regency = {
         # Match the Warlord succession flow: reconcile on the actual ruler
         # scope, not on the outer/global on-action scope.
         every_ruler = {
+            limit = {
+                is_landed = yes
+                exists = primary_title
+                OR = {
+                    has_diarchy_type = puppet_regency
+                    has_realm_law = riseandfall_puppet_regency_partition_succession_law
+                    has_realm_law = riseandfall_puppet_regency_single_heir_succession_law
+                }
+            }
+            riseandfall_puppet_regency_reconcile_succession_se = yes
+        }
+    }
+}
+
+# Code diarchy/title hooks provide the affected liege as root. Repair only that
+# character; the yearly handler above owns the whole-world safety scan.
+riseandfall_check_current_puppet_regency = {
+    trigger = {
+        has_game_rule = riseandfall_low_stability_events_enabled
+        OR = {
+            has_diarchy_type = puppet_regency
+            has_character_flag = rf_puppet_regency_persistent
+            employs_court_position = riseandfall_puppet_master_court_position
+        }
+    }
+    effect = {
+        riseandfall_maintain_current_puppet_regency_se = yes
+        if = {
             limit = {
                 is_landed = yes
                 exists = primary_title

@@ -7,14 +7,36 @@ riseandfall_puppet_master.100 = {
 	hidden = yes
 
 	immediate = {
-		# root = liege/employer; rehire the active puppet-regency diarch if valid.
+		# Multiple engine callbacks can have queued this event in an existing save.
+		# Only the first event still holding the queue marker may perform the sync.
 		if = {
-			limit = {
-				has_diarchy_type = puppet_regency
-				has_active_diarchy = yes
-				exists = diarch
+			limit = { has_character_flag = rf_puppet_master_resync_queued }
+			remove_character_flag = rf_puppet_master_resync_queued
+			if = {
+				limit = {
+					OR = {
+						has_diarchy_type = puppet_regency
+						has_character_flag = rf_puppet_regency_persistent
+					}
+				}
+				# Keep the teardown marker through set_diarch and its nested
+				# on_diarch_change callbacks, then allow exactly one position sync.
+				riseandfall_restore_puppet_regency_after_teardown_se = yes
+				riseandfall_resolve_invalid_puppet_master_after_teardown_se = yes
+				remove_character_flag = rf_puppet_master_position_teardown
+				if = {
+					limit = {
+						has_diarchy_type = puppet_regency
+						has_active_diarchy = yes
+						exists = diarch
+					}
+					riseandfall_sync_puppet_master_court_position = yes
+					remove_variable = rf_puppet_regency_successor
+				}
 			}
-			riseandfall_sync_puppet_master_court_position = yes
+			else = {
+				remove_character_flag = rf_puppet_master_position_teardown
+			}
 		}
 	}
 }

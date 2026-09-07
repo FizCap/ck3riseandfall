@@ -7,30 +7,36 @@
 				employs_court_position = riseandfall_puppet_master_court_position
 			}
 		}
-		riseandfall_recover_puppet_regency_se = yes
-		# The vanilla Discharge Entrenched Regent interaction marks the liege
-		# before deliberately ending the diarchy. Treat that as explicit removal.
-		if = {
-			limit = {
-				has_character_flag = rf_puppet_regency_persistent
-				NOT = { has_active_diarchy = yes }
-				has_character_flag = trying_to_dismiss_regent
-			}
-			remove_character_flag = rf_puppet_regency_persistent
-			remove_variable = rf_puppet_regency_diarch
-			riseandfall_puppet_regency_reconcile_succession_se = yes
-		}
-		if = {
-			limit = { has_diarchy_type = puppet_regency }
-			# If the active puppet master became unable to serve this ruler, replace
-			# them before syncing the position. Landed vassals may remain diarchs.
-			riseandfall_recover_invalid_puppet_master_se = yes
-			riseandfall_mark_puppet_regency_active_se = yes
-		}
-		# Script-driven court position assignment/cleanup. This also revokes a
-		# stale office after an explicit diarchy removal.
-		riseandfall_sync_puppet_master_court_position = yes
+		riseandfall_maintain_current_puppet_regency_se = yes
 	}
+}
+
+# Expected scope: current character = the one puppet-regency liege being repaired.
+# Keep this root-specific so diarchy on_actions cannot recursively scan every ruler.
+riseandfall_maintain_current_puppet_regency_se = {
+	riseandfall_recover_puppet_regency_se = yes
+	# The vanilla Discharge Entrenched Regent interaction marks the liege
+	# before deliberately ending the diarchy. Treat that as explicit removal.
+	if = {
+		limit = {
+			has_character_flag = rf_puppet_regency_persistent
+			NOT = { has_active_diarchy = yes }
+			has_character_flag = trying_to_dismiss_regent
+		}
+		remove_character_flag = rf_puppet_regency_persistent
+		remove_variable = rf_puppet_regency_diarch
+		riseandfall_puppet_regency_reconcile_succession_se = yes
+	}
+	if = {
+		limit = { has_diarchy_type = puppet_regency }
+		# If the active puppet master became unable to serve this ruler, replace
+		# them before syncing the position. Landed vassals may remain diarchs.
+		riseandfall_recover_invalid_puppet_master_se = yes
+		riseandfall_mark_puppet_regency_active_se = yes
+	}
+	# Script-driven court position assignment/cleanup. This also revokes a
+	# stale office after an explicit diarchy removal.
+	riseandfall_sync_puppet_master_court_position = yes
 }
 
 riseandfall_mark_puppet_regency_active_se = {
@@ -44,7 +50,53 @@ riseandfall_mark_puppet_regency_active_se = {
 			limit = { exists = diarch }
 			set_variable = { name = rf_puppet_regency_diarch value = diarch }
 		}
+		if = {
+			limit = { exists = diarchy_successor }
+			set_variable = { name = rf_puppet_regency_successor value = diarchy_successor }
+		}
 	}
+}
+
+# Expected scope: root = dying character.
+riseandfall_preserve_puppet_master_successor_on_death_se = {
+    save_scope_as = rf_dying_puppet_master
+    if = {
+        limit = {
+            exists = employer
+            employer = {
+                has_diarchy_type = puppet_regency
+                has_active_diarchy = yes
+                exists = diarch
+                diarch ?= scope:rf_dying_puppet_master
+            }
+        }
+        employer = {
+            if = {
+                limit = { exists = diarchy_successor }
+                set_variable = { name = rf_puppet_regency_successor value = diarchy_successor }
+            }
+            riseandfall_queue_puppet_master_court_position_resync_se = yes
+        }
+    }
+    else_if = {
+        limit = {
+            exists = liege
+            liege = {
+                has_diarchy_type = puppet_regency
+                has_active_diarchy = yes
+                exists = diarch
+                diarch ?= scope:rf_dying_puppet_master
+            }
+        }
+        liege = {
+            if = {
+                limit = { exists = diarchy_successor }
+                set_variable = { name = rf_puppet_regency_successor value = diarchy_successor }
+            }
+            riseandfall_queue_puppet_master_court_position_resync_se = yes
+        }
+    }
+    clear_saved_scope = rf_dying_puppet_master
 }
 
 # Rebuild a Puppet Regency that disappeared without its persistent marker being
@@ -58,9 +110,44 @@ riseandfall_recover_puppet_regency_se = {
 			is_landed = yes
 			is_independent_ruler = yes
 		}
+		# Missing-diarchy states during death are transient. Resolve once after
+		# vanilla succession and court-position teardown have completed.
+		riseandfall_queue_puppet_master_court_position_resync_se = yes
+	}
+}
+
+riseandfall_restore_puppet_regency_after_teardown_se = {
+	if = {
+		limit = {
+			has_character_flag = rf_puppet_regency_persistent
+			NOT = { has_active_diarchy = yes }
+			is_landed = yes
+			is_independent_ruler = yes
+		}
+		save_scope_as = rf_puppet_liege
 		clear_saved_scope = rf_puppet_regency_recovery_diarch
+
+		# The successor captured from the native diarchy line before death has
+		# priority over the former diarch reference and any generic courtier.
 		if = {
 			limit = {
+				has_variable = rf_puppet_regency_successor
+				var:rf_puppet_regency_successor = {
+					is_alive = yes
+					is_adult = yes
+					is_imprisoned = no
+					is_incapable = no
+					OR = {
+						is_ruler = no
+						is_vassal_of = scope:rf_puppet_liege
+					}
+				}
+			}
+			var:rf_puppet_regency_successor = { save_scope_as = rf_puppet_regency_recovery_diarch }
+		}
+		if = {
+			limit = {
+				NOT = { exists = scope:rf_puppet_regency_recovery_diarch }
 				has_variable = rf_puppet_regency_diarch
 				var:rf_puppet_regency_diarch = {
 					is_alive = yes
@@ -69,7 +156,7 @@ riseandfall_recover_puppet_regency_se = {
 					is_incapable = no
 					OR = {
 						is_ruler = no
-						is_vassal_of = root
+						is_vassal_of = scope:rf_puppet_liege
 					}
 				}
 			}
@@ -83,10 +170,6 @@ riseandfall_recover_puppet_regency_se = {
 					is_adult = yes
 					is_imprisoned = no
 					is_incapable = no
-					OR = {
-						is_ruler = no
-						is_vassal_of = root
-					}
 				}
 				order_by = {
 					add = intrigue
@@ -108,9 +191,11 @@ riseandfall_recover_puppet_regency_se = {
 				set_diarchy_type = puppet_regency
 				set_diarchy_swing = 90
 				set_variable = { name = rf_puppet_regency_diarch value = scope:rf_puppet_regency_recovery_diarch }
+				remove_variable = rf_puppet_regency_successor
 			}
 		}
 		clear_saved_scope = rf_puppet_regency_recovery_diarch
+		clear_saved_scope = rf_puppet_liege
 	}
 }
 
@@ -121,12 +206,14 @@ riseandfall_end_puppet_regency_forcefully_se = {
 		limit = { has_diarchy_type = puppet_regency }
 		remove_character_flag = rf_puppet_regency_persistent
 		remove_variable = rf_puppet_regency_diarch
+		remove_variable = rf_puppet_regency_successor
 		end_diarchy = yes
 		riseandfall_puppet_regency_reconcile_succession_se = yes
 	}
 }
 
 riseandfall_recover_invalid_puppet_master_se = {
+	save_scope_as = rf_puppet_liege
     if = {
         limit = {
             has_diarchy_type = puppet_regency
@@ -138,7 +225,7 @@ riseandfall_recover_invalid_puppet_master_se = {
                         is_alive = no
                         AND = {
                             is_ruler = yes
-                            NOT = { is_vassal_of = root }
+                            NOT = { is_vassal_of = scope:rf_puppet_liege }
                         }
                         is_imprisoned = yes
                         is_adult = no
@@ -147,30 +234,99 @@ riseandfall_recover_invalid_puppet_master_se = {
                 }
             }
         }
-        save_scope_as = rf_puppet_liege
-        clear_saved_scope = rf_replacement_puppet_master
+        # Diarch death briefly exposes an empty/invalid diarch before vanilla
+        # advances its succession line. Do not overwrite that transition.
+        riseandfall_queue_puppet_master_court_position_resync_se = yes
+    }
+	clear_saved_scope = rf_puppet_liege
+}
 
-        # Prefer a valid adult courtier so the Puppet Master office remains visible.
-        ordered_courtier = {
-            limit = {
-                is_alive = yes
-                is_adult = yes
-                is_imprisoned = no
-                is_incapable = no
-                OR = {
-                    is_ruler = no
-                    is_vassal_of = scope:rf_puppet_liege
+# Resolve an invalid Puppet Master only after diarchy and court-position death
+# processing has settled. Expected scope: root = puppet-regency liege.
+riseandfall_resolve_invalid_puppet_master_after_teardown_se = {
+	save_scope_as = rf_puppet_liege
+    if = {
+        limit = {
+            has_diarchy_type = puppet_regency
+            has_active_diarchy = yes
+            OR = {
+                NOT = { exists = diarch }
+                diarch = {
+                    OR = {
+                        is_alive = no
+                        AND = {
+                            is_ruler = yes
+                            NOT = { is_vassal_of = scope:rf_puppet_liege }
+                        }
+                        is_imprisoned = yes
+                        is_adult = no
+                        is_incapable = yes
+                    }
                 }
             }
-            order_by = {
-                add = intrigue
-                add = diplomacy
-                add = stewardship
-                add = martial
-                add = learning
+        }
+        clear_saved_scope = rf_replacement_puppet_master
+
+        # Preserve CK3's actual diarchy succession order before considering a
+        # generic courtier fallback.
+        if = {
+            limit = {
+                exists = diarchy_successor
+                diarchy_successor = {
+                    is_alive = yes
+                    is_adult = yes
+                    is_imprisoned = no
+                    is_incapable = no
+                    OR = {
+                        is_ruler = no
+                        is_vassal_of = scope:rf_puppet_liege
+                    }
+                }
             }
-            max = 1
-            save_scope_as = rf_replacement_puppet_master
+            diarchy_successor = { save_scope_as = rf_replacement_puppet_master }
+        }
+
+		if = {
+			limit = {
+				NOT = { exists = scope:rf_replacement_puppet_master }
+				has_variable = rf_puppet_regency_successor
+				var:rf_puppet_regency_successor = {
+					is_alive = yes
+					is_adult = yes
+					is_imprisoned = no
+					is_incapable = no
+					OR = {
+						is_ruler = no
+						is_vassal_of = scope:rf_puppet_liege
+					}
+				}
+			}
+			var:rf_puppet_regency_successor = { save_scope_as = rf_replacement_puppet_master }
+		}
+
+        if = {
+            limit = { NOT = { exists = scope:rf_replacement_puppet_master } }
+            ordered_courtier = {
+                limit = {
+                    is_alive = yes
+                    is_adult = yes
+                    is_imprisoned = no
+                    is_incapable = no
+                    OR = {
+                        is_ruler = no
+                        is_vassal_of = scope:rf_puppet_liege
+                    }
+                }
+                order_by = {
+                    add = intrigue
+                    add = diplomacy
+                    add = stewardship
+                    add = martial
+                    add = learning
+                }
+                max = 1
+                save_scope_as = rf_replacement_puppet_master
+            }
         }
 
         if = {
@@ -180,14 +336,10 @@ riseandfall_recover_invalid_puppet_master_se = {
             set_diarchy_swing = 90
             set_variable = { name = rf_puppet_regency_diarch value = scope:rf_replacement_puppet_master }
         }
-        else = {
-            # Keep the persistent diarchy alive and let the periodic recovery
-            # pass try again after the court has changed.
-        }
 
         clear_saved_scope = rf_replacement_puppet_master
-        clear_saved_scope = rf_puppet_liege
     }
+	clear_saved_scope = rf_puppet_liege
 }
 
 riseandfall_clear_puppet_succession_pending_se = {

@@ -204,9 +204,10 @@
                         NOT = { has_character_flag = riseandfall_newadventurer }
                         NOT = { has_trait_with_flag = can_not_marry }
                     }
-                    # Reuse the normal legitimist setup so this creates exactly
-                    # one claimant camp and its initial host army.
-                    riseandfall_do_create_adventurer_se = yes
+                    # Dispatch through a hidden event because the Decisions
+                    # tooltip builder expands scripted effects even when the
+                    # direct call is nested inside hidden_effect.
+                    trigger_event = { id = riseandfall_debug.0001 }
                 }
             }
         }

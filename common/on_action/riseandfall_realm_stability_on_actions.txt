@@ -16,7 +16,6 @@ on_game_start_after_lobby = {
         riseandfall_story_world_climate
         # Seed the director before initial stability calculations assign roles.
         riseandfall_yearly_realm_stability
-        riseandfall_low_stability_grace_period
         riseandfall_clear_unlanded_realm_stability
     }
 }
@@ -365,15 +364,6 @@ riseandfall_story_world_climate = {
     }
     effect = {
         riseandfall_story_world_climate_se = yes
-    }
-}
-
-riseandfall_low_stability_grace_period = {
-    trigger = {
-        has_game_rule = riseandfall_realm_stability_enabled
-    }
-    effect = {
-            riseandfall_low_stability_grace_period_se = yes
     }
 }
 

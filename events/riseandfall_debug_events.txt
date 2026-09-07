@@ -1,0 +1,11 @@
+﻿namespace = riseandfall_debug
+
+# Internal execution boundary for the single-claimant debug decision.
+riseandfall_debug.0001 = {
+    type = character_event
+    hidden = yes
+
+    immediate = {
+        riseandfall_do_create_adventurer_se = yes
+    }
+}

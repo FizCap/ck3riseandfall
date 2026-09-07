@@ -1,0 +1,1521 @@
+﻿#################################################################################
+# Rise and Fall courtier automation.
+# Invitation effects are called in a ruler scope. These candidates are pool
+# guests, so they use the vanilla Recruit Guest cost rather than bribe_value.
+#################################################################################
+
+riseandfall_player_invite_willing_knights_se = {
+    save_scope_as = rf_courtier_automation_actor
+
+    every_courtier_or_guest = {
+        limit = {
+            is_alive = yes
+            is_adult = yes
+            is_ruler = no
+            is_imprisoned = no
+            is_pool_guest_of = scope:rf_courtier_automation_actor
+            NOT = { is_courtier_of = scope:rf_courtier_automation_actor }
+            can_be_knight_trigger = { ARMY_OWNER = scope:rf_courtier_automation_actor }
+        }
+        save_scope_as = rf_courtier_automation_candidate
+        scope:rf_courtier_automation_actor = {
+            # This is the same value used by recruit_guest_interaction's
+            # is_valid_showing_failures_only and can_send checks.
+            if = {
+                limit = {
+                    has_character_flag = riseandfall_auto_invite_free_enabled
+                    scope:rf_courtier_automation_candidate.recruit_guest_interaction_cost <= 0
+                }
+                add_courtier = scope:rf_courtier_automation_candidate
+            }
+            else_if = {
+                limit = {
+                    has_character_flag = riseandfall_auto_invite_paid_enabled
+                    scope:rf_courtier_automation_candidate.recruit_guest_interaction_cost > 0
+                    gold >= scope:rf_courtier_automation_candidate.recruit_guest_interaction_cost
+                }
+                pay_short_term_gold = {
+                    gold = scope:rf_courtier_automation_candidate.recruit_guest_interaction_cost
+                    target = scope:rf_courtier_automation_candidate
+                }
+                add_courtier = scope:rf_courtier_automation_candidate
+            }
+        }
+    }
+}
+
+riseandfall_player_invite_willing_guardians_se = {
+    save_scope_as = rf_courtier_automation_actor
+    save_scope_as = actor
+
+    every_courtier_or_guest = {
+        limit = {
+            is_alive = yes
+            is_adult = yes
+            is_physically_able_adult = yes
+            is_ruler = no
+            is_imprisoned = no
+            is_pool_guest_of = scope:rf_courtier_automation_actor
+            NOT = { has_trait = incapable }
+            NOT = { is_courtier_of = scope:rf_courtier_automation_actor }
+            num_of_relation_ward < 2
+            # Guardian recruitment is intentionally selective: require a
+            # strong education stat plus strong Learning or intelligence.
+            OR = {
+                AND = {
+                    OR = {
+                        diplomacy >= good_skill_level
+                        martial >= good_skill_level
+                        stewardship >= good_skill_level
+                        intrigue >= good_skill_level
+                        learning >= good_skill_level
+                    }
+                    OR = {
+                        learning >= good_skill_level
+                        has_trait = intellect_good_2
+                        has_trait = intellect_good_3
+                        has_trait = shrewd
+                    }
+                }
+            }
+        }
+        save_scope_as = rf_courtier_automation_candidate
+        scope:rf_courtier_automation_actor = {
+            if = {
+                limit = {
+                    has_character_flag = riseandfall_auto_invite_free_enabled
+                    scope:rf_courtier_automation_candidate.recruit_guest_interaction_cost <= 0
+                }
+                add_courtier = scope:rf_courtier_automation_candidate
+            }
+            else_if = {
+                limit = {
+                    has_character_flag = riseandfall_auto_invite_paid_enabled
+                    scope:rf_courtier_automation_candidate.recruit_guest_interaction_cost > 0
+                    gold >= scope:rf_courtier_automation_candidate.recruit_guest_interaction_cost
+                }
+                pay_short_term_gold = {
+                    gold = scope:rf_courtier_automation_candidate.recruit_guest_interaction_cost
+                    target = scope:rf_courtier_automation_candidate
+                }
+                add_courtier = scope:rf_courtier_automation_candidate
+            }
+        }
+    }
+}
+
+# Invite eligible pool characters and foreign courtiers in diplomatic range.
+# These are not already visiting the player's court, so vanilla's Invite to
+# Court expense path is used.
+riseandfall_player_invite_diplomatic_range_knights_se = {
+    save_scope_as = rf_courtier_automation_actor
+
+    every_living_character = {
+        limit = {
+            is_alive = yes
+            is_adult = yes
+            is_ruler = no
+            is_imprisoned = no
+            OR = {
+                is_pool_character = yes
+                exists = liege
+            }
+            # Vanilla Invite to Court does not show for foreign court guests.
+            is_foreign_court_guest = no
+            in_diplomatic_range = scope:rf_courtier_automation_actor
+            NOT = { is_courtier_of = scope:rf_courtier_automation_actor }
+            can_be_knight_trigger = { ARMY_OWNER = scope:rf_courtier_automation_actor }
+            can_recruit_character_to_court_trigger = {
+                RECRUITER = scope:rf_courtier_automation_actor
+                RECRUITEE = this
+            }
+        }
+        save_scope_as = rf_courtier_automation_candidate
+        scope:rf_courtier_automation_actor = {
+            if = {
+                limit = { has_character_flag = riseandfall_auto_invite_free_enabled }
+                add_courtier = scope:rf_courtier_automation_candidate
+            }
+            else_if = {
+                limit = {
+                    has_character_flag = riseandfall_auto_invite_paid_enabled
+                    gold >= { value = riseandfall_courtier_automation_bribe_value multiply = 0.5 }
+                }
+                pay_short_term_gold = {
+                    gold = { value = riseandfall_courtier_automation_bribe_value multiply = 0.5 }
+                    target = scope:rf_courtier_automation_candidate
+                }
+                add_courtier = scope:rf_courtier_automation_candidate
+            }
+        }
+    }
+}
+
+riseandfall_player_invite_diplomatic_range_guardians_se = {
+    save_scope_as = rf_courtier_automation_actor
+
+    every_living_character = {
+        limit = {
+            is_alive = yes
+            is_adult = yes
+            is_physically_able_adult = yes
+            is_ruler = no
+            is_imprisoned = no
+            OR = {
+                is_pool_character = yes
+                exists = liege
+            }
+            is_foreign_court_guest = no
+            in_diplomatic_range = scope:rf_courtier_automation_actor
+            NOT = { has_trait = incapable }
+            NOT = { is_courtier_of = scope:rf_courtier_automation_actor }
+            num_of_relation_ward < 2
+            # Use the same high-value guardian gate as the local-guest pass.
+            AND = {
+                OR = {
+                    diplomacy >= good_skill_level
+                    martial >= good_skill_level
+                    stewardship >= good_skill_level
+                    intrigue >= good_skill_level
+                    learning >= good_skill_level
+                }
+                OR = {
+                    learning >= good_skill_level
+                    has_trait = intellect_good_2
+                    has_trait = intellect_good_3
+                    has_trait = shrewd
+                }
+            }
+            can_recruit_character_to_court_trigger = {
+                RECRUITER = scope:rf_courtier_automation_actor
+                RECRUITEE = this
+            }
+        }
+        save_scope_as = rf_courtier_automation_candidate
+        scope:rf_courtier_automation_actor = {
+            if = {
+                limit = { has_character_flag = riseandfall_auto_invite_free_enabled }
+                add_courtier = scope:rf_courtier_automation_candidate
+            }
+            else_if = {
+                limit = {
+                    has_character_flag = riseandfall_auto_invite_paid_enabled
+                    gold >= { value = riseandfall_courtier_automation_bribe_value multiply = 0.5 }
+                }
+                pay_short_term_gold = {
+                    gold = { value = riseandfall_courtier_automation_bribe_value multiply = 0.5 }
+                    target = scope:rf_courtier_automation_candidate
+                }
+                add_courtier = scope:rf_courtier_automation_candidate
+            }
+        }
+    }
+}
+
+#################################################################################
+# Immediate mode-specific passes used by the Free/Paid enable decisions.
+# Decision previews evaluate against the current character state, before an
+# enable decision's new flag exists. Keeping these passes independent of that
+# flag makes the candidates and costs visible in the Effects panel.
+#################################################################################
+
+riseandfall_player_invite_free_knights_now_se = {
+    save_scope_as = rf_courtier_automation_actor
+
+    every_courtier_or_guest = {
+        limit = {
+            is_alive = yes
+            is_adult = yes
+            is_ruler = no
+            is_imprisoned = no
+            is_pool_guest_of = scope:rf_courtier_automation_actor
+            NOT = { is_courtier_of = scope:rf_courtier_automation_actor }
+            can_be_knight_trigger = { ARMY_OWNER = scope:rf_courtier_automation_actor }
+            recruit_guest_interaction_cost <= 0
+        }
+        save_scope_as = rf_courtier_automation_candidate
+        scope:rf_courtier_automation_actor = {
+            add_courtier = scope:rf_courtier_automation_candidate
+        }
+    }
+
+    # This second pass is global; every_courtier_or_guest only covers the
+    # ruler's own court and guests.
+    every_living_character = {
+        limit = {
+            is_alive = yes
+            is_adult = yes
+            is_ruler = no
+            is_imprisoned = no
+            OR = {
+                is_pool_character = yes
+                exists = liege
+            }
+            is_foreign_court_guest = no
+            in_diplomatic_range = scope:rf_courtier_automation_actor
+            NOT = { is_courtier_of = scope:rf_courtier_automation_actor }
+            can_be_knight_trigger = { ARMY_OWNER = scope:rf_courtier_automation_actor }
+            can_recruit_character_to_court_trigger = {
+                RECRUITER = scope:rf_courtier_automation_actor
+                RECRUITEE = this
+            }
+        }
+        save_scope_as = rf_courtier_automation_candidate
+        scope:rf_courtier_automation_actor = {
+            add_courtier = scope:rf_courtier_automation_candidate
+        }
+    }
+}
+
+riseandfall_player_invite_paid_knights_now_se = {
+    save_scope_as = rf_courtier_automation_actor
+
+    every_courtier_or_guest = {
+        limit = {
+            is_alive = yes
+            is_adult = yes
+            is_ruler = no
+            is_imprisoned = no
+            is_pool_guest_of = scope:rf_courtier_automation_actor
+            NOT = { is_courtier_of = scope:rf_courtier_automation_actor }
+            can_be_knight_trigger = { ARMY_OWNER = scope:rf_courtier_automation_actor }
+            recruit_guest_interaction_cost > 0
+        }
+        save_scope_as = rf_courtier_automation_candidate
+        scope:rf_courtier_automation_actor = {
+            if = {
+                limit = { gold >= scope:rf_courtier_automation_candidate.recruit_guest_interaction_cost }
+                pay_short_term_gold = {
+                    gold = scope:rf_courtier_automation_candidate.recruit_guest_interaction_cost
+                    target = scope:rf_courtier_automation_candidate
+                }
+                add_courtier = scope:rf_courtier_automation_candidate
+            }
+        }
+    }
+
+    every_living_character = {
+        limit = {
+            is_alive = yes
+            is_adult = yes
+            is_ruler = no
+            is_imprisoned = no
+            OR = {
+                is_pool_character = yes
+                exists = liege
+            }
+            is_foreign_court_guest = no
+            in_diplomatic_range = scope:rf_courtier_automation_actor
+            NOT = { is_courtier_of = scope:rf_courtier_automation_actor }
+            can_be_knight_trigger = { ARMY_OWNER = scope:rf_courtier_automation_actor }
+            can_recruit_character_to_court_trigger = {
+                RECRUITER = scope:rf_courtier_automation_actor
+                RECRUITEE = this
+            }
+        }
+        save_scope_as = rf_courtier_automation_candidate
+        scope:rf_courtier_automation_actor = {
+            if = {
+                limit = { gold >= { value = riseandfall_courtier_automation_bribe_value multiply = 0.5 } }
+                pay_short_term_gold = {
+                    gold = { value = riseandfall_courtier_automation_bribe_value multiply = 0.5 }
+                    target = scope:rf_courtier_automation_candidate
+                }
+                add_courtier = scope:rf_courtier_automation_candidate
+            }
+        }
+    }
+}
+
+riseandfall_player_invite_free_guardians_now_se = {
+    save_scope_as = rf_courtier_automation_actor
+
+    every_courtier_or_guest = {
+        limit = {
+            is_alive = yes
+            is_adult = yes
+            is_physically_able_adult = yes
+            is_ruler = no
+            is_imprisoned = no
+            is_pool_guest_of = scope:rf_courtier_automation_actor
+            NOT = { has_trait = incapable }
+            NOT = { is_courtier_of = scope:rf_courtier_automation_actor }
+            num_of_relation_ward < 2
+            AND = {
+                OR = {
+                    diplomacy >= good_skill_level
+                    martial >= good_skill_level
+                    stewardship >= good_skill_level
+                    intrigue >= good_skill_level
+                    learning >= good_skill_level
+                }
+                OR = {
+                    learning >= good_skill_level
+                    has_trait = intellect_good_2
+                    has_trait = intellect_good_3
+                    has_trait = shrewd
+                }
+            }
+            recruit_guest_interaction_cost <= 0
+        }
+        save_scope_as = rf_courtier_automation_candidate
+        scope:rf_courtier_automation_actor = {
+            add_courtier = scope:rf_courtier_automation_candidate
+        }
+    }
+
+    every_living_character = {
+        limit = {
+            is_alive = yes
+            is_adult = yes
+            is_physically_able_adult = yes
+            is_ruler = no
+            is_imprisoned = no
+            OR = {
+                is_pool_character = yes
+                exists = liege
+            }
+            is_foreign_court_guest = no
+            in_diplomatic_range = scope:rf_courtier_automation_actor
+            NOT = { has_trait = incapable }
+            NOT = { is_courtier_of = scope:rf_courtier_automation_actor }
+            num_of_relation_ward < 2
+            AND = {
+                OR = {
+                    diplomacy >= good_skill_level
+                    martial >= good_skill_level
+                    stewardship >= good_skill_level
+                    intrigue >= good_skill_level
+                    learning >= good_skill_level
+                }
+                OR = {
+                    learning >= good_skill_level
+                    has_trait = intellect_good_2
+                    has_trait = intellect_good_3
+                    has_trait = shrewd
+                }
+            }
+            can_recruit_character_to_court_trigger = {
+                RECRUITER = scope:rf_courtier_automation_actor
+                RECRUITEE = this
+            }
+        }
+        save_scope_as = rf_courtier_automation_candidate
+        scope:rf_courtier_automation_actor = {
+            add_courtier = scope:rf_courtier_automation_candidate
+        }
+    }
+}
+
+riseandfall_player_invite_paid_guardians_now_se = {
+    save_scope_as = rf_courtier_automation_actor
+
+    every_courtier_or_guest = {
+        limit = {
+            is_alive = yes
+            is_adult = yes
+            is_physically_able_adult = yes
+            is_ruler = no
+            is_imprisoned = no
+            is_pool_guest_of = scope:rf_courtier_automation_actor
+            NOT = { has_trait = incapable }
+            NOT = { is_courtier_of = scope:rf_courtier_automation_actor }
+            num_of_relation_ward < 2
+            AND = {
+                OR = {
+                    diplomacy >= good_skill_level
+                    martial >= good_skill_level
+                    stewardship >= good_skill_level
+                    intrigue >= good_skill_level
+                    learning >= good_skill_level
+                }
+                OR = {
+                    learning >= good_skill_level
+                    has_trait = intellect_good_2
+                    has_trait = intellect_good_3
+                    has_trait = shrewd
+                }
+            }
+            recruit_guest_interaction_cost > 0
+        }
+        save_scope_as = rf_courtier_automation_candidate
+        scope:rf_courtier_automation_actor = {
+            if = {
+                limit = { gold >= scope:rf_courtier_automation_candidate.recruit_guest_interaction_cost }
+                pay_short_term_gold = {
+                    gold = scope:rf_courtier_automation_candidate.recruit_guest_interaction_cost
+                    target = scope:rf_courtier_automation_candidate
+                }
+                add_courtier = scope:rf_courtier_automation_candidate
+            }
+        }
+    }
+
+    every_living_character = {
+        limit = {
+            is_alive = yes
+            is_adult = yes
+            is_physically_able_adult = yes
+            is_ruler = no
+            is_imprisoned = no
+            OR = {
+                is_pool_character = yes
+                exists = liege
+            }
+            is_foreign_court_guest = no
+            in_diplomatic_range = scope:rf_courtier_automation_actor
+            NOT = { has_trait = incapable }
+            NOT = { is_courtier_of = scope:rf_courtier_automation_actor }
+            num_of_relation_ward < 2
+            AND = {
+                OR = {
+                    diplomacy >= good_skill_level
+                    martial >= good_skill_level
+                    stewardship >= good_skill_level
+                    intrigue >= good_skill_level
+                    learning >= good_skill_level
+                }
+                OR = {
+                    learning >= good_skill_level
+                    has_trait = intellect_good_2
+                    has_trait = intellect_good_3
+                    has_trait = shrewd
+                }
+            }
+            can_recruit_character_to_court_trigger = {
+                RECRUITER = scope:rf_courtier_automation_actor
+                RECRUITEE = this
+            }
+        }
+        save_scope_as = rf_courtier_automation_candidate
+        scope:rf_courtier_automation_actor = {
+            if = {
+                limit = { gold >= { value = riseandfall_courtier_automation_bribe_value multiply = 0.5 } }
+                pay_short_term_gold = {
+                    gold = { value = riseandfall_courtier_automation_bribe_value multiply = 0.5 }
+                    target = scope:rf_courtier_automation_candidate
+                }
+                add_courtier = scope:rf_courtier_automation_candidate
+            }
+        }
+    }
+}
+
+#################################################################################
+# Smart recruitment passes. Each cost mode recruits at most one knight and one
+# guardian per pass, choosing the strongest eligible candidate globally.
+#################################################################################
+
+riseandfall_player_legacy_worldscan_free_knight_se = {
+    save_scope_as = rf_courtier_automation_actor
+
+    ordered_living_character = {
+        limit = {
+            is_alive = yes
+            is_adult = yes
+            is_ruler = no
+            is_imprisoned = no
+            NOT = { is_courtier_of = scope:rf_courtier_automation_actor }
+            can_be_knight_trigger = { ARMY_OWNER = scope:rf_courtier_automation_actor }
+            OR = {
+                AND = {
+                    is_pool_guest_of = scope:rf_courtier_automation_actor
+                    recruit_guest_interaction_cost <= 0
+                }
+                AND = {
+                    NOT = { is_pool_guest_of = scope:rf_courtier_automation_actor }
+                    OR = {
+                        is_pool_character = yes
+                        exists = liege
+                    }
+                    is_foreign_court_guest = no
+                    in_diplomatic_range = scope:rf_courtier_automation_actor
+                    can_recruit_character_to_court_trigger = {
+                        RECRUITER = scope:rf_courtier_automation_actor
+                        RECRUITEE = this
+                    }
+                }
+            }
+        }
+        order_by = prowess
+        max = 1
+        check_range_bounds = no
+        save_scope_as = rf_courtier_automation_candidate
+
+        scope:rf_courtier_automation_actor = {
+            # Recruit only into an open slot or as a strict upgrade over at
+            # least one currently serving knight.
+            if = {
+                limit = {
+                    OR = {
+                        number_of_knights < max_number_of_knights
+                        any_knight = {
+                            prowess < scope:rf_courtier_automation_candidate.prowess
+                        }
+                    }
+                }
+                add_courtier = scope:rf_courtier_automation_candidate
+            }
+        }
+    }
+}
+
+riseandfall_player_legacy_worldscan_paid_knight_se = {
+    save_scope_as = rf_courtier_automation_actor
+
+    ordered_living_character = {
+        limit = {
+            is_alive = yes
+            is_adult = yes
+            is_ruler = no
+            is_imprisoned = no
+            NOT = { is_courtier_of = scope:rf_courtier_automation_actor }
+            can_be_knight_trigger = { ARMY_OWNER = scope:rf_courtier_automation_actor }
+            OR = {
+                AND = {
+                    is_pool_guest_of = scope:rf_courtier_automation_actor
+                    recruit_guest_interaction_cost > 0
+                }
+                AND = {
+                    NOT = { is_pool_guest_of = scope:rf_courtier_automation_actor }
+                    OR = {
+                        is_pool_character = yes
+                        exists = liege
+                    }
+                    is_foreign_court_guest = no
+                    in_diplomatic_range = scope:rf_courtier_automation_actor
+                    can_recruit_character_to_court_trigger = {
+                        RECRUITER = scope:rf_courtier_automation_actor
+                        RECRUITEE = this
+                    }
+                }
+            }
+        }
+        order_by = prowess
+        max = 1
+        check_range_bounds = no
+        save_scope_as = rf_courtier_automation_candidate
+
+        scope:rf_courtier_automation_actor = {
+            if = {
+                limit = {
+                    OR = {
+                        number_of_knights < max_number_of_knights
+                        any_knight = {
+                            prowess < scope:rf_courtier_automation_candidate.prowess
+                        }
+                    }
+                }
+                if = {
+                    limit = {
+                        scope:rf_courtier_automation_candidate = {
+                            is_pool_guest_of = scope:rf_courtier_automation_actor
+                        }
+                        gold >= scope:rf_courtier_automation_candidate.recruit_guest_interaction_cost
+                    }
+                    pay_short_term_gold = {
+                        gold = scope:rf_courtier_automation_candidate.recruit_guest_interaction_cost
+                        target = scope:rf_courtier_automation_candidate
+                    }
+                    add_courtier = scope:rf_courtier_automation_candidate
+                }
+                else_if = {
+                    limit = {
+                        NOT = {
+                            scope:rf_courtier_automation_candidate = {
+                                is_pool_guest_of = scope:rf_courtier_automation_actor
+                            }
+                        }
+                        gold >= { value = riseandfall_courtier_automation_bribe_value multiply = 0.5 }
+                    }
+                    pay_short_term_gold = {
+                        gold = { value = riseandfall_courtier_automation_bribe_value multiply = 0.5 }
+                        target = scope:rf_courtier_automation_candidate
+                    }
+                    add_courtier = scope:rf_courtier_automation_candidate
+                }
+            }
+        }
+    }
+}
+
+riseandfall_player_legacy_worldscan_free_guardian_se = {
+    save_scope_as = rf_courtier_automation_actor
+
+    if = {
+        limit = {
+            # Do nothing when every eligible house child already has a guardian.
+            any_courtier = {
+                is_adult = no
+                is_available_child_allow_travel = yes
+                num_of_relation_guardian = 0
+                exists = house
+                house = scope:rf_courtier_automation_actor.house
+            }
+            # Existing adults and the ruler supply their remaining ward slots
+            # before recruitment creates another courtier.
+            NOR = {
+                AND = {
+                    is_physically_able_adult = yes
+                    is_imprisoned = no
+                    NOT = { has_trait = incapable }
+                    num_of_relation_ward < 2
+                    OR = {
+                        learning >= good_skill_level
+                        has_trait = intellect_good_2
+                        has_trait = intellect_good_3
+                        has_trait = shrewd
+                    }
+                }
+                any_courtier = {
+                    is_physically_able_adult = yes
+                    is_imprisoned = no
+                    NOT = { has_trait = incapable }
+                    num_of_relation_ward < 2
+                    OR = {
+                        learning >= good_skill_level
+                        has_trait = intellect_good_2
+                        has_trait = intellect_good_3
+                        has_trait = shrewd
+                    }
+                }
+            }
+        }
+
+        ordered_living_character = {
+            limit = {
+                is_alive = yes
+                is_adult = yes
+                is_physically_able_adult = yes
+                is_ruler = no
+                is_imprisoned = no
+                NOT = { has_trait = incapable }
+                NOT = { is_courtier_of = scope:rf_courtier_automation_actor }
+                num_of_relation_ward < 2
+                AND = {
+                    OR = {
+                        diplomacy >= good_skill_level
+                        martial >= good_skill_level
+                        stewardship >= good_skill_level
+                        intrigue >= good_skill_level
+                        learning >= good_skill_level
+                    }
+                    OR = {
+                        learning >= good_skill_level
+                        has_trait = intellect_good_2
+                        has_trait = intellect_good_3
+                        has_trait = shrewd
+                    }
+                }
+                OR = {
+                    AND = {
+                        is_pool_guest_of = scope:rf_courtier_automation_actor
+                        recruit_guest_interaction_cost <= 0
+                    }
+                    AND = {
+                        NOT = { is_pool_guest_of = scope:rf_courtier_automation_actor }
+                        OR = {
+                            is_pool_character = yes
+                            exists = liege
+                        }
+                        is_foreign_court_guest = no
+                        in_diplomatic_range = scope:rf_courtier_automation_actor
+                        can_recruit_character_to_court_trigger = {
+                            RECRUITER = scope:rf_courtier_automation_actor
+                            RECRUITEE = this
+                        }
+                    }
+                }
+            }
+            order_by = riseandfall_guardian_recruitment_score_value
+            max = 1
+            check_range_bounds = no
+            save_scope_as = rf_courtier_automation_candidate
+            scope:rf_courtier_automation_actor = {
+                add_courtier = scope:rf_courtier_automation_candidate
+            }
+        }
+    }
+}
+
+riseandfall_player_legacy_worldscan_paid_guardian_se = {
+    save_scope_as = rf_courtier_automation_actor
+
+    if = {
+        limit = {
+            any_courtier = {
+                is_adult = no
+                is_available_child_allow_travel = yes
+                num_of_relation_guardian = 0
+                exists = house
+                house = scope:rf_courtier_automation_actor.house
+            }
+            NOR = {
+                AND = {
+                    is_physically_able_adult = yes
+                    is_imprisoned = no
+                    NOT = { has_trait = incapable }
+                    num_of_relation_ward < 2
+                    OR = {
+                        learning >= good_skill_level
+                        has_trait = intellect_good_2
+                        has_trait = intellect_good_3
+                        has_trait = shrewd
+                    }
+                }
+                any_courtier = {
+                    is_physically_able_adult = yes
+                    is_imprisoned = no
+                    NOT = { has_trait = incapable }
+                    num_of_relation_ward < 2
+                    OR = {
+                        learning >= good_skill_level
+                        has_trait = intellect_good_2
+                        has_trait = intellect_good_3
+                        has_trait = shrewd
+                    }
+                }
+            }
+        }
+
+        ordered_living_character = {
+            limit = {
+                is_alive = yes
+                is_adult = yes
+                is_physically_able_adult = yes
+                is_ruler = no
+                is_imprisoned = no
+                NOT = { has_trait = incapable }
+                NOT = { is_courtier_of = scope:rf_courtier_automation_actor }
+                num_of_relation_ward < 2
+                AND = {
+                    OR = {
+                        diplomacy >= good_skill_level
+                        martial >= good_skill_level
+                        stewardship >= good_skill_level
+                        intrigue >= good_skill_level
+                        learning >= good_skill_level
+                    }
+                    OR = {
+                        learning >= good_skill_level
+                        has_trait = intellect_good_2
+                        has_trait = intellect_good_3
+                        has_trait = shrewd
+                    }
+                }
+                OR = {
+                    AND = {
+                        is_pool_guest_of = scope:rf_courtier_automation_actor
+                        recruit_guest_interaction_cost > 0
+                    }
+                    AND = {
+                        NOT = { is_pool_guest_of = scope:rf_courtier_automation_actor }
+                        OR = {
+                            is_pool_character = yes
+                            exists = liege
+                        }
+                        is_foreign_court_guest = no
+                        in_diplomatic_range = scope:rf_courtier_automation_actor
+                        can_recruit_character_to_court_trigger = {
+                            RECRUITER = scope:rf_courtier_automation_actor
+                            RECRUITEE = this
+                        }
+                    }
+                }
+            }
+            order_by = riseandfall_guardian_recruitment_score_value
+            max = 1
+            check_range_bounds = no
+            save_scope_as = rf_courtier_automation_candidate
+
+            scope:rf_courtier_automation_actor = {
+                if = {
+                    limit = {
+                        scope:rf_courtier_automation_candidate = {
+                            is_pool_guest_of = scope:rf_courtier_automation_actor
+                        }
+                        gold >= scope:rf_courtier_automation_candidate.recruit_guest_interaction_cost
+                    }
+                    pay_short_term_gold = {
+                        gold = scope:rf_courtier_automation_candidate.recruit_guest_interaction_cost
+                        target = scope:rf_courtier_automation_candidate
+                    }
+                    add_courtier = scope:rf_courtier_automation_candidate
+                }
+                else_if = {
+                    limit = {
+                        NOT = {
+                            scope:rf_courtier_automation_candidate = {
+                                is_pool_guest_of = scope:rf_courtier_automation_actor
+                            }
+                        }
+                        gold >= { value = riseandfall_courtier_automation_bribe_value multiply = 0.5 }
+                    }
+                    pay_short_term_gold = {
+                        gold = { value = riseandfall_courtier_automation_bribe_value multiply = 0.5 }
+                        target = scope:rf_courtier_automation_candidate
+                    }
+                    add_courtier = scope:rf_courtier_automation_candidate
+                }
+            }
+        }
+    }
+}
+
+#################################################################################
+# Filtered smart recruitment. Build a small list from the ruler's own guests and
+# courts belonging to rulers in diplomatic range, then sort only that list.
+#################################################################################
+
+riseandfall_player_smart_invite_free_knight_se = {
+    save_scope_as = rf_courtier_automation_actor
+
+    # Rank current knights and available candidates together. The top entries
+    # up to the ruler's knight cap are the exact final roster upgrades.
+    every_knight = {
+        add_to_temporary_list = rf_smart_free_knight_roster_pool
+    }
+
+    every_courtier_or_guest = {
+        limit = {
+            is_alive = yes
+            is_adult = yes
+            is_ruler = no
+            is_imprisoned = no
+            is_pool_guest_of = scope:rf_courtier_automation_actor
+            NOT = { is_courtier_of = scope:rf_courtier_automation_actor }
+            recruit_guest_interaction_cost <= 0
+            can_be_knight_trigger = { ARMY_OWNER = scope:rf_courtier_automation_actor }
+        }
+        add_to_temporary_list = rf_smart_free_knight_candidates
+        add_to_temporary_list = rf_smart_free_knight_roster_pool
+    }
+
+    every_ruler = {
+        limit = {
+            is_alive = yes
+            in_diplomatic_range = scope:rf_courtier_automation_actor
+        }
+        every_courtier_or_guest = {
+            limit = {
+                is_alive = yes
+                is_adult = yes
+                is_ruler = no
+                is_imprisoned = no
+                NOT = { is_pool_guest_of = scope:rf_courtier_automation_actor }
+                NOT = { is_courtier_of = scope:rf_courtier_automation_actor }
+                OR = {
+                    is_pool_character = yes
+                    exists = liege
+                }
+                is_foreign_court_guest = no
+                in_diplomatic_range = scope:rf_courtier_automation_actor
+                can_be_knight_trigger = { ARMY_OWNER = scope:rf_courtier_automation_actor }
+                can_recruit_character_to_court_trigger = {
+                    RECRUITER = scope:rf_courtier_automation_actor
+                    RECRUITEE = this
+                }
+                # Free means vanilla accepts Invite to Court without travel
+                # expenses, Influence, or a Hook selected.
+                scope:rf_courtier_automation_actor = {
+                    is_character_interaction_potentially_accepted = {
+                        recipient = prev
+                        interaction = invite_to_court_interaction
+                        required_response = yes
+                        ai_accept = 0
+                    }
+                }
+            }
+            add_to_temporary_list = rf_smart_free_knight_candidates
+            add_to_temporary_list = rf_smart_free_knight_roster_pool
+        }
+    }
+
+    ordered_in_list = {
+        list = rf_smart_free_knight_roster_pool
+        order_by = prowess
+        max = scope:rf_courtier_automation_actor.max_number_of_knights
+        check_range_bounds = no
+        save_scope_as = rf_courtier_automation_candidate
+        if = {
+            limit = { is_in_list = rf_smart_free_knight_candidates }
+            scope:rf_courtier_automation_actor = {
+                add_courtier = scope:rf_courtier_automation_candidate
+            }
+        }
+    }
+}
+
+riseandfall_player_smart_invite_paid_knight_se = {
+    save_scope_as = rf_courtier_automation_actor
+
+    # Paid candidates use the same combined top-roster calculation as free
+    # candidates; payment remains conditional on current affordability.
+    every_knight = {
+        add_to_temporary_list = rf_smart_paid_knight_roster_pool
+    }
+
+    every_courtier_or_guest = {
+        limit = {
+            is_alive = yes
+            is_adult = yes
+            is_ruler = no
+            is_imprisoned = no
+            is_pool_guest_of = scope:rf_courtier_automation_actor
+            NOT = { is_courtier_of = scope:rf_courtier_automation_actor }
+            recruit_guest_interaction_cost > 0
+            can_be_knight_trigger = { ARMY_OWNER = scope:rf_courtier_automation_actor }
+        }
+        add_to_temporary_list = rf_smart_paid_knight_candidates
+        add_to_temporary_list = rf_smart_paid_knight_roster_pool
+    }
+
+    every_ruler = {
+        limit = {
+            is_alive = yes
+            in_diplomatic_range = scope:rf_courtier_automation_actor
+        }
+        every_courtier_or_guest = {
+            limit = {
+                is_alive = yes
+                is_adult = yes
+                is_ruler = no
+                is_imprisoned = no
+                NOT = { is_pool_guest_of = scope:rf_courtier_automation_actor }
+                NOT = { is_courtier_of = scope:rf_courtier_automation_actor }
+                OR = {
+                    is_pool_character = yes
+                    exists = liege
+                }
+                is_foreign_court_guest = no
+                in_diplomatic_range = scope:rf_courtier_automation_actor
+                can_be_knight_trigger = { ARMY_OWNER = scope:rf_courtier_automation_actor }
+                can_recruit_character_to_court_trigger = {
+                    RECRUITER = scope:rf_courtier_automation_actor
+                    RECRUITEE = this
+                }
+                # Keep genuinely free invitations in the free decision.
+                NOT = {
+                    scope:rf_courtier_automation_actor = {
+                        is_character_interaction_potentially_accepted = {
+                            recipient = prev
+                            interaction = invite_to_court_interaction
+                            required_response = yes
+                            ai_accept = 0
+                        }
+                    }
+                }
+            }
+            add_to_temporary_list = rf_smart_paid_knight_candidates
+            add_to_temporary_list = rf_smart_paid_knight_roster_pool
+        }
+    }
+
+    ordered_in_list = {
+        list = rf_smart_paid_knight_roster_pool
+        order_by = prowess
+        max = scope:rf_courtier_automation_actor.max_number_of_knights
+        check_range_bounds = no
+        save_scope_as = rf_courtier_automation_candidate
+        if = {
+            limit = { is_in_list = rf_smart_paid_knight_candidates }
+            scope:rf_courtier_automation_actor = {
+                if = {
+                    limit = {
+                        scope:rf_courtier_automation_candidate = {
+                            is_pool_guest_of = scope:rf_courtier_automation_actor
+                        }
+                        gold >= scope:rf_courtier_automation_candidate.recruit_guest_interaction_cost
+                    }
+                    pay_short_term_gold = {
+                        gold = scope:rf_courtier_automation_candidate.recruit_guest_interaction_cost
+                        target = scope:rf_courtier_automation_candidate
+                    }
+                    add_courtier = scope:rf_courtier_automation_candidate
+                }
+                else_if = {
+                    limit = {
+                        NOT = {
+                            scope:rf_courtier_automation_candidate = {
+                                is_pool_guest_of = scope:rf_courtier_automation_actor
+                            }
+                        }
+                        gold >= { value = riseandfall_courtier_automation_bribe_value multiply = 0.5 }
+                    }
+                    pay_short_term_gold = {
+                        gold = { value = riseandfall_courtier_automation_bribe_value multiply = 0.5 }
+                        target = scope:rf_courtier_automation_candidate
+                    }
+                    add_courtier = scope:rf_courtier_automation_candidate
+                }
+            }
+        }
+    }
+}
+
+#################################################################################
+# One-at-a-time general courtier recruitment, ranked by the vanilla sum of the
+# five council skills. Prowess is intentionally excluded.
+#################################################################################
+
+riseandfall_player_invite_best_free_courtier_se = {
+    save_scope_as = rf_courtier_automation_actor
+
+    every_courtier_or_guest = {
+        limit = {
+            is_alive = yes
+            is_adult = yes
+            is_ruler = no
+            is_imprisoned = no
+            is_pool_guest_of = scope:rf_courtier_automation_actor
+            NOT = { is_courtier_of = scope:rf_courtier_automation_actor }
+            recruit_guest_interaction_cost <= 0
+        }
+        add_to_temporary_list = rf_best_free_courtier_candidates
+    }
+
+    every_ruler = {
+        limit = {
+            is_alive = yes
+            in_diplomatic_range = scope:rf_courtier_automation_actor
+        }
+        every_courtier_or_guest = {
+            limit = {
+                is_alive = yes
+                is_adult = yes
+                is_ruler = no
+                is_imprisoned = no
+                NOT = { is_pool_guest_of = scope:rf_courtier_automation_actor }
+                NOT = { is_courtier_of = scope:rf_courtier_automation_actor }
+                OR = {
+                    is_pool_character = yes
+                    exists = liege
+                }
+                is_foreign_court_guest = no
+                in_diplomatic_range = scope:rf_courtier_automation_actor
+                can_recruit_character_to_court_trigger = {
+                    RECRUITER = scope:rf_courtier_automation_actor
+                    RECRUITEE = this
+                }
+                scope:rf_courtier_automation_actor = {
+                    is_character_interaction_potentially_accepted = {
+                        recipient = prev
+                        interaction = invite_to_court_interaction
+                        required_response = yes
+                        ai_accept = 0
+                    }
+                }
+            }
+            add_to_temporary_list = rf_best_free_courtier_candidates
+        }
+    }
+
+    ordered_in_list = {
+        list = rf_best_free_courtier_candidates
+        order_by = sum_of_all_skills_value
+        max = 1
+        check_range_bounds = no
+        save_scope_as = rf_courtier_automation_candidate
+        scope:rf_courtier_automation_actor = {
+            add_courtier = scope:rf_courtier_automation_candidate
+        }
+    }
+}
+
+riseandfall_player_recruit_best_paid_courtier_se = {
+    save_scope_as = rf_courtier_automation_actor
+
+    every_courtier_or_guest = {
+        limit = {
+            is_alive = yes
+            is_adult = yes
+            is_ruler = no
+            is_imprisoned = no
+            is_pool_guest_of = scope:rf_courtier_automation_actor
+            NOT = { is_courtier_of = scope:rf_courtier_automation_actor }
+            recruit_guest_interaction_cost > 0
+        }
+        add_to_temporary_list = rf_best_paid_courtier_candidates
+    }
+
+    every_ruler = {
+        limit = {
+            is_alive = yes
+            in_diplomatic_range = scope:rf_courtier_automation_actor
+        }
+        every_courtier_or_guest = {
+            limit = {
+                is_alive = yes
+                is_adult = yes
+                is_ruler = no
+                is_imprisoned = no
+                NOT = { is_pool_guest_of = scope:rf_courtier_automation_actor }
+                NOT = { is_courtier_of = scope:rf_courtier_automation_actor }
+                OR = {
+                    is_pool_character = yes
+                    exists = liege
+                }
+                is_foreign_court_guest = no
+                in_diplomatic_range = scope:rf_courtier_automation_actor
+                can_recruit_character_to_court_trigger = {
+                    RECRUITER = scope:rf_courtier_automation_actor
+                    RECRUITEE = this
+                }
+                NOT = {
+                    scope:rf_courtier_automation_actor = {
+                        is_character_interaction_potentially_accepted = {
+                            recipient = prev
+                            interaction = invite_to_court_interaction
+                            required_response = yes
+                            ai_accept = 0
+                        }
+                    }
+                }
+            }
+            add_to_temporary_list = rf_best_paid_courtier_candidates
+        }
+    }
+
+    ordered_in_list = {
+        list = rf_best_paid_courtier_candidates
+        order_by = sum_of_all_skills_value
+        max = 1
+        check_range_bounds = no
+        save_scope_as = rf_courtier_automation_candidate
+        scope:rf_courtier_automation_actor = {
+            if = {
+                limit = {
+                    scope:rf_courtier_automation_candidate = {
+                        is_pool_guest_of = scope:rf_courtier_automation_actor
+                    }
+                    gold >= scope:rf_courtier_automation_candidate.recruit_guest_interaction_cost
+                }
+                pay_short_term_gold = {
+                    gold = scope:rf_courtier_automation_candidate.recruit_guest_interaction_cost
+                    target = scope:rf_courtier_automation_candidate
+                }
+                add_courtier = scope:rf_courtier_automation_candidate
+            }
+            else_if = {
+                limit = {
+                    NOT = {
+                        scope:rf_courtier_automation_candidate = {
+                            is_pool_guest_of = scope:rf_courtier_automation_actor
+                        }
+                    }
+                    gold >= { value = riseandfall_courtier_automation_bribe_value multiply = 0.5 }
+                }
+                pay_short_term_gold = {
+                    gold = { value = riseandfall_courtier_automation_bribe_value multiply = 0.5 }
+                    target = scope:rf_courtier_automation_candidate
+                }
+                add_courtier = scope:rf_courtier_automation_candidate
+            }
+        }
+    }
+}
+
+riseandfall_player_smart_invite_free_guardian_se = {
+    save_scope_as = rf_courtier_automation_actor
+
+    if = {
+        limit = {
+            any_courtier = {
+                is_adult = no
+                is_available_child_allow_travel = yes
+                num_of_relation_guardian = 0
+                exists = house
+                house = scope:rf_courtier_automation_actor.house
+            }
+            NOR = {
+                AND = {
+                    is_physically_able_adult = yes
+                    is_imprisoned = no
+                    NOT = { has_trait = incapable }
+                    num_of_relation_ward < 2
+                    OR = {
+                        learning >= good_skill_level
+                        has_trait = intellect_good_2
+                        has_trait = intellect_good_3
+                        has_trait = shrewd
+                    }
+                }
+                any_courtier = {
+                    is_physically_able_adult = yes
+                    is_imprisoned = no
+                    NOT = { has_trait = incapable }
+                    num_of_relation_ward < 2
+                    OR = {
+                        learning >= good_skill_level
+                        has_trait = intellect_good_2
+                        has_trait = intellect_good_3
+                        has_trait = shrewd
+                    }
+                }
+            }
+        }
+
+        every_courtier_or_guest = {
+            limit = {
+                is_alive = yes
+                is_adult = yes
+                is_physically_able_adult = yes
+                is_ruler = no
+                is_imprisoned = no
+                NOT = { has_trait = incapable }
+                is_pool_guest_of = scope:rf_courtier_automation_actor
+                NOT = { is_courtier_of = scope:rf_courtier_automation_actor }
+                num_of_relation_ward < 2
+                recruit_guest_interaction_cost <= 0
+                AND = {
+                    OR = {
+                        diplomacy >= good_skill_level
+                        martial >= good_skill_level
+                        stewardship >= good_skill_level
+                        intrigue >= good_skill_level
+                        learning >= good_skill_level
+                    }
+                    OR = {
+                        learning >= good_skill_level
+                        has_trait = intellect_good_2
+                        has_trait = intellect_good_3
+                        has_trait = shrewd
+                    }
+                }
+            }
+            add_to_temporary_list = rf_smart_free_guardian_candidates
+        }
+
+        every_ruler = {
+            limit = {
+                is_alive = yes
+                in_diplomatic_range = scope:rf_courtier_automation_actor
+            }
+            every_courtier_or_guest = {
+                limit = {
+                    is_alive = yes
+                    is_adult = yes
+                    is_physically_able_adult = yes
+                    is_ruler = no
+                    is_imprisoned = no
+                    NOT = { has_trait = incapable }
+                    NOT = { is_pool_guest_of = scope:rf_courtier_automation_actor }
+                    NOT = { is_courtier_of = scope:rf_courtier_automation_actor }
+                    num_of_relation_ward < 2
+                    OR = {
+                        is_pool_character = yes
+                        exists = liege
+                    }
+                    is_foreign_court_guest = no
+                    in_diplomatic_range = scope:rf_courtier_automation_actor
+                    can_recruit_character_to_court_trigger = {
+                        RECRUITER = scope:rf_courtier_automation_actor
+                        RECRUITEE = this
+                    }
+                    scope:rf_courtier_automation_actor = {
+                        is_character_interaction_potentially_accepted = {
+                            recipient = prev
+                            interaction = invite_to_court_interaction
+                            required_response = yes
+                            ai_accept = 0
+                        }
+                    }
+                    AND = {
+                        OR = {
+                            diplomacy >= good_skill_level
+                            martial >= good_skill_level
+                            stewardship >= good_skill_level
+                            intrigue >= good_skill_level
+                            learning >= good_skill_level
+                        }
+                        OR = {
+                            learning >= good_skill_level
+                            has_trait = intellect_good_2
+                            has_trait = intellect_good_3
+                            has_trait = shrewd
+                        }
+                    }
+                }
+                add_to_temporary_list = rf_smart_free_guardian_candidates
+            }
+        }
+
+        ordered_in_list = {
+            list = rf_smart_free_guardian_candidates
+            order_by = riseandfall_guardian_recruitment_score_value
+            max = 1
+            check_range_bounds = no
+            save_scope_as = rf_courtier_automation_candidate
+            scope:rf_courtier_automation_actor = {
+                add_courtier = scope:rf_courtier_automation_candidate
+            }
+        }
+    }
+}
+
+riseandfall_player_smart_invite_paid_guardian_se = {
+    save_scope_as = rf_courtier_automation_actor
+
+    if = {
+        limit = {
+            any_courtier = {
+                is_adult = no
+                is_available_child_allow_travel = yes
+                num_of_relation_guardian = 0
+                exists = house
+                house = scope:rf_courtier_automation_actor.house
+            }
+            NOR = {
+                AND = {
+                    is_physically_able_adult = yes
+                    is_imprisoned = no
+                    NOT = { has_trait = incapable }
+                    num_of_relation_ward < 2
+                    OR = {
+                        learning >= good_skill_level
+                        has_trait = intellect_good_2
+                        has_trait = intellect_good_3
+                        has_trait = shrewd
+                    }
+                }
+                any_courtier = {
+                    is_physically_able_adult = yes
+                    is_imprisoned = no
+                    NOT = { has_trait = incapable }
+                    num_of_relation_ward < 2
+                    OR = {
+                        learning >= good_skill_level
+                        has_trait = intellect_good_2
+                        has_trait = intellect_good_3
+                        has_trait = shrewd
+                    }
+                }
+            }
+        }
+
+        every_courtier_or_guest = {
+            limit = {
+                is_alive = yes
+                is_adult = yes
+                is_physically_able_adult = yes
+                is_ruler = no
+                is_imprisoned = no
+                NOT = { has_trait = incapable }
+                is_pool_guest_of = scope:rf_courtier_automation_actor
+                NOT = { is_courtier_of = scope:rf_courtier_automation_actor }
+                num_of_relation_ward < 2
+                recruit_guest_interaction_cost > 0
+                AND = {
+                    OR = {
+                        diplomacy >= good_skill_level
+                        martial >= good_skill_level
+                        stewardship >= good_skill_level
+                        intrigue >= good_skill_level
+                        learning >= good_skill_level
+                    }
+                    OR = {
+                        learning >= good_skill_level
+                        has_trait = intellect_good_2
+                        has_trait = intellect_good_3
+                        has_trait = shrewd
+                    }
+                }
+            }
+            add_to_temporary_list = rf_smart_paid_guardian_candidates
+        }
+
+        every_ruler = {
+            limit = {
+                is_alive = yes
+                in_diplomatic_range = scope:rf_courtier_automation_actor
+            }
+            every_courtier_or_guest = {
+                limit = {
+                    is_alive = yes
+                    is_adult = yes
+                    is_physically_able_adult = yes
+                    is_ruler = no
+                    is_imprisoned = no
+                    NOT = { has_trait = incapable }
+                    NOT = { is_pool_guest_of = scope:rf_courtier_automation_actor }
+                    NOT = { is_courtier_of = scope:rf_courtier_automation_actor }
+                    num_of_relation_ward < 2
+                    OR = {
+                        is_pool_character = yes
+                        exists = liege
+                    }
+                    is_foreign_court_guest = no
+                    in_diplomatic_range = scope:rf_courtier_automation_actor
+                    can_recruit_character_to_court_trigger = {
+                        RECRUITER = scope:rf_courtier_automation_actor
+                        RECRUITEE = this
+                    }
+                    NOT = {
+                        scope:rf_courtier_automation_actor = {
+                            is_character_interaction_potentially_accepted = {
+                                recipient = prev
+                                interaction = invite_to_court_interaction
+                                required_response = yes
+                                ai_accept = 0
+                            }
+                        }
+                    }
+                    AND = {
+                        OR = {
+                            diplomacy >= good_skill_level
+                            martial >= good_skill_level
+                            stewardship >= good_skill_level
+                            intrigue >= good_skill_level
+                            learning >= good_skill_level
+                        }
+                        OR = {
+                            learning >= good_skill_level
+                            has_trait = intellect_good_2
+                            has_trait = intellect_good_3
+                            has_trait = shrewd
+                        }
+                    }
+                }
+                add_to_temporary_list = rf_smart_paid_guardian_candidates
+            }
+        }
+
+        ordered_in_list = {
+            list = rf_smart_paid_guardian_candidates
+            order_by = riseandfall_guardian_recruitment_score_value
+            max = 1
+            check_range_bounds = no
+            save_scope_as = rf_courtier_automation_candidate
+            scope:rf_courtier_automation_actor = {
+                if = {
+                    limit = {
+                        scope:rf_courtier_automation_candidate = {
+                            is_pool_guest_of = scope:rf_courtier_automation_actor
+                        }
+                        gold >= scope:rf_courtier_automation_candidate.recruit_guest_interaction_cost
+                    }
+                    pay_short_term_gold = {
+                        gold = scope:rf_courtier_automation_candidate.recruit_guest_interaction_cost
+                        target = scope:rf_courtier_automation_candidate
+                    }
+                    add_courtier = scope:rf_courtier_automation_candidate
+                }
+                else_if = {
+                    limit = {
+                        NOT = {
+                            scope:rf_courtier_automation_candidate = {
+                                is_pool_guest_of = scope:rf_courtier_automation_actor
+                            }
+                        }
+                        gold >= { value = riseandfall_courtier_automation_bribe_value multiply = 0.5 }
+                    }
+                    pay_short_term_gold = {
+                        gold = { value = riseandfall_courtier_automation_bribe_value multiply = 0.5 }
+                        target = scope:rf_courtier_automation_candidate
+                    }
+                    add_courtier = scope:rf_courtier_automation_candidate
+                }
+            }
+        }
+    }
+}
