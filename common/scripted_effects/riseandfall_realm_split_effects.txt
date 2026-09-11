@@ -1,6 +1,76 @@
 ﻿##########################
 # Rise and Fall - Realm Split System
 # Realm splits seed by de jure duchy for every rank so successor states
+
+# Apply the source realm's title-level succession identity to a newly-created
+# successor crown. Existing titles already carry their own laws and must not be
+# touched. CK3 exposes the law checks and add/remove effects, but not a generic
+# dynamic law-key assignment, so mirror the complete title-law set explicitly.
+riseandfall_copy_successor_title_succession_se = {
+    if = {
+        limit = {
+            exists = scope:rf_successor_law_source
+        }
+        if = {
+            limit = { scope:rf_successor_law_source = { has_title_law = feudal_elective_succession_law } }
+            add_title_law = feudal_elective_succession_law
+        }
+        else_if = {
+            limit = { scope:rf_successor_law_source = { has_title_law = princely_elective_succession_law } }
+            # Vanilla restricts Princely Elective to e_hre. A dynamic
+            # breakaway cannot legally receive that law, so retain the
+            # elective character with the valid feudal elective law.
+            if = {
+                limit = { this = title:e_hre }
+                add_title_law = princely_elective_succession_law
+            }
+            else = {
+                add_title_law = feudal_elective_succession_law
+            }
+        }
+        else_if = {
+            limit = { scope:rf_successor_law_source = { has_title_law = saxon_elective_succession_law } }
+            add_title_law = saxon_elective_succession_law
+        }
+        else_if = {
+            limit = { scope:rf_successor_law_source = { has_title_law = scandinavian_elective_succession_law } }
+            add_title_law = scandinavian_elective_succession_law
+        }
+        else_if = {
+            limit = { scope:rf_successor_law_source = { has_title_law = gaelic_elective_succession_law } }
+            add_title_law = gaelic_elective_succession_law
+        }
+        else_if = {
+            limit = { scope:rf_successor_law_source = { has_title_law = tribal_elective_succession_law } }
+            add_title_law = tribal_elective_succession_law
+        }
+        else_if = {
+            limit = { scope:rf_successor_law_source = { has_title_law = confederation_elective_succession_law } }
+            add_title_law = confederation_elective_succession_law
+        }
+        else_if = {
+            limit = { scope:rf_successor_law_source = { has_title_law = temporal_head_of_faith_succession_law } }
+            add_title_law = temporal_head_of_faith_succession_law
+        }
+        else_if = {
+            limit = { scope:rf_successor_law_source = { has_title_law = noble_family_succession_law } }
+            add_title_law = noble_family_succession_law
+        }
+        else_if = {
+            limit = { scope:rf_successor_law_source = { has_title_law = law_of_the_land_succession_law } }
+            add_title_law = law_of_the_land_succession_law
+        }
+        else_if = {
+            limit = { scope:rf_successor_law_source = { has_title_law = celestial_ministry_appointment_succession_law } }
+            add_title_law = celestial_ministry_appointment_succession_law
+        }
+        else_if = {
+            limit = { scope:rf_successor_law_source = { has_title_law = celestial_grand_marshal_appointment_succession_law } }
+            add_title_law = celestial_grand_marshal_appointment_succession_law
+        }
+    }
+}
+
 # stay compact before nearby unseeded duchies are assigned to stronger anchors.
 # The original ruler keeps their capital core and any territory outside the seeded regions.
 # Supports governments without powerful vassals (Celestial, Japanese, Administrative, Meritocratic, etc.)
@@ -901,6 +971,12 @@ riseandfall_realm_split_se = {
             scope:original_ruler = { change_variable = { name = rf_breakaway_seed_count add = 1 } }
         }
         riseandfall_select_dynamic_breakaway_anchors_se = yes
+        # The effect is also entered while building the event preview, where
+        # the runtime setup above may not have persisted this temporary value.
+        if = {
+            limit = { NOT = { has_variable = rf_breakaway_seed_count } }
+            set_variable = { name = rf_breakaway_seed_count value = 0 }
+        }
         if = {
             limit = { var:rf_breakaway_seed_count < 1 }
             ordered_vassal = {
@@ -1599,6 +1675,24 @@ riseandfall_execute_realm_split_se = {
             scope:new_realm_ruler = { has_character_flag = rf_created_breakaway_dynamic_title }
         }
         scope:rf_new_title = { generate_coa = yes }
+    }
+
+    # Dynamic crowns do not inherit title laws automatically. Copy the source
+    # crown's elective identity before making this title the successor primary.
+    if = {
+        limit = {
+            exists = scope:rf_new_title
+            scope:new_realm_ruler = {
+                has_character_flag = rf_created_breakaway_dynamic_title
+            }
+        }
+        scope:original_primary = {
+            save_temporary_scope_as = rf_successor_law_source
+        }
+        scope:rf_new_title = {
+            riseandfall_copy_successor_title_succession_se = yes
+        }
+        clear_saved_scope = rf_successor_law_source
     }
 
     # CK3 may keep a reserve lower title as primary after title handoff; force the

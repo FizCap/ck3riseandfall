@@ -34,6 +34,7 @@ riseandfall_refresh_independent_coalition_periphery = {
                 is_landed = yes
                 is_independent_ruler = yes
                 exists = primary_title
+                riseandfall_coalition_tracking_candidate_trigger = yes
             }
             riseandfall_coalition_calculate_periphery_se = yes
             riseandfall_coalition_update_threat_se = { APPLY_YEARLY = yes }
@@ -52,6 +53,7 @@ riseandfall_initialize_independent_coalition_threat = {
                 is_landed = yes
                 is_independent_ruler = yes
                 exists = primary_title
+                riseandfall_coalition_tracking_candidate_trigger = yes
             }
             riseandfall_coalition_calculate_periphery_se = yes
             riseandfall_coalition_update_threat_se = { APPLY_YEARLY = no }
@@ -127,6 +129,7 @@ riseandfall_record_coalition_vassalization_conquest = {
                         is_landed = yes
                         is_independent_ruler = yes
                         exists = primary_title
+                        riseandfall_coalition_tracking_candidate_trigger = yes
                     }
                     riseandfall_coalition_calculate_periphery_se = yes
                     riseandfall_coalition_update_threat_se = { APPLY_YEARLY = no }

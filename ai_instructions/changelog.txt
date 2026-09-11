@@ -1,23 +1,7 @@
-﻿CK3: Rise and Fall - 1.3.0
+﻿CK3: Rise and Fall - 1.3.1
 
-Stability
-- Replaced the flat 10-year low-stability cooldown with gradual recovery: each yearly roll restores 10% of the incident chance, reaching the full chance after 10 years.
-- Removed the obsolete game-start low-stability grace cooldown so low-stability event risk is available immediately and only completed incidents receive gradual recovery.
+Coaltiion
+- Coalition Threat was only tracked for realms large enough to qualify as targets and with at least two eligible independent invitees.
 
-adventurer
-- Removed the decay script for special troops as it wasn't working with the current modding tools
-
-AI / Quality of Life
-- Added a Courtier Automation decision group with repeatable one-time decisions for free and paid knight, guardian, or highest-total-skill courtier recruitment. Each knight search recruits the exact available set needed to fill open slots and replace weaker serving knights in one click, guardian searches recruit one best candidate only when additional high-value ward capacity is needed, and general courtier searches recruit one candidate ranked by combined council skills. Free searches require vanilla Invite to Court acceptance without travel expenses, Influence, or a Hook; searches cover eligible guests and foreign courts in diplomatic range, preview immediate recruits and payments, and do not run automatically on the yearly pulse.
-
-Bordergore
-- Prevented bordergore cleanup from transferring counties or vassals that legitimately belonged beneath any duchy, kingdom, empire, or higher de-jure title personally held by the targeted ruler.
-
-Bug Fixes
-- Replaced AI best-war scoring and broad `can_declare_war` validation with a direct `start_war` call for each adventurer's prepared origin kingdom, retaining explicit alliance, truce, war-state, and military safety checks.
-- Prevented duplicate Puppet Master appointment requests after death and preserved the next valid character in the diarchy succession line instead of prematurely substituting an unrelated courtier.
-- Fixed legitimist adventurers silently rejecting their prepared claim invasion after the engine entered the isolated AI war-candidate callback.
-- Promoted generated adventurers' selected origin targets to pressed claims and repaired their Legitimists camp purpose before invasion attempts, preventing vanilla from replacing the purpose when selection began from an implicit heir claim.
-- Prevented the debug legitimist decision tooltip from repeatedly evaluating temporary adventurer setup state, restored variable-scaled cloning of the target ruler's men-at-arms, and removed a redundant AI-frequency warning from the player-only camp interaction.
-
-Result : adventurers should be way more aggressive now with their invasions
+Palace Coup/Realm Split
+- Palace Coup and Realm Split successor crowns now preserve the source realm's elective succession identity when dynamic titles are created.

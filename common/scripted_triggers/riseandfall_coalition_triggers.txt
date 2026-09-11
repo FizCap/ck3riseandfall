@@ -16,6 +16,21 @@ riseandfall_coalition_target_controls_five_percent_world_trigger = {
     NOT = { var:riseandfall_rs_realm_size_component >= -4 }
 }
 
+# Cheap pre-filter for the yearly county scan. This mirrors the low-stability
+# Coalition selector's minimum: the ruler must be large enough to qualify and
+# have at least two independent rulers who could receive an invitation.
+riseandfall_coalition_tracking_candidate_trigger = {
+    riseandfall_coalition_target_controls_five_percent_world_trigger = yes
+    any_independent_ruler = {
+        count >= 2
+        riseandfall_coalition_potential_invitee_trigger = yes
+        NOT = { target_is_same_character_or_above = root }
+        in_diplomatic_range = root
+        NOT = { is_allied_to = root }
+        NOT = { has_truce = root }
+    }
+}
+
 # This trigger is evaluated from a Coalition interaction, where scope:actor
 # is the initiating neighbor and this is the proposed target.
 riseandfall_coalition_target_threat_valid_trigger = {

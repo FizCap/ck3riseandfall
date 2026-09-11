@@ -956,6 +956,15 @@ riseandfall_palace_coup_create_claimant_successor_title_se = {
     }
     if = {
         limit = { exists = scope:new_title }
+        # Dynamic claimant crowns should retain the original crown's elective
+        # identity, while ordinary succession remains vanilla by default.
+        scope:original_primary = {
+            save_temporary_scope_as = rf_successor_law_source
+        }
+        scope:new_title = {
+            riseandfall_copy_successor_title_succession_se = yes
+        }
+        clear_saved_scope = rf_successor_law_source
         create_title_and_vassal_change = {
             type = created
             save_scope_as = palace_coup_claimant_title_change
