@@ -1,7 +1,4 @@
-﻿CK3: Rise and Fall - 1.3.1
+﻿CK3: Rise and Fall - 1.3.2
 
-Coaltiion
-- Coalition Threat was only tracked for realms large enough to qualify as targets and with at least two eligible independent invitees.
-
-Palace Coup/Realm Split
-- Palace Coup and Realm Split successor crowns now preserve the source realm's elective succession identity when dynamic titles are created.
+Courtier Automation
+- Recruit Best Paid Courtier now excludes candidates who would reject a regular Invite to Court, even when their recruitment fee is affordable.

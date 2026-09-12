@@ -1161,14 +1161,14 @@ riseandfall_player_recruit_best_paid_courtier_se = {
                     RECRUITER = scope:rf_courtier_automation_actor
                     RECRUITEE = this
                 }
-                NOT = {
-                    scope:rf_courtier_automation_actor = {
-                        is_character_interaction_potentially_accepted = {
-                            recipient = prev
-                            interaction = invite_to_court_interaction
-                            required_response = yes
-                            ai_accept = 0
-                        }
+                # Payment covers recruitment cost, not a negative willingness
+                # score. Keep candidates who would accept a regular invite.
+                scope:rf_courtier_automation_actor = {
+                    is_character_interaction_potentially_accepted = {
+                        recipient = prev
+                        interaction = invite_to_court_interaction
+                        required_response = yes
+                        ai_accept = 0
                     }
                 }
             }
