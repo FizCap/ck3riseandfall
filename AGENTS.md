@@ -1,69 +1,30 @@
-# Rise and Fall (CK3) Agent Instructions
+# Rise and Fall Agent Instructions
 
-## Repository
-- This is a Crusader Kings III mod source tree, not a package project. `descriptor.mod` is the launcher metadata; check its `version`, `supported_version`, and `remote_file_id` before compatibility or release work. Do not add a `path=` entry or edit the installed CK3 `game/` directory.
-- There is no package manifest, build/lint/typecheck configuration, CI workflow, or automated test suite in this repository. Do not invent package commands; static checks plus an in-game smoke test are the verification path.
-- Preserve UTF-8 with BOM for CK3 `.txt`, `.yml`, and `.gui` files. Keep IDs stable and prefix new IDs and keys by their feature subsystem.
+## Project
 
-## Layout
-- `common/` contains definitions: `on_action/` hooks vanilla pulses and events, `scripted_effects/` and `scripted_triggers/` hold reusable logic, `script_values/` holds formulas, `game_rules/` holds toggles, and `decisions/` and `character_interactions/` are player/AI entry points.
-- `events/` contains event chains; `localization/english/` contains all UI-facing keys.
-- `gui/` contains vanilla overrides and widgets; `common/scripted_guis/` bridges GUI actions to scripted effects. Read `ai_instructions/ck3-gui-modding-instructions.txt` before GUI work.
-- Static modifiers belong in `common/modifiers/`; do not create or use a `common/static_modifiers/` folder.
+Rise and Fall is a Crusader Kings III mod. `descriptor.mod` is launcher metadata; this repository has no package build, lint, CI, or automated test suite. Use the game’s generated documentation and working vanilla examples as scripting references. Never edit installed vanilla game files.
 
-## Source Of Truth
-- Before using an unfamiliar CK3 token, check `docs/triggers.log`, `effects.log`, `event_scopes.log`, `event_targets.log`, or `on_actions.log`; GUI API tokens are in `docs/data_types*.txt`.
-- Treat `.github/prompt` notes and other prose as cheatsheets; when they conflict with generated docs or working vanilla examples, trust the latter. Use installed vanilla files for examples only, never edit them.
-- Search existing event IDs, script keys, and localization keys before adding new ones. Multiple files intentionally extend the same vanilla on_action; verify the hook name and expected scope in `docs/on_actions.log`, then inspect the matching vanilla handler comments and usage when the generated log reports `Expected Scope: none`. Some code hooks, including diarchy hooks, still provide the affected character as `root` despite that generated entry.
+## Start here
 
-## CK3 Scripting
-- Character flags are written with `add_character_flag = { flag = flag_name }`; `set_character_flag` is not a valid CK3 effect. Remove them with `remove_character_flag = flag_name`.
-- Decision effect previews evaluate conditional scripted effects against the character's current persistent state; do not require a flag being added by that same decision when the preview must enumerate dynamic targets or costs. Use a mode-specific immediate effect for that enable action. A direct scripted-effect call can still be expanded when nested inside `hidden_effect`; dispatch stateful, non-previewable work through a hidden event when the tooltip builder must not enter it.
-- `every_courtier_or_guest` only enumerates the scoped character's own court and guests. A diplomatic-range recruitment search must expand through a documented broader iterator, preferably diplomatic-range rulers and their courts, then narrowly filter court status and vanilla recruitment eligibility.
-- Do not use `ordered_living_character` in a decision effect whose preview is evaluated while browsing the Decisions window; sorting the entire living population causes visible UI stalls. Gather candidates from already-filtered diplomatic-range rulers and their courts into a temporary list, then use `ordered_in_list` on that reduced set.
-- For previewable one-click ranked roster upgrades, do not depend on variables set earlier in the same decision effect. Combine incumbents and candidates in a temporary list, order the list by score, cap it to the roster limit, and apply effects only to candidate entries in that final top set.
-- A free foreign-court invitation must check `is_character_interaction_potentially_accepted` for the vanilla interaction with no send-option scopes present; interaction validity alone does not mean the recipient accepts without paid travel expenses, Influence, or a Hook.
-- Validate every scope hop. Guard optional scopes with `exists` and optional variables with `has_variable`; saved scopes must retain the character, title, or province type expected by later code.
-- Interaction `ai_potential` blocks are evaluated with the interaction actor as the root scope only; `scope:actor`, `scope:recipient`, and other interaction event targets are unavailable there. Keep actor-only eligibility in `ai_potential` and put actor/recipient pair checks in `ai_will_do` or another block where both scopes are defined.
-- Tooltip-evaluated triggers can read an unset `var:` even when placed beside `has_variable` in an `AND`. For optional object comparisons, use the repository's `var:name ?= scope:target` pattern rather than relying on short-circuiting.
-- Income fields such as `yearly_character_income` and `year_character_treasury_variable_income` can supply numeric scripted values even though generated trigger documentation lists their comparison forms. For divided indemnities, calculate positive-clamped gold and treasury amounts in payer-scoped scripted values, then use `pay_short_term_gold` or `pay_short_term_treasury`; income-payment helpers reject negative net income.
-- `spawn_army.location` requires a province event target; use `capital_province`, not `capital_barony`, when spawning at a character's capital.
-- `spawn_army.save_scope_as` can remain unset when the character is not at war because CK3 creates the regiments without spawning an army stack. Guard the returned army scope before using it. For owner-wide maintenance that must also affect unraised event troops, iterate the character's `every_maa_regiment` and filter with `is_event_maa_regiment` instead of relying on `every_army`.
-- `create_maa_regiment.size` accepts a literal integer, not a `var:` script value. For dynamic size, snapshot existing regiments, create the new regiment at size 1, identify the new regiment by list exclusion, and resize it with `change_maa_regiment_size` using a saved scope value.
-- Keep on_action handlers small and dispatch to scripted effects with `effect = { ... }`. Gate game-rule mechanics with `has_game_rule`; define new rules in `common/game_rules/` with the `riseandfall` category.
-- When low-stability recovery is represented by a chance multiplier, do not seed the incident cooldown globally during `on_game_start_after_lobby`; apply recovery only when an incident completes so startup risk reflects the actual stability score.
-- `is_landed` means holding a county or barony; landless adventurers correctly satisfy `is_landed = no`. Do not add landed-hierarchy gates such as `can_attack_in_hierarchy` to their claim-war path when vanilla `can_declare_war` is the authoritative CB validation.
-- `ai_start_best_war.is_valid`, `on_success`, and `on_failure` receive only the callback scopes documented for that effect; surrounding saved scopes are unavailable. Persist prepared character or title targets as typed variables on `root`, compare them to `scope:target_character` and `scope:target_title` with `?=`, and remove them after the synchronous effect returns.
-- Yearly on-action loops such as `every_ruler` do not provide an implicit `root` scope; save the current character before entering a title or other nested scope when the effect must return to that character.
-- Do not reuse a whole-world `every_ruler` maintenance handler from a code on_action that supplies the affected character as `root`; dispatch a root-specific repair effect there and reserve the global scan for its periodic pulse, or nested state changes can recursively fan out the maintenance work.
-- When a trigger enters a character iterator but must compare candidates with the original character, save that character before the iterator and use a documented target trigger; direct comparisons such as `this = scope:name` are invalid.
-- Character-target triggers documented with `Traits: character target` take the target character directly, such as `target_is_same_character_or_above = scope:saved_character`; do not wrap the target in a `{ target = ... }` block unless the generated trigger documentation explicitly shows that form. A nested scripted trigger may not retain the iterator caller's `root`; keep cross-scope comparisons at the iterator call site or pass an explicitly valid saved scope.
-- For mechanics with an explicit title-level active-state marker, treat that marker as authoritative. Succession, trait assignment, and maintenance may preserve marked state but must not recreate a cleared marker from stale character traits.
-- Feature-specific scripted-score bonuses must include the feature's current eligibility gate in every copied appointment or score definition; relationship and government checks alone are not sufficient.
-- When a generated Legitimists camp may be selected from an implicit claim, add an explicit claim on its prepared target and set vanilla's `legitimist_claimed_title` before applying the camp-purpose law. Repair both pieces before later war discovery; forcing the law alone lets vanilla `can_keep` replace it.
-- Temporary realm succession laws must be applied to the ruler whose realm enters the relevant state, store the prior law on a persistent primary-title variable, and restore it only after the triggering state is absent.
-- Script-only laws must explicitly use `should_start_with = { always = no }`; omitting it can make the law win default-law selection even when `can_have` is false.
-- Temporary inheritance succession laws that must exclude landed candidates should use the native `exclude_rulers = yes` rule; a negative candidate score does not make a landed character ineligible.
-- Persistent diarchy states must use a dedicated marker and explicit removal effect; court-position synchronization and missing-candidate recovery may repair or defer the office, but must never end the diarchy implicitly. A court-position container tied to that state must remain shown and valid from the persistent marker during transient inactive or type-less succession gaps; put active-diarch requirements on `valid_character` instead of tearing down and recreating the position itself.
-- For a script-owned court position, keep `ai_position_score` decisively below the vanilla hire threshold and the holder's firing score safely positive; a boundary score can let automatic appointment race scripted succession. Before every scripted appointment, use vanilla `can_appoint_char_to_court_position` in the hiring liege's scope. Do not call an appointing synchronization effect from `on_court_position_received`; coalesce overlapping revoked, invalidated, and vacated callbacks behind one delayed, marker-guarded resync, and block fresh creation until engine teardown has finished.
-- When an active diarch dies, save the ruler's documented `diarchy_successor` before death cleanup can end the diarchy. Do not select a replacement during the transient empty-diarch callback; resolve after teardown, retain a valid diarch advanced by the engine, otherwise restore the saved native successor, and use a custom fallback only when that successor is unavailable or invalid.
-- Add concise `#` comments for non-obvious scope changes, thresholds, weights, or math. Keep braces and block structure strict.
-- When an effect resolves title or vassal changes inside a title/realm iterator, snapshot the target titles or counties into a list first and mutate them in a separate `every_in_list` pass; live collection mutation can invalidate vanilla on-action scopes.
-- After using vanilla `depose_effect`, let normal succession distribute the deposed ruler's surviving titles unless the mechanic explicitly requires a different holder; a second manual title-transfer pass can override or duplicate vanilla inheritance.
-- When every county held by an administrative sub-vassal is being reassigned, transfer the intact ruler to the destination liege instead of unlanding them; mixed holders can surrender only the offending counties.
-- Bordergore eligibility and execution must share their county triggers: direct holdings use the holder's primary de-jure region plus every personally held title in the county's de-jure chain; subordinate holdings use the target's equivalent region, and intact transferred rulers then surrender counties outside their own region while retaining a core county.
-- When a Story Mode event causes real realm fragmentation, apply a bounded collapse-pressure relief after title/vassal transfers and resync the primary-title copy; structural weakening should reduce an arc without deleting it.
-- For standard realm splits, select successor anchors from the full eligible vassal pool and assign ordinary vassals individually through political/geographic influence; de-jure regions are soft cohesion and fallback aids, not mandatory anchor quotas.
+- Before compatibility or release work, inspect `descriptor.mod` and its version fields.
+- Before adding IDs or localization, search for existing keys and collisions.
+- Preserve UTF-8 with BOM in CK3 `.txt`, `.yml`, and `.gui` files. Keep IDs stable and prefix new IDs and keys with their feature subsystem.
+- For an unfamiliar script token, consult the matching file under `docs/` (`triggers.log`, `effects.log`, `event_scopes.log`, `event_targets.log`, `on_actions.log`). For GUI APIs, consult `docs/data_types*.txt`.
+- Static modifiers go in `common/modifiers/`.
 
-## Localization And GUI
-- Every UI-facing key must exist under `l_english:`. Check dynamic localization methods against the actual scope type. For saved event scopes, use the working direct form `[saved_name.GetName]`; `scope:` is script syntax and can break event tooltips when copied into localization.
-- Match GUI `datacontext`, `datamodel`, and scripted GUI wrapper scopes exactly. Guard command buttons with `IsValidCommand` before `CreateCommandPopup` and guard list widgets against empty data.
-- A standalone custom `.gui` file does not automatically register a HUD or game-view key. Put custom HUD panels inside an already-loaded HUD widget, usually behind a `GetVariableSystem` state flag. Recheck vanilla overrides and block names after CK3 patches.
-- For custom content inside an existing vanilla window, override the GUI file that owns that window (often the complete vanilla window file) and insert the widget into its real tab/body block. A separate top-level `window` can parse successfully while never being instantiated by the existing game view. Preserve the vanilla window structure and types, then patch the copied override narrowly; for My Realm this means `gui/window_my_realm.gui`, not a detached companion window.
+## Detailed instructions
 
-## Workflow
-- Before editing, search for collisions and inspect the relevant reference log. After editing, check braces, duplicate event/script IDs, localization coverage, and scope/target types.
-- For chained player-choice events, guard pending flags and required variables; save scopes before clearing receiver state, use `root = { ... }` when targeting that receiver, clear stale saved scopes, and trigger follow-up popups with `delayed = yes` after verifying the next target is still pending.
-- Launch CK3 with the mod enabled, reproduce one minimal path per changed mechanic or screen, and use the game logs as the failure report. There is no repo-local parser or test runner.
-- For CK3 behavior or UI changes, add a player-facing Steam Workshop entry to `ai_instructions/changelog.txt` using that file's existing version, header, and past-tense bullet format. Documentation-only changes do not need a changelog entry.
-- When a fix reveals a reusable CK3 scope, token, ordering, encoding, runtime, or validation rule that is not already documented here, add a concise durable instruction to the relevant section of this file in the same change. Keep these additions general enough to prevent the class of bug from recurring; do not record temporary symptoms or one-off implementation details.
+Load the reference that matches the task; do not load every guide for unrelated changes.
+
+- [Scripting, scopes, decisions, and AI](ai_instructions/skills/ck3-scripting.md)
+- [Titles, succession, court positions, and realm changes](ai_instructions/skills/ck3-realm-systems.md)
+- [Events, localization, GUI, and player-facing workflow](ai_instructions/skills/ck3-ui-and-workflow.md)
+- [CK3 GUI modding skill](ai_instructions/skills/gui/SKILL.md)
+
+## Project-specific workflow
+
+There is no repository test runner. For behavior or UI changes, static checks are only an initial check: launch CK3 with the mod enabled, reproduce a minimal changed path, and inspect game logs. Add player-facing gameplay/UI changes to `ai_instructions/changelog.txt` using its current version and past-tense format. Documentation-only changes do not need a changelog entry.
+
+When adding behavior or non-obvious implementation logic, add a concise nearby comment explaining its purpose or constraints; do not merely restate the code.
+
+When work uncovers a verified, reusable CK3 rule, engine behavior, implementation pattern, or validation finding, update the matching guide under `ai_instructions/skills/` in the same change. Keep the note scoped, fold it into an existing section when possible, and omit guesses or temporary symptoms.

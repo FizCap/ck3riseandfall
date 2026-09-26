@@ -2,14 +2,14 @@
 # Rise and Fall - Realm Stability
 # Computes a 0..100 realm stability score and stores it on the ruler as
 # riseandfall_realm_stability_score
-# Weighting (user spec):
-#  - Ruler stats: each stat contributes (stat - 10), clamped to -6..+6.
-#    The five stat contributions are then summed and clamped to -30..+30.
+# Weighting:
+#  - Ruler stats: each stat contributes (stat - 10), clamped to -7..+7.
+#    The five stat contributions are then summed and clamped to -35..+35.
 #  - Legitimacy: additive component (-20..+15); no legitimacy = -20, full legitimacy = +15
-#  - Vassal relations: mapped to -30..+30 (average direct vassal opinion -100..100)
+#  - Vassal relations: mapped to -15..+15 (average direct vassal opinion -100..100)
 #    Powerful vassals count double. Noble relations dominated medieval stability.
-#  - Partition succession: -10 (destabilising — historical Carolingian/West Frankish pattern)
-#  - Smoothing: asymmetric — decline faster (ceil(d/3)/yr), recovery slower (ceil(d/7)/yr)
+#  - Partition succession: +10 (short-term stability from guaranteed shares; realm fragments on succession)
+#  - Smoothing: asymmetric — decline faster (ceil(d/3)/yr), recovery slower (ceil(d/5)/yr)
 
 riseandfall_calculate_realm_stability_se = {
     # Root scope: called from an every_ruler on_action, so root is the ruler
@@ -156,9 +156,9 @@ riseandfall_calculate_realm_stability_se = {
     ########################################
     # 1) RULER STATS
     # Each stat contributes relative to a fixed baseline of 10.
-    # Per-stat contribution = clamp(stat - 10, -6, +6)
+    # Per-stat contribution = clamp(stat - 10, -7, +7)
     # Total stats component is the sum of Diplomacy/Martial/Stewardship/Intrigue/Learning,
-    # then clamped to -30..+30.
+    # then clamped to -35..+35.
     set_variable = { name = riseandfall_rs_stats_component value = 0 }
 
     # If ruler is under a regular regency, save the active diarch scope so we can read the regent's stats.
@@ -174,14 +174,14 @@ riseandfall_calculate_realm_stability_se = {
     }
 
     # Helper macro-like repeated block for each stat: compute tmp_add = source_stat - 10,
-    # clamp to -6..+6, then add to the total.
+    # clamp to -7..+7, then add to the total.
     # Diplomacy
     if = { limit = { has_character_flag = rf_rs_use_diarch_stats }
         set_variable = { name = tmp_add value = scope:diarch.diplomacy }
     }
     else = { set_variable = { name = tmp_add value = diplomacy } }
     change_variable = { name = tmp_add add = -10 }
-    clamp_variable = { name = tmp_add min = -6 max = 6 }
+    clamp_variable = { name = tmp_add min = -7 max = 7 }
     change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
 
     # Martial
@@ -190,7 +190,7 @@ riseandfall_calculate_realm_stability_se = {
     }
     else = { set_variable = { name = tmp_add value = martial } }
     change_variable = { name = tmp_add add = -10 }
-    clamp_variable = { name = tmp_add min = -6 max = 6 }
+    clamp_variable = { name = tmp_add min = -7 max = 7 }
     change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
 
     # Stewardship
@@ -199,7 +199,7 @@ riseandfall_calculate_realm_stability_se = {
     }
     else = { set_variable = { name = tmp_add value = stewardship } }
     change_variable = { name = tmp_add add = -10 }
-    clamp_variable = { name = tmp_add min = -6 max = 6 }
+    clamp_variable = { name = tmp_add min = -7 max = 7 }
     change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
 
     # Intrigue
@@ -208,7 +208,7 @@ riseandfall_calculate_realm_stability_se = {
     }
     else = { set_variable = { name = tmp_add value = intrigue } }
     change_variable = { name = tmp_add add = -10 }
-    clamp_variable = { name = tmp_add min = -6 max = 6 }
+    clamp_variable = { name = tmp_add min = -7 max = 7 }
     change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
 
     # Learning
@@ -217,11 +217,11 @@ riseandfall_calculate_realm_stability_se = {
     }
     else = { set_variable = { name = tmp_add value = learning } }
     change_variable = { name = tmp_add add = -10 }
-    clamp_variable = { name = tmp_add min = -6 max = 6 }
+    clamp_variable = { name = tmp_add min = -7 max = 7 }
     change_variable = { name = riseandfall_rs_stats_component add = var:tmp_add }
 
-    # Clamp stats component to -30..+30 (sum of five per-stat ranges centered at 0)
-    clamp_variable = { name = riseandfall_rs_stats_component min = -30 max = 30 }
+    # Clamp stats component to -35..+35 (sum of five per-stat ranges centered at 0)
+    clamp_variable = { name = riseandfall_rs_stats_component min = -35 max = 35 }
 
 
 
@@ -299,8 +299,8 @@ riseandfall_calculate_realm_stability_se = {
     }
 
     ########################################
-    # 3) VASSAL RELATIONS (-30..+30)
-    # Now we compute the average vassal opinion including negatives, map -100..+100 -> -30..+30
+    # 3) VASSAL RELATIONS (-15..+15)
+    # Now we compute the average vassal opinion including negatives, map -100..+100 -> -15..+15
     set_variable = { name = riseandfall_rs_vassals_component value = 0 }
     # Prepare accumulators - count vassals we actually process and sum their opinions (including negatives)
     set_variable = { name = tmp_vassal_count value = 0 }
@@ -332,7 +332,7 @@ riseandfall_calculate_realm_stability_se = {
         }
     }
 
-    # Compute average (if there are vassals) and map to -30..+30
+    # Compute average (if there are vassals) and map to -15..+15
     set_variable = { name = tmp_avg_opinion value = 0 }
     if = {
         limit = { var:tmp_vassal_count > 0 }
@@ -344,11 +344,11 @@ riseandfall_calculate_realm_stability_se = {
         set_variable = { name = tmp_avg_opinion value = 0 }
     }
 
-    # Map -100..+100 to -30..+30 by scaling: value * 30 / 100 (implemented as *30 / 100)
-    # Noble relations were the primary driver of medieval stability; range raised from +-20 to +-30.
-    # This makes an average opinion of -68 -> approx -20, +80 -> approx +24
+    # Map -100..+100 to -15..+15 by scaling: value * 15 / 100 (implemented as *15 / 100)
+    # Keep vassal opinion influential while leaving room for structural pressures to matter.
+    # This makes an average opinion of -68 -> approx -10, +80 -> +12
     # Use integer math: multiply first then divide to preserve precision.
-    change_variable = { name = tmp_avg_opinion multiply = 30 }
+    change_variable = { name = tmp_avg_opinion multiply = 15 }
     change_variable = { name = tmp_avg_opinion divide = 100 }
     # Round the scaled value to keep the component integer
     round_variable = { name = tmp_avg_opinion nearest = 1 }
@@ -509,16 +509,16 @@ riseandfall_calculate_realm_stability_se = {
         set_variable = { name = tmp_rs_world_development_total value = global_var:riseandfall_world_total_development }
         if = { limit = { var:tmp_rs_world_development_total < 1 } set_variable = { name = tmp_rs_world_development_total value = 1 } }
 
-        # Continuous proportional scaling: lose 1 stability for every 1% of the world controlled.
+        # Continuous proportional scaling: lose 2 stability for every 1% of the world controlled.
         # This keeps the penalty fully dynamic instead of using tiered thresholds.
-        # e.g. 7% -> -7, 12% -> -12, 50% -> -50
+        # e.g. 7% -> -14, 12% -> -24, 50% -> -35 after the cap
         set_variable = { name = tmp_rs_realm_pct value = realm_size }
         change_variable = { name = tmp_rs_realm_pct multiply = 100 }
         change_variable = { name = tmp_rs_realm_pct divide = var:tmp_story_world_total }
         round_variable = { name = tmp_rs_realm_pct nearest = 1 }
         set_variable = { name = riseandfall_rs_realm_size_component value = var:tmp_rs_realm_pct }
-        change_variable = { name = riseandfall_rs_realm_size_component multiply = -1 }
-        clamp_variable = { name = riseandfall_rs_realm_size_component min = -15 max = 0 }
+        change_variable = { name = riseandfall_rs_realm_size_component multiply = -2 }
+        clamp_variable = { name = riseandfall_rs_realm_size_component min = -35 max = 0 }
 
         # Development is capacity and prize value for Story Mode, not a stability bonus.
         # Keep the metrics available so collapse targeting can distinguish dense powers
@@ -537,7 +537,7 @@ riseandfall_calculate_realm_stability_se = {
         change_variable = { name = riseandfall_rs_development_pct divide = var:tmp_rs_world_development_total }
         round_variable = { name = riseandfall_rs_development_pct nearest = 1 }
 
-        # Strong-vassal pressure is now a direct stability component from +10 to -30.
+        # Strong-vassal pressure is a direct stability component from +10 to -30.
         # Allied vassals should bolster the liege's effective military strength and
         # not be counted as hostile strong vassals. Implement a two-pass approach:
         # 1) Aggregate allied vassal strength into an effective liege strength.
@@ -753,12 +753,12 @@ riseandfall_calculate_realm_stability_se = {
             set_variable = { name = riseandfall_rs_epidemic_province_pct value = var:tmp_story_epidemic_province_pct }
 
             # Epidemic pressure scales with the share of affected realm provinces.
-            # 25% affected -> -10 stability, 50% -> -20, 100% -> -40.
+            # 25% affected -> -6 stability, 50% -> -13, 100% -> -25.
             set_variable = { name = riseandfall_rs_epidemic_component value = var:tmp_story_epidemic_province_pct }
-            change_variable = { name = riseandfall_rs_epidemic_component multiply = -40 }
+            change_variable = { name = riseandfall_rs_epidemic_component multiply = -25 }
             change_variable = { name = riseandfall_rs_epidemic_component divide = 100 }
             round_variable = { name = riseandfall_rs_epidemic_component nearest = 1 }
-            clamp_variable = { name = riseandfall_rs_epidemic_component min = -40 max = 0 }
+            clamp_variable = { name = riseandfall_rs_epidemic_component min = -25 max = 0 }
 
             set_variable = { name = tmp_story_nonapproved_pct value = var:tmp_story_culture_cohesion_pct }
             change_variable = { name = tmp_story_nonapproved_pct add = var:tmp_story_foreign_faith_county_pct }
@@ -892,10 +892,10 @@ riseandfall_calculate_realm_stability_se = {
     if = { limit = { NOT = { has_variable = riseandfall_story_blob_pressure } } set_variable = { name = riseandfall_story_blob_pressure value = 0 } }
     # Start from 50 as the equilibrium midpoint; components shift toward 0 or 100
     set_variable = { name = tmp_target_score value = 50 }
-    # Stats component contributes directly in range -30..+30 (already clamped above)
+    # Stats component contributes directly in range -35..+35 (already clamped above)
     set_variable = { name = tmp_stats_scaled value = var:riseandfall_rs_stats_component }
     change_variable = { name = tmp_target_score add = var:tmp_stats_scaled }
-    # Vassal relations are now 50% of calculation; add scaled vassal component mapped to -50..+50
+    # Vassal relations add their scaled component, mapped to -15..+15
     change_variable = { name = tmp_target_score add = var:riseandfall_rs_vassals_component }
     change_variable = { name = tmp_target_score add = var:riseandfall_rs_realm_size_component }
     change_variable = { name = tmp_target_score add = var:riseandfall_rs_strong_vassal_component }
@@ -1147,9 +1147,9 @@ riseandfall_calculate_realm_stability_se = {
             else = { set_variable = { name = tmp_rs_delta_abs value = var:tmp_rs_delta } change_variable = { name = tmp_rs_delta_abs multiply = -1 } }
 
             # Asymmetric smoothing: stability collapses faster than it recovers (historically accurate).
-            # Recovering (delta > 0): slow — step = ceil(abs(delta)/7) = (abs + 6) / 7
+            # Recovering (delta > 0): slow — step = ceil(abs(delta)/5) = (abs + 4) / 5
             # Declining (delta < 0): fast — step = ceil(abs(delta)/3) = (abs + 2) / 3
-            # At delta=21: recovery adds 3/yr (7 years to close); decline subtracts 7/yr (3 years to close).
+            # At delta=21, the first yearly step is +5 in recovery and -7 in decline; the remaining gap is recalculated yearly.
             if = {
                 limit = { var:tmp_rs_delta_abs = 0 }
                 set_variable = { name = tmp_rs_step value = 0 }
@@ -1158,9 +1158,9 @@ riseandfall_calculate_realm_stability_se = {
                 limit = { var:tmp_rs_delta > 0 }
                 # slow recovery
                 set_variable = { name = tmp_rs_step_numer value = var:tmp_rs_delta_abs }
-                change_variable = { name = tmp_rs_step_numer add = 6 }
+                change_variable = { name = tmp_rs_step_numer add = 4 }
                 set_variable = { name = tmp_rs_step value = var:tmp_rs_step_numer }
-                change_variable = { name = tmp_rs_step divide = 7 }
+                change_variable = { name = tmp_rs_step divide = 5 }
                 if = { limit = { var:tmp_rs_step < 1 } set_variable = { name = tmp_rs_step value = 1 } }
             }
             else = {

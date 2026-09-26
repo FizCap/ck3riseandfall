@@ -1,0 +1,908 @@
+﻿namespace = riseandfall_courtier_browser
+riseandfall_courtier_browser.0010 = {
+    type = character_event
+    title = riseandfall_courtier_browser.0010.t
+    desc = riseandfall_courtier_browser.0010.desc
+    theme = court
+    immediate = { riseandfall_courtier_browser_prepare_courtier_free_se = yes }
+
+    option = {
+        name = riseandfall_courtier_browser.0010.candidate_1
+        trigger = { exists = scope:rf_browser_courtier_free_1 }
+        custom_tooltip = riseandfall_courtier_browser.0010.candidate_1.tt
+        hidden_effect = {
+            scope:rf_browser_courtier_free_1 = { save_scope_as = rf_courtier_browser_selected }
+            riseandfall_courtier_browser_recruit_courtier_free_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0010 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0010.candidate_2
+        trigger = { exists = scope:rf_browser_courtier_free_2 }
+        custom_tooltip = riseandfall_courtier_browser.0010.candidate_2.tt
+        hidden_effect = {
+            scope:rf_browser_courtier_free_2 = { save_scope_as = rf_courtier_browser_selected }
+            riseandfall_courtier_browser_recruit_courtier_free_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0010 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0010.candidate_3
+        trigger = { exists = scope:rf_browser_courtier_free_3 }
+        custom_tooltip = riseandfall_courtier_browser.0010.candidate_3.tt
+        hidden_effect = {
+            scope:rf_browser_courtier_free_3 = { save_scope_as = rf_courtier_browser_selected }
+            riseandfall_courtier_browser_recruit_courtier_free_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0010 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0010.candidate_4
+        trigger = { exists = scope:rf_browser_courtier_free_4 }
+        custom_tooltip = riseandfall_courtier_browser.0010.candidate_4.tt
+        hidden_effect = {
+            scope:rf_browser_courtier_free_4 = { save_scope_as = rf_courtier_browser_selected }
+            riseandfall_courtier_browser_recruit_courtier_free_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0010 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0010.candidate_5
+        trigger = { exists = scope:rf_browser_courtier_free_5 }
+        custom_tooltip = riseandfall_courtier_browser.0010.candidate_5.tt
+        hidden_effect = {
+            scope:rf_browser_courtier_free_5 = { save_scope_as = rf_courtier_browser_selected }
+            riseandfall_courtier_browser_recruit_courtier_free_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0010 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0010.candidate_6
+        trigger = { exists = scope:rf_browser_courtier_free_6 }
+        custom_tooltip = riseandfall_courtier_browser.0010.candidate_6.tt
+        hidden_effect = {
+            scope:rf_browser_courtier_free_6 = { save_scope_as = rf_courtier_browser_selected }
+            riseandfall_courtier_browser_recruit_courtier_free_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0010 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0010.candidate_7
+        trigger = { exists = scope:rf_browser_courtier_free_7 }
+        custom_tooltip = riseandfall_courtier_browser.0010.candidate_7.tt
+        hidden_effect = {
+            scope:rf_browser_courtier_free_7 = { save_scope_as = rf_courtier_browser_selected }
+            riseandfall_courtier_browser_recruit_courtier_free_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0010 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0010.candidate_8
+        trigger = { exists = scope:rf_browser_courtier_free_8 }
+        custom_tooltip = riseandfall_courtier_browser.0010.candidate_8.tt
+        hidden_effect = {
+            scope:rf_browser_courtier_free_8 = { save_scope_as = rf_courtier_browser_selected }
+            riseandfall_courtier_browser_recruit_courtier_free_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0010 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0010.candidate_9
+        trigger = { exists = scope:rf_browser_courtier_free_9 }
+        custom_tooltip = riseandfall_courtier_browser.0010.candidate_9.tt
+        hidden_effect = {
+            scope:rf_browser_courtier_free_9 = { save_scope_as = rf_courtier_browser_selected }
+            riseandfall_courtier_browser_recruit_courtier_free_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0010 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0010.candidate_10
+        trigger = { exists = scope:rf_browser_courtier_free_10 }
+        custom_tooltip = riseandfall_courtier_browser.0010.candidate_10.tt
+        hidden_effect = {
+            scope:rf_browser_courtier_free_10 = { save_scope_as = rf_courtier_browser_selected }
+            riseandfall_courtier_browser_recruit_courtier_free_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0010 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0010.leave
+        trigger = { always = yes }
+        hidden_effect = {
+        clear_saved_scope = rf_browser_courtier_free_1
+        clear_saved_scope = rf_browser_courtier_free_2
+        clear_saved_scope = rf_browser_courtier_free_3
+        clear_saved_scope = rf_browser_courtier_free_4
+        clear_saved_scope = rf_browser_courtier_free_5
+        clear_saved_scope = rf_browser_courtier_free_6
+        clear_saved_scope = rf_browser_courtier_free_7
+        clear_saved_scope = rf_browser_courtier_free_8
+        clear_saved_scope = rf_browser_courtier_free_9
+        clear_saved_scope = rf_browser_courtier_free_10
+        }
+    }
+
+}
+
+riseandfall_courtier_browser.0011 = {
+    type = character_event
+    title = riseandfall_courtier_browser.0011.t
+    desc = riseandfall_courtier_browser.0011.desc
+    theme = court
+    immediate = { riseandfall_courtier_browser_prepare_courtier_paid_se = yes }
+
+    option = {
+        name = riseandfall_courtier_browser.0011.candidate_1
+        trigger = { exists = scope:rf_browser_courtier_paid_1 }
+        custom_tooltip = riseandfall_courtier_browser.0011.candidate_1.tt
+        hidden_effect = {
+            scope:rf_browser_courtier_paid_1 = { save_scope_as = rf_courtier_browser_selected }
+            riseandfall_courtier_browser_recruit_courtier_paid_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0011 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0011.candidate_2
+        trigger = { exists = scope:rf_browser_courtier_paid_2 }
+        custom_tooltip = riseandfall_courtier_browser.0011.candidate_2.tt
+        hidden_effect = {
+            scope:rf_browser_courtier_paid_2 = { save_scope_as = rf_courtier_browser_selected }
+            riseandfall_courtier_browser_recruit_courtier_paid_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0011 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0011.candidate_3
+        trigger = { exists = scope:rf_browser_courtier_paid_3 }
+        custom_tooltip = riseandfall_courtier_browser.0011.candidate_3.tt
+        hidden_effect = {
+            scope:rf_browser_courtier_paid_3 = { save_scope_as = rf_courtier_browser_selected }
+            riseandfall_courtier_browser_recruit_courtier_paid_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0011 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0011.candidate_4
+        trigger = { exists = scope:rf_browser_courtier_paid_4 }
+        custom_tooltip = riseandfall_courtier_browser.0011.candidate_4.tt
+        hidden_effect = {
+            scope:rf_browser_courtier_paid_4 = { save_scope_as = rf_courtier_browser_selected }
+            riseandfall_courtier_browser_recruit_courtier_paid_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0011 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0011.candidate_5
+        trigger = { exists = scope:rf_browser_courtier_paid_5 }
+        custom_tooltip = riseandfall_courtier_browser.0011.candidate_5.tt
+        hidden_effect = {
+            scope:rf_browser_courtier_paid_5 = { save_scope_as = rf_courtier_browser_selected }
+            riseandfall_courtier_browser_recruit_courtier_paid_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0011 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0011.candidate_6
+        trigger = { exists = scope:rf_browser_courtier_paid_6 }
+        custom_tooltip = riseandfall_courtier_browser.0011.candidate_6.tt
+        hidden_effect = {
+            scope:rf_browser_courtier_paid_6 = { save_scope_as = rf_courtier_browser_selected }
+            riseandfall_courtier_browser_recruit_courtier_paid_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0011 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0011.candidate_7
+        trigger = { exists = scope:rf_browser_courtier_paid_7 }
+        custom_tooltip = riseandfall_courtier_browser.0011.candidate_7.tt
+        hidden_effect = {
+            scope:rf_browser_courtier_paid_7 = { save_scope_as = rf_courtier_browser_selected }
+            riseandfall_courtier_browser_recruit_courtier_paid_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0011 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0011.candidate_8
+        trigger = { exists = scope:rf_browser_courtier_paid_8 }
+        custom_tooltip = riseandfall_courtier_browser.0011.candidate_8.tt
+        hidden_effect = {
+            scope:rf_browser_courtier_paid_8 = { save_scope_as = rf_courtier_browser_selected }
+            riseandfall_courtier_browser_recruit_courtier_paid_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0011 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0011.candidate_9
+        trigger = { exists = scope:rf_browser_courtier_paid_9 }
+        custom_tooltip = riseandfall_courtier_browser.0011.candidate_9.tt
+        hidden_effect = {
+            scope:rf_browser_courtier_paid_9 = { save_scope_as = rf_courtier_browser_selected }
+            riseandfall_courtier_browser_recruit_courtier_paid_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0011 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0011.candidate_10
+        trigger = { exists = scope:rf_browser_courtier_paid_10 }
+        custom_tooltip = riseandfall_courtier_browser.0011.candidate_10.tt
+        hidden_effect = {
+            scope:rf_browser_courtier_paid_10 = { save_scope_as = rf_courtier_browser_selected }
+            riseandfall_courtier_browser_recruit_courtier_paid_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0011 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0011.leave
+        trigger = { always = yes }
+        hidden_effect = {
+            if = {
+            limit = { exists = scope:rf_browser_courtier_paid_1 }
+            scope:rf_browser_courtier_paid_1 = { remove_variable = rf_courtier_browser_cost_courtier_paid_1 }
+            }
+            clear_saved_scope = rf_browser_courtier_paid_1
+            if = {
+            limit = { exists = scope:rf_browser_courtier_paid_2 }
+            scope:rf_browser_courtier_paid_2 = { remove_variable = rf_courtier_browser_cost_courtier_paid_2 }
+            }
+            clear_saved_scope = rf_browser_courtier_paid_2
+            if = {
+            limit = { exists = scope:rf_browser_courtier_paid_3 }
+            scope:rf_browser_courtier_paid_3 = { remove_variable = rf_courtier_browser_cost_courtier_paid_3 }
+            }
+            clear_saved_scope = rf_browser_courtier_paid_3
+            if = {
+            limit = { exists = scope:rf_browser_courtier_paid_4 }
+            scope:rf_browser_courtier_paid_4 = { remove_variable = rf_courtier_browser_cost_courtier_paid_4 }
+            }
+            clear_saved_scope = rf_browser_courtier_paid_4
+            if = {
+            limit = { exists = scope:rf_browser_courtier_paid_5 }
+            scope:rf_browser_courtier_paid_5 = { remove_variable = rf_courtier_browser_cost_courtier_paid_5 }
+            }
+            clear_saved_scope = rf_browser_courtier_paid_5
+            if = {
+            limit = { exists = scope:rf_browser_courtier_paid_6 }
+            scope:rf_browser_courtier_paid_6 = { remove_variable = rf_courtier_browser_cost_courtier_paid_6 }
+            }
+            clear_saved_scope = rf_browser_courtier_paid_6
+            if = {
+            limit = { exists = scope:rf_browser_courtier_paid_7 }
+            scope:rf_browser_courtier_paid_7 = { remove_variable = rf_courtier_browser_cost_courtier_paid_7 }
+            }
+            clear_saved_scope = rf_browser_courtier_paid_7
+            if = {
+            limit = { exists = scope:rf_browser_courtier_paid_8 }
+            scope:rf_browser_courtier_paid_8 = { remove_variable = rf_courtier_browser_cost_courtier_paid_8 }
+            }
+            clear_saved_scope = rf_browser_courtier_paid_8
+            if = {
+            limit = { exists = scope:rf_browser_courtier_paid_9 }
+            scope:rf_browser_courtier_paid_9 = { remove_variable = rf_courtier_browser_cost_courtier_paid_9 }
+            }
+            clear_saved_scope = rf_browser_courtier_paid_9
+            if = {
+            limit = { exists = scope:rf_browser_courtier_paid_10 }
+            scope:rf_browser_courtier_paid_10 = { remove_variable = rf_courtier_browser_cost_courtier_paid_10 }
+            }
+            clear_saved_scope = rf_browser_courtier_paid_10
+        }
+    }
+
+}
+
+riseandfall_courtier_browser.0012 = {
+    type = character_event
+    title = riseandfall_courtier_browser.0012.t
+    desc = riseandfall_courtier_browser.0012.desc
+    theme = court
+    immediate = { riseandfall_courtier_browser_prepare_guardian_free_se = yes }
+
+    option = {
+        name = riseandfall_courtier_browser.0012.candidate_1
+        trigger = { exists = scope:rf_browser_guardian_free_1 }
+        custom_tooltip = riseandfall_courtier_browser.0012.candidate_1.tt
+        hidden_effect = {
+            scope:rf_browser_guardian_free_1 = { save_scope_as = rf_courtier_browser_selected }
+            riseandfall_courtier_browser_recruit_guardian_free_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0012 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0012.candidate_2
+        trigger = { exists = scope:rf_browser_guardian_free_2 }
+        custom_tooltip = riseandfall_courtier_browser.0012.candidate_2.tt
+        hidden_effect = {
+            scope:rf_browser_guardian_free_2 = { save_scope_as = rf_courtier_browser_selected }
+            riseandfall_courtier_browser_recruit_guardian_free_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0012 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0012.candidate_3
+        trigger = { exists = scope:rf_browser_guardian_free_3 }
+        custom_tooltip = riseandfall_courtier_browser.0012.candidate_3.tt
+        hidden_effect = {
+            scope:rf_browser_guardian_free_3 = { save_scope_as = rf_courtier_browser_selected }
+            riseandfall_courtier_browser_recruit_guardian_free_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0012 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0012.candidate_4
+        trigger = { exists = scope:rf_browser_guardian_free_4 }
+        custom_tooltip = riseandfall_courtier_browser.0012.candidate_4.tt
+        hidden_effect = {
+            scope:rf_browser_guardian_free_4 = { save_scope_as = rf_courtier_browser_selected }
+            riseandfall_courtier_browser_recruit_guardian_free_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0012 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0012.candidate_5
+        trigger = { exists = scope:rf_browser_guardian_free_5 }
+        custom_tooltip = riseandfall_courtier_browser.0012.candidate_5.tt
+        hidden_effect = {
+            scope:rf_browser_guardian_free_5 = { save_scope_as = rf_courtier_browser_selected }
+            riseandfall_courtier_browser_recruit_guardian_free_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0012 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0012.candidate_6
+        trigger = { exists = scope:rf_browser_guardian_free_6 }
+        custom_tooltip = riseandfall_courtier_browser.0012.candidate_6.tt
+        hidden_effect = {
+            scope:rf_browser_guardian_free_6 = { save_scope_as = rf_courtier_browser_selected }
+            riseandfall_courtier_browser_recruit_guardian_free_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0012 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0012.candidate_7
+        trigger = { exists = scope:rf_browser_guardian_free_7 }
+        custom_tooltip = riseandfall_courtier_browser.0012.candidate_7.tt
+        hidden_effect = {
+            scope:rf_browser_guardian_free_7 = { save_scope_as = rf_courtier_browser_selected }
+            riseandfall_courtier_browser_recruit_guardian_free_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0012 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0012.candidate_8
+        trigger = { exists = scope:rf_browser_guardian_free_8 }
+        custom_tooltip = riseandfall_courtier_browser.0012.candidate_8.tt
+        hidden_effect = {
+            scope:rf_browser_guardian_free_8 = { save_scope_as = rf_courtier_browser_selected }
+            riseandfall_courtier_browser_recruit_guardian_free_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0012 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0012.candidate_9
+        trigger = { exists = scope:rf_browser_guardian_free_9 }
+        custom_tooltip = riseandfall_courtier_browser.0012.candidate_9.tt
+        hidden_effect = {
+            scope:rf_browser_guardian_free_9 = { save_scope_as = rf_courtier_browser_selected }
+            riseandfall_courtier_browser_recruit_guardian_free_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0012 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0012.candidate_10
+        trigger = { exists = scope:rf_browser_guardian_free_10 }
+        custom_tooltip = riseandfall_courtier_browser.0012.candidate_10.tt
+        hidden_effect = {
+            scope:rf_browser_guardian_free_10 = { save_scope_as = rf_courtier_browser_selected }
+            riseandfall_courtier_browser_recruit_guardian_free_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0012 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0012.leave
+        trigger = { always = yes }
+        hidden_effect = {
+        clear_saved_scope = rf_browser_guardian_free_1
+        clear_saved_scope = rf_browser_guardian_free_2
+        clear_saved_scope = rf_browser_guardian_free_3
+        clear_saved_scope = rf_browser_guardian_free_4
+        clear_saved_scope = rf_browser_guardian_free_5
+        clear_saved_scope = rf_browser_guardian_free_6
+        clear_saved_scope = rf_browser_guardian_free_7
+        clear_saved_scope = rf_browser_guardian_free_8
+        clear_saved_scope = rf_browser_guardian_free_9
+        clear_saved_scope = rf_browser_guardian_free_10
+        }
+    }
+
+}
+
+riseandfall_courtier_browser.0013 = {
+    type = character_event
+    title = riseandfall_courtier_browser.0013.t
+    desc = riseandfall_courtier_browser.0013.desc
+    theme = court
+    immediate = { riseandfall_courtier_browser_prepare_guardian_paid_se = yes }
+
+    option = {
+        name = riseandfall_courtier_browser.0013.candidate_1
+        trigger = { exists = scope:rf_browser_guardian_paid_1 }
+        custom_tooltip = riseandfall_courtier_browser.0013.candidate_1.tt
+        hidden_effect = {
+            scope:rf_browser_guardian_paid_1 = { save_scope_as = rf_courtier_browser_selected }
+            riseandfall_courtier_browser_recruit_guardian_paid_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0013 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0013.candidate_2
+        trigger = { exists = scope:rf_browser_guardian_paid_2 }
+        custom_tooltip = riseandfall_courtier_browser.0013.candidate_2.tt
+        hidden_effect = {
+            scope:rf_browser_guardian_paid_2 = { save_scope_as = rf_courtier_browser_selected }
+            riseandfall_courtier_browser_recruit_guardian_paid_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0013 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0013.candidate_3
+        trigger = { exists = scope:rf_browser_guardian_paid_3 }
+        custom_tooltip = riseandfall_courtier_browser.0013.candidate_3.tt
+        hidden_effect = {
+            scope:rf_browser_guardian_paid_3 = { save_scope_as = rf_courtier_browser_selected }
+            riseandfall_courtier_browser_recruit_guardian_paid_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0013 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0013.candidate_4
+        trigger = { exists = scope:rf_browser_guardian_paid_4 }
+        custom_tooltip = riseandfall_courtier_browser.0013.candidate_4.tt
+        hidden_effect = {
+            scope:rf_browser_guardian_paid_4 = { save_scope_as = rf_courtier_browser_selected }
+            riseandfall_courtier_browser_recruit_guardian_paid_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0013 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0013.candidate_5
+        trigger = { exists = scope:rf_browser_guardian_paid_5 }
+        custom_tooltip = riseandfall_courtier_browser.0013.candidate_5.tt
+        hidden_effect = {
+            scope:rf_browser_guardian_paid_5 = { save_scope_as = rf_courtier_browser_selected }
+            riseandfall_courtier_browser_recruit_guardian_paid_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0013 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0013.candidate_6
+        trigger = { exists = scope:rf_browser_guardian_paid_6 }
+        custom_tooltip = riseandfall_courtier_browser.0013.candidate_6.tt
+        hidden_effect = {
+            scope:rf_browser_guardian_paid_6 = { save_scope_as = rf_courtier_browser_selected }
+            riseandfall_courtier_browser_recruit_guardian_paid_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0013 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0013.candidate_7
+        trigger = { exists = scope:rf_browser_guardian_paid_7 }
+        custom_tooltip = riseandfall_courtier_browser.0013.candidate_7.tt
+        hidden_effect = {
+            scope:rf_browser_guardian_paid_7 = { save_scope_as = rf_courtier_browser_selected }
+            riseandfall_courtier_browser_recruit_guardian_paid_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0013 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0013.candidate_8
+        trigger = { exists = scope:rf_browser_guardian_paid_8 }
+        custom_tooltip = riseandfall_courtier_browser.0013.candidate_8.tt
+        hidden_effect = {
+            scope:rf_browser_guardian_paid_8 = { save_scope_as = rf_courtier_browser_selected }
+            riseandfall_courtier_browser_recruit_guardian_paid_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0013 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0013.candidate_9
+        trigger = { exists = scope:rf_browser_guardian_paid_9 }
+        custom_tooltip = riseandfall_courtier_browser.0013.candidate_9.tt
+        hidden_effect = {
+            scope:rf_browser_guardian_paid_9 = { save_scope_as = rf_courtier_browser_selected }
+            riseandfall_courtier_browser_recruit_guardian_paid_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0013 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0013.candidate_10
+        trigger = { exists = scope:rf_browser_guardian_paid_10 }
+        custom_tooltip = riseandfall_courtier_browser.0013.candidate_10.tt
+        hidden_effect = {
+            scope:rf_browser_guardian_paid_10 = { save_scope_as = rf_courtier_browser_selected }
+            riseandfall_courtier_browser_recruit_guardian_paid_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0013 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0013.leave
+        trigger = { always = yes }
+        hidden_effect = {
+            if = {
+            limit = { exists = scope:rf_browser_guardian_paid_1 }
+            scope:rf_browser_guardian_paid_1 = { remove_variable = rf_courtier_browser_cost_guardian_paid_1 }
+            }
+            clear_saved_scope = rf_browser_guardian_paid_1
+            if = {
+            limit = { exists = scope:rf_browser_guardian_paid_2 }
+            scope:rf_browser_guardian_paid_2 = { remove_variable = rf_courtier_browser_cost_guardian_paid_2 }
+            }
+            clear_saved_scope = rf_browser_guardian_paid_2
+            if = {
+            limit = { exists = scope:rf_browser_guardian_paid_3 }
+            scope:rf_browser_guardian_paid_3 = { remove_variable = rf_courtier_browser_cost_guardian_paid_3 }
+            }
+            clear_saved_scope = rf_browser_guardian_paid_3
+            if = {
+            limit = { exists = scope:rf_browser_guardian_paid_4 }
+            scope:rf_browser_guardian_paid_4 = { remove_variable = rf_courtier_browser_cost_guardian_paid_4 }
+            }
+            clear_saved_scope = rf_browser_guardian_paid_4
+            if = {
+            limit = { exists = scope:rf_browser_guardian_paid_5 }
+            scope:rf_browser_guardian_paid_5 = { remove_variable = rf_courtier_browser_cost_guardian_paid_5 }
+            }
+            clear_saved_scope = rf_browser_guardian_paid_5
+            if = {
+            limit = { exists = scope:rf_browser_guardian_paid_6 }
+            scope:rf_browser_guardian_paid_6 = { remove_variable = rf_courtier_browser_cost_guardian_paid_6 }
+            }
+            clear_saved_scope = rf_browser_guardian_paid_6
+            if = {
+            limit = { exists = scope:rf_browser_guardian_paid_7 }
+            scope:rf_browser_guardian_paid_7 = { remove_variable = rf_courtier_browser_cost_guardian_paid_7 }
+            }
+            clear_saved_scope = rf_browser_guardian_paid_7
+            if = {
+            limit = { exists = scope:rf_browser_guardian_paid_8 }
+            scope:rf_browser_guardian_paid_8 = { remove_variable = rf_courtier_browser_cost_guardian_paid_8 }
+            }
+            clear_saved_scope = rf_browser_guardian_paid_8
+            if = {
+            limit = { exists = scope:rf_browser_guardian_paid_9 }
+            scope:rf_browser_guardian_paid_9 = { remove_variable = rf_courtier_browser_cost_guardian_paid_9 }
+            }
+            clear_saved_scope = rf_browser_guardian_paid_9
+            if = {
+            limit = { exists = scope:rf_browser_guardian_paid_10 }
+            scope:rf_browser_guardian_paid_10 = { remove_variable = rf_courtier_browser_cost_guardian_paid_10 }
+            }
+            clear_saved_scope = rf_browser_guardian_paid_10
+        }
+    }
+
+}
+
+riseandfall_courtier_browser.0014 = {
+    type = character_event
+    title = riseandfall_courtier_browser.0014.t
+    desc = riseandfall_courtier_browser.0014.desc
+    theme = court
+    option = {
+        name = riseandfall_courtier_browser.0014.auto
+        custom_tooltip = riseandfall_courtier_browser.0014.auto.tt
+        hidden_effect = { trigger_event = { id = riseandfall_courtier_automation.0002 } }
+    }
+    option = {
+        name = riseandfall_courtier_browser.0014.manual
+        custom_tooltip = riseandfall_courtier_browser.0014.manual.tt
+        hidden_effect = { trigger_event = { id = riseandfall_courtier_browser.0015 } }
+    }
+    option = { name = riseandfall_courtier_browser.0014.leave trigger = { always = yes } }
+}
+
+riseandfall_courtier_browser.0015 = {
+    type = character_event
+    title = riseandfall_courtier_browser.0015.t
+    desc = riseandfall_courtier_browser.0015.desc
+    theme = court
+    immediate = { riseandfall_prepare_free_knight_browser_se = yes }
+
+    option = {
+        name = riseandfall_courtier_browser.0015.candidate_1
+        trigger = { exists = scope:rf_knight_browser_free_1 }
+        custom_tooltip = riseandfall_courtier_browser.0015.candidate_1.tt
+        hidden_effect = {
+            scope:rf_knight_browser_free_1 = { save_scope_as = rf_knight_browser_selected }
+            riseandfall_invite_manual_free_knight_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0015 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0015.candidate_2
+        trigger = { exists = scope:rf_knight_browser_free_2 }
+        custom_tooltip = riseandfall_courtier_browser.0015.candidate_2.tt
+        hidden_effect = {
+            scope:rf_knight_browser_free_2 = { save_scope_as = rf_knight_browser_selected }
+            riseandfall_invite_manual_free_knight_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0015 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0015.candidate_3
+        trigger = { exists = scope:rf_knight_browser_free_3 }
+        custom_tooltip = riseandfall_courtier_browser.0015.candidate_3.tt
+        hidden_effect = {
+            scope:rf_knight_browser_free_3 = { save_scope_as = rf_knight_browser_selected }
+            riseandfall_invite_manual_free_knight_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0015 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0015.candidate_4
+        trigger = { exists = scope:rf_knight_browser_free_4 }
+        custom_tooltip = riseandfall_courtier_browser.0015.candidate_4.tt
+        hidden_effect = {
+            scope:rf_knight_browser_free_4 = { save_scope_as = rf_knight_browser_selected }
+            riseandfall_invite_manual_free_knight_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0015 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0015.candidate_5
+        trigger = { exists = scope:rf_knight_browser_free_5 }
+        custom_tooltip = riseandfall_courtier_browser.0015.candidate_5.tt
+        hidden_effect = {
+            scope:rf_knight_browser_free_5 = { save_scope_as = rf_knight_browser_selected }
+            riseandfall_invite_manual_free_knight_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0015 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0015.candidate_6
+        trigger = { exists = scope:rf_knight_browser_free_6 }
+        custom_tooltip = riseandfall_courtier_browser.0015.candidate_6.tt
+        hidden_effect = {
+            scope:rf_knight_browser_free_6 = { save_scope_as = rf_knight_browser_selected }
+            riseandfall_invite_manual_free_knight_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0015 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0015.candidate_7
+        trigger = { exists = scope:rf_knight_browser_free_7 }
+        custom_tooltip = riseandfall_courtier_browser.0015.candidate_7.tt
+        hidden_effect = {
+            scope:rf_knight_browser_free_7 = { save_scope_as = rf_knight_browser_selected }
+            riseandfall_invite_manual_free_knight_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0015 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0015.candidate_8
+        trigger = { exists = scope:rf_knight_browser_free_8 }
+        custom_tooltip = riseandfall_courtier_browser.0015.candidate_8.tt
+        hidden_effect = {
+            scope:rf_knight_browser_free_8 = { save_scope_as = rf_knight_browser_selected }
+            riseandfall_invite_manual_free_knight_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0015 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0015.candidate_9
+        trigger = { exists = scope:rf_knight_browser_free_9 }
+        custom_tooltip = riseandfall_courtier_browser.0015.candidate_9.tt
+        hidden_effect = {
+            scope:rf_knight_browser_free_9 = { save_scope_as = rf_knight_browser_selected }
+            riseandfall_invite_manual_free_knight_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0015 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0015.candidate_10
+        trigger = { exists = scope:rf_knight_browser_free_10 }
+        custom_tooltip = riseandfall_courtier_browser.0015.candidate_10.tt
+        hidden_effect = {
+            scope:rf_knight_browser_free_10 = { save_scope_as = rf_knight_browser_selected }
+            riseandfall_invite_manual_free_knight_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0015 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0015.leave
+        trigger = { always = yes }
+        hidden_effect = { riseandfall_clear_free_knight_browser_se = yes }
+    }
+}
+
+riseandfall_courtier_browser.0016 = {
+    type = character_event
+    title = riseandfall_courtier_browser.0016.t
+    desc = riseandfall_courtier_browser.0016.desc
+    theme = court
+    option = {
+        name = riseandfall_courtier_browser.0016.auto
+        custom_tooltip = riseandfall_courtier_browser.0016.auto.tt
+        hidden_effect = { trigger_event = { id = riseandfall_courtier_automation.0003 } }
+    }
+    option = {
+        name = riseandfall_courtier_browser.0016.manual
+        custom_tooltip = riseandfall_courtier_browser.0016.manual.tt
+        hidden_effect = { trigger_event = { id = riseandfall_courtier_browser.0017 } }
+    }
+    option = { name = riseandfall_courtier_browser.0016.leave trigger = { always = yes } }
+}
+
+riseandfall_courtier_browser.0017 = {
+    type = character_event
+    title = riseandfall_courtier_browser.0017.t
+    desc = riseandfall_courtier_browser.0017.desc
+    theme = court
+    immediate = { riseandfall_prepare_paid_knight_browser_se = yes }
+
+    option = {
+        name = riseandfall_courtier_browser.0017.candidate_1
+        trigger = { exists = scope:rf_knight_browser_paid_1 }
+        custom_tooltip = riseandfall_courtier_browser.0017.candidate_1.tt
+        hidden_effect = {
+            scope:rf_knight_browser_paid_1 = { save_scope_as = rf_knight_browser_selected }
+            riseandfall_invite_manual_paid_knight_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0017 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0017.candidate_2
+        trigger = { exists = scope:rf_knight_browser_paid_2 }
+        custom_tooltip = riseandfall_courtier_browser.0017.candidate_2.tt
+        hidden_effect = {
+            scope:rf_knight_browser_paid_2 = { save_scope_as = rf_knight_browser_selected }
+            riseandfall_invite_manual_paid_knight_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0017 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0017.candidate_3
+        trigger = { exists = scope:rf_knight_browser_paid_3 }
+        custom_tooltip = riseandfall_courtier_browser.0017.candidate_3.tt
+        hidden_effect = {
+            scope:rf_knight_browser_paid_3 = { save_scope_as = rf_knight_browser_selected }
+            riseandfall_invite_manual_paid_knight_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0017 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0017.candidate_4
+        trigger = { exists = scope:rf_knight_browser_paid_4 }
+        custom_tooltip = riseandfall_courtier_browser.0017.candidate_4.tt
+        hidden_effect = {
+            scope:rf_knight_browser_paid_4 = { save_scope_as = rf_knight_browser_selected }
+            riseandfall_invite_manual_paid_knight_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0017 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0017.candidate_5
+        trigger = { exists = scope:rf_knight_browser_paid_5 }
+        custom_tooltip = riseandfall_courtier_browser.0017.candidate_5.tt
+        hidden_effect = {
+            scope:rf_knight_browser_paid_5 = { save_scope_as = rf_knight_browser_selected }
+            riseandfall_invite_manual_paid_knight_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0017 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0017.candidate_6
+        trigger = { exists = scope:rf_knight_browser_paid_6 }
+        custom_tooltip = riseandfall_courtier_browser.0017.candidate_6.tt
+        hidden_effect = {
+            scope:rf_knight_browser_paid_6 = { save_scope_as = rf_knight_browser_selected }
+            riseandfall_invite_manual_paid_knight_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0017 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0017.candidate_7
+        trigger = { exists = scope:rf_knight_browser_paid_7 }
+        custom_tooltip = riseandfall_courtier_browser.0017.candidate_7.tt
+        hidden_effect = {
+            scope:rf_knight_browser_paid_7 = { save_scope_as = rf_knight_browser_selected }
+            riseandfall_invite_manual_paid_knight_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0017 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0017.candidate_8
+        trigger = { exists = scope:rf_knight_browser_paid_8 }
+        custom_tooltip = riseandfall_courtier_browser.0017.candidate_8.tt
+        hidden_effect = {
+            scope:rf_knight_browser_paid_8 = { save_scope_as = rf_knight_browser_selected }
+            riseandfall_invite_manual_paid_knight_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0017 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0017.candidate_9
+        trigger = { exists = scope:rf_knight_browser_paid_9 }
+        custom_tooltip = riseandfall_courtier_browser.0017.candidate_9.tt
+        hidden_effect = {
+            scope:rf_knight_browser_paid_9 = { save_scope_as = rf_knight_browser_selected }
+            riseandfall_invite_manual_paid_knight_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0017 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0017.candidate_10
+        trigger = { exists = scope:rf_knight_browser_paid_10 }
+        custom_tooltip = riseandfall_courtier_browser.0017.candidate_10.tt
+        hidden_effect = {
+            scope:rf_knight_browser_paid_10 = { save_scope_as = rf_knight_browser_selected }
+            riseandfall_invite_manual_paid_knight_se = yes
+            trigger_event = { id = riseandfall_courtier_browser.0017 }
+        }
+    }
+
+    option = {
+        name = riseandfall_courtier_browser.0017.leave
+        trigger = { always = yes }
+        hidden_effect = { riseandfall_clear_paid_knight_browser_se = yes }
+    }
+}

@@ -262,11 +262,11 @@ riseandfall_steal_gold_effect = {
 		remove_variable = rf_transfer_gold
 	}
 
-	# Using this interaction spends 8 points of puppet stability mana.
+	# Gold theft further weakens the figurehead ruler's stability reserve.
 	scope:recipient = {
 		if = {
 			limit = { has_variable = riseandfall_rs_puppet_stability_bonus }
-			change_variable = { name = riseandfall_rs_puppet_stability_bonus add = -8 }
+			change_variable = { name = riseandfall_rs_puppet_stability_bonus add = -12 }
 			clamp_variable = { name = riseandfall_rs_puppet_stability_bonus min = -35 max = 35 }
 			round_variable = { name = riseandfall_rs_puppet_stability_bonus nearest = 1 }
 		}
@@ -307,11 +307,11 @@ riseandfall_curry_favor_effect = {
 		}
 	}
 
-	# Using this interaction spends 10 points of puppet stability mana.
+	# Favor-seeking also spends stability, even without taking land or money.
 	scope:recipient = {
 		if = {
 			limit = { has_variable = riseandfall_rs_puppet_stability_bonus }
-			change_variable = { name = riseandfall_rs_puppet_stability_bonus add = -10 }
+			change_variable = { name = riseandfall_rs_puppet_stability_bonus add = -15 }
 			clamp_variable = { name = riseandfall_rs_puppet_stability_bonus min = -35 max = 35 }
 			round_variable = { name = riseandfall_rs_puppet_stability_bonus nearest = 1 }
 		}
@@ -641,11 +641,11 @@ riseandfall_seize_liege_land_effect = {
 			}
 		}
 
-		# This is a major power grab and spends 20 points of puppet stability mana.
+		# A territorial power grab is the strongest direct hit to puppet stability.
 		scope:recipient = {
 			if = {
 				limit = { has_variable = riseandfall_rs_puppet_stability_bonus }
-				change_variable = { name = riseandfall_rs_puppet_stability_bonus add = -20 }
+				change_variable = { name = riseandfall_rs_puppet_stability_bonus add = -25 }
 				clamp_variable = { name = riseandfall_rs_puppet_stability_bonus min = -35 max = 35 }
 				round_variable = { name = riseandfall_rs_puppet_stability_bonus nearest = 1 }
 			}

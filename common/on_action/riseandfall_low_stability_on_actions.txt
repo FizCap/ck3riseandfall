@@ -1,10 +1,39 @@
 ﻿yearly_global_pulse = {
     on_actions = {
         riseandfall_check_puppet_regency
+        riseandfall_warlord_expire_legacy
         riseandfall_warlord
         riseandfall_marry_male_puppet_master_target
         riseandfall_marry_female_puppet_master_target
         riseandfall_split_title_monitor
+    }
+}
+
+# Temporary Rebel banners expire even when the optional realm-crisis system is
+# disabled; this also governs Puppet Masters who choose the legacy Warlord path.
+riseandfall_warlord_expire_legacy = {
+    effect = {
+        every_ruler = {
+            limit = {
+                has_character_flag = rf_warlord_legacy
+                riseandfall_is_any_warlord_trigger = yes
+            }
+            if = {
+                limit = {
+                    NOT = { has_variable = rf_warlord_legacy_expiry }
+                    NOT = { has_variable = rf_warlord_legacy_expiry_initialized }
+                }
+                set_variable = { name = rf_warlord_legacy_expiry value = 1 years = 5 }
+                set_variable = { name = rf_warlord_legacy_expiry_initialized value = 1 }
+            }
+            else_if = {
+                limit = {
+                    has_variable = rf_warlord_legacy_expiry_initialized
+                    NOT = { has_variable = rf_warlord_legacy_expiry }
+                }
+                riseandfall_warlord_retire_legacy_se = yes
+            }
+        }
     }
 }
 
@@ -377,28 +406,6 @@ riseandfall_warlord = {
         has_game_rule = riseandfall_low_stability_events_enabled
     }
     effect = {
-        # Legacy banners expire independently of any active realm crisis.
-        every_ruler = {
-            limit = {
-                has_character_flag = rf_warlord_legacy
-                riseandfall_is_any_warlord_trigger = yes
-            }
-            if = {
-                limit = {
-                    NOT = { has_variable = rf_warlord_legacy_expiry }
-                    NOT = { has_variable = rf_warlord_legacy_expiry_initialized }
-                }
-                set_variable = { name = rf_warlord_legacy_expiry value = 1 years = 5 }
-                set_variable = { name = rf_warlord_legacy_expiry_initialized value = 1 }
-            }
-            else_if = {
-                limit = {
-                    has_variable = rf_warlord_legacy_expiry_initialized
-                    NOT = { has_variable = rf_warlord_legacy_expiry }
-                }
-                riseandfall_warlord_retire_legacy_se = yes
-            }
-        }
         # Cleanup: handle unlanded/independent warlords
         riseandfall_warlord_cleanup_se = yes
 

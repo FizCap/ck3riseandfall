@@ -1,0 +1,29 @@
+# CK3 Titles, Succession, Offices, and Realm Changes
+
+Read this guide when changing title laws, succession, diarchies, court positions, realm splits, bordergore, or title/vassal transfers. General scope and token checks are in `ck3-scripting.md`.
+
+## Laws and persistent state
+
+- For an explicit title-level active-state marker, treat that marker as authoritative. Succession, trait assignment, and maintenance may preserve marked state, but must not recreate a cleared marker from stale character traits.
+- Apply temporary realm succession laws to the ruler whose realm enters the state. Store the previous law on a persistent primary-title variable, then restore only after the triggering state has ended.
+- Script-only laws must set `should_start_with = { always = no }`; `can_have` alone may not prevent default-law selection.
+- Temporary inheritance laws that exclude landed candidates should use native `exclude_rulers = yes`; a negative score does not make a landed candidate ineligible.
+- For low-stability recovery chance multipliers, do not seed incident cooldown globally at `on_game_start_after_lobby`. Apply recovery on incident completion so initial risk follows actual stability.
+- For generated Legitimists camps selected from an implicit claim, add an explicit claim on the prepared target and set vanilla `legitimist_claimed_title` before applying the camp-purpose law. Repair both before war discovery; forcing only the law allows vanilla `can_keep` to replace it.
+
+## Diarchies and script-owned court positions
+
+- Persistent diarchy states need a dedicated marker and explicit removal effect. Position sync and missing-candidate recovery may repair/defer the office, but never end the diarchy implicitly.
+- A court-position container tied to the state must remain shown and valid from the persistent marker during transient inactive/type-less succession gaps. Put active-diarch requirements on `valid_character`, rather than tearing down and recreating the position.
+- Keep a script-owned position’s `ai_position_score` clearly below vanilla’s hire threshold and the holder’s firing score safely positive; boundary scores can race scripted succession. Before each scripted appointment, call vanilla `can_appoint_char_to_court_position` in the hiring liege’s scope.
+- Do not appoint from `on_court_position_received`. Coalesce revoked, invalidated, and vacated callbacks behind one delayed, marker-guarded resync; block fresh creation until engine teardown finishes.
+- On an active diarch’s death, save documented `diarchy_successor` before cleanup can end the diarchy. Do not choose during the transient empty-diarch callback. After teardown, retain a valid engine-advanced diarch, otherwise restore the saved native successor; use a custom fallback only if that successor is missing or invalid.
+
+## Title and realm mutations
+
+- Snapshot target titles/counties before resolving title or vassal changes inside title/realm iterators. Mutate in a separate `every_in_list` pass; changing live collections can invalidate vanilla on_action scopes.
+- After vanilla `depose_effect`, let normal succession distribute surviving titles unless the mechanic explicitly requires another holder. A second manual transfer can override or duplicate inheritance.
+- If every county of an administrative sub-vassal is reassigned, transfer the intact ruler to the destination liege instead of unlanding them. For mixed holdings, surrender only offending counties.
+- Bordergore eligibility and execution must share the same county triggers. Direct holdings use the holder’s primary de-jure region plus every personally held title in the county’s de-jure chain. Subordinate holdings use the target’s equivalent region. An intact transferred ruler then surrenders counties outside their own region while retaining a core county.
+- For a standard realm split, choose successor anchors from the full eligible vassal pool. Assign ordinary vassals individually using political/geographic influence; de-jure regions are soft cohesion and fallback aids, not mandatory anchor quotas.
+- When a Story Mode event genuinely fragments a realm, apply bounded collapse-pressure relief after transfers and resync the primary-title copy. Structural weakening should reduce an arc without deleting it.

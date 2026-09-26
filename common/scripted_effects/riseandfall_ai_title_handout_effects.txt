@@ -314,8 +314,11 @@ riseandfall_ai_advanced_destroy_unwanted_titles_se = {
         limit = {
             is_ai = yes
             is_landed = yes
+            is_independent_ruler = yes
             exists = primary_title
             primary_title.tier >= tier_kingdom
+            # Vassals retain secondary crowns; Warlords retain crowns they create.
+            NOT = { riseandfall_is_any_warlord_trigger = yes }
         }
 
         # Do not try to demote empire-tier primary titles by swapping to a

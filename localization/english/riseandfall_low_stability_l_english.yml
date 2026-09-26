@@ -7,6 +7,10 @@
  puppet.1002.a:0 "Accept and become Puppet Master"
  puppet.1002.b:0 "Decline and let another vassal try"
 
+riseandfall_puppet_master_become_warlord_interaction_desc:0 "Raise a Rebel Warlord banner for five years. This legacy banner grants the usual Rebel Warlord abilities but does not begin or renew a realm-wide Warlord Era."
+riseandfall_puppet_master_become_warlord_popup_title:0 "A Rebel Banner Rises"
+riseandfall_puppet_master_become_warlord_popup_desc:0 "A Rebel Warlord banner has been raised. It will last five years and will not begin a realm-wide Warlord Era."
+
 
  # Warlord localization
 warlord_loyalty_opinion:0 "Loyal Vassal."

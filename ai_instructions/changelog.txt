@@ -1,4 +1,18 @@
-﻿CK3: Rise and Fall - 1.3.2
+﻿CK3: Rise and Fall - 1.3.3
+
+Puppet Regency
+- Increased the puppet stability cost of stealing gold, currying favor, and seizing land.
+- Added a Puppet Master interaction to become a Rebel Warlord for five years without starting a realm-wide Warlord Era.
+
+Realm Stability
+- Reduced the vassal-opinion ceiling, increased ruler-skill weight, and strengthened late-game pressure on realms that control a large share of the world.
+- Accelerated recovery toward the target while keeping declines faster and civil-war pressure cumulative.
+- Excluded vassals and Warlords from Advanced AI's spare-crown cleanup so their qualifying titles are retained.
 
 Courtier Automation
-- Recruit Best Paid Courtier now excludes candidates who would reject a regular Invite to Court, even when their recruitment fee is affordable.
+- Added ranked candidate browsers for free and paid courtier and guardian recruitment, showing up to ten candidates and paid costs. Paid options exclude candidates in debt.
+- Kept recruitment browsers open after each selection so additional candidates can be recruited from the refreshed list.
+- Removed decision-menu tooltip lag by moving recruitment searches to selection; best-courtier decisions report the selected recruit.
+- Assigned guardians to primary-title heirs in succession order before other house children.
+- Kept Courtier Automation recruit actions visible but disabled them when no eligible candidate can join.
+- Added automatic or manual knight recruitment choices, limited manual lists to Prowess upgrades, and excluded paid candidates who would still reject a vanilla invite after travel expenses.

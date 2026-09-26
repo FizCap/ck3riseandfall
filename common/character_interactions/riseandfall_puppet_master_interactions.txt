@@ -776,3 +776,72 @@ riseandfall_claim_puppet_master_office_interaction = {
 		base = 100
 	}
 }
+
+# Interaction: Become a five-year legacy Rebel Warlord without starting a crisis
+riseandfall_puppet_master_become_warlord_interaction = {
+	interface_priority = 82
+	common_interaction = yes
+	category = interaction_riseandfall
+	icon = icon_riseandfall
+	show_effects_in_notification = yes
+	desc = riseandfall_puppet_master_become_warlord_interaction_desc
+	diarch_interaction = yes
+
+	is_shown = {
+		OR = {
+			scope:actor = { is_ai = yes }
+			AND = {
+				scope:actor = { is_ai = no }
+				has_game_rule = riseandfall_lite_mode_disabled
+			}
+		}
+		scope:recipient = {
+			has_diarchy_type = puppet_regency
+			is_independent_ruler = yes
+		}
+		scope:actor = { is_diarch_of_target = scope:recipient }
+	}
+
+	is_valid_showing_failures_only = {
+		scope:actor = {
+			is_diarch_of_target = scope:recipient
+			is_landed = yes
+			NOT = { riseandfall_is_any_warlord_trigger = yes }
+		}
+		scope:recipient = {
+			has_diarchy_type = puppet_regency
+			is_independent_ruler = yes
+		}
+	}
+
+	auto_accept = yes
+	can_send = { always = yes }
+
+	on_accept = {
+		custom_tooltip = { text = riseandfall_puppet_master_become_warlord_interaction_desc }
+		hidden_effect = {
+			scope:actor = { riseandfall_warlord_become_legacy_rebel = yes }
+			scope:recipient = {
+				send_interface_popup = {
+					type = send_interface_message_bad
+					title = riseandfall_puppet_master_become_warlord_popup_title
+					custom_tooltip = riseandfall_puppet_master_become_warlord_popup_desc
+					left_icon = scope:actor
+				}
+			}
+		}
+	}
+
+	ai_frequency = 24
+	cooldown = { years = 5 }
+	cooldown_against_recipient = { years = 5 }
+	ai_potential = { exists = this is_alive = yes }
+	ai_targets = { ai_recipients = liege max = 1 }
+	ai_will_do = {
+		base = 5
+		modifier = { scope:actor = { has_trait = ambitious } add = 50 }
+		modifier = { scope:actor = { has_trait = brave } add = 20 }
+		modifier = { scope:actor = { has_trait = content } add = -40 }
+		modifier = { scope:actor = { has_trait = craven } add = -25 }
+	}
+}

@@ -43,6 +43,30 @@ riseandfall_warlord_become_warlord = {
     riseandfall_warlord_reconcile_succession_se = yes
 }
 
+# A Puppet Master can raise a temporary Rebel banner without starting or
+# extending the liege's realm-wide Warlord Era.
+riseandfall_warlord_become_legacy_rebel = {
+    riseandfall_warlord_become_warlord = yes
+    if = {
+        limit = { is_landed = yes has_trait = warlord }
+        add_character_flag = rf_warlord_legacy
+        set_variable = { name = rf_warlord_legacy_expiry value = 1 years = 5 }
+        set_variable = { name = rf_warlord_legacy_expiry_initialized value = 1 }
+        # The Rebel banner threatens the puppet ruler's grip for its full cost.
+        if = {
+            limit = { exists = liege }
+            liege = {
+                if = {
+                    limit = { has_variable = riseandfall_rs_puppet_stability_bonus }
+                    change_variable = { name = riseandfall_rs_puppet_stability_bonus add = -20 }
+                    clamp_variable = { name = riseandfall_rs_puppet_stability_bonus min = -35 max = 35 }
+                    round_variable = { name = riseandfall_rs_puppet_stability_bonus nearest = 1 }
+                }
+            }
+        }
+    }
+}
+
 riseandfall_warlord_remain_loyal = {
     set_variable = { name = riseandfall_warlord_choice_made value = yes years = 5 }
     riseandfall_warlord_become_loyal = yes

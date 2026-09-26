@@ -1,0 +1,46 @@
+﻿namespace = riseandfall_courtier_automation
+
+# Hidden execution boundaries keep the Decisions tooltip builder out of the
+# candidate and roster searches. Each event runs on the deciding character.
+
+riseandfall_courtier_automation.0002 = {
+    type = character_event
+    hidden = yes
+
+    immediate = { riseandfall_player_smart_invite_free_knight_se = yes }
+}
+
+riseandfall_courtier_automation.0003 = {
+    type = character_event
+    hidden = yes
+
+    immediate = { riseandfall_player_smart_invite_paid_knight_se = yes }
+}
+
+riseandfall_courtier_automation.0004 = {
+    type = character_event
+    hidden = yes
+
+    immediate = { riseandfall_player_invite_best_free_courtier_se = yes }
+}
+
+riseandfall_courtier_automation.0005 = {
+    type = character_event
+    hidden = yes
+
+    immediate = { riseandfall_player_recruit_best_paid_courtier_se = yes }
+}
+
+riseandfall_courtier_automation.0006 = {
+    type = character_event
+    hidden = yes
+
+    immediate = { riseandfall_player_smart_invite_free_guardian_se = yes }
+}
+
+riseandfall_courtier_automation.0007 = {
+    type = character_event
+    hidden = yes
+
+    immediate = { riseandfall_player_smart_invite_paid_guardian_se = yes }
+}

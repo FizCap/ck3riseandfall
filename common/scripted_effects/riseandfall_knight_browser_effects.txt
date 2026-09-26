@@ -1,0 +1,394 @@
+﻿#################################################################################
+# Manual choices reuse the combined Prowess ranking and roster cap from automation.
+#################################################################################
+
+riseandfall_prepare_free_knight_browser_se = {
+    save_scope_as = rf_courtier_automation_actor
+    clear_saved_scope = rf_knight_browser_free_1
+    clear_saved_scope = rf_knight_browser_free_2
+    clear_saved_scope = rf_knight_browser_free_3
+    clear_saved_scope = rf_knight_browser_free_4
+    clear_saved_scope = rf_knight_browser_free_5
+    clear_saved_scope = rf_knight_browser_free_6
+    clear_saved_scope = rf_knight_browser_free_7
+    clear_saved_scope = rf_knight_browser_free_8
+    clear_saved_scope = rf_knight_browser_free_9
+    clear_saved_scope = rf_knight_browser_free_10
+    set_variable = { name = rf_knight_browser_cursor value = 0 }
+
+    # Rank current knights and available candidates together. The top entries
+    # up to the ruler's knight cap are the exact final roster upgrades.
+    every_knight = {
+        add_to_temporary_list = rf_smart_free_knight_roster_pool
+    }
+
+    every_courtier_or_guest = {
+        limit = {
+            is_alive = yes
+            is_adult = yes
+            is_ruler = no
+            is_imprisoned = no
+            is_pool_guest_of = scope:rf_courtier_automation_actor
+            NOT = { is_courtier_of = scope:rf_courtier_automation_actor }
+            recruit_guest_interaction_cost <= 0
+            can_be_knight_trigger = { ARMY_OWNER = scope:rf_courtier_automation_actor }
+        }
+        add_to_temporary_list = rf_smart_free_knight_candidates
+        add_to_temporary_list = rf_smart_free_knight_roster_pool
+    }
+
+    every_ruler = {
+        limit = {
+            is_alive = yes
+            in_diplomatic_range = scope:rf_courtier_automation_actor
+        }
+        every_courtier_or_guest = {
+            limit = {
+                is_alive = yes
+                is_adult = yes
+                is_ruler = no
+                is_imprisoned = no
+                NOT = { is_pool_guest_of = scope:rf_courtier_automation_actor }
+                NOT = { is_courtier_of = scope:rf_courtier_automation_actor }
+                OR = {
+                    is_pool_character = yes
+                    exists = liege
+                }
+                is_foreign_court_guest = no
+                in_diplomatic_range = scope:rf_courtier_automation_actor
+                can_be_knight_trigger = { ARMY_OWNER = scope:rf_courtier_automation_actor }
+                can_recruit_character_to_court_trigger = {
+                    RECRUITER = scope:rf_courtier_automation_actor
+                    RECRUITEE = this
+                }
+                # Free means vanilla accepts Invite to Court without travel
+                # expenses, Influence, or a Hook selected.
+                scope:rf_courtier_automation_actor = {
+                    is_character_interaction_potentially_accepted = {
+                        recipient = prev
+                        interaction = invite_to_court_interaction
+                        required_response = yes
+                        ai_accept = 0
+                    }
+                }
+            }
+            add_to_temporary_list = rf_smart_free_knight_candidates
+            add_to_temporary_list = rf_smart_free_knight_roster_pool
+        }
+    }
+
+    ordered_in_list = {
+        list = rf_smart_free_knight_roster_pool
+        order_by = prowess
+        max = scope:rf_courtier_automation_actor.max_number_of_knights
+        check_range_bounds = no
+        save_scope_as = rf_courtier_automation_candidate
+        if = {
+            limit = { is_in_list = rf_smart_free_knight_candidates }
+            root = {
+                if = {
+                    limit = { var:rf_knight_browser_cursor = 0 }
+                    scope:rf_courtier_automation_candidate = { save_scope_as = rf_knight_browser_free_1 }
+                }
+                if = {
+                    limit = { var:rf_knight_browser_cursor = 1 }
+                    scope:rf_courtier_automation_candidate = { save_scope_as = rf_knight_browser_free_2 }
+                }
+                if = {
+                    limit = { var:rf_knight_browser_cursor = 2 }
+                    scope:rf_courtier_automation_candidate = { save_scope_as = rf_knight_browser_free_3 }
+                }
+                if = {
+                    limit = { var:rf_knight_browser_cursor = 3 }
+                    scope:rf_courtier_automation_candidate = { save_scope_as = rf_knight_browser_free_4 }
+                }
+                if = {
+                    limit = { var:rf_knight_browser_cursor = 4 }
+                    scope:rf_courtier_automation_candidate = { save_scope_as = rf_knight_browser_free_5 }
+                }
+                if = {
+                    limit = { var:rf_knight_browser_cursor = 5 }
+                    scope:rf_courtier_automation_candidate = { save_scope_as = rf_knight_browser_free_6 }
+                }
+                if = {
+                    limit = { var:rf_knight_browser_cursor = 6 }
+                    scope:rf_courtier_automation_candidate = { save_scope_as = rf_knight_browser_free_7 }
+                }
+                if = {
+                    limit = { var:rf_knight_browser_cursor = 7 }
+                    scope:rf_courtier_automation_candidate = { save_scope_as = rf_knight_browser_free_8 }
+                }
+                if = {
+                    limit = { var:rf_knight_browser_cursor = 8 }
+                    scope:rf_courtier_automation_candidate = { save_scope_as = rf_knight_browser_free_9 }
+                }
+                if = {
+                    limit = { var:rf_knight_browser_cursor = 9 }
+                    scope:rf_courtier_automation_candidate = { save_scope_as = rf_knight_browser_free_10 }
+                }
+                change_variable = { name = rf_knight_browser_cursor add = 1 }
+            }
+        }
+    }
+    remove_variable = rf_knight_browser_cursor
+}
+
+riseandfall_prepare_paid_knight_browser_se = {
+    save_scope_as = rf_courtier_automation_actor
+    if = { limit = { exists = scope:rf_knight_browser_paid_1 } scope:rf_knight_browser_paid_1 = { remove_variable = rf_knight_browser_cost_paid_1 } }
+    clear_saved_scope = rf_knight_browser_paid_1
+    if = { limit = { exists = scope:rf_knight_browser_paid_2 } scope:rf_knight_browser_paid_2 = { remove_variable = rf_knight_browser_cost_paid_2 } }
+    clear_saved_scope = rf_knight_browser_paid_2
+    if = { limit = { exists = scope:rf_knight_browser_paid_3 } scope:rf_knight_browser_paid_3 = { remove_variable = rf_knight_browser_cost_paid_3 } }
+    clear_saved_scope = rf_knight_browser_paid_3
+    if = { limit = { exists = scope:rf_knight_browser_paid_4 } scope:rf_knight_browser_paid_4 = { remove_variable = rf_knight_browser_cost_paid_4 } }
+    clear_saved_scope = rf_knight_browser_paid_4
+    if = { limit = { exists = scope:rf_knight_browser_paid_5 } scope:rf_knight_browser_paid_5 = { remove_variable = rf_knight_browser_cost_paid_5 } }
+    clear_saved_scope = rf_knight_browser_paid_5
+    if = { limit = { exists = scope:rf_knight_browser_paid_6 } scope:rf_knight_browser_paid_6 = { remove_variable = rf_knight_browser_cost_paid_6 } }
+    clear_saved_scope = rf_knight_browser_paid_6
+    if = { limit = { exists = scope:rf_knight_browser_paid_7 } scope:rf_knight_browser_paid_7 = { remove_variable = rf_knight_browser_cost_paid_7 } }
+    clear_saved_scope = rf_knight_browser_paid_7
+    if = { limit = { exists = scope:rf_knight_browser_paid_8 } scope:rf_knight_browser_paid_8 = { remove_variable = rf_knight_browser_cost_paid_8 } }
+    clear_saved_scope = rf_knight_browser_paid_8
+    if = { limit = { exists = scope:rf_knight_browser_paid_9 } scope:rf_knight_browser_paid_9 = { remove_variable = rf_knight_browser_cost_paid_9 } }
+    clear_saved_scope = rf_knight_browser_paid_9
+    if = { limit = { exists = scope:rf_knight_browser_paid_10 } scope:rf_knight_browser_paid_10 = { remove_variable = rf_knight_browser_cost_paid_10 } }
+    clear_saved_scope = rf_knight_browser_paid_10
+    set_variable = { name = rf_knight_browser_cursor value = 0 }
+
+    # Paid candidates use the same combined top-roster calculation as free
+    # candidates; payment remains conditional on current affordability.
+    every_knight = {
+        add_to_temporary_list = rf_smart_paid_knight_roster_pool
+    }
+
+    every_courtier_or_guest = {
+        limit = {
+            is_alive = yes
+            is_adult = yes
+            is_ruler = no
+            is_imprisoned = no
+            is_pool_guest_of = scope:rf_courtier_automation_actor
+            NOT = { is_courtier_of = scope:rf_courtier_automation_actor }
+            recruit_guest_interaction_cost > 0
+            is_in_debt = no
+            scope:rf_courtier_automation_actor = { gold >= prev.recruit_guest_interaction_cost }
+            can_be_knight_trigger = { ARMY_OWNER = scope:rf_courtier_automation_actor }
+        }
+        add_to_temporary_list = rf_smart_paid_knight_candidates
+        add_to_temporary_list = rf_smart_paid_knight_roster_pool
+    }
+
+    every_ruler = {
+        limit = {
+            is_alive = yes
+            in_diplomatic_range = scope:rf_courtier_automation_actor
+        }
+        every_courtier_or_guest = {
+            limit = {
+                is_alive = yes
+                is_adult = yes
+                is_in_debt = no
+                is_ruler = no
+                is_imprisoned = no
+                NOT = { is_pool_guest_of = scope:rf_courtier_automation_actor }
+                NOT = { is_courtier_of = scope:rf_courtier_automation_actor }
+                OR = {
+                    is_pool_character = yes
+                    exists = liege
+                }
+                is_foreign_court_guest = no
+                in_diplomatic_range = scope:rf_courtier_automation_actor
+                can_be_knight_trigger = { ARMY_OWNER = scope:rf_courtier_automation_actor }
+                can_recruit_character_to_court_trigger = {
+                    RECRUITER = scope:rf_courtier_automation_actor
+                    RECRUITEE = this
+                }
+                # Keep genuinely free invitations in the free decision.
+                NOT = {
+                    scope:rf_courtier_automation_actor = {
+                        is_character_interaction_potentially_accepted = {
+                            recipient = prev
+                            interaction = invite_to_court_interaction
+                            required_response = yes
+                            ai_accept = 0
+                        }
+                    }
+                }
+                # Paying travel expenses adds +20 acceptance in vanilla.
+                scope:rf_courtier_automation_actor = {
+                    is_character_interaction_potentially_accepted = {
+                        recipient = prev
+                        interaction = invite_to_court_interaction
+                        required_response = yes
+                        ai_accept = -20
+                    }
+                }
+                scope:rf_courtier_automation_actor = { gold >= { value = riseandfall_courtier_automation_bribe_value multiply = 0.5 } }
+            }
+            add_to_temporary_list = rf_smart_paid_knight_candidates
+            add_to_temporary_list = rf_smart_paid_knight_roster_pool
+        }
+    }
+
+    ordered_in_list = {
+        list = rf_smart_paid_knight_roster_pool
+        order_by = prowess
+        max = scope:rf_courtier_automation_actor.max_number_of_knights
+        check_range_bounds = no
+        save_scope_as = rf_courtier_automation_candidate
+        if = {
+            limit = { is_in_list = rf_smart_paid_knight_candidates }
+            root = {
+                if = {
+                    limit = { var:rf_knight_browser_cursor = 0 }
+                    scope:rf_courtier_automation_candidate = { save_scope_as = rf_knight_browser_paid_1 }
+                    if = { limit = { scope:rf_courtier_automation_candidate = { is_pool_guest_of = scope:rf_courtier_automation_actor } } scope:rf_courtier_automation_candidate = { set_variable = { name = rf_knight_browser_cost_paid_1 value = scope:rf_courtier_automation_candidate.recruit_guest_interaction_cost } } }
+                    else = { scope:rf_courtier_automation_candidate = { set_variable = { name = rf_knight_browser_cost_paid_1 value = { value = riseandfall_courtier_automation_bribe_value multiply = 0.5 } } } }
+                }
+                if = {
+                    limit = { var:rf_knight_browser_cursor = 1 }
+                    scope:rf_courtier_automation_candidate = { save_scope_as = rf_knight_browser_paid_2 }
+                    if = { limit = { scope:rf_courtier_automation_candidate = { is_pool_guest_of = scope:rf_courtier_automation_actor } } scope:rf_courtier_automation_candidate = { set_variable = { name = rf_knight_browser_cost_paid_2 value = scope:rf_courtier_automation_candidate.recruit_guest_interaction_cost } } }
+                    else = { scope:rf_courtier_automation_candidate = { set_variable = { name = rf_knight_browser_cost_paid_2 value = { value = riseandfall_courtier_automation_bribe_value multiply = 0.5 } } } }
+                }
+                if = {
+                    limit = { var:rf_knight_browser_cursor = 2 }
+                    scope:rf_courtier_automation_candidate = { save_scope_as = rf_knight_browser_paid_3 }
+                    if = { limit = { scope:rf_courtier_automation_candidate = { is_pool_guest_of = scope:rf_courtier_automation_actor } } scope:rf_courtier_automation_candidate = { set_variable = { name = rf_knight_browser_cost_paid_3 value = scope:rf_courtier_automation_candidate.recruit_guest_interaction_cost } } }
+                    else = { scope:rf_courtier_automation_candidate = { set_variable = { name = rf_knight_browser_cost_paid_3 value = { value = riseandfall_courtier_automation_bribe_value multiply = 0.5 } } } }
+                }
+                if = {
+                    limit = { var:rf_knight_browser_cursor = 3 }
+                    scope:rf_courtier_automation_candidate = { save_scope_as = rf_knight_browser_paid_4 }
+                    if = { limit = { scope:rf_courtier_automation_candidate = { is_pool_guest_of = scope:rf_courtier_automation_actor } } scope:rf_courtier_automation_candidate = { set_variable = { name = rf_knight_browser_cost_paid_4 value = scope:rf_courtier_automation_candidate.recruit_guest_interaction_cost } } }
+                    else = { scope:rf_courtier_automation_candidate = { set_variable = { name = rf_knight_browser_cost_paid_4 value = { value = riseandfall_courtier_automation_bribe_value multiply = 0.5 } } } }
+                }
+                if = {
+                    limit = { var:rf_knight_browser_cursor = 4 }
+                    scope:rf_courtier_automation_candidate = { save_scope_as = rf_knight_browser_paid_5 }
+                    if = { limit = { scope:rf_courtier_automation_candidate = { is_pool_guest_of = scope:rf_courtier_automation_actor } } scope:rf_courtier_automation_candidate = { set_variable = { name = rf_knight_browser_cost_paid_5 value = scope:rf_courtier_automation_candidate.recruit_guest_interaction_cost } } }
+                    else = { scope:rf_courtier_automation_candidate = { set_variable = { name = rf_knight_browser_cost_paid_5 value = { value = riseandfall_courtier_automation_bribe_value multiply = 0.5 } } } }
+                }
+                if = {
+                    limit = { var:rf_knight_browser_cursor = 5 }
+                    scope:rf_courtier_automation_candidate = { save_scope_as = rf_knight_browser_paid_6 }
+                    if = { limit = { scope:rf_courtier_automation_candidate = { is_pool_guest_of = scope:rf_courtier_automation_actor } } scope:rf_courtier_automation_candidate = { set_variable = { name = rf_knight_browser_cost_paid_6 value = scope:rf_courtier_automation_candidate.recruit_guest_interaction_cost } } }
+                    else = { scope:rf_courtier_automation_candidate = { set_variable = { name = rf_knight_browser_cost_paid_6 value = { value = riseandfall_courtier_automation_bribe_value multiply = 0.5 } } } }
+                }
+                if = {
+                    limit = { var:rf_knight_browser_cursor = 6 }
+                    scope:rf_courtier_automation_candidate = { save_scope_as = rf_knight_browser_paid_7 }
+                    if = { limit = { scope:rf_courtier_automation_candidate = { is_pool_guest_of = scope:rf_courtier_automation_actor } } scope:rf_courtier_automation_candidate = { set_variable = { name = rf_knight_browser_cost_paid_7 value = scope:rf_courtier_automation_candidate.recruit_guest_interaction_cost } } }
+                    else = { scope:rf_courtier_automation_candidate = { set_variable = { name = rf_knight_browser_cost_paid_7 value = { value = riseandfall_courtier_automation_bribe_value multiply = 0.5 } } } }
+                }
+                if = {
+                    limit = { var:rf_knight_browser_cursor = 7 }
+                    scope:rf_courtier_automation_candidate = { save_scope_as = rf_knight_browser_paid_8 }
+                    if = { limit = { scope:rf_courtier_automation_candidate = { is_pool_guest_of = scope:rf_courtier_automation_actor } } scope:rf_courtier_automation_candidate = { set_variable = { name = rf_knight_browser_cost_paid_8 value = scope:rf_courtier_automation_candidate.recruit_guest_interaction_cost } } }
+                    else = { scope:rf_courtier_automation_candidate = { set_variable = { name = rf_knight_browser_cost_paid_8 value = { value = riseandfall_courtier_automation_bribe_value multiply = 0.5 } } } }
+                }
+                if = {
+                    limit = { var:rf_knight_browser_cursor = 8 }
+                    scope:rf_courtier_automation_candidate = { save_scope_as = rf_knight_browser_paid_9 }
+                    if = { limit = { scope:rf_courtier_automation_candidate = { is_pool_guest_of = scope:rf_courtier_automation_actor } } scope:rf_courtier_automation_candidate = { set_variable = { name = rf_knight_browser_cost_paid_9 value = scope:rf_courtier_automation_candidate.recruit_guest_interaction_cost } } }
+                    else = { scope:rf_courtier_automation_candidate = { set_variable = { name = rf_knight_browser_cost_paid_9 value = { value = riseandfall_courtier_automation_bribe_value multiply = 0.5 } } } }
+                }
+                if = {
+                    limit = { var:rf_knight_browser_cursor = 9 }
+                    scope:rf_courtier_automation_candidate = { save_scope_as = rf_knight_browser_paid_10 }
+                    if = { limit = { scope:rf_courtier_automation_candidate = { is_pool_guest_of = scope:rf_courtier_automation_actor } } scope:rf_courtier_automation_candidate = { set_variable = { name = rf_knight_browser_cost_paid_10 value = scope:rf_courtier_automation_candidate.recruit_guest_interaction_cost } } }
+                    else = { scope:rf_courtier_automation_candidate = { set_variable = { name = rf_knight_browser_cost_paid_10 value = { value = riseandfall_courtier_automation_bribe_value multiply = 0.5 } } } }
+                }
+                change_variable = { name = rf_knight_browser_cursor add = 1 }
+            }
+        }
+    }
+    remove_variable = rf_knight_browser_cursor
+}
+
+riseandfall_invite_manual_free_knight_se = {
+    save_scope_as = rf_courtier_automation_actor
+    scope:rf_knight_browser_selected = { save_scope_as = rf_courtier_automation_candidate }
+    if = {
+        limit = { exists = scope:rf_courtier_automation_candidate scope:rf_courtier_automation_candidate = { is_alive = yes is_adult = yes is_ruler = no is_imprisoned = no NOT = { is_courtier_of = root } can_be_knight_trigger = { ARMY_OWNER = root } } }
+        riseandfall_player_report_browser_recruited_courtier_se = yes
+    }
+    clear_saved_scope = rf_knight_browser_selected
+}
+
+riseandfall_invite_manual_paid_knight_se = {
+    save_scope_as = rf_courtier_automation_actor
+    scope:rf_knight_browser_selected = { save_scope_as = rf_courtier_automation_candidate }
+    if = {
+        limit = { exists = scope:rf_courtier_automation_candidate scope:rf_courtier_automation_candidate = { is_alive = yes is_adult = yes is_in_debt = no is_ruler = no is_imprisoned = no NOT = { is_courtier_of = root } can_be_knight_trigger = { ARMY_OWNER = root } } }
+        if = {
+            limit = { scope:rf_courtier_automation_candidate = { is_pool_guest_of = root } }
+            if = {
+                limit = { gold >= scope:rf_courtier_automation_candidate.recruit_guest_interaction_cost }
+                pay_short_term_gold = { gold = scope:rf_courtier_automation_candidate.recruit_guest_interaction_cost target = scope:rf_courtier_automation_candidate }
+                riseandfall_player_report_browser_recruited_courtier_se = yes
+            }
+        }
+        else_if = {
+            limit = {
+                NOT = { scope:rf_courtier_automation_candidate = { is_pool_guest_of = root } }
+                gold >= { value = riseandfall_courtier_automation_bribe_value multiply = 0.5 }
+                NOT = {
+                    is_character_interaction_potentially_accepted = {
+                        recipient = scope:rf_courtier_automation_candidate
+                        interaction = invite_to_court_interaction
+                        required_response = yes
+                        ai_accept = 0
+                    }
+                }
+                is_character_interaction_potentially_accepted = {
+                    recipient = scope:rf_courtier_automation_candidate
+                    interaction = invite_to_court_interaction
+                    required_response = yes
+                    ai_accept = -20
+                }
+            }
+            pay_short_term_gold = { gold = { value = riseandfall_courtier_automation_bribe_value multiply = 0.5 } target = scope:rf_courtier_automation_candidate }
+            riseandfall_player_report_browser_recruited_courtier_se = yes
+        }
+    }
+    clear_saved_scope = rf_knight_browser_selected
+}
+
+riseandfall_clear_free_knight_browser_se = {
+    clear_saved_scope = rf_knight_browser_free_1
+    clear_saved_scope = rf_knight_browser_free_2
+    clear_saved_scope = rf_knight_browser_free_3
+    clear_saved_scope = rf_knight_browser_free_4
+    clear_saved_scope = rf_knight_browser_free_5
+    clear_saved_scope = rf_knight_browser_free_6
+    clear_saved_scope = rf_knight_browser_free_7
+    clear_saved_scope = rf_knight_browser_free_8
+    clear_saved_scope = rf_knight_browser_free_9
+    clear_saved_scope = rf_knight_browser_free_10
+}
+
+riseandfall_clear_paid_knight_browser_se = {
+    if = { limit = { exists = scope:rf_knight_browser_paid_1 } scope:rf_knight_browser_paid_1 = { remove_variable = rf_knight_browser_cost_paid_1 } }
+    clear_saved_scope = rf_knight_browser_paid_1
+    if = { limit = { exists = scope:rf_knight_browser_paid_2 } scope:rf_knight_browser_paid_2 = { remove_variable = rf_knight_browser_cost_paid_2 } }
+    clear_saved_scope = rf_knight_browser_paid_2
+    if = { limit = { exists = scope:rf_knight_browser_paid_3 } scope:rf_knight_browser_paid_3 = { remove_variable = rf_knight_browser_cost_paid_3 } }
+    clear_saved_scope = rf_knight_browser_paid_3
+    if = { limit = { exists = scope:rf_knight_browser_paid_4 } scope:rf_knight_browser_paid_4 = { remove_variable = rf_knight_browser_cost_paid_4 } }
+    clear_saved_scope = rf_knight_browser_paid_4
+    if = { limit = { exists = scope:rf_knight_browser_paid_5 } scope:rf_knight_browser_paid_5 = { remove_variable = rf_knight_browser_cost_paid_5 } }
+    clear_saved_scope = rf_knight_browser_paid_5
+    if = { limit = { exists = scope:rf_knight_browser_paid_6 } scope:rf_knight_browser_paid_6 = { remove_variable = rf_knight_browser_cost_paid_6 } }
+    clear_saved_scope = rf_knight_browser_paid_6
+    if = { limit = { exists = scope:rf_knight_browser_paid_7 } scope:rf_knight_browser_paid_7 = { remove_variable = rf_knight_browser_cost_paid_7 } }
+    clear_saved_scope = rf_knight_browser_paid_7
+    if = { limit = { exists = scope:rf_knight_browser_paid_8 } scope:rf_knight_browser_paid_8 = { remove_variable = rf_knight_browser_cost_paid_8 } }
+    clear_saved_scope = rf_knight_browser_paid_8
+    if = { limit = { exists = scope:rf_knight_browser_paid_9 } scope:rf_knight_browser_paid_9 = { remove_variable = rf_knight_browser_cost_paid_9 } }
+    clear_saved_scope = rf_knight_browser_paid_9
+    if = { limit = { exists = scope:rf_knight_browser_paid_10 } scope:rf_knight_browser_paid_10 = { remove_variable = rf_knight_browser_cost_paid_10 } }
+    clear_saved_scope = rf_knight_browser_paid_10
+}

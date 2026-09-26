@@ -1,0 +1,419 @@
+﻿# Availability checks for the one-time Courtier Automation recruitment actions.
+# These use any-candidate triggers and avoid building/sorting the full result lists.
+
+riseandfall_courtier_automation_has_free_knight_candidate_trigger = {
+    OR = {
+        any_courtier_or_guest = {
+            is_alive = yes
+            is_adult = yes
+            is_ruler = no
+            is_imprisoned = no
+            is_pool_guest_of = root
+            NOT = { is_courtier_of = root }
+            recruit_guest_interaction_cost <= 0
+            can_be_knight_trigger = { ARMY_OWNER = root }
+        }
+        any_ruler = {
+            limit = {
+                is_alive = yes
+                in_diplomatic_range = root
+            }
+            any_courtier_or_guest = {
+                is_alive = yes
+                is_adult = yes
+                is_ruler = no
+                is_imprisoned = no
+                NOT = { is_pool_guest_of = root }
+                NOT = { is_courtier_of = root }
+                OR = {
+                    is_pool_character = yes
+                    exists = liege
+                }
+                is_foreign_court_guest = no
+                in_diplomatic_range = root
+                can_be_knight_trigger = { ARMY_OWNER = root }
+                can_recruit_character_to_court_trigger = {
+                    RECRUITER = root
+                    RECRUITEE = this
+                }
+                root = {
+                    is_character_interaction_potentially_accepted = {
+                        recipient = prev
+                        interaction = invite_to_court_interaction
+                        required_response = yes
+                        ai_accept = 0
+                    }
+                }
+            }
+        }
+    }
+}
+
+riseandfall_courtier_automation_has_paid_knight_candidate_trigger = {
+    OR = {
+        any_courtier_or_guest = {
+            is_alive = yes
+            is_adult = yes
+            is_in_debt = no
+            is_ruler = no
+            is_imprisoned = no
+            is_pool_guest_of = root
+            NOT = { is_courtier_of = root }
+            recruit_guest_interaction_cost > 0
+            root = { gold >= prev.recruit_guest_interaction_cost }
+            can_be_knight_trigger = { ARMY_OWNER = root }
+        }
+        any_ruler = {
+            limit = {
+                is_alive = yes
+                in_diplomatic_range = root
+            }
+            any_courtier_or_guest = {
+                is_alive = yes
+                is_adult = yes
+                is_in_debt = no
+                is_ruler = no
+                is_imprisoned = no
+                NOT = { is_pool_guest_of = root }
+                NOT = { is_courtier_of = root }
+                OR = {
+                    is_pool_character = yes
+                    exists = liege
+                }
+                is_foreign_court_guest = no
+                in_diplomatic_range = root
+                can_be_knight_trigger = { ARMY_OWNER = root }
+                can_recruit_character_to_court_trigger = {
+                    RECRUITER = root
+                    RECRUITEE = this
+                }
+                NOT = {
+                    root = {
+                        is_character_interaction_potentially_accepted = {
+                            recipient = prev
+                            interaction = invite_to_court_interaction
+                            required_response = yes
+                            ai_accept = 0
+                        }
+                    }
+                }
+                # Paying travel expenses adds +20 acceptance in vanilla. A paid
+                # candidate must still reach non-negative acceptance afterward.
+                root = {
+                    is_character_interaction_potentially_accepted = {
+                        recipient = prev
+                        interaction = invite_to_court_interaction
+                        required_response = yes
+                        ai_accept = -20
+                    }
+                }
+                root = { gold >= { value = riseandfall_courtier_automation_bribe_value multiply = 0.5 } }
+            }
+        }
+    }
+}
+
+riseandfall_courtier_automation_has_free_courtier_candidate_trigger = {
+    OR = {
+        any_courtier_or_guest = {
+            is_alive = yes
+            is_adult = yes
+            is_ruler = no
+            is_imprisoned = no
+            is_pool_guest_of = root
+            NOT = { is_courtier_of = root }
+            recruit_guest_interaction_cost <= 0
+        }
+        any_ruler = {
+            limit = {
+                is_alive = yes
+                in_diplomatic_range = root
+            }
+            any_courtier_or_guest = {
+                is_alive = yes
+                is_adult = yes
+                is_ruler = no
+                is_imprisoned = no
+                NOT = { is_pool_guest_of = root }
+                NOT = { is_courtier_of = root }
+                OR = {
+                    is_pool_character = yes
+                    exists = liege
+                }
+                is_foreign_court_guest = no
+                in_diplomatic_range = root
+                can_recruit_character_to_court_trigger = {
+                    RECRUITER = root
+                    RECRUITEE = this
+                }
+                root = {
+                    is_character_interaction_potentially_accepted = {
+                        recipient = prev
+                        interaction = invite_to_court_interaction
+                        required_response = yes
+                        ai_accept = 0
+                    }
+                }
+            }
+        }
+    }
+}
+
+riseandfall_courtier_automation_has_paid_courtier_candidate_trigger = {
+    OR = {
+        any_courtier_or_guest = {
+            is_alive = yes
+            is_adult = yes
+            is_in_debt = no
+            is_ruler = no
+            is_imprisoned = no
+            is_pool_guest_of = root
+            NOT = { is_courtier_of = root }
+            recruit_guest_interaction_cost > 0
+            root = { gold >= prev.recruit_guest_interaction_cost }
+        }
+        any_ruler = {
+            limit = {
+                is_alive = yes
+                in_diplomatic_range = root
+            }
+            any_courtier_or_guest = {
+                is_alive = yes
+                is_adult = yes
+            is_in_debt = no
+                is_ruler = no
+                is_imprisoned = no
+                NOT = { is_pool_guest_of = root }
+                NOT = { is_courtier_of = root }
+                OR = {
+                    is_pool_character = yes
+                    exists = liege
+                }
+                is_foreign_court_guest = no
+                in_diplomatic_range = root
+                can_recruit_character_to_court_trigger = {
+                    RECRUITER = root
+                    RECRUITEE = this
+                }
+                root = {
+                    is_character_interaction_potentially_accepted = {
+                        recipient = prev
+                        interaction = invite_to_court_interaction
+                        required_response = yes
+                        ai_accept = 0
+                    }
+                    gold >= { value = riseandfall_courtier_automation_bribe_value multiply = 0.5 }
+                }
+            }
+        }
+    }
+}
+
+riseandfall_courtier_automation_needs_guardian_recruitment_trigger = {
+    exists = house
+    any_courtier = {
+        is_adult = no
+        is_available_child_allow_travel = yes
+        num_of_relation_guardian = 0
+        exists = house
+        house = root.house
+    }
+    NOR = {
+        AND = {
+            is_physically_able_adult = yes
+            is_imprisoned = no
+            NOT = { has_trait = incapable }
+            num_of_relation_ward < 2
+            OR = {
+                learning >= good_skill_level
+                has_trait = intellect_good_2
+                has_trait = intellect_good_3
+                has_trait = shrewd
+            }
+        }
+        any_courtier = {
+            is_physically_able_adult = yes
+            is_imprisoned = no
+            NOT = { has_trait = incapable }
+            num_of_relation_ward < 2
+            OR = {
+                learning >= good_skill_level
+                has_trait = intellect_good_2
+                has_trait = intellect_good_3
+                has_trait = shrewd
+            }
+        }
+    }
+}
+
+riseandfall_courtier_automation_has_free_guardian_candidate_trigger = {
+    riseandfall_courtier_automation_needs_guardian_recruitment_trigger = yes
+    OR = {
+        any_courtier_or_guest = {
+            is_alive = yes
+            is_adult = yes
+            is_physically_able_adult = yes
+            is_ruler = no
+            is_imprisoned = no
+            NOT = { has_trait = incapable }
+            is_pool_guest_of = root
+            NOT = { is_courtier_of = root }
+            num_of_relation_ward < 2
+            recruit_guest_interaction_cost <= 0
+            AND = {
+                OR = {
+                    diplomacy >= good_skill_level
+                    martial >= good_skill_level
+                    stewardship >= good_skill_level
+                    intrigue >= good_skill_level
+                    learning >= good_skill_level
+                }
+                OR = {
+                    learning >= good_skill_level
+                    has_trait = intellect_good_2
+                    has_trait = intellect_good_3
+                    has_trait = shrewd
+                }
+            }
+        }
+        any_ruler = {
+            limit = {
+                is_alive = yes
+                in_diplomatic_range = root
+            }
+            any_courtier_or_guest = {
+                is_alive = yes
+                is_adult = yes
+                is_physically_able_adult = yes
+                is_ruler = no
+                is_imprisoned = no
+                NOT = { has_trait = incapable }
+                NOT = { is_pool_guest_of = root }
+                NOT = { is_courtier_of = root }
+                num_of_relation_ward < 2
+                OR = {
+                    is_pool_character = yes
+                    exists = liege
+                }
+                is_foreign_court_guest = no
+                in_diplomatic_range = root
+                can_recruit_character_to_court_trigger = {
+                    RECRUITER = root
+                    RECRUITEE = this
+                }
+                root = {
+                    is_character_interaction_potentially_accepted = {
+                        recipient = prev
+                        interaction = invite_to_court_interaction
+                        required_response = yes
+                        ai_accept = 0
+                    }
+                }
+                AND = {
+                    OR = {
+                        diplomacy >= good_skill_level
+                        martial >= good_skill_level
+                        stewardship >= good_skill_level
+                        intrigue >= good_skill_level
+                        learning >= good_skill_level
+                    }
+                    OR = {
+                        learning >= good_skill_level
+                        has_trait = intellect_good_2
+                        has_trait = intellect_good_3
+                        has_trait = shrewd
+                    }
+                }
+            }
+        }
+    }
+}
+
+riseandfall_courtier_automation_has_paid_guardian_candidate_trigger = {
+    riseandfall_courtier_automation_needs_guardian_recruitment_trigger = yes
+    OR = {
+        any_courtier_or_guest = {
+            is_alive = yes
+            is_adult = yes
+            is_in_debt = no
+            is_physically_able_adult = yes
+            is_ruler = no
+            is_imprisoned = no
+            NOT = { has_trait = incapable }
+            is_pool_guest_of = root
+            NOT = { is_courtier_of = root }
+            num_of_relation_ward < 2
+            recruit_guest_interaction_cost > 0
+            root = { gold >= prev.recruit_guest_interaction_cost }
+            AND = {
+                OR = {
+                    diplomacy >= good_skill_level
+                    martial >= good_skill_level
+                    stewardship >= good_skill_level
+                    intrigue >= good_skill_level
+                    learning >= good_skill_level
+                }
+                OR = {
+                    learning >= good_skill_level
+                    has_trait = intellect_good_2
+                    has_trait = intellect_good_3
+                    has_trait = shrewd
+                }
+            }
+        }
+        any_ruler = {
+            limit = {
+                is_alive = yes
+                in_diplomatic_range = root
+            }
+            any_courtier_or_guest = {
+                is_alive = yes
+                is_adult = yes
+            is_in_debt = no
+                is_physically_able_adult = yes
+                is_ruler = no
+                is_imprisoned = no
+                NOT = { has_trait = incapable }
+                NOT = { is_pool_guest_of = root }
+                NOT = { is_courtier_of = root }
+                num_of_relation_ward < 2
+                OR = {
+                    is_pool_character = yes
+                    exists = liege
+                }
+                is_foreign_court_guest = no
+                in_diplomatic_range = root
+                can_recruit_character_to_court_trigger = {
+                    RECRUITER = root
+                    RECRUITEE = this
+                }
+                NOT = {
+                    root = {
+                        is_character_interaction_potentially_accepted = {
+                            recipient = prev
+                            interaction = invite_to_court_interaction
+                            required_response = yes
+                            ai_accept = 0
+                        }
+                    }
+                }
+                root = { gold >= { value = riseandfall_courtier_automation_bribe_value multiply = 0.5 } }
+                AND = {
+                    OR = {
+                        diplomacy >= good_skill_level
+                        martial >= good_skill_level
+                        stewardship >= good_skill_level
+                        intrigue >= good_skill_level
+                        learning >= good_skill_level
+                    }
+                    OR = {
+                        learning >= good_skill_level
+                        has_trait = intellect_good_2
+                        has_trait = intellect_good_3
+                        has_trait = shrewd
+                    }
+                }
+            }
+        }
+    }
+}
