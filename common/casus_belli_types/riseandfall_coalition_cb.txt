@@ -151,10 +151,10 @@ riseandfall_coalition_cb = {
 
     interface_priority = 80
     ticking_war_score_targets_entire_realm = yes
-    attacker_wargoal_percentage = 0.50
-    defender_wargoal_percentage = 0.50
-    attacker_ticking_warscore_delay = { months = 24 }
-    defender_ticking_warscore_delay = { months = 24 }
+    attacker_wargoal_percentage = 0.01
+    defender_wargoal_percentage = 0.95
+    attacker_ticking_warscore_delay = { months = 36 }
+    defender_ticking_warscore_delay = { months = 36 }
     attacker_ticking_warscore = 0.03
     defender_ticking_warscore = 0.03
     attacker_score_from_battles_scale = 100

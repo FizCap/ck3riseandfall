@@ -2,7 +2,16 @@
 riseandfall_courtier_browser.0010 = {
     type = character_event
     title = riseandfall_courtier_browser.0010.t
-    desc = riseandfall_courtier_browser.0010.desc
+    # Read the prepared first slot; do not run another candidate search for the description.
+    desc = {
+        first_valid = {
+            triggered_desc = {
+                trigger = { NOT = { exists = scope:rf_browser_courtier_free_1 } }
+                desc = riseandfall_courtier_browser.empty.desc
+            }
+            desc = riseandfall_courtier_browser.0010.desc
+        }
+    }
     theme = court
     immediate = { riseandfall_courtier_browser_prepare_courtier_free_se = yes }
 
@@ -138,7 +147,16 @@ riseandfall_courtier_browser.0010 = {
 riseandfall_courtier_browser.0011 = {
     type = character_event
     title = riseandfall_courtier_browser.0011.t
-    desc = riseandfall_courtier_browser.0011.desc
+    # Read the prepared first slot; do not run another candidate search for the description.
+    desc = {
+        first_valid = {
+            triggered_desc = {
+                trigger = { NOT = { exists = scope:rf_browser_courtier_paid_1 } }
+                desc = riseandfall_courtier_browser.empty.desc
+            }
+            desc = riseandfall_courtier_browser.0011.desc
+        }
+    }
     theme = court
     immediate = { riseandfall_courtier_browser_prepare_courtier_paid_se = yes }
 
@@ -314,7 +332,16 @@ riseandfall_courtier_browser.0011 = {
 riseandfall_courtier_browser.0012 = {
     type = character_event
     title = riseandfall_courtier_browser.0012.t
-    desc = riseandfall_courtier_browser.0012.desc
+    # Read the prepared first slot; do not run another candidate search for the description.
+    desc = {
+        first_valid = {
+            triggered_desc = {
+                trigger = { NOT = { exists = scope:rf_browser_guardian_free_1 } }
+                desc = riseandfall_courtier_browser.empty.desc
+            }
+            desc = riseandfall_courtier_browser.0012.desc
+        }
+    }
     theme = court
     immediate = { riseandfall_courtier_browser_prepare_guardian_free_se = yes }
 
@@ -450,7 +477,16 @@ riseandfall_courtier_browser.0012 = {
 riseandfall_courtier_browser.0013 = {
     type = character_event
     title = riseandfall_courtier_browser.0013.t
-    desc = riseandfall_courtier_browser.0013.desc
+    # Read the prepared first slot; do not run another candidate search for the description.
+    desc = {
+        first_valid = {
+            triggered_desc = {
+                trigger = { NOT = { exists = scope:rf_browser_guardian_paid_1 } }
+                desc = riseandfall_courtier_browser.empty.desc
+            }
+            desc = riseandfall_courtier_browser.0013.desc
+        }
+    }
     theme = court
     immediate = { riseandfall_courtier_browser_prepare_guardian_paid_se = yes }
 
@@ -644,7 +680,16 @@ riseandfall_courtier_browser.0014 = {
 riseandfall_courtier_browser.0015 = {
     type = character_event
     title = riseandfall_courtier_browser.0015.t
-    desc = riseandfall_courtier_browser.0015.desc
+    # Read the prepared first slot; do not run another candidate search for the description.
+    desc = {
+        first_valid = {
+            triggered_desc = {
+                trigger = { NOT = { exists = scope:rf_knight_browser_free_1 } }
+                desc = riseandfall_courtier_browser.empty.desc
+            }
+            desc = riseandfall_courtier_browser.0015.desc
+        }
+    }
     theme = court
     immediate = { riseandfall_prepare_free_knight_browser_se = yes }
 
@@ -786,7 +831,16 @@ riseandfall_courtier_browser.0016 = {
 riseandfall_courtier_browser.0017 = {
     type = character_event
     title = riseandfall_courtier_browser.0017.t
-    desc = riseandfall_courtier_browser.0017.desc
+    # Read the prepared first slot; do not run another candidate search for the description.
+    desc = {
+        first_valid = {
+            triggered_desc = {
+                trigger = { NOT = { exists = scope:rf_knight_browser_paid_1 } }
+                desc = riseandfall_courtier_browser.empty.desc
+            }
+            desc = riseandfall_courtier_browser.0017.desc
+        }
+    }
     theme = court
     immediate = { riseandfall_prepare_paid_knight_browser_se = yes }
 

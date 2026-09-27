@@ -230,10 +230,8 @@ riseandfall_enable_auto_invite_knights = {
         is_landed = yes
         NOT = { exists = global_var:riseandfall_hide_other_decisions }
     }
-    is_valid = {
-        is_landed = yes
-        riseandfall_courtier_automation_has_free_knight_candidate_trigger = yes
-    }
+    # Search only after clicking; availability checks here scan courts on menu refresh.
+    is_valid = { is_landed = yes }
     effect = { trigger_event = { id = riseandfall_courtier_browser.0014 } }
     ai_potential = {}
     ai_will_do = { base = 0 }
@@ -251,10 +249,8 @@ riseandfall_disable_auto_invite_knights = {
         is_landed = yes
         NOT = { exists = global_var:riseandfall_hide_other_decisions }
     }
-    is_valid = {
-        is_landed = yes
-        riseandfall_courtier_automation_has_paid_knight_candidate_trigger = yes
-    }
+    # Search only after clicking; availability checks here scan courts on menu refresh.
+    is_valid = { is_landed = yes }
     effect = { trigger_event = { id = riseandfall_courtier_browser.0016 } }
     ai_potential = {}
     ai_will_do = { base = 0 }
@@ -272,10 +268,8 @@ riseandfall_invite_best_free_courtier = {
         is_landed = yes
         NOT = { exists = global_var:riseandfall_hide_other_decisions }
     }
-    is_valid = {
-        is_landed = yes
-        riseandfall_courtier_automation_has_free_courtier_candidate_trigger = yes
-    }
+    # Search only after clicking; availability checks here scan courts on menu refresh.
+    is_valid = { is_landed = yes }
     effect = { trigger_event = { id = riseandfall_courtier_browser.0010 } }
     ai_potential = {}
     ai_will_do = { base = 0 }
@@ -293,10 +287,8 @@ riseandfall_recruit_best_paid_courtier = {
         is_landed = yes
         NOT = { exists = global_var:riseandfall_hide_other_decisions }
     }
-    is_valid = {
-        is_landed = yes
-        riseandfall_courtier_automation_has_paid_courtier_candidate_trigger = yes
-    }
+    # Search only after clicking; availability checks here scan courts on menu refresh.
+    is_valid = { is_landed = yes }
     effect = { trigger_event = { id = riseandfall_courtier_browser.0011 } }
     ai_potential = {}
     ai_will_do = { base = 0 }
@@ -314,10 +306,8 @@ riseandfall_enable_auto_invite_guardians = {
         is_landed = yes
         NOT = { exists = global_var:riseandfall_hide_other_decisions }
     }
-    is_valid = {
-        is_landed = yes
-        riseandfall_courtier_automation_has_free_guardian_candidate_trigger = yes
-    }
+    # Search only after clicking; availability checks here scan courts on menu refresh.
+    is_valid = { is_landed = yes }
     effect = { trigger_event = { id = riseandfall_courtier_browser.0012 } }
     ai_potential = {}
     ai_will_do = { base = 0 }
@@ -335,10 +325,8 @@ riseandfall_disable_auto_invite_guardians = {
         is_landed = yes
         NOT = { exists = global_var:riseandfall_hide_other_decisions }
     }
-    is_valid = {
-        is_landed = yes
-        riseandfall_courtier_automation_has_paid_guardian_candidate_trigger = yes
-    }
+    # Search only after clicking; availability checks here scan courts on menu refresh.
+    is_valid = { is_landed = yes }
     effect = { trigger_event = { id = riseandfall_courtier_browser.0013 } }
     ai_potential = {}
     ai_will_do = { base = 0 }
