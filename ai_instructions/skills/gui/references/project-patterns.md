@@ -71,6 +71,8 @@ riseandfall_example_gui = {
 - For a mod HUD panel, add the panel inside a loaded HUD widget and control it with state, for example `Set('my_panel_open', 'true')`, `Clear('my_panel_open')`, and `Exists('my_panel_open')`.
 - For content inside an existing window, override the file that owns that window and insert into its real body/tab. A detached companion window is not automatically instantiated by the existing view.
 - Full-window vanilla copies drift; keep edits marked and focused, and recheck them after CK3 updates.
+- A map-icon override must retain every engine-requested named widget from the current vanilla file. In CK3 1.20, omitting `landless_religious_head_widget` caused a `Failed to create map icon widget` assertion during character selection. Rebase the whole owning file and transplant only the fort overlay; restoring individual obsolete API calls is insufficient.
+- In the character stability strip, CK3 1.20 rejected `size` and `margin_left` on a `container`, and `margin_top` on a progressbar. Use a fixed-size `widget` for the icon cell and supported `position` offsets for those elements; containers resize to their contents.
 
 ## Localization and data
 

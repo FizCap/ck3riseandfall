@@ -4,9 +4,12 @@ Read this guide for script effects/triggers, decisions, interactions, on_actions
 
 ## Verify syntax and scope
 
+- In CK3 1.20, administrative government membership is tested with `government_has_mechanic = administrative`, not `government_allows = administrative`. GUI uses `Government.HasMechanic('administrative')`. Ordinary government rules such as `deny_powerful_vassal` still use `government_allows`; do not replace every rule check indiscriminately.
+- `any_*` trigger iterators take filtering conditions directly inside their body. A nested `limit` is an effect-iterator pattern and produces an unknown-trigger error in `any_ruler`.
 - Check the generated reference logs in `docs/` before using unfamiliar triggers, effects, targets, scopes, or on_actions. Treat prose notes as cheatsheets; generated docs and working vanilla examples take precedence.
 - For on_action extensions, verify the hook and expected scope in `docs/on_actions.log`, then inspect the vanilla handler. Some code hooks, including diarchy hooks, provide the affected character as `root` despite generated entries saying `Expected Scope: none`.
 - Validate every scope hop. Guard optional scopes with `exists`; guard variables with `has_variable`. A saved scope must retain the expected character/title/province type.
+- `every_realm_de_jure_kingdom` accepts a character but yields landed titles. Save the kingdom, then explicitly re-enter the ruler character scope before nesting `ordered_vassal` or `every_vassal`; both vassal iterators require character scope.
 - Character flags use add_character_flag = { flag = flag_name } and 
 emove_character_flag = flag_name; set_character_flag is not a valid effect.
 - Tooltip triggers may read an unset `var:` even beside `has_variable` in an `AND`; use `var:name ?= scope:target` for optional object comparisons.
@@ -15,6 +18,7 @@ emove_character_flag = flag_name; set_character_flag is not a valid effect.
 
 ## Decisions, interactions, and candidate searches
 
+- In CK3 1.20, do not combine interaction `is_available` with deprecated `ai_potential`. A disabled AI schedule can use `ai_frequency = 0`, a proper `ai_targets = { ai_recipients = ... }` list, and actor checks in `is_available`. `ai_target_quick_trigger` takes predefined quick-filter fields such as `adult`, rather than arbitrary script triggers.
 - Use `is_valid` for cheap availability requirements when a decision should remain visible but disabled. Do not put world-wide candidate searches there: even `any_ruler` with nested court/acceptance checks searches for candidates independently of the event that builds the list. Recruitment browsers should search in the clicked event, handle empty results using their prepared candidate scopes, and retain recruitment eligibility checks. Keep broad visibility requirements such as government/landed status in `is_shown`.
 - If a scripted value reads a named saved scope such as `scope:rf_courtier_automation_candidate`, save that candidate before evaluating the value. In candidate iterators, move candidate-dependent affordability checks out of `limit` and into the iterator body after `save_scope_as`; trigger limits cannot create the saved scope the value expects.
 
@@ -27,12 +31,15 @@ emove_character_flag = flag_name; set_character_flag is not a valid effect.
 - Vanilla `invite_to_court_interaction` adds +20 AI acceptance when `cover_travel_expenses` is selected. Since `is_character_interaction_potentially_accepted` has no send-option parameter, use its `ai_accept` threshold of `-20` to check that the candidate reaches acceptance with that option; also require the default threshold to be rejected when separating paid from free invites.
 - A free foreign-court invitation must call `is_character_interaction_potentially_accepted` for the vanilla interaction with no send-option scopes; validity alone does not prove acceptance without paid expenses, Influence, or a Hook.
 - Interaction `ai_potential` runs with the actor as root only. Keep actor-only checks there; put actor/recipient checks in `ai_will_do` or a block where both scopes exist.
+- CK3 1.20 validates AI interaction fields as a set: a frequency requires `ai_targets`, and `ai_potential` requires a frequency. For a disabled self-targeting interaction, keep `ai_frequency = 0`, `ai_targets = { ai_recipients = self }` and `ai_potential = { always = no }` together; human-only visibility still supplies the player restriction.
 - Feature-specific scripted-score bonuses must repeat the feature’s current eligibility gate in each copied score/appointment definition.
 
 ## Hooks, armies, and war callbacks
 
+- CK3 1.20's Declare War interaction scopes the war declarer as `scope:puppet_or_actor`, while `scope:actor` can be the puppeteer. Preserve current vanilla scopes, hook handling, notifications and acceptance effects when rebasing an interaction; the ordinary target checks now live in `allows_declaring_war_against_target_trigger`.
 - Keep on_action handlers small and dispatch through `effect = { ... }`. Gate optional mechanics with `has_game_rule`; define rules under `common/game_rules/` with the `riseandfall` category.
 - Yearly loops such as `every_ruler` do not provide an implicit `root`. Save the current character before nested title scopes when code must return to it. Do not call a whole-world `every_ruler` repair from a character-rooted code hook; use a root-specific repair to avoid recursive fan-out.
+- If a world-loop pre-filter compares neighbors with the current ruler, first apply cheap ruler-only conditions in the iterator limit, then save the ruler in the iterator body and evaluate the neighbor trigger inside an `if`. `limit` cannot initialize that saved target, and `root` is unset on a global yearly pulse. Clear the temporary scope after the filtered work.
 - `spawn_army.location` needs a province target such as `capital_province`, not `capital_barony`. Its `save_scope_as` may be unset when not at war; guard before using it.
 - To maintain owner-wide regiments including unraised event troops, use the character’s `every_maa_regiment` and filter `is_event_maa_regiment`, not `every_army`.
 - `create_maa_regiment.size` accepts a literal integer. For a dynamic size, snapshot existing regiments, create at size 1, identify the new regiment by list exclusion, then resize it with `change_maa_regiment_size` using a saved scope value.

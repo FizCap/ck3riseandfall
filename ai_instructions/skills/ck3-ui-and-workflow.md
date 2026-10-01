@@ -4,6 +4,7 @@ Read this guide for event chains, localization, UI changes, changelog entries, a
 
 ## Events and localization
 
+- For retained legacy or debug event entry points with intentionally no scripted callers, use `orphan = yes` as documented in vanilla `events/_events.info`. Preserve their IDs and behavior; do not add artificial callers simply to silence the unreferenced-event warning.
 - Every player-facing key must exist under `l_english:`. Verify dynamic localization methods against the actual scope type. For saved event scopes, use the working direct form `[saved_name.GetName]`; script syntax such as `scope:` can break event tooltips.
 - For chained player-choice events, guard pending flags and required variables. Save scopes before clearing receiver state; use `root = { ... }` when targeting that receiver. Clear stale saved scopes and trigger a follow-up popup with `delayed = yes` only after checking the next target is still pending.
 

@@ -1,0 +1,64 @@
+﻿# Separate action IDs keep this slot independent of vanilla puppet types.
+riseandfall_puppet_action_give_gift = {
+	type = character_interaction
+	interaction = gift_interaction
+	is_important = yes
+}
+
+riseandfall_puppet_action_declare_war = {
+	type = character_interaction
+	interaction = declare_war_interaction
+	is_important = yes
+}
+
+riseandfall_puppet_action_imprison = {
+	type = character_interaction
+	interaction = imprison_interaction
+	is_important = yes
+}
+
+riseandfall_puppet_action_release_from_prison = {
+	type = character_interaction
+	interaction = release_from_prison_interaction
+}
+
+riseandfall_puppet_action_command_murder = {
+	type = character_interaction
+	interaction = start_murder_interaction
+	is_enabled = {
+		OR = {
+			puppet:riseandfall_ruler_puppet ?= scope:puppet
+			scope:puppet = {
+				has_trait = schemer
+			}
+		}
+	}
+	is_important = yes
+}
+
+riseandfall_puppet_action_command_abduct = {
+	type = character_interaction
+	interaction = start_abduct
+	is_enabled = {
+		OR = {
+			puppet:riseandfall_ruler_puppet ?= scope:puppet
+			scope:puppet = {
+				has_trait = schemer
+			}
+		}
+	}
+	is_important = yes
+}
+
+riseandfall_puppet_action_command_sway = {
+	type = character_interaction
+	interaction = sway_interaction
+	is_important = yes
+}
+
+riseandfall_puppet_action_give_vassal_directive = {
+	type = character_interaction
+	interaction = give_vassal_directive_interaction
+	is_important = yes
+}
+

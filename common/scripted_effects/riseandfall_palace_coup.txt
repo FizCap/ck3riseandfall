@@ -1530,34 +1530,38 @@ riseandfall_palace_coup_compact_ai_claimant_bids_se = {
     scope:palace_coup_challenger = {
         every_realm_de_jure_kingdom = {
             save_scope_as = palace_coup_claimant_region
-            ordered_vassal = {
-                limit = {
-                    is_landed = yes
-                    liege = scope:palace_coup_challenger
-                    has_character_flag = rf_palace_coup_ai_claimant_bidder
-                    has_character_flag = rf_palace_coup_claimant_bidder
-                    capital_county.kingdom = scope:palace_coup_claimant_region
-                }
-                order_by = current_military_strength
-                max = 1
-                save_scope_as = palace_coup_ai_claimant_anchor
-            }
-            if = {
-                limit = { exists = scope:palace_coup_ai_claimant_anchor }
-                every_vassal = {
+            # The kingdom iterator yields a title; vassal iterators require
+            # the challenger's character scope while retaining that region.
+            scope:palace_coup_challenger = {
+                ordered_vassal = {
                     limit = {
                         is_landed = yes
                         liege = scope:palace_coup_challenger
                         has_character_flag = rf_palace_coup_ai_claimant_bidder
                         has_character_flag = rf_palace_coup_claimant_bidder
                         capital_county.kingdom = scope:palace_coup_claimant_region
-                        NOT = { this = scope:palace_coup_ai_claimant_anchor }
                     }
-                    remove_character_flag = rf_palace_coup_ai_claimant_bidder
-                    remove_character_flag = rf_palace_coup_claimant_bidder
+                    order_by = current_military_strength
+                    max = 1
+                    save_scope_as = palace_coup_ai_claimant_anchor
                 }
+                if = {
+                    limit = { exists = scope:palace_coup_ai_claimant_anchor }
+                    every_vassal = {
+                        limit = {
+                            is_landed = yes
+                            liege = scope:palace_coup_challenger
+                            has_character_flag = rf_palace_coup_ai_claimant_bidder
+                            has_character_flag = rf_palace_coup_claimant_bidder
+                            capital_county.kingdom = scope:palace_coup_claimant_region
+                            NOT = { this = scope:palace_coup_ai_claimant_anchor }
+                        }
+                        remove_character_flag = rf_palace_coup_ai_claimant_bidder
+                        remove_character_flag = rf_palace_coup_claimant_bidder
+                    }
+                }
+                clear_saved_scope = palace_coup_ai_claimant_anchor
             }
-            clear_saved_scope = palace_coup_ai_claimant_anchor
         }
     }
 }

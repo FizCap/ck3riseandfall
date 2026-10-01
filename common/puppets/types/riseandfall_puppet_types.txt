@@ -1,0 +1,48 @@
+﻿riseandfall_ruler_puppet = {
+	color = { 0.7 0.5 0.7 1 }
+	interaction = riseandfall_assume_ruler_puppet_interaction
+	# set_puppet rejects ordinary unlanded courtiers even with a custom puppet type.
+	can_have = {
+		can_have_puppets_trigger = yes
+		has_pam_dlc_trigger = yes
+		is_alive = yes
+		is_adult = yes
+		is_incapable = no
+		has_variable = rf_native_puppet_ruler
+		var:rf_native_puppet_ruler ?= {
+			is_alive = yes
+			is_landed = yes
+			is_ai = yes
+			has_active_diarchy = yes
+			has_diarchy_type = puppet_regency
+			diarch ?= root
+		}
+	}
+	is_valid = {
+		can_have_puppets_trigger = yes
+		scope:puppet = {
+			is_alive = yes
+			is_landed = yes
+			is_ai = yes
+			has_active_diarchy = yes
+			has_diarchy_type = puppet_regency
+			diarch ?= root
+		}
+	}
+	priority = 20
+	actions = {
+		riseandfall_puppet_action_give_gift
+		riseandfall_puppet_action_declare_war
+		riseandfall_puppet_action_imprison
+		riseandfall_puppet_action_release_from_prison
+		riseandfall_puppet_action_command_murder
+		riseandfall_puppet_action_command_abduct
+		riseandfall_puppet_action_command_sway
+		riseandfall_puppet_action_give_vassal_directive
+	}
+	asset = {
+		icon = "gfx/interface/icons/external_ruler_puppet.dds"
+		background = "gfx/interface/illustrations/council/bg_council_chancellor.dds"
+	}
+	animation = { reference = "chancellor" }
+}

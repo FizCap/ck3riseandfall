@@ -1,9 +1,20 @@
-﻿CK3: Rise and Fall - 1.3.4
+﻿CK3: Rise and Fall - 1.4
 
-Coalitions
-- Matched coalition war goal percentages and ticking warscore delays to the Diadochi CB.
-
-Courtier Automation
-- Removed candidate searches from the six recruitment decisions' availability checks so opening the Decisions menu no longer ran those searches.
-- Kept recruitment browsers available when no candidates qualified and added an empty-results message with a Close option.
-- Made free and paid guardian browsers search for the top ten eligible teachers by guardian score even when no house child needed a guardian or suitable teachers were already at court.
+Compatibility
+- Prevented native puppet setup attempts by ineligible Puppet Masters and added an eligibility tooltip; preserved Puppet Regency and its court position for unlanded masters.
+- Moved Establish Puppet Control into the Rise and Fall interaction category.
+- Added independent native Puppet Master synchronization on diarchy changes, title succession, game load and yearly maintenance, including when low-stability incidents were disabled.
+- Renamed the Puppet Ruler setup interaction to Establish Puppet Control and hid it for connected rulers; clarified that commands are issued by selecting Puppet Ruler beside the intended target's interaction menu.
+- Added native ruler-puppet commands for Puppet Masters controlling AI rulers through Puppet Regency, including Palace Coup submission, succession synchronization and removal cleanup; retained existing regency behavior for player rulers.
+- Updated Rise and Fall for CK3 1.20, including the new succession-law format and administrative government mechanic checks.
+- Refreshed character, title, interaction-menu, map-icon and map-mode interfaces while preserving Rise and Fall controls and indicators.
+- Restored the required religious-head map widget and removed obsolete map GUI calls.
+- Updated administrative candidate scoring and Warlord appointment tier eligibility.
+- Updated Declare War for puppet actions while preserving Warlord exemptions from administrative war bans.
+- Moved the Rise and Fall interaction category after the new vanilla debug category.
+- Fixed recruitment trigger parsing, Puppet Master title-transfer parsing and missing debug decision confirmation text.
+- Fixed Palace Coup AI claimant consolidation to search the challenger's vassals from character scope inside each de jure kingdom.
+- Removed unused invitation helpers referencing retired recruitment toggles and retained legacy recruitment events as intentionally unreferenced entry points.
+- Fixed Coalition tracking on world pulses to use an explicitly saved ruler for neighbor eligibility checks.
+- Added standalone text for the Dragonrider compatibility placeholder and removed its dependency on AGOT-only localization.
+- Completed the disabled AI configuration for the player-only Create Adventurer Camp interaction with a self-target list.

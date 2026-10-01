@@ -32,8 +32,9 @@
         scope:recipient = scope:actor
     }
 
-    # Do not let AI perform this
+    # Keep AI disabled; 1.20 requires a target list even for a zero-frequency schedule.
     ai_frequency = 0
+    ai_targets = { ai_recipients = self }
     ai_potential = { always = no }
     ai_min_reply_days = 0
     ai_max_reply_days = 0

@@ -1,0 +1,86 @@
+﻿# Expected scope: the crowned ruler. Only our own puppet type may be cleared.
+riseandfall_clear_native_ruler_puppet_se = {
+	save_scope_as = rf_native_puppet_cleanup_ruler
+	if = {
+		limit = { is_puppet_of_type = riseandfall_ruler_puppet }
+		clear_puppet_status = yes
+	}
+	if = {
+		limit = { has_variable = rf_native_puppet_master }
+		var:rf_native_puppet_master = {
+			if = {
+				limit = { var:rf_native_puppet_ruler ?= scope:rf_native_puppet_cleanup_ruler }
+				remove_variable = rf_native_puppet_ruler
+			}
+		}
+		remove_variable = rf_native_puppet_master
+	}
+}
+
+# The diarchy remains authoritative. Native commands supplement its office and succession.
+riseandfall_sync_native_ruler_puppet_se = {
+	save_scope_as = rf_native_puppet_sync_ruler
+	if = {
+		limit = {
+			has_pam_dlc_trigger = yes
+			is_alive = yes
+			is_landed = yes
+			is_ai = yes
+			has_active_diarchy = yes
+			has_diarchy_type = puppet_regency
+			# A court position does not grant engine eligibility to own native puppets.
+			diarch ?= {
+				is_alive = yes
+				is_adult = yes
+				is_incapable = no
+				can_have_puppets_trigger = yes
+			}
+		}
+		diarch = { save_scope_as = rf_native_puppet_sync_master }
+		if = {
+			limit = {
+				OR = {
+					AND = {
+						has_variable = rf_native_puppet_master
+						NOT = { var:rf_native_puppet_master ?= scope:rf_native_puppet_sync_master }
+					}
+					# The native link is authoritative if a save lost our tracking variable.
+					AND = {
+						is_puppet_of_type = riseandfall_ruler_puppet
+						NOT = { puppeteer ?= scope:rf_native_puppet_sync_master }
+					}
+				}
+			}
+			riseandfall_clear_native_ruler_puppet_se = yes
+		}
+		# A master has one slot. Release the predecessor before binding an inherited ruler.
+		scope:rf_native_puppet_sync_master = {
+			if = {
+				limit = {
+					has_variable = rf_native_puppet_ruler
+					NOT = { var:rf_native_puppet_ruler ?= scope:rf_native_puppet_sync_ruler }
+				}
+				var:rf_native_puppet_ruler = { riseandfall_clear_native_ruler_puppet_se = yes }
+			}
+			set_variable = { name = rf_native_puppet_ruler value = scope:rf_native_puppet_sync_ruler }
+		}
+		if = {
+			limit = {
+				NOT = { is_puppet_of_type = riseandfall_ruler_puppet }
+				# Preserve unrelated vanilla/mod puppeteers rather than stealing their puppet.
+				NOT = { exists = puppeteer }
+				scope:rf_native_puppet_sync_master = {
+					NOT = { exists = puppet:riseandfall_ruler_puppet }
+				}
+			}
+			scope:rf_native_puppet_sync_master = {
+				set_puppet = { target = scope:rf_native_puppet_sync_ruler type = riseandfall_ruler_puppet }
+			}
+		}
+		if = {
+			limit = { is_puppet_of_type = riseandfall_ruler_puppet }
+			set_variable = { name = rf_native_puppet_master value = scope:rf_native_puppet_sync_master }
+		}
+	}
+	else = { riseandfall_clear_native_ruler_puppet_se = yes }
+}

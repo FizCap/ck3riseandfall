@@ -20,14 +20,16 @@ riseandfall_coalition_target_controls_five_percent_world_trigger = {
 # Coalition selector's minimum: the ruler must be large enough to qualify and
 # have at least two independent rulers who could receive an invitation.
 riseandfall_coalition_tracking_candidate_trigger = {
+    # World pulses have no character root; each caller saves its tracked ruler.
+    exists = scope:rf_coalition_tracking_ruler
     riseandfall_coalition_target_controls_five_percent_world_trigger = yes
     any_independent_ruler = {
         count >= 2
         riseandfall_coalition_potential_invitee_trigger = yes
-        NOT = { target_is_same_character_or_above = root }
-        in_diplomatic_range = root
-        NOT = { is_allied_to = root }
-        NOT = { has_truce = root }
+        NOT = { target_is_same_character_or_above = scope:rf_coalition_tracking_ruler }
+        in_diplomatic_range = scope:rf_coalition_tracking_ruler
+        NOT = { is_allied_to = scope:rf_coalition_tracking_ruler }
+        NOT = { has_truce = scope:rf_coalition_tracking_ruler }
     }
 }
 

@@ -335,7 +335,7 @@ riseandfall_mark_puppet_succession_on_death = {
                     set_variable = { name = rf_puppet_succession_years value = root.var:riseandfall_puppet_regency_years }
                 }
                 if = { limit = { is_landed = yes } add_character_flag = { flag = rf_puppet_succession_heir_was_landed days = 30 } }
-                if = { limit = { root = { government_allows = administrative } } add_character_flag = { flag = rf_puppet_succession_predecessor_admin days = 30 } }
+                if = { limit = { root = { government_has_mechanic = administrative } } add_character_flag = { flag = rf_puppet_succession_predecessor_admin days = 30 } }
             }
         }
         else_if = {
@@ -356,7 +356,7 @@ riseandfall_mark_puppet_succession_on_death = {
                     set_variable = { name = rf_puppet_succession_years value = root.var:riseandfall_puppet_regency_years }
                 }
                 if = { limit = { is_landed = yes } add_character_flag = { flag = rf_puppet_succession_heir_was_landed days = 30 } }
-                if = { limit = { root = { government_allows = administrative } } add_character_flag = { flag = rf_puppet_succession_predecessor_admin days = 30 } }
+                if = { limit = { root = { government_has_mechanic = administrative } } add_character_flag = { flag = rf_puppet_succession_predecessor_admin days = 30 } }
             }
         }
         clear_saved_scope = rf_dying_puppet_master
@@ -387,7 +387,7 @@ riseandfall_resolve_puppet_succession_on_inheritance = {
                 OR = {
                     has_character_flag = rf_puppet_succession_heir_was_landed
                     has_character_flag = rf_puppet_succession_predecessor_admin
-                    government_allows = administrative
+                    government_has_mechanic = administrative
                 }
             }
             add_character_flag = { flag = rf_puppet_succession_event_queued days = 30 }

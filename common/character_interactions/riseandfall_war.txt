@@ -1,20 +1,23 @@
-﻿declare_war_interaction = {
+﻿# Rise and Fall: 1.20 puppet-aware vanilla interaction with Warlord war-law validation.
+declare_war_interaction = {
 	category = interaction_category_diplomacy
 	common_interaction = yes
 	special_interaction = declare_war_interaction
 	interface = declare_war
-	interface_priority = 70
+	interface_priority = 80
 	popup_on_receive = yes
 	pause_on_receive = no # this is handled by the interface instead
 
 	desc = declare_war_desc
 
 	is_shown = {
+		scope:recipient != scope:puppet_or_actor
+		# Only differs from puppet_or_actor on puppet actions; a puppet cannot be ordered to attack their own puppeteer
 		scope:recipient != scope:actor
 		scope:recipient = {
 			is_playable_character = yes
 		}
-		scope:actor = {
+		scope:puppet_or_actor ?= {
 			NOT = {
 				is_at_war_with = scope:recipient
 			}
@@ -22,231 +25,18 @@
 	}
 
 	is_valid_showing_failures_only = {
-		scope:actor = {
-			custom_tooltip = {
-				text = sworn_peace_tt
-				NOT = { has_character_flag = sworn_peace }
-			}
-			NOT = { has_trait = incapable }
-			can_attack_in_hierarchy = scope:recipient
+		scope:puppet_or_actor = {
 			trigger_if = {
-				limit = {
-					NOT = {
-						government_has_flag = can_start_war_with_raised_troops
-					}
-				}
-				NOT = {
-					has_raised_armies = yes
+				limit = { government_has_flag = government_is_theocracy }
+				custom_tooltip = {
+					text = theocratic_government_war_restriction
+					has_any_display_cb_on = scope:recipient
 				}
 			}
 			trigger_else = {
-				custom_description = {
-					text = army_blocks_defender_army
-					NOT = {
-						any_army = {
-							location.county.holder ?= scope:recipient
-						}
-					}
-				}
+				has_any_display_cb_on = scope:recipient
 			}
-			has_any_display_cb_on = scope:recipient
-			NOT = {
-				is_allied_in_war = scope:recipient
-			}
-			custom_description = {
-				text = "is_not_bankrupt"
-				is_in_debt = no
-			}
-			NOT = {
-				custom_description = {
-					text = "is_in_an_activity"
-					exists = involved_activity
-				}
-			}
-			trigger_if = {
-				limit = {
-					culture = { has_cultural_parameter = cannot_attack_allies }
-				}
-				NOT = {
-					is_allied_to = scope:recipient
-				}
-			}
-			trigger_if = {
-				limit = {
-					culture = { has_cultural_parameter = cannot_attack_truces }
-				}
-				NOT = {
-					has_truce = scope:recipient
-				}
-			}
-			is_imprisoned = no
-			trigger_if = {
-				limit = {
-					has_variable_list = subjugation_offer_under_consideration
-				}
-				custom_description = {
-					text = is_not_considering_offer_of_subjugation
-					NOT = {
-						is_target_in_variable_list = {
-							name = subjugation_offer_under_consideration
-							target = scope:recipient
-						}
-					}
-				}
-			}
-			trigger_if = {
-				limit = {
-					has_realm_law = japanese_bureaucracy_3
-					this != top_liege
-				}
-				custom_tooltip = {
-					text = non_admin_vassal_japanese_bureaucracy_3
-					government_allows = administrative
-				}
-			}
-		}
-		scope:recipient = {
-			custom_tooltip = {
-				text = is_a_herder_recipient_tt
-				NOT = { government_has_flag = government_is_herder } # herders can't fight
-			}
-			NOT = { is_tributary_of_suzerain_or_above = scope:actor } # can't fight your tributaries or your tributaries' tributaries
-			NOT = { has_strong_hook = scope:actor }
-			trigger_if = {
-				limit = { is_imprisoned = yes }
-				imprisoner != scope:actor
-			}
-		}
-		scope:actor = {
-			trigger_if = {
-				limit = {
-					NOT = { government_allows = administrative }
-					NOT = { riseandfall_is_any_warlord_trigger = yes }
-					liege ?= {
-						has_realm_law_flag = vassal_all_wars_banned_permanent
-						this != scope:actor
-					}
-				}
-				custom_tooltip = {
-					text = admin_all_vassal_wars_banned
-					always = no
-				}
-			}
-			trigger_if = {
-				limit = {
-					government_allows = administrative
-					top_liege = scope:recipient.top_liege
-					scope:recipient = { government_allows = administrative }
-					top_liege != scope:recipient
-					NOT = {
-						top_participant_group:dynastic_cycle ?= {
-							has_participant_group_parameter = dynastic_cycle_vassal_internal_wars_allowed
-						}
-					}
-					NOT = { riseandfall_is_any_warlord_trigger = yes }
-				}
-				custom_tooltip = {
-					text = admin_cannot_declare_internal_wars
-					always = no
-				}
-			}
-			trigger_if = { # Admin - Laws only allow frontier and naval themes to declare war
-				limit = {
-					government_allows = administrative
-					top_liege != this
-					top_liege = {
-						this != scope:recipient.top_liege
-						has_realm_law_flag = admin_vassal_wars_restricted
-					}
-					NOT = { riseandfall_is_any_warlord_trigger = yes }
-				}
-				custom_tooltip = {
-					text = admin_all_vassal_wars_banned
-					OR = {
-						vassal_contract_has_flag = admin_theme_frontier
-						vassal_contract_has_flag = admin_theme_naval
-					}
-				}
-			}
-			trigger_if = { # Admin - Laws only allow frontier and naval themes to declare war IF they have permission
-				limit = {
-					government_allows = administrative
-					OR = {
-						vassal_contract_has_flag = admin_theme_frontier
-						vassal_contract_has_flag = admin_theme_naval
-					}
-					top_liege = {
-						this != scope:recipient.top_liege
-						has_realm_law_flag = admin_vassal_wars_permission_only
-						NOT = { has_realm_law_flag = admin_vassal_wars_banned }
-					}
-					NOT = { riseandfall_is_any_warlord_trigger = yes }
-				}
-				custom_tooltip = {
-					text = admin_vassal_wars_permission_only_desc
-					has_variable = admin_permission_to_declare_war
-				}
-			}
-			trigger_if = { # Admin - Laws prevent all vassals from declaring war
-				limit = {
-					government_allows = administrative
-					OR = {
-						vassal_contract_has_flag = admin_theme_frontier
-						vassal_contract_has_flag = admin_theme_naval
-					}
-					top_liege = {
-						this != scope:recipient.top_liege
-						has_realm_law_flag = admin_vassal_wars_banned
-					}
-					NOT = { riseandfall_is_any_warlord_trigger = yes }
-				}
-				custom_tooltip = {
-					text = admin_all_vassal_wars_banned
-					always = no
-				}
-			}
-			trigger_if = {
-				limit = {
-					scope:recipient = {
-						OR = {
-							has_subject_contract_group = tributary_celestial
-							has_subject_contract_group = tributary_hegemonic
-						}
-					}
-					is_independent_ruler = no # to avoid duplicating tooltips already applying to the top_liege
-				}
-				NOT = {
-					scope:recipient = {
-						is_tributary_of = scope:actor.top_liege
-					}
-				}
-			}
-		}
-		scope:actor = {
-			trigger_if = {
-				limit = { has_government = landless_adventurer_government }
-				custom_tooltip = {
-					text = camp_located_in_defender_realm.tt
-					domicile.domicile_location.county.holder = {
-						NOR = {
-							this = scope:recipient
-							any_liege_or_above = { this = scope:recipient }
-						}
-					}
-				}
-			}
-		}
-		trigger_if = {
-			limit = {
-				scope:actor = {
-					is_confederation_member = yes
-				}
-			}
-			NOT = {
-				scope:recipient = {
-					is_member_of_confederation = scope:actor.confederation
-				}
-			}
+			riseandfall_allows_declaring_war_against_target_trigger = { TARGET = scope:recipient }
 		}
 	}
 
@@ -254,11 +44,11 @@
 		custom_description = {
 			text = "declare_war_hook_on_liege"
 			OR = {
-				war_declarer_needs_hook_on_liege = no
+				scope:puppet_or_actor = { war_declarer_needs_hook_on_liege = no }
 				always = scope:hook
 			}
 		}
-		scope:actor = {
+		scope:puppet_or_actor = {
 			NOR = {
 				is_at_war_with = scope:recipient
 				custom_description = { #A vassal cannot go to war against someone their Liege is already at war with
@@ -275,10 +65,10 @@
 	send_options_exclusive = no
 	send_option = {
 		is_shown = {
-			war_declarer_needs_hook_on_liege = yes
+			scope:puppet_or_actor = { war_declarer_needs_hook_on_liege = yes }
 		}
 		is_valid = {
-			scope:actor = {
+			scope:puppet_or_actor = {
 				has_usable_hook = liege
 			}
 		}
@@ -287,20 +77,20 @@
 		can_invalidate_interaction = yes
 	}
 	should_use_extra_icon = {
-		war_declarer_needs_hook_on_liege = yes
-		scope:actor = { has_usable_hook = liege }
+		scope:puppet_or_actor = { war_declarer_needs_hook_on_liege = yes }
+		scope:puppet_or_actor = { has_usable_hook = liege }
 	}
 	extra_icon = "gfx/interface/icons/character_interactions/hook_icon.dds"
-	
+
 	on_accept = {
-		scope:actor = {
+		scope:puppet_or_actor = {
 			#Feedback!
 			hidden_effect = {
 				send_interface_toast = {
 					type = event_toast_effect_neutral
 					title = declare_war_interaction_notification
 
-					left_icon = scope:actor					
+					left_icon = scope:puppet_or_actor
 					right_icon = scope:recipient
 
 					custom_tooltip = declare_war_interaction_notification_tooltip
@@ -341,7 +131,7 @@
 					NOT = { has_relation_rival = scope:recipient } #To enable really strange love stories
 					any_character_war = {
 						casus_belli = {
-							primary_attacker = scope:actor
+							primary_attacker = scope:puppet_or_actor
 							primary_defender = scope:recipient
 							any_target_title = { }
 						}
@@ -361,7 +151,7 @@
 					limit = {
 						any_character_war = {
 							primary_attacker = {
-								is_vassal_or_below_of = scope:actor
+								is_vassal_or_below_of = scope:puppet_or_actor
 								trigger_if = { #Ai should never invalidate a player's war!
 									limit = {
 										this = { is_ai = no }
@@ -376,7 +166,7 @@
 					every_character_war = {
 						limit = {
 							primary_attacker = {
-								is_vassal_or_below_of = scope:actor
+								is_vassal_or_below_of = scope:puppet_or_actor
 								trigger_if = { #Ai should never invalidate a player's war!
 									limit = {
 										this = { is_ai = no }
@@ -400,7 +190,7 @@
 							save_temporary_scope_as = attacked_vassal
 							any_character_war = {
 								casus_belli = {
-									primary_attacker = scope:actor
+									primary_attacker = scope:puppet_or_actor
 									primary_defender = scope:recipient
 									any_target_title = {
 										holder = {
@@ -419,7 +209,7 @@
 						limit = {
 							any_character_war = {
 								casus_belli = {
-									primary_attacker = scope:actor
+									primary_attacker = scope:puppet_or_actor
 									primary_defender = scope:recipient
 									any_target_title = {
 										holder = {
@@ -436,7 +226,7 @@
 							type = msg_war_declared_on_liege
 							title = declare_war_interaction_notification
 
-							left_icon = scope:actor					
+							left_icon = scope:puppet_or_actor
 							right_icon = scope:recipient
 
 							custom_tooltip = declare_war_interaction_notification_tooltip
@@ -444,7 +234,7 @@
 					}
 				}
 			}
-			
+
 			# If you are admin and had permission to start war, spend said permission
 			if = {
 				limit = {
@@ -453,7 +243,25 @@
 				remove_variable = admin_permission_to_declare_war
 			}
 		}
+		hidden_effect = {
+			if = {
+				limit = {
+					scope:is_puppet_action ?= yes
+				}
+				scope:actor = {
+					send_interface_toast = {
+						type = event_toast_effect_neutral
+						title = declare_war_interaction_notification
+
+						left_icon = scope:puppet_or_actor
+						right_icon = scope:recipient
+
+						custom_tooltip = declare_war_interaction_notification_tooltip
+					}
+				}
+			}
+		}
 	}
-	
+
 	auto_accept = yes
 }

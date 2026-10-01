@@ -20,6 +20,8 @@ riseandfall_courtier_automation.0003 = {
 riseandfall_courtier_automation.0004 = {
     type = character_event
     hidden = yes
+    # Retain legacy direct-recruitment IDs; current decisions open browsers.
+    orphan = yes
 
     immediate = { riseandfall_player_invite_best_free_courtier_se = yes }
 }
@@ -27,6 +29,7 @@ riseandfall_courtier_automation.0004 = {
 riseandfall_courtier_automation.0005 = {
     type = character_event
     hidden = yes
+    orphan = yes
 
     immediate = { riseandfall_player_recruit_best_paid_courtier_se = yes }
 }
@@ -34,6 +37,7 @@ riseandfall_courtier_automation.0005 = {
 riseandfall_courtier_automation.0006 = {
     type = character_event
     hidden = yes
+    orphan = yes
 
     immediate = { riseandfall_player_smart_invite_free_guardian_se = yes }
 }
@@ -41,6 +45,7 @@ riseandfall_courtier_automation.0006 = {
 riseandfall_courtier_automation.0007 = {
     type = character_event
     hidden = yes
+    orphan = yes
 
     immediate = { riseandfall_player_smart_invite_paid_guardian_se = yes }
 }

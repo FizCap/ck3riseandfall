@@ -1,7 +1,8 @@
 ﻿riseandfall_warlord_family = {
 	# Rebel Warlord realms may only appoint a close family member of the holder.
 	default_candidates = { holder_close_family }
-	allow_same_tier_candidates = yes
+	# 1.20 expresses candidate tier eligibility as an enum.
+	allowed_candidate_tier = lower_or_equal
 
 	candidate_score = {
                 value = {

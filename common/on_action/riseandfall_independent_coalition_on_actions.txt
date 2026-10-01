@@ -34,10 +34,15 @@ riseandfall_refresh_independent_coalition_periphery = {
                 is_landed = yes
                 is_independent_ruler = yes
                 exists = primary_title
-                riseandfall_coalition_tracking_candidate_trigger = yes
             }
-            riseandfall_coalition_calculate_periphery_se = yes
-            riseandfall_coalition_update_threat_se = { APPLY_YEARLY = yes }
+            # Save the current ruler before testing neighbors in the world pulse.
+            save_scope_as = rf_coalition_tracking_ruler
+            if = {
+                limit = { riseandfall_coalition_tracking_candidate_trigger = yes }
+                riseandfall_coalition_calculate_periphery_se = yes
+                riseandfall_coalition_update_threat_se = { APPLY_YEARLY = yes }
+            }
+            clear_saved_scope = rf_coalition_tracking_ruler
         }
     }
 }
@@ -53,10 +58,15 @@ riseandfall_initialize_independent_coalition_threat = {
                 is_landed = yes
                 is_independent_ruler = yes
                 exists = primary_title
-                riseandfall_coalition_tracking_candidate_trigger = yes
             }
-            riseandfall_coalition_calculate_periphery_se = yes
-            riseandfall_coalition_update_threat_se = { APPLY_YEARLY = no }
+            # Save the current ruler before testing neighbors in the world pulse.
+            save_scope_as = rf_coalition_tracking_ruler
+            if = {
+                limit = { riseandfall_coalition_tracking_candidate_trigger = yes }
+                riseandfall_coalition_calculate_periphery_se = yes
+                riseandfall_coalition_update_threat_se = { APPLY_YEARLY = no }
+            }
+            clear_saved_scope = rf_coalition_tracking_ruler
         }
     }
 }
@@ -123,6 +133,7 @@ riseandfall_record_coalition_vassalization_conquest = {
                 }
             }
             scope:rf_vassalization_conqueror = {
+                save_scope_as = rf_coalition_tracking_ruler
                 if = {
                     limit = {
                         is_alive = yes
@@ -134,6 +145,7 @@ riseandfall_record_coalition_vassalization_conquest = {
                     riseandfall_coalition_calculate_periphery_se = yes
                     riseandfall_coalition_update_threat_se = { APPLY_YEARLY = no }
                 }
+                clear_saved_scope = rf_coalition_tracking_ruler
             }
         }
         clear_saved_scope = rf_vassalization_conqueror

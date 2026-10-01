@@ -5,3 +5,5 @@
  riseandfall_debug_remove_temporary_higher_title:0 "Remove Temporary Higher Title"
  riseandfall_debug_remove_temporary_higher_title_desc:0 "Restore your original primary title and destroy the temporary higher title."
  riseandfall_debug_remove_temporary_higher_title_tooltip:0 "Removes the temporary title created by the Coalition test debug."
+ riseandfall_debug_create_temporary_higher_title_confirm:0 "Create Temporary Title"
+ riseandfall_debug_remove_temporary_higher_title_confirm:0 "Remove Temporary Title"

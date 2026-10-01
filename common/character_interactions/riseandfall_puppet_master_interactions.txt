@@ -845,3 +845,51 @@ riseandfall_puppet_master_become_warlord_interaction = {
 		modifier = { scope:actor = { has_trait = craven } add = -25 }
 	}
 }
+
+# Selection is restricted to the existing diarch's ruler; this grants no new coup route.
+riseandfall_assume_ruler_puppet_interaction = {
+	category = interaction_riseandfall
+	icon = icon_riseandfall
+	interface_priority = 50
+	desc = riseandfall_assume_ruler_puppet_interaction_desc
+	is_available = {
+		is_ai = no
+		has_pam_dlc_trigger = yes
+		is_adult = yes
+		is_incapable = no
+	}
+	is_shown = {
+		scope:recipient = {
+			is_ai = yes
+			has_active_diarchy = yes
+			has_diarchy_type = puppet_regency
+			diarch ?= scope:actor
+			# Commands use the target interaction menu's puppet tab; this only establishes the link.
+			NOT = { is_puppet_of_type = riseandfall_ruler_puppet }
+		}
+	}
+	is_valid_showing_failures_only = {
+		custom_tooltip = {
+			text = riseandfall_native_puppet_other_master_tt
+			scope:recipient = { NOT = { exists = puppeteer } }
+		}
+		custom_tooltip = {
+			text = riseandfall_native_puppet_master_eligible_tt
+			scope:actor = { can_have_puppets_trigger = yes }
+		}
+		custom_tooltip = {
+			text = riseandfall_native_puppet_slot_occupied_tt
+			scope:actor = { NOT = { exists = puppet:riseandfall_ruler_puppet } }
+		}
+	}
+	on_accept = {
+		hidden_effect = {
+			scope:recipient = { riseandfall_sync_native_ruler_puppet_se = yes }
+		}
+	}
+	auto_accept = yes
+	ai_frequency = 0
+	ai_targets = { ai_recipients = liege }
+	ai_target_quick_trigger = { adult = yes }
+	ai_will_do = { base = 0 }
+}

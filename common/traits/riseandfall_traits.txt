@@ -69,42 +69,9 @@ dragonrider = {
 	random_creation_weight = 0
 	ai_boldness = 45
 
-	name = {
-		first_valid = {
-			triggered_desc = {
-				trigger = {
-					exists = this
-					exists = var:current_dragon
-					var:current_dragon ?= { is_alive = yes }
-				}
-				desc = trait_dragon_name_dragon_alive
-			}
-			desc = trait_dragonrider
-		}
-	}
-
-	desc = {
-		first_valid = {
-			triggered_desc = {
-				trigger = {
-					exists = this
-					has_character_flag = dragon_by_horn
-					exists = var:current_dragon
-					var:current_dragon ?= { is_alive = yes }
-				}
-				desc = trait_dragonbinder_desc
-			}
-			triggered_desc = {
-				trigger = {
-					exists = this
-					exists = var:current_dragon
-					var:current_dragon ?= { is_alive = yes }
-				}
-				desc = trait_dragonrider_desc
-			}
-			desc = trait_dragonrider_desc
-		}
-	}
+	# Compatibility placeholder text must also exist without AGOT installed.
+	name = riseandfall_dragonrider_compat_name
+	desc = riseandfall_dragonrider_compat_desc
 
 	tracks = {
 		dragon_training = {

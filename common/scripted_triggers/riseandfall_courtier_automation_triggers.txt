@@ -14,10 +14,9 @@ riseandfall_courtier_automation_has_free_knight_candidate_trigger = {
             can_be_knight_trigger = { ARMY_OWNER = root }
         }
         any_ruler = {
-            limit = {
-                is_alive = yes
-                in_diplomatic_range = root
-            }
+            # Any-trigger iterators take conditions directly, unlike every/ordered effects.
+            is_alive = yes
+            in_diplomatic_range = root
             any_courtier_or_guest = {
                 is_alive = yes
                 is_adult = yes
@@ -64,10 +63,9 @@ riseandfall_courtier_automation_has_paid_knight_candidate_trigger = {
             can_be_knight_trigger = { ARMY_OWNER = root }
         }
         any_ruler = {
-            limit = {
-                is_alive = yes
-                in_diplomatic_range = root
-            }
+            # Any-trigger iterators take conditions directly, unlike every/ordered effects.
+            is_alive = yes
+            in_diplomatic_range = root
             any_courtier_or_guest = {
                 is_alive = yes
                 is_adult = yes
@@ -125,10 +123,9 @@ riseandfall_courtier_automation_has_free_courtier_candidate_trigger = {
             recruit_guest_interaction_cost <= 0
         }
         any_ruler = {
-            limit = {
-                is_alive = yes
-                in_diplomatic_range = root
-            }
+            # Any-trigger iterators take conditions directly, unlike every/ordered effects.
+            is_alive = yes
+            in_diplomatic_range = root
             any_courtier_or_guest = {
                 is_alive = yes
                 is_adult = yes
@@ -173,10 +170,9 @@ riseandfall_courtier_automation_has_paid_courtier_candidate_trigger = {
             root = { gold >= prev.recruit_guest_interaction_cost }
         }
         any_ruler = {
-            limit = {
-                is_alive = yes
-                in_diplomatic_range = root
-            }
+            # Any-trigger iterators take conditions directly, unlike every/ordered effects.
+            is_alive = yes
+            in_diplomatic_range = root
             any_courtier_or_guest = {
                 is_alive = yes
                 is_adult = yes
@@ -277,10 +273,9 @@ riseandfall_courtier_automation_has_free_guardian_candidate_trigger = {
             }
         }
         any_ruler = {
-            limit = {
-                is_alive = yes
-                in_diplomatic_range = root
-            }
+            # Any-trigger iterators take conditions directly, unlike every/ordered effects.
+            is_alive = yes
+            in_diplomatic_range = root
             any_courtier_or_guest = {
                 is_alive = yes
                 is_adult = yes
@@ -362,10 +357,9 @@ riseandfall_courtier_automation_has_paid_guardian_candidate_trigger = {
             }
         }
         any_ruler = {
-            limit = {
-                is_alive = yes
-                in_diplomatic_range = root
-            }
+            # Any-trigger iterators take conditions directly, unlike every/ordered effects.
+            is_alive = yes
+            in_diplomatic_range = root
             any_courtier_or_guest = {
                 is_alive = yes
                 is_adult = yes

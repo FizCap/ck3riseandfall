@@ -346,7 +346,7 @@ riseandfall_ai_create_titles_se = {
     every_ruler = {
         limit = { is_landed = yes }
         save_scope_as = acting_ruler
-        
+
         # First, cleanup any existing titular titles if they have non-titular equivalents
         riseandfall_cleanup_titular_titles_se = yes
 
@@ -444,7 +444,7 @@ riseandfall_ai_create_titles_se = {
                         primary_title.tier = tier_kingdom
                         primary_title.tier = tier_empire
                         primary_title.tier = tier_hegemony
-                        government_allows = administrative
+                        government_has_mechanic = administrative
                     }
                 }
                 # Prevent same-tier creation unless:
@@ -455,7 +455,7 @@ riseandfall_ai_create_titles_se = {
                         tier = scope:acting_ruler.primary_title.tier
                         NOT = { scope:acting_ruler = { has_realm_law = single_heir_succession_law } }
                         NOT = { scope:acting_ruler.primary_title = { is_titular = yes } }
-                        NOT = { scope:acting_ruler = { government_allows = administrative } }
+                        NOT = { scope:acting_ruler = { government_has_mechanic = administrative } }
                     }
                 }
             }
@@ -630,7 +630,7 @@ riseandfall_ai_create_titles_advanced_se = {
             limit = {
                 tier = tier_duchy
                 scope:acting_ruler = {
-                    government_allows = administrative
+                    government_has_mechanic = administrative
                 }
             }
             save_scope_as = target_title

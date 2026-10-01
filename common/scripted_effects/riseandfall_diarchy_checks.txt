@@ -204,6 +204,7 @@ riseandfall_restore_puppet_regency_after_teardown_se = {
 riseandfall_end_puppet_regency_forcefully_se = {
 	if = {
 		limit = { has_diarchy_type = puppet_regency }
+		riseandfall_clear_native_ruler_puppet_se = yes
 		remove_character_flag = rf_puppet_regency_persistent
 		remove_variable = rf_puppet_regency_diarch
 		remove_variable = rf_puppet_regency_successor

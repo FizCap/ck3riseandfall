@@ -1,4 +1,4 @@
-version="1.3.4"
+version="1.4"
 tags={
 	"Balance"
 	"Gameplay"
@@ -6,5 +6,5 @@ tags={
 }
 name="Rise and Fall"
 picture="thumbnail.png"
-supported_version="1.19.*"
+supported_version="1.20.*"
 remote_file_id="3554844335"

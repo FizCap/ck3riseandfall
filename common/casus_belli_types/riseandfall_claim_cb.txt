@@ -51,7 +51,7 @@
     }
 
     is_allowed_claim_title = {
-        scope:attacker = { 
+        scope:attacker = {
             is_landless_adventurer = yes
             has_character_flag = riseandfall_newadventurer
         }
@@ -249,18 +249,18 @@
                     }
                 }
             }
-            AND = { 
-                NOT = { scope:claimant = scope:attacker } 
+            AND = {
+                NOT = { scope:claimant = scope:attacker }
                 scope:claimant = {
                     OR = {
-                        is_alive = no 
-                        NAND = { 
-                            is_vassal_or_below_of = scope:attacker 
-                            is_courtier_of = scope:attacker 
+                        is_alive = no
+                        NAND = {
+                            is_vassal_or_below_of = scope:attacker
+                            is_courtier_of = scope:attacker
                         }
                     }
                 }
-            } 
+            }
         }
     }
 
@@ -268,7 +268,7 @@
         first_valid = {
             triggered_desc = {
                 trigger = {
-                    NOT = { scope:claimant = scope:attacker } 
+                    NOT = { scope:claimant = scope:attacker }
                     scope:claimant = { is_alive = no }
                 }
                 desc = msg_claim_war_invalidated_claimant_unavailable_dead_message
@@ -276,11 +276,11 @@
             triggered_desc = {
                 trigger = {
                     scope:claimant = {
-                        NOR = { 
-                            this = scope:attacker 
-                            NOR = { 
-                                is_vassal_or_below_of = scope:attacker 
-                                is_courtier_of = scope:attacker 
+                        NOR = {
+                            this = scope:attacker
+                            NOR = {
+                                is_vassal_or_below_of = scope:attacker
+                                is_courtier_of = scope:attacker
                             }
                         }
                     }
@@ -381,7 +381,7 @@
             if = {
                 limit = {
                     is_independent_ruler = yes
-                    government_allows = administrative
+                    government_has_mechanic = administrative
                     exists = scope:target
                 }
                 every_held_title = {

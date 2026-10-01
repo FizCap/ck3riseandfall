@@ -1,0 +1,84 @@
+﻿on_entered_diarchy = {
+    on_actions = { riseandfall_native_puppet_sync_current_ruler }
+}
+on_left_diarchy = {
+    on_actions = { riseandfall_native_puppet_sync_current_ruler }
+}
+on_diarch_change = {
+    on_actions = { riseandfall_native_puppet_sync_current_ruler }
+}
+on_title_gain = {
+    on_actions = { riseandfall_native_puppet_sync_current_ruler }
+}
+on_title_gain_inheritance = {
+    on_actions = { riseandfall_native_puppet_sync_current_ruler }
+}
+on_game_start_after_lobby = {
+    on_actions = { riseandfall_native_puppet_sync_existing_rulers }
+}
+yearly_global_pulse = {
+    on_actions = { riseandfall_native_puppet_sync_existing_rulers }
+}
+
+# Native control must track the actual diarch even with low-stability incidents disabled.
+# Code diarchy/title hooks scope the affected ruler; never scan the world from these hooks.
+riseandfall_native_puppet_sync_current_ruler = {
+    trigger = {
+        OR = {
+            has_diarchy_type = puppet_regency
+            has_character_flag = rf_puppet_regency_persistent
+            has_variable = rf_native_puppet_master
+            is_puppet_of_type = riseandfall_ruler_puppet
+        }
+    }
+    effect = { riseandfall_sync_native_ruler_puppet_se = yes }
+}
+
+# Game load repairs existing saves; yearly maintenance catches a lost native link.
+riseandfall_native_puppet_sync_existing_rulers = {
+    effect = {
+        every_ruler = {
+            limit = {
+                OR = {
+                    has_diarchy_type = puppet_regency
+                    has_character_flag = rf_puppet_regency_persistent
+                    has_variable = rf_native_puppet_master
+                    is_puppet_of_type = riseandfall_ruler_puppet
+                }
+            }
+            riseandfall_sync_native_ruler_puppet_se = yes
+        }
+    }
+}
+
+on_player_character_change = {
+	on_actions = { riseandfall_native_puppet_player_change }
+}
+
+# Vanilla identifies ROOT as the new player and the previous character separately.
+# Refresh both sides when switching into a master; a player ruler cannot stay a puppet.
+riseandfall_native_puppet_player_change = {
+	effect = {
+		if = {
+			limit = { has_variable = rf_native_puppet_master }
+			riseandfall_clear_native_ruler_puppet_se = yes
+		}
+		if = {
+			limit = {
+				scope:previous_player_character ?= {
+					has_active_diarchy = yes
+					has_diarchy_type = puppet_regency
+				}
+			}
+			scope:previous_player_character = { riseandfall_sync_native_ruler_puppet_se = yes }
+		}
+		if = {
+			limit = { liege ?= { has_active_diarchy = yes has_diarchy_type = puppet_regency diarch ?= root } }
+			liege = { riseandfall_sync_native_ruler_puppet_se = yes }
+		}
+		else_if = {
+			limit = { employer ?= { has_active_diarchy = yes has_diarchy_type = puppet_regency diarch ?= root } }
+			employer = { riseandfall_sync_native_ruler_puppet_se = yes }
+		}
+	}
+}
