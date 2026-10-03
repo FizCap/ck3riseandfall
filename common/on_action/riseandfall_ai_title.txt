@@ -106,7 +106,6 @@ riseandfall_player_guardian_automation_yearly = {
         every_ruler = {
             limit = {
                 is_alive = yes
-                is_landed = yes
                 is_ai = no
             }
             if = {

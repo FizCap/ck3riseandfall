@@ -7,7 +7,7 @@ riseandfall_start_coalition_interaction = {
     desc = riseandfall_start_coalition_interaction_desc
 
     is_shown = {
-        has_game_rule = riseandfall_independent_coalitions_enabled
+        riseandfall_independent_coalitions_active_trigger = yes
         has_game_rule = riseandfall_lite_mode_disabled
         scope:actor = { is_alive = yes is_landed = yes is_independent_ruler = yes }
         scope:recipient = { is_alive = yes is_landed = yes is_independent_ruler = yes this != scope:actor }
@@ -16,10 +16,6 @@ riseandfall_start_coalition_interaction = {
     # Show the full eligibility checklist, matching the Fix Bordergore interaction.
     # The failures-only variant hid all passing conditions and left an all-red tooltip.
     is_valid = {
-        custom_tooltip = {
-            text = riseandfall_coalition.target_must_be_larger.tooltip
-            scope:actor = { realm_size < scope:recipient.realm_size }
-        }
         custom_tooltip = {
             text = riseandfall_coalition.target_in_diplomatic_range.tooltip
             scope:actor = { in_diplomatic_range = scope:recipient }
@@ -40,9 +36,18 @@ riseandfall_start_coalition_interaction = {
             text = riseandfall_coalition.target_independent.tooltip
             scope:recipient = { is_independent_ruler = yes }
         }
-        custom_tooltip = {
-            text = riseandfall_coalition.target_threat.tooltip
-            scope:recipient = { riseandfall_coalition_target_threat_valid_trigger = yes }
+        trigger_if = {
+            limit = { has_game_rule = riseandfall_independent_coalitions_unrestricted }
+            custom_tooltip = {
+                text = riseandfall_coalition.target_threat_unrestricted.tooltip
+                scope:recipient = { riseandfall_coalition_target_threat_valid_trigger = yes }
+            }
+        }
+        trigger_else = {
+            custom_tooltip = {
+                text = riseandfall_coalition.target_threat.tooltip
+                scope:recipient = { riseandfall_coalition_target_threat_valid_trigger = yes }
+            }
         }
         custom_tooltip = {
             text = riseandfall_coalition.target_no_active_war.tooltip
@@ -52,13 +57,16 @@ riseandfall_start_coalition_interaction = {
             text = riseandfall_coalition.target_not_forming.tooltip
             scope:recipient = { NOT = { has_character_flag = rf_coalition_formation_active } }
         }
-        custom_tooltip = {
-            text = riseandfall_coalition.target_no_beta_cooldown.tooltip
-            scope:recipient = { NOT = { primary_title = { has_variable = rf_coalition_interaction_cooldown } } }
-        }
-        custom_tooltip = {
-            text = riseandfall_coalition.target_no_postwar_cooldown.tooltip
-            scope:recipient = { NOT = { primary_title = { has_variable = rf_coalition_postwar_cooldown } } }
+        trigger_if = {
+            limit = { NOT = { has_game_rule = riseandfall_independent_coalitions_unrestricted } }
+            custom_tooltip = {
+                text = riseandfall_coalition.target_no_beta_cooldown.tooltip
+                scope:recipient = { NOT = { primary_title = { has_variable = rf_coalition_interaction_cooldown } } }
+            }
+            custom_tooltip = {
+                text = riseandfall_coalition.target_no_postwar_cooldown.tooltip
+                scope:recipient = { NOT = { primary_title = { has_variable = rf_coalition_postwar_cooldown } } }
+            }
         }
     }
 
@@ -79,12 +87,14 @@ riseandfall_start_coalition_interaction = {
         is_alive = yes
         is_landed = yes
         is_independent_ruler = yes
-        has_game_rule = riseandfall_independent_coalitions_enabled
+        riseandfall_independent_coalitions_active_trigger = yes
         has_game_rule = riseandfall_lite_mode_disabled
     }
     ai_targets = { ai_recipients = neighboring_rulers max = 12 }
     ai_will_do = {
         base = -90
+        # Offset the large-realm preference so small high-threat targets can attract AI coalitions.
+        modifier = { has_game_rule = riseandfall_independent_coalitions_unrestricted add = 100 }
         modifier = { scope:recipient = { realm_size >= 80 } add = 45 }
         modifier = { scope:recipient = { realm_size >= 150 } add = 45 }
         modifier = { scope:recipient = { var:rf_coalition_peripheral_pct >= 40 } add = 35 }

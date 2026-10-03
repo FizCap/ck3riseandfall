@@ -1559,15 +1559,8 @@ riseandfall_courtier_browser_prepare_courtier_paid_se = {
                     RECRUITER = scope:rf_courtier_automation_actor
                     RECRUITEE = this
                 }
-                # Payment covers recruitment cost, not a negative willingness
-                # score. Keep candidates who would accept a regular invite.
                 scope:rf_courtier_automation_actor = {
-                    is_character_interaction_potentially_accepted = {
-                        recipient = prev
-                        interaction = invite_to_court_interaction
-                        required_response = yes
-                        ai_accept = 0
-                    }
+                    riseandfall_courtier_browser_paid_invite_trigger = { RECIPIENT = prev }
                 }
             }
             save_scope_as = rf_courtier_automation_candidate
@@ -1971,15 +1964,8 @@ riseandfall_courtier_browser_prepare_guardian_paid_se = {
                     RECRUITER = scope:rf_courtier_automation_actor
                     RECRUITEE = this
                 }
-                NOT = {
-                    scope:rf_courtier_automation_actor = {
-                        is_character_interaction_potentially_accepted = {
-                            recipient = prev
-                            interaction = invite_to_court_interaction
-                            required_response = yes
-                            ai_accept = 0
-                        }
-                    }
+                scope:rf_courtier_automation_actor = {
+                    riseandfall_courtier_browser_paid_invite_trigger = { RECIPIENT = prev }
                 }
                 AND = {
                     OR = {
@@ -2168,6 +2154,17 @@ riseandfall_courtier_browser_recruit_courtier_paid_se = {
         else_if = {
             limit = {
                 NOT = { scope:rf_courtier_automation_candidate = { is_pool_guest_of = root } }
+                # Recheck willingness and eligibility because the browser can stay open.
+                scope:rf_courtier_automation_candidate = {
+                    in_diplomatic_range = scope:rf_courtier_automation_actor
+                    is_foreign_court_guest = no
+                    OR = { is_pool_character = yes exists = liege }
+                    can_recruit_character_to_court_trigger = {
+                        RECRUITER = scope:rf_courtier_automation_actor
+                        RECRUITEE = this
+                    }
+                }
+                riseandfall_courtier_browser_paid_invite_trigger = { RECIPIENT = scope:rf_courtier_automation_candidate }
                 gold >= { value = riseandfall_courtier_automation_bribe_value multiply = 0.5 }
             }
             pay_short_term_gold = { gold = { value = riseandfall_courtier_automation_bribe_value multiply = 0.5 } target = scope:rf_courtier_automation_candidate }
@@ -2205,6 +2202,17 @@ riseandfall_courtier_browser_recruit_guardian_paid_se = {
         else_if = {
             limit = {
                 NOT = { scope:rf_courtier_automation_candidate = { is_pool_guest_of = root } }
+                # Recheck willingness and eligibility because the browser can stay open.
+                scope:rf_courtier_automation_candidate = {
+                    in_diplomatic_range = scope:rf_courtier_automation_actor
+                    is_foreign_court_guest = no
+                    OR = { is_pool_character = yes exists = liege }
+                    can_recruit_character_to_court_trigger = {
+                        RECRUITER = scope:rf_courtier_automation_actor
+                        RECRUITEE = this
+                    }
+                }
+                riseandfall_courtier_browser_paid_invite_trigger = { RECIPIENT = scope:rf_courtier_automation_candidate }
                 gold >= { value = riseandfall_courtier_automation_bribe_value multiply = 0.5 }
             }
             pay_short_term_gold = { gold = { value = riseandfall_courtier_automation_bribe_value multiply = 0.5 } target = scope:rf_courtier_automation_candidate }

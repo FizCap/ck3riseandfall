@@ -1,20 +1,14 @@
-﻿CK3: Rise and Fall - 1.4
+﻿CK3: Rise and Fall - 1.4.1
 
-Compatibility
-- Prevented native puppet setup attempts by ineligible Puppet Masters and added an eligibility tooltip; preserved Puppet Regency and its court position for unlanded masters.
-- Moved Establish Puppet Control into the Rise and Fall interaction category.
-- Added independent native Puppet Master synchronization on diarchy changes, title succession, game load and yearly maintenance, including when low-stability incidents were disabled.
-- Renamed the Puppet Ruler setup interaction to Establish Puppet Control and hid it for connected rulers; clarified that commands are issued by selecting Puppet Ruler beside the intended target's interaction menu.
-- Added native ruler-puppet commands for Puppet Masters controlling AI rulers through Puppet Regency, including Palace Coup submission, succession synchronization and removal cleanup; retained existing regency behavior for player rulers.
-- Updated Rise and Fall for CK3 1.20, including the new succession-law format and administrative government mechanic checks.
-- Refreshed character, title, interaction-menu, map-icon and map-mode interfaces while preserving Rise and Fall controls and indicators.
-- Restored the required religious-head map widget and removed obsolete map GUI calls.
-- Updated administrative candidate scoring and Warlord appointment tier eligibility.
-- Updated Declare War for puppet actions while preserving Warlord exemptions from administrative war bans.
-- Moved the Rise and Fall interaction category after the new vanilla debug category.
-- Fixed recruitment trigger parsing, Puppet Master title-transfer parsing and missing debug decision confirmation text.
-- Fixed Palace Coup AI claimant consolidation to search the challenger's vassals from character scope inside each de jure kingdom.
-- Removed unused invitation helpers referencing retired recruitment toggles and retained legacy recruitment events as intentionally unreferenced entry points.
-- Fixed Coalition tracking on world pulses to use an explicitly saved ruler for neighbor eligibility checks.
-- Added standalone text for the Dragonrider compatibility placeholder and removed its dependency on AGOT-only localization.
-- Completed the disabled AI configuration for the player-only Create Adventurer Camp interaction with a self-target list.
+- Removed the Beta label from the Coalitions game rule.
+- Added Off, Restricted (default), and Unrestricted Coalition rule options; allowed Unrestricted interaction Coalitions against any independent landed ruler at 100 threat without territorial, relative-size, cooldown, or strength gates, and expanded threat tracking with a performance warning. Kept Low Stability Coalition incidents under their separate rule.
+- Excluded noble-family and landless office titles from Palace Coup retreat selection, donor county counts and territorial influence; prevented shared-duchy rally points from enclosing the loyalist base before recruitment.
+- Protected landed Palace Coup governors from ministry recruitment during the title handoff and restored the prepared retreat county and successor crown when native title callbacks removed them; expanded diagnostics to report missing voter snapshots and landless participants.
+- Batched Palace Coup crown exchange and capital transfers to avoid overlapping crowns in governments that forbid them, supplied the incumbent government when landing courtier challengers, and added allegiance diagnostics around the handoff.
+- Preserved Palace Coup successor succession laws and removed the China-specific recruitment workaround.
+- Prevented distant AI loyalists from seeding extra Palace Coup zones and merged isolated one-to-three-county AI pockets into a single surrounding camp, while preserving player land, contender bases, larger blocs and intact personal domains.
+- Reworked Palace Coups into competing county-based zones around the capital, the fleeing ruler and declared claimants; allowed provincial rulers to break from regional lords on the opposite side, preserved same-side hierarchy and explicit player choices, and secured a landed retreat. Kept the split peaceful pending later wars.
+- Stopped Palace Coup tooltip previews from entering territorial allocation and deferred weaker AI loyalties until regional scoring; removed the bonus for supporting another usurper merely because the voter had their own claim.
+- Fixed Palace Coup claimant recruitment to use the actual supporter, consolidated rival AI bids before side selection, and corrected ruler and treasury scopes when resisting Puppet Regency succession.
+- Enabled courtier, knight and guardian recruitment for landless title-holding rulers, including theocratic rulers and adventurers, and extended yearly house-child guardian automation to them.
+- Fixed paid courtier and guardian candidate searches to require willingness to join with travel expenses, including Greedy and Generous acceptance bonuses, and rechecked eligibility before recruitment.

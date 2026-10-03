@@ -1,0 +1,7 @@
+﻿# County-tier family/office titles have no province. They cannot provide a
+# retreat base, a territorial vote, or a spare county that keeps a donor landed.
+riseandfall_palace_coup_territorial_county_trigger = {
+    tier = tier_county
+    is_noble_family_title = no
+    is_landless_type_title = no
+}

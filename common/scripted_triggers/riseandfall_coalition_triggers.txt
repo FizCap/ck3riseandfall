@@ -10,34 +10,24 @@ riseandfall_coalition_target_has_active_war_trigger = {
 
 # Realm Stability stores the ruler's rounded share of world realm size as a
 # negative component: controlling 5% of the world produces -5. Coalition is
-# reserved for rulers at that threshold or larger.
+# restricted to rulers at that threshold or larger in Restricted mode and
+# the separately configured Low Stability incident.
 riseandfall_coalition_target_controls_five_percent_world_trigger = {
     has_variable = riseandfall_rs_realm_size_component
     NOT = { var:riseandfall_rs_realm_size_component >= -4 }
 }
 
-# Cheap pre-filter for the yearly county scan. This mirrors the low-stability
-# Coalition selector's minimum: the ruler must be large enough to qualify and
-# have at least two independent rulers who could receive an invitation.
-riseandfall_coalition_tracking_candidate_trigger = {
-    # World pulses have no character root; each caller saves its tracked ruler.
-    exists = scope:rf_coalition_tracking_ruler
-    riseandfall_coalition_target_controls_five_percent_world_trigger = yes
-    any_independent_ruler = {
-        count >= 2
-        riseandfall_coalition_potential_invitee_trigger = yes
-        NOT = { target_is_same_character_or_above = scope:rf_coalition_tracking_ruler }
-        in_diplomatic_range = scope:rf_coalition_tracking_ruler
-        NOT = { is_allied_to = scope:rf_coalition_tracking_ruler }
-        NOT = { has_truce = scope:rf_coalition_tracking_ruler }
+# Shared switch for threat pulses, inheritance, conquest hooks and interaction AI.
+riseandfall_independent_coalitions_active_trigger = {
+    OR = {
+        has_game_rule = riseandfall_independent_coalitions_enabled
+        has_game_rule = riseandfall_independent_coalitions_unrestricted
     }
 }
 
-# This trigger is evaluated from a Coalition interaction, where scope:actor
-# is the initiating neighbor and this is the proposed target.
-riseandfall_coalition_target_threat_valid_trigger = {
-    has_variable = rf_coalition_threat
-    var:rf_coalition_threat >= 100
+# Keep Low Stability incidents on their existing territorial contract even when
+# the separate interaction rule permits unrestricted targets.
+riseandfall_coalition_target_territory_valid_trigger = {
     riseandfall_coalition_target_controls_five_percent_world_trigger = yes
     OR = {
         AND = {
@@ -51,7 +41,44 @@ riseandfall_coalition_target_threat_valid_trigger = {
         # de-jure core, so world scale is the sole territorial gate.
         var:rf_coalition_uses_dejure_core = 0
     }
-    realm_size >= { value = scope:actor.realm_size multiply = 2 }
+}
+
+# Cheap pre-filter for the yearly county scan. This mirrors the low-stability
+# Coalition selector's minimum: the ruler must be large enough to qualify and
+# have at least two independent rulers who could receive an invitation.
+riseandfall_coalition_tracking_candidate_trigger = {
+    # Unrestricted tracks every independent landed ruler before threat reaches
+    # 100; applying the Restricted pre-filter would prevent small realms gaining it.
+    OR = {
+        has_game_rule = riseandfall_independent_coalitions_unrestricted
+        AND = {
+            # World pulses have no character root; each caller saves its tracked ruler.
+            exists = scope:rf_coalition_tracking_ruler
+            riseandfall_coalition_target_controls_five_percent_world_trigger = yes
+            any_independent_ruler = {
+                count >= 2
+                riseandfall_coalition_potential_invitee_trigger = yes
+                NOT = { target_is_same_character_or_above = scope:rf_coalition_tracking_ruler }
+                in_diplomatic_range = scope:rf_coalition_tracking_ruler
+                NOT = { is_allied_to = scope:rf_coalition_tracking_ruler }
+                NOT = { has_truce = scope:rf_coalition_tracking_ruler }
+            }
+        }
+    }
+}
+
+# This trigger is evaluated from a Coalition interaction, where scope:actor
+# is the initiating neighbor and this is the proposed target.
+riseandfall_coalition_target_threat_valid_trigger = {
+    has_variable = rf_coalition_threat
+    var:rf_coalition_threat >= 100
+    OR = {
+        has_game_rule = riseandfall_independent_coalitions_unrestricted
+        AND = {
+            riseandfall_coalition_target_territory_valid_trigger = yes
+            realm_size >= { value = scope:actor.realm_size multiply = 2 }
+        }
+    }
 }
 
 # Stable target requirements shared by selection, preparation, and final assembly.
@@ -60,26 +87,24 @@ riseandfall_coalition_target_core_valid_trigger = {
     is_landed = yes
     is_independent_ruler = yes
     exists = primary_title
-    riseandfall_coalition_target_controls_five_percent_world_trigger = yes
-    OR = {
-        AND = {
-            var:rf_coalition_uses_dejure_core = 1
-            has_variable = rf_coalition_peripheral_pct
-            var:rf_coalition_peripheral_pct >= 25
-            has_variable = rf_coalition_core_counties
-            var:rf_coalition_core_counties > 0
-        }
-        var:rf_coalition_uses_dejure_core = 0
-    }
+    riseandfall_coalition_target_territory_valid_trigger = yes
     NOT = { primary_title = { has_variable = rf_coalition_postwar_cooldown } }
     NOT = { has_character_flag = rf_coalition_under_attack }
     NOT = { riseandfall_coalition_target_has_active_war_trigger = yes }
 }
 
 riseandfall_coalition_interaction_target_valid_trigger = {
-    riseandfall_coalition_target_core_valid_trigger = yes
+    riseandfall_independent_coalitions_active_trigger = yes
+    riseandfall_coalition_target_still_valid_trigger = yes
     NOT = { has_character_flag = rf_coalition_formation_active }
-    NOT = { primary_title = { has_variable = rf_coalition_interaction_cooldown } }
+    OR = {
+        has_game_rule = riseandfall_independent_coalitions_unrestricted
+        AND = {
+            riseandfall_coalition_target_territory_valid_trigger = yes
+            NOT = { primary_title = { has_variable = rf_coalition_postwar_cooldown } }
+            NOT = { primary_title = { has_variable = rf_coalition_interaction_cooldown } }
+        }
+    }
 }
 
 # The dynamic cause is checked before Coalition is selected from the

@@ -1,0 +1,935 @@
+﻿# Palace Coup influence uses a persistent county snapshot because player choices
+# can span delayed events. No live title/vassal collections change during growth.
+riseandfall_palace_coup_prepare_territory_se = {
+    capital_county = { save_scope_as = palace_coup_old_capital_county }
+    capital_county.duchy = { save_scope_as = palace_coup_core_duchy }
+    capital_county.kingdom = { save_scope_as = palace_coup_core_kingdom }
+    clear_saved_scope = palace_coup_retreat_county
+    clear_variable_list = rf_palace_coup_counties
+    clear_variable_list = rf_palace_coup_vassals
+    clear_variable_list = rf_palace_coup_contenders
+    remove_variable = rf_palace_coup_retreat_county
+    every_sub_realm_county = {
+        limit = { riseandfall_palace_coup_territorial_county_trigger = yes }
+        save_scope_as = rf_palace_coup_county
+        remove_variable = rf_palace_coup_player_side
+        remove_variable = rf_palace_coup_county_side
+        clear_variable_list = rf_palace_coup_neighbors
+        scope:original_ruler = {
+            add_to_variable_list = { name = rf_palace_coup_counties target = scope:rf_palace_coup_county days = 30 }
+        }
+    }
+    every_in_list = {
+        variable = rf_palace_coup_counties
+        save_scope_as = rf_palace_coup_county
+        every_neighboring_county = {
+            save_scope_as = rf_palace_coup_neighbor
+            if = {
+                limit = {
+                    scope:original_ruler = {
+                        is_target_in_variable_list = { name = rf_palace_coup_counties target = scope:rf_palace_coup_neighbor }
+                    }
+                }
+                scope:rf_palace_coup_county = {
+                    add_to_variable_list = { name = rf_palace_coup_neighbors target = scope:rf_palace_coup_neighbor days = 30 }
+                }
+            }
+        }
+    }
+    # Prefer an existing outside holding. Development breaks ties without using
+    # the incumbent's unsplit military strength as a proxy for retreat support.
+    ordered_held_title = {
+        limit = { riseandfall_palace_coup_territorial_county_trigger = yes NOT = { duchy = scope:palace_coup_core_duchy } }
+        order_by = development_level
+        max = 1
+        save_scope_as = palace_coup_retreat_county
+    }
+    if = {
+        limit = { NOT = { exists = scope:palace_coup_retreat_county } }
+        ordered_vassal = {
+            limit = {
+                is_landed = yes
+                is_ai = yes
+                liege = scope:original_ruler
+                NOT = { this = scope:palace_coup_challenger }
+                NOT = { has_claim_on = scope:original_primary }
+                any_held_title = { riseandfall_palace_coup_territorial_county_trigger = yes count >= 2 }
+                any_held_title = { riseandfall_palace_coup_territorial_county_trigger = yes NOT = { duchy = scope:palace_coup_core_duchy } }
+            }
+            order_by = current_military_strength
+            max = 1
+            ordered_held_title = {
+                limit = { riseandfall_palace_coup_territorial_county_trigger = yes NOT = { duchy = scope:palace_coup_core_duchy } }
+                order_by = development_level
+                max = 1
+                save_scope_as = palace_coup_retreat_county
+            }
+        }
+    }
+    if = {
+        limit = { NOT = { exists = scope:palace_coup_retreat_county } }
+        # A wholly centralised realm may have no outside donor. Reserve a second
+        # personal core county rather than briefly stripping the ruler's government.
+        ordered_held_title = {
+            limit = { riseandfall_palace_coup_territorial_county_trigger = yes NOT = { this = scope:palace_coup_old_capital_county } }
+            order_by = development_level
+            max = 1
+            save_scope_as = palace_coup_retreat_county
+        }
+    }
+    if = {
+        limit = { NOT = { exists = scope:palace_coup_retreat_county } }
+        # Last landed fallback: another county of a multi-county AI lord. Never
+        # confiscate the player's only holding or unland an administrative governor.
+        ordered_vassal = {
+            limit = {
+                is_landed = yes
+                is_ai = yes
+                liege = scope:original_ruler
+                NOT = { this = scope:palace_coup_challenger }
+                any_held_title = { riseandfall_palace_coup_territorial_county_trigger = yes count >= 2 }
+            }
+            order_by = current_military_strength
+            max = 1
+            ordered_held_title = {
+                limit = { riseandfall_palace_coup_territorial_county_trigger = yes }
+                order_by = development_level
+                max = 1
+                save_scope_as = palace_coup_retreat_county
+            }
+        }
+    }
+    if = {
+        limit = {
+            NOT = { exists = scope:palace_coup_retreat_county }
+            scope:palace_coup_challenger = {
+                is_landed = yes
+                any_held_title = { riseandfall_palace_coup_territorial_county_trigger = yes count >= 2 }
+            }
+        }
+        scope:palace_coup_challenger = {
+            ordered_held_title = {
+                limit = { riseandfall_palace_coup_territorial_county_trigger = yes NOT = { this = scope:palace_coup_old_capital_county } }
+                order_by = development_level
+                max = 1
+                save_scope_as = palace_coup_retreat_county
+            }
+        }
+    }
+    if = {
+        limit = { exists = scope:palace_coup_retreat_county }
+        set_variable = { name = rf_palace_coup_retreat_county value = scope:palace_coup_retreat_county days = 30 }
+    }
+    every_vassal_or_below = {
+        limit = {
+            is_alive = yes
+            is_landed = yes
+            primary_title.tier >= tier_county
+            NOT = { this = scope:palace_coup_challenger }
+
+        }
+        save_scope_as = rf_palace_coup_vassal
+        liege = { save_scope_as = rf_palace_coup_parent }
+        set_variable = { name = rf_palace_coup_original_liege value = scope:rf_palace_coup_parent days = 30 }
+        riseandfall_palace_coup_clear_vassal_choice_se = yes
+        remove_character_flag = rf_palace_coup_claimant_bidder
+        remove_character_flag = rf_palace_coup_ai_claimant_bidder
+        clear_variable_list = rf_palace_coup_subrealm_counties
+        remove_variable = rf_palace_coup_influence_side
+        remove_variable = rf_palace_coup_next_side
+        every_held_title = {
+            limit = { riseandfall_palace_coup_territorial_county_trigger = yes }
+            save_scope_as = rf_palace_coup_county
+            scope:rf_palace_coup_vassal = {
+                add_to_variable_list = { name = rf_palace_coup_subrealm_counties target = scope:rf_palace_coup_county days = 30 }
+            }
+        }
+        scope:original_ruler = {
+            add_to_variable_list = { name = rf_palace_coup_vassals target = scope:rf_palace_coup_vassal days = 30 }
+        }
+    }
+}
+
+# Seed only the land actually available to each contender. Comparing a county
+# with the incumbent's whole pre-coup realm would give every voter a loyalist border.
+riseandfall_palace_coup_seed_influence_se = {
+    clear_variable_list = rf_palace_coup_contenders
+    add_to_variable_list = { name = rf_palace_coup_contenders target = scope:original_ruler days = 30 }
+    add_to_variable_list = { name = rf_palace_coup_contenders target = scope:palace_coup_challenger days = 30 }
+    ordered_vassal = {
+        limit = { is_landed = yes liege = scope:original_ruler has_character_flag = rf_palace_coup_claimant_bidder }
+        order_by = current_military_strength
+        save_scope_as = rf_palace_coup_contender
+        scope:original_ruler = {
+            add_to_variable_list = { name = rf_palace_coup_contenders target = scope:rf_palace_coup_contender days = 30 }
+        }
+    }
+    every_in_list = {
+        variable = rf_palace_coup_counties
+        if = {
+            limit = { holder = scope:original_ruler }
+            if = {
+                limit = { duchy = scope:palace_coup_core_duchy NOT = { this = scope:palace_coup_retreat_county } }
+                set_variable = { name = rf_palace_coup_county_side value = scope:palace_coup_challenger days = 30 }
+            }
+            else = { set_variable = { name = rf_palace_coup_county_side value = scope:original_ruler days = 30 } }
+        }
+        else_if = {
+            limit = {
+                OR = {
+                    holder = scope:palace_coup_challenger
+                    holder = { is_vassal_or_below_of = scope:palace_coup_challenger }
+                }
+            }
+            set_variable = { name = rf_palace_coup_county_side value = scope:palace_coup_challenger days = 30 }
+        }
+    }
+    if = {
+        limit = { exists = scope:palace_coup_retreat_county }
+        scope:palace_coup_retreat_county = {
+            set_variable = { name = rf_palace_coup_county_side value = scope:original_ruler days = 30 }
+        }
+    }
+    every_in_list = {
+        variable = rf_palace_coup_vassals
+        if = {
+            limit = { has_character_flag = rf_palace_coup_claimant_bidder }
+            set_variable = { name = rf_palace_coup_influence_side value = this days = 30 }
+        }
+        else_if = {
+            limit = { has_variable = rf_palace_coup_supported_claimant }
+            set_variable = { name = rf_palace_coup_influence_side value = var:rf_palace_coup_supported_claimant days = 30 }
+        }
+        else_if = {
+            limit = { has_character_flag = rf_palace_coup_return_to_ruler }
+            set_variable = { name = rf_palace_coup_influence_side value = scope:original_ruler days = 30 }
+        }
+        else_if = {
+            limit = { has_character_flag = rf_palace_coup_split_protected }
+            set_variable = { name = rf_palace_coup_influence_side value = scope:palace_coup_challenger days = 30 }
+        }
+        if = {
+            limit = { has_variable = rf_palace_coup_influence_side }
+            riseandfall_palace_coup_publish_influence_se = yes
+        }
+    }
+    ordered_in_list = {
+        variable = rf_palace_coup_vassals
+        limit = { is_ai = no has_variable = rf_palace_coup_influence_side }
+        order_by = realm_size
+        save_scope_as = rf_palace_coup_vassal
+        every_sub_realm_county = {
+            limit = { riseandfall_palace_coup_territorial_county_trigger = yes }
+            set_variable = { name = rf_palace_coup_player_side value = scope:rf_palace_coup_vassal.var:rf_palace_coup_influence_side days = 30 }
+            set_variable = { name = rf_palace_coup_county_side value = var:rf_palace_coup_player_side days = 30 }
+        }
+    }
+    # The graph is ready before evaluating AI: strong preferences must not depend
+    # on which sibling vassal happened to be visited first by every_vassal.
+    every_in_list = {
+        variable = rf_palace_coup_vassals
+        limit = { is_ai = yes NOT = { has_variable = rf_palace_coup_influence_side } }
+        riseandfall_palace_coup_choose_influence_side_se = yes
+        if = {
+            limit = {
+                var:rf_palace_coup_best_score >= { value = var:rf_palace_coup_runner_score add = 100 }
+                # Common opinion/culture/faith bonuses alone must not lock an
+                # entire administration before territorial zones are considered.
+                OR = {
+                    is_allied_to = var:rf_palace_coup_best_side
+                    is_close_family_of = var:rf_palace_coup_best_side
+                    has_relation_friend = var:rf_palace_coup_best_side
+                }
+            }
+            set_variable = { name = rf_palace_coup_next_side value = var:rf_palace_coup_best_side days = 30 }
+        }
+    }
+    every_in_list = {
+        variable = rf_palace_coup_vassals
+        limit = { has_variable = rf_palace_coup_next_side }
+        set_variable = { name = rf_palace_coup_influence_side value = var:rf_palace_coup_next_side days = 30 }
+        remove_variable = rf_palace_coup_next_side
+        riseandfall_palace_coup_record_influence_side_se = yes
+    }
+}
+
+riseandfall_palace_coup_publish_influence_se = {
+    save_scope_as = rf_palace_coup_vassal
+    every_in_list = {
+        variable = rf_palace_coup_subrealm_counties
+        # A reserved retreat county is taken from a donor before the handoff.
+        limit = { NOT = { this = scope:palace_coup_retreat_county } }
+        if = {
+            limit = { has_variable = rf_palace_coup_player_side }
+            set_variable = { name = rf_palace_coup_county_side value = var:rf_palace_coup_player_side days = 30 }
+        }
+        else = {
+            set_variable = { name = rf_palace_coup_county_side value = scope:rf_palace_coup_vassal.var:rf_palace_coup_influence_side days = 30 }
+        }
+    }
+}
+
+riseandfall_palace_coup_score_claimant_influence_se = {
+    # These are the voter's opinions and ties, not the event root's ties.
+    set_variable = { name = rf_palace_coup_candidate_score value = var:rf_palace_coup_reject_score }
+    if = { limit = { is_allied_to = scope:rf_palace_coup_contender } change_variable = { name = rf_palace_coup_candidate_score add = 100 } }
+    if = { limit = { is_at_war_with = scope:rf_palace_coup_contender } change_variable = { name = rf_palace_coup_candidate_score add = -80 } }
+    if = { limit = { opinion = { target = scope:rf_palace_coup_contender value >= 80 } } change_variable = { name = rf_palace_coup_candidate_score add = 70 } }
+    else_if = { limit = { opinion = { target = scope:rf_palace_coup_contender value >= 40 } } change_variable = { name = rf_palace_coup_candidate_score add = 40 } }
+    else_if = { limit = { opinion = { target = scope:rf_palace_coup_contender value >= 10 } } change_variable = { name = rf_palace_coup_candidate_score add = 15 } }
+    if = { limit = { opinion = { target = scope:rf_palace_coup_contender value <= -60 } } change_variable = { name = rf_palace_coup_candidate_score add = -70 } }
+    else_if = { limit = { opinion = { target = scope:rf_palace_coup_contender value <= -20 } } change_variable = { name = rf_palace_coup_candidate_score add = -35 } }
+    if = {
+        limit = { has_dynasty = yes scope:rf_palace_coup_contender = { has_dynasty = yes } dynasty = scope:rf_palace_coup_contender.dynasty }
+        change_variable = { name = rf_palace_coup_candidate_score add = 60 }
+    }
+    if = { limit = { has_same_culture_as = scope:rf_palace_coup_contender } change_variable = { name = rf_palace_coup_candidate_score add = 25 } }
+    if = { limit = { faith = scope:rf_palace_coup_contender.faith } change_variable = { name = rf_palace_coup_candidate_score add = 25 } }
+    if = { limit = { religion = scope:rf_palace_coup_contender.religion } change_variable = { name = rf_palace_coup_candidate_score add = 10 } }
+}
+
+# Called on a voter. The leader scope supplies a county anchor even when the
+# challenger is still unlanded, or the old ruler still occupies the old capital.
+riseandfall_palace_coup_score_influence_geography_se = {
+    set_variable = { name = rf_palace_coup_candidate_border value = 0 }
+    if = {
+        limit = { capital_county.duchy = scope:rf_palace_coup_anchor.duchy }
+        change_variable = { name = rf_palace_coup_candidate_score add = 70 }
+    }
+    else_if = {
+        limit = { capital_county.kingdom = scope:rf_palace_coup_anchor.kingdom }
+        change_variable = { name = rf_palace_coup_candidate_score add = 40 }
+    }
+    every_in_list = {
+        variable = rf_palace_coup_subrealm_counties
+        if = {
+            limit = {
+                any_in_list = {
+                    variable = rf_palace_coup_neighbors
+                    var:rf_palace_coup_county_side ?= scope:rf_palace_coup_contender
+                }
+            }
+            scope:rf_palace_coup_voter = { set_variable = { name = rf_palace_coup_candidate_border value = 1 } }
+        }
+    }
+    if = {
+        limit = { var:rf_palace_coup_candidate_border = 1 }
+        change_variable = { name = rf_palace_coup_candidate_score add = 65 }
+    }
+    # A county's nearest territorial rally point outweighs ordinary court
+    # popularity. Disconnected personal holdings vote proportionally, avoiding
+    # an entire kingdom following whichever camp reaches its capital first.
+    set_variable = { name = rf_palace_coup_zone_share value = 0 }
+    set_variable = { name = rf_palace_coup_personal_counties value = 0 }
+    every_in_list = {
+        variable = rf_palace_coup_subrealm_counties
+        scope:rf_palace_coup_voter = { change_variable = { name = rf_palace_coup_personal_counties add = 1 } }
+        if = {
+            limit = { var:rf_palace_coup_zone_side ?= scope:rf_palace_coup_contender }
+            scope:rf_palace_coup_voter = { change_variable = { name = rf_palace_coup_zone_share add = 1 } }
+        }
+    }
+    if = {
+        limit = { var:rf_palace_coup_personal_counties > 0 }
+        change_variable = { name = rf_palace_coup_zone_share multiply = 240 }
+        change_variable = { name = rf_palace_coup_zone_share divide = var:rf_palace_coup_personal_counties }
+        change_variable = { name = rf_palace_coup_candidate_score add = var:rf_palace_coup_zone_share }
+    }
+}
+
+riseandfall_palace_coup_consider_influence_side_se = {
+    # Strict comparisons keep the first candidate on ties. The caller evaluates
+    # coup first in its core, otherwise incumbent first, then browser-order bidders.
+    if = {
+        limit = { var:rf_palace_coup_candidate_score > var:rf_palace_coup_best_score }
+        set_variable = { name = rf_palace_coup_runner_score value = var:rf_palace_coup_best_score }
+        set_variable = { name = rf_palace_coup_best_score value = var:rf_palace_coup_candidate_score }
+        set_variable = { name = rf_palace_coup_best_side value = scope:rf_palace_coup_contender days = 30 }
+    }
+    else_if = {
+        limit = { var:rf_palace_coup_candidate_score > var:rf_palace_coup_runner_score }
+        set_variable = { name = rf_palace_coup_runner_score value = var:rf_palace_coup_candidate_score }
+    }
+}
+
+riseandfall_palace_coup_evaluate_influence_contender_se = {
+    if = {
+        limit = { scope:rf_palace_coup_contender = scope:original_ruler }
+        set_variable = { name = rf_palace_coup_candidate_score value = var:rf_palace_coup_loyalist_score }
+        scope:palace_coup_retreat_county = { save_scope_as = rf_palace_coup_anchor }
+    }
+    else_if = {
+        limit = { scope:rf_palace_coup_contender = scope:palace_coup_challenger }
+        set_variable = { name = rf_palace_coup_candidate_score value = var:rf_palace_coup_coup_score }
+        scope:palace_coup_old_capital_county = { save_scope_as = rf_palace_coup_anchor }
+    }
+    else = {
+        riseandfall_palace_coup_score_claimant_influence_se = yes
+        scope:rf_palace_coup_contender.capital_county = { save_scope_as = rf_palace_coup_anchor }
+    }
+    if = {
+        limit = { scope:original_ruler = { has_variable = rf_palace_coup_grow_influence } }
+        riseandfall_palace_coup_score_influence_geography_se = yes
+    }
+    riseandfall_palace_coup_consider_influence_side_se = yes
+}
+
+riseandfall_palace_coup_choose_influence_side_se = {
+    save_scope_as = rf_palace_coup_voter
+    riseandfall_palace_coup_score_vassal_alignment_se = yes
+    remove_variable = rf_palace_coup_best_side
+    set_variable = { name = rf_palace_coup_best_score value = -99999 }
+    set_variable = { name = rf_palace_coup_runner_score value = -99999 }
+    if = {
+        limit = { capital_county.duchy = scope:palace_coup_core_duchy }
+        scope:palace_coup_challenger = { save_scope_as = rf_palace_coup_contender }
+        riseandfall_palace_coup_evaluate_influence_contender_se = yes
+        scope:original_ruler = { save_scope_as = rf_palace_coup_contender }
+        riseandfall_palace_coup_evaluate_influence_contender_se = yes
+    }
+    else = {
+        scope:original_ruler = { save_scope_as = rf_palace_coup_contender }
+        riseandfall_palace_coup_evaluate_influence_contender_se = yes
+        scope:palace_coup_challenger = { save_scope_as = rf_palace_coup_contender }
+        riseandfall_palace_coup_evaluate_influence_contender_se = yes
+    }
+    scope:original_ruler = {
+        every_in_list = {
+            variable = rf_palace_coup_contenders
+            limit = { NOT = { this = scope:original_ruler } NOT = { this = scope:palace_coup_challenger } }
+            save_scope_as = rf_palace_coup_contender
+            scope:rf_palace_coup_voter = { riseandfall_palace_coup_evaluate_influence_contender_se = yes }
+        }
+    }
+}
+
+riseandfall_palace_coup_record_influence_side_se = {
+    var:rf_palace_coup_influence_side = { save_scope_as = palace_coup_selected_claimant }
+    if = {
+        limit = { var:rf_palace_coup_influence_side = scope:original_ruler }
+        riseandfall_palace_coup_mark_loyalist_se = yes
+    }
+    else_if = {
+        limit = { var:rf_palace_coup_influence_side = scope:palace_coup_challenger }
+        riseandfall_palace_coup_mark_coup_se = yes
+    }
+    else = { riseandfall_palace_coup_mark_claimant_supporter_se = yes }
+    riseandfall_palace_coup_publish_influence_se = yes
+}
+
+riseandfall_palace_coup_allocate_influence_se = {
+    riseandfall_palace_coup_seed_influence_se = yes
+    riseandfall_palace_coup_build_territorial_zones_se = yes
+    set_variable = { name = rf_palace_coup_grow_influence value = 1 }
+    # Territory grows independently of political assignments. Otherwise the
+    # first camp to reach a lord could exclude a nearer rival from consideration.
+    every_in_list = {
+        variable = rf_palace_coup_vassals
+        limit = { is_alive = yes is_landed = yes NOT = { has_variable = rf_palace_coup_influence_side } }
+        riseandfall_palace_coup_choose_influence_side_se = yes
+        set_variable = { name = rf_palace_coup_next_side value = var:rf_palace_coup_best_side days = 30 }
+    }
+    every_in_list = {
+        variable = rf_palace_coup_vassals
+        limit = { has_variable = rf_palace_coup_next_side }
+        set_variable = { name = rf_palace_coup_influence_side value = var:rf_palace_coup_next_side days = 30 }
+        remove_variable = rf_palace_coup_next_side
+        riseandfall_palace_coup_record_influence_side_se = yes
+    }
+    remove_variable = rf_palace_coup_grow_influence
+    riseandfall_palace_coup_merge_small_pockets_se = yes
+}
+
+# Multi-source county growth produces territorial catchments before any ordinary
+# governor chooses sides. Each wave reads one immutable prior-wave frontier.
+riseandfall_palace_coup_build_territorial_zones_se = {
+    set_variable = { name = rf_palace_coup_zone_priority_cursor value = 0 }
+    every_in_list = {
+        variable = rf_palace_coup_contenders
+        set_variable = { name = rf_palace_coup_zone_priority value = scope:original_ruler.var:rf_palace_coup_zone_priority_cursor }
+        scope:original_ruler = { change_variable = { name = rf_palace_coup_zone_priority_cursor add = 1 } }
+    }
+    # If both principals start in one duchy, reserve the actual captured core
+    # and retreat county only. Seeding that entire duchy for the coup would
+    # surround the loyalist seed before any neutral province could join it.
+    every_in_list = {
+        variable = rf_palace_coup_counties
+        remove_variable = rf_palace_coup_zone_side
+        remove_variable = rf_palace_coup_zone_next_side
+        remove_variable = rf_palace_coup_zone_best_priority
+        if = {
+            limit = {
+                duchy = scope:palace_coup_core_duchy
+                OR = {
+                    NOT = { scope:palace_coup_retreat_county.duchy = scope:palace_coup_core_duchy }
+                    AND = {
+                        holder = scope:original_ruler
+                        NOT = { this = scope:palace_coup_retreat_county }
+                    }
+                }
+            }
+            set_variable = { name = rf_palace_coup_zone_side value = scope:palace_coup_challenger days = 30 }
+        }
+        else_if = {
+            limit = {
+                duchy = scope:palace_coup_retreat_county.duchy
+                NOT = { scope:palace_coup_retreat_county.duchy = scope:palace_coup_core_duchy }
+            }
+            set_variable = { name = rf_palace_coup_zone_side value = scope:original_ruler days = 30 }
+        }
+    }
+    every_in_list = {
+        variable = rf_palace_coup_contenders
+        limit = { NOT = { this = scope:original_ruler } NOT = { this = scope:palace_coup_challenger } }
+        save_scope_as = rf_palace_coup_zone_owner
+        scope:original_ruler = {
+            every_in_list = {
+                variable = rf_palace_coup_counties
+                limit = {
+                    NOT = { has_variable = rf_palace_coup_zone_side }
+                    duchy = scope:rf_palace_coup_zone_owner.capital_county.duchy
+                }
+                set_variable = { name = rf_palace_coup_zone_side value = scope:rf_palace_coup_zone_owner days = 30 }
+            }
+        }
+    }
+    # A player chooses for their existing sub-realm. Apply large sub-realms
+    # first so a nested player's explicit opposite choice remains authoritative.
+    ordered_in_list = {
+        variable = rf_palace_coup_vassals
+        limit = { is_ai = no has_variable = rf_palace_coup_influence_side }
+        order_by = realm_size
+        save_scope_as = rf_palace_coup_zone_owner
+        every_sub_realm_county = {
+            limit = { riseandfall_palace_coup_territorial_county_trigger = yes }
+            set_variable = { name = rf_palace_coup_zone_side value = scope:rf_palace_coup_zone_owner.var:rf_palace_coup_influence_side days = 30 }
+        }
+    }
+    # Only explicit player choices and contenders seed additional rally points.
+    # A distant AI friend must not bootstrap another territorial island.
+    every_in_list = {
+        variable = rf_palace_coup_vassals
+        limit = {
+            has_variable = rf_palace_coup_influence_side
+            OR = { is_ai = no has_character_flag = rf_palace_coup_claimant_bidder }
+        }
+        save_scope_as = rf_palace_coup_zone_owner
+        every_in_list = {
+            variable = rf_palace_coup_subrealm_counties
+            set_variable = { name = rf_palace_coup_zone_side value = scope:rf_palace_coup_zone_owner.var:rf_palace_coup_influence_side days = 30 }
+        }
+    }
+    scope:palace_coup_old_capital_county = {
+        set_variable = { name = rf_palace_coup_zone_side value = scope:palace_coup_challenger days = 30 }
+    }
+    scope:palace_coup_retreat_county = {
+        set_variable = { name = rf_palace_coup_zone_side value = scope:original_ruler days = 30 }
+    }
+    set_variable = { name = rf_palace_coup_zone_progress value = 1 }
+    set_variable = { name = rf_palace_coup_zone_rounds_left value = 1 }
+    every_in_list = {
+        variable = rf_palace_coup_counties
+        scope:original_ruler = { change_variable = { name = rf_palace_coup_zone_rounds_left add = 1 } }
+    }
+    while = {
+        limit = { var:rf_palace_coup_zone_progress > 0 var:rf_palace_coup_zone_rounds_left > 0 }
+        set_variable = { name = rf_palace_coup_zone_progress value = 0 }
+        change_variable = { name = rf_palace_coup_zone_rounds_left add = -1 }
+        every_in_list = {
+            variable = rf_palace_coup_counties
+            limit = { NOT = { has_variable = rf_palace_coup_zone_side } }
+            save_scope_as = rf_palace_coup_county
+            set_variable = { name = rf_palace_coup_zone_best_priority value = 99999 }
+            every_in_list = {
+                variable = rf_palace_coup_neighbors
+                limit = { has_variable = rf_palace_coup_zone_side }
+                var:rf_palace_coup_zone_side = { save_scope_as = rf_palace_coup_zone_neighbor }
+                scope:rf_palace_coup_county = {
+                    riseandfall_palace_coup_consider_zone_neighbor_se = yes
+                }
+            }
+        }
+        every_in_list = {
+            variable = rf_palace_coup_counties
+            limit = { has_variable = rf_palace_coup_zone_next_side }
+            set_variable = { name = rf_palace_coup_zone_side value = var:rf_palace_coup_zone_next_side days = 30 }
+            remove_variable = rf_palace_coup_zone_next_side
+            scope:original_ruler = { change_variable = { name = rf_palace_coup_zone_progress add = 1 } }
+        }
+    }
+}
+
+riseandfall_palace_coup_consider_zone_neighbor_se = {
+    if = {
+        limit = {
+            duchy = scope:palace_coup_core_duchy
+            scope:rf_palace_coup_zone_neighbor = scope:palace_coup_challenger
+        }
+        set_variable = { name = rf_palace_coup_zone_best_priority value = -1 }
+        set_variable = { name = rf_palace_coup_zone_next_side value = scope:palace_coup_challenger days = 30 }
+    }
+    else_if = {
+        limit = { scope:rf_palace_coup_zone_neighbor.var:rf_palace_coup_zone_priority < var:rf_palace_coup_zone_best_priority }
+        set_variable = { name = rf_palace_coup_zone_best_priority value = scope:rf_palace_coup_zone_neighbor.var:rf_palace_coup_zone_priority }
+        set_variable = { name = rf_palace_coup_zone_next_side value = scope:rf_palace_coup_zone_neighbor days = 30 }
+    }
+}
+
+# Label actual allegiance components, not distance zones: political overrides
+# can leave a one-county island even when the geographical catchment is coherent.
+# Merge only 1-3 county AI pockets with one unambiguous surrounding camp. Never
+# divide a lord's personal holdings, move player land, or erase a contender's base.
+riseandfall_palace_coup_merge_small_pockets_se = {
+    set_variable = { name = rf_palace_coup_component_cursor value = 0 }
+    every_in_list = {
+        variable = rf_palace_coup_counties
+        set_variable = { name = rf_palace_coup_component value = this }
+        set_variable = { name = rf_palace_coup_component_rank value = scope:original_ruler.var:rf_palace_coup_component_cursor }
+        scope:original_ruler = { change_variable = { name = rf_palace_coup_component_cursor add = 1 } }
+        set_variable = { name = rf_palace_coup_component_size value = 0 }
+        set_variable = { name = rf_palace_coup_component_protected value = 0 }
+        remove_variable = rf_palace_coup_component_border_side
+        remove_variable = rf_palace_coup_component_mixed_border
+    }
+    set_variable = { name = rf_palace_coup_component_progress value = 1 }
+    while = {
+        limit = { var:rf_palace_coup_component_progress > 0 }
+        set_variable = { name = rf_palace_coup_component_progress value = 0 }
+        every_in_list = {
+            variable = rf_palace_coup_counties
+            save_scope_as = rf_palace_coup_county
+            set_variable = { name = rf_palace_coup_component_next value = var:rf_palace_coup_component }
+            set_variable = { name = rf_palace_coup_component_next_rank value = var:rf_palace_coup_component_rank }
+            every_in_list = {
+                variable = rf_palace_coup_neighbors
+                limit = {
+                    var:rf_palace_coup_county_side ?= scope:rf_palace_coup_county.var:rf_palace_coup_county_side
+                    var:rf_palace_coup_component_rank < scope:rf_palace_coup_county.var:rf_palace_coup_component_next_rank
+                }
+                save_scope_as = rf_palace_coup_neighbor
+                scope:rf_palace_coup_county = {
+                    set_variable = { name = rf_palace_coup_component_next value = scope:rf_palace_coup_neighbor.var:rf_palace_coup_component }
+                    set_variable = { name = rf_palace_coup_component_next_rank value = scope:rf_palace_coup_neighbor.var:rf_palace_coup_component_rank }
+                }
+            }
+        }
+        # Publish together so the result does not depend on county browser order.
+        every_in_list = {
+            variable = rf_palace_coup_counties
+            limit = { var:rf_palace_coup_component_next_rank < var:rf_palace_coup_component_rank }
+            set_variable = { name = rf_palace_coup_component value = var:rf_palace_coup_component_next }
+            set_variable = { name = rf_palace_coup_component_rank value = var:rf_palace_coup_component_next_rank }
+            scope:original_ruler = { change_variable = { name = rf_palace_coup_component_progress add = 1 } }
+        }
+    }
+    every_in_list = {
+        variable = rf_palace_coup_counties
+        save_scope_as = rf_palace_coup_county
+        var:rf_palace_coup_component = { save_scope_as = rf_palace_coup_component }
+        scope:rf_palace_coup_component = { change_variable = { name = rf_palace_coup_component_size add = 1 } }
+        # The two principal domains and claimant seats keep their existing land.
+        # A ruler holding counties in multiple components cannot be moved intact.
+        if = {
+            limit = {
+                OR = {
+                    this = scope:palace_coup_old_capital_county
+                    this = scope:palace_coup_retreat_county
+                    holder = scope:original_ruler
+                    holder = scope:palace_coup_challenger
+                    holder = {
+                        OR = {
+                            is_ai = no
+                            has_character_flag = rf_palace_coup_claimant_bidder
+                            NOT = { has_variable = rf_palace_coup_influence_side }
+                            any_in_list = {
+                                variable = rf_palace_coup_subrealm_counties
+                                NOT = { var:rf_palace_coup_component ?= scope:rf_palace_coup_component }
+                            }
+                        }
+                    }
+                }
+            }
+            scope:rf_palace_coup_component = { set_variable = { name = rf_palace_coup_component_protected value = 1 } }
+        }
+        every_in_list = {
+            variable = rf_palace_coup_neighbors
+            limit = { NOT = { var:rf_palace_coup_county_side ?= scope:rf_palace_coup_county.var:rf_palace_coup_county_side } }
+            var:rf_palace_coup_county_side = { save_scope_as = rf_palace_coup_border_side }
+            scope:rf_palace_coup_component = {
+                if = {
+                    limit = { NOT = { has_variable = rf_palace_coup_component_border_side } }
+                    set_variable = { name = rf_palace_coup_component_border_side value = scope:rf_palace_coup_border_side }
+                }
+                else_if = {
+                    limit = { NOT = { var:rf_palace_coup_component_border_side ?= scope:rf_palace_coup_border_side } }
+                    set_variable = { name = rf_palace_coup_component_mixed_border value = 1 }
+                }
+            }
+        }
+    }
+    every_in_list = {
+        variable = rf_palace_coup_vassals
+        limit = {
+            is_ai = yes is_alive = yes is_landed = yes has_variable = rf_palace_coup_influence_side
+            capital_county = { has_variable = rf_palace_coup_component }
+        }
+        save_scope_as = rf_palace_coup_vassal
+        capital_county.var:rf_palace_coup_component = { save_scope_as = rf_palace_coup_component }
+        if = {
+            limit = {
+                scope:rf_palace_coup_component = {
+                    var:rf_palace_coup_component_size <= 3
+                    var:rf_palace_coup_component_protected = 0
+                    has_variable = rf_palace_coup_component_border_side
+                    NOT = { has_variable = rf_palace_coup_component_mixed_border }
+                }
+                # Require an established receiving bloc, avoiding swaps between
+                # two tiny isolated fragments on the same disconnected island.
+                any_in_list = {
+                    variable = rf_palace_coup_subrealm_counties
+                    any_in_list = {
+                        variable = rf_palace_coup_neighbors
+                        var:rf_palace_coup_county_side ?= scope:rf_palace_coup_component.var:rf_palace_coup_component_border_side
+                        var:rf_palace_coup_component = {
+                            OR = {
+                                var:rf_palace_coup_component_size > 3
+                                var:rf_palace_coup_component_protected = 1
+                            }
+                        }
+                    }
+                }
+            }
+            set_variable = { name = rf_palace_coup_next_side value = scope:rf_palace_coup_component.var:rf_palace_coup_component_border_side days = 30 }
+        }
+    }
+    every_in_list = {
+        variable = rf_palace_coup_vassals
+        limit = { has_variable = rf_palace_coup_next_side }
+        set_variable = { name = rf_palace_coup_influence_side value = var:rf_palace_coup_next_side days = 30 }
+        remove_variable = rf_palace_coup_next_side
+        riseandfall_palace_coup_record_influence_side_se = yes
+    }
+}
+
+# Restore only the prepared base and its crown if native callbacks retired them.
+# The captured capital core stays with the challenger, and no new donor is chosen.
+riseandfall_palace_coup_restore_retreat_se = {
+    if = {
+        limit = {
+            exists = scope:palace_coup_retreat_county
+            NOT = { scope:palace_coup_retreat_county = { holder = scope:original_ruler } }
+        }
+        debug_log = "RF Palace Coup: native callbacks removed the prepared retreat county; restoring it."
+        create_title_and_vassal_change = {
+            type = granted
+            save_scope_as = rf_palace_coup_restore_base_change
+            add_claim_on_loss = no
+        }
+        scope:palace_coup_retreat_county = {
+            change_title_holder = {
+                holder = scope:original_ruler
+                change = scope:rf_palace_coup_restore_base_change
+                government_base = scope:palace_coup_challenger
+            }
+        }
+        resolve_title_and_vassal_change = scope:rf_palace_coup_restore_base_change
+    }
+    if = {
+        limit = {
+            exists = scope:palace_coup_root_successor_title
+            NOT = { scope:palace_coup_root_successor_title = { holder = scope:original_ruler } }
+        }
+        debug_log = "RF Palace Coup: native callbacks removed the prepared successor crown; restoring it."
+        create_title_and_vassal_change = {
+            type = created
+            save_scope_as = rf_palace_coup_restore_crown_change
+            add_claim_on_loss = no
+        }
+        scope:palace_coup_root_successor_title = {
+            change_title_holder = {
+                holder = scope:original_ruler
+                change = scope:rf_palace_coup_restore_crown_change
+                government_base = scope:palace_coup_challenger
+            }
+        }
+        resolve_title_and_vassal_change = scope:rf_palace_coup_restore_crown_change
+    }
+    if = {
+        limit = { scope:palace_coup_root_successor_title = { holder = scope:original_ruler } }
+        scope:palace_coup_root_successor_title = { generate_coa = yes }
+        set_primary_title_to = scope:palace_coup_root_successor_title
+    }
+}
+
+riseandfall_palace_coup_transfer_influence_realms_se = {
+    create_title_and_vassal_change = {
+        type = granted
+        save_scope_as = palace_coup_provincial_change
+        add_claim_on_loss = no
+    }
+    every_in_list = {
+        variable = rf_palace_coup_vassals
+        limit = { is_alive = yes is_landed = yes has_variable = rf_palace_coup_influence_side }
+        save_scope_as = rf_palace_coup_vassal
+        var:rf_palace_coup_influence_side = { save_scope_as = rf_palace_coup_contender }
+        if = {
+            limit = { NOT = { this = scope:rf_palace_coup_contender } }
+            scope:rf_palace_coup_contender = { save_scope_as = rf_palace_coup_destination }
+            if = {
+                limit = { has_variable = rf_palace_coup_original_liege }
+                var:rf_palace_coup_original_liege = { save_scope_as = rf_palace_coup_parent }
+                if = {
+                    limit = {
+                        scope:rf_palace_coup_parent = {
+                            is_alive = yes
+                            is_landed = yes
+                            var:rf_palace_coup_influence_side ?= scope:rf_palace_coup_contender
+                            primary_title.tier > scope:rf_palace_coup_vassal.primary_title.tier
+                        }
+                    }
+                    scope:rf_palace_coup_parent = { save_scope_as = rf_palace_coup_destination }
+                }
+            }
+            if = {
+                limit = {
+                    primary_title.tier < scope:rf_palace_coup_destination.primary_title.tier
+                    NOT = { is_vassal_of = scope:rf_palace_coup_destination }
+                }
+                change_liege = { liege = scope:rf_palace_coup_destination change = scope:palace_coup_provincial_change }
+            }
+            else_if = {
+                limit = {
+                    primary_title.tier >= scope:rf_palace_coup_destination.primary_title.tier
+                    is_independent_ruler = no
+                }
+                becomes_independent = { change = scope:palace_coup_provincial_change }
+            }
+        }
+    }
+    resolve_title_and_vassal_change = scope:palace_coup_provincial_change
+    # Preserve the equal-rank fallback as an allied independent participant.
+    every_in_list = {
+        variable = rf_palace_coup_vassals
+        limit = { is_alive = yes is_independent_ruler = yes has_variable = rf_palace_coup_influence_side }
+        var:rf_palace_coup_influence_side = { save_scope_as = rf_palace_coup_contender }
+        if = {
+            limit = { NOT = { this = scope:rf_palace_coup_contender } NOT = { is_allied_to = scope:rf_palace_coup_contender } }
+            create_alliance = scope:rf_palace_coup_contender
+            riseandfall_apply_palace_coup_successor_grace_se = yes
+        }
+    }
+}
+
+# Retain evidence across the handoff: source allocation and the engine's final
+# top liege can differ even when change_liege ran without a scripting error.
+riseandfall_palace_coup_log_influence_mismatches_se = {
+    # debug_log localization exposes ROOT/SCOPE/PREV, unlike event tooltips.
+    # Native scope dumps retain IDs and typed targets without a string formatter.
+    debug_log = "RF Palace Coup: principal and saved crown scopes."
+    debug_log_scopes = yes
+    set_variable = { name = rf_palace_coup_diagnostics_left value = 5 }
+    if = {
+        limit = { NOT = { has_variable_list = rf_palace_coup_vassals } }
+        debug_log = "RF Palace Coup: recorded voter list is empty or missing."
+    }
+    every_in_list = {
+        variable = rf_palace_coup_vassals
+        limit = { is_alive = yes has_variable = rf_palace_coup_influence_side }
+        save_scope_as = rf_palace_coup_diagnostic_vassal
+        var:rf_palace_coup_influence_side = { save_scope_as = rf_palace_coup_diagnostic_expected }
+        top_liege = { save_scope_as = rf_palace_coup_diagnostic_actual }
+        primary_title = { save_scope_as = rf_palace_coup_diagnostic_title }
+        if = {
+            limit = { var:rf_palace_coup_influence_side = scope:original_ruler }
+            debug_log = "RF Palace Coup: recorded incumbent supporter."
+        }
+        else_if = {
+            limit = { var:rf_palace_coup_influence_side = scope:palace_coup_challenger }
+            debug_log = "RF Palace Coup: recorded challenger supporter."
+        }
+        else = { debug_log = "RF Palace Coup: recorded claimant supporter." }
+        if = {
+            limit = { is_landed = no }
+            debug_log = "RF Palace Coup: recorded territorial voter is now landless."
+        }
+        if = {
+            limit = {
+                NOT = { top_liege = var:rf_palace_coup_influence_side }
+                scope:original_ruler = { var:rf_palace_coup_diagnostics_left > 0 }
+            }
+            debug_log = "RF Palace Coup: assigned camp differs from actual top liege."
+            debug_log_scopes = yes
+            scope:original_ruler = { change_variable = { name = rf_palace_coup_diagnostics_left add = -1 } }
+        }
+    }
+    remove_variable = rf_palace_coup_diagnostics_left
+    clear_saved_scope = rf_palace_coup_diagnostic_vassal
+    clear_saved_scope = rf_palace_coup_diagnostic_expected
+    clear_saved_scope = rf_palace_coup_diagnostic_actual
+    clear_saved_scope = rf_palace_coup_diagnostic_title
+}
+
+riseandfall_palace_coup_clear_influence_se = {
+    every_in_list = {
+        variable = rf_palace_coup_counties
+        remove_variable = rf_palace_coup_player_side
+        remove_variable = rf_palace_coup_county_side
+        remove_variable = rf_palace_coup_zone_side
+        remove_variable = rf_palace_coup_zone_next_side
+        remove_variable = rf_palace_coup_zone_best_priority
+        remove_variable = rf_palace_coup_component
+        remove_variable = rf_palace_coup_component_rank
+        remove_variable = rf_palace_coup_component_next
+        remove_variable = rf_palace_coup_component_next_rank
+        remove_variable = rf_palace_coup_component_size
+        remove_variable = rf_palace_coup_component_protected
+        remove_variable = rf_palace_coup_component_border_side
+        remove_variable = rf_palace_coup_component_mixed_border
+        clear_variable_list = rf_palace_coup_neighbors
+    }
+    every_in_list = {
+        variable = rf_palace_coup_vassals
+        clear_variable_list = rf_palace_coup_subrealm_counties
+        remove_variable = rf_palace_coup_influence_side
+        remove_variable = rf_palace_coup_original_liege
+        remove_variable = rf_palace_coup_zone_share
+        remove_variable = rf_palace_coup_personal_counties
+        remove_variable = rf_palace_coup_next_side
+        remove_variable = rf_palace_coup_best_side
+        remove_variable = rf_palace_coup_best_score
+        remove_variable = rf_palace_coup_runner_score
+        remove_variable = rf_palace_coup_candidate_score
+        remove_variable = rf_palace_coup_candidate_border
+        remove_variable = rf_palace_coup_supported_claimant
+        remove_character_flag = rf_palace_coup_ai_claimant_bidder
+        remove_character_flag = rf_palace_coup_claimant_bidder
+        remove_variable = rf_palace_coup_claimant_page
+        remove_variable = rf_palace_coup_claimant_has_overflow
+        riseandfall_palace_coup_clear_vassal_choice_se = yes
+    }
+    every_in_list = { variable = rf_palace_coup_contenders remove_variable = rf_palace_coup_zone_priority }
+    clear_variable_list = rf_palace_coup_counties
+    clear_variable_list = rf_palace_coup_vassals
+    clear_variable_list = rf_palace_coup_contenders
+    remove_variable = rf_palace_coup_retreat_county
+    remove_variable = rf_palace_coup_grow_influence
+    remove_variable = rf_palace_coup_zone_priority_cursor
+    remove_variable = rf_palace_coup_zone_progress
+    remove_variable = rf_palace_coup_component_cursor
+    remove_variable = rf_palace_coup_component_progress
+    clear_saved_scope = rf_palace_coup_component
+    clear_saved_scope = rf_palace_coup_border_side
+    remove_variable = rf_palace_coup_zone_rounds_left
+    clear_saved_scope = rf_palace_coup_zone_owner
+    clear_saved_scope = rf_palace_coup_zone_neighbor
+    clear_saved_scope = rf_palace_coup_parent
+    clear_saved_scope = rf_palace_coup_destination
+    clear_saved_scope = rf_palace_coup_voter
+    clear_saved_scope = rf_palace_coup_contender
+    clear_saved_scope = rf_palace_coup_anchor
+    clear_saved_scope = rf_palace_coup_vassal
+    clear_saved_scope = rf_palace_coup_county
+    clear_saved_scope = rf_palace_coup_neighbor
+    riseandfall_palace_coup_clear_claimant_browser_se = yes
+    clear_saved_scope = palace_coup_voter
+}

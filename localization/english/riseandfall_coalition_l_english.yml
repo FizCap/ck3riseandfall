@@ -92,3 +92,5 @@
  rf_coalition_vote_result_light:0 "Light Punishment — Coalition Indemnity"
  rf_coalition_vote_result_medium:0 "Medium Punishment — Indemnity and Peripheral Concessions"
  rf_coalition_vote_result_heavy:0 "Heavy Punishment — Indemnity, Abdication, and Full Peripheral Breakup"
+
+ riseandfall_coalition.target_threat_unrestricted.tooltip:0 "The target must have reached 100 Coalition Threat. Unrestricted Coalitions have no world-size, peripheral-territory, relative-size, cooldown, or Coalition strength requirements."

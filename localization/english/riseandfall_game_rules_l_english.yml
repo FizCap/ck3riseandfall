@@ -95,10 +95,10 @@ setting_riseandfall_interaction_stability_disabled:0 "Disabled"
 setting_riseandfall_interaction_stability_disabled_desc:0 "Does not show stability or adventurer chance markers in the character interaction menu."
 
 # Independent Coalition rule
-rule_riseandfall_independent_coalitions:0 "Coalitions (Beta)"
-setting_riseandfall_independent_coalitions_enabled:0 "Enabled"
+rule_riseandfall_independent_coalitions:0 "Coalitions"
+setting_riseandfall_independent_coalitions_enabled:0 "Restricted"
 setting_riseandfall_independent_coalitions_enabled_desc:0 "Independent rulers may start Coalitions against large, overextended realms through a character interaction. AI rulers may use the same interaction."
-setting_riseandfall_independent_coalitions_disabled:0 "Disabled"
+setting_riseandfall_independent_coalitions_disabled:0 "Off"
 setting_riseandfall_independent_coalitions_disabled_desc:0 "Only the separate Low Stability Coalition incident may form Coalitions."
 
 # Low Stability Events rule
@@ -160,3 +160,6 @@ setting_riseandfall_dynamic_story_mode_forced:0 "Accelerated (50-100 Years)"
 setting_riseandfall_dynamic_story_mode_forced_desc:0 "Uses the existing high-impact collapse curve to try to break selected oversized, stable realms over roughly 50-100 years. The exact timing depends on the realm's strength, rivals, stability, and available crisis events."
 setting_riseandfall_dynamic_story_mode_dynamic:0 "Long Campaign (200-300 Years)"
 setting_riseandfall_dynamic_story_mode_dynamic_desc:0 "Builds collapse pressure slowly to try to break selected oversized, stable realms over roughly 200-300 years. The exact timing depends on the realm's strength, rivals, stability, and available crisis events."
+
+setting_riseandfall_independent_coalitions_unrestricted:0 "Unrestricted"
+setting_riseandfall_independent_coalitions_unrestricted_desc:0 "Independent rulers may start Coalitions against any independent landed ruler at 100 Coalition Threat, without world-size, peripheral-territory, relative-size, cooldown, or Coalition strength requirements. Normal diplomatic and participant requirements still apply. Threat is tracked for all independent landed rulers; this may significantly reduce performance. The separate Low Stability Coalition incident keeps its own rules."

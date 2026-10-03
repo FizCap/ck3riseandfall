@@ -167,6 +167,8 @@ riseandfall_transfer_rightful_vassals = {
 }
 
 
+# Court recruitment needs a title-holding ruler, including landless religious heads
+# and adventurer camp leaders; county/barony ownership is not required.
 # Player: toggle guardian assignment for house children in the ruler's court.
 riseandfall_automate_house_child_guardians = {
     picture = { reference = "gfx/interface/illustrations/decisions/decision_misc.dds" }
@@ -177,13 +179,13 @@ riseandfall_automate_house_child_guardians = {
     decision_group_type = courtier_automation
 
     is_shown = {
-        is_landed = yes
+        is_ruler = yes
         NOT = { exists = global_var:riseandfall_hide_other_decisions }
         exists = house
         NOT = { has_character_flag = riseandfall_auto_house_child_guardians_enabled }
     }
 
-    is_valid = { is_landed = yes }
+    is_valid = { is_ruler = yes }
 
     effect = {
         add_character_flag = { flag = riseandfall_auto_house_child_guardians_enabled }
@@ -204,13 +206,13 @@ riseandfall_disable_automate_house_child_guardians = {
     decision_group_type = courtier_automation
 
     is_shown = {
-        is_landed = yes
+        is_ruler = yes
         NOT = { exists = global_var:riseandfall_hide_other_decisions }
         exists = house
         has_character_flag = riseandfall_auto_house_child_guardians_enabled
     }
 
-    is_valid = { is_landed = yes }
+    is_valid = { is_ruler = yes }
 
     effect = { remove_character_flag = riseandfall_auto_house_child_guardians_enabled }
 
@@ -227,11 +229,11 @@ riseandfall_enable_auto_invite_knights = {
     decision_group_type = courtier_automation
 
     is_shown = {
-        is_landed = yes
+        is_ruler = yes
         NOT = { exists = global_var:riseandfall_hide_other_decisions }
     }
     # Search only after clicking; availability checks here scan courts on menu refresh.
-    is_valid = { is_landed = yes }
+    is_valid = { is_ruler = yes }
     effect = { trigger_event = { id = riseandfall_courtier_browser.0014 } }
     ai_potential = {}
     ai_will_do = { base = 0 }
@@ -246,11 +248,11 @@ riseandfall_disable_auto_invite_knights = {
     decision_group_type = courtier_automation
 
     is_shown = {
-        is_landed = yes
+        is_ruler = yes
         NOT = { exists = global_var:riseandfall_hide_other_decisions }
     }
     # Search only after clicking; availability checks here scan courts on menu refresh.
-    is_valid = { is_landed = yes }
+    is_valid = { is_ruler = yes }
     effect = { trigger_event = { id = riseandfall_courtier_browser.0016 } }
     ai_potential = {}
     ai_will_do = { base = 0 }
@@ -265,11 +267,11 @@ riseandfall_invite_best_free_courtier = {
     decision_group_type = courtier_automation
 
     is_shown = {
-        is_landed = yes
+        is_ruler = yes
         NOT = { exists = global_var:riseandfall_hide_other_decisions }
     }
     # Search only after clicking; availability checks here scan courts on menu refresh.
-    is_valid = { is_landed = yes }
+    is_valid = { is_ruler = yes }
     effect = { trigger_event = { id = riseandfall_courtier_browser.0010 } }
     ai_potential = {}
     ai_will_do = { base = 0 }
@@ -284,11 +286,11 @@ riseandfall_recruit_best_paid_courtier = {
     decision_group_type = courtier_automation
 
     is_shown = {
-        is_landed = yes
+        is_ruler = yes
         NOT = { exists = global_var:riseandfall_hide_other_decisions }
     }
     # Search only after clicking; availability checks here scan courts on menu refresh.
-    is_valid = { is_landed = yes }
+    is_valid = { is_ruler = yes }
     effect = { trigger_event = { id = riseandfall_courtier_browser.0011 } }
     ai_potential = {}
     ai_will_do = { base = 0 }
@@ -303,11 +305,11 @@ riseandfall_enable_auto_invite_guardians = {
     decision_group_type = courtier_automation
 
     is_shown = {
-        is_landed = yes
+        is_ruler = yes
         NOT = { exists = global_var:riseandfall_hide_other_decisions }
     }
     # Search only after clicking; availability checks here scan courts on menu refresh.
-    is_valid = { is_landed = yes }
+    is_valid = { is_ruler = yes }
     effect = { trigger_event = { id = riseandfall_courtier_browser.0012 } }
     ai_potential = {}
     ai_will_do = { base = 0 }
@@ -322,11 +324,11 @@ riseandfall_disable_auto_invite_guardians = {
     decision_group_type = courtier_automation
 
     is_shown = {
-        is_landed = yes
+        is_ruler = yes
         NOT = { exists = global_var:riseandfall_hide_other_decisions }
     }
     # Search only after clicking; availability checks here scan courts on menu refresh.
-    is_valid = { is_landed = yes }
+    is_valid = { is_ruler = yes }
     effect = { trigger_event = { id = riseandfall_courtier_browser.0013 } }
     ai_potential = {}
     ai_will_do = { base = 0 }

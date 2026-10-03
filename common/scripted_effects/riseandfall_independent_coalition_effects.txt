@@ -14,8 +14,10 @@ riseandfall_coalition_start_interaction_se = {
             riseandfall_coalition_interaction_target_valid_trigger = yes
             has_variable = rf_coalition_threat
             var:rf_coalition_threat >= 100
-            riseandfall_coalition_target_controls_five_percent_world_trigger = yes
-            realm_size >= { value = $INITIATOR$.realm_size multiply = 2 }
+            OR = {
+                has_game_rule = riseandfall_independent_coalitions_unrestricted
+                realm_size >= { value = $INITIATOR$.realm_size multiply = 2 }
+            }
         }
         set_variable = { name = rf_coalition_initiator value = $INITIATOR$ days = 60 }
         add_character_flag = { flag = rf_coalition_interaction_formation days = 60 }

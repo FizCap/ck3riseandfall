@@ -541,3 +541,22 @@ palace_coup.2004 = {
 		ai_chance = { base = 100 }
 	}
 }
+
+# Execution boundaries: option previews must not enter the stateful county
+# allocator, including when the final answer comes from a delayed vassal event.
+palace_coup.1300 = {
+    type = character_event
+    hidden = yes
+    immediate = { riseandfall_palace_coup_prepare_rebellion = yes }
+}
+
+palace_coup.1301 = {
+    type = character_event
+    hidden = yes
+    trigger = {
+        has_variable = rf_palace_coup_active_challenger
+        has_variable_list = rf_palace_coup_counties
+        has_variable = rf_palace_coup_retreat_county
+    }
+    immediate = { riseandfall_palace_coup_root_flees_success = yes }
+}

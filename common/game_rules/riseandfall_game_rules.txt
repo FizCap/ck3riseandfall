@@ -304,10 +304,12 @@ riseandfall_independent_coalitions = {
     categories = { riseandfall }
     default = riseandfall_independent_coalitions_enabled
 
-    riseandfall_independent_coalitions_enabled = { }
+    # Retain the enabled/disabled IDs for existing campaign rule compatibility.
     riseandfall_independent_coalitions_disabled = {
         flag = riseandfall_independent_coalitions_disabled
     }
+    riseandfall_independent_coalitions_enabled = { }
+    riseandfall_independent_coalitions_unrestricted = { }
 }
 
 riseandfall_enable_interaction_stability = {

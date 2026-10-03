@@ -26,7 +26,7 @@ on_war_won_attacker = {
 }
 
 riseandfall_refresh_independent_coalition_periphery = {
-    trigger = { has_game_rule = riseandfall_independent_coalitions_enabled }
+    trigger = { riseandfall_independent_coalitions_active_trigger = yes }
     effect = {
         every_ruler = {
             limit = {
@@ -50,7 +50,7 @@ riseandfall_refresh_independent_coalition_periphery = {
 # New campaigns begin at zero threat. Subsequent yearly pulses are what make
 # expansion and prolonged hegemony accumulate into a Coalition crisis.
 riseandfall_initialize_independent_coalition_threat = {
-    trigger = { has_game_rule = riseandfall_independent_coalitions_enabled }
+    trigger = { riseandfall_independent_coalitions_active_trigger = yes }
     effect = {
         every_ruler = {
             limit = {
@@ -76,7 +76,7 @@ riseandfall_initialize_independent_coalition_threat = {
 # crown; ordinary secondary-title inheritances must not overwrite another realm.
 riseandfall_inherit_independent_coalition_threat = {
     trigger = {
-        has_game_rule = riseandfall_independent_coalitions_enabled
+        riseandfall_independent_coalitions_active_trigger = yes
         is_alive = yes
         is_landed = yes
         is_independent_ruler = yes
@@ -100,7 +100,7 @@ riseandfall_inherit_independent_coalition_threat = {
 # offers of vassalage do not create Coalition Threat.
 riseandfall_record_coalition_vassalization_conquest = {
     trigger = {
-        has_game_rule = riseandfall_independent_coalitions_enabled
+        riseandfall_independent_coalitions_active_trigger = yes
         exists = scope:war
         scope:war = {
             OR = {

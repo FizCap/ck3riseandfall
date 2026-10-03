@@ -1,4 +1,46 @@
-﻿# Availability checks for the one-time Courtier Automation recruitment actions.
+﻿# Actor scope; RECIPIENT is the foreign candidate. Match vanilla travel-expense
+# willingness, including Greedy/Generous bonuses, without paying for free invites.
+riseandfall_courtier_browser_paid_invite_trigger = {
+    NOT = {
+        is_character_interaction_potentially_accepted = {
+            recipient = $RECIPIENT$
+            interaction = invite_to_court_interaction
+            required_response = yes
+            ai_accept = 0
+        }
+    }
+    OR = {
+        AND = {
+            $RECIPIENT$ = { has_trait = greedy }
+            is_character_interaction_potentially_accepted = {
+                recipient = $RECIPIENT$
+                interaction = invite_to_court_interaction
+                required_response = yes
+                ai_accept = -30
+            }
+        }
+        AND = {
+            $RECIPIENT$ = { NOT = { has_trait = greedy } has_trait = generous }
+            is_character_interaction_potentially_accepted = {
+                recipient = $RECIPIENT$
+                interaction = invite_to_court_interaction
+                required_response = yes
+                ai_accept = -10
+            }
+        }
+        AND = {
+            $RECIPIENT$ = { NOT = { has_trait = greedy } NOT = { has_trait = generous } }
+            is_character_interaction_potentially_accepted = {
+                recipient = $RECIPIENT$
+                interaction = invite_to_court_interaction
+                required_response = yes
+                ai_accept = -20
+            }
+        }
+    }
+}
+
+# Availability checks for the one-time Courtier Automation recruitment actions.
 # These use any-candidate triggers and avoid building/sorting the full result lists.
 
 riseandfall_courtier_automation_has_free_knight_candidate_trigger = {
