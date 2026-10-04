@@ -345,6 +345,8 @@ riseandfall_ai_advanced_destroy_unwanted_titles_se = {
                     }
                 }
                 NOT = { this = scope:rf_advanced_cleanup_ruler.primary_title }
+                # Clerical regions are religious offices, not spare secular crowns.
+                has_clerical_region = no
                 is_landless_type_title = no
                 NOT = { is_head_of_faith = yes }
                 NOT = { is_nomad_title = yes }

@@ -1,3 +1,3 @@
-﻿CK3: Rise and Fall - 1.4.2
+﻿CK3: Rise and Fall - 1.4.3
 
-- Removed Basic from the AI Title Creation game rule, made Advanced the default, and removed its (Beta) label.
+- Prevented Advanced AI title creation from destroying clerical region titles during title replacement and cleanup.

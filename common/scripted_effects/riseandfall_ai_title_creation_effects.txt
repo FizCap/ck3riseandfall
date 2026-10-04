@@ -14,6 +14,8 @@ riseandfall_destroy_same_tier_dynamic_titles_se = {
             primary_title = {
                 tier = scope:target_title.tier
                 is_titular = yes
+                # Clerical region offices must survive secular title replacement.
+                has_clerical_region = no
                 NOT = { this = scope:target_title }
             }
         }
@@ -46,6 +48,8 @@ riseandfall_destroy_same_tier_dynamic_titles_se = {
                 tier = scope:target_title.tier
                 NOT = { this = scope:target_title }
                 is_titular = yes
+                # Clerical region offices must survive secular title replacement.
+                has_clerical_region = no
                 NOT = { is_head_of_faith = yes }
                 NOT = { is_nomad_title = yes }
                 NOT = { is_noble_family_title = yes }
@@ -101,6 +105,8 @@ riseandfall_cleanup_titular_titles_se = {
         # Those are special and must not be destroyed by the AI creation/cleanup process.
         limit = {
             is_titular = yes
+            # Clerical regions can be titular duchies, including Roma.
+            has_clerical_region = no
             NOT = { is_head_of_faith = yes }
             NOT = { is_nomad_title = yes }
             NOT = { is_noble_family_title = yes }

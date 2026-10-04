@@ -27,6 +27,8 @@ Read this guide when changing title laws, succession, diarchies, court positions
 
 ## Title and realm mutations
 
+- Generated `docs/triggers.log` defines title-scoped `has_clerical_region`; vanilla uses it to identify clerical region offices. Exclude titles with `has_clerical_region = yes` from secular spare-title destruction. `is_head_of_faith` only identifies the faith-head title, so it does not protect every clerical region held by that ruler.
+
 - Administrative noble-family titles can be county-tier without territorial land. The 2026-10-03 post-coup save showed `c_nf_zhao_8d99_1` used as the loyalist county influence seed, while the fleeing ruler lost both real counties and his dynamic hegemony was destroyed twice. Filter county title loops with `is_noble_family_title = no` and `is_landless_type_title = no` when selecting retreats, counting donor spare counties, collecting personal territorial votes or building the county graph. `tier = tier_county` alone is insufficient; character `is_landed = yes` does not filter their held family title.
 
 - `debug_log` localization has ROOT/SCOPE/PREV contexts; direct saved-name event-tooltip expressions failed in the Palace Coup runtime log on 2026-10-03. Prefer `debug_log_scopes = yes` to inspect typed saved targets and engine IDs, and cap repeated dumps. This differs from event text, which supports direct saved-name expressions.
