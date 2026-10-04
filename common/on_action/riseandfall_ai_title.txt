@@ -1,8 +1,5 @@
 ﻿yearly_global_pulse = {
     on_actions = {
-        riseandfall_ai_create_titles
-        riseandfall_ai_usurp_titles
-        riseandfall_ai_title_handout
         riseandfall_ai_advanced_destroy_titles
         riseandfall_player_guardian_automation_yearly
     }
@@ -14,44 +11,6 @@ random_yearly_everyone_pulse = {
     on_actions = {
         riseandfall_ai_advanced_create_titles
         riseandfall_ai_advanced_title_handout
-    }
-}
-
-on_game_start_after_lobby = {
-    on_actions = {
-        riseandfall_ai_county_handout
-    }
-}
-
-
-
-riseandfall_ai_create_titles = {
-    trigger = {
-        has_game_rule = riseandfall_ai_kingdom_creation_enabled
-    }
-    effect = {
-        riseandfall_ai_create_titles_se = yes
-    }
-}
-
-riseandfall_ai_usurp_titles = {
-    trigger = {
-        has_game_rule = riseandfall_ai_kingdom_creation_enabled
-    }
-    effect = {
-        riseandfall_ai_usurp_titles_se = yes
-    }
-}
-
-riseandfall_ai_title_handout = {
-    trigger = {
-        has_game_rule = riseandfall_ai_kingdom_creation_enabled
-    }
-    effect = {
-        every_ruler = {
-            limit = { is_ai = yes }
-            riseandfall_ai_title_handout_se = yes
-        }
     }
 }
 
@@ -112,18 +71,6 @@ riseandfall_player_guardian_automation_yearly = {
                 limit = { has_character_flag = riseandfall_auto_house_child_guardians_enabled }
                 riseandfall_player_automate_house_child_guardians_se = yes
             }
-        }
-    }
-}
-
-riseandfall_ai_county_handout = {
-    trigger = {
-        has_game_rule = riseandfall_ai_kingdom_creation_enabled
-    }
-    effect = {
-        every_ruler = {
-            limit = { is_ai = yes domain_limit_available < -10 }
-            riseandfall_grant_counties_se = yes
         }
     }
 }
