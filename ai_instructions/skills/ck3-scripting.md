@@ -37,6 +37,8 @@ emove_character_flag = flag_name; set_character_flag is not a valid effect.
 
 ## Hooks, armies, and war callbacks
 
+- Installed vanilla common/defines/00_defines.txt documents zero attacker/defender ticking rates as disabling ticking; set attacker_ticking_warscore = 0 and defender_ticking_warscore = 0 in the CB to disable both sides locally. Percentage thresholds and ticking delays are unnecessary when the rate is zero. The CB reference _casus_belli.info separately supports battle/occupation score caps, full-occupation victories, and landless_attacker_needs_armies; these remain independent victory paths.
+
 - CK3 1.20's Declare War interaction scopes the war declarer as `scope:puppet_or_actor`, while `scope:actor` can be the puppeteer. Preserve current vanilla scopes, hook handling, notifications and acceptance effects when rebasing an interaction; the ordinary target checks now live in `allows_declaring_war_against_target_trigger`.
 - Keep on_action handlers small and dispatch through `effect = { ... }`. Gate optional mechanics with `has_game_rule`; define rules under `common/game_rules/` with the `riseandfall` category.
 - Yearly loops such as `every_ruler` do not provide an implicit `root`. Save the current character before nested title scopes when code must return to it. Do not call a whole-world `every_ruler` repair from a character-rooted code hook; use a root-specific repair to avoid recursive fan-out.

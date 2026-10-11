@@ -1,4 +1,11 @@
 ﻿l_english:
+ # The ledger localizes CB type IDs separately from declaration cb_name keys.
+ warlord_conquest_cb:0 "$WARLORD_CONQUEST_CB_NAME$"
+ riseandfall_diadochi_cb:0 "$RISEANDFALL_DIADOCHI_CB_NAME$"
+ riseandfall_coalition_cb:0 "$RISEANDFALL_COALITION_CB_NAME$"
+ adventurer_claim_cb:0 "$RISEANDFALL_ADVENTURER_CLAIM_CB_NAME$"
+ warlord_absorption_cb:0 "Warlord Absorption"
+ riseandfall_diadochi_absorption_cb:0 "Successor State Absorption"
  riseandfall_ducal_conquest_cb: "Warlord Ducal Conquest"
  RISEANDFALL_DUCAL_CONQUEST_CB_NAME: "[ducal_conquest|E] of [county|E]"
  RISEANDFALL_DUCAL_CONQUEST_CB_SPECIFIC_NAME: "Warlord Ducal Conquest of [TITLE.GetBaseName]"

@@ -1,3 +1,8 @@
-﻿CK3: Rise and Fall - 1.4.3
+﻿CK3: Rise and Fall - 1.4.4
 
-- Prevented Advanced AI title creation from destroying clerical region titles during title replacement and cleanup.
+Adventurers
+- Rebalanced adventurer claim wars around battles and sieges: disabled passive ticking warscore, slowed battle score gains, capped partial occupation score at 40, and restored defeat when the adventurer lost all armies.
+
+Interface
+- Fixed repeated religious map icon errors that could cause severe slowdown in faith map mode, and restored the holy-site/religious-head selector.
+- Fixed custom casus belli names appearing as script IDs in the war ledger.

@@ -38,7 +38,7 @@
         }
     }
 
-    # This file intentionally mirrors the vanilla claim_cb with only the small change above.
+    # Claim eligibility follows vanilla; adventurer outcomes and warscore are customized.
     # Root is the title
     # scope:claimant is the claimant
     # scope:attacker is the attacker
@@ -673,25 +673,22 @@
 
     should_show_war_goal_subview = yes
 
-    use_de_jure_wargoal_only = yes
-    # Require a majority of the target before ticking warscore starts, and give
-    # adventurer claim wars more time to resolve through battles and sieges.
-    attacker_wargoal_percentage = 0.51
-    defender_wargoal_percentage = 0.51
-    attacker_ticking_warscore_delay = { months = 36 }    # Delay ticking War Score for three years
-    defender_ticking_warscore_delay = { months = 36 }
-    attacker_ticking_warscore = 0.2                     # Increase daily ticking War Score
-    defender_ticking_warscore = 0.2
-    attacker_score_from_battles_scale = 40
-    defender_score_from_battles_scale = 50
+    # Disable passive victory from holding a foothold or waiting in a large realm.
+    # Slower battles can still decide the war; partial occupation only supports them.
+    attacker_ticking_warscore = 0
+    defender_ticking_warscore = 0
+    attacker_score_from_battles_scale = 25
+    defender_score_from_battles_scale = 25
     max_attacker_score_from_battles = 100
     max_defender_score_from_battles = 100
-    max_attacker_score_from_occupation = 150
-    max_defender_score_from_occupation = 150
+    attacker_score_from_occupation_scale = 100
+    defender_score_from_occupation_scale = 100
+    max_attacker_score_from_occupation = 40
+    max_defender_score_from_occupation = 40
+    full_occupation_by_defender_gives_victory = yes
+    full_occupation_by_attacker_gives_victory = yes
+    landless_attacker_needs_armies = yes
     max_ai_diplo_distance_to_title = 1000
-    attacker_score_from_occupation_scale = 100         # Restore occupation scale to vanilla
-    defender_score_from_occupation_scale = 100         # Restore occupation scale to vanilla
-    landless_attacker_needs_armies = yes 				# If set to no, being landless and having no armies doesn't automatically give the other side 100% warscore
 
     white_peace_possible = no # If set to "no", white peaces can't happen; only victory, defeat, or invalidation
 
