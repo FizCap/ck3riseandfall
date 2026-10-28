@@ -29,7 +29,6 @@ puppet_regency = {
 		parameter = dismissal_requires_gift
 		parameter = unlock_syphon_treasury_interaction
 		parameter = diarch_can_subsidise_liege_authority
-		parameter = regency_cant_be_ended_above_this_point
 	}
 	## 020
 	power_level = {
@@ -51,6 +50,7 @@ puppet_regency = {
 		parameter = unlock_diarch_retract_vassal_interaction
 		parameter = unlock_diarch_imprison_interaction
 		parameter = liege_pays_currency_surcharge_for_mundane_interactions_medium
+		parameter = regency_cant_be_ended_above_this_point
 	}
 	## 080
 	power_level = {
