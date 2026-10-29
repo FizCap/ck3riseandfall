@@ -1,5 +1,6 @@
-﻿interaction_riseandfall = {
-    index = 16
+﻿# Keep Rise and Fall after every EK2 category, including Magic.
+interaction_riseandfall = {
+    index = 17
     desc = "RISEANDFALL_ACTIONS"
     color = { 1 0 1 1 } # Byzantine purple (approx)
 }

@@ -1,0 +1,22 @@
+{
+  "sources": {
+    "riseandfall_descriptor": "version=\"1.4.6\"\ntags={\n\t\"Balance\"\n\t\"Gameplay\"\n\t\"Fixes\"\n}\nname=\"Rise and Fall\"\npicture=\"thumbnail.png\"\nsupported_version=\"1.20.*\"\nremote_file_id=\"3554844335\"",
+    "elder_kings_descriptor": "version=\"0.21.1.1\"\ntags={\n\t\"Total Conversion\"\n}\nname=\"Elder Kings 2\"\nreplace_path=\"common/bookmark_portraits\"\nreplace_path=\"common/dna_data\"\nreplace_path=\"common/culture/cultures\"\nreplace_path=\"common/culture/name_lists\"\nreplace_path=\"common/dynasties\"\nreplace_path=\"common/landed_titles\"\nreplace_path=\"common/province_terrain\"\nreplace_path=\"common/terrain_types\"\nreplace_path=\"common/religion/doctrine_types\"\nreplace_path=\"common/religion/holy_site_types\"\nreplace_path=\"common/religion/religion_family_types\"\nreplace_path=\"common/religion/religion_types\"\nreplace_path=\"common/religion/faith_types\"\nreplace_path=\"common/religion/rite_types\"\nreplace_path=\"gfx/interface/illustrations/loading_screens\"\nreplace_path=\"gfx/portraits/portrait_modifiers\"\nreplace_path=\"history\"\nreplace_path=\"history/artifacts\"\nreplace_path=\"history/characters\"\nreplace_path=\"history/cultures\"\nreplace_path=\"history/faiths\"\nreplace_path=\"history/provinces\"\nreplace_path=\"history/titles\"\nreplace_path=\"history/wars\"\nreplace_path=\"history/struggles\"\nsupported_version=\"1.20.1.2\"\nremote_file_id=\"2887120253\""
+  },
+  "sha256": {
+    "gui/window_character.gui": "053f67adda3872dccc906f4080c78cca9f892e8f7582d1da3d040264b9d697f8",
+    "gui/window_title.gui": "59edadd123bd9dacef64eb4abaea6caa5e4ec06f4bed0e0e48e081fb137aa356",
+    "gui/shared/mapmodes.gui": "c94bf44d4d9f4ec7158276e5769984065d5df8ff4e17ab99bbc56a04a9e8f981",
+    "common/succession_appointment/admin_emperor.txt": "a756da33086da13c34e6e37d60ee4bab299f3d36d7c36e5fafa8f7186fe9c3bc",
+    "common/succession_appointment/admin_governor.txt": "0d672947e8d84cc82386b711bc9f8c53d1a7fb9a34cc971d94b7c23e16d709d7",
+    "common/laws/00_succession_laws.txt": "fa9b4dcf865e4e7fae84fdd71d74984a049c02a05325f8986f9688f62c113ab3",
+    "common/character_interactions/riseandfall_war.txt": "347d590381cc306dd77559eaa8f3cc39a42da95df0d0a0b67eb744c82c6e68d7",
+    "common/character_interaction_categories/riseandfall_interaction.txt": "98428906fb4164a2e39308d47e9ca94a387e6131693b07ef9a5f22e80e86a5ff",
+    "common/scripted_effects/riseandfall_ai_title_creation_effects.txt": "dba433e093c36408039fb6fa6a5557ae807d21eaebd8864a73a07fdc2eb86bb3",
+    "common/scripted_effects/riseandfall_ai_title_handout_effects.txt": "85f641b3a2f09b95f65e0bb1cb157eb28dfd3ca46ce0ed96d8033da2cbd2a30a",
+    "common/scripted_effects/riseandfall_realm_split_effects.txt": "5195df7ceb84bfa0b147f25392fb5837fd3e9337f29c6adaea5bcfc80ba64004",
+    "events/riseandfall_war_enhancement_events.txt": "a2f70c5bc25ae2063f86d20159b5d0f76428d30a8c94abda71f2134681487178",
+    "common/casus_belli_types/riseandfall_warlord_conquest.txt": "bbee2b6cd381e1f67beae218b2778938049ffab56f4cbd5f7d7f2a3f024cda8b",
+    "common/casus_belli_types/riseandfall_claim_cb.txt": "605df0bda89dc43179226a763604e36322e2d83cd56b4b5e07b9ec167012138d"
+  }
+}

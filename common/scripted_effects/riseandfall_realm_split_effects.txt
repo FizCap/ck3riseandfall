@@ -1,0 +1,2539 @@
+﻿##########################
+# Rise and Fall - Realm Split System
+# Realm splits seed by de jure duchy for every rank so successor states
+
+# Apply the source realm's title-level succession identity to a newly-created
+# successor crown. Existing titles already carry their own laws and must not be
+# touched. CK3 exposes the law checks and add/remove effects, but not a generic
+# dynamic law-key assignment, so mirror the complete title-law set explicitly.
+riseandfall_copy_successor_title_succession_se = {
+    if = {
+        limit = {
+            exists = scope:rf_successor_law_source
+        }
+        if = {
+            limit = { scope:rf_successor_law_source = { has_title_law = feudal_elective_succession_law } }
+            add_title_law = feudal_elective_succession_law
+        }
+        else_if = {
+            limit = { scope:rf_successor_law_source = { has_title_law = princely_elective_succession_law } }
+            # EK2 has no HRE; dynamic successors use ordinary elective succession.
+            add_title_law = feudal_elective_succession_law
+        }
+        else_if = {
+            limit = { scope:rf_successor_law_source = { has_title_law = saxon_elective_succession_law } }
+            add_title_law = saxon_elective_succession_law
+        }
+        else_if = {
+            limit = { scope:rf_successor_law_source = { has_title_law = scandinavian_elective_succession_law } }
+            add_title_law = scandinavian_elective_succession_law
+        }
+        else_if = {
+            limit = { scope:rf_successor_law_source = { has_title_law = gaelic_elective_succession_law } }
+            add_title_law = gaelic_elective_succession_law
+        }
+        else_if = {
+            limit = { scope:rf_successor_law_source = { has_title_law = tribal_elective_succession_law } }
+            add_title_law = tribal_elective_succession_law
+        }
+        else_if = {
+            limit = { scope:rf_successor_law_source = { has_title_law = confederation_elective_succession_law } }
+            add_title_law = confederation_elective_succession_law
+        }
+        else_if = {
+            limit = { scope:rf_successor_law_source = { has_title_law = temporal_head_of_faith_succession_law } }
+            add_title_law = temporal_head_of_faith_succession_law
+        }
+        else_if = {
+            limit = { scope:rf_successor_law_source = { has_title_law = noble_family_succession_law } }
+            add_title_law = noble_family_succession_law
+        }
+        else_if = {
+            limit = { scope:rf_successor_law_source = { has_title_law = law_of_the_land_succession_law } }
+            add_title_law = law_of_the_land_succession_law
+        }
+        else_if = {
+            limit = { scope:rf_successor_law_source = { has_title_law = celestial_ministry_appointment_succession_law } }
+            add_title_law = celestial_ministry_appointment_succession_law
+        }
+        else_if = {
+            limit = { scope:rf_successor_law_source = { has_title_law = celestial_grand_marshal_appointment_succession_law } }
+            add_title_law = celestial_grand_marshal_appointment_succession_law
+        }
+    }
+}
+
+# stay compact before nearby unseeded duchies are assigned to stronger anchors.
+# The original ruler keeps their capital core and any territory outside the seeded regions.
+# Supports governments without powerful vassals (Celestial, Japanese, Administrative, Meritocratic, etc.)
+# All governments use county-tier or above
+
+riseandfall_mark_primary_breakaway_seed_se = {
+    add_character_flag = { flag = rf_breakaway_ruler days = 30 }
+    set_variable = { name = rf_seeded_kingdom value = scope:rf_seed_kingdom }
+    set_variable = { name = rf_seeded_duchy value = capital_county.duchy }
+    set_variable = { name = rf_primary_kingdom_seed value = 1 }
+    scope:original_ruler = { change_variable = { name = rf_breakaway_seed_count add = 1 } }
+}
+
+riseandfall_mark_secondary_breakaway_seed_se = {
+    add_character_flag = { flag = rf_breakaway_ruler days = 30 }
+    set_variable = { name = rf_seeded_kingdom value = scope:rf_seed_kingdom }
+    set_variable = { name = rf_seeded_duchy value = capital_county.duchy }
+    scope:original_ruler = { change_variable = { name = rf_breakaway_seed_count add = 1 } }
+}
+
+riseandfall_mark_empire_breakaway_seed_se = {
+    add_character_flag = { flag = rf_breakaway_ruler days = 30 }
+    set_variable = { name = rf_seeded_empire value = scope:rf_seed_empire }
+    set_variable = { name = rf_seeded_kingdom value = capital_county.kingdom }
+    set_variable = { name = rf_seeded_duchy value = capital_county.duchy }
+    set_variable = { name = rf_primary_kingdom_seed value = 1 }
+    scope:original_ruler = { change_variable = { name = rf_breakaway_seed_count add = 1 } }
+}
+
+riseandfall_assign_saved_kingdom_to_seed_se = {
+    scope:original_ruler = {
+        every_vassal = {
+            limit = {
+                is_landed = yes
+                NOT = { has_character_flag = rf_breakaway_ruler }
+                NOT = { has_character_flag = rf_palace_coup_split_protected }
+                NOT = { has_variable = rf_my_breakaway }
+                primary_title.tier >= tier_county
+                NOT = { primary_title.tier >= tier_empire }
+                NOT = { capital_county.duchy = scope:original_ruler.capital_county.duchy }
+                capital_county.kingdom = scope:rf_assign_kingdom
+            }
+            set_variable = { name = rf_my_breakaway value = scope:rf_active_seed }
+        }
+    }
+}
+
+riseandfall_assign_saved_duchy_to_seed_se = {
+    scope:original_ruler = {
+        every_vassal = {
+            limit = {
+                is_landed = yes
+                NOT = { has_character_flag = rf_breakaway_ruler }
+                NOT = { has_character_flag = rf_palace_coup_split_protected }
+                NOT = { has_variable = rf_my_breakaway }
+                primary_title.tier >= tier_county
+                NOT = { primary_title.tier >= tier_empire }
+                NOT = { capital_county.duchy = scope:rf_capital_duchy }
+                capital_county.duchy = scope:rf_assign_duchy
+            }
+            set_variable = { name = rf_my_breakaway value = scope:rf_active_seed }
+        }
+    }
+}
+
+riseandfall_score_breakaway_influence_for_vassal_se = {
+    save_scope_as = rf_candidate_breakaway
+    scope:rf_influence_vassal = {
+        set_variable = { name = rf_sphere_score value = 0 }
+
+        if = {
+            limit = {
+                scope:rf_candidate_breakaway = { has_variable = rf_seeded_empire }
+                capital_county.kingdom = { de_jure_liege = scope:rf_candidate_breakaway.var:rf_seeded_empire }
+            }
+            change_variable = { name = rf_sphere_score add = 35 }
+        }
+        if = {
+            limit = {
+                scope:rf_candidate_breakaway = { has_variable = rf_seeded_kingdom }
+                capital_county.kingdom = scope:rf_candidate_breakaway.var:rf_seeded_kingdom
+            }
+            change_variable = { name = rf_sphere_score add = 30 }
+        }
+        if = {
+            limit = {
+                scope:rf_candidate_breakaway = { has_variable = rf_seeded_duchy }
+                capital_county.duchy = scope:rf_candidate_breakaway.var:rf_seeded_duchy
+            }
+            change_variable = { name = rf_sphere_score add = 25 }
+        }
+        if = {
+            limit = { scope:rf_candidate_breakaway.primary_title = { is_neighbor_to_realm = scope:rf_influence_vassal } }
+            change_variable = { name = rf_sphere_score add = 85 }
+        }
+        if = {
+            limit = { primary_title = { is_neighbor_to_realm = scope:rf_candidate_breakaway } }
+            change_variable = { name = rf_sphere_score add = 65 }
+        }
+        if = {
+            limit = {
+                NOT = { capital_county.kingdom = scope:rf_candidate_breakaway.capital_county.kingdom }
+                NOT = { scope:rf_candidate_breakaway.primary_title = { is_neighbor_to_realm = scope:rf_influence_vassal } }
+                NOT = { primary_title = { is_neighbor_to_realm = scope:rf_candidate_breakaway } }
+            }
+            # Keep distant candidates from creating enclaves when their only
+            # connection is a weak cultural or dynastic relationship.
+            change_variable = { name = rf_sphere_score add = -60 }
+        }
+        if = {
+            limit = { is_allied_to = scope:rf_candidate_breakaway }
+            change_variable = { name = rf_sphere_score add = 100 }
+        }
+        if = {
+            limit = { opinion = { target = scope:rf_candidate_breakaway value >= 60 } }
+            change_variable = { name = rf_sphere_score add = 70 }
+        }
+        else_if = {
+            limit = { opinion = { target = scope:rf_candidate_breakaway value >= 20 } }
+            change_variable = { name = rf_sphere_score add = 35 }
+        }
+        else_if = {
+            limit = { opinion = { target = scope:rf_candidate_breakaway value <= -40 } }
+            change_variable = { name = rf_sphere_score add = -55 }
+        }
+        if = {
+            limit = { has_same_culture_as = scope:rf_candidate_breakaway }
+            change_variable = { name = rf_sphere_score add = 35 }
+        }
+        if = {
+            limit = { faith = scope:rf_candidate_breakaway.faith }
+            change_variable = { name = rf_sphere_score add = 35 }
+        }
+        else_if = {
+            limit = { religion = scope:rf_candidate_breakaway.religion }
+            change_variable = { name = rf_sphere_score add = 15 }
+        }
+        if = {
+            limit = {
+                scope:rf_candidate_breakaway = { has_dynasty = yes }
+                has_dynasty = yes
+                dynasty = scope:rf_candidate_breakaway.dynasty
+            }
+            change_variable = { name = rf_sphere_score add = 45 }
+        }
+        if = {
+            limit = { has_claim_on = scope:original_primary }
+            change_variable = { name = rf_sphere_score add = 25 }
+        }
+        if = {
+            limit = { current_military_strength > scope:rf_candidate_breakaway.current_military_strength }
+            change_variable = { name = rf_sphere_score add = 20 }
+        }
+        if = {
+            limit = {
+                scope:rf_candidate_breakaway = { has_character_flag = rf_major_breakaway_seed }
+            }
+            change_variable = { name = rf_sphere_score add = 25 }
+        }
+        if = {
+            limit = {
+                scope:rf_candidate_breakaway = { has_character_flag = rf_secondary_breakaway_seed }
+            }
+            change_variable = { name = rf_sphere_score add = 15 }
+        }
+        if = {
+            limit = {
+                has_variable = rf_best_sphere_score
+                var:rf_sphere_score > var:rf_best_sphere_score
+            }
+            set_variable = { name = rf_best_sphere_score value = var:rf_sphere_score }
+            set_variable = { name = rf_my_breakaway value = scope:rf_candidate_breakaway }
+        }
+    }
+}
+
+riseandfall_assign_vassal_to_best_breakaway_sphere_se = {
+    save_scope_as = rf_influence_vassal
+    set_variable = { name = rf_best_sphere_score value = -9999 }
+
+    scope:original_ruler = {
+        every_vassal = {
+            limit = {
+                is_landed = yes
+                has_character_flag = rf_breakaway_ruler
+                NOT = { this = scope:rf_influence_vassal }
+            }
+            riseandfall_score_breakaway_influence_for_vassal_se = yes
+        }
+    }
+
+    remove_variable = rf_sphere_score
+    remove_variable = rf_best_sphere_score
+}
+
+# Select anchors from the whole vassal pool instead of assigning one anchor to
+# each de jure region. Strength increases the chance of becoming an anchor,
+# but every eligible vassal can qualify, including multiple vassals in one
+# kingdom or duchy. The existing regional passes below are only a temporary
+# compatibility pass; their assignments are cleared before sphere allocation.
+riseandfall_select_dynamic_breakaway_anchors_se = {
+    scope:original_ruler = {
+        every_vassal = {
+            limit = {
+                is_landed = yes
+                NOT = { has_character_flag = rf_palace_coup_split_protected }
+                NOT = { has_character_flag = rf_forced_breakaway_seed }
+                primary_title.tier >= tier_county
+                NOT = { primary_title.tier >= tier_empire }
+                NOT = { capital_county.duchy = scope:rf_capital_duchy }
+            }
+            if = {
+                limit = {
+                    OR = {
+                        is_allied_to = scope:original_ruler
+                        opinion = { target = scope:original_ruler value >= 80 }
+                        has_claim_on = scope:original_primary
+                        dynasty = scope:original_ruler.dynasty
+                    }
+                }
+                random = {
+                    chance = 55
+                    riseandfall_mark_primary_breakaway_seed_se = yes
+                }
+            }
+            else_if = {
+                limit = {
+                    current_military_strength >= {
+                        value = scope:original_ruler.current_military_strength
+                        multiply = 0.25
+                    }
+                }
+                random = {
+                    chance = 70
+                    riseandfall_mark_primary_breakaway_seed_se = yes
+                }
+            }
+            else_if = {
+                limit = {
+                    current_military_strength >= {
+                        value = scope:original_ruler.current_military_strength
+                        multiply = 0.15
+                    }
+                }
+                random = {
+                    chance = 45
+                    riseandfall_mark_primary_breakaway_seed_se = yes
+                }
+            }
+            else_if = {
+                limit = {
+                    current_military_strength >= {
+                        value = scope:original_ruler.current_military_strength
+                        multiply = 0.08
+                    }
+                }
+                random = {
+                    chance = 25
+                    riseandfall_mark_secondary_breakaway_seed_se = yes
+                }
+            }
+            else_if = {
+                limit = {
+                    current_military_strength >= {
+                        value = scope:original_ruler.current_military_strength
+                        multiply = 0.04
+                    }
+                }
+                random = {
+                    chance = 12
+                    riseandfall_mark_secondary_breakaway_seed_se = yes
+                }
+            }
+            else = {
+                random = {
+                    chance = 4
+                    riseandfall_mark_secondary_breakaway_seed_se = yes
+                }
+            }
+        }
+    }
+}
+
+##########################
+# Main Realm Split Effect
+# Called on the ruler who is being split
+
+riseandfall_realm_split_se = {
+    save_scope_as = original_ruler
+    primary_title = { save_scope_as = original_primary }
+
+    scope:original_ruler = {
+        set_variable = { name = rf_breakaway_seed_count value = 0 }
+        set_variable = { name = rf_usable_empire_anchor_count value = 0 }
+        set_variable = { name = rf_usable_kingdom_anchor_count value = 0 }
+        set_variable = { name = rf_usable_duchy_anchor_count value = 0 }
+        capital_county.kingdom = { save_scope_as = rf_capital_kingdom }
+        capital_county.duchy = { save_scope_as = rf_capital_duchy }
+        capital_county.kingdom = {
+            if = {
+                limit = { exists = de_jure_liege }
+                de_jure_liege = { save_scope_as = rf_capital_empire }
+            }
+        }
+        remove_character_flag = rf_split_small
+        remove_character_flag = rf_split_medium
+        remove_character_flag = rf_split_large
+        remove_character_flag = rf_split_extreme
+        remove_character_flag = rf_split_fracture
+        remove_character_flag = rf_split_major_fracture
+        remove_character_flag = rf_split_total_collapse
+        remove_character_flag = rf_split_lower_tier
+        # Declare legacy scale flags in this live effect for CK3's static
+        # analysis; the live selector below remains duchy-only.
+        add_character_flag = rf_split_seed_by_empire
+        add_character_flag = rf_split_seed_by_kingdom
+        remove_character_flag = rf_split_seed_by_empire
+        remove_character_flag = rf_split_seed_by_kingdom
+        remove_character_flag = rf_split_seed_by_duchy
+
+        every_vassal = {
+            limit = { is_landed = yes }
+            remove_character_flag = rf_breakaway_ruler
+            remove_character_flag = rf_major_breakaway_seed
+            remove_character_flag = rf_secondary_breakaway_seed
+            remove_variable = rf_my_breakaway
+            remove_variable = rf_seeded_empire
+            remove_variable = rf_seeded_kingdom
+            remove_variable = rf_seeded_duchy
+            remove_variable = rf_primary_kingdom_seed
+            remove_variable = rf_execute_breakaway
+        }
+
+        every_vassal = {
+            limit = {
+                is_landed = yes
+                has_character_flag = rf_forced_breakaway_seed
+            }
+            add_character_flag = { flag = rf_breakaway_ruler days = 30 }
+            capital_county.kingdom = { save_scope_as = rf_seed_kingdom }
+            set_variable = { name = rf_seeded_kingdom value = scope:rf_seed_kingdom }
+            set_variable = { name = rf_seeded_duchy value = capital_county.duchy }
+            scope:original_ruler = { change_variable = { name = rf_breakaway_seed_count add = 1 } }
+        }
+
+        every_realm_de_jure_empire = {
+            limit = {
+                NOT = { this = scope:rf_capital_empire }
+            }
+            scope:original_ruler = { change_variable = { name = rf_usable_empire_anchor_count add = 1 } }
+        }
+        every_realm_de_jure_kingdom = {
+            limit = {
+                NOT = { this = scope:rf_capital_kingdom }
+            }
+            scope:original_ruler = { change_variable = { name = rf_usable_kingdom_anchor_count add = 1 } }
+        }
+        every_realm_de_jure_duchy = {
+            limit = {
+                NOT = { this = scope:rf_capital_duchy }
+            }
+            scope:original_ruler = { change_variable = { name = rf_usable_duchy_anchor_count add = 1 } }
+        }
+
+        # Use duchy-scale anchors for all ranks. Empire and hegemony-tier
+        # de jure regions can be too large, especially in China, and produce
+        # successor states that swallow entire macro-regions.
+        add_character_flag = rf_split_seed_by_duchy
+
+        # Fragmentation is the Warlord victory condition and closes the era.
+        riseandfall_warlord_end_era_realm_split_se = yes
+
+        if = {
+            limit = { realm_size >= 20 }
+            add_character_flag = rf_split_small
+        }
+        if = {
+            limit = { realm_size >= 45 }
+            add_character_flag = rf_split_medium
+        }
+        if = {
+            limit = { realm_size >= 90 }
+            add_character_flag = rf_split_large
+        }
+        if = {
+            limit = { realm_size >= 180 }
+            add_character_flag = rf_split_extreme
+        }
+        if = {
+            limit = { realm_size >= 70 }
+            add_character_flag = rf_split_fracture
+        }
+        if = {
+            limit = { realm_size >= 120 }
+            add_character_flag = rf_split_major_fracture
+        }
+        if = {
+            limit = { realm_size >= 220 }
+            add_character_flag = rf_split_total_collapse
+        }
+        if = {
+            limit = { primary_title.tier <= tier_kingdom }
+            add_character_flag = rf_split_lower_tier
+        }
+    }
+
+    # Hegemony special case: make all empire-tier vassals break away automatically.
+    if = {
+        limit = { primary_title.tier = tier_hegemony }
+        scope:original_ruler = {
+            every_vassal = {
+                limit = {
+                    is_landed = yes
+                    NOT = { has_character_flag = rf_palace_coup_split_protected }
+                    primary_title.tier >= tier_empire
+                }
+                add_character_flag = { flag = rf_breakaway_ruler days = 30 }
+                this = { riseandfall_execute_realm_split_se = yes }
+            }
+        }
+    }
+
+    # Phase 1: seed the split at the selected scale.
+    if = {
+        limit = { scope:original_ruler = { has_character_flag = rf_split_seed_by_empire } }
+        scope:original_ruler = {
+            every_realm_de_jure_empire = {
+                limit = { NOT = { this = scope:rf_capital_empire } }
+                save_scope_as = rf_seed_empire
+
+                if = {
+                    limit = { scope:original_ruler = { has_character_flag = rf_split_extreme } }
+                    random = {
+                        chance = 70
+                        scope:original_ruler = {
+                            ordered_vassal = {
+                                limit = {
+                                    is_landed = yes
+                                    primary_title.tier >= tier_county
+                                    NOT = { primary_title.tier >= tier_empire }
+                                    NOT = { has_character_flag = rf_breakaway_ruler }
+                                    NOT = { has_character_flag = rf_palace_coup_split_protected }
+                                    capital_county.kingdom = { de_jure_liege = scope:rf_seed_empire }
+                                }
+                                order_by = current_military_strength
+                                max = 1
+                                riseandfall_mark_empire_breakaway_seed_se = yes
+                            }
+                        }
+                    }
+                }
+                else_if = {
+                    limit = { scope:original_ruler = { has_character_flag = rf_split_large } }
+                    random = {
+                        chance = 60
+                        scope:original_ruler = {
+                            ordered_vassal = {
+                                limit = {
+                                    is_landed = yes
+                                    primary_title.tier >= tier_county
+                                    NOT = { primary_title.tier >= tier_empire }
+                                    NOT = { has_character_flag = rf_breakaway_ruler }
+                                    NOT = { has_character_flag = rf_palace_coup_split_protected }
+                                    capital_county.kingdom = { de_jure_liege = scope:rf_seed_empire }
+                                }
+                                order_by = current_military_strength
+                                max = 1
+                                riseandfall_mark_empire_breakaway_seed_se = yes
+                            }
+                        }
+                    }
+                }
+                else_if = {
+                    limit = { scope:original_ruler = { has_character_flag = rf_split_medium } }
+                    random = {
+                        chance = 50
+                        scope:original_ruler = {
+                            ordered_vassal = {
+                                limit = {
+                                    is_landed = yes
+                                    primary_title.tier >= tier_county
+                                    NOT = { primary_title.tier >= tier_empire }
+                                    NOT = { has_character_flag = rf_breakaway_ruler }
+                                    NOT = { has_character_flag = rf_palace_coup_split_protected }
+                                    capital_county.kingdom = { de_jure_liege = scope:rf_seed_empire }
+                                }
+                                order_by = current_military_strength
+                                max = 1
+                                riseandfall_mark_empire_breakaway_seed_se = yes
+                            }
+                        }
+                    }
+                }
+                else_if = {
+                    limit = { scope:original_ruler = { has_character_flag = rf_split_small } }
+                    random = {
+                        chance = 40
+                        scope:original_ruler = {
+                            ordered_vassal = {
+                                limit = {
+                                    is_landed = yes
+                                    primary_title.tier >= tier_county
+                                    NOT = { primary_title.tier >= tier_empire }
+                                    NOT = { has_character_flag = rf_breakaway_ruler }
+                                    NOT = { has_character_flag = rf_palace_coup_split_protected }
+                                    capital_county.kingdom = { de_jure_liege = scope:rf_seed_empire }
+                                }
+                                order_by = current_military_strength
+                                max = 1
+                                riseandfall_mark_empire_breakaway_seed_se = yes
+                            }
+                        }
+                    }
+                }
+                else = {
+                    random = {
+                        chance = 30
+                        scope:original_ruler = {
+                            ordered_vassal = {
+                                limit = {
+                                    is_landed = yes
+                                    primary_title.tier >= tier_county
+                                    NOT = { primary_title.tier >= tier_empire }
+                                    NOT = { has_character_flag = rf_breakaway_ruler }
+                                    NOT = { has_character_flag = rf_palace_coup_split_protected }
+                                    capital_county.kingdom = { de_jure_liege = scope:rf_seed_empire }
+                                }
+                                order_by = current_military_strength
+                                max = 1
+                                riseandfall_mark_empire_breakaway_seed_se = yes
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    if = {
+        limit = { scope:original_ruler = { has_character_flag = rf_split_seed_by_kingdom } }
+        scope:original_ruler = {
+            every_realm_de_jure_kingdom = {
+                limit = { NOT = { this = scope:rf_capital_kingdom } }
+                save_scope_as = rf_seed_kingdom
+
+                if = {
+                    limit = { scope:original_ruler = { has_character_flag = rf_split_extreme } }
+                    random = {
+                        chance = 60
+                        scope:original_ruler = {
+                            ordered_vassal = {
+                                limit = {
+                                    is_landed = yes
+                                    primary_title.tier >= tier_county
+                                    NOT = { primary_title.tier >= tier_empire }
+                                    NOT = { has_character_flag = rf_breakaway_ruler }
+                                    NOT = { has_character_flag = rf_palace_coup_split_protected }
+                                    capital_county.kingdom = scope:rf_seed_kingdom
+                                }
+                                order_by = current_military_strength
+                                max = 1
+                                riseandfall_mark_primary_breakaway_seed_se = yes
+                            }
+                        }
+                    }
+                }
+                else_if = {
+                    limit = { scope:original_ruler = { has_character_flag = rf_split_large } }
+                    random = {
+                        chance = 50
+                        scope:original_ruler = {
+                            ordered_vassal = {
+                                limit = {
+                                    is_landed = yes
+                                    primary_title.tier >= tier_county
+                                    NOT = { primary_title.tier >= tier_empire }
+                                    NOT = { has_character_flag = rf_breakaway_ruler }
+                                    NOT = { has_character_flag = rf_palace_coup_split_protected }
+                                    capital_county.kingdom = scope:rf_seed_kingdom
+                                }
+                                order_by = current_military_strength
+                                max = 1
+                                riseandfall_mark_primary_breakaway_seed_se = yes
+                            }
+                        }
+                    }
+                }
+                else_if = {
+                    limit = { scope:original_ruler = { has_character_flag = rf_split_medium } }
+                    random = {
+                        chance = 40
+                        scope:original_ruler = {
+                            ordered_vassal = {
+                                limit = {
+                                    is_landed = yes
+                                    primary_title.tier >= tier_county
+                                    NOT = { primary_title.tier >= tier_empire }
+                                    NOT = { has_character_flag = rf_breakaway_ruler }
+                                    NOT = { has_character_flag = rf_palace_coup_split_protected }
+                                    capital_county.kingdom = scope:rf_seed_kingdom
+                                }
+                                order_by = current_military_strength
+                                max = 1
+                                riseandfall_mark_primary_breakaway_seed_se = yes
+                            }
+                        }
+                    }
+                }
+                else_if = {
+                    limit = { scope:original_ruler = { has_character_flag = rf_split_small } }
+                    random = {
+                        chance = 30
+                        scope:original_ruler = {
+                            ordered_vassal = {
+                                limit = {
+                                    is_landed = yes
+                                    primary_title.tier >= tier_county
+                                    NOT = { primary_title.tier >= tier_empire }
+                                    NOT = { has_character_flag = rf_breakaway_ruler }
+                                    NOT = { has_character_flag = rf_palace_coup_split_protected }
+                                    capital_county.kingdom = scope:rf_seed_kingdom
+                                }
+                                order_by = current_military_strength
+                                max = 1
+                                riseandfall_mark_primary_breakaway_seed_se = yes
+                            }
+                        }
+                    }
+                }
+                else = {
+                    random = {
+                        chance = 20
+                        scope:original_ruler = {
+                            ordered_vassal = {
+                                limit = {
+                                    is_landed = yes
+                                    primary_title.tier >= tier_county
+                                    NOT = { primary_title.tier >= tier_empire }
+                                    NOT = { has_character_flag = rf_breakaway_ruler }
+                                    NOT = { has_character_flag = rf_palace_coup_split_protected }
+                                    capital_county.kingdom = scope:rf_seed_kingdom
+                                }
+                                order_by = current_military_strength
+                                max = 1
+                                riseandfall_mark_primary_breakaway_seed_se = yes
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    if = {
+        limit = { scope:original_ruler = { has_character_flag = rf_split_seed_by_duchy } }
+        scope:original_ruler = {
+            every_realm_de_jure_duchy = {
+                limit = { NOT = { this = scope:rf_capital_duchy } }
+                save_scope_as = rf_seed_duchy
+
+                if = {
+                    limit = { scope:original_ruler = { has_character_flag = rf_split_extreme } }
+                    random = {
+                        chance = 45
+                        scope:original_ruler = {
+                            ordered_vassal = {
+                                limit = {
+                                    is_landed = yes
+                                    primary_title.tier >= tier_county
+                                    NOT = { primary_title.tier >= tier_empire }
+                                    NOT = { has_character_flag = rf_breakaway_ruler }
+                                    NOT = { has_character_flag = rf_palace_coup_split_protected }
+                                    capital_county.duchy = scope:rf_seed_duchy
+                                }
+                                order_by = current_military_strength
+                                max = 1
+                                capital_county.kingdom = { save_scope_as = rf_seed_kingdom }
+                                riseandfall_mark_primary_breakaway_seed_se = yes
+                            }
+                        }
+                    }
+                }
+                else_if = {
+                    limit = { scope:original_ruler = { has_character_flag = rf_split_large } }
+                    random = {
+                        chance = 35
+                        scope:original_ruler = {
+                            ordered_vassal = {
+                                limit = {
+                                    is_landed = yes
+                                    primary_title.tier >= tier_county
+                                    NOT = { primary_title.tier >= tier_empire }
+                                    NOT = { has_character_flag = rf_breakaway_ruler }
+                                    NOT = { has_character_flag = rf_palace_coup_split_protected }
+                                    capital_county.duchy = scope:rf_seed_duchy
+                                }
+                                order_by = current_military_strength
+                                max = 1
+                                capital_county.kingdom = { save_scope_as = rf_seed_kingdom }
+                                riseandfall_mark_primary_breakaway_seed_se = yes
+                            }
+                        }
+                    }
+                }
+                else_if = {
+                    limit = { scope:original_ruler = { has_character_flag = rf_split_medium } }
+                    random = {
+                        chance = 28
+                        scope:original_ruler = {
+                            ordered_vassal = {
+                                limit = {
+                                    is_landed = yes
+                                    primary_title.tier >= tier_county
+                                    NOT = { primary_title.tier >= tier_empire }
+                                    NOT = { has_character_flag = rf_breakaway_ruler }
+                                    NOT = { has_character_flag = rf_palace_coup_split_protected }
+                                    capital_county.duchy = scope:rf_seed_duchy
+                                }
+                                order_by = current_military_strength
+                                max = 1
+                                capital_county.kingdom = { save_scope_as = rf_seed_kingdom }
+                                riseandfall_mark_primary_breakaway_seed_se = yes
+                            }
+                        }
+                    }
+                }
+                else_if = {
+                    limit = { scope:original_ruler = { has_character_flag = rf_split_small } }
+                    random = {
+                        chance = 20
+                        scope:original_ruler = {
+                            ordered_vassal = {
+                                limit = {
+                                    is_landed = yes
+                                    primary_title.tier >= tier_county
+                                    NOT = { primary_title.tier >= tier_empire }
+                                    NOT = { has_character_flag = rf_breakaway_ruler }
+                                    NOT = { has_character_flag = rf_palace_coup_split_protected }
+                                    capital_county.duchy = scope:rf_seed_duchy
+                                }
+                                order_by = current_military_strength
+                                max = 1
+                                capital_county.kingdom = { save_scope_as = rf_seed_kingdom }
+                                riseandfall_mark_primary_breakaway_seed_se = yes
+                            }
+                        }
+                    }
+                }
+                else = {
+                    random = {
+                        chance = 12
+                        scope:original_ruler = {
+                            ordered_vassal = {
+                                limit = {
+                                    is_landed = yes
+                                    primary_title.tier >= tier_county
+                                    NOT = { primary_title.tier >= tier_empire }
+                                    NOT = { has_character_flag = rf_breakaway_ruler }
+                                    NOT = { has_character_flag = rf_palace_coup_split_protected }
+                                    capital_county.duchy = scope:rf_seed_duchy
+                                }
+                                order_by = current_military_strength
+                                max = 1
+                                capital_county.kingdom = { save_scope_as = rf_seed_kingdom }
+                                riseandfall_mark_primary_breakaway_seed_se = yes
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    # Fallback so smaller realms can still produce a clean single split.
+    if = {
+        limit = {
+            has_variable = rf_breakaway_seed_count
+            var:rf_breakaway_seed_count = 0
+        }
+        ordered_vassal = {
+            limit = {
+                is_landed = yes
+                primary_title.tier >= tier_county
+                NOT = { primary_title.tier >= tier_empire }
+                NOT = { has_character_flag = rf_palace_coup_split_protected }
+                NOT = { capital_county.duchy = scope:original_ruler.capital_county.duchy }
+                NOT = { capital_county.kingdom = scope:rf_capital_kingdom }
+            }
+            order_by = current_military_strength
+            max = 1
+            capital_county.kingdom = { save_scope_as = rf_seed_kingdom }
+            riseandfall_mark_primary_breakaway_seed_se = yes
+        }
+    }
+    if = {
+        limit = {
+            has_variable = rf_breakaway_seed_count
+            var:rf_breakaway_seed_count = 0
+        }
+        ordered_vassal = {
+            limit = {
+                is_landed = yes
+                primary_title.tier >= tier_county
+                NOT = { primary_title.tier >= tier_empire }
+                NOT = { has_character_flag = rf_palace_coup_split_protected }
+                NOT = { capital_county.duchy = scope:original_ruler.capital_county.duchy }
+            }
+            order_by = current_military_strength
+            max = 1
+            capital_county.kingdom = { save_scope_as = rf_seed_kingdom }
+            riseandfall_mark_primary_breakaway_seed_se = yes
+        }
+    }
+    if = {
+        limit = {
+            has_variable = rf_breakaway_seed_count
+            var:rf_breakaway_seed_count = 1
+            has_variable = rf_usable_duchy_anchor_count
+            var:rf_usable_duchy_anchor_count >= 2
+        }
+        ordered_vassal = {
+            limit = {
+                is_landed = yes
+                primary_title.tier >= tier_county
+                NOT = { primary_title.tier >= tier_empire }
+                NOT = { has_character_flag = rf_breakaway_ruler }
+                NOT = { has_character_flag = rf_palace_coup_split_protected }
+                NOT = { capital_county.duchy = scope:original_ruler.capital_county.duchy }
+            }
+            order_by = current_military_strength
+            max = 1
+            capital_county.kingdom = { save_scope_as = rf_seed_kingdom }
+            riseandfall_mark_secondary_breakaway_seed_se = yes
+        }
+    }
+
+    # The strongest seeds become the likely large successor states.
+    if = {
+        limit = {
+            has_variable = rf_breakaway_seed_count
+            var:rf_breakaway_seed_count >= 1
+        }
+        scope:original_ruler = {
+            ordered_vassal = {
+                limit = { has_character_flag = rf_breakaway_ruler }
+                order_by = current_military_strength
+                max = 1
+                add_character_flag = { flag = rf_major_breakaway_seed days = 30 }
+            }
+        }
+    }
+    if = {
+        limit = {
+            has_variable = rf_breakaway_seed_count
+            var:rf_breakaway_seed_count >= 2
+        }
+        scope:original_ruler = {
+            ordered_vassal = {
+                limit = {
+                    has_character_flag = rf_breakaway_ruler
+                    NOT = { has_character_flag = rf_major_breakaway_seed }
+                }
+                order_by = current_military_strength
+                max = 1
+                add_character_flag = { flag = rf_secondary_breakaway_seed days = 30 }
+            }
+        }
+    }
+
+    # Replace the legacy de jure-region seed result with a global, scalable
+    # anchor pool. Forced Palace Coup/other explicit seeds are preserved; all
+    # ordinary vassals compete independently, so several anchors can emerge
+    # from one region and no region is guaranteed an anchor.
+    scope:original_ruler = {
+        set_variable = { name = rf_breakaway_seed_count value = 0 }
+        every_vassal = {
+            limit = { is_landed = yes }
+            remove_character_flag = rf_breakaway_ruler
+            remove_character_flag = rf_major_breakaway_seed
+            remove_character_flag = rf_secondary_breakaway_seed
+            remove_variable = rf_my_breakaway
+            remove_variable = rf_seeded_empire
+            remove_variable = rf_seeded_kingdom
+            remove_variable = rf_seeded_duchy
+            remove_variable = rf_primary_kingdom_seed
+        }
+        every_vassal = {
+            limit = {
+                is_landed = yes
+                has_character_flag = rf_forced_breakaway_seed
+                NOT = { has_character_flag = rf_palace_coup_split_protected }
+                primary_title.tier >= tier_county
+                NOT = { primary_title.tier >= tier_empire }
+            }
+            capital_county.kingdom = { save_scope_as = rf_seed_kingdom }
+            set_variable = { name = rf_seeded_kingdom value = scope:rf_seed_kingdom }
+            set_variable = { name = rf_seeded_duchy value = capital_county.duchy }
+            add_character_flag = { flag = rf_breakaway_ruler days = 30 }
+            scope:original_ruler = { change_variable = { name = rf_breakaway_seed_count add = 1 } }
+        }
+        riseandfall_select_dynamic_breakaway_anchors_se = yes
+        # The effect is also entered while building the event preview, where
+        # the runtime setup above may not have persisted this temporary value.
+        if = {
+            limit = { NOT = { has_variable = rf_breakaway_seed_count } }
+            set_variable = { name = rf_breakaway_seed_count value = 0 }
+        }
+        if = {
+            limit = { var:rf_breakaway_seed_count < 1 }
+            ordered_vassal = {
+                limit = {
+                    is_landed = yes
+                    NOT = { has_character_flag = rf_palace_coup_split_protected }
+                    primary_title.tier >= tier_county
+                    NOT = { primary_title.tier >= tier_empire }
+                    NOT = { capital_county.duchy = scope:rf_capital_duchy }
+                }
+                order_by = current_military_strength
+                max = 1
+                capital_county.kingdom = { save_scope_as = rf_seed_kingdom }
+                set_variable = { name = rf_seeded_kingdom value = scope:rf_seed_kingdom }
+                set_variable = { name = rf_seeded_duchy value = capital_county.duchy }
+                add_character_flag = { flag = rf_breakaway_ruler days = 30 }
+                change_variable = { name = rf_breakaway_seed_count add = 1 }
+            }
+        }
+    }
+
+    # Compatibility staging: the legacy regional assignments are rebuilt here
+    # only so older downstream logic remains intact until the global sphere
+    # pass below clears them.
+    if = {
+        limit = { scope:original_ruler = { has_character_flag = rf_split_seed_by_empire } }
+        scope:original_ruler = {
+            every_vassal = {
+                limit = {
+                    has_character_flag = rf_breakaway_ruler
+                    has_variable = rf_seeded_empire
+                }
+                save_scope_as = rf_active_seed
+
+                scope:original_ruler = {
+                    every_vassal = {
+                        limit = {
+                            is_landed = yes
+                            NOT = { has_character_flag = rf_breakaway_ruler }
+                            NOT = { has_character_flag = rf_palace_coup_split_protected }
+                            NOT = { has_variable = rf_my_breakaway }
+                            primary_title.tier >= tier_county
+                            NOT = { primary_title.tier >= tier_empire }
+                            NOT = { capital_county.duchy = scope:rf_capital_duchy }
+                            capital_county.kingdom = { de_jure_liege = scope:rf_active_seed.var:rf_seeded_empire }
+                        }
+                        set_variable = { name = rf_my_breakaway value = scope:rf_active_seed }
+                    }
+                }
+            }
+        }
+    }
+    if = {
+        limit = { scope:original_ruler = { has_character_flag = rf_split_seed_by_kingdom } }
+        scope:original_ruler = {
+            every_vassal = {
+                limit = {
+                    has_character_flag = rf_breakaway_ruler
+                    has_variable = rf_seeded_kingdom
+                }
+                save_scope_as = rf_active_seed
+
+                scope:original_ruler = {
+                    every_vassal = {
+                        limit = {
+                            is_landed = yes
+                            NOT = { has_character_flag = rf_breakaway_ruler }
+                            NOT = { has_character_flag = rf_palace_coup_split_protected }
+                            NOT = { has_variable = rf_my_breakaway }
+                            primary_title.tier >= tier_county
+                            NOT = { primary_title.tier >= tier_empire }
+                            NOT = { capital_county.duchy = scope:rf_capital_duchy }
+                            capital_county.kingdom = scope:rf_active_seed.var:rf_seeded_kingdom
+                        }
+                        set_variable = { name = rf_my_breakaway value = scope:rf_active_seed }
+                    }
+                }
+            }
+        }
+    }
+    if = {
+        limit = { scope:original_ruler = { has_character_flag = rf_split_seed_by_duchy } }
+        scope:original_ruler = {
+            every_vassal = {
+                limit = {
+                    has_character_flag = rf_breakaway_ruler
+                    has_variable = rf_seeded_duchy
+                }
+                save_scope_as = rf_active_seed
+
+                scope:original_ruler = {
+                    every_vassal = {
+                        limit = {
+                            is_landed = yes
+                            NOT = { has_character_flag = rf_breakaway_ruler }
+                            NOT = { has_character_flag = rf_palace_coup_split_protected }
+                            NOT = { has_variable = rf_my_breakaway }
+                            primary_title.tier >= tier_county
+                            NOT = { primary_title.tier >= tier_empire }
+                            NOT = { capital_county.duchy = scope:rf_capital_duchy }
+                            capital_county.duchy = scope:rf_active_seed.var:rf_seeded_duchy
+                        }
+                        set_variable = { name = rf_my_breakaway value = scope:rf_active_seed }
+                    }
+                }
+            }
+        }
+    }
+
+    # Palace coup neutral rejectors prefer the strongest neutral seed in their
+    # de jure kingdom, even if the old ruler was seeded there first.
+    if = {
+        limit = {
+            scope:original_ruler = {
+                any_vassal = {
+                    is_landed = yes
+                    has_character_flag = rf_palace_coup_neutral_seed
+                }
+            }
+        }
+        scope:original_ruler = {
+            every_realm_de_jure_kingdom = {
+                save_scope_as = rf_palace_coup_neutral_region
+                clear_saved_scope = rf_active_seed
+
+                scope:original_ruler = {
+                    ordered_vassal = {
+                        limit = {
+                            is_landed = yes
+                            has_character_flag = rf_palace_coup_neutral_seed
+                            capital_county.kingdom = scope:rf_palace_coup_neutral_region
+                        }
+                        order_by = current_military_strength
+                        max = 1
+                        save_scope_as = rf_active_seed
+                    }
+                }
+
+                if = {
+                    limit = { exists = scope:rf_active_seed }
+                    scope:original_ruler = {
+                        every_vassal = {
+                            limit = {
+                                is_landed = yes
+                                has_character_flag = rf_palace_coup_neutral_rejector
+                                NOT = { has_character_flag = rf_breakaway_ruler }
+                                NOT = { has_character_flag = rf_palace_coup_split_protected }
+                                primary_title.tier >= tier_county
+                                NOT = { primary_title.tier >= tier_empire }
+                                capital_county.kingdom = scope:rf_palace_coup_neutral_region
+                            }
+                            set_variable = { name = rf_my_breakaway value = scope:rf_active_seed }
+                        }
+                    }
+                }
+            }
+        }
+        clear_saved_scope = rf_active_seed
+    }
+
+    # Legacy regional staging; final ownership is assigned individually below.
+    if = {
+        limit = { scope:original_ruler = { has_character_flag = rf_split_seed_by_kingdom } }
+        scope:original_ruler = {
+            every_realm_de_jure_kingdom = {
+                limit = { NOT = { this = scope:rf_capital_kingdom } }
+                save_scope_as = rf_assign_kingdom
+
+                if = {
+                    limit = {
+                        scope:original_ruler = {
+                            any_vassal = {
+                                is_landed = yes
+                                NOT = { has_character_flag = rf_breakaway_ruler }
+                                NOT = { has_character_flag = rf_palace_coup_split_protected }
+                                NOT = { has_variable = rf_my_breakaway }
+                                primary_title.tier >= tier_county
+                                NOT = { primary_title.tier >= tier_empire }
+                                capital_county.kingdom = scope:rf_assign_kingdom
+                            }
+                        }
+                    }
+
+                    if = {
+                        limit = {
+                            scope:original_ruler = {
+                                any_vassal = {
+                                    has_character_flag = rf_major_breakaway_seed
+                                    scope:rf_assign_kingdom = { is_neighbor_to_realm = prev }
+                                }
+                            }
+                        }
+                        scope:original_ruler = {
+                            ordered_vassal = {
+                                limit = {
+                                    has_character_flag = rf_major_breakaway_seed
+                                    scope:rf_assign_kingdom = { is_neighbor_to_realm = prev }
+                                }
+                                order_by = current_military_strength
+                                max = 1
+                                save_scope_as = rf_active_seed
+                                riseandfall_assign_saved_kingdom_to_seed_se = yes
+                            }
+                        }
+                    }
+                    else_if = {
+                        limit = {
+                            scope:original_ruler = {
+                                any_vassal = {
+                                    has_character_flag = rf_secondary_breakaway_seed
+                                    scope:rf_assign_kingdom = { is_neighbor_to_realm = prev }
+                                }
+                            }
+                        }
+                        scope:original_ruler = {
+                            ordered_vassal = {
+                                limit = {
+                                    has_character_flag = rf_secondary_breakaway_seed
+                                    scope:rf_assign_kingdom = { is_neighbor_to_realm = prev }
+                                }
+                                order_by = current_military_strength
+                                max = 1
+                                save_scope_as = rf_active_seed
+                                riseandfall_assign_saved_kingdom_to_seed_se = yes
+                            }
+                        }
+                    }
+                    else_if = {
+                        limit = {
+                            scope:original_ruler = {
+                                any_vassal = {
+                                    has_character_flag = rf_breakaway_ruler
+                                    scope:rf_assign_kingdom = { is_neighbor_to_realm = prev }
+                                }
+                            }
+                        }
+                        scope:original_ruler = {
+                            ordered_vassal = {
+                                limit = {
+                                    has_character_flag = rf_breakaway_ruler
+                                    scope:rf_assign_kingdom = { is_neighbor_to_realm = prev }
+                                }
+                                order_by = current_military_strength
+                                max = 1
+                                save_scope_as = rf_active_seed
+                                riseandfall_assign_saved_kingdom_to_seed_se = yes
+                            }
+                        }
+                    }
+                    else_if = {
+                        limit = {
+                            scope:original_ruler = {
+                                any_vassal = { has_character_flag = rf_secondary_breakaway_seed }
+                            }
+                        }
+                        scope:original_ruler = {
+                            ordered_vassal = {
+                                limit = { has_character_flag = rf_secondary_breakaway_seed }
+                                order_by = current_military_strength
+                                max = 1
+                                save_scope_as = rf_active_seed
+                                riseandfall_assign_saved_kingdom_to_seed_se = yes
+                            }
+                        }
+                    }
+                    else_if = {
+                        limit = {
+                            scope:original_ruler = {
+                                any_vassal = { has_character_flag = rf_major_breakaway_seed }
+                            }
+                        }
+                        scope:original_ruler = {
+                            ordered_vassal = {
+                                limit = { has_character_flag = rf_major_breakaway_seed }
+                                order_by = current_military_strength
+                                max = 1
+                                save_scope_as = rf_active_seed
+                                riseandfall_assign_saved_kingdom_to_seed_se = yes
+                            }
+                        }
+                    }
+                    else = {
+                        scope:original_ruler = {
+                            ordered_vassal = {
+                                limit = { has_character_flag = rf_breakaway_ruler }
+                                order_by = current_military_strength
+                                max = 1
+                                save_scope_as = rf_active_seed
+                                riseandfall_assign_saved_kingdom_to_seed_se = yes
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    if = {
+        limit = { scope:original_ruler = { has_character_flag = rf_split_seed_by_duchy } }
+        scope:original_ruler = {
+            every_realm_de_jure_duchy = {
+                limit = { NOT = { this = scope:rf_capital_duchy } }
+                save_scope_as = rf_assign_duchy
+
+                if = {
+                    limit = {
+                        scope:original_ruler = {
+                            any_vassal = {
+                                is_landed = yes
+                                NOT = { has_character_flag = rf_breakaway_ruler }
+                                NOT = { has_character_flag = rf_palace_coup_split_protected }
+                                NOT = { has_variable = rf_my_breakaway }
+                                primary_title.tier >= tier_county
+                                NOT = { primary_title.tier >= tier_empire }
+                                capital_county.duchy = scope:rf_assign_duchy
+                            }
+                        }
+                    }
+
+                    if = {
+                        limit = {
+                            scope:original_ruler = {
+                                any_vassal = {
+                                    has_character_flag = rf_major_breakaway_seed
+                                    scope:rf_assign_duchy = { is_neighbor_to_realm = prev }
+                                }
+                            }
+                        }
+                        scope:original_ruler = {
+                            ordered_vassal = {
+                                limit = {
+                                    has_character_flag = rf_major_breakaway_seed
+                                    scope:rf_assign_duchy = { is_neighbor_to_realm = prev }
+                                }
+                                order_by = current_military_strength
+                                max = 1
+                                save_scope_as = rf_active_seed
+                                riseandfall_assign_saved_duchy_to_seed_se = yes
+                            }
+                        }
+                    }
+                    else_if = {
+                        limit = {
+                            scope:original_ruler = {
+                                any_vassal = {
+                                    has_character_flag = rf_secondary_breakaway_seed
+                                    scope:rf_assign_duchy = { is_neighbor_to_realm = prev }
+                                }
+                            }
+                        }
+                        scope:original_ruler = {
+                            ordered_vassal = {
+                                limit = {
+                                    has_character_flag = rf_secondary_breakaway_seed
+                                    scope:rf_assign_duchy = { is_neighbor_to_realm = prev }
+                                }
+                                order_by = current_military_strength
+                                max = 1
+                                save_scope_as = rf_active_seed
+                                riseandfall_assign_saved_duchy_to_seed_se = yes
+                            }
+                        }
+                    }
+                    else_if = {
+                        limit = {
+                            scope:original_ruler = {
+                                any_vassal = {
+                                    has_character_flag = rf_breakaway_ruler
+                                    scope:rf_assign_duchy = { is_neighbor_to_realm = prev }
+                                }
+                            }
+                        }
+                        scope:original_ruler = {
+                            ordered_vassal = {
+                                limit = {
+                                    has_character_flag = rf_breakaway_ruler
+                                    scope:rf_assign_duchy = { is_neighbor_to_realm = prev }
+                                }
+                                order_by = current_military_strength
+                                max = 1
+                                save_scope_as = rf_active_seed
+                                riseandfall_assign_saved_duchy_to_seed_se = yes
+                            }
+                        }
+                    }
+                    else_if = {
+                        limit = {
+                            scope:original_ruler = {
+                                any_vassal = { has_character_flag = rf_secondary_breakaway_seed }
+                            }
+                        }
+                        scope:original_ruler = {
+                            ordered_vassal = {
+                                limit = { has_character_flag = rf_secondary_breakaway_seed }
+                                order_by = current_military_strength
+                                max = 1
+                                save_scope_as = rf_active_seed
+                                riseandfall_assign_saved_duchy_to_seed_se = yes
+                            }
+                        }
+                    }
+                    else_if = {
+                        limit = {
+                            scope:original_ruler = {
+                                any_vassal = { has_character_flag = rf_major_breakaway_seed }
+                            }
+                        }
+                        scope:original_ruler = {
+                            ordered_vassal = {
+                                limit = { has_character_flag = rf_major_breakaway_seed }
+                                order_by = current_military_strength
+                                max = 1
+                                save_scope_as = rf_active_seed
+                                riseandfall_assign_saved_duchy_to_seed_se = yes
+                            }
+                        }
+                    }
+                    else = {
+                        scope:original_ruler = {
+                            ordered_vassal = {
+                                limit = { has_character_flag = rf_breakaway_ruler }
+                                order_by = current_military_strength
+                                max = 1
+                                save_scope_as = rf_active_seed
+                                riseandfall_assign_saved_duchy_to_seed_se = yes
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    # Dynamic sphere pass: after clean de jure blocks are handled, remaining
+    # loose vassals choose the strongest plausible nearby breakaway anchor.
+    # Clear the legacy region-first assignments so every ordinary vassal is
+    # evaluated independently by the political/geographic scorer.
+    scope:original_ruler = {
+        every_vassal = {
+            limit = {
+                is_landed = yes
+                NOT = { has_character_flag = rf_breakaway_ruler }
+                NOT = { has_character_flag = rf_palace_coup_split_protected }
+            }
+            remove_variable = rf_my_breakaway
+        }
+    }
+    scope:original_ruler = {
+        every_vassal = {
+            limit = {
+                is_landed = yes
+                NOT = { has_character_flag = rf_breakaway_ruler }
+                NOT = { has_character_flag = rf_palace_coup_split_protected }
+                NOT = { has_variable = rf_my_breakaway }
+                primary_title.tier >= tier_county
+                NOT = { primary_title.tier >= tier_empire }
+                NOT = { capital_county.duchy = scope:rf_capital_duchy }
+            }
+            riseandfall_assign_vassal_to_best_breakaway_sphere_se = yes
+        }
+    }
+
+    # Phase 4: any leftover border marches outside clean duchy blocks join the
+    # nearest breakaway so the map does not leave many stray leftovers.
+    scope:original_ruler = {
+        every_vassal = {
+            limit = {
+                is_landed = yes
+                NOT = { has_character_flag = rf_breakaway_ruler }
+                NOT = { has_character_flag = rf_palace_coup_split_protected }
+                NOT = { has_variable = rf_my_breakaway }
+                primary_title.tier >= tier_county
+                NOT = { primary_title.tier >= tier_empire }
+                NOT = { capital_county.duchy = scope:original_ruler.capital_county.duchy }
+            }
+            save_scope_as = rf_unassigned_vassal
+
+            if = {
+                limit = {
+                    scope:original_ruler = {
+                        any_vassal = {
+                            has_character_flag = rf_breakaway_ruler
+                            primary_title = { is_neighbor_to_realm = scope:rf_unassigned_vassal }
+                        }
+                    }
+                }
+                scope:original_ruler = {
+                    ordered_vassal = {
+                        limit = {
+                            has_character_flag = rf_breakaway_ruler
+                            primary_title = { is_neighbor_to_realm = scope:rf_unassigned_vassal }
+                        }
+                        order_by = current_military_strength
+                        max = 1
+                        save_scope_as = rf_active_seed
+                        scope:rf_unassigned_vassal = {
+                            set_variable = { name = rf_my_breakaway value = scope:rf_active_seed }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    # Execute all marked breakaways without relying on named slots.
+    scope:original_ruler = {
+        every_vassal = {
+            limit = { has_character_flag = rf_breakaway_ruler }
+            set_variable = { name = rf_execute_breakaway value = 1 }
+        }
+        every_vassal = {
+            limit = { has_variable = rf_execute_breakaway }
+            remove_variable = rf_execute_breakaway
+            this = { riseandfall_execute_realm_split_se = yes }
+        }
+    }
+
+    # Cleanup temporary variables and add cooldown.
+    scope:original_ruler = {
+        remove_variable = rf_breakaway_seed_count
+        remove_character_flag = rf_split_small
+        remove_character_flag = rf_split_medium
+        remove_character_flag = rf_split_large
+        remove_character_flag = rf_split_extreme
+        remove_character_flag = rf_split_fracture
+        remove_character_flag = rf_split_major_fracture
+        remove_character_flag = rf_split_total_collapse
+        remove_character_flag = rf_split_lower_tier
+        remove_character_flag = rf_split_seed_by_empire
+        remove_character_flag = rf_split_seed_by_kingdom
+        remove_character_flag = rf_split_seed_by_duchy
+        remove_variable = rf_usable_empire_anchor_count
+        remove_variable = rf_usable_kingdom_anchor_count
+        remove_variable = rf_usable_duchy_anchor_count
+        every_vassal = {
+            limit = { has_character_flag = rf_forced_breakaway_seed }
+            remove_character_flag = rf_forced_breakaway_seed
+        }
+        every_vassal = {
+            limit = {
+                OR = {
+                    has_character_flag = rf_palace_coup_neutral_rejector
+                    has_character_flag = rf_palace_coup_neutral_seed
+                }
+            }
+            remove_character_flag = rf_palace_coup_neutral_rejector
+            remove_character_flag = rf_palace_coup_neutral_seed
+        }
+    }
+}
+
+##########################
+# Execute Realm Split
+# Called on a breakaway ruler - makes them independent with their assigned vassals
+
+riseandfall_execute_realm_split_se = {
+    save_scope_as = new_realm_ruler
+
+    # Match the original ruler's rank for breakaway dynamic titles. Hegemony
+    # successors use vanilla's dynamic-title flow, then receive empire-tier
+    # vassals through the normal assignment pass below.
+    scope:new_realm_ruler = {
+        save_scope_as = rf_breakaway_ruler
+        capital_county = { save_scope_as = rf_base_county }
+        capital_barony = { save_scope_as = rf_base_capital_barony }
+
+        if = {
+            limit = {
+                scope:original_primary = { tier = tier_hegemony }
+            }
+            if = {
+                limit = { highest_held_title_tier >= tier_hegemony }
+                primary_title = { save_scope_as = rf_new_title }
+            }
+            else = {
+                create_dynamic_title = {
+                    tier = hegemony
+                    name = RISEANDFALL_BREAKAWAY_NAME_CAPITAL
+                }
+                if = {
+                    limit = { exists = scope:new_title }
+                    add_character_flag = { flag = rf_created_breakaway_dynamic_title days = 7 }
+                    scope:new_title = { save_scope_as = rf_new_title }
+                }
+            }
+        }
+        else_if = {
+            limit = {
+                scope:original_primary = { tier = tier_empire }
+            }
+            if = {
+                limit = { highest_held_title_tier >= tier_empire }
+                primary_title = { save_scope_as = rf_new_title }
+            }
+            else = {
+                create_dynamic_title = {
+                    tier = empire
+                    name = RISEANDFALL_BREAKAWAY_NAME_CAPITAL
+                }
+                if = {
+                    limit = { exists = scope:new_title }
+                    add_character_flag = { flag = rf_created_breakaway_dynamic_title days = 7 }
+                    scope:new_title = { save_scope_as = rf_new_title }
+                }
+            }
+        }
+        else_if = {
+            limit = {
+                scope:original_primary = { tier = tier_kingdom }
+            }
+            if = {
+                limit = { highest_held_title_tier >= tier_kingdom }
+                primary_title = { save_scope_as = rf_new_title }
+            }
+            else = {
+                create_dynamic_title = {
+                    tier = kingdom
+                    name = RISEANDFALL_BREAKAWAY_NAME_CAPITAL
+                }
+                if = {
+                    limit = { exists = scope:new_title }
+                    add_character_flag = { flag = rf_created_breakaway_dynamic_title days = 7 }
+                    scope:new_title = { save_scope_as = rf_new_title }
+                }
+            }
+        }
+        else_if = {
+            limit = {
+                scope:original_primary = { tier = tier_duchy }
+            }
+            if = {
+                limit = { highest_held_title_tier >= tier_duchy }
+                primary_title = { save_scope_as = rf_new_title }
+            }
+            else = {
+                create_dynamic_title = {
+                    tier = duchy
+                    name = RISEANDFALL_BREAKAWAY_NAME_CAPITAL
+                }
+                if = {
+                    limit = { exists = scope:new_title }
+                    add_character_flag = { flag = rf_created_breakaway_dynamic_title days = 7 }
+                    scope:new_title = { save_scope_as = rf_new_title }
+                }
+            }
+        }
+        else_if = {
+            limit = { exists = primary_title }
+            primary_title = { save_scope_as = rf_new_title }
+        }
+    }
+
+    # Keep the vanilla dynamic-hegemony presentation setup on newly created
+    # titles only; existing primary titles must not have their CoA regenerated.
+    if = {
+        limit = {
+            exists = scope:rf_new_title
+            scope:new_realm_ruler = { has_character_flag = rf_created_breakaway_dynamic_title }
+        }
+        scope:rf_new_title = {
+            set_color_from_title = scope:rf_base_county
+            if = {
+                limit = { tier = tier_hegemony }
+                set_can_be_named_after_dynasty = no
+                set_can_use_nomadic_naming = no
+                set_definitive_form = yes
+            }
+        }
+    }
+
+
+    # Give them the new title
+    if = {
+        limit = {
+            exists = scope:rf_new_title
+            scope:new_realm_ruler = { has_character_flag = rf_created_breakaway_dynamic_title }
+        }
+        create_title_and_vassal_change = {
+            type = created
+            save_scope_as = rf_title_change
+            add_claim_on_loss = yes
+        }
+        scope:rf_new_title = {
+            change_title_holder = {
+                holder = scope:new_realm_ruler
+                change = scope:rf_title_change
+            }
+        }
+        resolve_title_and_vassal_change = scope:rf_title_change
+    }
+
+    # Vanilla generates the CoA only after the dynamic title's holder change
+    # has resolved. This ordering is especially important for hegemonies.
+    if = {
+        limit = {
+            exists = scope:rf_new_title
+            scope:new_realm_ruler = { has_character_flag = rf_created_breakaway_dynamic_title }
+        }
+        scope:rf_new_title = { generate_coa = yes }
+    }
+
+    # Dynamic crowns do not inherit title laws automatically. Copy the source
+    # crown's elective identity before making this title the successor primary.
+    if = {
+        limit = {
+            exists = scope:rf_new_title
+            scope:new_realm_ruler = {
+                has_character_flag = rf_created_breakaway_dynamic_title
+            }
+        }
+        scope:original_primary = {
+            save_temporary_scope_as = rf_successor_law_source
+        }
+        scope:rf_new_title = {
+            riseandfall_copy_successor_title_succession_se = yes
+        }
+        clear_saved_scope = rf_successor_law_source
+    }
+
+    # CK3 may keep a reserve lower title as primary after title handoff; force the
+    # same-rank successor title primary before successor war markers are applied.
+    if = {
+        limit = { exists = scope:rf_new_title }
+        scope:new_realm_ruler = {
+            set_primary_title_to = scope:rf_new_title
+        }
+    }
+
+    # Transfer assigned vassals
+    # This is an internal political handoff, not a military conquest. Using
+    # conquest here creates false recent-conquest history for Coalition Threat.
+    create_title_and_vassal_change = {
+        type = granted
+        save_scope_as = rf_vassal_change
+        add_claim_on_loss = no
+    }
+
+    scope:original_ruler = {
+        every_vassal = {
+            limit = {
+                has_variable = rf_my_breakaway
+                var:rf_my_breakaway = scope:new_realm_ruler
+            }
+            change_liege = {
+                liege = scope:new_realm_ruler
+                change = scope:rf_vassal_change
+            }
+            remove_variable = rf_my_breakaway
+            remove_character_flag = rf_palace_coup_neutral_rejector
+            remove_character_flag = rf_palace_coup_neutral_seed
+        }
+    }
+
+    resolve_title_and_vassal_change = scope:rf_vassal_change
+
+    # Make independent
+    create_title_and_vassal_change = {
+        type = independency
+        save_scope_as = rf_indep_change
+        add_claim_on_loss = yes
+    }
+
+    becomes_independent = {
+        change = scope:rf_indep_change
+    }
+
+    resolve_title_and_vassal_change = scope:rf_indep_change
+
+    # Split realms become tributaries; the retired no-tributaries override had
+    # no writer and could only produce a static variable warning.
+    start_tributary = {
+        contract_group = tributary_settled
+        suzerain = scope:original_ruler
+    }
+
+    # Claims on titles removed; successor war CB handles claims now.
+
+    if = {
+        limit = { exists = scope:new_realm_ruler }
+        scope:new_realm_ruler = {
+            riseandfall_set_low_stability_cooldown_se = yes
+        }
+    }
+
+    # Mark this realm as a successor state and link it to its split origin title.
+    # Stored both on the ruler and the successor primary title for future mechanics.
+    set_variable = { name = rf_successor_origin_title value = scope:original_primary }
+    # Seed a propagated "root origin" pointer so descendant splits can be
+    # associated with the original root of a split chain (enables multi-gen CBs).
+    set_variable = { name = rf_successor_root_origin_title value = scope:original_primary }
+    add_character_flag = rf_successor_state_ruler
+    riseandfall_apply_successor_realm_grace_se = yes
+    if = {
+        limit = { exists = scope:new_realm_ruler.primary_title }
+        # Capture the initial realm size on the new realm ruler so we can store
+        # a permanent snapshot on the title for future shrink checks.
+        scope:rf_breakaway_ruler = { set_variable = { name = tmp_successor_realm_size value = realm_size } }
+        scope:new_realm_ruler.primary_title = {
+            # immediate origin (the title that was split)
+            set_variable = { name = rf_successor_origin_title value = scope:original_primary years = 50 }
+            set_variable = { name = rf_is_successor_split_title value = 1 years = 50 }
+            # Permanent marker for this title indicating it's a split realm successor
+            set_variable = { name = rf_is_permanent_successor_split value = 1 }
+            # Propagate and/or set the root origin: if the original_primary was
+            # itself a successor, inherit its root; otherwise use original_primary.
+            if = {
+                limit = { scope:original_primary = { has_variable = rf_successor_root_origin_title } }
+                set_variable = { name = rf_successor_root_origin_title value = scope:original_primary.var:rf_successor_root_origin_title years = 50 }
+            }
+            else = {
+                set_variable = { name = rf_successor_root_origin_title value = scope:original_primary years = 50 }
+            }
+            # Store the baseline realm size (number of counties) on the title permanently
+            # Only set if the title doesn't already have a snapshot to avoid accidental overwrite
+            if = {
+                limit = { NOT = { has_variable = rf_successor_permanent_realm_size } }
+                set_variable = { name = rf_successor_permanent_realm_size value = scope:rf_breakaway_ruler.var:tmp_successor_realm_size }
+            }
+        }
+        # Clear the temporary holder variable from the ruler scope
+        scope:rf_breakaway_ruler = { remove_variable = tmp_successor_realm_size }
+    }
+
+    # Ensure all successor rulers from this same split origin have mutual claims
+    # on each other's primary titles (including the newly-created breakaway).
+    every_independent_ruler = {
+        limit = {
+            NOT = { this = scope:new_realm_ruler }
+            is_landed = yes
+            exists = primary_title
+            primary_title = {
+                has_variable = rf_is_successor_split_title
+                has_variable = rf_successor_origin_title
+            }
+            has_weak_claim_on = scope:original_primary
+        }
+        save_scope_as = rf_peer_successor
+    }
+
+    # --- End new rivalry & cross-claims block ---
+
+    remove_variable = rf_seeded_empire
+    remove_variable = rf_seeded_kingdom
+    remove_variable = rf_seeded_duchy
+    remove_variable = rf_primary_kingdom_seed
+    remove_variable = rf_execute_breakaway
+    remove_character_flag = rf_major_breakaway_seed
+    remove_character_flag = rf_secondary_breakaway_seed
+
+    # Remove flag
+    remove_character_flag = rf_breakaway_ruler
+    remove_character_flag = rf_forced_breakaway_seed
+    remove_character_flag = rf_created_breakaway_dynamic_title
+    remove_character_flag = rf_palace_coup_neutral_rejector
+    remove_character_flag = rf_palace_coup_neutral_seed
+}
+
+riseandfall_realm_split_sync_successor_primary_title_se = {
+    if = {
+        limit = { exists = primary_title }
+        primary_title = { save_temporary_scope_as = rf_successor_sync_title }
+    }
+    if = {
+        limit = { exists = scope:rf_successor_sync_title }
+        scope:rf_successor_sync_title = {
+            if = {
+                limit = { scope:recipient = { has_variable = rf_successor_origin_title } }
+                set_variable = { name = rf_successor_origin_title value = scope:recipient.var:rf_successor_origin_title years = 50 }
+            }
+            if = {
+                limit = { scope:recipient = { has_variable = rf_successor_root_origin_title } }
+                set_variable = { name = rf_successor_root_origin_title value = scope:recipient.var:rf_successor_root_origin_title years = 50 }
+            }
+            if = {
+                limit = {
+                    NOT = { has_variable = rf_successor_root_origin_title }
+                    scope:rf_recipient_old_primary = { has_variable = rf_successor_root_origin_title }
+                }
+                set_variable = { name = rf_successor_root_origin_title value = scope:rf_recipient_old_primary.var:rf_successor_root_origin_title years = 50 }
+            }
+            if = {
+                limit = {
+                    NOT = { has_variable = rf_successor_origin_title }
+                    scope:rf_recipient_old_primary = { has_variable = rf_successor_origin_title }
+                }
+                set_variable = { name = rf_successor_origin_title value = scope:rf_recipient_old_primary.var:rf_successor_origin_title years = 50 }
+            }
+            if = {
+                limit = {
+                    NOT = { has_variable = rf_successor_root_origin_title }
+                    exists = scope:rf_incoming_split_title
+                    scope:rf_incoming_split_title = { has_variable = rf_successor_root_origin_title }
+                }
+                set_variable = { name = rf_successor_root_origin_title value = scope:rf_incoming_split_title.var:rf_successor_root_origin_title years = 50 }
+            }
+            if = {
+                limit = {
+                    NOT = { has_variable = rf_successor_origin_title }
+                    exists = scope:rf_incoming_split_title
+                    scope:rf_incoming_split_title = { has_variable = rf_successor_origin_title }
+                }
+                set_variable = { name = rf_successor_origin_title value = scope:rf_incoming_split_title.var:rf_successor_origin_title years = 50 }
+            }
+            set_variable = { name = rf_is_successor_split_title value = 1 years = 50 }
+            set_variable = { name = rf_is_permanent_successor_split value = 1 }
+            if = {
+                limit = { scope:rf_recipient_old_primary = { has_variable = rf_successor_permanent_realm_size } }
+                set_variable = { name = rf_successor_permanent_realm_size value = scope:rf_recipient_old_primary.var:rf_successor_permanent_realm_size }
+            }
+            else_if = {
+                limit = {
+                    exists = scope:rf_incoming_split_title
+                    scope:rf_incoming_split_title = { has_variable = rf_successor_permanent_realm_size }
+                }
+                set_variable = { name = rf_successor_permanent_realm_size value = scope:rf_incoming_split_title.var:rf_successor_permanent_realm_size }
+            }
+            else_if = {
+                limit = { NOT = { has_variable = rf_successor_permanent_realm_size } }
+                set_variable = { name = rf_successor_permanent_realm_size value = scope:recipient.realm_size }
+            }
+        }
+    }
+}
+
+riseandfall_realm_split_migrate_successor_primary_title_se = {
+    if = {
+        limit = {
+            is_landed = yes
+            is_independent_ruler = yes
+            exists = primary_title
+            primary_title = {
+                NOT = { has_variable = rf_is_successor_split_title }
+                NOT = { has_variable = rf_successor_root_origin_title }
+            }
+            any_held_title = {
+                NOT = { this = root.primary_title }
+                has_variable = rf_is_successor_split_title
+                has_variable = rf_successor_root_origin_title
+            }
+        }
+        primary_title = { save_temporary_scope_as = rf_successor_new_primary_title }
+        random_held_title = {
+            limit = {
+                NOT = { this = root.primary_title }
+                has_variable = rf_is_successor_split_title
+                has_variable = rf_successor_root_origin_title
+            }
+            save_temporary_scope_as = rf_successor_old_primary_title
+        }
+
+        scope:rf_successor_new_primary_title = {
+            if = {
+                limit = { scope:rf_successor_old_primary_title = { has_variable = rf_successor_origin_title } }
+                set_variable = { name = rf_successor_origin_title value = scope:rf_successor_old_primary_title.var:rf_successor_origin_title years = 50 }
+            }
+            if = {
+                limit = { scope:rf_successor_old_primary_title = { has_variable = rf_successor_root_origin_title } }
+                    set_variable = { name = rf_successor_root_origin_title value = scope:rf_successor_old_primary_title.var:rf_successor_root_origin_title years = 50 }
+            }
+                    set_variable = { name = rf_is_successor_split_title value = 1 years = 50 }
+            set_variable = { name = rf_is_permanent_successor_split value = 1 }
+            # Some legacy successor titles carry the marker without a valid
+            # numeric snapshot; rebuild the permanent baseline from the ruler.
+            set_variable = { name = rf_successor_permanent_realm_size value = root.realm_size }
+        }
+
+        every_held_title = {
+            limit = {
+                NOT = { this = root.primary_title }
+                has_variable = rf_is_successor_split_title
+            }
+            remove_variable = rf_is_successor_split_title
+            remove_variable = rf_successor_origin_title
+            remove_variable = rf_successor_root_origin_title
+            remove_variable = rf_is_permanent_successor_split
+            remove_variable = rf_successor_permanent_realm_size
+        }
+    }
+}
+
+riseandfall_realm_split_lower_actor_primary_below_recipient_se = {
+    # Declare the temporary list in this live helper before any list read.
+    add_to_list = rf_absorbed_surrender_vassals
+    clear_saved_scope = rf_absorbed_split_title
+    clear_saved_scope = rf_absorbed_replacement_title
+    clear_variable_list = rf_absorbed_surrender_vassals
+
+    if = {
+        limit = {
+            exists = scope:recipient
+            exists = primary_title
+            scope:recipient = { exists = primary_title }
+            primary_title = {
+                has_variable = rf_is_successor_split_title
+                has_variable = rf_successor_root_origin_title
+            }
+            primary_title.tier >= scope:recipient.primary_title.tier
+        }
+        primary_title = { save_scope_as = rf_absorbed_split_title }
+        # Preserve the recipient's current successor crown before a real
+        # equal-rank crown is handed upward and made their new primary title.
+        scope:recipient.primary_title = { save_temporary_scope_as = rf_recipient_old_primary }
+
+        # Demotion needs a real lower title to preserve the actor as a landed
+        # vassal after their successor crown is destroyed or handed upward.
+        if = {
+            limit = { scope:recipient = { primary_title.tier >= tier_hegemony } }
+            random_held_title = {
+                limit = {
+                    tier = tier_empire
+                    is_titular = no
+                    NOT = { this = scope:rf_absorbed_split_title }
+                }
+                save_scope_as = rf_absorbed_replacement_title
+            }
+        }
+        if = {
+            limit = {
+                NOT = { exists = scope:rf_absorbed_replacement_title }
+                scope:recipient = { primary_title.tier >= tier_empire }
+            }
+            random_held_title = {
+                limit = {
+                    tier = tier_kingdom
+                    is_titular = no
+                    NOT = { this = scope:rf_absorbed_split_title }
+                }
+                save_scope_as = rf_absorbed_replacement_title
+            }
+        }
+        if = {
+            limit = {
+                NOT = { exists = scope:rf_absorbed_replacement_title }
+                scope:recipient = { primary_title.tier >= tier_kingdom }
+            }
+            random_held_title = {
+                limit = {
+                    tier = tier_duchy
+                    is_titular = no
+                    NOT = { this = scope:rf_absorbed_split_title }
+                }
+                save_scope_as = rf_absorbed_replacement_title
+            }
+        }
+        if = {
+            limit = {
+                NOT = { exists = scope:rf_absorbed_replacement_title }
+                scope:recipient = { primary_title.tier >= tier_duchy }
+            }
+            random_held_title = {
+                limit = {
+                    tier = tier_county
+                    is_titular = no
+                    NOT = { this = scope:rf_absorbed_split_title }
+                }
+                save_scope_as = rf_absorbed_replacement_title
+            }
+        }
+
+        if = {
+            limit = { exists = scope:rf_absorbed_replacement_title }
+            scope:rf_absorbed_replacement_title = {
+                if = {
+                    limit = { scope:rf_absorbed_split_title = { has_variable = rf_successor_origin_title } }
+                    set_variable = { name = rf_successor_origin_title value = scope:rf_absorbed_split_title.var:rf_successor_origin_title years = 50 }
+                }
+                if = {
+                    limit = { scope:rf_absorbed_split_title = { has_variable = rf_successor_root_origin_title } }
+                    set_variable = { name = rf_successor_root_origin_title value = scope:rf_absorbed_split_title.var:rf_successor_root_origin_title years = 50 }
+                }
+                if = {
+                    limit = { scope:rf_absorbed_split_title = { has_variable = rf_successor_permanent_realm_size } }
+                    set_variable = { name = rf_successor_permanent_realm_size value = scope:rf_absorbed_split_title.var:rf_successor_permanent_realm_size }
+                }
+                else_if = {
+                    limit = { NOT = { has_variable = rf_successor_permanent_realm_size } }
+                    set_variable = { name = rf_successor_permanent_realm_size value = root.realm_size }
+                }
+                set_variable = { name = rf_is_successor_split_title value = 1 years = 50 }
+                set_variable = { name = rf_is_permanent_successor_split value = 1 }
+            }
+            # CK3 does not allow lowering a ruler's primary title while they
+            # still hold a higher primary. If the replacement is lower rank,
+            # let the submitted/destroyed successor crown force recalculation.
+            if = {
+                limit = { scope:rf_absorbed_replacement_title.tier >= primary_title.tier }
+                set_primary_title_to = scope:rf_absorbed_replacement_title
+            }
+            scope:rf_absorbed_split_title = {
+                remove_variable = rf_is_successor_split_title
+                remove_variable = rf_successor_origin_title
+                remove_variable = rf_successor_root_origin_title
+                remove_variable = rf_is_permanent_successor_split
+                remove_variable = rf_successor_permanent_realm_size
+            }
+            if = {
+                limit = { scope:rf_absorbed_split_title = { is_titular = no } }
+                # Preserve real de jure crowns by handing them to the recipient.
+                # This lets an equal-rank successor join another realm without
+                # leaving a duplicate titular primary title behind.
+                create_title_and_vassal_change = {
+                    type = granted
+                    save_scope_as = rf_absorbed_title_change
+                    add_claim_on_loss = no
+                }
+                hidden_effect = {
+                    every_vassal = {
+                        add_to_list = rf_absorbed_surrender_vassals
+                    }
+                }
+                scope:rf_absorbed_split_title = {
+                    change_title_holder = {
+                        holder = scope:recipient
+                        change = scope:rf_absorbed_title_change
+                        take_baronies = no
+                    }
+                }
+                resolve_title_and_vassal_change = scope:rf_absorbed_title_change
+                scope:recipient = {
+                    if = {
+                        limit = { primary_title.tier <= scope:rf_absorbed_split_title.tier }
+                        set_primary_title_to = scope:rf_absorbed_split_title
+                    }
+                }
+                hidden_effect = {
+                    create_title_and_vassal_change = {
+                        type = granted
+                        save_scope_as = rf_absorbed_vassal_change
+                        add_claim_on_loss = no
+                    }
+                    every_in_list = {
+                        list = rf_absorbed_surrender_vassals
+                        change_liege = {
+                            liege = scope:recipient
+                            change = scope:rf_absorbed_vassal_change
+                        }
+                    }
+                    resolve_title_and_vassal_change = scope:rf_absorbed_vassal_change
+                    clear_variable_list = rf_absorbed_surrender_vassals
+                }
+                # The receiving realm retains the successor-state lineage on
+                # its new real primary crown.
+                scope:recipient.primary_title = {
+                    if = {
+                        limit = { scope:rf_recipient_old_primary = { has_variable = rf_successor_origin_title } }
+                        set_variable = { name = rf_successor_origin_title value = scope:rf_recipient_old_primary.var:rf_successor_origin_title years = 50 }
+                    }
+                    if = {
+                        limit = { scope:rf_recipient_old_primary = { has_variable = rf_successor_root_origin_title } }
+                        set_variable = { name = rf_successor_root_origin_title value = scope:rf_recipient_old_primary.var:rf_successor_root_origin_title years = 50 }
+                    }
+                    set_variable = { name = rf_is_successor_split_title value = 1 years = 50 }
+                    set_variable = { name = rf_is_permanent_successor_split value = 1 }
+                    if = {
+                        limit = { scope:rf_recipient_old_primary = { has_variable = rf_successor_permanent_realm_size } }
+                        set_variable = { name = rf_successor_permanent_realm_size value = scope:rf_recipient_old_primary.var:rf_successor_permanent_realm_size }
+                    }
+                    else = {
+                        set_variable = { name = rf_successor_permanent_realm_size value = scope:recipient.realm_size }
+                    }
+                }
+                # After the real crown transfer, retire every eligible titular
+                # shell. The shared cleanup preserves all non-titular titles
+                # and protected special titles.
+                scope:recipient = { riseandfall_cleanup_titular_titles_se = yes }
+            }
+            else = {
+                # Titular successor shells have no de jure land to preserve.
+                # Remove only the titular crown and restore its vassals.
+                hidden_effect = {
+                    every_vassal = {
+                        add_to_list = rf_absorbed_surrender_vassals
+                    }
+                }
+                destroy_title = scope:rf_absorbed_split_title
+                hidden_effect = {
+                    create_title_and_vassal_change = {
+                        type = granted
+                        save_scope_as = rf_absorbed_vassal_change
+                        add_claim_on_loss = no
+                    }
+                    every_in_list = {
+                        list = rf_absorbed_surrender_vassals
+                        change_liege = {
+                            liege = scope:recipient
+                            change = scope:rf_absorbed_vassal_change
+                        }
+                    }
+                    resolve_title_and_vassal_change = scope:rf_absorbed_vassal_change
+                    clear_variable_list = rf_absorbed_surrender_vassals
+                }
+            }
+        }
+    }
+}
+
+riseandfall_realm_split_defect_to_recipient_se = {
+    scope:actor.liege = { save_temporary_scope_as = rf_former_split_liege }
+    scope:actor.primary_title = { save_temporary_scope_as = rf_incoming_split_title }
+
+    scope:rf_former_split_liege = {
+        add_opinion = {
+            target = scope:actor
+            modifier = riseandfall_split_defection_opinion
+        }
+    }
+    scope:actor = {
+        add_opinion = {
+            target = scope:rf_former_split_liege
+            modifier = riseandfall_split_defection_opinion
+        }
+    }
+
+    scope:actor = { riseandfall_realm_split_lower_actor_primary_below_recipient_se = yes }
+
+    create_title_and_vassal_change = {
+        type = granted
+        save_scope_as = rf_split_defection_change
+        add_claim_on_loss = no
+    }
+    if = {
+        limit = {
+            scope:actor = {
+                primary_title.tier < scope:recipient.primary_title.tier
+            }
+        }
+        scope:actor = {
+            change_liege = {
+                liege = scope:recipient
+                change = scope:rf_split_defection_change
+            }
+        }
+    }
+    resolve_title_and_vassal_change = scope:rf_split_defection_change
+
+    if = {
+        limit = { scope:rf_former_split_liege = { is_ai = no } }
+        scope:rf_former_split_liege = {
+            set_variable = { name = rf_split_defection_defector value = scope:actor }
+            set_variable = { name = rf_split_defection_new_liege value = scope:recipient }
+            trigger_event = { id = realm_split.2001 }
+        }
+    }
+}
+
+riseandfall_realm_split_surrender_to_recipient_se = {
+    scope:actor.primary_title = { save_temporary_scope_as = rf_submitted_split_title }
+    scope:rf_submitted_split_title = { save_temporary_scope_as = rf_incoming_split_title }
+    # Retain the recipient's successor crown as the metadata source if accepting
+    # this surrender promotes a real empire or hegemony title to primary.
+    scope:recipient.primary_title = { save_temporary_scope_as = rf_recipient_old_primary }
+
+    scope:actor = {
+        if = {
+            limit = { is_tributary = yes }
+            end_tributary = yes
+        }
+    }
+
+    if = {
+        limit = {
+            scope:rf_submitted_split_title = {
+                exists = holder
+                tier = tier_hegemony
+            }
+        }
+        create_title_and_vassal_change = {
+            type = granted
+            save_scope_as = rf_split_submission_title_change
+            add_claim_on_loss = no
+        }
+        scope:rf_submitted_split_title = {
+            change_title_holder = {
+                holder = scope:recipient
+                change = scope:rf_split_submission_title_change
+                take_baronies = no
+            }
+        }
+        resolve_title_and_vassal_change = scope:rf_split_submission_title_change
+        scope:recipient = { set_primary_title_to = scope:rf_submitted_split_title }
+        # Move Baghdad's successor metadata directly onto the promoted Spanish
+        # crown. This interaction changes the recipient's primary title before
+        # cleanup, so the generic recipient-scope sync cannot safely infer it.
+        scope:recipient.primary_title = {
+            if = {
+                limit = { scope:rf_recipient_old_primary = { has_variable = rf_successor_origin_title } }
+                set_variable = { name = rf_successor_origin_title value = scope:rf_recipient_old_primary.var:rf_successor_origin_title years = 50 }
+            }
+            if = {
+                limit = { scope:rf_recipient_old_primary = { has_variable = rf_successor_root_origin_title } }
+                set_variable = { name = rf_successor_root_origin_title value = scope:rf_recipient_old_primary.var:rf_successor_root_origin_title years = 50 }
+            }
+            set_variable = { name = rf_is_successor_split_title value = 1 years = 50 }
+            set_variable = { name = rf_is_permanent_successor_split value = 1 }
+            if = {
+                limit = { scope:rf_recipient_old_primary = { has_variable = rf_successor_permanent_realm_size } }
+                set_variable = { name = rf_successor_permanent_realm_size value = scope:rf_recipient_old_primary.var:rf_successor_permanent_realm_size }
+            }
+            else = {
+                set_variable = { name = rf_successor_permanent_realm_size value = scope:recipient.realm_size }
+            }
+        }
+    }
+    else = {
+        # Titular successor crowns are retired after surrender; non-titular
+        # crowns are retained through the helper's normal handoff.
+        scope:actor = { riseandfall_realm_split_lower_actor_primary_below_recipient_se = yes }
+    }
+
+    scope:actor = {
+        remove_character_flag = rf_successor_state_ruler
+        remove_variable = rf_successor_origin_title
+        remove_variable = rf_successor_root_origin_title
+        # Surrender ends this ruler's successor-state status. The demotion
+        # helper may copy split metadata onto a lower replacement title so the
+        # actor can remain landed; clear it before the yearly monitor can
+        # rebuild that title into a fresh independent successor realm.
+        every_held_title = {
+            remove_variable = rf_is_successor_split_title
+            remove_variable = rf_successor_origin_title
+            remove_variable = rf_successor_root_origin_title
+            remove_variable = rf_is_permanent_successor_split
+            remove_variable = rf_successor_permanent_realm_size
+        }
+    }
+    if = {
+        limit = {
+            scope:rf_submitted_split_title = { exists = holder }
+            # The recipient must keep metadata when this de jure title was
+            # promoted to their primary title by the surrender above.
+            NOT = { scope:rf_submitted_split_title = scope:recipient.primary_title }
+        }
+        scope:rf_submitted_split_title = {
+            remove_variable = rf_is_successor_split_title
+            remove_variable = rf_successor_origin_title
+            remove_variable = rf_successor_root_origin_title
+            remove_variable = rf_is_permanent_successor_split
+            remove_variable = rf_successor_permanent_realm_size
+        }
+    }
+
+    create_title_and_vassal_change = {
+        type = granted
+        save_scope_as = rf_split_submission_change
+        add_claim_on_loss = no
+    }
+    if = {
+        limit = {
+            scope:actor = {
+                primary_title.tier < scope:recipient.primary_title.tier
+            }
+        }
+        scope:actor = {
+            change_liege = {
+                liege = scope:recipient
+                change = scope:rf_split_submission_change
+            }
+        }
+    }
+    resolve_title_and_vassal_change = scope:rf_split_submission_change
+}
+
+riseandfall_split_title_monitor_cleanup_se = {
+    save_scope_as = rf_ruler
+    capital_barony = { save_scope_as = rf_base_capital_barony }
+
+    # Successor split tracking is only valid for independent successor realms.
+    # Vassalized titular split crowns can be safely destroyed; de jure titles
+    # like Georgia should survive and only lose their successor-state markers.
+    if = {
+        limit = { is_independent_ruler = no }
+        every_held_title = {
+            limit = { has_variable = rf_is_permanent_successor_split }
+            save_scope_as = rf_vassal_split_title
+            if = {
+                limit = { is_titular = no }
+                remove_variable = rf_is_successor_split_title
+                remove_variable = rf_successor_origin_title
+                remove_variable = rf_successor_root_origin_title
+                remove_variable = rf_is_permanent_successor_split
+                remove_variable = rf_successor_permanent_realm_size
+            }
+            else = {
+                scope:rf_ruler = {
+                    if = {
+                        limit = { exists = scope:rf_vassal_split_title }
+                        destroy_title = scope:rf_vassal_split_title
+                    }
+                }
+            }
+        }
+    }
+
+    # Only operate on independent primary titles that were flagged as permanent split successors.
+    if = {
+        limit = {
+            is_independent_ruler = yes
+            primary_title = {
+                has_variable = rf_is_permanent_successor_split
+                has_variable = rf_successor_permanent_realm_size
+            }
+        }
+        primary_title = { save_scope_as = rf_split_title }
+        clear_saved_scope = rf_replacement_split_title
+
+        # Legacy safety repair: older palace-coup/split paths could leave the
+        # successor marker on a lower-rank primary. Promote those states back to
+        # the stored root origin rank, matching normal realm split behavior.
+        if = {
+            limit = {
+                scope:rf_split_title = {
+                    has_variable = rf_successor_root_origin_title
+                    var:rf_successor_root_origin_title = {
+                        OR = {
+                            tier = tier_hegemony
+                            tier = tier_empire
+                        }
+                    }
+                    tier < tier_empire
+                }
+            }
+            random_held_title = {
+                limit = {
+                    tier = tier_empire
+                    NOT = { this = scope:rf_split_title }
+                }
+                save_scope_as = rf_replacement_split_title
+            }
+            if = {
+                limit = { NOT = { exists = scope:rf_replacement_split_title } }
+                create_dynamic_title = {
+                    tier = empire
+                    name = RISEANDFALL_BREAKAWAY_NAME_CAPITAL
+                }
+                if = {
+                    limit = { exists = scope:new_title }
+                    scope:new_title = { save_scope_as = rf_replacement_split_title }
+                    create_title_and_vassal_change = {
+                        type = created
+                        save_scope_as = rf_replacement_title_change
+                        add_claim_on_loss = no
+                    }
+                    scope:rf_replacement_split_title = {
+                        change_title_holder = {
+                            holder = scope:rf_ruler
+                            change = scope:rf_replacement_title_change
+                        }
+                        generate_coa = yes
+                    }
+                    resolve_title_and_vassal_change = scope:rf_replacement_title_change
+                }
+            }
+        }
+        else_if = {
+            limit = {
+                OR = {
+                    scope:rf_split_title = {
+                        has_variable = rf_successor_root_origin_title
+                        var:rf_successor_root_origin_title = { tier = tier_kingdom }
+                        tier < tier_kingdom
+                    }
+                    scope:rf_split_title = {
+                        NOT = { has_variable = rf_successor_root_origin_title }
+                        tier < tier_kingdom
+                    }
+                }
+            }
+            random_held_title = {
+                limit = {
+                    tier = tier_kingdom
+                    NOT = { this = scope:rf_split_title }
+                }
+                save_scope_as = rf_replacement_split_title
+            }
+            if = {
+                limit = { NOT = { exists = scope:rf_replacement_split_title } }
+                create_dynamic_title = {
+                    tier = kingdom
+                    name = RISEANDFALL_BREAKAWAY_NAME_CAPITAL
+                }
+                if = {
+                    limit = { exists = scope:new_title }
+                    scope:new_title = { save_scope_as = rf_replacement_split_title }
+                    create_title_and_vassal_change = {
+                        type = created
+                        save_scope_as = rf_replacement_title_change
+                        add_claim_on_loss = no
+                    }
+                    scope:rf_replacement_split_title = {
+                        change_title_holder = {
+                            holder = scope:rf_ruler
+                            change = scope:rf_replacement_title_change
+                        }
+                        generate_coa = yes
+                    }
+                    resolve_title_and_vassal_change = scope:rf_replacement_title_change
+                }
+            }
+        }
+
+        if = {
+            limit = {
+                exists = scope:rf_replacement_split_title
+                NOT = { scope:rf_replacement_split_title = scope:rf_split_title }
+            }
+            scope:rf_replacement_split_title = {
+                if = {
+                    limit = { scope:rf_split_title = { has_variable = rf_successor_origin_title } }
+                    set_variable = { name = rf_successor_origin_title value = scope:rf_split_title.var:rf_successor_origin_title years = 50 }
+                }
+                if = {
+                    limit = { scope:rf_split_title = { has_variable = rf_successor_root_origin_title } }
+                    set_variable = { name = rf_successor_root_origin_title value = scope:rf_split_title.var:rf_successor_root_origin_title years = 50 }
+                }
+                set_variable = { name = rf_is_successor_split_title value = 1 years = 50 }
+                set_variable = { name = rf_is_permanent_successor_split value = 1 }
+                # Rebuilt replacement titles get a fresh numeric baseline in
+                # case the old title only had a stale/empty legacy marker.
+                set_variable = { name = rf_successor_permanent_realm_size value = scope:rf_ruler.realm_size }
+            }
+            scope:rf_split_title = {
+                remove_variable = rf_is_successor_split_title
+                remove_variable = rf_successor_origin_title
+                remove_variable = rf_successor_root_origin_title
+                remove_variable = rf_is_permanent_successor_split
+                remove_variable = rf_successor_permanent_realm_size
+            }
+            if = {
+                limit = { scope:rf_split_title = { is_titular = yes } }
+                destroy_title = scope:rf_split_title
+            }
+            if = {
+                limit = {
+                    exists = scope:rf_replacement_split_title
+                    primary_title.tier <= scope:rf_replacement_split_title.tier
+                }
+                set_primary_title_to = scope:rf_replacement_split_title
+            }
+        }
+
+        # Compute current realm size from a fresh numeric value; legacy
+        # titles may have an empty snapshot variable that cannot be read.
+        set_variable = { name = rf_current_realm_size value = realm_size }
+        set_variable = { name = rf_snapshot value = realm_size }
+        if = {
+            limit = {
+                has_variable = rf_current_realm_size
+                has_variable = rf_snapshot
+            }
+            change_variable = { name = rf_snapshot multiply = 0.25 }
+            if = {
+                limit = {
+                    var:rf_current_realm_size <= var:rf_snapshot
+                    # The under-25% collapse check only destroys old successor titular titles
+                    # after their initial 50-year origin grace marker has expired.
+                    primary_title = { NOT = { has_variable = rf_successor_origin_title } }
+                }
+                primary_title = { save_scope_as = rf_split_title }
+                if = {
+                    limit = { scope:rf_split_title = { is_titular = yes } }
+                    destroy_title = scope:rf_split_title
+                }
+            }
+        }
+        remove_variable = rf_current_realm_size
+        remove_variable = rf_snapshot
+        clear_saved_scope = rf_replacement_split_title
+    }
+}

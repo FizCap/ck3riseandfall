@@ -1,0 +1,880 @@
+﻿#EK NOTE: added our crimes, added flavor for Cyrodiil
+admin_emperor = {
+	default_candidates = { holder_close_family landed_vassal }
+
+	allow_children = yes
+
+	candidate_score = {
+		value = {
+			add = appointment_score_base
+			# AGE
+			if = {
+				limit = { age <= 5 }
+				subtract = {
+					value = 100
+					desc = infant_candidate_desc
+				}
+			}
+			else_if = {
+				limit = { age < 10 }
+				subtract = {
+					value = 50
+					desc = child_candidate_desc
+				}
+			}
+			else_if = {
+				limit = { age < 16 }
+				subtract = {
+					value = 20
+					desc = adolescent_candidate_desc
+				}
+			}
+			else_if = {
+				limit = { ek_human_age_equivalent > 60 }
+				subtract = {
+					value = 20
+					desc = geriatric_candidate_desc
+				}
+			}
+
+			# SKILLS
+			add = {
+				value = {
+					add = diplomacy
+					add = learning
+					add = martial
+					add = intrigue
+					add = stewardship
+					multiply = 2
+				}
+				desc = sum_of_skills_desc
+			}
+
+			#EK ADDITION: arcana for magic-focused cultures
+			if = {
+				limit = {
+					culture = {
+						culture_is_magic_focused = yes
+					}
+				}
+				add = {
+					value = {
+						add = arcana
+						multiply = 2
+					}
+					desc = arcana_skills_desc
+				}
+			}
+			#EK ADDITION END
+
+			# TRAITS
+			if = {
+				limit = {
+					has_trait = born_in_the_purple
+				}
+				add = {
+					value = 50
+					desc = trait_born_in_the_purple
+				}
+			}
+			if = {
+				limit = {
+					has_trait = disfigured
+					scope:title.holder.culture = { has_cultural_parameter = physical_disfigurement_blocks_inheritance }
+				}
+				subtract = {
+					value = 1000
+					desc = trait_disfigured
+				}
+			}
+			if = {
+				limit = { has_trait = clubfooted }
+				subtract = {
+					value = 15
+					desc = trait_clubfooted
+				}
+			}
+			if = {
+				limit = { has_trait = dwarf }
+				subtract = {
+					value = 15
+					desc = trait_dwarf
+				}
+			}
+			if = {
+				limit = { has_trait = hunchbacked }
+				subtract = {
+					value = 15
+					desc = trait_hunchbacked
+				}
+			}
+			if = {
+				limit = { has_trait = lisping }
+				subtract = {
+					value = 20
+					desc = trait_lisping
+				}
+			}
+			if = {
+				limit = {
+					OR = {
+						has_trait = inbred
+						has_trait = spindly
+						has_trait = scaly
+						has_trait = albino
+						has_trait = wheezing
+						has_trait = bleeder
+						has_trait_with_flag = age_related_ailment
+					}
+				}
+				subtract = {
+					value = 50
+					desc = negative_trait_succession
+				}
+			}
+			if = {
+				limit = {
+					has_trait = incapable
+					#EK EDIT: no one wants to elect incapable people
+					#scope:title.holder.culture = { has_cultural_parameter = physical_disfigurement_blocks_inheritance }
+				}
+				subtract = {
+					value = 1000
+					desc = trait_incapable
+				}
+			}
+			if = {
+				limit = {
+					has_trait = blind
+					scope:title.holder.culture = { has_cultural_parameter = physical_disfigurement_blocks_inheritance }
+				}
+				subtract = {
+					value = 1000
+					desc = trait_blind
+				}
+			}
+			if = {
+				limit = {
+					has_trait = eunuch_1
+					scope:title.holder.culture = { has_cultural_parameter = physical_disfigurement_blocks_inheritance }
+				}
+				subtract = {
+					value = 1000
+					desc = trait_eunuch
+				}
+			}
+			if = {
+				limit = {
+					has_trait = beardless_eunuch
+					scope:title.holder.culture = { has_cultural_parameter = physical_disfigurement_blocks_inheritance }
+				}
+				subtract = {
+					value = 1500
+					desc = trait_beardless_eunuch
+				}
+			}
+			if = {
+				limit = {
+					has_trait = disinherited
+
+					#EK EDIT: this is not a physical disfigurement
+					#scope:title.holder.culture = { has_cultural_parameter = physical_disfigurement_blocks_inheritance }
+				}
+				subtract = {
+					value = 1000
+					desc = trait_disinherited
+				}
+			}
+			if = {
+				limit = { has_trait = gallivanter }
+				subtract = {
+					value = 1000
+					desc = trait_gallivanter
+				}
+			}
+
+			# COUNCIL POSITIONS
+			if = {
+				limit = {
+					top_liege ?= {
+						legitimacy_level >= 3
+						any_councillor ?= { this = root }
+					}
+				}
+				add = {
+					value = 20
+					desc = councillor_position_desc
+				}
+			}
+			else_if = {
+				limit = {
+					top_liege ?= {
+						any_councillor ?= { this = root }
+					}
+				}
+				add = {
+					value = 10
+					desc = councillor_position_desc
+				}
+			}
+
+			# COURT POSITIONS
+			if = {
+				limit = {
+					top_liege ?= {
+						legitimacy_level >= 3
+						any_court_position_holder ?= {
+							this = root
+						}
+					}
+				}
+				add = {
+					value = 10
+					desc = court_position_succession_desc
+				}
+			}
+			else_if = {
+				limit = {
+					top_liege ?= {
+						any_court_position_holder ?= {
+							this = root
+						}
+					}
+				}
+				add = {
+					value = 5
+					desc = court_position_succession_desc
+				}
+			}
+
+			# FAITH HOSTILITY
+			##EK EDIT: edited this block to work with faiths hostility
+			#if = {
+			#	limit = {
+			#		top_liege.primary_title.state_faith ?= {
+			#			NOT = { this = root.faith }
+			#			faith_hostility_level = {
+			#				target = root.faith
+			#				value = faith_fully_accepted_level
+			#			}
+			#		}
+			#	} #Change to faith acceptance
+			#	subtract = {
+			#		value = 5
+			#		desc = accepted_faith_succession_desc
+			#	}
+			#}
+			if = { #EK EDIT: was else if
+				limit = {
+					top_liege.primary_title.state_rite ?= {
+						rite_hostility_level = {
+							target = root.rite
+							value = faith_astray_level
+						}
+					}
+				} #Change to faith acceptance
+				subtract = {
+					value = 20
+					if = {
+						#EK ADDITION: bigger debuff for ceremoniarchies
+						limit = {
+							scope:title.holder.top_liege ?= { uses_praxis_mechanics = yes }
+						}
+						value = 200
+					}
+					#EK ADDITION: tolerance laws
+					if = { #No penalties if tolerance law level 2
+						limit = {
+							scope:title.holder = { has_realm_law = religious_tolerance_law_1 }
+						}
+						value = 0
+					}
+					desc = astray_faith_succession_desc
+				}
+			}
+			else_if = {
+				limit = {
+					top_liege.primary_title.state_rite ?= {
+						rite_hostility_level = {
+							target = root.rite
+							value = faith_hostile_level
+						}
+					}
+				} #Change to faith acceptance
+				subtract = {
+					value = 50
+					if = {
+						#EK ADDITION: bigger debuff for ceremoniarchies
+						limit = {
+							scope:title.holder.top_liege ?= { uses_praxis_mechanics = yes }
+						}
+						value = 500
+					}
+					#EK ADDITION: tolerance laws
+					if = { #Smaller penalty if tolerance law level 2
+						limit = {
+							scope:title.holder = { has_realm_law = religious_tolerance_law_1 }
+						}
+						value = 25
+					}
+					if = { #No penalty if tolerance law level 3
+						limit = {
+							scope:title.holder = { has_realm_law = religious_tolerance_law_2 }
+						}
+						value = 0
+					}
+					desc = hostile_faith_succession_desc
+				}
+			}
+			else_if = {
+				limit = {
+					top_liege.primary_title.state_rite ?= {
+						rite_hostility_level = {
+							target = root.rite
+							value >= faith_evil_level
+						}
+					}
+				} #Change to faith acceptance
+				subtract = {
+					value = 100
+					if = {
+						#EK ADDITION: bigger debuff for ceremoniarchies
+						limit = {
+							scope:title.holder.top_liege ?= { uses_praxis_mechanics = yes }
+						}
+						value = 1000
+					}
+					if = { #Smaller penalty if tolerance law level 3
+						limit = {
+							scope:title.holder = { has_realm_law = religious_tolerance_law_2 }
+						}
+						value = 50
+					}
+					desc = evil_faith_sucession_desc
+				}
+			}
+
+			if = { # Score for house members of the emperor is affected by the capital's popular opinion
+				limit = {
+					exists = top_liege.house
+					house ?= top_liege.house
+				}
+				add = {
+					value = top_liege.capital_county.county_holder_opinion
+					desc = popular_opinion_in_capital_desc
+				}
+			}
+
+			# LIFESTYLE PERKS
+			if = {
+				limit = { has_perk = dignitas_perk }
+				add = {
+					value = 30
+					desc = dignitas_perk_name
+				}
+			}
+
+			# TITLE TIER
+			if = {
+				limit = {
+					is_landed = yes
+					highest_held_title_tier = tier_duchy
+				}
+				add = {
+					value = 10
+					desc = duchy_tier_desc
+				}
+			}
+			if = {
+				limit = {
+					is_landed = yes
+					highest_held_title_tier = tier_kingdom
+				}
+				add = {
+					value = 20
+					desc = kingdom_tier_desc
+				}
+			}
+
+			# DIFFERENT CULTURE FROM IMPERIAL CAPITAL
+			if = {
+				limit = {
+					root.top_liege.capital_county.culture ?= {
+						this != root.culture
+						cultural_acceptance = {
+							target = root.culture
+							value = 0
+						}
+					}
+				}
+				subtract = {
+					value = 50
+					desc = no_cultural_acceptance
+				}
+			}
+			else_if = {
+				limit = {
+					root.top_liege.capital_county.culture ?= {
+						this != root.culture
+						cultural_acceptance = {
+							target = root.culture
+							value <= 20
+						}
+					}
+				}
+				subtract = {
+					value = 40
+					desc = terrible_cultural_acceptance
+				}
+			}
+			else_if = {
+				limit = {
+					root.top_liege.capital_county.culture ?= {
+						this != root.culture
+						cultural_acceptance = {
+							target = root.culture
+							value <= 40
+						}
+					}
+				}
+				subtract = {
+					value = 30
+					desc = poor_cultural_acceptance
+				}
+			}
+			else_if = {
+				limit = {
+					root.top_liege.capital_county.culture ?= {
+						this != root.culture
+						cultural_acceptance = {
+							target = root.culture
+							value <= 60
+						}
+					}
+				}
+				subtract = {
+					value = 20
+					desc = mediocre_cultural_acceptance
+				}
+			}
+			else_if = {
+				limit = {
+					root.top_liege.capital_county.culture ?= {
+						this != root.culture
+						cultural_acceptance = {
+							target = root.culture
+							value <= 80
+						}
+					}
+				}
+				subtract = {
+					value = 10
+					desc = accepted_foreign_culture
+				}
+			}
+
+			# ELDEST ELIGIBLE CHILD OF EMPEROR
+			if = {
+				limit = {
+					scope:title.holder = {
+						OR = {
+							has_realm_law = male_preference_law
+							has_realm_law = male_only_law
+						}
+					}
+					is_male = yes
+					is_child_of = scope:title.holder
+					is_eunuch_trigger = no
+					NOT = { has_trait = bastard }
+					any_sibling = {
+						count = 0
+						is_male = yes
+						age > prev.age
+						is_eunuch_trigger = no
+						NOT = { has_trait = bastard }
+					}
+				}
+				add = {
+					value = 30
+					multiply = scope:title.holder.legitimacy_level
+					desc = eldest_imperial_son_desc
+				}
+			}
+			else_if = {
+				limit = {
+					scope:title.holder = {
+						OR = {
+							has_realm_law = female_preference_law
+							has_realm_law = female_only_law
+						}
+					}
+					is_female = yes
+					is_child_of = scope:title.holder
+					NOT = { has_trait = bastard }
+					any_sibling = {
+						count = 0
+						is_female = yes
+						age > prev.age
+						NOT = { has_trait = bastard }
+					}
+				}
+				add = {
+					value = 30
+					multiply = scope:title.holder.legitimacy_level
+					desc = eldest_imperial_daughter_desc
+				}
+			}
+			else_if = {
+				limit = {
+					scope:title.holder = {
+						has_realm_law = equal_law
+					}
+					is_eunuch_trigger = no
+					NOT = { has_trait = bastard }
+					is_child_of = scope:title.holder
+					any_sibling = {
+						count = 0
+						age > prev.age
+						is_eunuch_trigger = no
+						NOT = { has_trait = bastard }
+					}
+				}
+				add = {
+					value = 30
+					multiply = scope:title.holder.legitimacy_level
+					desc = eldest_imperial_child_desc
+				}
+			}
+			# CLOSE FAMILY
+			else_if = {
+				limit = {
+					is_close_family_of = scope:title.holder
+				}
+				add = {
+					value = 20
+					multiply = scope:title.holder.legitimacy_level
+					desc = imperial_close_family_desc
+				}
+			}
+			# EXTENDED FAMILY
+			else_if = {
+				limit = {
+					is_close_or_extended_family_of = scope:title.holder
+				}
+				add = {
+					value = 15
+					multiply = scope:title.holder.legitimacy_level
+					desc = imperial_close_extended_family_desc
+				}
+			}
+			# SAME HOUSE
+			else_if = {
+				limit = {
+					house = top_liege.house
+				}
+				add = {
+					value = 10
+					multiply = scope:title.holder.legitimacy_level
+					desc = imperial_same_house_desc
+				}
+			}
+			#EK ADDITION: empires in Cyrodiil care about dynastic continuty
+			if = {
+				limit = {
+					scope:title.holder ?= { #Current title holder is cyrodiilic and independent
+						is_independent_ruler = yes
+						culture = {
+							has_cultural_pillar = heritage_cyrodiilic
+						}
+					}
+					dynasty = top_liege.dynasty
+				}
+				add = {
+					value = 200
+					multiply = scope:title.holder.legitimacy_level
+					desc = ek_imperial_same_dynasty_desc
+				}
+			}
+
+			# SPOUSE AND THEIR FAMILY
+			if = {
+				limit = {
+					is_spouse_of = scope:title.holder
+				}
+				add = {
+					value = 4
+					multiply = scope:title.holder.legitimacy_level
+					desc = spouse_of_emperor_desc
+				}
+			}
+			if = {
+				limit = {
+					scope:title.holder = {
+						any_spouse = { is_close_family_of = root }
+						NOT = { is_close_family_of = root }
+					}
+				}
+				add = {
+					value = 4
+					multiply = scope:title.holder.legitimacy_level
+					desc = close_family_married_to_holder_desc
+				}
+			}
+
+			# FRIENDS OF THE EMPEROR
+			if = {
+				limit = {
+					has_relation_friend = scope:title.holder
+				}
+				add = {
+					value = scope:title.holder.legitimacy_level
+					multiply = 4
+					desc = imperial_friend_desc
+				}
+			}
+			if = {
+				limit = {
+					has_relation_best_friend = scope:title.holder
+				}
+				add = {
+					value = scope:title.holder.legitimacy_level
+					multiply = 8
+					desc = imperial_best_friend_desc
+				}
+			}
+			if = {
+				limit = {
+					has_relation_ward = scope:title.holder
+				}
+				add = {
+					value = scope:title.holder.legitimacy_level
+					multiply = 8
+					desc = imperial_guardian_desc
+				}
+			}
+			if = {
+				limit = {
+					exists = house
+				}
+				# All get to use their Family Rating
+				add = {
+					value = house.house_power_score
+					multiply = 0.5
+					desc = "[powerful_family_rating|E]"
+				}
+			}
+
+			# MODIFIERS
+			#EK DISABLED
+			#if = {
+			#	limit = {
+			#		has_character_flag = patriarch_support_2030
+			#	}
+			#	add = {
+			#		value = 10
+			#		desc = patriarch_support_2030_desc
+			#	}
+			#}
+
+			if = {
+				limit = { has_character_modifier = restored_greek_theme_modifier }
+				add = {
+					value = 50
+					desc = restored_greek_theme_modifier
+				}
+			}
+			if = {
+				limit = {
+					has_character_flag = decried_weakness_score
+				}
+				add = {
+					value = 20
+					desc = decried_weakness_score_desc
+				}
+			}
+			if = {
+				limit = {
+					has_character_flag = insulted_trait_candidate_score
+				}
+				add = {
+					value = 15
+					desc = insulted_trait_score_desc
+				}
+			}
+			if = {
+				limit = {
+					has_character_flag = boosted_by_sycophant_score
+				}
+				add = {
+					value = 15
+					desc = boosted_by_sycophant_score_desc
+				}
+			}
+
+			# Renounced imperial aspriations (from decision)
+			if = {
+				limit = {
+					OR = {
+						has_character_modifier = ep3_admin_renounce_throne_personal
+						house ?= { has_house_modifier = ep3_admin_renounce_throne_house }
+					}
+				}
+				add = {
+					value = -1000
+					desc = admin_renounced_throne
+				}
+			}
+
+			#Praxis things
+			if = { #Alinor is chosen from among closest descendants of Auriel
+				limit = {
+					OR = {
+						scope:title = title:e_summerset
+						scope:title = title:h_aldmeri_dominion
+						scope:title = title:k_alinor
+						scope:title = title:d_alinor
+						scope:title = title:c_alinor
+					}
+					dynasty = { has_dynasty_modifier = auriels_heirs_dynasty_modifier }
+				}
+				add = {
+					value = 600 #Enough to only consider Auriels (if they're alive of course)
+					desc = ek_auriel_dynasty_desc
+				}
+			}
+			if = { #the other Aedric lineages are more preferable over other dynasties
+				limit = {
+					OR = {
+						scope:title = title:e_summerset
+						scope:title = title:h_aldmeri_dominion
+						scope:title = title:k_alinor
+						scope:title = title:d_alinor
+						scope:title = title:c_alinor
+					}
+					dynasty = {
+						OR = {
+							has_dynasty_modifier = syrabane_heirs_dynasty_modifier
+							has_dynasty_modifier = phynaster_heirs_dynasty_modifier
+							has_dynasty_modifier = xarxes_heirs_dynasty_modifier
+
+						}
+					}
+				}
+				add = {
+					value = 300 #Enough to have priority over most but not compete with Auriels
+					desc = ek_syrabane_dynasty_desc
+				}
+			}
+
+			#Founding dynasties
+			if = {
+				limit = {
+					scope:title = title:k_indoril
+					dynasty = dynasty:dyn_indoril
+				}
+				add = {
+					value = 15 #Smaller than actually aligning with values of the house
+					desc = admin_great_house_founding_dynasty
+				}
+			}
+			if = {
+				limit = {
+					scope:title = title:k_hlaalu
+					dynasty = dynasty:dyn_hlaalu
+				}
+				add = {
+					value = 15
+					desc = admin_great_house_founding_dynasty
+				}
+			}
+			# Crown Republic wanna elect Crowns
+			if = {
+				limit = {
+					scope:title = title:e_crown
+					NOT = { culture = { has_cultural_tradition = tradition_crown_core } }
+				}
+				add = {
+					value = -200 #Pretty big malus
+					desc = admin_not_crown_culture
+				}
+			}
+			# In the unlikely event that the Forebear Union is Admin...
+			if = {
+				limit = {
+					scope:title = title:e_forebear
+					NOT = { culture = { has_cultural_tradition = tradition_forebear_core } }
+				}
+				add = {
+					value = -200 #Pretty big malus
+					desc = admin_not_forebear_culture
+				}
+			}
+			#EK ADDITION END
+
+			add = appointment_score_final_factors
+			# ROUND THE NUMBER
+			divide = 1
+			ceiling = yes
+			multiply = 1
+			# Rise and Fall: preserve Warlord, Puppet Regency and assigned score adjustments.
+
+			if = {
+				limit = {
+					is_child_of = scope:title.holder
+					scope:title.holder = {
+						has_trait = warlord
+						OR = {
+							government_has_flag = government_is_administrative
+							government_has_flag = government_is_celestial
+							government_has_flag = government_is_meritocratic
+							government_has_flag = government_is_japan_administrative
+						}
+					}
+				}
+				add = {
+					value = riseandfall_warlord_child_succession_value
+					desc = riseandfall_warlord_child_succession_desc
+				}
+			}
+			if = {
+				limit = {
+					scope:title.holder ?= {
+						is_close_family_of = root
+						has_trait = warlord
+					}
+				}
+				add = {
+					value = 690
+					desc = riseandfall_warlord_relative_succession_desc
+				}
+			}
+
+			# During an independent Puppet Regency, landed candidates must not
+			# compete with the unlanded court succession pool. Keep normal
+			# administrative appointment behavior outside Puppet Regency.
+			if = {
+				limit = {
+					is_landed = yes
+					scope:title.holder = {
+						is_independent_ruler = yes
+						has_diarchy_type = puppet_regency
+						has_active_diarchy = yes
+					}
+				}
+				subtract = {
+					value = 100000
+					desc = riseandfall_puppet_regency_landed_candidate_desc
+				}
+			}
+
+			# RANDOM ADMIN NERF SCORE (if assigned by scripted effect)
+			if = {
+				limit = { has_variable = riseandfall_admin_nerf }
+				add = {
+					value = var:riseandfall_admin_nerf
+					desc = riseandfall_admin_nerf_desc
+				}
+			}
+		}
+	}
+}
