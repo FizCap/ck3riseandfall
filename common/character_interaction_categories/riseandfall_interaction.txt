@@ -1,0 +1,6 @@
+﻿# Place Rise and Fall after every PoD interaction category.
+interaction_riseandfall = {
+    index = 33
+    desc = "RISEANDFALL_ACTIONS"
+    color = { 1 0 1 1 } # Byzantine purple (approx)
+}

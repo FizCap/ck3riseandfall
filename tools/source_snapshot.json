@@ -1,0 +1,17 @@
+{
+  "sources": {
+    "riseandfall": "version=\"1.4.6\"\ntags={\n\t\"Balance\"\n\t\"Gameplay\"\n\t\"Fixes\"\n}\nname=\"Rise and Fall\"\npicture=\"thumbnail.png\"\nsupported_version=\"1.20.*\"\nremote_file_id=\"3554844335\"",
+    "pod": "version=\"1.20.1\"\ntags={\n\t\"Total Conversion\"\n}\nname=\"Princes of Darkness\"\nsupported_version=\"1.20.*\"\nremote_file_id=\"2216659254\""
+  },
+  "output_sha256": {
+    "gui/window_character.gui": "3e77e5dc75a4fe2b7bc05c98e23785d8bdc6caebee5cedfd2cb463c2427257e7",
+    "gui/window_title.gui": "9941ff20dd7fc91d405485ad1c22bbd2d2daec9d53a58d4763fc66d865596ae1",
+    "gui/interaction_menu_window.gui": "770630b808fb15737f44dd0d839d7bb73e18c5bc5d5582934dae3618e0b81581",
+    "gui/map_icon_layer.gui": "06d523973b8cb63395303d412d4006870d88c18b6b111c075bb2b92edcd094b8",
+    "gui/shared/mapmodes.gui": "62f8ad2ab441ad45ee1c7ac17581078bd7b938fdeb86799284109d14f4761402",
+    "common/laws/00_succession_laws.txt": "ab50f6257e0ebddc6ea20296efd5c953f2797bf62fb76f20ee02eadbf42adbde",
+    "common/character_interactions/riseandfall_war.txt": "ef8c635139ae7ffb1b2c9f4176683ab8c886930672d20ebd679dcd37c03d2071",
+    "common/character_interaction_categories/riseandfall_interaction.txt": "2253fc482dfdd5c4903c5e7e8e986736446c67e707ec6769d166b5298c4c7e14",
+    "common/casus_belli_types/riseandfall_claim_cb.txt": "5f2c3582d69b8382e85456a54b27355ece86497f948039ec3010e21692b0dab8"
+  }
+}
