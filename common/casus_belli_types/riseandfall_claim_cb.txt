@@ -673,18 +673,19 @@
 
     should_show_war_goal_subview = yes
 
-    # Disable passive victory from holding a foothold or waiting in a large realm.
-    # Slower battles can still decide the war; partial occupation only supports them.
+    # No ticking score, so a small foothold or waiting out a large realm can't win the war.
+    # Occupation is uncapped (100) so a side that holds most of the enemy's land can still
+    # win. A 40 cap left the war unwinnable for both sides unless battles made up the rest.
     attacker_ticking_warscore = 0
     defender_ticking_warscore = 0
-    attacker_score_from_battles_scale = 25
-    defender_score_from_battles_scale = 25
+    attacker_score_from_battles_scale = 50
+    defender_score_from_battles_scale = 50
     max_attacker_score_from_battles = 100
     max_defender_score_from_battles = 100
     attacker_score_from_occupation_scale = 100
     defender_score_from_occupation_scale = 100
-    max_attacker_score_from_occupation = 40
-    max_defender_score_from_occupation = 40
+    max_attacker_score_from_occupation = 100
+    max_defender_score_from_occupation = 100
     full_occupation_by_defender_gives_victory = yes
     full_occupation_by_attacker_gives_victory = yes
     landless_attacker_needs_armies = yes

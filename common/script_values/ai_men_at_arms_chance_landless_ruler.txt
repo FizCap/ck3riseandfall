@@ -1,8 +1,6 @@
 ﻿### ai_men_at_arms_chance_landless_ruler
 # Chance the AI will prefer MaA to buildings when they are a landless ruler.
-# Scoped to: root (character)
-# Rise and Fall mod override file. If the realm law `camp_purpose_legitimist` is present
-# the value is forced to 1 and no other modifiers apply.
+# Rise and Fall keeps 1.21 scoring and exempts mod-created legitimist adventurers.
 
 ai_men_at_arms_chance_landless_ruler = {
 	value = {
@@ -47,7 +45,7 @@ ai_men_at_arms_chance_landless_ruler = {
 			}
 			multiply = 0
 		}
-		if = { # To avoid Adventurer travels becoming super-costly provision-wise, they should focus on buildings over MaA at certain ratios
+		if = {
 			limit = {
 				vassal_contract_has_flag = celestial_grand_marshal_obligation
 			}

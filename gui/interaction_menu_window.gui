@@ -346,7 +346,6 @@ types InteractionTypes
 				expand = {}
 
 				hbox = {
-
 				# Rise and Fall: recipient stability and adventurer chance.
 						vbox = {
 							datacontext = "[AccessGameRules.AccessNamedGameRule( 'riseandfall_enable_interaction_stability' ).GetSetting]"
@@ -439,7 +438,7 @@ types InteractionTypes
 		widget = {
 			visible = [CharacterInteractionMenuWindow.OutsideDiplomaticRange]
 			size = { 317 40 }
-
+			
 			tooltip = OUT_OF_DIPLOMACY_RANGE_TOOLTIP
 
 			text_label_center = {
@@ -494,9 +493,9 @@ types InteractionTypes
 
 	type more_interactions_container = container
 	{
+		visible = "[CharacterInteractionMenuWindow.AreMoreInteractionsVisible]"
 		alwaystransparent = no
 		name = "more_interactions_container"
-		visible = "[CharacterInteractionMenuWindow.AreMoreInteractionsVisisble]"
 
 		container = {
 			#this is used in code as an offset to its position

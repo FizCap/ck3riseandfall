@@ -14,6 +14,7 @@
 				desc = sum_of_skills_desc
 			}
 
+
 			add = appointment_score_base
 			add = appointment_score_non_military
 			add = appointment_score_non_merit
@@ -55,6 +56,7 @@
 				}
 			}
 			add = appointment_score_final_factors
+
 			# Rise and Fall: preserve Warlord, Puppet Regency and assigned score adjustments.
 
 

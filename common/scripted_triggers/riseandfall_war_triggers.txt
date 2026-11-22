@@ -1,4 +1,4 @@
-﻿# Keep 1.20 target validation; Warlords bypass only administrative war-law bans.
+﻿# 1.21 target validation. Warlords bypass only the administrative and permanent vassal war-law bans.
 riseandfall_allows_declaring_war_against_target_trigger = {
 	save_temporary_scope_as = attacker_check
 	$TARGET$ = { save_temporary_scope_as = defender_check }
@@ -77,6 +77,16 @@ riseandfall_allows_declaring_war_against_target_trigger = {
 			}
 		}
 	}
+	trigger_if = {
+		limit = {
+			has_realm_law = japanese_bureaucracy_3
+			this != top_liege
+		}
+		custom_tooltip = {
+			text = non_admin_vassal_japanese_bureaucracy_3
+			government_has_mechanic = administrative
+		}
+	}
 	scope:defender_check = {
 		custom_tooltip = {
 			text = is_a_herder_recipient_tt
@@ -89,6 +99,33 @@ riseandfall_allows_declaring_war_against_target_trigger = {
 			custom_tooltip = {
 				text = declare_war_target_is_your_prisoner_tt
 				imprisoner != scope:attacker_check
+			}
+		}
+	}
+	trigger_if = {
+		limit = {
+			gdp_is_protected_city_war_target_trigger = { TARGET = scope:defender_check }
+			NOT = { has_strong_usable_hook = liege }
+		}
+		trigger_if = {
+			limit = { NOT = { exists = scope:recipient } }
+			scope:defender_check = {
+				save_temporary_scope_as = recipient
+			}
+		}
+		scope:defender_check = {
+			trigger_if = {
+				limit = { vassal_contract_has_flag = free_city_obligation }
+				custom_tooltip = {
+					text = declare_war_target_is_free_city_tt
+					always = no
+				}
+			}
+			trigger_else = {
+				custom_tooltip = {
+					text = declare_war_target_is_chartered_city_tt
+					always = no
+				}
 			}
 		}
 	}
@@ -144,6 +181,10 @@ riseandfall_allows_declaring_war_against_target_trigger = {
 							top_liege = {
 								has_realm_law_flag = admin_vassal_wars_permission_only
 							}
+						}
+						custom_tooltip = {
+							text = admin_all_vassal_wars_banned
+							admin_governor_allows_declaring_war_trigger = yes
 						}
 						custom_tooltip = {
 							text = admin_vassal_wars_permission_only_desc
@@ -223,6 +264,70 @@ riseandfall_allows_declaring_war_against_target_trigger = {
 		NOT = {
 			scope:defender_check = {
 				is_member_of_confederation = scope:attacker_check.confederation
+			}
+		}
+	}
+	# Republican rulers must seek approval if the law demands it
+	trigger_if = {
+		limit = {
+			has_realm_law_flag = republic_war_approval_required
+			highest_liege_matching_rule:uses_assembly != scope:defender_check # Approval is not needed against the republic's ruler
+		}
+		custom_tooltip = {
+			text = must_have_assembly_approval_declare_war_desc
+			has_variable = has_assembly_approval_declare_war
+		}
+	}
+	#You're under Peace Privilege; no wars allowed against the opposite side
+	custom_tooltip = {
+		text = not_attack_gg_during_repose_tt
+		trigger_if = {
+			limit = {
+				situation:guelph_ghibelline ?= { situation_current_phase = repose }
+				OR = {
+					is_guelph_trigger = yes
+					is_ghibelline_trigger = yes
+				}
+			}
+			NOR = {
+				AND = {
+					is_guelph_trigger = yes
+					scope:recipient = { is_ghibelline_trigger = yes }
+				}
+				AND = {
+					is_ghibelline_trigger = yes
+					scope:recipient = { is_guelph_trigger = yes }
+				}
+			}
+		}
+	}
+
+	#The Guelphs won the GG Situation; no HRE wars against theocratic vassals
+	custom_tooltip = {
+		text = guelph_victory_hre_no_theocracy_cb_tt
+		trigger_if = {
+			limit = { exists = var:gg_ended_in_guelph_victory_no_hre_wars_on_theocratic_vassals }
+			NOT = {
+				this = title:e_hre.holder
+				scope:defender_check = {
+					is_vassal_of = title:e_hre.holder
+					government_has_flag = government_is_ecclesiastical
+				}
+			}
+		}
+	}
+	#... nor against rulers in Northern Italy
+	custom_tooltip = {
+		text = guelph_victory_hre_no_cb_tt
+		trigger_if = {
+			limit = { exists = var:gg_hre_no_cb_northern_italy }
+			NOT = {
+				this = title:e_hre.holder
+				scope:defender_check = {
+					primary_title = {
+						title_province = { geographical_region = gdp_guelph_ghibelline_northern_italy_region }
+					}
+				}
 			}
 		}
 	}

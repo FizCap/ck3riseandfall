@@ -602,8 +602,8 @@ riseandfall_do_create_adventurer_se = {
 
 riseandfall_adventurer_press_claims_se = {
     # Called with saved scope: scope:independent_adventurer = the adventurer character.
-    # War declarations mirror the Diadochi path: validate against vanilla-style gates,
-    # then let the engine score and start the prepared adventurer claim war.
+    # Validate the prepared target explicitly before starting the claim war.
+    # Both yearly declaration paths share these restrictions.
     scope:independent_adventurer = {
         # Prefer the origin claim target used during adventurer creation.
         if = {
@@ -700,14 +700,9 @@ riseandfall_adventurer_press_claims_se = {
                         is_allied_to = scope:claim_target_title.holder
                     }
                 }
-                trigger_if = {
-                    limit = {
-                        culture = { has_cultural_parameter = cannot_attack_truces }
-                    }
-                    NOT = {
-                        has_truce = scope:claim_target_title.holder
-                    }
-                }
+                # Scripted invasions must always honor the adventurer's truce,
+                # regardless of whether their culture forbids truce-breaking.
+                NOT = { has_truce = scope:claim_target_title.holder }
                 is_imprisoned = no
                 trigger_if = {
                     limit = {

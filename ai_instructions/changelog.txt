@@ -1,2 +1,3 @@
-﻿CK3: Rise and Fall - 1.4.5
-- Fixed Puppet Regency dismissal to use vanilla Scales of Power thresholds, allowing dismissal at low regent power.
+﻿CK3: Rise and Fall - 1.4.6
+- Updated overwritten interface and succession files for Crusader Kings III 1.21, including the trade map icons, trade character widgets, and merchant succession rules.
+- Fixed Adventurer Claim wars stalling forever: occupation war score is no longer capped at 40%, and battles now count for twice as much war score.

@@ -1,4 +1,4 @@
-﻿# Rise and Fall: 1.20 puppet-aware vanilla interaction with Warlord war-law validation.
+﻿# Rise and Fall: 1.21 puppet-aware Declare War, with Warlord exemptions in the target-validation trigger.
 declare_war_interaction = {
 	category = interaction_category_diplomacy
 	common_interaction = yes
@@ -21,6 +21,10 @@ declare_war_interaction = {
 			NOT = {
 				is_at_war_with = scope:recipient
 			}
+			trigger_if = {
+				limit = { government_has_flag = government_is_merchant }
+				has_any_display_cb_on = scope:recipient
+			}
 		}
 	}
 
@@ -37,6 +41,7 @@ declare_war_interaction = {
 				has_any_display_cb_on = scope:recipient
 			}
 			riseandfall_allows_declaring_war_against_target_trigger = { TARGET = scope:recipient }
+
 		}
 	}
 
@@ -45,6 +50,15 @@ declare_war_interaction = {
 			text = "declare_war_hook_on_liege"
 			OR = {
 				scope:puppet_or_actor = { war_declarer_needs_hook_on_liege = no }
+				always = scope:hook
+			}
+		}
+		trigger_if = {
+			limit = {
+				scope:puppet_or_actor = { gdp_is_protected_city_war_target_trigger = { TARGET = scope:recipient } }
+			}
+			custom_tooltip = {
+				text = declare_war_strong_hook_on_protected_city_tt
 				always = scope:hook
 			}
 		}
@@ -65,11 +79,22 @@ declare_war_interaction = {
 	send_options_exclusive = no
 	send_option = {
 		is_shown = {
-			scope:puppet_or_actor = { war_declarer_needs_hook_on_liege = yes }
+			scope:puppet_or_actor = {
+				OR = {
+					war_declarer_needs_hook_on_liege = yes
+					gdp_is_protected_city_war_target_trigger = { TARGET = scope:recipient }
+				}
+			}
 		}
 		is_valid = {
 			scope:puppet_or_actor = {
-				has_usable_hook = liege
+				trigger_if = {
+					limit = { gdp_is_protected_city_war_target_trigger = { TARGET = scope:recipient } }
+					has_strong_usable_hook = liege
+				}
+				trigger_else = {
+					has_usable_hook = liege
+				}
 			}
 		}
 		flag = hook
@@ -77,8 +102,16 @@ declare_war_interaction = {
 		can_invalidate_interaction = yes
 	}
 	should_use_extra_icon = {
-		scope:puppet_or_actor = { war_declarer_needs_hook_on_liege = yes }
-		scope:puppet_or_actor = { has_usable_hook = liege }
+		scope:puppet_or_actor = {
+			trigger_if = {
+				limit = { gdp_is_protected_city_war_target_trigger = { TARGET = scope:recipient } }
+				has_strong_usable_hook = liege
+			}
+			trigger_else = {
+				war_declarer_needs_hook_on_liege = yes
+				has_usable_hook = liege
+			}
+		}
 	}
 	extra_icon = "gfx/interface/icons/character_interactions/hook_icon.dds"
 
@@ -241,6 +274,14 @@ declare_war_interaction = {
 					has_variable = admin_permission_to_declare_war
 				}
 				remove_variable = admin_permission_to_declare_war
+			}
+
+			# If you are republic and had permission to start war, spend said permission
+			if = {
+				limit = {
+					has_variable = has_assembly_approval_declare_war
+				}
+				remove_variable = has_assembly_approval_declare_war
 			}
 		}
 		hidden_effect = {
